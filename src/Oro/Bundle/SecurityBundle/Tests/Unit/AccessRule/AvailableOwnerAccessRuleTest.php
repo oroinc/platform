@@ -15,14 +15,13 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AvailableOwnerAccessRuleTest extends \PHPUnit\Framework\TestCase
+class AvailableOwnerAccessRuleTest extends TestCase
 {
-    /** @var AclConditionDataBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $builder;
-
-    /** @var AvailableOwnerAccessRule */
-    private $rule;
+    private AclConditionDataBuilderInterface&MockObject $builder;
+    private AvailableOwnerAccessRule $rule;
 
     #[\Override]
     protected function setUp(): void
@@ -44,7 +43,7 @@ class AvailableOwnerAccessRuleTest extends \PHPUnit\Framework\TestCase
         $this->rule = new AvailableOwnerAccessRule($this->builder, $ownershipMetadataProvider);
     }
 
-    public function testIsApplicableWithNotRootEntity()
+    public function testIsApplicableWithNotRootEntity(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e', 'CREATE', false);
         $criteria->setOption(AvailableOwnerAccessRule::TARGET_ENTITY_CLASS, CmsAddress::class);
@@ -52,14 +51,14 @@ class AvailableOwnerAccessRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->rule->isApplicable($criteria));
     }
 
-    public function testIsApplicableWithRootEntityButWithoutTargetEntityClass()
+    public function testIsApplicableWithRootEntityButWithoutTargetEntityClass(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e', 'CREATE', true);
 
         $this->assertFalse($this->rule->isApplicable($criteria));
     }
 
-    public function testIsApplicableWithRootEntityAndTargetEntityClass()
+    public function testIsApplicableWithRootEntityAndTargetEntityClass(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e', 'CREATE', true);
         $criteria->setOption(AvailableOwnerAccessRule::TARGET_ENTITY_CLASS, CmsAddress::class);
@@ -67,7 +66,7 @@ class AvailableOwnerAccessRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->rule->isApplicable($criteria));
     }
 
-    public function testProcessOnEntityWithFullAccess()
+    public function testProcessOnEntityWithFullAccess(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'owner', 'CREATE');
         $criteria->setOption(AvailableOwnerAccessRule::TARGET_ENTITY_CLASS, CmsAddress::class);
@@ -81,7 +80,7 @@ class AvailableOwnerAccessRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($criteria->getExpression());
     }
 
-    public function testProcessOnEntityWithNoAccess()
+    public function testProcessOnEntityWithNoAccess(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'owner', 'CREATE');
         $criteria->setOption(AvailableOwnerAccessRule::TARGET_ENTITY_CLASS, CmsAddress::class);
@@ -95,7 +94,7 @@ class AvailableOwnerAccessRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(AccessDenied::class, $criteria->getExpression());
     }
 
-    public function testProcessOnEntityWithSingleOwnerRestriction()
+    public function testProcessOnEntityWithSingleOwnerRestriction(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'owner', 'CREATE');
         $criteria->setOption(AvailableOwnerAccessRule::TARGET_ENTITY_CLASS, CmsAddress::class);
@@ -112,7 +111,7 @@ class AvailableOwnerAccessRuleTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessOnEntityWithArrayOwnerRestriction()
+    public function testProcessOnEntityWithArrayOwnerRestriction(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'owner', 'CREATE');
         $criteria->setOption(AvailableOwnerAccessRule::TARGET_ENTITY_CLASS, CmsAddress::class);
@@ -129,7 +128,7 @@ class AvailableOwnerAccessRuleTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessOnEntityWithOrganizationRestriction()
+    public function testProcessOnEntityWithOrganizationRestriction(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'owner', 'CREATE');
         $criteria->setOption(AvailableOwnerAccessRule::TARGET_ENTITY_CLASS, CmsAddress::class);
@@ -146,7 +145,7 @@ class AvailableOwnerAccessRuleTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessOnEntityWithOwnerAndOrganizationRestriction()
+    public function testProcessOnEntityWithOwnerAndOrganizationRestriction(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'owner', 'CREATE');
         $criteria->setOption(AvailableOwnerAccessRule::TARGET_ENTITY_CLASS, CmsAddress::class);
@@ -169,7 +168,7 @@ class AvailableOwnerAccessRuleTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessOnEntityWithOwnerAndOrganizationRestrictionAndCurrentOwnerOption()
+    public function testProcessOnEntityWithOwnerAndOrganizationRestrictionAndCurrentOwnerOption(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'owner', 'CREATE');
         $criteria->setOption(AvailableOwnerAccessRule::TARGET_ENTITY_CLASS, CmsAddress::class);

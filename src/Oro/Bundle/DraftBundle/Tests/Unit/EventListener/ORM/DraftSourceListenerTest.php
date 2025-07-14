@@ -7,8 +7,9 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\DraftBundle\EventListener\ORM\DraftSourceListener;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
+use PHPUnit\Framework\TestCase;
 
-class DraftSourceListenerTest extends \PHPUnit\Framework\TestCase
+class DraftSourceListenerTest extends TestCase
 {
     /**
      * @dataProvider getSupportedPlatformDataProvider

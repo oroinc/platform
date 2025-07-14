@@ -8,22 +8,17 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Bundle\SecurityBundle\Exception\InvalidTokenSerializationException;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobManagerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class SecurityAwareJobExtensionTest extends \PHPUnit\Framework\TestCase
+class SecurityAwareJobExtensionTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
-    private $tokenStorage;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenSerializerInterface */
-    private $tokenSerializer;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|JobManagerInterface */
-    private $jobManager;
-
-    /** @var SecurityAwareJobExtension */
-    private $extension;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private TokenSerializerInterface&MockObject $tokenSerializer;
+    private JobManagerInterface&MockObject $jobManager;
+    private SecurityAwareJobExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +34,7 @@ class SecurityAwareJobExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnPreRunUniqueShouldDoNothingIfNoSecurityTokenInTokenStorage()
+    public function testOnPreRunUniqueShouldDoNothingIfNoSecurityTokenInTokenStorage(): void
     {
         $rootJob = new Job();
         $job = new Job();
@@ -57,7 +52,7 @@ class SecurityAwareJobExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($job->getProperties());
     }
 
-    public function testOnPreRunUniqueShouldDoNothingIfRootJobAlreadyHasSecurityToken()
+    public function testOnPreRunUniqueShouldDoNothingIfRootJobAlreadyHasSecurityToken(): void
     {
         $rootJob = new Job();
         $job = new Job();
@@ -78,7 +73,7 @@ class SecurityAwareJobExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($job->getProperties());
     }
 
-    public function testOnPreRunUniqueShouldAddSecurityTokenToRootJobIfItIsNotSetYet()
+    public function testOnPreRunUniqueShouldAddSecurityTokenToRootJobIfItIsNotSetYet(): void
     {
         $rootJob = new Job();
         $job = new Job();
@@ -107,7 +102,7 @@ class SecurityAwareJobExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($job->getProperties());
     }
 
-    public function testOnPreRunUniqueShouldNotAddSecurityTokenToRootJobIfTokenCannotBeSerialized()
+    public function testOnPreRunUniqueShouldNotAddSecurityTokenToRootJobIfTokenCannotBeSerialized(): void
     {
         $rootJob = new Job();
         $job = new Job();

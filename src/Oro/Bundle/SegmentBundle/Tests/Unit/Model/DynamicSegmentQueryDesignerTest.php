@@ -11,7 +11,7 @@ use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 
 class DynamicSegmentQueryDesignerTest extends SegmentDefinitionTestCase
 {
-    public function testQueryDesignerForValidDefinition()
+    public function testQueryDesignerForValidDefinition(): void
     {
         $segment = $this->getSegment([
             'columns' => [
@@ -83,7 +83,7 @@ class DynamicSegmentQueryDesignerTest extends SegmentDefinitionTestCase
         $this->assertEquals($segment->getEntity(), $queryDesigner->getEntity());
     }
 
-    public function testQueryDesignerForInvalidDefinition()
+    public function testQueryDesignerForInvalidDefinition(): void
     {
         $this->expectException(InvalidConfigurationException::class);
 

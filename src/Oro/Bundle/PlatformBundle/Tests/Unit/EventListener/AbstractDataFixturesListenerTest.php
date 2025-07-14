@@ -7,16 +7,15 @@ use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutorInterface;
 use Oro\Bundle\PlatformBundle\EventListener\AbstractDataFixturesListener;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AbstractDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
+class AbstractDataFixturesListenerTest extends TestCase
 {
     private const LISTENERS = ['test_listener_1', 'test_listener_2'];
 
-    /** @var OptionalListenerManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $listenerManager;
-
-    /** @var AbstractDataFixturesListener */
-    private $listener;
+    private OptionalListenerManager&MockObject $listenerManager;
+    private AbstractDataFixturesListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +35,7 @@ class AbstractDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnPreLoad()
+    public function testOnPreLoad(): void
     {
         $this->listenerManager->expects(self::once())
             ->method('disableListeners')
@@ -45,7 +44,7 @@ class AbstractDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onPreLoad($this->getEvent(DataFixturesExecutorInterface::MAIN_FIXTURES));
     }
 
-    public function testOnPostLoad()
+    public function testOnPostLoad(): void
     {
         $this->listenerManager->expects(self::once())
             ->method('enableListeners')

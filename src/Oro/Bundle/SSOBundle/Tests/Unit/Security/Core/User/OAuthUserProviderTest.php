@@ -11,20 +11,17 @@ use Oro\Bundle\SSOBundle\Security\Core\User\OAuthUserProviderInterface;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\LockedException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
-class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
+class OAuthUserProviderTest extends TestCase
 {
-    /** @var OAuthUserProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $userProvider;
-
-    /** @var UserCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $userChecker;
-
-    /** @var OAuthUserProvider */
-    private $provider;
+    private OAuthUserProviderInterface&MockObject $userProvider;
+    private UserCheckerInterface&MockObject $userChecker;
+    private OAuthUserProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -63,7 +60,7 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
         return $userResponse;
     }
 
-    public function testShouldThrowExceptionIfUserProviderNotFound()
+    public function testShouldThrowExceptionIfUserProviderNotFound(): void
     {
         $this->expectException(ResourceOwnerNotAllowedException::class);
         $this->expectExceptionMessage('SSO is not supported.');
@@ -73,7 +70,7 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldThrowExceptionIfSsoIsDisabled()
+    public function testShouldThrowExceptionIfSsoIsDisabled(): void
     {
         $this->expectException(ResourceOwnerNotAllowedException::class);
         $this->expectExceptionMessage('SSO is not enabled.');
@@ -85,7 +82,7 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->loadUserByOAuthUserResponse($this->getUserResponse());
     }
 
-    public function testShouldReturnUserByOAuthIdWhenUserFound()
+    public function testShouldReturnUserByOAuthIdWhenUserFound(): void
     {
         $user = new User();
         $user->addUserRole(new Role());
@@ -107,7 +104,7 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame($user, $loadedUser);
     }
 
-    public function testShouldReturnUserByOAuthIdWhenUserFoundAndEmailIsAllowed()
+    public function testShouldReturnUserByOAuthIdWhenUserFoundAndEmailIsAllowed(): void
     {
         $user = new User();
         $user->addUserRole(new Role());
@@ -129,7 +126,7 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame($user, $loadedUser);
     }
 
-    public function testShouldThrowExceptionWhenEmailIsNotAllowed()
+    public function testShouldThrowExceptionWhenEmailIsNotAllowed(): void
     {
         $this->expectException(EmailDomainNotAllowedException::class);
         $this->expectExceptionMessage('The user email is not allowed.');
@@ -146,7 +143,7 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->loadUserByOAuthUserResponse($this->getUserResponse());
     }
 
-    public function testShouldThrowExceptionIfUserIsDisabled()
+    public function testShouldThrowExceptionIfUserIsDisabled(): void
     {
         $this->expectException(LockedException::class);
         $this->expectExceptionMessage('Account is locked.');
@@ -179,7 +176,7 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->loadUserByOAuthUserResponse($userResponse);
     }
 
-    public function testShouldThrowExceptionIfUserNotFound()
+    public function testShouldThrowExceptionIfUserNotFound(): void
     {
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('The user does not exist.');

@@ -6,11 +6,11 @@ use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class ActiveDashboardTest extends \PHPUnit\Framework\TestCase
+class ActiveDashboardTest extends TestCase
 {
-    /** @var ActiveDashboard */
-    private $activeDashboard;
+    private ActiveDashboard $activeDashboard;
 
     #[\Override]
     protected function setUp(): void
@@ -18,30 +18,30 @@ class ActiveDashboardTest extends \PHPUnit\Framework\TestCase
         $this->activeDashboard = new ActiveDashboard();
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $this->assertNull($this->activeDashboard->getUser());
     }
 
-    public function testSetAndGetUser()
+    public function testSetAndGetUser(): void
     {
-        $expected  = $this->createMock(User::class);
+        $expected = $this->createMock(User::class);
 
         $this->activeDashboard->setUser($expected);
 
         $this->assertSame($expected, $this->activeDashboard->getUser());
     }
 
-    public function testSetAndGetDashboard()
+    public function testSetAndGetDashboard(): void
     {
-        $expected  = $this->createMock(Dashboard::class);
+        $expected = $this->createMock(Dashboard::class);
 
         $this->activeDashboard->setDashboard($expected);
 
         $this->assertSame($expected, $this->activeDashboard->getDashboard());
     }
 
-    public function testOrganization()
+    public function testOrganization(): void
     {
         $this->assertNull($this->activeDashboard->getOrganization());
         $value = $this->createMock(Organization::class);

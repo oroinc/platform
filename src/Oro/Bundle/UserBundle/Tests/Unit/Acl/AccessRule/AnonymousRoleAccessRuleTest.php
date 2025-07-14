@@ -8,8 +8,9 @@ use Oro\Bundle\SecurityBundle\AccessRule\Expr\Path;
 use Oro\Bundle\UserBundle\Acl\AccessRule\AnonymousRoleAccessRule;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class AnonymousRoleAccessRuleTest extends \PHPUnit\Framework\TestCase
+class AnonymousRoleAccessRuleTest extends TestCase
 {
     private AnonymousRoleAccessRule $accessRule;
 
@@ -19,12 +20,12 @@ class AnonymousRoleAccessRuleTest extends \PHPUnit\Framework\TestCase
         $this->accessRule = new AnonymousRoleAccessRule();
     }
 
-    public function testIsApplicable()
+    public function testIsApplicable(): void
     {
         $this->assertTrue($this->accessRule->isApplicable($this->createMock(Criteria::class)));
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $criteria = new Criteria('ORM', Role::class, 'test');
         $this->accessRule->process($criteria);

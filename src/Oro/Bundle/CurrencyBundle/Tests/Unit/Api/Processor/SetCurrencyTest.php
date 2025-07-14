@@ -7,6 +7,7 @@ use Oro\Bundle\CurrencyBundle\Api\Processor\SetCurrency;
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Api\Stub\CurrencyAwareStub;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -15,11 +16,8 @@ class SetCurrencyTest extends CustomizeFormDataProcessorTestCase
 {
     private const CURRENCY_FIELD_NAME = 'currency';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LocaleSettings */
-    private $localeSettings;
-
-    /** @var SetCurrency */
-    private $processor;
+    private LocaleSettings&MockObject $localeSettings;
+    private SetCurrency $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -47,7 +45,7 @@ class SetCurrencyTest extends CustomizeFormDataProcessorTestCase
         );
     }
 
-    public function testProcessWhenFormHasSubmittedCurrencyField()
+    public function testProcessWhenFormHasSubmittedCurrencyField(): void
     {
         $entity = new CurrencyAwareStub();
         $currency = 'USD';
@@ -69,7 +67,7 @@ class SetCurrencyTest extends CustomizeFormDataProcessorTestCase
         self::assertSame($currency, $entity->getCurrency());
     }
 
-    public function testProcessWhenFormHasSubmittedCurrencyFieldButItIsNotMapped()
+    public function testProcessWhenFormHasSubmittedCurrencyFieldButItIsNotMapped(): void
     {
         $entity = new CurrencyAwareStub();
         $currency = 'USD';
@@ -92,7 +90,7 @@ class SetCurrencyTest extends CustomizeFormDataProcessorTestCase
         self::assertSame($currency, $entity->getCurrency());
     }
 
-    public function testProcessWhenFormDoesNotHaveCurrencyField()
+    public function testProcessWhenFormDoesNotHaveCurrencyField(): void
     {
         $entity = new CurrencyAwareStub();
         $currency = 'USD';
@@ -112,7 +110,7 @@ class SetCurrencyTest extends CustomizeFormDataProcessorTestCase
         self::assertSame($currency, $entity->getCurrency());
     }
 
-    public function testProcessWhenFormHasNotSubmittedCurrencyField()
+    public function testProcessWhenFormHasNotSubmittedCurrencyField(): void
     {
         $entity = new CurrencyAwareStub();
         $currency = 'USD';
@@ -133,7 +131,7 @@ class SetCurrencyTest extends CustomizeFormDataProcessorTestCase
         self::assertSame($currency, $entity->getCurrency());
     }
 
-    public function testProcessWhenFormHasNotSubmittedRenamedCurrencyField()
+    public function testProcessWhenFormHasNotSubmittedRenamedCurrencyField(): void
     {
         $entity = new CurrencyAwareStub();
         $currency = 'USD';
@@ -154,7 +152,7 @@ class SetCurrencyTest extends CustomizeFormDataProcessorTestCase
         self::assertSame($currency, $entity->getCurrency());
     }
 
-    public function testProcessWhenFormHasNotSubmittedCurrencyFieldAndNoCurrencyInLocaleSettings()
+    public function testProcessWhenFormHasNotSubmittedCurrencyFieldAndNoCurrencyInLocaleSettings(): void
     {
         $entity = new CurrencyAwareStub();
 
@@ -174,7 +172,7 @@ class SetCurrencyTest extends CustomizeFormDataProcessorTestCase
         self::assertNull($entity->getCurrency());
     }
 
-    public function testProcessWhenFormHasNotSubmittedCurrencyFieldButCurrencyAlreadySetToEntity()
+    public function testProcessWhenFormHasNotSubmittedCurrencyFieldButCurrencyAlreadySetToEntity(): void
     {
         $entity = new CurrencyAwareStub();
         $currency = 'USD';

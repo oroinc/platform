@@ -12,23 +12,16 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\EventListener\RowSelectionListener;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
+class RowSelectionListenerTest extends TestCase
 {
-    /** @var BuildAfter|\PHPUnit\Framework\MockObject\MockObject */
-    private $event;
-
-    /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagrid;
-
-    /** @var OrmDatasource|\PHPUnit\Framework\MockObject\MockObject */
-    private $datasource;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var RowSelectionListener */
-    private $listener;
+    private BuildAfter&MockObject $event;
+    private DatagridInterface&MockObject $datagrid;
+    private OrmDatasource&MockObject $datasource;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private RowSelectionListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -49,7 +42,7 @@ class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
         array $expectedConfig,
         array $classMetadataArray,
         array $expectedBindParameters
-    ) {
+    ): void {
         $config = DatagridConfiguration::create($config);
 
         $classMetadata = new ClassMetadata('');
@@ -277,7 +270,7 @@ class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testOnBuildAfterWorksSkippedForNotApplicableDatasource()
+    public function testOnBuildAfterWorksSkippedForNotApplicableDatasource(): void
     {
         $this->event->expects($this->once())
             ->method('getDatagrid')

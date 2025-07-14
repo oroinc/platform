@@ -5,10 +5,11 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Job\Extension;
 use Oro\Component\MessageQueue\Job\Extension\JobExtension;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Log\ConsumerState;
+use PHPUnit\Framework\TestCase;
 
-class JobExtensionTest extends \PHPUnit\Framework\TestCase
+class JobExtensionTest extends TestCase
 {
-    public function testOnPreRunUnique()
+    public function testOnPreRunUnique(): void
     {
         $job = new Job();
 
@@ -20,7 +21,7 @@ class JobExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($job, $consumerState->getJob());
     }
 
-    public function testOnPostRunUnique()
+    public function testOnPostRunUnique(): void
     {
         $job = new Job();
 
@@ -33,7 +34,7 @@ class JobExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($consumerState->getJob());
     }
 
-    public function testOnPreRunDelayed()
+    public function testOnPreRunDelayed(): void
     {
         $job = new Job();
 
@@ -45,7 +46,7 @@ class JobExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($job, $consumerState->getJob());
     }
 
-    public function testOnPostRunDelayed()
+    public function testOnPostRunDelayed(): void
     {
         $job = new Job();
 
@@ -58,7 +59,7 @@ class JobExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($consumerState->getJob());
     }
 
-    public function testOnCancel()
+    public function testOnCancel(): void
     {
         $job = new Job();
 

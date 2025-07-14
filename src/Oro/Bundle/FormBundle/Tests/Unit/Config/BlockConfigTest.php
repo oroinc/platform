@@ -131,7 +131,7 @@ class BlockConfigTest extends TestCase
             $blockDescription = !empty($data['description']) ? $data['description'] : null;
             $blockDescriptionStyle = !empty($data['descriptionStyle']) ? $data['descriptionStyle'] : null;
             $tooltip = !empty($data['tooltip']) ? $data['tooltip'] : null;
-            $subblocks[]      = [
+            $subblocks[] = [
                 'code'        => $code,
                 'title'       => $data['title'],
                 'data'        => ['some_data'],
@@ -140,7 +140,7 @@ class BlockConfigTest extends TestCase
                 'tooltip'     => $tooltip,
                 'useSpan'     => true
             ];
-            $subBlock         = new SubBlockConfig($code);
+            $subBlock = new SubBlockConfig($code);
 
             /** test SubBlockConfig set/get Title/Priority/Code */
             $subBlock->setTitle($data['title']);

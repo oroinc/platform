@@ -4,20 +4,17 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\EventListener\DebugVoteListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\EventListener\VoteListener;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Event\VoteEvent;
 
-class DebugVoteListenerTest extends \PHPUnit\Framework\TestCase
+class DebugVoteListenerTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var VoteListener|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerListener;
-
-    /** @var DebugVoteListener */
-    private $listener;
+    private ConfigManager&MockObject $configManager;
+    private VoteListener&MockObject $innerListener;
+    private DebugVoteListener $listener;
 
     #[\Override]
     protected function setUp(): void

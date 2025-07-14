@@ -4,15 +4,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation\Helper;
 
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Translation\Helper\TransitionTranslationHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
+class TransitionTranslationHelperTest extends TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var TransitionTranslationHelper */
-    private $helper;
+    private TranslatorInterface&MockObject $translator;
+    private TransitionTranslationHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processTransitionTranslationsProvider
      */
-    public function testProcessTransitionTranslations(array $inputData, array $expectedData)
+    public function testProcessTransitionTranslations(array $inputData, array $expectedData): void
     {
         $this->translator->expects($this->any())
             ->method('trans')

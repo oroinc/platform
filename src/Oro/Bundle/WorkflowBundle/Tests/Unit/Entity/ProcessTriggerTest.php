@@ -6,14 +6,14 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
+class ProcessTriggerTest extends TestCase
 {
-    /** @var ProcessTrigger */
-    private $entity;
+    private ProcessTrigger $entity;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +21,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
         $this->entity = new ProcessTrigger();
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertNull($this->entity->getId());
 
@@ -33,7 +33,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setGetDataProvider
      */
-    public function testSetGetEntity(string $propertyName, mixed $testValue, mixed $defaultValue = null)
+    public function testSetGetEntity(string $propertyName, mixed $testValue, mixed $defaultValue = null): void
     {
         $setter = 'set' . ucfirst($propertyName);
         $getter = (is_bool($testValue) ? 'is' : 'get') . ucfirst($propertyName);
@@ -60,7 +60,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dateIntervalAndSecondsDataProvider
      */
-    public function testConvertDateIntervalToSeconds(\DateInterval $interval, int $seconds)
+    public function testConvertDateIntervalToSeconds(\DateInterval $interval, int $seconds): void
     {
         $this->assertEquals($seconds, ProcessTrigger::convertDateIntervalToSeconds($interval));
     }
@@ -68,7 +68,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dateIntervalAndSecondsDataProvider
      */
-    public function testConvertSecondsToDateInterval(\DateInterval $interval, int $seconds)
+    public function testConvertSecondsToDateInterval(\DateInterval $interval, int $seconds): void
     {
         $actualInterval = ProcessTrigger::convertSecondsToDateInterval($seconds);
 
@@ -92,7 +92,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSetGetTimeShiftInterval()
+    public function testSetGetTimeShiftInterval(): void
     {
         $this->assertNull($this->entity->getTimeShift());
         $this->assertNull($this->entity->getTimeShiftInterval());
@@ -106,7 +106,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->entity->getTimeShiftInterval());
     }
 
-    public function testPrePersist()
+    public function testPrePersist(): void
     {
         $this->assertNull($this->entity->getCreatedAt());
         $this->assertNull($this->entity->getUpdatedAt());
@@ -119,7 +119,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('UTC', $this->entity->getUpdatedAt()->getTimezone()->getName());
     }
 
-    public function testPreUpdate()
+    public function testPreUpdate(): void
     {
         $this->assertNull($this->entity->getUpdatedAt());
 
@@ -129,7 +129,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('UTC', $this->entity->getUpdatedAt()->getTimezone()->getName());
     }
 
-    public function testImport()
+    public function testImport(): void
     {
         $importedDefinition = new ProcessDefinition();
 
@@ -165,7 +165,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider testIsDefinitiveEqualData
      */
-    public function testIsDefinitiveEqual(array $trigger1Attributes, array $trigger2Attributes, bool $expected)
+    public function testIsDefinitiveEqual(array $trigger1Attributes, array $trigger2Attributes, bool $expected): void
     {
         $trigger1 = $this->createProcessTriggerByAttributes($trigger1Attributes);
         $trigger2 = $this->createProcessTriggerByAttributes($trigger2Attributes);
@@ -258,7 +258,7 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
         return $trigger;
     }
 
-    public function testGetEntityClass()
+    public function testGetEntityClass(): void
     {
         $this->assertNull($this->entity->getEntityClass());
 

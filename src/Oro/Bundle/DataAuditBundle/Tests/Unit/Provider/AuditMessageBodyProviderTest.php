@@ -8,15 +8,16 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\AbstractUserStub;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
+class AuditMessageBodyProviderTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityNameResolver;
+    private EntityNameResolver&MockObject $entityNameResolver;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +25,7 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
     }
 
-    public function testPrepareMessageBodyEmptyParameters()
+    public function testPrepareMessageBodyEmptyParameters(): void
     {
         $provider = new AuditMessageBodyProvider($this->entityNameResolver);
 
@@ -46,7 +47,7 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($body);
     }
 
-    public function testPrepareMessageBodyEmptyUserNoImpersonationAttributeNoOwnerAttribute()
+    public function testPrepareMessageBodyEmptyUserNoImpersonationAttributeNoOwnerAttribute(): void
     {
         $provider = new AuditMessageBodyProvider($this->entityNameResolver);
 
@@ -86,7 +87,7 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
         self::assertArrayNotHasKey('owner_description', $body);
     }
 
-    public function testPrepareMessageBodyUserInterfaceNoImpersonationAttributeNoOwnerAttribute()
+    public function testPrepareMessageBodyUserInterfaceNoImpersonationAttributeNoOwnerAttribute(): void
     {
         $provider = new AuditMessageBodyProvider($this->entityNameResolver);
 
@@ -125,7 +126,7 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
         self::assertArrayNotHasKey('owner_description', $body);
     }
 
-    public function testPrepareMessageBodyAbstractUserNoImpersonationAttributeNoOwnerAttribute()
+    public function testPrepareMessageBodyAbstractUserNoImpersonationAttributeNoOwnerAttribute(): void
     {
         $provider = new AuditMessageBodyProvider($this->entityNameResolver);
 
@@ -185,7 +186,7 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($transactionId, $body['transaction_id']);
     }
 
-    public function testPrepareMessageBodyEmptyUserNoImpersonationAttributeNoOwnerAttributeOrganizationToken()
+    public function testPrepareMessageBodyEmptyUserNoImpersonationAttributeNoOwnerAttributeOrganizationToken(): void
     {
         $provider = new AuditMessageBodyProvider($this->entityNameResolver);
 
@@ -234,7 +235,7 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
         self::assertArrayNotHasKey('owner_description', $body);
     }
 
-    public function testPrepareMessageBodyEmptyUserHasImpersonationAttributeNoOwnerAttribute()
+    public function testPrepareMessageBodyEmptyUserHasImpersonationAttributeNoOwnerAttribute(): void
     {
         $provider = new AuditMessageBodyProvider($this->entityNameResolver);
 
@@ -281,7 +282,7 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
         self::assertArrayNotHasKey('owner_description', $body);
     }
 
-    public function testPrepareMessageBodyEmptyUserNoImpersonationAttributeHasOwnerAttribute()
+    public function testPrepareMessageBodyEmptyUserNoImpersonationAttributeHasOwnerAttribute(): void
     {
         $provider = new AuditMessageBodyProvider($this->entityNameResolver);
 
@@ -327,7 +328,7 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('owner_description_attribute', $body['owner_description']);
     }
 
-    public function testPrepareMessageBodyEmptyToken()
+    public function testPrepareMessageBodyEmptyToken(): void
     {
         $provider = new AuditMessageBodyProvider($this->entityNameResolver);
 

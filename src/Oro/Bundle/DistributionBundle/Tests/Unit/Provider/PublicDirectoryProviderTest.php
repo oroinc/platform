@@ -9,6 +9,7 @@ class PublicDirectoryProviderTest extends TestCase
 {
     private string $projectDir;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->projectDir = sys_get_temp_dir() . '/test_project';
@@ -17,6 +18,7 @@ class PublicDirectoryProviderTest extends TestCase
         }
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->removeDirectory($this->projectDir);

@@ -10,8 +10,9 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestEntityWithOwnerFieldButWithoutGetOwnerMethod;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
+use PHPUnit\Framework\TestCase;
 
-class EntityOwnerAccessorTest extends \PHPUnit\Framework\TestCase
+class EntityOwnerAccessorTest extends TestCase
 {
     private Inflector $inflector;
 
@@ -21,7 +22,7 @@ class EntityOwnerAccessorTest extends \PHPUnit\Framework\TestCase
         $this->inflector = (new InflectorFactory())->build();
     }
 
-    public function testGetOwner()
+    public function testGetOwner(): void
     {
         $metadataProvider = new OwnershipMetadataProviderStub($this);
         $accessor = new EntityOwnerAccessor($metadataProvider, $this->inflector);
@@ -44,12 +45,11 @@ class EntityOwnerAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('testOwner3', $accessor->getOwner($obj1));
     }
 
-    public function testGetOwnerNoMetadata()
+    public function testGetOwnerNoMetadata(): void
     {
         $metadataProvider = new OwnershipMetadataProviderStub($this);
         $accessor = new EntityOwnerAccessor($metadataProvider, $this->inflector);
-        $metadataProvider->getCacheMock()
-            ->expects(self::any())
+        $metadataProvider->getCacheMock()->expects(self::any())
             ->method('get')
             ->willReturn(true);
 
@@ -58,14 +58,14 @@ class EntityOwnerAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($accessor->getOwner($obj));
     }
 
-    public function testGetOwnerNull()
+    public function testGetOwnerNull(): void
     {
         $this->expectException(InvalidEntityException::class);
         $accessor = new EntityOwnerAccessor(new OwnershipMetadataProviderStub($this), $this->inflector);
         $accessor->getOwner(null);
     }
 
-    public function testGetOwnerNoGetOwnerAndNoOwnerField()
+    public function testGetOwnerNoGetOwnerAndNoOwnerField(): void
     {
         $this->expectException(InvalidEntityException::class);
         $metadataProvider = new OwnershipMetadataProviderStub($this);
@@ -77,7 +77,7 @@ class EntityOwnerAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getOwner($obj);
     }
 
-    public function testGetOrganizationWrongObject()
+    public function testGetOrganizationWrongObject(): void
     {
         $this->expectException(InvalidEntityException::class);
         $metadataProvider = new OwnershipMetadataProviderStub($this);
@@ -85,7 +85,7 @@ class EntityOwnerAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getOrganization('not_an_object');
     }
 
-    public function testGetOrganization()
+    public function testGetOrganization(): void
     {
         $metadataProvider = new OwnershipMetadataProviderStub($this);
         $accessor = new EntityOwnerAccessor($metadataProvider, $this->inflector);

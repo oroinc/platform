@@ -6,23 +6,18 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptionsGuesser;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditingConfigurator;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class InlineEditingConfiguratorTest extends \PHPUnit\Framework\TestCase
+class InlineEditingConfiguratorTest extends TestCase
 {
-    /** @var InlineEditColumnOptionsGuesser|\PHPUnit\Framework\MockObject\MockObject */
-    private $guesser;
-
-    /** @var EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassNameHelper;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var InlineEditingConfigurator */
-    private $configurator;
+    private InlineEditColumnOptionsGuesser&MockObject $guesser;
+    private EntityClassNameHelper&MockObject $entityClassNameHelper;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private InlineEditingConfigurator $configurator;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +36,7 @@ class InlineEditingConfiguratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider paramsDataProvider
      */
-    public function testIsInlineEditingSupported(array $params, bool $expected)
+    public function testIsInlineEditingSupported(array $params, bool $expected): void
     {
         $config = DatagridConfiguration::create($params);
 
@@ -57,7 +52,7 @@ class InlineEditingConfiguratorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testConfigureInlineEditingForGrid()
+    public function testConfigureInlineEditingForGrid(): void
     {
         $config = DatagridConfiguration::create([
             'extended_entity_name' => 'Test'
@@ -96,7 +91,7 @@ class InlineEditingConfiguratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConfigureInlineEditingForGridAclDisallowed()
+    public function testConfigureInlineEditingForGridAclDisallowed(): void
     {
         $config = DatagridConfiguration::create([
             'extended_entity_name' => 'Test',
@@ -138,7 +133,7 @@ class InlineEditingConfiguratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConfigureInlineEditingForColumn()
+    public function testConfigureInlineEditingForColumn(): void
     {
         $config = DatagridConfiguration::create([
             'extended_entity_name' => 'Test',
@@ -185,7 +180,7 @@ class InlineEditingConfiguratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConfigureInlineEditingForColumnWhenEditDisallowed()
+    public function testConfigureInlineEditingForColumnWhenEditDisallowed(): void
     {
         $config = DatagridConfiguration::create([
             'extended_entity_name' => 'Test',
@@ -233,7 +228,7 @@ class InlineEditingConfiguratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConfigureInlineEditingForSupportingColumns()
+    public function testConfigureInlineEditingForSupportingColumns(): void
     {
         $config = DatagridConfiguration::create([
             'extended_entity_name' => 'Test',

@@ -6,17 +6,14 @@ use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader;
 use Oro\Bundle\LayoutBundle\Loader\ImagineFilterConfigurationDecorator;
 use Oro\Component\DependencyInjection\ServiceLink;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ImagineFilterConfigurationDecoratorTest extends \PHPUnit\Framework\TestCase
+class ImagineFilterConfigurationDecoratorTest extends TestCase
 {
-    /** @var FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    private $filterConfiguration;
-
-    /** @var ServiceLink|\PHPUnit\Framework\MockObject\MockObject */
-    private $filterLoaderServiceLink;
-
-    /** @var ImagineFilterConfigurationDecorator */
-    private $imagineFilterConfigurationDecorator;
+    private FilterConfiguration&MockObject $filterConfiguration;
+    private ServiceLink&MockObject $filterLoaderServiceLink;
+    private ImagineFilterConfigurationDecorator $imagineFilterConfigurationDecorator;
 
     #[\Override]
     protected function setUp(): void

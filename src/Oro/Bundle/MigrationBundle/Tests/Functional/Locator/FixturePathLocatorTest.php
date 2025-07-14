@@ -7,10 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class FixturePathLocatorTest extends WebTestCase
 {
-    /**
-     * @var FixturePathLocatorInterface
-     */
-    private $serviceLocator;
+    private FixturePathLocatorInterface $serviceLocator;
 
     #[\Override]
     protected function setUp(): void

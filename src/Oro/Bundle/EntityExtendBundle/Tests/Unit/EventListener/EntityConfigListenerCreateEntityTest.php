@@ -15,7 +15,7 @@ class EntityConfigListenerCreateEntityTest extends EntityConfigListenerTestCase
     /**
      * Test class is extend and persisted
      */
-    public function testNewExtendEntity()
+    public function testNewExtendEntity(): void
     {
         $configModel = new EntityConfigModel(TestClass::class);
         $entityConfig = new Config(new EntityConfigId('extend', TestClass::class));
@@ -45,7 +45,7 @@ class EntityConfigListenerCreateEntityTest extends EntityConfigListenerTestCase
     /**
      * Test class is NOT extend and should NOT be persisted
      */
-    public function testNewNotExtendEntity()
+    public function testNewNotExtendEntity(): void
     {
         $configModel = new EntityConfigModel(TestClass2::class);
         $entityConfig = new Config(new EntityConfigId(TestClass2::class, 'extend'));

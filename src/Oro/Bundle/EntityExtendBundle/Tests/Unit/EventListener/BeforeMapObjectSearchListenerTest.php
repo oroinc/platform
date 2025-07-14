@@ -10,14 +10,13 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\EventListener\BeforeMapObjectSearchListener;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class BeforeMapObjectSearchListenerTest extends \PHPUnit\Framework\TestCase
+class BeforeMapObjectSearchListenerTest extends TestCase
 {
-    /** @var BeforeMapObjectSearchListener */
-    private $listener;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
+    private BeforeMapObjectSearchListener $listener;
+    private ConfigManager&MockObject $configManager;
 
     private array $expectedConfig = [
         'Oro\TestBundle\Entity\Test'   => [
@@ -74,7 +73,7 @@ class BeforeMapObjectSearchListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new BeforeMapObjectSearchListener($this->configManager);
     }
 
-    public function testPrepareEntityMapEvent()
+    public function testPrepareEntityMapEvent(): void
     {
         $mappingConfig = [
             'Oro\TestBundle\Entity\Test' => [
@@ -91,7 +90,7 @@ class BeforeMapObjectSearchListenerTest extends \PHPUnit\Framework\TestCase
         $testEntityFirstField = new FieldConfigId('search', 'Oro\TestBundle\Entity\Test', 'first', 'integer');
         $testEntityFirstFieldConfig = new Config($testEntityFirstField);
         $testEntityFirstFieldConfig->set('searchable', true);
-        $testEntitySecondField  = new FieldConfigId('search', 'Oro\TestBundle\Entity\Test', 'second', 'string');
+        $testEntitySecondField = new FieldConfigId('search', 'Oro\TestBundle\Entity\Test', 'second', 'string');
         $testEntitySecondConfig = new Config($testEntitySecondField);
         $testEntitySecondConfig->set('searchable', true);
         $testEntitySearchConfigs = [$testEntityFirstFieldConfig, $testEntitySecondConfig];
@@ -144,17 +143,15 @@ class BeforeMapObjectSearchListenerTest extends \PHPUnit\Framework\TestCase
             });
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->willReturnCallback(
-                function ($configScope) use ($extendProvider, $searchProvider, $entityProvider) {
-                    if ($configScope === 'extend') {
-                        return $extendProvider;
-                    }
-                    if ($configScope === 'search') {
-                        return $searchProvider;
-                    }
-                    return $entityProvider;
+            ->willReturnCallback(function ($configScope) use ($extendProvider, $searchProvider, $entityProvider) {
+                if ($configScope === 'extend') {
+                    return $extendProvider;
                 }
-            );
+                if ($configScope === 'search') {
+                    return $searchProvider;
+                }
+                return $entityProvider;
+            });
         $event = new SearchMappingCollectEvent($mappingConfig);
         $this->listener->prepareEntityMapEvent($event);
         $this->assertEquals($this->expectedConfig, $event->getMappingConfig());

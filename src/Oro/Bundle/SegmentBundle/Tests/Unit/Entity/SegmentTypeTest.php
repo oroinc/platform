@@ -3,13 +3,13 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
+use PHPUnit\Framework\TestCase;
 
-class SegmentTypeTest extends \PHPUnit\Framework\TestCase
+class SegmentTypeTest extends TestCase
 {
     private const TEST_NAME = 'name_test';
 
-    /** @var SegmentType */
-    private $entity;
+    private SegmentType $entity;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +17,7 @@ class SegmentTypeTest extends \PHPUnit\Framework\TestCase
         $this->entity = new SegmentType(self::TEST_NAME);
     }
 
-    public function testGettersAndSetters()
+    public function testGettersAndSetters(): void
     {
         $this->assertEquals(self::TEST_NAME, $this->entity->getName());
 

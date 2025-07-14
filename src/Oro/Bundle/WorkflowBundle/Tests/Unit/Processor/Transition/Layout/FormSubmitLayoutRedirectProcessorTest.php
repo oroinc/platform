@@ -10,10 +10,11 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\LayoutDialogResultType;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Layout\FormSubmitLayoutRedirectProcessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 
-class FormSubmitLayoutRedirectProcessorTest extends \PHPUnit\Framework\TestCase
+class FormSubmitLayoutRedirectProcessorTest extends TestCase
 {
     private FormSubmitLayoutRedirectProcessor $processor;
 

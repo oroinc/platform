@@ -17,14 +17,14 @@ use Symfony\Component\Process\Process;
 
 class OroAssetsBuildCommandTest extends TestCase
 {
-    private AssetCommandProcessFactory|MockObject $assetCommandProcessFactory;
-    private AssetConfigCache|MockObject $assetConfigCache;
-    private ThemeManager|MockObject $themeManager;
-    private OroAssetsBuildCommand $command;
-    private Application|MockObject $application;
-    private Kernel|MockObject $kernel;
+    private AssetCommandProcessFactory&MockObject $assetCommandProcessFactory;
+    private AssetConfigCache&MockObject $assetConfigCache;
+    private ThemeManager&MockObject $themeManager;
+    private Application&MockObject $application;
+    private Kernel&MockObject $kernel;
     private string $projectDir;
-    private Process|MockObject $process;
+    private Process&MockObject $process;
+    private OroAssetsBuildCommand $command;
 
     #[\Override]
     protected function setUp(): void
@@ -59,7 +59,7 @@ class OroAssetsBuildCommandTest extends TestCase
         $this->command->setApplication($this->application);
     }
 
-    public function testWebPackBuildOnEachThemeSeparately()
+    public function testWebPackBuildOnEachThemeSeparately(): void
     {
         $inputMock = $this->createMock(InputInterface::class);
         $outputMock = new OutputStub();

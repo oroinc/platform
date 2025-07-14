@@ -8,26 +8,21 @@ use Oro\Bundle\EntityConfigBundle\Manager\AttributeFamilyManager;
 use Oro\Bundle\EntityConfigBundle\Voter\AttributeFamilyVoter;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
+class AttributeFamilyVoterTest extends TestCase
 {
     use EntityTrait;
     private const ENTITY_CLASS_NAME = 'stdClass';
     private const FAMILY_ID = 777;
 
-    /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $token;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var AttributeFamilyManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeFamilyManager;
-
-    /** @var AttributeFamilyVoter */
-    private $voter;
+    private TokenInterface&MockObject $token;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private AttributeFamilyManager&MockObject $attributeFamilyManager;
+    private AttributeFamilyVoter $voter;
 
     #[\Override]
     protected function setUp(): void
@@ -44,7 +39,7 @@ class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
         $this->voter->setClassName(AttributeFamily::class);
     }
 
-    public function testVoteWithNotSupportedClass()
+    public function testVoteWithNotSupportedClass(): void
     {
         $this->assertEquals(
             VoterInterface::ACCESS_ABSTAIN,
@@ -52,7 +47,7 @@ class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVoteWithNotSupportedAttribute()
+    public function testVoteWithNotSupportedAttribute(): void
     {
         $this->assertEquals(
             VoterInterface::ACCESS_ABSTAIN,
@@ -60,7 +55,7 @@ class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVoteWhenAttributeFamilyDeniedToDelete()
+    public function testVoteWhenAttributeFamilyDeniedToDelete(): void
     {
         $attributeFamily = $this->getEntity(AttributeFamily::class, [
             'id' => self::FAMILY_ID,
@@ -83,7 +78,7 @@ class AttributeFamilyVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVoteWhenAttributeFamilyNotLastAndHasNoEntityAssignedToIt()
+    public function testVoteWhenAttributeFamilyNotLastAndHasNoEntityAssignedToIt(): void
     {
         $attributeFamily = $this->getEntity(AttributeFamily::class, [
             'id' => self::FAMILY_ID,

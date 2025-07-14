@@ -22,7 +22,7 @@ class CacheExpressionProcessorTest extends ExpressionProcessorTest
         );
     }
 
-    public function testProcessExpressionsDoNothingIfEvaluationOfExpressionsDisabledAndEncodingIsNotSetAndCachedTrue()
+    public function testProcessExpressionsDoNothingIfEvaluationOfExprDisabledAndEncodingIsNotSetAndCachedTrue(): void
     {
         $values['expr_object'] = new ParsedExpression('true', new ConstantNode(true));
         $values['expr_closure'] = function () {
@@ -52,7 +52,7 @@ class CacheExpressionProcessorTest extends ExpressionProcessorTest
         $this->assertSame($initialVars, $values);
     }
 
-    public function testProcessExpressionsWithCachedTrue()
+    public function testProcessExpressionsWithCachedTrue(): void
     {
         $values['expr_object'] = new ParsedExpression('true', new ConstantNode(true));
         $values['expr_closure'] = function () {

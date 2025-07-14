@@ -5,8 +5,9 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 use Oro\Bundle\ActionBundle\Model\ParameterInterface;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class VariableTest extends \PHPUnit\Framework\TestCase
+class VariableTest extends TestCase
 {
     use EntityTestCaseTrait;
 
@@ -16,7 +17,7 @@ class VariableTest extends \PHPUnit\Framework\TestCase
      * @param mixed $value
      * @param bool $testDefaultValue
      */
-    public function testGettersAndSetters($property, $value, $testDefaultValue = false)
+    public function testGettersAndSetters($property, $value, $testDefaultValue = false): void
     {
         $setter = 'set' . ucfirst($property);
         $obj = new Variable();
@@ -43,7 +44,7 @@ class VariableTest extends \PHPUnit\Framework\TestCase
     /**
      * Test get/set options
      */
-    public function testGetSetOption()
+    public function testGetSetOption(): void
     {
         $obj = new Variable();
 
@@ -58,7 +59,7 @@ class VariableTest extends \PHPUnit\Framework\TestCase
     /**
      * Test get form options
      */
-    public function testGetFormOptions()
+    public function testGetFormOptions(): void
     {
         $obj = new Variable();
 
@@ -69,7 +70,7 @@ class VariableTest extends \PHPUnit\Framework\TestCase
     /**
      * Test entity ACL
      */
-    public function testEntityAclAllowed()
+    public function testEntityAclAllowed(): void
     {
         $variable = new Variable();
 
@@ -88,7 +89,7 @@ class VariableTest extends \PHPUnit\Framework\TestCase
     /**
      * Test instance and internal type
      */
-    public function testInstanceAndInternalType()
+    public function testInstanceAndInternalType(): void
     {
         $variable = new Variable();
         $this->assertInstanceOf(ParameterInterface::class, $variable);

@@ -8,18 +8,17 @@ use Oro\Bundle\DataGridBundle\Event\EventDispatcher;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Stub\GridConfigEvent;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Stub\GridEvent;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class EventDispatcherTest extends \PHPUnit\Framework\TestCase
+class EventDispatcherTest extends TestCase
 {
     private const TEST_EVENT_NAME = 'test.event';
 
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $realDispatcher;
-
-    /** @var EventDispatcherInterface */
-    private $dispatcher;
+    private EventDispatcherInterface&MockObject $realDispatcher;
+    private EventDispatcherInterface $dispatcher;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +31,7 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider eventDataProvider
      */
-    public function testDispatchGridEvent(array $config, array $expectedEvents)
+    public function testDispatchGridEvent(array $config, array $expectedEvents): void
     {
         $config = DatagridConfiguration::create($config);
         $grid = $this->createMock(DatagridInterface::class);
@@ -74,7 +73,7 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider eventDataProvider
      */
-    public function testDispatchGridConfigEvent(array $config, array $expectedEvents)
+    public function testDispatchGridConfigEvent(array $config, array $expectedEvents): void
     {
         $config = DatagridConfiguration::create($config);
 
@@ -91,7 +90,7 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->dispatch($event, self::TEST_EVENT_NAME);
     }
 
-    public function testDispatchException()
+    public function testDispatchException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(

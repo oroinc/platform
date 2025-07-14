@@ -20,12 +20,13 @@ use Oro\Component\MessageQueue\Client\NoopMessageProcessor;
 use Oro\Component\MessageQueue\Topic\TopicInterface;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
-class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
+class OroMessageQueueExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

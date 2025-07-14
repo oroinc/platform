@@ -6,16 +6,17 @@ use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumptionTimeExtension;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class LimitConsumptionTimeExtensionTest extends \PHPUnit\Framework\TestCase
+class LimitConsumptionTimeExtensionTest extends TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
+    public function testCouldBeConstructedWithRequiredArguments(): void
     {
         new LimitConsumptionTimeExtension(new \DateTime('+1 day'));
     }
 
-    public function testOnBeforeReceiveShouldInterruptExecutionIfConsumptionTimeExceeded()
+    public function testOnBeforeReceiveShouldInterruptExecutionIfConsumptionTimeExceeded(): void
     {
         $context = $this->createContext();
 
@@ -30,7 +31,7 @@ class LimitConsumptionTimeExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($context->isExecutionInterrupted());
     }
 
-    public function testOnIdleShouldInterruptExecutionIfConsumptionTimeExceeded()
+    public function testOnIdleShouldInterruptExecutionIfConsumptionTimeExceeded(): void
     {
         $context = $this->createContext();
 
@@ -45,7 +46,7 @@ class LimitConsumptionTimeExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($context->isExecutionInterrupted());
     }
 
-    public function testOnPostReceivedShouldInterruptExecutionIfConsumptionTimeExceeded()
+    public function testOnPostReceivedShouldInterruptExecutionIfConsumptionTimeExceeded(): void
     {
         $context = $this->createContext();
 
@@ -60,7 +61,7 @@ class LimitConsumptionTimeExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($context->isExecutionInterrupted());
     }
 
-    public function testOnBeforeReceiveShouldNotInterruptExecutionIfConsumptionTimeIsNotExceeded()
+    public function testOnBeforeReceiveShouldNotInterruptExecutionIfConsumptionTimeIsNotExceeded(): void
     {
         $context = $this->createContext();
 
@@ -75,7 +76,7 @@ class LimitConsumptionTimeExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($context->isExecutionInterrupted());
     }
 
-    public function testOnIdleShouldNotInterruptExecutionIfConsumptionTimeIsNotExceeded()
+    public function testOnIdleShouldNotInterruptExecutionIfConsumptionTimeIsNotExceeded(): void
     {
         $context = $this->createContext();
 
@@ -90,7 +91,7 @@ class LimitConsumptionTimeExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($context->isExecutionInterrupted());
     }
 
-    public function testOnPostReceivedShouldNotInterruptExecutionIfConsumptionTimeIsNotExceeded()
+    public function testOnPostReceivedShouldNotInterruptExecutionIfConsumptionTimeIsNotExceeded(): void
     {
         $context = $this->createContext();
 

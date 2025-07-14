@@ -17,20 +17,17 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
 use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
+class AssociationBuilderTest extends TestCase
 {
     private const SOURCE_CLASS = 'Test\SourceEntity';
     private const TARGET_CLASS = 'Test\TargetEntity';
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var RelationBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $relationBuilder;
+    private ManagerRegistry&MockObject $doctrine;
+    private ConfigManager&MockObject $configManager;
+    private RelationBuilder&MockObject $relationBuilder;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +37,7 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->relationBuilder = $this->createMock(RelationBuilder::class);
     }
 
-    public function testCreateManyToManyRelationForNewAssociation()
+    public function testCreateManyToManyRelationForNewAssociation(): void
     {
         $builder = $this->getMockBuilder(AssociationBuilder::class)
             ->onlyMethods(['getPrimaryKeyColumnNames'])
@@ -120,7 +117,7 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
         $builder->createManyToManyAssociation(self::SOURCE_CLASS, self::TARGET_CLASS, null);
     }
 
-    public function testCreateManyToManyRelationForNewAssociationAndNoLabelForTargetEntity()
+    public function testCreateManyToManyRelationForNewAssociationAndNoLabelForTargetEntity(): void
     {
         $builder = $this->getMockBuilder(AssociationBuilder::class)
             ->onlyMethods(['getPrimaryKeyColumnNames'])
@@ -197,7 +194,7 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
         $builder->createManyToManyAssociation(self::SOURCE_CLASS, self::TARGET_CLASS, null);
     }
 
-    public function testCreateManyToManyRelationForExistingAssociation()
+    public function testCreateManyToManyRelationForExistingAssociation(): void
     {
         $builder = $this->getMockBuilder(AssociationBuilder::class)
             ->onlyMethods(['getPrimaryKeyColumnNames'])
@@ -245,7 +242,7 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
         $builder->createManyToManyAssociation(self::SOURCE_CLASS, self::TARGET_CLASS, null);
     }
 
-    public function testCreateManyToOneRelationForNewAssociation()
+    public function testCreateManyToOneRelationForNewAssociation(): void
     {
         $builder = $this->getMockBuilder(AssociationBuilder::class)
             ->onlyMethods(['getPrimaryKeyColumnNames'])
@@ -320,7 +317,7 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
         $builder->createManyToOneAssociation(self::SOURCE_CLASS, self::TARGET_CLASS, null);
     }
 
-    public function testCreateManyToOneRelationForNewAssociationAndNoLabelForTargetEntity()
+    public function testCreateManyToOneRelationForNewAssociationAndNoLabelForTargetEntity(): void
     {
         $builder = $this->getMockBuilder(AssociationBuilder::class)
             ->onlyMethods(['getPrimaryKeyColumnNames'])
@@ -392,7 +389,7 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
         $builder->createManyToOneAssociation(self::SOURCE_CLASS, self::TARGET_CLASS, null);
     }
 
-    public function testCreateManyToOneRelationForExistingAssociation()
+    public function testCreateManyToOneRelationForExistingAssociation(): void
     {
         $builder = $this->getMockBuilder(AssociationBuilder::class)
             ->onlyMethods(['getPrimaryKeyColumnNames'])
@@ -439,7 +436,7 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
         $builder->createManyToOneAssociation(self::SOURCE_CLASS, self::TARGET_CLASS, null);
     }
 
-    public function testPrimaryKeyColumnNames()
+    public function testPrimaryKeyColumnNames(): void
     {
         $entityClass = 'Test\Entity';
 
@@ -471,7 +468,7 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['id', 'name'], $columnNames);
     }
 
-    public function testPrimaryKeyColumnNamesWithReflectionException()
+    public function testPrimaryKeyColumnNamesWithReflectionException(): void
     {
         $this->doctrine->expects($this->any())
             ->method('getManagerForClass')
@@ -488,7 +485,7 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['id'], $columnNames);
     }
 
-    public function testPrimaryKeyColumnNamesWithORMMappingException()
+    public function testPrimaryKeyColumnNamesWithORMMappingException(): void
     {
         $this->doctrine->expects($this->any())
             ->method('getManagerForClass')
@@ -505,7 +502,7 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['id'], $columnNames);
     }
 
-    public function testPrimaryKeyColumnNamesWithPersistenceMappingException()
+    public function testPrimaryKeyColumnNamesWithPersistenceMappingException(): void
     {
         $this->doctrine->expects($this->any())
             ->method('getManagerForClass')

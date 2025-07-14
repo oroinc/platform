@@ -17,8 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SegmentTypeTest extends TestCase
 {
-    /** @var SegmentType */
-    private $type;
+    private SegmentType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class SegmentTypeTest extends TestCase
         $this->type = new SegmentType();
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilder::class);
 
@@ -55,7 +54,7 @@ class SegmentTypeTest extends TestCase
         $this->type->buildForm($builder, []);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())

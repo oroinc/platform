@@ -5,11 +5,12 @@ namespace Oro\Component\Routing\Tests\Unit\Resolver;
 use Oro\Component\Routing\Resolver\ChainRouteOptionsResolver;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 
-class ChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
+class ChainRouteOptionsResolverTest extends TestCase
 {
-    public function testEmptyChainResolver()
+    public function testEmptyChainResolver(): void
     {
         $route = $this->createMock(Route::class);
 
@@ -19,7 +20,7 @@ class ChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
         $chainResolver->resolve($route, $routeCollectionAccessor);
     }
 
-    public function testChainResolver()
+    public function testChainResolver(): void
     {
         $route = $this->createMock(Route::class);
 

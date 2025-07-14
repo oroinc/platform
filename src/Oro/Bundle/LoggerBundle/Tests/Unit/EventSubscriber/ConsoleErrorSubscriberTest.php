@@ -5,6 +5,8 @@ namespace Oro\Bundle\LoggerBundle\Tests\Unit\EventSubscriber;
 use Oro\Bundle\LoggerBundle\EventSubscriber\ConsoleErrorSubscriber;
 use Oro\Bundle\MessageQueueBundle\Command\CleanupCommand;
 use Oro\Component\MessageQueue\Client\ConsumeMessagesCommand;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -12,22 +14,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\ErrorHandler\ErrorHandler;
 
-class ConsoleErrorSubscriberTest extends \PHPUnit\Framework\TestCase
+class ConsoleErrorSubscriberTest extends TestCase
 {
-    /** @var ConsoleErrorSubscriber */
-    private $subscriber;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var ErrorHandler */
-    private $handler;
-
-    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $input;
-
-    /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $output;
+    private ConsoleErrorSubscriber $subscriber;
+    private LoggerInterface&MockObject $logger;
+    private ErrorHandler $handler;
+    private InputInterface&MockObject $input;
+    private OutputInterface&MockObject $output;
 
     private static array $defaultLoggers = [
         E_DEPRECATED => [null, LogLevel::INFO],

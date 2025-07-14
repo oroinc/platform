@@ -6,11 +6,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class PermissionTest extends \PHPUnit\Framework\TestCase
+class PermissionTest extends TestCase
 {
-    /** @var Permission */
-    private $object;
+    private Permission $object;
 
     #[\Override]
     protected function setUp(): void
@@ -18,14 +18,14 @@ class PermissionTest extends \PHPUnit\Framework\TestCase
         $this->object = new Permission();
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $this->assertEquals(new ArrayCollection(), $this->object->getApplyToEntities());
         $this->assertEquals(new ArrayCollection(), $this->object->getExcludeEntities());
         $this->assertEquals(new ArrayCollection(), $this->object->getGroupNames());
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertNull($this->object->getId());
 
@@ -37,7 +37,7 @@ class PermissionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setGetDataProvider
      */
-    public function testSetGet(string $propertyName, mixed $value, mixed $defaultValue = null)
+    public function testSetGet(string $propertyName, mixed $value, mixed $defaultValue = null): void
     {
         $setter = 'set' . ucfirst($propertyName);
         $getter = 'get' . ucfirst($propertyName);
@@ -53,7 +53,7 @@ class PermissionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider addRemoveDataProvider
      */
-    public function testAddRemove(string $propertyName, string $getter, mixed $value, mixed $defaultValue = null)
+    public function testAddRemove(string $propertyName, string $getter, mixed $value, mixed $defaultValue = null): void
     {
         $defaultValue = $defaultValue ?: new ArrayCollection();
         $adder = 'add' . ucfirst($propertyName);

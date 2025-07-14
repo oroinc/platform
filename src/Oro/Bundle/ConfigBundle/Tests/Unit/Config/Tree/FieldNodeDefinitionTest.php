@@ -3,12 +3,13 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config\Tree;
 
 use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
+use PHPUnit\Framework\TestCase;
 
-class FieldNodeDefinitionTest extends \PHPUnit\Framework\TestCase
+class FieldNodeDefinitionTest extends TestCase
 {
     private const TEST_NAME = 'testNodeName';
     private const TEST_TYPE = 'text';
-    private const TEST_ACL  = 'acl';
+    private const TEST_ACL = 'acl';
     private const TEST_NEEDS_PAGE_RELOAD = true;
 
     private const TEST_DEFINITION = [
@@ -20,13 +21,13 @@ class FieldNodeDefinitionTest extends \PHPUnit\Framework\TestCase
         'page_reload'  => self::TEST_NEEDS_PAGE_RELOAD,
     ];
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $node = new FieldNodeDefinition(self::TEST_NAME, self::TEST_DEFINITION);
         $this->assertEquals(self::TEST_NAME, $node->getName());
     }
 
-    public function testPriority()
+    public function testPriority(): void
     {
         $node = new FieldNodeDefinition(self::TEST_NAME, self::TEST_DEFINITION);
         $this->assertSame(0, $node->getPriority());
@@ -42,13 +43,13 @@ class FieldNodeDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($priority, $node->getPriority());
     }
 
-    public function testGetType()
+    public function testGetType(): void
     {
         $node = new FieldNodeDefinition(self::TEST_NAME, self::TEST_DEFINITION);
         $this->assertEquals(self::TEST_TYPE, $node->getType());
     }
 
-    public function testGetAclResource()
+    public function testGetAclResource(): void
     {
         // acl resource specified
         $node = new FieldNodeDefinition(self::TEST_NAME, self::TEST_DEFINITION);
@@ -59,7 +60,7 @@ class FieldNodeDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($node->getAclResource());
     }
 
-    public function testGetOptions()
+    public function testGetOptions(): void
     {
         // options come from definition
         $node = new FieldNodeDefinition(self::TEST_NAME, self::TEST_DEFINITION);
@@ -79,7 +80,7 @@ class FieldNodeDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('newValue', $options['another_opt']);
     }
 
-    public function testPrepareDefinition()
+    public function testPrepareDefinition(): void
     {
         $node = new FieldNodeDefinition(self::TEST_NAME, []);
 
@@ -88,7 +89,7 @@ class FieldNodeDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertIsArray($node->getOptions());
     }
 
-    public function testPropertyPathIsApplied()
+    public function testPropertyPathIsApplied(): void
     {
         $nodeWithoutPropertyPath = new FieldNodeDefinition(self::TEST_NAME, self::TEST_DEFINITION);
         $this->assertEquals(self::TEST_NAME, $nodeWithoutPropertyPath->getPropertyPath());
@@ -99,7 +100,7 @@ class FieldNodeDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test_path', $nodeWithPropertyPath->getPropertyPath());
     }
 
-    public function testNeedsPageReload()
+    public function testNeedsPageReload(): void
     {
         $node = new FieldNodeDefinition(self::TEST_NEEDS_PAGE_RELOAD, self::TEST_DEFINITION);
         $this->assertSame(self::TEST_NEEDS_PAGE_RELOAD, $node->needsPageReload());

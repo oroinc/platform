@@ -4,16 +4,17 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Form;
 
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormInterface;
 
-class FormAccessorTest extends \PHPUnit\Framework\TestCase
+class FormAccessorTest extends TestCase
 {
     private const FORM_NAME = 'test_form';
 
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
+    private FormInterface&MockObject $form;
 
     #[\Override]
     protected function setUp(): void
@@ -24,19 +25,19 @@ class FormAccessorTest extends \PHPUnit\Framework\TestCase
             ->willReturn(self::FORM_NAME);
     }
 
-    public function testGetForm()
+    public function testGetForm(): void
     {
         $formAccessor = new FormAccessor($this->form);
         $this->assertSame($this->form, $formAccessor->getForm());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $formAccessor = new FormAccessor($this->form);
         $this->assertEquals('name:'.self::FORM_NAME, $formAccessor->toString());
     }
 
-    public function testGetHash()
+    public function testGetHash(): void
     {
         $formAccessor = new FormAccessor(
             $this->form,
@@ -50,7 +51,7 @@ class FormAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParamsInitializer()
+    public function testParamsInitializer(): void
     {
         $formAccessor = new FormAccessor($this->form);
 
@@ -81,7 +82,7 @@ class FormAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('name:'.self::FORM_NAME, $formAccessor->toString());
     }
 
-    public function testParamsInitializerForMultipartForm()
+    public function testParamsInitializerForMultipartForm(): void
     {
         $formAccessor = new FormAccessor($this->form);
 
@@ -112,7 +113,7 @@ class FormAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('name:'.self::FORM_NAME, $formAccessor->toString());
     }
 
-    public function testGetView()
+    public function testGetView(): void
     {
         // form
         //   field1
@@ -133,7 +134,7 @@ class FormAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($field2View, $formAccessor->getView('field1.field2'));
     }
 
-    public function testProcessedFields()
+    public function testProcessedFields(): void
     {
         $formAccessor = new FormAccessor($this->form);
 

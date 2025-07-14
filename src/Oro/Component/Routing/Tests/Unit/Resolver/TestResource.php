@@ -7,8 +7,7 @@ use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
 
 class TestResource implements ResourceInterface, SelfCheckingResourceInterface
 {
-    /** @var string */
-    protected $name;
+    protected string $name;
 
     /**
      * @param string $name

@@ -14,9 +14,9 @@ use PHPUnit\Framework\TestCase;
 
 class UsersUsageStatsProviderTest extends TestCase
 {
-    private ObjectManager|MockObject $objectManager;
-    private UserRepository|MockObject $userRepository;
-    private OrganizationRestrictionProviderInterface|MockObject $organizationRestrictionProvider;
+    private ObjectManager&MockObject $objectManager;
+    private UserRepository&MockObject $userRepository;
+    private OrganizationRestrictionProviderInterface&MockObject $organizationRestrictionProvider;
     private UsersUsageStatsProvider $provider;
 
     #[\Override]

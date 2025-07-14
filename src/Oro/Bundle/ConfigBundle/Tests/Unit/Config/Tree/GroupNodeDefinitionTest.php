@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config\Tree;
 
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
+use PHPUnit\Framework\TestCase;
 
-class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
+class GroupNodeDefinitionTest extends TestCase
 {
-    private const TEST_NAME  = 'testNodeName';
+    private const TEST_NAME = 'testNodeName';
 
     private static function getTestGroup(): GroupNodeDefinition
     {
@@ -16,13 +17,13 @@ class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
         return new GroupNodeDefinition('node4', [], [$node1, $node3]);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $node = new GroupNodeDefinition(self::TEST_NAME);
         $this->assertEquals(self::TEST_NAME, $node->getName());
     }
 
-    public function testPriority()
+    public function testPriority(): void
     {
         $node = new GroupNodeDefinition(self::TEST_NAME);
         $this->assertSame(0, $node->getPriority());
@@ -36,7 +37,7 @@ class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($priority, $node->getPriority());
     }
 
-    public function testGetSetLevel()
+    public function testGetSetLevel(): void
     {
         $node = new GroupNodeDefinition(self::TEST_NAME);
         $this->assertSame(0, $node->getLevel());
@@ -46,7 +47,7 @@ class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($level, $node->getLevel());
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         // empty node
         $node = new GroupNodeDefinition(self::TEST_NAME);
@@ -57,7 +58,7 @@ class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(2, $node->count());
     }
 
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         // empty node
         $node = new GroupNodeDefinition(self::TEST_NAME);
@@ -68,7 +69,7 @@ class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($node->isEmpty());
     }
 
-    public function testFirst()
+    public function testFirst(): void
     {
         // empty node
         $node = new GroupNodeDefinition(self::TEST_NAME);
@@ -82,7 +83,7 @@ class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider nodeDefinitionProvider
      */
-    public function testToBlockConfig(GroupNodeDefinition $node)
+    public function testToBlockConfig(GroupNodeDefinition $node): void
     {
         $result = $node->toBlockConfig();
 
@@ -105,7 +106,7 @@ class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider nodeDefinitionProvider
      */
-    public function testToViewData(GroupNodeDefinition $node)
+    public function testToViewData(GroupNodeDefinition $node): void
     {
         $result = $node->toViewData();
 

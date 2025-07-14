@@ -8,19 +8,18 @@ use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionWrapp
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ResettableExtensionWrapperTest extends \PHPUnit\Framework\TestCase
+class ResettableExtensionWrapperTest extends TestCase
 {
     use ClassExtensionTrait;
 
     private const EXTENSION_SERVICE_ID = 'service_id';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
-
-    /** @var ResettableExtensionWrapper */
-    private $resettableExtensionWrapper;
+    private ContainerInterface&MockObject $container;
+    private ResettableExtensionWrapper $resettableExtensionWrapper;
 
     #[\Override]
     protected function setUp(): void
@@ -33,17 +32,17 @@ class ResettableExtensionWrapperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldImplementExtensionInterface()
+    public function testShouldImplementExtensionInterface(): void
     {
         $this->assertClassImplements(ExtensionInterface::class, ChainExtension::class);
     }
 
-    public function testShouldImplementResettableExtensionInterface()
+    public function testShouldImplementResettableExtensionInterface(): void
     {
         $this->assertClassImplements(ResettableExtensionInterface::class, ChainExtension::class);
     }
 
-    public function testOnStart()
+    public function testOnStart(): void
     {
         $context = $this->createMock(Context::class);
 
@@ -63,7 +62,7 @@ class ResettableExtensionWrapperTest extends \PHPUnit\Framework\TestCase
         $this->resettableExtensionWrapper->onStart($context);
     }
 
-    public function testOnBeforeReceive()
+    public function testOnBeforeReceive(): void
     {
         $context = $this->createMock(Context::class);
 
@@ -83,7 +82,7 @@ class ResettableExtensionWrapperTest extends \PHPUnit\Framework\TestCase
         $this->resettableExtensionWrapper->onBeforeReceive($context);
     }
 
-    public function testOnPreReceive()
+    public function testOnPreReceive(): void
     {
         $context = $this->createMock(Context::class);
 
@@ -103,7 +102,7 @@ class ResettableExtensionWrapperTest extends \PHPUnit\Framework\TestCase
         $this->resettableExtensionWrapper->onPreReceived($context);
     }
 
-    public function testOnPostReceive()
+    public function testOnPostReceive(): void
     {
         $context = $this->createMock(Context::class);
 
@@ -123,7 +122,7 @@ class ResettableExtensionWrapperTest extends \PHPUnit\Framework\TestCase
         $this->resettableExtensionWrapper->onPostReceived($context);
     }
 
-    public function testOnIdle()
+    public function testOnIdle(): void
     {
         $context = $this->createMock(Context::class);
 
@@ -143,7 +142,7 @@ class ResettableExtensionWrapperTest extends \PHPUnit\Framework\TestCase
         $this->resettableExtensionWrapper->onIdle($context);
     }
 
-    public function testOnInterrupted()
+    public function testOnInterrupted(): void
     {
         $context = $this->createMock(Context::class);
 
@@ -163,7 +162,7 @@ class ResettableExtensionWrapperTest extends \PHPUnit\Framework\TestCase
         $this->resettableExtensionWrapper->onInterrupted($context);
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $context = $this->createMock(Context::class);
 

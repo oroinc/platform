@@ -23,6 +23,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
@@ -32,29 +33,14 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
  */
 class ActivityManagerTest extends OrmTestCase
 {
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityConfigProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $groupingConfigProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendConfigProvider;
-
-    /** @var AssociationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $associationManager;
-
-    /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var ActivityManager */
-    private $manager;
+    private EntityManagerInterface $em;
+    private ConfigProvider&MockObject $activityConfigProvider;
+    private ConfigProvider&MockObject $groupingConfigProvider;
+    private ConfigProvider&MockObject $entityConfigProvider;
+    private ConfigProvider&MockObject $extendConfigProvider;
+    private AssociationManager&MockObject $associationManager;
+    private EventDispatcher&MockObject $eventDispatcher;
+    private ActivityManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -92,7 +78,7 @@ class ActivityManagerTest extends OrmTestCase
         $this->manager->setEventDispatcher($this->eventDispatcher);
     }
 
-    public function testHasActivityAssociations()
+    public function testHasActivityAssociations(): void
     {
         $targetEntityClass = 'Test\Entity';
 
@@ -113,7 +99,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testHasActivityAssociationsForNoActivities()
+    public function testHasActivityAssociationsForNoActivities(): void
     {
         $targetEntityClass = 'Test\Entity';
 
@@ -133,7 +119,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testHasActivityAssociationsForNonConfigurableEntity()
+    public function testHasActivityAssociationsForNonConfigurableEntity(): void
     {
         $targetEntityClass = 'Test\Entity';
 
@@ -147,7 +133,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testHasActivityAssociation()
+    public function testHasActivityAssociation(): void
     {
         $activityEntityClass = 'Test\Activity';
         $targetEntityClass = 'Test\Entity';
@@ -172,7 +158,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testHasActivityAssociationForNoActivities()
+    public function testHasActivityAssociationForNoActivities(): void
     {
         $activityEntityClass = 'Test\Activity';
         $targetEntityClass = 'Test\Entity';
@@ -193,7 +179,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testHasActivityAssociationForNonConfigurableEntity()
+    public function testHasActivityAssociationForNonConfigurableEntity(): void
     {
         $activityEntityClass = 'Test\Activity';
         $targetEntityClass = 'Test\Entity';
@@ -208,7 +194,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testAddActivityTarget()
+    public function testAddActivityTarget(): void
     {
         $activityEntity = $this->createMock(ActivityInterface::class);
         $targetEntity = new Target();
@@ -234,7 +220,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testAddActivityTargetForAlreadyAddedTarget()
+    public function testAddActivityTargetForAlreadyAddedTarget(): void
     {
         $activityEntity = $this->createMock(ActivityInterface::class);
         $targetEntity = new Target();
@@ -256,7 +242,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testAddActivityTargetForNotSupportedTarget()
+    public function testAddActivityTargetForNotSupportedTarget(): void
     {
         $activityEntity = $this->createMock(ActivityInterface::class);
         $targetEntity = new Target();
@@ -277,7 +263,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testAddActivityTargetForNullTarget()
+    public function testAddActivityTargetForNullTarget(): void
     {
         $activityEntity = $this->createMock(ActivityInterface::class);
 
@@ -293,7 +279,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testAddActivityTargets()
+    public function testAddActivityTargets(): void
     {
         $activityEntity = $this->createMock(ActivityInterface::class);
         $targetEntity = new Target();
@@ -316,7 +302,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testAddActivityTargetsForAlreadyAddedTarget()
+    public function testAddActivityTargetsForAlreadyAddedTarget(): void
     {
         $activityEntity = $this->createMock(ActivityInterface::class);
         $targetEntity = new Target();
@@ -338,7 +324,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testAddActivityTargetsForNotSupportedTarget()
+    public function testAddActivityTargetsForNotSupportedTarget(): void
     {
         $activityEntity = $this->createMock(ActivityInterface::class);
         $targetEntity = new Target();
@@ -359,7 +345,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testRemoveActivityTarget()
+    public function testRemoveActivityTarget(): void
     {
         $activityEntity = $this->createMock(ActivityInterface::class);
         $targetEntity = new Target();
@@ -385,7 +371,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testRemoveActivityTargetForNotExistingTarget()
+    public function testRemoveActivityTargetForNotExistingTarget(): void
     {
         $activityEntity = $this->createMock(ActivityInterface::class);
         $targetEntity = new Target();
@@ -407,7 +393,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testRemoveActivityTargetForNotSupportedTarget()
+    public function testRemoveActivityTargetForNotSupportedTarget(): void
     {
         $activityEntity = $this->createMock(ActivityInterface::class);
         $targetEntity = new Target();
@@ -428,7 +414,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testRemoveActivityTargetForNullTarget()
+    public function testRemoveActivityTargetForNullTarget(): void
     {
         $activityEntity = $this->createMock(ActivityInterface::class);
 
@@ -444,7 +430,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testReplaceActivityTarget()
+    public function testReplaceActivityTarget(): void
     {
         $activityEntity = $this->createMock(ActivityInterface::class);
 
@@ -477,7 +463,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testReplaceActivityTargetNoAssociationWithOldTarget()
+    public function testReplaceActivityTargetNoAssociationWithOldTarget(): void
     {
         $activityEntity = $this->createMock(ActivityInterface::class);
 
@@ -508,7 +494,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testReplaceActivityTargetNewTargetAlreadyExist()
+    public function testReplaceActivityTargetNewTargetAlreadyExist(): void
     {
         $activityEntity = $this->createMock(ActivityInterface::class);
 
@@ -539,7 +525,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testReplaceActivityTargetNoChanges()
+    public function testReplaceActivityTargetNoChanges(): void
     {
         $activityEntity = $this->createMock(ActivityInterface::class);
 
@@ -568,7 +554,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testGetActivityAssociations()
+    public function testGetActivityAssociations(): void
     {
         $targetEntityClass = 'Test\Entity';
         $activity1Class = 'Test\Activity1';
@@ -654,7 +640,7 @@ class ActivityManagerTest extends OrmTestCase
     /**
      * Test that activity is not returned if an activity is enabled on UI but schema update is not performed yet
      */
-    public function testGetActivityAssociationsNoSchemaUpdate()
+    public function testGetActivityAssociationsNoSchemaUpdate(): void
     {
         $targetEntityClass = 'Test\Entity';
         $activityClass = 'Test\Activity';
@@ -693,7 +679,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testGetActivityActions()
+    public function testGetActivityActions(): void
     {
         $targetEntityClass = 'Test\Entity';
         $activity1Class = 'Test\Activity1';
@@ -779,7 +765,7 @@ class ActivityManagerTest extends OrmTestCase
     /**
      * Test that activity action is not returned if an activity is enabled on UI but schema update is not performed yet
      */
-    public function testGetActivityActionsNoSchemaUpdate()
+    public function testGetActivityActionsNoSchemaUpdate(): void
     {
         $targetEntityClass = 'Test\Entity';
         $activityClass = 'Test\Activity';
@@ -818,7 +804,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testAddFilterByTargetEntity()
+    public function testAddFilterByTargetEntity(): void
     {
         $targetEntityClass = Target::class;
         $targetEntityId = 123;
@@ -844,7 +830,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testAddFilterByTargetEntityWithSeveralRootEntities()
+    public function testAddFilterByTargetEntityWithSeveralRootEntities(): void
     {
         $targetEntityClass = Target::class;
         $targetEntityId = 123;
@@ -878,7 +864,7 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
-    public function testAddFilterByTargetEntityWithEmptyQuery()
+    public function testAddFilterByTargetEntityWithEmptyQuery(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The query must have at least one root entity.');
@@ -891,7 +877,7 @@ class ActivityManagerTest extends OrmTestCase
         $this->manager->addFilterByTargetEntity($qb, $targetEntityClass, $targetEntityId);
     }
 
-    public function testAddFilterByTargetEntityWithSeveralRootEntitiesButWithoutActivityEntityClassSpecified()
+    public function testAddFilterByTargetEntityWithSeveralRootEntitiesButWithoutActivityEntityClassSpecified(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
@@ -910,7 +896,7 @@ class ActivityManagerTest extends OrmTestCase
         $this->manager->addFilterByTargetEntity($qb, $targetEntityClass, $targetEntityId);
     }
 
-    public function testAddFilterByTargetEntityWithInvalidActivityEntityClassSpecified()
+    public function testAddFilterByTargetEntityWithInvalidActivityEntityClassSpecified(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The "Entity\NotRoot" must be the root entity.');

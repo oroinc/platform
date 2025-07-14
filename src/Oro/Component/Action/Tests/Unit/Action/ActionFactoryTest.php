@@ -5,9 +5,10 @@ namespace Oro\Component\Action\Tests\Unit\Action;
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ActionFactoryTest extends \PHPUnit\Framework\TestCase
+class ActionFactoryTest extends TestCase
 {
     private const TEST_TYPE = 'test_type';
     private const TEST_TYPE_SERVICE = 'test_type_service';
@@ -26,7 +27,7 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase
         return new ActionFactory($arguments['container'], $arguments['types']);
     }
 
-    public function testCreateNoType()
+    public function testCreateNoType(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The action type must be defined');
@@ -35,7 +36,7 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase
         $factory->create(null);
     }
 
-    public function testCreateIncorrectType()
+    public function testCreateIncorrectType(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('No attached service to action type named `unknown_type`');
@@ -44,7 +45,7 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase
         $factory->create('unknown_type');
     }
 
-    public function testCreateIncorrectInterface()
+    public function testCreateIncorrectInterface(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The service `test_type_service` must implement `ActionInterface`');
@@ -56,7 +57,7 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider createDataProvider
      */
-    public function testCreate(string $type, string $id, array $options = [], bool $isCondition = false)
+    public function testCreate(string $type, string $id, array $options = [], bool $isCondition = false): void
     {
         $action = $this->createMock(ActionInterface::class);
         $action->expects($this->once())
@@ -101,7 +102,7 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetTypes()
+    public function testGetTypes(): void
     {
         $types = ['type1' => 'val1', 'type2' => 'val2'];
         $factory = $this->getActionFactory(['types' => $types]);
@@ -109,7 +110,7 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($types, $factory->getTypes());
     }
 
-    public function testIsTypeExists()
+    public function testIsTypeExists(): void
     {
         $factory = $this->getActionFactory();
 

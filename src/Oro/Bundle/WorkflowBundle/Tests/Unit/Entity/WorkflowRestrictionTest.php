@@ -6,8 +6,9 @@ use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowRestrictionTest extends \PHPUnit\Framework\TestCase
+class WorkflowRestrictionTest extends TestCase
 {
     /**
      * @dataProvider propertiesDataProvider
@@ -15,7 +16,7 @@ class WorkflowRestrictionTest extends \PHPUnit\Framework\TestCase
      * @param string $property
      * @param mixed  $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters($property, $value): void
     {
         $restriction = new WorkflowRestriction();
         $accessor = PropertyAccess::createPropertyAccessor();
@@ -36,7 +37,7 @@ class WorkflowRestrictionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testImport()
+    public function testImport(): void
     {
         $restriction = new WorkflowRestriction();
         $step = new WorkflowStep();

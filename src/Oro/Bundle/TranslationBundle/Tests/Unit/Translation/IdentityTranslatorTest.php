@@ -4,8 +4,9 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Bundle\TranslationBundle\Translation\IdentityTranslator;
+use PHPUnit\Framework\TestCase;
 
-class IdentityTranslatorTest extends \PHPUnit\Framework\TestCase
+class IdentityTranslatorTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 

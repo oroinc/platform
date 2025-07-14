@@ -6,23 +6,18 @@ use Oro\Bundle\UIBundle\Formatter\FormatterManager;
 use Oro\Bundle\UIBundle\Provider\UrlWithoutFrontControllerProvider;
 use Oro\Bundle\UIBundle\Twig\FormatExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormatExtensionTest extends \PHPUnit\Framework\TestCase
+class FormatExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var FormatterManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $formatterManager;
-
-    /** @var UrlWithoutFrontControllerProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $urlProvider;
-
-    /** @var FormatExtension */
-    private $extension;
+    private TranslatorInterface&MockObject $translator;
+    private FormatterManager&MockObject $formatterManager;
+    private UrlWithoutFrontControllerProvider&MockObject $urlProvider;
+    private FormatExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +35,7 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new FormatExtension($container);
     }
 
-    public function testFormat()
+    public function testFormat(): void
     {
         $parameter = 'test';
         $formatterName = 'test_format';
@@ -62,7 +57,7 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGenerateUrlWithoutFrontController()
+    public function testGenerateUrlWithoutFrontController(): void
     {
         $name = 'some_route_name';
         $parameters = ['any_route_parameter'];
@@ -79,7 +74,7 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider formatFilenameProvider
      */
-    public function testFormatFilename(string $filename, string $result)
+    public function testFormatFilename(string $filename, string $result): void
     {
         $this->assertEquals(
             $result,
@@ -124,7 +119,7 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider ageDataProvider
      */
-    public function testGetAge(\DateTime|string|null $date, array $options, ?int $age)
+    public function testGetAge(\DateTime|string|null $date, array $options, ?int $age): void
     {
         $this->assertEquals(
             $age,
@@ -132,7 +127,7 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAgeAsStringInvertDiff()
+    public function testGetAgeAsStringInvertDiff(): void
     {
         $date = new \DateTime('+1 year', new \DateTimeZone('UTC'));
 
@@ -146,7 +141,7 @@ class FormatExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAgeAsString()
+    public function testGetAgeAsString(): void
     {
         $date = new \DateTime('-1 year -1 month', new \DateTimeZone('UTC'));
 

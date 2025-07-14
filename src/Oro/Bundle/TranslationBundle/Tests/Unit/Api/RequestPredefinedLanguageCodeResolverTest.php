@@ -3,16 +3,15 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Api;
 
 use Oro\Bundle\TranslationBundle\Api\RequestPredefinedLanguageCodeResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class RequestPredefinedLanguageCodeResolverTest extends \PHPUnit\Framework\TestCase
+class RequestPredefinedLanguageCodeResolverTest extends TestCase
 {
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var RequestPredefinedLanguageCodeResolver */
-    private $resolver;
+    private RequestStack&MockObject $requestStack;
+    private RequestPredefinedLanguageCodeResolver $resolver;
 
     #[\Override]
     protected function setUp(): void

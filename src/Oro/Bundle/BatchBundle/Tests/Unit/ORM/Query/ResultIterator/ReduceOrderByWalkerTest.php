@@ -15,11 +15,11 @@ use Doctrine\ORM\Query\AST\SelectExpression;
 use Doctrine\ORM\Query\AST\SelectStatement;
 use Doctrine\ORM\Query\ParserResult;
 use Oro\Bundle\BatchBundle\ORM\Query\ResultIterator\ReduceOrderByWalker;
+use PHPUnit\Framework\TestCase;
 
-class ReduceOrderByWalkerTest extends \PHPUnit\Framework\TestCase
+class ReduceOrderByWalkerTest extends TestCase
 {
-    /** @var ReduceOrderByWalker */
-    private $reduceOrderByWalker;
+    private ReduceOrderByWalker $reduceOrderByWalker;
 
     #[\Override]
     protected function setUp(): void

@@ -10,15 +10,13 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\AttributeField;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\AttributeFieldValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class AttributeFieldValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var FieldNameValidationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $validationHelper;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeConfigProvider;
+    private FieldNameValidationHelper&MockObject $validationHelper;
+    private ConfigProvider&MockObject $attributeConfigProvider;
 
     #[\Override]
     protected function setUp(): void

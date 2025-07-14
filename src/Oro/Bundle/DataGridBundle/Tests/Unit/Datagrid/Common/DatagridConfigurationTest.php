@@ -7,15 +7,15 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
+class DatagridConfigurationTest extends TestCase
 {
-    /** @var DatagridConfiguration */
-    private $configuration;
+    private DatagridConfiguration $configuration;
 
     #[\Override]
     protected function setUp(): void

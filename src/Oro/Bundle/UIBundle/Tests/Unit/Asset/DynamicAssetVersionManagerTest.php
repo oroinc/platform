@@ -3,19 +3,16 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Asset;
 
 use Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
-class DynamicAssetVersionManagerTest extends \PHPUnit\Framework\TestCase
+class DynamicAssetVersionManagerTest extends TestCase
 {
-    /** @var CacheItemPoolInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var CacheItemInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cacheItem;
-
-    /** @var DynamicAssetVersionManager */
-    private $assetVersionManager;
+    private CacheItemPoolInterface&MockObject $cache;
+    private CacheItemInterface&MockObject $cacheItem;
+    private DynamicAssetVersionManager $assetVersionManager;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +22,7 @@ class DynamicAssetVersionManagerTest extends \PHPUnit\Framework\TestCase
         $this->assetVersionManager = new DynamicAssetVersionManager($this->cache);
     }
 
-    public function testGetAssetVersionWithEmptyCache()
+    public function testGetAssetVersionWithEmptyCache(): void
     {
         $this->cache->expects($this->once())
             ->method('getItem')
@@ -38,7 +35,7 @@ class DynamicAssetVersionManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('', $this->assetVersionManager->getAssetVersion('test'));
     }
 
-    public function testGetAssetVersion()
+    public function testGetAssetVersion(): void
     {
         $this->cache->expects($this->once())
             ->method('getItem')
@@ -54,7 +51,7 @@ class DynamicAssetVersionManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('123', $this->assetVersionManager->getAssetVersion('test'));
     }
 
-    public function testUpdateAssetVersionWithEmptyCache()
+    public function testUpdateAssetVersionWithEmptyCache(): void
     {
         $this->cache->expects($this->exactly(3))
             ->method('getItem')
@@ -78,7 +75,7 @@ class DynamicAssetVersionManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('2', $this->assetVersionManager->getAssetVersion('test'));
     }
 
-    public function testUpdateAssetVersion()
+    public function testUpdateAssetVersion(): void
     {
         $this->cache->expects($this->exactly(3))
             ->method('getItem')

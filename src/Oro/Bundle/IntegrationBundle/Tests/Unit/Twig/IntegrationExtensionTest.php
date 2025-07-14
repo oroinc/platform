@@ -5,18 +5,17 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Twig;
 use Oro\Bundle\IntegrationBundle\Event\LoadIntegrationThemesEvent;
 use Oro\Bundle\IntegrationBundle\Twig\IntegrationExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormView;
 
-class IntegrationExtensionTest extends \PHPUnit\Framework\TestCase
+class IntegrationExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dispatcher;
-
-    /** @var IntegrationExtension */
-    private $extension;
+    private EventDispatcherInterface&MockObject $dispatcher;
+    private IntegrationExtension $extension;
 
     #[\Override]
     protected function setUp(): void

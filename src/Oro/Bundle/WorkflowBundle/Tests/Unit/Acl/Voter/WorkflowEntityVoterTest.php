@@ -26,14 +26,9 @@ class WorkflowEntityVoterTest extends TestCase
 {
     private const SUPPORTED_CLASS = User::class;
 
-    /** @var DoctrineHelper|MockObject */
-    private $doctrineHelper;
-
-    /** @var WorkflowRegistry|MockObject */
-    private $workflowRegistry;
-
-    /** @var WorkflowEntityVoter */
-    private $voter;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private WorkflowRegistry&MockObject $workflowRegistry;
+    private WorkflowEntityVoter $voter;
 
     #[\Override]
     protected function setUp(): void
@@ -60,7 +55,7 @@ class WorkflowEntityVoterTest extends TestCase
         array $attributes = [],
         bool $updatable = true,
         bool $deletable = true
-    ) {
+    ): void {
         $definition = new WorkflowDefinition();
         $definition->setRelatedEntity(self::SUPPORTED_CLASS);
 

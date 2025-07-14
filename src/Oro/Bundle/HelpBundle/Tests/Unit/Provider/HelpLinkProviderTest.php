@@ -8,11 +8,13 @@ use Oro\Bundle\HelpBundle\Provider\HelpLinkProvider;
 use Oro\Bundle\HelpBundle\Tests\Unit\Fixtures\Bundles\TestBundle\Controller\TestController;
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
 use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Cache\CacheInterface;
 
-class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
+class HelpLinkProviderTest extends TestCase
 {
     private const VERSION = '1.0';
 
@@ -20,17 +22,10 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
     private const TEST = 'http://test.com';
     private const TEST_WIKI = self::TEST . '/wiki';
 
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var ControllerClassProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $controllerClassProvider;
-
-    /** @var VersionHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $helper;
-
-    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
+    private RequestStack&MockObject $requestStack;
+    private ControllerClassProvider&MockObject $controllerClassProvider;
+    private VersionHelper&MockObject $helper;
+    private CacheInterface&MockObject $cache;
 
     #[\Override]
     protected function setUp(): void

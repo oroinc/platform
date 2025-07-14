@@ -4,16 +4,17 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\TranslationBundle\Extension\TranslationContextResolverInterface;
 use Oro\Bundle\TranslationBundle\Provider\TranslationContextProvider;
+use PHPUnit\Framework\TestCase;
 
-class TranslationContextProviderTest extends \PHPUnit\Framework\TestCase
+class TranslationContextProviderTest extends TestCase
 {
-    public function testResolveContextAndNoExtensions()
+    public function testResolveContextAndNoExtensions(): void
     {
         $provider = new TranslationContextProvider([]);
         $this->assertNull($provider->resolveContext('Translation Key'));
     }
 
-    public function testResolveContext()
+    public function testResolveContext(): void
     {
         $extension1 = $this->createMock(TranslationContextResolverInterface::class);
         $extension2 = $this->createMock(TranslationContextResolverInterface::class);
@@ -39,7 +40,7 @@ class TranslationContextProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Resolved Value', $provider->resolveContext('Translation Key'));
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $extension1 = $this->createMock(TranslationContextResolverInterface::class);
         $extension1->expects($this->exactly(2))

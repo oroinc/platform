@@ -16,10 +16,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CaptchaProtectionListenerTest extends TestCase
 {
-    private CaptchaServiceRegistry|MockObject $captchaServiceRegistry;
-    private TranslatorInterface|MockObject $translator;
+    private CaptchaServiceRegistry&MockObject $captchaServiceRegistry;
+    private TranslatorInterface&MockObject $translator;
     private CaptchaProtectionListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->captchaServiceRegistry = $this->createMock(CaptchaServiceRegistry::class);

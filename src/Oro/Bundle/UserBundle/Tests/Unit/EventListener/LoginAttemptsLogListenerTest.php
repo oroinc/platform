@@ -5,19 +5,18 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\EventListener;
 use Oro\Bundle\SecurityBundle\Authentication\Authenticator\UsernamePasswordOrganizationAuthenticator;
 use Oro\Bundle\UserBundle\EventListener\LoginAttemptsLogListener;
 use Oro\Bundle\UserBundle\Security\LoginAttemptsHandlerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 
-class LoginAttemptsLogListenerTest extends \PHPUnit\Framework\TestCase
+class LoginAttemptsLogListenerTest extends TestCase
 {
-    /** @var LoginAttemptsHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $handler;
-
-    /** @var LoginAttemptsLogListener */
-    private $listener;
+    private LoginAttemptsHandlerInterface&MockObject $handler;
+    private LoginAttemptsLogListener $listener;
 
     #[\Override]
     protected function setUp(): void

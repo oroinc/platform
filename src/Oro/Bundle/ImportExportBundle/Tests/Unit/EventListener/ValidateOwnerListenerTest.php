@@ -14,18 +14,15 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
+class ValidateOwnerListenerTest extends TestCase
 {
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipMetadataProvider;
-
-    /** @var ConfigurableTableDataConverter|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurableDataConverter;
-
-    /** @var ValidateOwnerListener */
-    private $listener;
+    private OwnershipMetadataProviderInterface&MockObject $ownershipMetadataProvider;
+    private ConfigurableTableDataConverter&MockObject $configurableDataConverter;
+    private ValidateOwnerListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -48,7 +45,7 @@ class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnProcessAfterWithNonACLProtectedEntity()
+    public function testOnProcessAfterWithNonACLProtectedEntity(): void
     {
         $entity = new TestEntity();
         $context = new Context([]);
@@ -64,7 +61,7 @@ class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($context->getErrors());
     }
 
-    public function testOnProcessAfterWithSystemOwnershipTypeEntity()
+    public function testOnProcessAfterWithSystemOwnershipTypeEntity(): void
     {
         $entity = new TestEntity();
         $context = new Context([]);
@@ -81,7 +78,7 @@ class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($context->getErrors());
     }
 
-    public function testOnProcessAfterWithUserOwnershipTypeEntityWithFillerData()
+    public function testOnProcessAfterWithUserOwnershipTypeEntityWithFillerData(): void
     {
         $entity = new TestEntity();
         $entity->setUserOwner(new User());
@@ -106,7 +103,7 @@ class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($context->getErrors());
     }
 
-    public function testOnProcessAfterWithUserOwnershipTypeEntityWithoutOwnerData()
+    public function testOnProcessAfterWithUserOwnershipTypeEntityWithoutOwnerData(): void
     {
         $entity = new TestEntity();
         $entity->setOrganization(new Organization());
@@ -135,7 +132,7 @@ class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['Owner field: translated_This value should not be blank.'], $context->getErrors());
     }
 
-    public function testOnProcessAfterWithUserOwnershipTypeEntityWithoutOrganizationData()
+    public function testOnProcessAfterWithUserOwnershipTypeEntityWithoutOrganizationData(): void
     {
         $entity = new TestEntity();
         $entity->setUserOwner(new User());
@@ -164,7 +161,7 @@ class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['Organization field: translated_This value should not be blank.'], $context->getErrors());
     }
 
-    public function testOnProcessAfterWithBusinessUnitOwnershipTypeEntityWithFillerData()
+    public function testOnProcessAfterWithBusinessUnitOwnershipTypeEntityWithFillerData(): void
     {
         $entity = new TestEntity();
         $entity->setBusinessUnitOwner(new BusinessUnit());
@@ -189,7 +186,7 @@ class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($context->getErrors());
     }
 
-    public function testOnProcessAfterWithBusinessUnitOwnershipTypeEntityWithoutOwnerData()
+    public function testOnProcessAfterWithBusinessUnitOwnershipTypeEntityWithoutOwnerData(): void
     {
         $entity = new TestEntity();
         $entity->setOrganization(new Organization());
@@ -218,7 +215,7 @@ class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['BU owner field: translated_This value should not be blank.'], $context->getErrors());
     }
 
-    public function testOnProcessAfterWithBusinessUnitOwnershipTypeEntityWithoutOrganizationData()
+    public function testOnProcessAfterWithBusinessUnitOwnershipTypeEntityWithoutOrganizationData(): void
     {
         $entity = new TestEntity();
         $entity->setBusinessUnitOwner(new BusinessUnit());
@@ -247,7 +244,7 @@ class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['Organization field: translated_This value should not be blank.'], $context->getErrors());
     }
 
-    public function testOnProcessAfterWithOrganizationOwnershipTypeEntityWithFillerData()
+    public function testOnProcessAfterWithOrganizationOwnershipTypeEntityWithFillerData(): void
     {
         $entity = new TestEntity();
         $entity->setOrganization(new Organization());
@@ -269,7 +266,7 @@ class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($context->getErrors());
     }
 
-    public function testOnProcessAfterWithOrganizationOwnershipTypeEntityWithoutOwnerData()
+    public function testOnProcessAfterWithOrganizationOwnershipTypeEntityWithoutOwnerData(): void
     {
         $entity = new TestEntity();
         $context = new Context([]);

@@ -7,16 +7,15 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ResetPasswordExtentionTest extends \PHPUnit\Framework\TestCase
+class ResetPasswordExtentionTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DatagridConfiguration */
-    private $configuration;
-
-    /** @var ResetPasswordExtension */
-    private $resetExtension;
+    private DatagridConfiguration&MockObject $configuration;
+    private ResetPasswordExtension $resetExtension;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class ResetPasswordExtentionTest extends \PHPUnit\Framework\TestCase
         $this->resetExtension->setParameters(new ParameterBag());
     }
 
-    public function testIsApplicable()
+    public function testIsApplicable(): void
     {
         $request = $this->createMock(Request::class);
         $request->expects($this->once())
@@ -49,7 +48,7 @@ class ResetPasswordExtentionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->resetExtension->isApplicable($this->configuration));
     }
 
-    public function testVisitDatasource()
+    public function testVisitDatasource(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->once())

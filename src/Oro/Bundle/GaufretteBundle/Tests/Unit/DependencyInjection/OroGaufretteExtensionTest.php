@@ -6,11 +6,12 @@ use Knp\Bundle\GaufretteBundle\DependencyInjection\KnpGaufretteExtension;
 use Oro\Bundle\GaufretteBundle\DependencyInjection\Factory\LocalConfigurationFactory;
 use Oro\Bundle\GaufretteBundle\DependencyInjection\OroGaufretteExtension;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class OroGaufretteExtensionTest extends \PHPUnit\Framework\TestCase
+class OroGaufretteExtensionTest extends TestCase
 {
     private ExtendedContainerBuilder $container;
     private OroGaufretteExtension $extension;
@@ -42,13 +43,13 @@ class OroGaufretteExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->addConfigurationFactory(new LocalConfigurationFactory());
     }
 
-    public function testConfigureReadonlyGaufretteProtocolWhenGaufretteProtocolIsNotConfigured()
+    public function testConfigureReadonlyGaufretteProtocolWhenGaufretteProtocolIsNotConfigured(): void
     {
         $this->extension->load([], $this->container);
         self::assertFalse($this->container->hasParameter('oro_gaufrette.stream_wrapper.readonly_protocol'));
     }
 
-    public function testConfigureReadonlyGaufretteProtocolWhenGaufretteProtocolIsConfigured()
+    public function testConfigureReadonlyGaufretteProtocolWhenGaufretteProtocolIsConfigured(): void
     {
         $this->container->setParameter('knp_gaufrette.stream_wrapper.protocol', 'gaufrette');
         $this->extension->load([], $this->container);
@@ -58,13 +59,13 @@ class OroGaufretteExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConfigureReadonlyGaufretteProtocolWhenIsIsSetExplicitlyAndGaufretteProtocolIsNotConfigured()
+    public function testConfigureReadonlyGaufretteProtocolWhenIsIsSetExplicitlyAndProtocolIsNotConfigured(): void
     {
         $this->extension->load([['stream_wrapper' => ['readonly_protocol' => 'test-protocol']]], $this->container);
         self::assertFalse($this->container->hasParameter('oro_gaufrette.stream_wrapper.readonly_protocol'));
     }
 
-    public function testConfigureReadonlyGaufretteProtocolWhenIsIsSetExplicitlyAndGaufretteProtocolIsConfigured()
+    public function testConfigureReadonlyGaufretteProtocolWhenIsIsSetExplicitlyAndProtocolIsConfigured(): void
     {
         $this->container->setParameter('knp_gaufrette.stream_wrapper.protocol', 'gaufrette');
         $this->extension->load([['stream_wrapper' => ['readonly_protocol' => 'test-protocol']]], $this->container);
@@ -74,13 +75,13 @@ class OroGaufretteExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrependWhenNoConfigParameters()
+    public function testPrependWhenNoConfigParameters(): void
     {
         $this->extension->prepend($this->container);
         self::assertEquals(self::CONFIG, $this->container->getExtensionConfig('knp_gaufrette'));
     }
 
-    public function testPrependForAdapterConfigParameter()
+    public function testPrependForAdapterConfigParameter(): void
     {
         $this->container->setParameter('gaufrette_adapter.first_adapter', 'local:/test1');
         $this->container->setParameter('gaufrette_adapter.third_adapter', 'local:/test3');
@@ -105,7 +106,7 @@ class OroGaufretteExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedConfig, $this->container->getExtensionConfig('knp_gaufrette'));
     }
 
-    public function testPrependForUnknownAdapterConfigParameter()
+    public function testPrependForUnknownAdapterConfigParameter(): void
     {
         $this->container->setParameter('gaufrette_adapter.unknown_adapter', 'local:/test');
 
@@ -118,7 +119,7 @@ class OroGaufretteExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->prepend($this->container);
     }
 
-    public function testPrependForUnknownAdapterTypeConfigParameter()
+    public function testPrependForUnknownAdapterTypeConfigParameter(): void
     {
         $this->container->setParameter('gaufrette_adapter.first_adapter', 'unknown:/test');
 
@@ -135,7 +136,7 @@ class OroGaufretteExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->prepend($this->container);
     }
 
-    public function testPrependForFilesystemConfigParameter()
+    public function testPrependForFilesystemConfigParameter(): void
     {
         $this->container->setParameter('gaufrette_filesystem.first_fs', 'local:/test1');
         $this->container->setParameter('gaufrette_filesystem.third_fs', 'local:/test3');
@@ -170,7 +171,7 @@ class OroGaufretteExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedConfig, $this->container->getExtensionConfig('knp_gaufrette'));
     }
 
-    public function testPrependForUnknownFilesystemConfigParameter()
+    public function testPrependForUnknownFilesystemConfigParameter(): void
     {
         $this->container->setParameter('gaufrette_filesystem.unknown_fs', 'local:/test');
 
@@ -183,7 +184,7 @@ class OroGaufretteExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->prepend($this->container);
     }
 
-    public function testPrependForFilesystemWithUnknownAdapterTypeConfigParameter()
+    public function testPrependForFilesystemWithUnknownAdapterTypeConfigParameter(): void
     {
         $this->container->setParameter('gaufrette_filesystem.first_fs', 'unknown:/test');
 

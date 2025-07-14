@@ -4,11 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Handler;
 
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\VariableHandler;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use PHPUnit\Framework\TestCase;
 
-class VariableHandlerTest extends \PHPUnit\Framework\TestCase
+class VariableHandlerTest extends TestCase
 {
-    /** @var VariableHandler */
-    private $handler;
+    private VariableHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class VariableHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider handleDataProvider
      */
-    public function testHandle(array $expected, array $input)
+    public function testHandle(array $expected, array $input): void
     {
         $actual = $this->handler->handle($input);
 
@@ -135,7 +135,7 @@ class VariableHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testHandleEmptyConfiguration()
+    public function testHandleEmptyConfiguration(): void
     {
         $configuration = [
             WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS => [

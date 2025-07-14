@@ -6,10 +6,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
+use PHPUnit\Framework\TestCase;
 
-class OrmFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
+class OrmFilterDatasourceAdapterTest extends TestCase
 {
-    public function testGenerateParameterName()
+    public function testGenerateParameterName(): void
     {
         $parameters = new ArrayCollection([new Parameter('_gpnpint1', 1)]);
 

@@ -3,11 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+use PHPUnit\Framework\TestCase;
 
-class ProcessDefinitionTest extends \PHPUnit\Framework\TestCase
+class ProcessDefinitionTest extends TestCase
 {
-    /** @var ProcessDefinition */
-    private $entity;
+    private ProcessDefinition $entity;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +21,7 @@ class ProcessDefinitionTest extends \PHPUnit\Framework\TestCase
      * @param mixed $defaultValue
      * @dataProvider setGetDataProvider
      */
-    public function testSetGetEntity($propertyName, $testValue, $defaultValue = null)
+    public function testSetGetEntity($propertyName, $testValue, $defaultValue = null): void
     {
         $setter = 'set' . ucfirst($propertyName);
         $getter = (is_bool($testValue) ? 'is' : 'get') . ucfirst($propertyName);
@@ -46,7 +46,7 @@ class ProcessDefinitionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testImport()
+    public function testImport(): void
     {
         $importedEntity = new ProcessDefinition();
         $importedEntity->setName('my_name')
@@ -76,7 +76,7 @@ class ProcessDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->entity->isEnabled()); // enabled must not be changed
     }
 
-    public function testPrePersist()
+    public function testPrePersist(): void
     {
         $this->assertNull($this->entity->getCreatedAt());
         $this->assertNull($this->entity->getUpdatedAt());
@@ -89,7 +89,7 @@ class ProcessDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('UTC', $this->entity->getUpdatedAt()->getTimezone()->getName());
     }
 
-    public function testPreUpdate()
+    public function testPreUpdate(): void
     {
         $this->assertNull($this->entity->getUpdatedAt());
 

@@ -6,23 +6,23 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\GridParams\GridParamsExtension;
+use PHPUnit\Framework\TestCase;
 
-class GridParamsExtensionTest extends \PHPUnit\Framework\TestCase
+class GridParamsExtensionTest extends TestCase
 {
-    /** @var GridParamsExtension */
-    private $extension;
+    private GridParamsExtension $extension;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->extension  = new GridParamsExtension();
+        $this->extension = new GridParamsExtension();
         $this->extension->setParameters(new ParameterBag());
     }
 
     /**
      * @dataProvider isApplicableProvider
      */
-    public function testIsApplicable(array $input, bool $result)
+    public function testIsApplicable(array $input, bool $result): void
     {
         $this->assertEquals(
             $result,
@@ -55,7 +55,7 @@ class GridParamsExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider visitMetadataProvider
      */
-    public function testVisitMetadata(array $parameters, array $gridParameters)
+    public function testVisitMetadata(array $parameters, array $gridParameters): void
     {
         $dataGridConfig = $this->createMock(DatagridConfiguration::class);
         $metadata = $this->createMock(MetadataObject::class);

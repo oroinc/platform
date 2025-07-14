@@ -12,27 +12,18 @@ use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestContext;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestTwoWayConnector as TestConnector;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ReverseSyncProcessorTest extends \PHPUnit\Framework\TestCase
+class ReverseSyncProcessorTest extends TestCase
 {
-    /** @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $processorRegistry;
-
-    /** @var Executor|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobExecutor;
-
-    /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var Integration|\PHPUnit\Framework\MockObject\MockObject */
-    private $integration;
-
-    /** @var LoggerStrategy|\PHPUnit\Framework\MockObject\MockObject */
-    private $log;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
+    private ProcessorRegistry&MockObject $processorRegistry;
+    private Executor&MockObject $jobExecutor;
+    private TypesRegistry&MockObject $registry;
+    private Integration&MockObject $integration;
+    private LoggerStrategy&MockObject $log;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
 
     #[\Override]
     protected function setUp(): void
@@ -45,7 +36,7 @@ class ReverseSyncProcessorTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $connectors = 'test';
         $params = [];
@@ -59,7 +50,7 @@ class ReverseSyncProcessorTest extends \PHPUnit\Framework\TestCase
         $processor->process($this->integration, $connectors, $params);
     }
 
-    public function testOneIntegrationConnectorProcess()
+    public function testOneIntegrationConnectorProcess(): void
     {
         $connector = 'testConnector';
 

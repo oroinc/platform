@@ -11,22 +11,19 @@ use Oro\Bundle\BatchBundle\Event\StepExecutionEvent;
 use Oro\Bundle\BatchBundle\EventListener\LoggerSubscriber;
 use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Oro\Component\Testing\Logger\BufferingLogger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class LoggerSubscriberTest extends \PHPUnit\Framework\TestCase
+class LoggerSubscriberTest extends TestCase
 {
-    /** @var BufferingLogger */
-    private $logger;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var LoggerSubscriber */
-    private $subscriber;
+    private BufferingLogger $logger;
+    private TranslatorInterface&MockObject $translator;
+    private LoggerSubscriber $subscriber;
 
     #[\Override]
     protected function setUp(): void
@@ -169,15 +166,12 @@ class LoggerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testStepExecutionErrored(): void
     {
-        $this->translator
-            ->expects(self::any())
+        $this->translator->expects(self::any())
             ->method('trans')
-            ->willReturnMap(
-                [
-                    ['foo is wrong', ['foo' => 'Item1'], 'messages', 'en', 'Item1 is wrong'],
-                    ['bar is wrong', ['bar' => 'Item2'], 'messages', 'en', 'Item2 is wrong'],
-                ]
-            );
+            ->willReturnMap([
+                ['foo is wrong', ['foo' => 'Item1'], 'messages', 'en', 'Item1 is wrong'],
+                ['bar is wrong', ['bar' => 'Item2'], 'messages', 'en', 'Item2 is wrong'],
+            ]);
 
         $jobExecution = $this->createMock(JobExecution::class);
         $jobExecution->expects(self::any())
@@ -257,8 +251,7 @@ class LoggerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testInvalidItemExecution(): void
     {
-        $this->translator
-            ->expects(self::any())
+        $this->translator->expects(self::any())
             ->method('trans')
             ->with('batch.invalid_item_reason', ['item' => 'foobar'], 'messages', 'en')
             ->willReturn('This is a valid reason.');

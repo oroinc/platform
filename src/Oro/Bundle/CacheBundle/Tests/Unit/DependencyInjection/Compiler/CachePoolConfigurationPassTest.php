@@ -4,14 +4,15 @@ namespace Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CacheConfigurationPass;
 use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CachePoolConfigurationPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class CachePoolConfigurationPassTest extends \PHPUnit\Framework\TestCase
+class CachePoolConfigurationPassTest extends TestCase
 {
-    public function testDefaultCachePoolDefinitions()
+    public function testDefaultCachePoolDefinitions(): void
     {
         $container = new ContainerBuilder();
 

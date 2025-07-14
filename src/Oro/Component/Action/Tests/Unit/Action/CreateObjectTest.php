@@ -7,13 +7,13 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class CreateObjectTest extends \PHPUnit\Framework\TestCase
+class CreateObjectTest extends TestCase
 {
-    /** @var CreateObject */
-    private $action;
+    private CreateObject $action;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +22,7 @@ class CreateObjectTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
-    public function testInitializeExceptionNoClassName()
+    public function testInitializeExceptionNoClassName(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Class name parameter is required');
@@ -30,7 +30,7 @@ class CreateObjectTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize(['some' => 1, 'attribute' => $this->createMock(PropertyPath::class)]);
     }
 
-    public function testInitializeExceptionNoAttribute()
+    public function testInitializeExceptionNoAttribute(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute name parameter is required');
@@ -38,7 +38,7 @@ class CreateObjectTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize(['class' => 'stdClass']);
     }
 
-    public function testInitializeExceptionInvalidAttribute()
+    public function testInitializeExceptionInvalidAttribute(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute must be valid property definition.');
@@ -46,7 +46,7 @@ class CreateObjectTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize(['class' => 'stdClass', 'attribute' => 'string']);
     }
 
-    public function testExceptionInvalidData()
+    public function testExceptionInvalidData(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Object data must be an array.');
@@ -60,7 +60,7 @@ class CreateObjectTest extends \PHPUnit\Framework\TestCase
         $this->action->execute(new ItemStub());
     }
 
-    public function testInitializeExceptionInvalidArguments()
+    public function testInitializeExceptionInvalidArguments(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Object constructor arguments must be an array.');
@@ -72,7 +72,7 @@ class CreateObjectTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $options = ['class' => 'stdClass', 'attribute' => $this->createMock(PropertyPath::class)];
         self::assertEquals($this->action, $this->action->initialize($options));
@@ -82,7 +82,7 @@ class CreateObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeDataProvider
      */
-    public function testExecute(array $options, array $contextData = [], ?array $expectedData = null)
+    public function testExecute(array $options, array $contextData = [], ?array $expectedData = null): void
     {
         $context = new ItemStub($contextData);
         $attributeName = (string)$options['attribute'];

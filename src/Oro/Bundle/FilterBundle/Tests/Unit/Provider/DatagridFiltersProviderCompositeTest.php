@@ -5,14 +5,13 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Provider;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\FilterBundle\Provider\DatagridFiltersProviderComposite;
 use Oro\Bundle\FilterBundle\Provider\DatagridFiltersProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DatagridFiltersProviderCompositeTest extends \PHPUnit\Framework\TestCase
+class DatagridFiltersProviderCompositeTest extends TestCase
 {
-    /** @var DatagridFiltersProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerProvider1;
-
-    /** @var DatagridFiltersProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerProvider2;
+    private DatagridFiltersProviderInterface&MockObject $innerProvider1;
+    private DatagridFiltersProviderInterface&MockObject $innerProvider2;
 
     #[\Override]
     protected function setUp(): void

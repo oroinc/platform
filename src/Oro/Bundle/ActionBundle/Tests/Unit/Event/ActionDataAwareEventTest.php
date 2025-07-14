@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class ActionDataAwareEventTest extends TestCase
 {
-    public function testEventMinimal()
+    public function testEventMinimal(): void
     {
         $data = new ActionData();
         $event = $this->getMockForAbstractClass(ActionDataAwareEvent::class, [$data]);
@@ -18,7 +18,7 @@ class ActionDataAwareEventTest extends TestCase
         $this->assertNull($event->getErrors());
     }
 
-    public function testEventFull()
+    public function testEventFull(): void
     {
         $data = new ActionData();
         $errors = new ArrayCollection();

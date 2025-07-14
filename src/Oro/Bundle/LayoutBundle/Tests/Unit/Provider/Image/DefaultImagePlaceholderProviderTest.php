@@ -4,14 +4,15 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Provider\Image;
 
 use Oro\Bundle\AttachmentBundle\Imagine\Provider\ImagineUrlProviderInterface;
 use Oro\Bundle\LayoutBundle\Provider\Image\DefaultImagePlaceholderProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class DefaultImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
+class DefaultImagePlaceholderProviderTest extends TestCase
 {
     private const DEFAULT_PATH = '/some/default/image.png';
 
-    private ImagineUrlProviderInterface|\PHPUnit\Framework\MockObject\MockObject $imagineUrlProvider;
-
+    private ImagineUrlProviderInterface&MockObject $imagineUrlProvider;
     private DefaultImagePlaceholderProvider $provider;
 
     #[\Override]

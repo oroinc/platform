@@ -6,24 +6,19 @@ use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 use Oro\Bundle\EntityMergeBundle\Twig\MergeExtension;
 use Oro\Bundle\EntityMergeBundle\Twig\MergeRenderer;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormView;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MergeExtensionTest extends \PHPUnit\Framework\TestCase
+class MergeExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var AccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $accessor;
-
-    /** @var MergeRenderer|\PHPUnit\Framework\MockObject\MockObject */
-    private $renderer;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var MergeExtension */
-    private $extension;
+    private AccessorInterface&MockObject $accessor;
+    private MergeRenderer&MockObject $renderer;
+    private TranslatorInterface&MockObject $translator;
+    private MergeExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +36,7 @@ class MergeExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new MergeExtension($container);
     }
 
-    public function testSortMergeFields()
+    public function testSortMergeFields(): void
     {
         $foo = $this->createFormView(['name' => 'foo', 'label' => 'Foo']);
         $bar = $this->createFormView(['name' => 'bar', 'label' => 'Bar']);

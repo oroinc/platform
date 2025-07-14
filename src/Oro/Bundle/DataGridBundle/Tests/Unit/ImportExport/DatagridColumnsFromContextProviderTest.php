@@ -12,13 +12,13 @@ use Oro\Bundle\DataGridBundle\Provider\State\ColumnsStateProvider;
 use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DatagridColumnsFromContextProviderTest extends \PHPUnit\Framework\TestCase
+class DatagridColumnsFromContextProviderTest extends TestCase
 {
-    private DatagridManager|\PHPUnit\Framework\MockObject\MockObject $datagridManager;
-
-    private DatagridStateProviderInterface|\PHPUnit\Framework\MockObject\MockObject $columnsStateProvider;
-
+    private DatagridManager&MockObject $datagridManager;
+    private DatagridStateProviderInterface&MockObject $columnsStateProvider;
     private DatagridColumnsFromContextProvider $datagridColumnsFromContextProvider;
 
     #[\Override]
@@ -58,12 +58,10 @@ class DatagridColumnsFromContextProviderTest extends \PHPUnit\Framework\TestCase
 
         $datagrid = $this->createMock(DatagridInterface::class);
         $datagridConfig = DatagridConfiguration::create([Configuration::COLUMNS_KEY => $gridColumns]);
-        $datagrid
-            ->expects(self::once())
+        $datagrid->expects(self::once())
             ->method('getConfig')
             ->willReturn($datagridConfig);
-        $datagrid
-            ->expects(self::once())
+        $datagrid->expects(self::once())
             ->method('getParameters')
             ->willReturn($gridParameters);
         $this->datagridManager->expects(self::once())

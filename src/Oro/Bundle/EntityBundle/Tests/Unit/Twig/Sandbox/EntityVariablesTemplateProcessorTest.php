@@ -16,10 +16,8 @@ use Twig\Environment as TwigEnvironment;
 
 class EntityVariablesTemplateProcessorTest extends TestCase
 {
-    private TwigEnvironment|MockObject $twigEnvironment;
-
-    private EntityVariableComputer|MockObject $entityVariableComputer;
-
+    private TwigEnvironment&MockObject $twigEnvironment;
+    private EntityVariableComputer&MockObject $entityVariableComputer;
     private EntityVariablesTemplateProcessor $processor;
 
     #[\Override]
@@ -29,7 +27,7 @@ class EntityVariablesTemplateProcessorTest extends TestCase
         $this->entityVariableComputer = $this->createMock(EntityVariableComputer::class);
         $translator = $this->createMock(TranslatorInterface::class);
 
-        $translator
+        $translator->expects(self::any())
             ->method('trans')
             ->willReturnCallback(function (string $key) {
                 return $key . '.translated';
@@ -48,12 +46,10 @@ class EntityVariablesTemplateProcessorTest extends TestCase
         $templateContent = 'template content';
         $templateData = $this->createMock(TemplateData::class);
 
-        $this->twigEnvironment
-            ->expects(self::never())
+        $this->twigEnvironment->expects(self::never())
             ->method(self::anything());
 
-        $this->entityVariableComputer
-            ->expects(self::never())
+        $this->entityVariableComputer->expects(self::never())
             ->method(self::anything());
 
         $this->processor->processEntityVariables($templateContent, $templateData);
@@ -76,8 +72,7 @@ class EntityVariablesTemplateProcessorTest extends TestCase
             'computed'
         );
 
-        $this->entityVariableComputer
-            ->expects(self::any())
+        $this->entityVariableComputer->expects(self::any())
             ->method('computeEntityVariable')
             ->willReturnMap([
                 ['entity.computable_variable', $templateData, 'computed.computable_variable'],
@@ -85,12 +80,12 @@ class EntityVariablesTemplateProcessorTest extends TestCase
             ]);
 
         $entityFormatExtension = $this->createMock(EntityFormatExtension::class);
-        $this->twigEnvironment
+        $this->twigEnvironment->expects(self::any())
             ->method('getExtension')
             ->with(EntityFormatExtension::class)
             ->willReturn($entityFormatExtension);
 
-        $entityFormatExtension
+        $entityFormatExtension->expects(self::any())
             ->method('getSafeFormatExpression')
             ->willReturnMap([
                 [

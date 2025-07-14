@@ -10,28 +10,22 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Migrations\Schema\v1_1\UpdateAclEntriesMigrationQuery;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 
-class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
+class UpdateAclEntriesMigrationQueryTest extends TestCase
 {
     private const ENTRIES_TABLE_NAME = 'acl_entries';
     private const OBJECT_IDENTITIES_TABLE_NAME = 'acl_object_identities';
     private const ACL_CLASSES_TABLE_NAME = 'acl_classes';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Connection */
-    private $connection;
+    private Connection&MockObject $connection;
+    private AclManager&MockObject $aclManager;
+    private AclCacheInterface&MockObject $aclCache;
+    private UpdateAclEntriesMigrationQuery $query;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AclManager */
-    private $aclManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AclCacheInterface */
-    private $aclCache;
-
-    /** @var UpdateAclEntriesMigrationQuery */
-    private $query;
-
-    /** @var array */
-    private $keys = ['id', 'class_id', 'object_identity_id', 'field_name', 'ace_order', 'security_identity_id',
+    private array $keys = ['id', 'class_id', 'object_identity_id', 'field_name', 'ace_order', 'security_identity_id',
         'mask', 'granting', 'granting_strategy', 'audit_success', 'audit_failure'];
 
     #[\Override]
@@ -61,7 +55,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $this->query->setConnection($this->connection);
     }
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $this->assertConnectionCalled(true);
         $this->assertEntityAclExtensionCalled();
@@ -73,7 +67,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $this->assertConnectionCalled();
         $this->assertEntityAclExtensionCalled();
@@ -122,19 +116,17 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
 
         $this->connection->expects($this->exactly($updatesCount))
             ->method('executeStatement')
-            ->willReturnCallback(
-                function ($query, array $params = [], array $types = []) use (&$data) {
-                    $index = array_search($params, $data, true);
+            ->willReturnCallback(function ($query, array $params = [], array $types = []) use (&$data) {
+                $index = array_search($params, $data, true);
 
-                    self::assertNotFalse($index);
-                    self::assertStringContainsString(
-                        (count($data[$index]) > 2 ? 'INSERT INTO ' : 'UPDATE ') . self::ENTRIES_TABLE_NAME,
-                        $query
-                    );
+                self::assertNotFalse($index);
+                self::assertStringContainsString(
+                    (count($data[$index]) > 2 ? 'INSERT INTO ' : 'UPDATE ') . self::ENTRIES_TABLE_NAME,
+                    $query
+                );
 
-                    unset($data[$index]);
-                }
-            );
+                unset($data[$index]);
+            });
     }
 
     private function assertAclCacheCleared(bool $never = false)

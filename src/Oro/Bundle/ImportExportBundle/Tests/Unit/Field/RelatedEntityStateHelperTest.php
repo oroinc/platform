@@ -14,17 +14,14 @@ use Oro\Bundle\ImportExportBundle\Field\RelatedEntityStateHelper;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class RelatedEntityStateHelperTest extends \PHPUnit\Framework\TestCase
+class RelatedEntityStateHelperTest extends TestCase
 {
-    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldHelper;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var RelatedEntityStateHelper */
-    private $helper;
+    private FieldHelper&MockObject $fieldHelper;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private RelatedEntityStateHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +35,7 @@ class RelatedEntityStateHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testForgetLoadedCollectionItems()
+    public function testForgetLoadedCollectionItems(): void
     {
         $businessUnit = new BusinessUnit();
         ReflectionUtil::setId($businessUnit, 1);
@@ -117,7 +114,7 @@ class RelatedEntityStateHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($organization->getBusinessUnits()->contains($businessUnit));
     }
 
-    public function testRemoveRememberedCollectionItems()
+    public function testRemoveRememberedCollectionItems(): void
     {
         $businessUnit = new BusinessUnit();
         ReflectionUtil::setId($businessUnit, 1);

@@ -6,16 +6,14 @@ use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
 use Oro\Bundle\ImportExportBundle\Form\Type\ExportType;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class ExportTypeTest extends FormIntegrationTestCase
 {
-    /** @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $processorRegistry;
-
-    /** @var ExportType */
-    private $exportType;
+    private ProcessorRegistry&MockObject $processorRegistry;
+    private ExportType $exportType;
 
     #[\Override]
     protected function setUp(): void

@@ -10,7 +10,7 @@ class SameEntityVirtualColumnsTest extends DatagridConfigurationBuilderTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testVirtualColumns()
+    public function testVirtualColumns(): void
     {
         $en = 'Acme\Entity\TestEntity';
         $definition = [
@@ -128,7 +128,7 @@ class SameEntityVirtualColumnsTest extends DatagridConfigurationBuilderTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testVirtualColumnsWithJoinsToDifferentTablesButTheSameTableAlias()
+    public function testVirtualColumnsWithJoinsToDifferentTablesButTheSameTableAlias(): void
     {
         $en = 'Acme\Entity\TestEntity';
         $definition = [

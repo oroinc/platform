@@ -6,36 +6,30 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigFieldHandler;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
+class ConfigFieldHandlerTest extends TestCase
 {
     use EntityTrait;
 
     private const SAMPLE_FORM_ACTION = '/entity_config/create';
     private const SAMPLE_SUCCESS_MESSAGE = 'Entity config was successfully saved';
 
-    /** @var ConfigHelperHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $configHelperHandler;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var FieldConfigModel|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldConfigModel;
-
-    /** @var ConfigFieldHandler */
-    private $handler;
+    private ConfigHelperHandler&MockObject $configHelperHandler;
+    private RequestStack&MockObject $requestStack;
+    private FieldConfigModel $fieldConfigModel;
+    private ConfigFieldHandler $handler;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->configHelperHandler = $this->createMock(ConfigHelperHandler::class);
         $this->requestStack = $this->createMock(RequestStack::class);
-
         $this->fieldConfigModel = $this->getEntity(FieldConfigModel::class, ['id' => 777]);
 
         $this->handler = new ConfigFieldHandler(
@@ -65,7 +59,7 @@ class ConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         return $form;
     }
 
-    public function testHandleUpdateWhenFormIsValid()
+    public function testHandleUpdateWhenFormIsValid(): void
     {
         $this->expectsFormCreationSubmissionAndValidation(true);
         $successMessage = 'Success message';
@@ -83,7 +77,7 @@ class ConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($redirectResponse->getStatusCode(), $response->getStatusCode());
     }
 
-    public function testHandleUpdateWhenFormIsNotValid()
+    public function testHandleUpdateWhenFormIsNotValid(): void
     {
         $form = $this->expectsFormCreationSubmissionAndValidation(false);
         $successMessage = 'Success message';

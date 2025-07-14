@@ -5,8 +5,9 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Step;
 use Oro\Bundle\EntityMergeBundle\Model\Step\DependentMergeStepInterface;
 use Oro\Bundle\EntityMergeBundle\Model\Step\MergeStepInterface;
 use Oro\Bundle\EntityMergeBundle\Model\Step\StepSorter;
+use PHPUnit\Framework\TestCase;
 
-class StepSorterTest extends \PHPUnit\Framework\TestCase
+class StepSorterTest extends TestCase
 {
     private function createMockStep($mockClassName): MergeStepInterface
     {
@@ -36,12 +37,12 @@ class StepSorterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testGetOrderedStepsWhenNoSteps()
+    public function testGetOrderedStepsWhenNoSteps(): void
     {
         $this->assertSame([], StepSorter::getOrderedSteps([]));
     }
 
-    public function testGetOrderedStepsForStepsWithoutDependencies()
+    public function testGetOrderedStepsForStepsWithoutDependencies(): void
     {
         $foo = $this->createMockStep('OroEntityMergeBundle_Tests_Foo_1');
         $bar = $this->createMockStep('OroEntityMergeBundle_Tests_Bar_1');
@@ -50,7 +51,7 @@ class StepSorterTest extends \PHPUnit\Framework\TestCase
         $this->assertStepsEqual([$foo, $bar], $steps);
     }
 
-    public function testGetOrderedStepsForStepsWithDependencies()
+    public function testGetOrderedStepsForStepsWithDependencies(): void
     {
         $foo = $this->createMockDependentStep(
             'OroEntityMergeBundle_Tests_Foo_2',
@@ -66,7 +67,7 @@ class StepSorterTest extends \PHPUnit\Framework\TestCase
         $this->assertStepsEqual([$baz, $bar, $foo], $steps);
     }
 
-    public function testGetOrderedStepsForStepsWithCyclicDependencies()
+    public function testGetOrderedStepsForStepsWithCyclicDependencies(): void
     {
         $foo = $this->createMockDependentStep(
             'OroEntityMergeBundle_Tests_Foo_3',

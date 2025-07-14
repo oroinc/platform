@@ -8,6 +8,8 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasLoader;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
 use Oro\Component\Config\Cache\ConfigCacheStateInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
@@ -15,25 +17,14 @@ use Psr\Log\LoggerInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
+class EntityAliasResolverTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasLoader */
-    private $loader;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheItemPoolInterface */
-    private $cache;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheItemInterface */
-    private $cacheItem;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
-    private $logger;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCacheStateInterface */
-    private $configCacheState;
-
-    /** @var EntityAliasResolver */
-    private $entityAliasResolver;
+    private EntityAliasLoader&MockObject $loader;
+    private CacheItemPoolInterface&MockObject $cache;
+    private CacheItemInterface&MockObject $cacheItem;
+    private LoggerInterface&MockObject $logger;
+    private ConfigCacheStateInterface&MockObject $configCacheState;
+    private EntityAliasResolver $entityAliasResolver;
 
     #[\Override]
     protected function setUp(): void
@@ -71,7 +62,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
             });
     }
 
-    public function testHasAliasForUnknownEntity()
+    public function testHasAliasForUnknownEntity(): void
     {
         $this->setLoadExpectations();
 
@@ -80,7 +71,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAliasForUnknownEntity()
+    public function testGetAliasForUnknownEntity(): void
     {
         $this->expectException(EntityAliasNotFoundException::class);
         $this->expectExceptionMessage('An alias for "Test\UnknownEntity" entity not found.');
@@ -90,7 +81,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         $this->entityAliasResolver->getAlias('Test\UnknownEntity');
     }
 
-    public function testGetPluralAliasForUnknownEntity()
+    public function testGetPluralAliasForUnknownEntity(): void
     {
         $this->expectException(EntityAliasNotFoundException::class);
         $this->expectExceptionMessage('A plural alias for "Test\UnknownEntity" entity not found.');
@@ -100,7 +91,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         $this->entityAliasResolver->getPluralAlias('Test\UnknownEntity');
     }
 
-    public function testGetClassByAliasForUnknownAlias()
+    public function testGetClassByAliasForUnknownAlias(): void
     {
         $this->expectException(EntityAliasNotFoundException::class);
         $this->expectExceptionMessage('The alias "unknown" is not associated with any entity class.');
@@ -110,7 +101,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         $this->entityAliasResolver->getClassByAlias('unknown');
     }
 
-    public function testGetClassByPluralAliasForUnknownAlias()
+    public function testGetClassByPluralAliasForUnknownAlias(): void
     {
         $this->expectException(EntityAliasNotFoundException::class);
         $this->expectExceptionMessage('The plural alias "unknown" is not associated with any entity class.');
@@ -120,7 +111,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         $this->entityAliasResolver->getClassByPluralAlias('unknown');
     }
 
-    public function testHasAlias()
+    public function testHasAlias(): void
     {
         $this->setLoadExpectations();
 
@@ -129,7 +120,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAlias()
+    public function testGetAlias(): void
     {
         $this->setLoadExpectations();
 
@@ -139,7 +130,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPluralAlias()
+    public function testGetPluralAlias(): void
     {
         $this->setLoadExpectations();
 
@@ -149,7 +140,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetClassByAlias()
+    public function testGetClassByAlias(): void
     {
         $this->setLoadExpectations();
 
@@ -159,7 +150,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetClassByPluralAlias()
+    public function testGetClassByPluralAlias(): void
     {
         $this->setLoadExpectations();
 
@@ -169,7 +160,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAll()
+    public function testGetAll(): void
     {
         $this->setLoadExpectations();
 
@@ -179,7 +170,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWarmUpCache()
+    public function testWarmUpCache(): void
     {
         $this->cache->expects(self::once())
             ->method('deleteItem')
@@ -190,7 +181,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         $this->entityAliasResolver->warmUpCache();
     }
 
-    public function testClearCache()
+    public function testClearCache(): void
     {
         $this->cache->expects(self::once())
             ->method('deleteItem')
@@ -199,7 +190,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         $this->entityAliasResolver->clearCache();
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $loadedStorage = new EntityAliasStorage();
         $loadedStorage->addEntityAlias('Test\Entity1', new EntityAlias('entity1_alias', 'entity1_plural_alias'));
@@ -234,7 +225,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadFromCache()
+    public function testLoadFromCache(): void
     {
         $storage = new EntityAliasStorage();
         $storage->addEntityAlias('Test\Entity1', new EntityAlias('entity1_alias', 'entity1_plural_alias'));
@@ -259,7 +250,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadFromCacheWithConfigCacheStateWhenConfigCacheTimestampIsNull()
+    public function testLoadFromCacheWithConfigCacheStateWhenConfigCacheTimestampIsNull(): void
     {
         $this->entityAliasResolver->setConfigCacheState($this->configCacheState);
 
@@ -291,7 +282,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadFromCacheWithConfigCacheStateWhenConfigCacheIsFresh()
+    public function testLoadFromCacheWithConfigCacheStateWhenConfigCacheIsFresh(): void
     {
         $this->entityAliasResolver->setConfigCacheState($this->configCacheState);
 
@@ -325,7 +316,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadFromCacheWithConfigCacheStateWhenConfigCacheIsDirty()
+    public function testLoadFromCacheWithConfigCacheStateWhenConfigCacheIsDirty(): void
     {
         $this->entityAliasResolver->setConfigCacheState($this->configCacheState);
 

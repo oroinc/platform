@@ -13,6 +13,7 @@ class ResetConfigManagerMemoryCacheExtensionTest extends TestCase
     private ResetConfigManagerMemoryCacheExtension $extension;
     private MemoryCache $memoryCache;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->memoryCache = new MemoryCache();
@@ -21,7 +22,7 @@ class ResetConfigManagerMemoryCacheExtensionTest extends TestCase
 
     public function testOnStart(): void
     {
-        $session = self::createMock(SessionInterface::class);
+        $session = $this->createMock(SessionInterface::class);
         $context = new Context($session);
 
         $this->memoryCache->set('key', 'value');

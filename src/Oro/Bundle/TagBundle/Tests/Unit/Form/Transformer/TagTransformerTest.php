@@ -4,14 +4,13 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Form\Transformer;
 
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Form\Transformer\TagTransformer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TagTransformerTest extends \PHPUnit\Framework\TestCase
+class TagTransformerTest extends TestCase
 {
-    /** @var TagManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var TagTransformer */
-    private $transformer;
+    private TagManager&MockObject $manager;
+    private TagTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class TagTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider valueReverseTransformProvider
      */
-    public function testReverseTransform(string $value, array $tags)
+    public function testReverseTransform(string $value, array $tags): void
     {
         $this->manager->expects($this->once())
             ->method('loadOrCreateTags')
@@ -46,7 +45,7 @@ class TagTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider valueTransformProvider
      */
-    public function testTransform(string $expected, array $value)
+    public function testTransform(string $expected, array $value): void
     {
         $this->assertEquals($expected, $this->transformer->transform($value));
     }

@@ -5,19 +5,18 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Twig\Sandbox;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\EntityDataAccessor;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\EntityVariableComputer;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateData;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class TemplateDataTest extends \PHPUnit\Framework\TestCase
+class TemplateDataTest extends TestCase
 {
-    /** @var EntityVariableComputer|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityVariableComputer;
-
-    /** @var EntityDataAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityDataAccessor;
+    private EntityVariableComputer&MockObject $entityVariableComputer;
+    private EntityDataAccessor&MockObject $entityDataAccessor;
 
     #[\Override]
     protected function setUp(): void
@@ -38,26 +37,26 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetData()
+    public function testGetData(): void
     {
         $data = ['system' => ['key' => 'val'], 'entity' => new \stdClass()];
         $templateData = $this->getTemplateData($data);
         self::assertSame($data, $templateData->getData());
     }
 
-    public function testHasSystemVariablesWhenTheyDoNotExist()
+    public function testHasSystemVariablesWhenTheyDoNotExist(): void
     {
         $templateData = $this->getTemplateData([]);
         self::assertFalse($templateData->hasSystemVariables());
     }
 
-    public function testHasSystemVariablesWhenTheyExist()
+    public function testHasSystemVariablesWhenTheyExist(): void
     {
         $templateData = $this->getTemplateData(['system' => ['key' => 'val']]);
         self::assertTrue($templateData->hasSystemVariables());
     }
 
-    public function testGetSystemVariablesWhenTheyDoNotExist()
+    public function testGetSystemVariablesWhenTheyDoNotExist(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('This object does not contain values of system variables.');
@@ -66,33 +65,33 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         $templateData->getSystemVariables();
     }
 
-    public function testGetSystemVariablesTheyExist()
+    public function testGetSystemVariablesTheyExist(): void
     {
         $systemVariables = ['key' => 'val'];
         $templateData = $this->getTemplateData(['system' => $systemVariables]);
         self::assertSame($systemVariables, $templateData->getSystemVariables());
     }
 
-    public function testHasRootEntityWhenItDoesNotExist()
+    public function testHasRootEntityWhenItDoesNotExist(): void
     {
         $templateData = $this->getTemplateData([]);
         self::assertFalse($templateData->hasRootEntity());
     }
 
-    public function testHasRootEntityWhenItExists()
+    public function testHasRootEntityWhenItExists(): void
     {
         $templateData = $this->getTemplateData(['entity' => new \stdClass()]);
         self::assertTrue($templateData->hasRootEntity());
     }
 
-    public function testGetRootEntityWhenItExists()
+    public function testGetRootEntityWhenItExists(): void
     {
         $entity = new \stdClass();
         $templateData = $this->getTemplateData(['entity' => $entity]);
         self::assertSame($entity, $templateData->getRootEntity());
     }
 
-    public function testGetRootEntityWhenTheyDoNotExist()
+    public function testGetRootEntityWhenTheyDoNotExist(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('This object does not contain the root entity.');
@@ -101,7 +100,7 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         $templateData->getRootEntity();
     }
 
-    public function testGetEntityVariableForNotRootEntity()
+    public function testGetEntityVariableForNotRootEntity(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Expected "entity" variable, got "system".');
@@ -110,7 +109,7 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         $templateData->getEntityVariable('system');
     }
 
-    public function testGetEntityVariableForNotEntityRelatedVariablePath()
+    public function testGetEntityVariableForNotEntityRelatedVariablePath(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The variable "system.test" must start with "entity.".');
@@ -119,7 +118,7 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         $templateData->getEntityVariable('system.test');
     }
 
-    public function testGetEntityVariableForRootEntityWhenItDoesNotExist()
+    public function testGetEntityVariableForRootEntityWhenItDoesNotExist(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('This object does not contain the root entity.');
@@ -128,14 +127,14 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         $templateData->getEntityVariable('entity');
     }
 
-    public function testGetEntityVariableForRootEntity()
+    public function testGetEntityVariableForRootEntity(): void
     {
         $entity = new \stdClass();
         $templateData = $this->getTemplateData(['entity' => $entity]);
         self::assertSame($entity, $templateData->getEntityVariable('entity'));
     }
 
-    public function testGetEntityVariableForFirstLevelChildEntity()
+    public function testGetEntityVariableForFirstLevelChildEntity(): void
     {
         $entity = new \stdClass();
         $entity1 = new \stdClass();
@@ -151,7 +150,7 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         self::assertSame($entity1, $templateData->getEntityVariable('entity.entity1'));
     }
 
-    public function testGetEntityVariableForFirstLevelChildEntityWhenItCannotBeResolved()
+    public function testGetEntityVariableForFirstLevelChildEntityWhenItCannotBeResolved(): void
     {
         $entity = new \stdClass();
         $templateData = $this->getTemplateData(['entity' => $entity]);
@@ -162,7 +161,7 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($templateData->getEntityVariable('entity.entity1'));
     }
 
-    public function testGetEntityVariableForComputedFirstLevelChildEntity()
+    public function testGetEntityVariableForComputedFirstLevelChildEntity(): void
     {
         $entity = new \stdClass();
         $entity1 = new \stdClass();
@@ -173,7 +172,7 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         self::assertSame($entity1, $templateData->getEntityVariable('entity.entity1'));
     }
 
-    public function testGetEntityVariableForSecondLevelChildEntity()
+    public function testGetEntityVariableForSecondLevelChildEntity(): void
     {
         $entity = new \stdClass();
         $entity1 = new \stdClass();
@@ -201,7 +200,7 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         self::assertSame($entity2, $templateData->getEntityVariable('entity.entity1.entity2'));
     }
 
-    public function testGetEntityVariableForSecondLevelChildEntityWhenFirstLevelChildEntityCannotBeResolved()
+    public function testGetEntityVariableForSecondLevelChildEntityWhenFirstLevelChildEntityCannotBeResolved(): void
     {
         $entity = new \stdClass();
         $templateData = $this->getTemplateData(['entity' => $entity]);
@@ -212,7 +211,7 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($templateData->getEntityVariable('entity.entity1.entity2'));
     }
 
-    public function testGetEntityVariableForSecondLevelChildEntityWhenItCannotBeResolved()
+    public function testGetEntityVariableForSecondLevelChildEntityWhenItCannotBeResolved(): void
     {
         $entity = new \stdClass();
         $entity1 = new \stdClass();
@@ -235,7 +234,7 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($templateData->getEntityVariable('entity.entity1.entity2'));
     }
 
-    public function testGetEntityVariableForSecondLevelChildEntityWhenFirstLevelEntityIsComputedOne()
+    public function testGetEntityVariableForSecondLevelChildEntityWhenFirstLevelEntityIsComputedOne(): void
     {
         $entity = new \stdClass();
         $entity1 = new \stdClass();
@@ -253,7 +252,7 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         self::assertSame($entity2, $templateData->getEntityVariable('entity.entity1.entity2'));
     }
 
-    public function testGetParentVariablePathForInvalidVariable()
+    public function testGetParentVariablePathForInvalidVariable(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The variable "entity" must have at least 2 elements delimited by ".".');
@@ -262,19 +261,19 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         $templateData->getParentVariablePath('entity');
     }
 
-    public function testGetParentVariablePath()
+    public function testGetParentVariablePath(): void
     {
         $templateData = $this->getTemplateData([]);
         self::assertEquals('entity', $templateData->getParentVariablePath('entity.field'));
     }
 
-    public function testHasComputedVariableWhenNoAnyComputedVariablesExist()
+    public function testHasComputedVariableWhenNoAnyComputedVariablesExist(): void
     {
         $templateData = $this->getTemplateData([]);
         self::assertFalse($templateData->hasComputedVariable('entity.field1'));
     }
 
-    public function testHasComputedVariableWhenItDoesNotExist()
+    public function testHasComputedVariableWhenItDoesNotExist(): void
     {
         $data = [
             'computed' => [
@@ -285,7 +284,7 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($templateData->hasComputedVariable('entity.field1'));
     }
 
-    public function testHasComputedVariableWhenItExists()
+    public function testHasComputedVariableWhenItExists(): void
     {
         $data = [
             'computed' => [
@@ -296,7 +295,7 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($templateData->hasComputedVariable('entity.field1'));
     }
 
-    public function testGetComputedVariableWhenNoAnyComputedVariablesExist()
+    public function testGetComputedVariableWhenNoAnyComputedVariablesExist(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The computed variable "entity.field1" does not exist.');
@@ -305,7 +304,7 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         $templateData->getComputedVariable('entity.field1');
     }
 
-    public function testGetComputedVariableWhenItDoesNotExist()
+    public function testGetComputedVariableWhenItDoesNotExist(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The computed variable "entity.field1" does not exist.');
@@ -319,7 +318,7 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         $templateData->getComputedVariable('entity.field1');
     }
 
-    public function testGetComputedVariableWhenItExists()
+    public function testGetComputedVariableWhenItExists(): void
     {
         $data = [
             'computed' => [
@@ -330,7 +329,7 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         self::assertSame('val1', $templateData->getComputedVariable('entity.field1'));
     }
 
-    public function testHasAndGetComputedVariableWhenItExistsAndItsValueIsNull()
+    public function testHasAndGetComputedVariableWhenItExistsAndItsValueIsNull(): void
     {
         $data = [
             'computed' => [
@@ -342,7 +341,7 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($templateData->getComputedVariable('entity.field1'));
     }
 
-    public function testSetComputedVariable()
+    public function testSetComputedVariable(): void
     {
         $templateData = $this->getTemplateData([]);
 
@@ -366,21 +365,21 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetComputedVariablePath()
+    public function testGetComputedVariablePath(): void
     {
         $templateData = $this->getTemplateData([]);
         self::assertSame('computed.entity', $templateData->getComputedVariablePath('entity'));
         self::assertSame('computed.entity__field1', $templateData->getComputedVariablePath('entity.field1'));
     }
 
-    public function testGetVariablePath()
+    public function testGetVariablePath(): void
     {
         $templateData = $this->getTemplateData([]);
         self::assertSame('entity', $templateData->getVariablePath('computed.entity'));
         self::assertSame('entity.field1', $templateData->getVariablePath('computed.entity__field1'));
     }
 
-    public function testGetVariablePathForNotComputedPath()
+    public function testGetVariablePathForNotComputedPath(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The computed variable "entity.field1" must start with "computed.".');

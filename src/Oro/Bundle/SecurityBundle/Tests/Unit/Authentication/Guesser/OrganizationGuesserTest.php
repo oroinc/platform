@@ -7,8 +7,9 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesser;
 use Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class OrganizationGuesserTest extends \PHPUnit\Framework\TestCase
+class OrganizationGuesserTest extends TestCase
 {
     private OrganizationGuesser $guesser;
 
@@ -18,7 +19,7 @@ class OrganizationGuesserTest extends \PHPUnit\Framework\TestCase
         $this->guesser = new OrganizationGuesser();
     }
 
-    public function testGuessFromUserOrganization()
+    public function testGuessFromUserOrganization(): void
     {
         $user = $this->createMock(User::class);
         $organization = $this->createMock(Organization::class);
@@ -37,7 +38,7 @@ class OrganizationGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($organization, $this->guesser->guess($user));
     }
 
-    public function testGuessFromUserOrganizations()
+    public function testGuessFromUserOrganizations(): void
     {
         $user = $this->createMock(User::class);
         $organization = $this->createMock(Organization::class);
@@ -58,7 +59,7 @@ class OrganizationGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($organization1, $this->guesser->guess($user));
     }
 
-    public function testUserWithoutOrganizationGuess()
+    public function testUserWithoutOrganizationGuess(): void
     {
         $user = $this->createMock(User::class);
         $user->expects($this->once())
@@ -71,7 +72,7 @@ class OrganizationGuesserTest extends \PHPUnit\Framework\TestCase
         $this->guesser->guess($user);
     }
 
-    public function testGuessFromUserOrganizationsWhenTheyAreEmpty()
+    public function testGuessFromUserOrganizationsWhenTheyAreEmpty(): void
     {
         $user = $this->createMock(User::class);
         $userOrganization = $this->createMock(Organization::class);

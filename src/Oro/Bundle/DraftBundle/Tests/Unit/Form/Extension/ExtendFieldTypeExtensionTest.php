@@ -4,9 +4,10 @@ namespace Oro\Bundle\DraftBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\DraftBundle\Form\Extension\ExtendFieldTypeExtension;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ExtendFieldTypeExtensionTest extends \PHPUnit\Framework\TestCase
+class ExtendFieldTypeExtensionTest extends TestCase
 {
     public function testConfigureOptions(): void
     {

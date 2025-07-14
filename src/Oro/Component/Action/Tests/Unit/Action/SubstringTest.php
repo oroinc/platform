@@ -7,16 +7,16 @@ use Oro\Component\Action\Action\Substring;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class SubstringTest extends \PHPUnit\Framework\TestCase
+class SubstringTest extends TestCase
 {
     private const ATTRIBUTE_PATH = 'attribute';
     private const TEST_STRING = 'some test string';
 
-    /** @var Substring */
-    private $action;
+    private Substring $action;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +25,7 @@ class SubstringTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $options = [
             'attribute' => new PropertyPath(self::ATTRIBUTE_PATH),
@@ -41,7 +41,7 @@ class SubstringTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage): void
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
@@ -94,7 +94,7 @@ class SubstringTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testExecute(array $options, string $expected)
+    public function testExecute(array $options, string $expected): void
     {
         $context = new ActionData([]);
         $this->action->initialize($options);

@@ -4,11 +4,12 @@ namespace Oro\Bundle\ChartBundle\Tests\Unit\Model\Data;
 
 use Oro\Bundle\ChartBundle\Model\Data\DataInterface;
 use Oro\Bundle\ChartBundle\Model\Data\MappedData;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
-class MappedDataTest extends \PHPUnit\Framework\TestCase
+class MappedDataTest extends TestCase
 {
-    public function testToArraySourceHasNoMappedField()
+    public function testToArraySourceHasNoMappedField(): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->expectExceptionMessage(
@@ -26,7 +27,7 @@ class MappedDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $actual);
     }
 
-    public function testToArrayIfSourceIsArray()
+    public function testToArrayIfSourceIsArray(): void
     {
         $mapping = ['label' => 'firstName', 'value' => 'totalAmount'];
         $source = $this->createMock(DataInterface::class);
@@ -50,7 +51,7 @@ class MappedDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $mappedData->toArray());
     }
 
-    public function testToArrayIfSourceIsNestedArray()
+    public function testToArrayIfSourceIsNestedArray(): void
     {
         $mapping = ['label' => 'firstName', 'value' => 'totalAmount'];
         $source = $this->createMock(DataInterface::class);
@@ -74,7 +75,7 @@ class MappedDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $mappedData->toArray());
     }
 
-    public function testToArrayIfSourceIsObject()
+    public function testToArrayIfSourceIsObject(): void
     {
         $mapping = ['label' => 'firstName', 'value' => 'totalAmount'];
         $source = $this->createMock(DataInterface::class);

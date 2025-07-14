@@ -9,14 +9,12 @@ use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestConnector;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestIntegrationType;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestTwoWayConnector;
 use Oro\Bundle\IntegrationBundle\Utils\FormUtils;
+use PHPUnit\Framework\TestCase;
 
-class FormUtilsTest extends \PHPUnit\Framework\TestCase
+class FormUtilsTest extends TestCase
 {
-    /** @var TypesRegistry */
-    private $typesRegistry;
-
-    /** @var FormUtils */
-    private $utils;
+    private TypesRegistry $typesRegistry;
+    private FormUtils $utils;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +23,7 @@ class FormUtilsTest extends \PHPUnit\Framework\TestCase
         $this->utils = new FormUtils($this->typesRegistry);
     }
 
-    public function testHasTwoWaySyncConnectors()
+    public function testHasTwoWaySyncConnectors(): void
     {
         $testType = 'type2';
         $testTypeThatHasConnectors = 'type1';
@@ -39,7 +37,7 @@ class FormUtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->utils->hasTwoWaySyncConnectors($testType));
     }
 
-    public function testWasSyncedAtLeastOnce()
+    public function testWasSyncedAtLeastOnce(): void
     {
         $channel = new Channel();
         $status = new Status();

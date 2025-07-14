@@ -4,10 +4,11 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Query;
 
 use Oro\Bundle\SegmentBundle\Query\QueryBuilderInterface;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryBuilderRegistry;
+use PHPUnit\Framework\TestCase;
 
-class SegmentQueryBuilderRegistryTest extends \PHPUnit\Framework\TestCase
+class SegmentQueryBuilderRegistryTest extends TestCase
 {
-    public function testGetQueryBuilder()
+    public function testGetQueryBuilder(): void
     {
         $queryBuilderRegistry = new SegmentQueryBuilderRegistry();
 
@@ -17,7 +18,7 @@ class SegmentQueryBuilderRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($queryBuilder, $queryBuilderRegistry->getQueryBuilder('test'));
     }
 
-    public function testGetQueryBuilderNull()
+    public function testGetQueryBuilderNull(): void
     {
         $queryBuilderRegistry = new SegmentQueryBuilderRegistry();
 

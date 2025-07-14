@@ -7,14 +7,13 @@ use Oro\Bundle\DataAuditBundle\Tests\Unit\Fixture\LoggableClass;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AuditableFilterTest extends \PHPUnit\Framework\TestCase
+class AuditableFilterTest extends TestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var AuditableFilter */
-    private $filter;
+    private ConfigProvider&MockObject $configProvider;
+    private AuditableFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class AuditableFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter = new AuditableFilter($this->configProvider);
     }
 
-    public function testIsEntityAuditableWithForceShow()
+    public function testIsEntityAuditableWithForceShow(): void
     {
         $this->configProvider->expects($this->never())
             ->method('hasConfig');
@@ -34,7 +33,7 @@ class AuditableFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsEntityAuditableWithForceShowAndNotObject()
+    public function testIsEntityAuditableWithForceShowAndNotObject(): void
     {
         $this->configProvider->expects($this->never())
             ->method('hasConfig');
@@ -44,7 +43,7 @@ class AuditableFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsEntityAuditableWithNull()
+    public function testIsEntityAuditableWithNull(): void
     {
         $this->configProvider->expects($this->never())
             ->method('hasConfig');
@@ -54,7 +53,7 @@ class AuditableFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsEntityAuditableWithNotObject()
+    public function testIsEntityAuditableWithNotObject(): void
     {
         $this->configProvider->expects($this->never())
             ->method('hasConfig');
@@ -64,7 +63,7 @@ class AuditableFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsEntityAuditableWithNotConfigurableEntity()
+    public function testIsEntityAuditableWithNotConfigurableEntity(): void
     {
         $this->configProvider->expects($this->once())
             ->method('hasConfig')
@@ -74,7 +73,7 @@ class AuditableFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->filter->isEntityAuditable(new LoggableClass(), false));
     }
 
-    public function testIsEntityAuditable()
+    public function testIsEntityAuditable(): void
     {
         $config = new Config(new EntityConfigId('dataaudit', LoggableClass::class));
         $config->set('auditable', true);

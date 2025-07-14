@@ -4,21 +4,18 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Migration;
 
 use Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider;
 use Oro\Bundle\SecurityBundle\Migration\DeleteAclMigrationQuery;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 
-class DeleteAclMigrationQueryTest extends \PHPUnit\Framework\TestCase
+class DeleteAclMigrationQueryTest extends TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var MutableAclProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclProvider;
-
-    /** @var ObjectIdentityInterface */
-    private $oid;
+    private ContainerInterface&MockObject $container;
+    private MutableAclProvider&MockObject $aclProvider;
+    private ObjectIdentityInterface $oid;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +25,7 @@ class DeleteAclMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $this->oid = new ObjectIdentity('entity', 'Test\Class');
     }
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $this->container->expects($this->once())
             ->method('get')
@@ -43,7 +40,7 @@ class DeleteAclMigrationQueryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDescriptionNoAclProvider()
+    public function testGetDescriptionNoAclProvider(): void
     {
         $this->container->expects($this->once())
             ->method('get')
@@ -55,7 +52,7 @@ class DeleteAclMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($query->getDescription());
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $this->container->expects($this->once())
             ->method('get')
@@ -75,7 +72,7 @@ class DeleteAclMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $query->execute($logger);
     }
 
-    public function testExecuteNoAclProvider()
+    public function testExecuteNoAclProvider(): void
     {
         $this->container->expects($this->once())
             ->method('get')

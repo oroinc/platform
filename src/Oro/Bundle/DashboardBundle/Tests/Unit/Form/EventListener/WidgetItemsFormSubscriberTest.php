@@ -4,18 +4,17 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\DashboardBundle\Form\EventListener\WidgetItemsFormSubscriber;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class WidgetItemsFormSubscriberTest extends \PHPUnit\Framework\TestCase
+class WidgetItemsFormSubscriberTest extends TestCase
 {
-    /** @var WidgetConfigs|\PHPUnit\Framework\MockObject\MockObject */
-    private $widgetConfigs;
-
-    /** @var WidgetItemsFormSubscriber */
-    private $widgetItemsFormSubscriber;
+    private WidgetConfigs&MockObject $widgetConfigs;
+    private WidgetItemsFormSubscriber $widgetItemsFormSubscriber;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class WidgetItemsFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->widgetItemsFormSubscriber = new WidgetItemsFormSubscriber($this->widgetConfigs, $translator);
     }
 
-    public function testPreSetShouldPrepareDataForForm()
+    public function testPreSetShouldPrepareDataForForm(): void
     {
         $twigVariables = [
             'widgetDataItems' => [
@@ -84,7 +83,7 @@ class WidgetItemsFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedEventData, $event->getData());
     }
 
-    public function testPreSetShouldUpdateStoredData()
+    public function testPreSetShouldUpdateStoredData(): void
     {
         $twigVariables = [
             'widgetDataItems' => [

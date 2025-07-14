@@ -7,8 +7,9 @@ use Oro\Bundle\EntityConfigBundle\Config\Config as EntityConfig;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassAction;
+use PHPUnit\Framework\TestCase;
 
-class MergeMassActionTest extends \PHPUnit\Framework\TestCase
+class MergeMassActionTest extends TestCase
 {
     private const ENTITY_CLASS = 'Some\Entity';
     private const MAX_ENTITIES_COUNT = 10;
@@ -34,7 +35,7 @@ class MergeMassActionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getOptionsDataProvider
      */
-    public function testGetOptions(array $actualOptions, array $expectedOptions)
+    public function testGetOptions(array $actualOptions, array $expectedOptions): void
     {
         $this->action->setOptions(ActionConfiguration::create($actualOptions));
         $this->assertEquals($expectedOptions, $this->action->getOptions()->toArray());
@@ -92,7 +93,7 @@ class MergeMassActionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testMergeMassActionSetOptionShouldThrowExceptionIfClassNameOptionIsEmpty()
+    public function testMergeMassActionSetOptionShouldThrowExceptionIfClassNameOptionIsEmpty(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Trying to get name of unnamed object');

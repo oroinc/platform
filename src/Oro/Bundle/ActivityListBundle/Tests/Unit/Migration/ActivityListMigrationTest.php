@@ -11,10 +11,11 @@ use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use PHPUnit\Framework\TestCase;
 
-class ActivityListMigrationTest extends \PHPUnit\Framework\TestCase
+class ActivityListMigrationTest extends TestCase
 {
-    public function testUp()
+    public function testUp(): void
     {
         $provider = $this->createMock(ActivityListChainProvider::class);
         $activityListExtension = $this->createMock(ActivityListExtension::class);

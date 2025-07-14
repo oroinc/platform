@@ -19,15 +19,14 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
+class ReportDatagridConfigurationBuilderTest extends TestCase
 {
-    private DatagridDateGroupingBuilder|\PHPUnit\Framework\MockObject\MockObject $dateGroupingBuilder;
-
-    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
-
-    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $doctrine;
-
+    private DatagridDateGroupingBuilder&MockObject $dateGroupingBuilder;
+    private ConfigManager&MockObject $configManager;
+    private ManagerRegistry&MockObject $doctrine;
     private ReportDatagridConfigurationBuilder $builder;
 
     #[\Override]

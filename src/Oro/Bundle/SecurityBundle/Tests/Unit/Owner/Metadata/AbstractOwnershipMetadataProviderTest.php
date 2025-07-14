@@ -8,26 +8,21 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class AbstractOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
+class AbstractOwnershipMetadataProviderTest extends TestCase
 {
     private const SOME_CLASS = \stdClass::class;
     private const UNDEFINED_CLASS = 'UndefinedClass';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var Config */
-    private $config;
-
-    /** @var OwnershipMetadataProviderStub */
-    private $provider;
+    private ConfigManager&MockObject $configManager;
+    private AbstractAdapter&MockObject $cache;
+    private Config $config;
+    private OwnershipMetadataProviderStub $provider;
 
     #[\Override]
     protected function setUp(): void

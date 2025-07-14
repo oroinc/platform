@@ -6,20 +6,15 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureDecisionManagerInterface;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureResourceDecisionManagerInterface;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
+class FeatureCheckerTest extends TestCase
 {
-    /** @var FeatureDecisionManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureDecisionManager;
-
-    /** @var FeatureResourceDecisionManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureResourceDecisionManager;
-
-    /** @var ConfigurationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var FeatureChecker */
-    private $featureChecker;
+    private FeatureDecisionManagerInterface&MockObject $featureDecisionManager;
+    private FeatureResourceDecisionManagerInterface&MockObject $featureResourceDecisionManager;
+    private ConfigurationManager&MockObject $configManager;
+    private FeatureChecker $featureChecker;
 
     #[\Override]
     protected function setUp(): void

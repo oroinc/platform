@@ -6,8 +6,9 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\OroPageObjectInitia
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageFactory;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
+use PHPUnit\Framework\TestCase;
 
-class OroPageObjectInitializerTest extends \PHPUnit\Framework\TestCase
+class OroPageObjectInitializerTest extends TestCase
 {
     public function testInitializeContext(): void
     {

@@ -18,27 +18,20 @@ use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
 use Oro\Component\DependencyInjection\ServiceLink;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
+class StorageDataCollectorTest extends TestCase
 {
     private const ENTITY_NAME = 'test_entity';
-    private const GRID_NAME   = 'test_grid';
+    private const GRID_NAME = 'test_grid';
 
-    /** @var ManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagridManager;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EntityPaginationStorage|\PHPUnit\Framework\MockObject\MockObject */
-    private $storage;
-
-    /** @var EntityPaginationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $paginationManager;
-
-    /** @var StorageDataCollector */
-    private $collector;
+    private ManagerInterface&MockObject $datagridManager;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityPaginationStorage&MockObject $storage;
+    private EntityPaginationManager&MockObject $paginationManager;
+    private StorageDataCollector $collector;
 
     #[\Override]
     protected function setUp(): void
@@ -61,7 +54,7 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCollectWithDisabledPagination()
+    public function testCollectWithDisabledPagination(): void
     {
         $this->paginationManager->expects($this->once())
             ->method('isEnabled')
@@ -72,7 +65,7 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->collector->collect($this->getGridRequest(), 'test'));
     }
 
-    public function testCollectWithEmptyGridRequest()
+    public function testCollectWithEmptyGridRequest(): void
     {
         $this->paginationManager->expects($this->once())
             ->method('isEnabled')
@@ -83,7 +76,7 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->collector->collect(new Request(['grid' => '']), 'test'));
     }
 
-    public function testCollectWithInvalidGridName()
+    public function testCollectWithInvalidGridName(): void
     {
         $invalidGridName = 'invalid';
 
@@ -100,7 +93,7 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->collector->collect(new Request(['grid' => [$invalidGridName => null]]), 'test'));
     }
 
-    public function testCollectGridNotApplicable()
+    public function testCollectGridNotApplicable(): void
     {
         $this->paginationManager->expects($this->once())
             ->method('isEnabled')
@@ -112,7 +105,7 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->collector->collect($this->getGridRequest(), 'test'));
     }
 
-    public function testCollectDataAlreadySet()
+    public function testCollectDataAlreadySet(): void
     {
         $scope = EntityPaginationManager::VIEW_SCOPE;
 
@@ -130,7 +123,7 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->collector->collect($this->getGridRequest(), $scope));
     }
 
-    public function testCollectAllowedNumberOfEntities()
+    public function testCollectAllowedNumberOfEntities(): void
     {
         $state = ['filters' => [1 => 2], 'sorters' => [3 => 4]];
         $hash = md5(json_encode($state));
@@ -156,7 +149,7 @@ class StorageDataCollectorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->collector->collect($this->getGridRequest(), $scope));
     }
 
-    public function testCollectNotAllowedNumberOfEntities()
+    public function testCollectNotAllowedNumberOfEntities(): void
     {
         $state = ['filters' => [], 'sorters' => []];
         $hash = md5(json_encode($state));

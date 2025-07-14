@@ -22,7 +22,7 @@ class DqlUtilTest extends OrmTestCase
     /**
      * @dataProvider hasParameterDataProvider
      */
-    public function testHasParameter(string $dql, string|int $parameter, bool $expected)
+    public function testHasParameter(string $dql, string|int $parameter, bool $expected): void
     {
         $this->assertEquals($expected, DqlUtil::hasParameter($dql, $parameter));
     }
@@ -44,7 +44,7 @@ class DqlUtilTest extends OrmTestCase
     /**
      * @dataProvider getAliasesDataProvider
      */
-    public function testGetAliases(callable $dqlFactory, array $expectedAliases)
+    public function testGetAliases(callable $dqlFactory, array $expectedAliases): void
     {
         $this->assertEquals($expectedAliases, DqlUtil::getAliases($dqlFactory($this->em)));
     }
@@ -116,7 +116,7 @@ DQL
     /**
      * @dataProvider replaceAliasesProvider
      */
-    public function testReplaceAliases(string $dql, array $replacements, string $expectedDql)
+    public function testReplaceAliases(string $dql, array $replacements, string $expectedDql): void
     {
         $this->assertEquals($expectedDql, DqlUtil::replaceAliases($dql, $replacements));
     }
@@ -183,7 +183,7 @@ DQL
     /**
      * @dataProvider buildConcatExprProvider
      */
-    public function testBuildConcatExpr(array $parts, string $expectedExpr)
+    public function testBuildConcatExpr(array $parts, string $expectedExpr): void
     {
         $this->assertEquals($expectedExpr, DqlUtil::buildConcatExpr($parts));
     }

@@ -14,29 +14,18 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
 use Oro\Bundle\SecurityBundle\Search\SearchAclHelperConditionProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AclHelperTest extends \PHPUnit\Framework\TestCase
+class AclHelperTest extends TestCase
 {
-    /** @var AclHelper */
-    private $aclHelper;
-
-    /** @var SearchMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $mappingProvider;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var OwnershipConditionDataBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipDataBuilder;
-
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipMetadataProvider;
-
-    /** @var OwnershipMetadataInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipMetadata;
-
-    /** @var SearchAclHelperConditionProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $searchAclHelperConditionProvider;
+    private AclHelper $aclHelper;
+    private SearchMappingProvider&MockObject $mappingProvider;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private OwnershipConditionDataBuilder&MockObject $ownershipDataBuilder;
+    private OwnershipMetadataProviderInterface&MockObject $ownershipMetadataProvider;
+    private OwnershipMetadataInterface&MockObject $ownershipMetadata;
+    private SearchAclHelperConditionProvider&MockObject $searchAclHelperConditionProvider;
 
     private array $mappings = [
         'Oro\Test\Entity\Organization'      => [
@@ -114,7 +103,7 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider applyTestCases
      */
-    public function testApply(mixed $from, string $ownerColumnName, string $expectedQuery)
+    public function testApply(mixed $from, string $ownerColumnName, string $expectedQuery): void
     {
         $mappings = $this->mappings;
 

@@ -6,17 +6,16 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\RenderTemplate;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Twig\Environment;
 
-class RenderTemplateTest extends \PHPUnit\Framework\TestCase
+class RenderTemplateTest extends TestCase
 {
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $twig;
-
-    /** @var RenderTemplate */
-    private $action;
+    private Environment&MockObject $twig;
+    private RenderTemplate $action;
 
     #[\Override]
     protected function setUp(): void

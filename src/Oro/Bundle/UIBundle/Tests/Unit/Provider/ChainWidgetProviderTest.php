@@ -4,20 +4,15 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\UIBundle\Provider\ChainWidgetProvider;
 use Oro\Bundle\UIBundle\Provider\WidgetProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChainWidgetProviderTest extends \PHPUnit\Framework\TestCase
+class ChainWidgetProviderTest extends TestCase
 {
-    /** @var WidgetProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $highPriorityProvider;
-
-    /** @var WidgetProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $lowPriorityProvider;
-
-    /** @var WidgetProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $unsupportedProvider;
-
-    /** @var ChainWidgetProvider */
-    private $chainProvider;
+    private WidgetProviderInterface&MockObject $highPriorityProvider;
+    private WidgetProviderInterface&MockObject $lowPriorityProvider;
+    private WidgetProviderInterface&MockObject $unsupportedProvider;
+    private ChainWidgetProvider $chainProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -33,12 +28,12 @@ class ChainWidgetProviderTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $this->assertTrue($this->chainProvider->supports(new \stdClass()));
     }
 
-    public function testGetWidgets()
+    public function testGetWidgets(): void
     {
         $entity = new \stdClass();
 

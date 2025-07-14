@@ -4,10 +4,11 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation\KeySource;
 
 use Oro\Bundle\TranslationBundle\Translation\KeySource\DynamicTranslationKeySource;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
+use PHPUnit\Framework\TestCase;
 
-class DynamicTranslationKeySourceTest extends \PHPUnit\Framework\TestCase
+class DynamicTranslationKeySourceTest extends TestCase
 {
-    public function testNonConfiguredCalls()
+    public function testNonConfiguredCalls(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -18,7 +19,7 @@ class DynamicTranslationKeySourceTest extends \PHPUnit\Framework\TestCase
         $dynamicSource->getTemplate();
     }
 
-    public function testMergedConfiguredData()
+    public function testMergedConfiguredData(): void
     {
         $template = $this->createMock(TranslationKeyTemplateInterface::class);
         $template->expects($this->once())
@@ -38,7 +39,7 @@ class DynamicTranslationKeySourceTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConstructorDataValidationFailure()
+    public function testConstructorDataValidationFailure(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -54,7 +55,7 @@ class DynamicTranslationKeySourceTest extends \PHPUnit\Framework\TestCase
         $dynamicSource->configure($templateMock, ['some_other_key' => 'someValue']);
     }
 
-    public function testGetTemplate()
+    public function testGetTemplate(): void
     {
         $template = $this->createMock(TranslationKeyTemplateInterface::class);
         $template->expects($this->once())

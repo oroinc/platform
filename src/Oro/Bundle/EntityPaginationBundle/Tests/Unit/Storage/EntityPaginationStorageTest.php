@@ -5,32 +5,25 @@ namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Storage;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
-class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
+class EntityPaginationStorageTest extends TestCase
 {
     private const ENTITY_NAME = 'stdClass';
     private const HASH = '9b59e3bbc14e88a044c112a5b5e914a4';
 
     public static $entityIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EntityPaginationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $paginationManager;
-
-    /** @var RequestStack */
-    private $requestStack;
-
-    /** @var \stdClass */
-    private $entity;
-
-    /** @var EntityPaginationStorage */
-    private $storage;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityPaginationManager&MockObject $paginationManager;
+    private RequestStack $requestStack;
+    private \stdClass $entity;
+    private EntityPaginationStorage $storage;
 
     #[\Override]
     protected function setUp(): void
@@ -50,7 +43,7 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setDataDataProvider
      */
-    public function testSetData(bool $enabled, bool $request, array $source, bool $expected)
+    public function testSetData(bool $enabled, bool $request, array $source, bool $expected): void
     {
         $this->setEnabled($enabled);
 
@@ -98,7 +91,7 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider hasDataDataProvider
      */
-    public function testHasData(bool $enabled, bool $request, string $entityName, string $hash, bool $expected)
+    public function testHasData(bool $enabled, bool $request, string $entityName, string $hash, bool $expected): void
     {
         $this->setEnabled($enabled);
 
@@ -156,7 +149,7 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getCurrentPositionDataProvider
      */
-    public function testGetCurrentPosition(array $source, int|bool $expected)
+    public function testGetCurrentPosition(array $source, int|bool $expected): void
     {
         $this->setStorage($source['storage_data']);
 
@@ -218,7 +211,7 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isEntityInStorageDataProvider
      */
-    public function testIsEntityInStorage(array $source, bool $expected)
+    public function testIsEntityInStorage(array $source, bool $expected): void
     {
         $this->setStorage($source['storage_data']);
 
@@ -293,7 +286,7 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider unsetIdentifierDataProvider
      */
-    public function testUnsetIdentifier(array $source, array $expected)
+    public function testUnsetIdentifier(array $source, array $expected): void
     {
         $this->setStorage($source['storage_data']);
         $this->storage->unsetIdentifier($source['identifier'], $this->entity, $source['scope']);
@@ -324,7 +317,7 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider clearDataDataProvider
      */
-    public function testClearData(bool $enabled, bool $request, array $source, array $expected)
+    public function testClearData(bool $enabled, bool $request, array $source, array $expected): void
     {
         $this->setEnabled($enabled);
 
@@ -445,7 +438,7 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isInfoMessageShownDataProvider
      */
-    public function testIsInfoMessageShown(?bool $expected, bool $enabled = false, ?array $storage = null)
+    public function testIsInfoMessageShown(?bool $expected, bool $enabled = false, ?array $storage = null): void
     {
         $this->setEnabled($enabled);
 
@@ -485,7 +478,7 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setInfoMessageShownDataProvider
      */
-    public function testSetInfoMessageShown(bool $expected, bool $enabled = false, ?bool $shown = false)
+    public function testSetInfoMessageShown(bool $expected, bool $enabled = false, ?bool $shown = false): void
     {
         $this->setEnabled($enabled);
 

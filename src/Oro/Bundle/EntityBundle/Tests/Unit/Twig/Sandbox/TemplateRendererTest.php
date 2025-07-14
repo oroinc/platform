@@ -8,20 +8,17 @@ use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateData;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateDataFactory;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRenderer;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Twig\Environment as TwigEnvironment;
 use Twig\Template;
 use Twig\TemplateWrapper;
 
-class TemplateRendererTest extends \PHPUnit\Framework\TestCase
+class TemplateRendererTest extends TestCase
 {
-    private TwigEnvironment|MockObject $twigEnvironment;
-
-    private TemplateDataFactory|MockObject $templateDataFactory;
-
-    private SystemVariablesTemplateProcessor|MockObject $systemVariablesTemplateProcessor;
-
-    private EntityVariablesTemplateProcessor|MockObject $entityVariablesTemplateProcessor;
-
+    private TwigEnvironment&MockObject $twigEnvironment;
+    private TemplateDataFactory&MockObject $templateDataFactory;
+    private SystemVariablesTemplateProcessor&MockObject $systemVariablesTemplateProcessor;
+    private EntityVariablesTemplateProcessor&MockObject $entityVariablesTemplateProcessor;
     private TemplateRenderer $renderer;
 
     #[\Override]
@@ -44,43 +41,37 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
     {
         $templateParams = ['sample_key' => 'sample_value'];
         $templateData = $this->createMock(TemplateData::class);
-        $this->templateDataFactory
-            ->expects(self::once())
+        $this->templateDataFactory->expects(self::once())
             ->method('createTemplateData')
             ->with($templateParams)
             ->willReturn($templateData);
 
         $templateContent = 'sample content';
         $systemVarsProcessedTemplateContent = 'sample content (system vars processed)';
-        $this->systemVariablesTemplateProcessor
-            ->expects(self::once())
+        $this->systemVariablesTemplateProcessor->expects(self::once())
             ->method('processSystemVariables')
             ->with($templateContent)
             ->willReturn($systemVarsProcessedTemplateContent);
 
         $entityVarsProcessedTemplateContent = 'sample content (system vars processed) (entity vars processed)';
-        $this->entityVariablesTemplateProcessor
-            ->expects(self::once())
+        $this->entityVariablesTemplateProcessor->expects(self::once())
             ->method('processEntityVariables')
             ->with($systemVarsProcessedTemplateContent, $templateData)
             ->willReturn($entityVarsProcessedTemplateContent);
 
         $template = $this->createMock(Template::class);
         $templateWrapper = new TemplateWrapper($this->twigEnvironment, $template);
-        $this->twigEnvironment
-            ->expects(self::once())
+        $this->twigEnvironment->expects(self::once())
             ->method('createTemplate')
             ->with($entityVarsProcessedTemplateContent)
             ->willReturn($templateWrapper);
 
-        $templateData
-            ->expects(self::once())
+        $templateData->expects(self::once())
             ->method('getData')
             ->willReturn($templateParams);
 
         $renderedContent = 'rendered content';
-        $template
-            ->expects(self::once())
+        $template->expects(self::once())
             ->method('render')
             ->with($templateParams)
             ->willReturn($renderedContent);

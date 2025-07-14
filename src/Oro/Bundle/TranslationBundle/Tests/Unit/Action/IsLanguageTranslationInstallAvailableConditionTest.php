@@ -10,9 +10,10 @@ use Oro\Bundle\TranslationBundle\Download\TranslationMetricsProviderInterface;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class IsLanguageTranslationInstallAvailableConditionTest extends \PHPUnit\Framework\TestCase
+class IsLanguageTranslationInstallAvailableConditionTest extends TestCase
 {
     private string $codeWithout;
     private string $codeNotInstalled;
@@ -136,7 +137,7 @@ class IsLanguageTranslationInstallAvailableConditionTest extends \PHPUnit\Framew
         self::assertFalse($this->condition3->evaluate($context));
     }
 
-    public function testWithFilesBasedLanguage()
+    public function testWithFilesBasedLanguage(): void
     {
         $context = ['$' => ['filesBasedLanguage' => $this->filesBasedLanguage]];
 

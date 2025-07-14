@@ -4,15 +4,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Connection;
 use Oro\Bundle\WorkflowBundle\Migration\RemoveProcessesQuery;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class RemoveProcessQueryTest extends \PHPUnit\Framework\TestCase
+class RemoveProcessQueryTest extends TestCase
 {
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connector;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
+    private Connection&MockObject $connector;
+    private LoggerInterface&MockObject $logger;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class RemoveProcessQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testUp(string|array $names, array $expectedParams)
+    public function testUp(string|array $names, array $expectedParams): void
     {
         $this->connector->expects($this->once())
             ->method('executeQuery')

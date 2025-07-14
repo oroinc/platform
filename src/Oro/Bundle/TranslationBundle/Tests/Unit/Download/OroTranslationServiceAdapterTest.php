@@ -15,6 +15,7 @@ use Oro\Bundle\TranslationBundle\Exception\TranslationServiceInvalidResponseExce
 use Oro\Bundle\TranslationBundle\Test\TranslationArchiveGenerator;
 use Oro\Component\Testing\Logger\BufferingLogger;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Loader\CsvFileLoader;
 
@@ -54,14 +55,9 @@ class OroTranslationServiceAdapterTest extends TestCase
     private const PACKAGES = ['PackageA', 'PackageB'];
     private const API_KEY = 'SOME-API-KEY';
 
-    /** @var Client|\PHPUnit\Framework\MockObject\MockObject */
-    private $client;
-
-    /** @var BufferingLogger|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var OroTranslationServiceAdapter */
-    private $adapter;
+    private Client&MockObject $client;
+    private BufferingLogger $logger;
+    private OroTranslationServiceAdapter $adapter;
 
     #[\Override]
     protected function setUp(): void

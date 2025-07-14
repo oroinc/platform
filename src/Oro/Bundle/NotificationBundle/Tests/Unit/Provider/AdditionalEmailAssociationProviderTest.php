@@ -11,18 +11,15 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NotificationBundle\Provider\AdditionalEmailAssociationProvider;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Fixtures\Entity\EmailHolderTestEntity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\TestCase
+class AdditionalEmailAssociationProviderTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var AdditionalEmailAssociationProvider */
-    private $provider;
+    private ManagerRegistry&MockObject $doctrine;
+    private ConfigProvider&MockObject $configProvider;
+    private AdditionalEmailAssociationProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -44,7 +41,7 @@ class AdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAssociationsWithNonSupportedEntity()
+    public function testGetAssociationsWithNonSupportedEntity(): void
     {
         $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
@@ -54,7 +51,7 @@ class AdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $this->provider->getAssociations(\stdClass::class));
     }
 
-    public function testGetAssociationsWithEntityWithEmptyAssociations()
+    public function testGetAssociationsWithEntityWithEmptyAssociations(): void
     {
         $entityClass = \stdClass::class;
 
@@ -74,7 +71,7 @@ class AdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $this->provider->getAssociations($entityClass));
     }
 
-    public function testGetAssociations()
+    public function testGetAssociations(): void
     {
         $entityClass = \stdClass::class;
 
@@ -117,7 +114,7 @@ class AdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsAssociationSupportedForSupportedEntity()
+    public function testIsAssociationSupportedForSupportedEntity(): void
     {
         $entity = new \stdClass();
         $entityClass = get_class($entity);
@@ -135,7 +132,7 @@ class AdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->provider->isAssociationSupported($entity, 'test_field'));
     }
 
-    public function testIsAssociationSupportedForNotSupportedEntity()
+    public function testIsAssociationSupportedForNotSupportedEntity(): void
     {
         $entity = new \stdClass();
         $entityClass = get_class($entity);
@@ -148,7 +145,7 @@ class AdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->provider->isAssociationSupported($entity, 'test_field'));
     }
 
-    public function testGetAssociationValue()
+    public function testGetAssociationValue(): void
     {
         $entity = new EmailHolderTestEntity();
         $entity->setTestField('test_value');

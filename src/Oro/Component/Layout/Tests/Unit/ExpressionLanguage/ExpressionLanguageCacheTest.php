@@ -6,11 +6,12 @@ use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\ExpressionLanguage\ClosureWithExtraParams;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCache;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class ExpressionLanguageCacheTest extends \PHPUnit\Framework\TestCase
+class ExpressionLanguageCacheTest extends TestCase
 {
-    public function testGetClosure()
+    public function testGetClosure(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $cache = new ExpressionLanguageCache(__DIR__ . '/cached_expressions_stub.php', $logger);
@@ -33,7 +34,7 @@ class ExpressionLanguageCacheTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('expression_2_result', $result($context, $data));
     }
 
-    public function testGetClosureWhenFileNotFound()
+    public function testGetClosureWhenFileNotFound(): void
     {
         $cacheFilePath = __DIR__ . '/non_existing_file.php';
         $logger = $this->createMock(LoggerInterface::class);
@@ -53,7 +54,7 @@ class ExpressionLanguageCacheTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($result);
     }
 
-    public function testGetClosureWithExtraParams()
+    public function testGetClosureWithExtraParams(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $cache = new ExpressionLanguageCache(__DIR__ . '/cached_expressions_stub.php', $logger);
@@ -80,7 +81,7 @@ class ExpressionLanguageCacheTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('expression_4_result', $closure($context, $data, 'param1', 'param2'));
     }
 
-    public function testGetClosureWithExtraParamsWhenFileNotFound()
+    public function testGetClosureWithExtraParamsWhenFileNotFound(): void
     {
         $cacheFilePath = __DIR__ . '/non_existing_file.php';
         $logger = $this->createMock(LoggerInterface::class);

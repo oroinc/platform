@@ -11,17 +11,14 @@ use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\User;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
+class EntityOwnershipAssociationsSetterTest extends TestCase
 {
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipMetadataProvider;
-
-    /** @var EntityOwnershipAssociationsSetter */
-    private $setter;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private OwnershipMetadataProviderInterface&MockObject $ownershipMetadataProvider;
+    private EntityOwnershipAssociationsSetter $setter;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +33,7 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetOwnershipAssociationsForUserOwnedEntity()
+    public function testSetOwnershipAssociationsForUserOwnedEntity(): void
     {
         $entity = new Entity();
         $ownershipMetadata = new OwnershipMetadata(
@@ -69,7 +66,7 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($user, $entity->getOwner());
     }
 
-    public function testSetOwnershipAssociationsForUserOwnedEntityWhenAssociationsAlreadySet()
+    public function testSetOwnershipAssociationsForUserOwnedEntityWhenAssociationsAlreadySet(): void
     {
         $entity = new Entity();
         $ownershipMetadata = new OwnershipMetadata(
@@ -102,7 +99,7 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($user, $entity->getOwner());
     }
 
-    public function testSetOwnershipAssociationsForBusinessUnitOwnedEntity()
+    public function testSetOwnershipAssociationsForBUOwnedEntity(): void
     {
         $entity = new Entity();
         $ownershipMetadata = new OwnershipMetadata(
@@ -139,7 +136,7 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($businessUnit, $entity->getOwner());
     }
 
-    public function testSetOwnershipAssociationsForBusinessUnitOwnedEntityWhenAssociationsAlreadySet()
+    public function testSetOwnershipAssociationsForBUEntityWhenAssociationsAlreadySet(): void
     {
         $entity = new Entity();
         $ownershipMetadata = new OwnershipMetadata(
@@ -176,7 +173,7 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($businessUnit, $entity->getOwner());
     }
 
-    public function testSetOwnershipAssociationsForBusinessUnitOwnedEntityWhenUserHasBusinessUnitsFromDifferentOrgs()
+    public function testSetOwnershipAssociationsForBUEntityWhenUserHasBusinessUnitsFromDifferentOrgs(): void
     {
         $entity = new Entity();
         $ownershipMetadata = new OwnershipMetadata(
@@ -218,7 +215,7 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($businessUnit2, $entity->getOwner());
     }
 
-    public function testSetOwnershipAssociationsForBusinessUnitEntity()
+    public function testSetOwnershipAssociationsForBusinessUnitEntity(): void
     {
         $entity = new BusinessUnit();
         $ownershipMetadata = new OwnershipMetadata(
@@ -250,7 +247,7 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($entity->getOwner());
     }
 
-    public function testSetOwnershipAssociationsForOrganizationOwnedEntity()
+    public function testSetOwnershipAssociationsForOrganizationOwnedEntity(): void
     {
         $entity = new Entity();
         $ownershipMetadata = new OwnershipMetadata(
@@ -279,7 +276,7 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($entity->getOwner());
     }
 
-    public function testSetOwnershipAssociationsForOrganizationOwnedEntityWhenAssociationsAlreadySet()
+    public function testSetOwnershipAssociationsForOrganizationOwnedEntityWhenAssociationsAlreadySet(): void
     {
         $entity = new Entity();
         $ownershipMetadata = new OwnershipMetadata(
@@ -308,7 +305,7 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($entity->getOwner());
     }
 
-    public function testSetOwnershipAssociationsForAnonymousToken()
+    public function testSetOwnershipAssociationsForAnonymousToken(): void
     {
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')

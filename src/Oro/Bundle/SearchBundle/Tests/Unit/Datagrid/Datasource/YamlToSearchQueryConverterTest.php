@@ -7,11 +7,12 @@ use Oro\Bundle\SearchBundle\Query\AbstractSearchQuery;
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class YamlToSearchQueryConverterTest extends \PHPUnit\Framework\TestCase
+class YamlToSearchQueryConverterTest extends TestCase
 {
-    /** @var SearchQueryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $query;
+    private SearchQueryInterface&MockObject $query;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +20,7 @@ class YamlToSearchQueryConverterTest extends \PHPUnit\Framework\TestCase
         $this->query = $this->createMock(SearchQueryInterface::class);
     }
 
-    public function testProcessSelectFrom()
+    public function testProcessSelectFrom(): void
     {
         $config = [
             'query' => [
@@ -45,7 +46,7 @@ class YamlToSearchQueryConverterTest extends \PHPUnit\Framework\TestCase
         $testable->process($this->query, $config);
     }
 
-    public function testProcessWhere()
+    public function testProcessWhere(): void
     {
         $config = [
             'query' => [
@@ -67,7 +68,7 @@ class YamlToSearchQueryConverterTest extends \PHPUnit\Framework\TestCase
         $testable->process($this->query, $config);
     }
 
-    public function testProcessHints()
+    public function testProcessHints(): void
     {
         $config = [
             'query' => [

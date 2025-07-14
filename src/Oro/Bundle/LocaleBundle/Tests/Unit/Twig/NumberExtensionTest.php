@@ -5,19 +5,18 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Twig;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Twig\NumberExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class NumberExtensionTest extends \PHPUnit\Framework\TestCase
+class NumberExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    private $formatter;
-
-    /** @var NumberExtension */
-    private $extension;
+    private NumberFormatter&MockObject $formatter;
+    private NumberExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +30,7 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new NumberExtension($container);
     }
 
-    public function testGetAttribute()
+    public function testGetAttribute(): void
     {
         $attribute = 'grouping_used';
         $style = 'decimal';
@@ -54,7 +53,7 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTextAttribute()
+    public function testGetTextAttribute(): void
     {
         $attribute = 'currency_code';
         $style = 'decimal';
@@ -76,7 +75,7 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSymbol()
+    public function testGetSymbol(): void
     {
         $symbol = 'percent_symbol';
         $style = 'decimal';
@@ -94,7 +93,7 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormat()
+    public function testFormat(): void
     {
         $value = 1234.5;
         $style = 'decimal';
@@ -118,7 +117,7 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormatCurrency()
+    public function testFormatCurrency(): void
     {
         $value = 1234.5;
         $currency = 'USD';
@@ -146,7 +145,7 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormatDecimal()
+    public function testFormatDecimal(): void
     {
         $value = 1234.5;
         $attributes = ['grouping_size' => 3];
@@ -172,7 +171,7 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormatPercent()
+    public function testFormatPercent(): void
     {
         $value = 99;
         $attributes = ['grouping_size' => 3];
@@ -198,7 +197,7 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormatSpellout()
+    public function testFormatSpellout(): void
     {
         $value = 1;
         $attributes = ['foo' => 1];
@@ -224,7 +223,7 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormatDuration()
+    public function testFormatDuration(): void
     {
         $value = 1;
         $attributes = ['foo' => 1];
@@ -250,7 +249,7 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormatOrdinal()
+    public function testFormatOrdinal(): void
     {
         $value = 1;
         $attributes = ['foo' => 1];

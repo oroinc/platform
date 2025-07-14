@@ -25,7 +25,7 @@ class ValidateFileViewAccessTest extends GetProcessorTestCase
         $this->processor = new ValidateFileViewAccess($this->authorizationChecker);
     }
 
-    public function testProcessWhenAccessGranted()
+    public function testProcessWhenAccessGranted(): void
     {
         $action = 'get';
         $fileClass = File::class;
@@ -44,7 +44,7 @@ class ValidateFileViewAccessTest extends GetProcessorTestCase
         self::assertEquals($this->context->getSharedData()->get('granted_view_access'), [$action, $fileClass, $fileId]);
     }
 
-    public function testProcessWhenAccessDenied()
+    public function testProcessWhenAccessDenied(): void
     {
         $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('No access to the entity.');

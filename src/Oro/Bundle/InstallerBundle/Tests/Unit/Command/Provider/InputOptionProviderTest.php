@@ -6,20 +6,21 @@ namespace Oro\Bundle\InstallerBundle\Tests\Unit\Command\Provider;
 
 use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
-class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
+class InputOptionProviderTest extends TestCase
 {
     private const OPTION_NAME = 'option-name';
     private const MESSAGE = 'Question message';
 
-    private QuestionHelper|MockObject $questionHelper;
-    private InputInterface|MockObject $input;
-    private OutputInterface|MockObject $output;
+    private QuestionHelper&MockObject $questionHelper;
+    private InputInterface&MockObject $input;
+    private OutputInterface&MockObject $output;
     private InputOptionProvider $inputOptionProvider;
 
     #[\Override]
@@ -32,7 +33,7 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
         $this->inputOptionProvider = new InputOptionProvider($this->output, $this->input, $this->questionHelper);
     }
 
-    public function testGetWhenOptionHasValue()
+    public function testGetWhenOptionHasValue(): void
     {
         $defaultOptionValue = 'default option value';
         $this->input->expects($this->any())
@@ -46,8 +47,10 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider confirmationQuestionDataProvider
      */
-    public function testGetWhenOptionHasValueAndConfirmationTypeOfQuestion(string $optionValue, bool $convertedValue)
-    {
+    public function testGetWhenOptionHasValueAndConfirmationTypeOfQuestion(
+        string $optionValue,
+        bool $convertedValue
+    ): void {
         $this->input->expects($this->any())
             ->method('getOption')
             ->with(self::OPTION_NAME)
@@ -94,7 +97,7 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetWhenOptionHasNoValueAndNotInteractive()
+    public function testGetWhenOptionHasNoValueAndNotInteractive(): void
     {
         $this->input->expects($this->any())
             ->method('isInteractive')
@@ -112,7 +115,7 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetWhenOptionHasNoValueAndInteractiveAndNoInputFromUser()
+    public function testGetWhenOptionHasNoValueAndInteractiveAndNoInputFromUser(): void
     {
         $this->input->expects($this->any())
             ->method('isInteractive')
@@ -135,7 +138,7 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetWhenOptionHasNoValueAndInteractiveAndUserInputsAnswer()
+    public function testGetWhenOptionHasNoValueAndInteractiveAndUserInputsAnswer(): void
     {
         $this->input->expects($this->any())
             ->method('isInteractive')
@@ -158,7 +161,7 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetCommandParametersFromOptions()
+    public function testGetCommandParametersFromOptions(): void
     {
         $options = [
             'option-a' => [

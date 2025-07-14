@@ -67,7 +67,7 @@ class WorkflowDataSerializeListenerTest extends TestCase
         $this->serializer->expects(self::never())
             ->method('deserialize');
 
-        $this->listener->postLoad($entity, $args);
+        $this->listener->postLoad($entity);
 
         self::assertSame($this->serializer, $this->getEntitySerializer($entity));
     }

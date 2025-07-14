@@ -16,30 +16,19 @@ use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessor;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestContext;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\TestConnector;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class SyncProcessorTest extends \PHPUnit\Framework\TestCase
+class SyncProcessorTest extends TestCase
 {
-    /** @var Integration|\PHPUnit\Framework\MockObject\MockObject */
-    private $integration;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $processorRegistry;
-
-    /** @var Executor|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobExecutor;
-
-    /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var LoggerStrategy|\PHPUnit\Framework\MockObject\MockObject */
-    private $log;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
+    private Integration&MockObject $integration;
+    private EntityManager&MockObject $em;
+    private ProcessorRegistry&MockObject $processorRegistry;
+    private Executor&MockObject $jobExecutor;
+    private TypesRegistry&MockObject $registry;
+    private LoggerStrategy&MockObject $log;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
 
     #[\Override]
     protected function setUp(): void
@@ -56,7 +45,7 @@ class SyncProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processDataProvider
      */
-    public function testProcess(array $data, array $expected)
+    public function testProcess(array $data, array $expected): void
     {
         $this->integration->expects($this->once())
             ->method('getConnectors')

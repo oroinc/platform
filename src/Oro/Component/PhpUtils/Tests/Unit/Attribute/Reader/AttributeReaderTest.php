@@ -8,8 +8,9 @@ use Oro\Component\PhpUtils\Tests\Unit\Fixtures\PhpUtilsAttribute\Class\SimpleCla
 use Oro\Component\PhpUtils\Tests\Unit\Fixtures\PhpUtilsAttribute\ClassTestAttribute;
 use Oro\Component\PhpUtils\Tests\Unit\Fixtures\PhpUtilsAttribute\MethodTestAttribute;
 use Oro\Component\PhpUtils\Tests\Unit\Fixtures\PhpUtilsAttribute\PropertyTestAttribute;
+use PHPUnit\Framework\TestCase;
 
-class AttributeReaderTest extends \PHPUnit\Framework\TestCase
+class AttributeReaderTest extends TestCase
 {
     #[\Override]
     protected function setUp(): void
@@ -17,7 +18,7 @@ class AttributeReaderTest extends \PHPUnit\Framework\TestCase
         $this->reader = new AttributeReader();
     }
 
-    public function testGetClassAttributeWithDefinedAttributes()
+    public function testGetClassAttributeWithDefinedAttributes(): void
     {
         $reflection = new \ReflectionClass(ClassWithAttributes::class);
 
@@ -29,7 +30,7 @@ class AttributeReaderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['custom' => 'CustomClassMode'], $attributeValues->mode);
     }
 
-    public function testGetClassAttributeWithoutDefinedAttributes()
+    public function testGetClassAttributeWithoutDefinedAttributes(): void
     {
         $reflection = new \ReflectionClass(SimpleClass::class);
 
@@ -38,7 +39,7 @@ class AttributeReaderTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($attributeValues);
     }
 
-    public function testGetPropertyAttributeWithDefinedAttributes()
+    public function testGetPropertyAttributeWithDefinedAttributes(): void
     {
         $reflection = new \ReflectionClass(ClassWithAttributes::class);
         $nameProperty = $reflection->getProperty('foo');
@@ -50,7 +51,7 @@ class AttributeReaderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['custom' => 'CustomPropertyMode'], $attributeValues->mode);
     }
 
-    public function testGetPropertyAttributeWithoutDefinedAttributes()
+    public function testGetPropertyAttributeWithoutDefinedAttributes(): void
     {
         $reflection = new \ReflectionClass(SimpleClass::class);
         $nameProperty = $reflection->getProperty('foo');
@@ -60,7 +61,7 @@ class AttributeReaderTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($attributeValues);
     }
 
-    public function testGetMethodAttributeWithDefinedAttributes()
+    public function testGetMethodAttributeWithDefinedAttributes(): void
     {
         $reflectionMethod = new \ReflectionMethod(ClassWithAttributes::class, 'getFoo');
 
@@ -71,7 +72,7 @@ class AttributeReaderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['custom' => 'CustomMethodMode'], $attributeValues->mode);
     }
 
-    public function testGetMethodAttributeWithoutDefinedAttributes()
+    public function testGetMethodAttributeWithoutDefinedAttributes(): void
     {
         $reflectionMethod = new \ReflectionMethod(SimpleClass::class, 'getFoo');
 

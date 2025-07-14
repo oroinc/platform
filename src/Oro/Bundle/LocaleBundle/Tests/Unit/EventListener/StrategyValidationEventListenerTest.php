@@ -6,16 +6,16 @@ use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImportExportBundle\Event\StrategyValidationEvent;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\EventListener\StrategyValidationEventListener;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
+class StrategyValidationEventListenerTest extends TestCase
 {
-    /** @var StrategyValidationEventListener */
-    private $listener;
+    private StrategyValidationEventListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +23,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new StrategyValidationEventListener(PropertyAccess::createPropertyAccessor());
     }
 
-    public function testViolationsEmpty()
+    public function testViolationsEmpty(): void
     {
         $violations = new ConstraintViolationList();
         $event = new StrategyValidationEvent($violations);
@@ -32,7 +32,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $event->getErrors());
     }
 
-    public function testInvalidValueWithNotExpectedClass()
+    public function testInvalidValueWithNotExpectedClass(): void
     {
         $violations = new ConstraintViolationList(
             [
@@ -53,7 +53,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['existing'], $event->getErrors());
     }
 
-    public function testInvalidValuePropertyPath()
+    public function testInvalidValuePropertyPath(): void
     {
         $violations = new ConstraintViolationList(
             [
@@ -67,7 +67,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['existing'], $event->getErrors());
     }
 
-    public function testInvalidValueWithoutRoot()
+    public function testInvalidValueWithoutRoot(): void
     {
         $violations = new ConstraintViolationList(
             [
@@ -81,7 +81,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['existing'], $event->getErrors());
     }
 
-    public function testInvalidValueCollectionPathEmpty()
+    public function testInvalidValueCollectionPathEmpty(): void
     {
         $violations = new ConstraintViolationList(
             [
@@ -95,7 +95,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['existing'], $event->getErrors());
     }
 
-    public function testInvalidValueCollectionWrongPath()
+    public function testInvalidValueCollectionWrongPath(): void
     {
         $violations = new ConstraintViolationList(
             [
@@ -109,7 +109,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['existing'], $event->getErrors());
     }
 
-    public function testInvalidValueLocalizedFallbackValueToOneRoot()
+    public function testInvalidValueLocalizedFallbackValueToOneRoot(): void
     {
         $fallback = new LocalizedFallbackValue();
         $class = new \stdClass();
@@ -123,7 +123,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['root: test'], $event->getErrors());
     }
 
-    public function testInvalidValueLocalizedFallbackValueToOneProp()
+    public function testInvalidValueLocalizedFallbackValueToOneProp(): void
     {
         $fallback = new LocalizedFallbackValue();
         $class = new \stdClass();
@@ -139,7 +139,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['root.prop: test'], $event->getErrors());
     }
 
-    public function testInvalidValueLocalizedFallbackValueToManyRoot()
+    public function testInvalidValueLocalizedFallbackValueToManyRoot(): void
     {
         $fallback = new LocalizedFallbackValue();
         $class = new \stdClass();
@@ -153,7 +153,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['root[default]: test'], $event->getErrors());
     }
 
-    public function testInvalidValueLocalizedFallbackValueToManyProp()
+    public function testInvalidValueLocalizedFallbackValueToManyProp(): void
     {
         $fallback = new LocalizedFallbackValue();
         $class = new \stdClass();
@@ -169,7 +169,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['root[0].prop: test'], $event->getErrors());
     }
 
-    public function testInvalidValueLocalizedFallbackValueToMany()
+    public function testInvalidValueLocalizedFallbackValueToMany(): void
     {
         $fallback = new LocalizedFallbackValue();
         $class = new \stdClass();
@@ -185,7 +185,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['root[0].prop[default]: test'], $event->getErrors());
     }
 
-    public function testInvalidValueLocalizedFallbackValueDoublePathIgnored()
+    public function testInvalidValueLocalizedFallbackValueDoublePathIgnored(): void
     {
         $fallback = new LocalizedFallbackValue();
         $class = new \stdClass();

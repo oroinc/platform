@@ -8,14 +8,13 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\EventListener\ClearDynamicTranslationCacheListener;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationCache;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ClearDynamicTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
+class ClearDynamicTranslationCacheListenerTest extends TestCase
 {
-    /** @var DynamicTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $dynamicTranslationCache;
-
-    /** @var ClearDynamicTranslationCacheListener */
-    private $listener;
+    private DynamicTranslationCache&MockObject $dynamicTranslationCache;
+    private ClearDynamicTranslationCacheListener $listener;
 
     #[\Override]
     protected function setUp(): void

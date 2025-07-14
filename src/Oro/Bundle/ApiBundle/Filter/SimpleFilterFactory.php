@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Filter;
 
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -44,12 +45,17 @@ class SimpleFilterFactory implements FilterFactoryInterface
     #[\Override]
     public function createFilter(string $filterType, array $options = []): ?StandaloneFilter
     {
+        $dataType = $filterType;
+        $filterTypeDetailDelimiterPos = strpos($filterType, DataType::DETAIL_DELIMITER);
+        if (false !== $filterTypeDetailDelimiterPos) {
+            $filterType = substr($filterType, 0, $filterTypeDetailDelimiterPos);
+        }
+
         if (!isset($this->factories[$filterType]) && !isset($this->filters[$filterType])) {
             return null;
         }
 
         $options = array_replace($this->getFilterParameters($filterType), $options);
-        $dataType = $filterType;
         if (\array_key_exists(self::DATA_TYPE_OPTION, $options)) {
             $dataType = $options[self::DATA_TYPE_OPTION];
             unset($options[self::DATA_TYPE_OPTION]);
@@ -82,7 +88,7 @@ class SimpleFilterFactory implements FilterFactoryInterface
             $filter = new $filterClass($dataType);
         }
         if (!$filter instanceof StandaloneFilter) {
-            throw new \LogicException(sprintf(
+            throw new \LogicException(\sprintf(
                 'The filter "%s" must be an instance of %s, got %s.',
                 $filterType,
                 StandaloneFilter::class,

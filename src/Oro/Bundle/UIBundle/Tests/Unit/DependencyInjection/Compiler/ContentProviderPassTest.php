@@ -4,13 +4,14 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class ContentProviderPassTest extends \PHPUnit\Framework\TestCase
+class ContentProviderPassTest extends TestCase
 {
     public function testProcess(): void
     {

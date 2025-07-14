@@ -4,11 +4,11 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\TagBundle\Formatter\TagsTypeFormatter;
+use PHPUnit\Framework\TestCase;
 
-class TagsTypeFormatterTest extends \PHPUnit\Framework\TestCase
+class TagsTypeFormatterTest extends TestCase
 {
-    /** @var TagsTypeFormatter */
-    private $formatter;
+    private TagsTypeFormatter $formatter;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class TagsTypeFormatterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider formatTypeDataProvider
      */
-    public function testFormatType(array $value, string $type, ?string $exception, string $expected)
+    public function testFormatType(array $value, string $type, ?string $exception, string $expected): void
     {
         if ($exception) {
             $this->expectException($exception);
@@ -30,7 +30,7 @@ class TagsTypeFormatterTest extends \PHPUnit\Framework\TestCase
 
     public function formatTypeDataProvider(): array
     {
-        $value    = [
+        $value = [
             ['name' => 1],
             ['name' => 2],
             ['name' => 3]

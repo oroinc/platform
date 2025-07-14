@@ -3,19 +3,20 @@
 namespace Oro\Component\Layout\Tests\Unit\Loader\Generator;
 
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
+use PHPUnit\Framework\TestCase;
 
-class GeneratorDataTest extends \PHPUnit\Framework\TestCase
+class GeneratorDataTest extends TestCase
 {
-    public function testFilenameShouldBeOptional()
+    public function testFilenameShouldBeOptional(): void
     {
         $data = new GeneratorData(uniqid('testSource', true));
         $this->assertNull($data->getFilename());
     }
 
-    public function testSourceDataGetter()
+    public function testSourceDataGetter(): void
     {
         $source = uniqid('testSource', true);
-        $data   = new GeneratorData($source);
+        $data = new GeneratorData($source);
 
         $this->assertSame($source, $data->getSource());
 
@@ -25,7 +26,7 @@ class GeneratorDataTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($newSource, $data->getSource());
     }
 
-    public function testFilenameSetter()
+    public function testFilenameSetter(): void
     {
         $data = new GeneratorData(uniqid('testSource', true));
         $this->assertNull($data->getFilename());

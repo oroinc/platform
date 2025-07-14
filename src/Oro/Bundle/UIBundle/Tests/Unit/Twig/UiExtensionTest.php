@@ -29,16 +29,11 @@ class UiExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    private Environment|MockObject $environment;
-
-    private ContentProviderManager|MockObject $contentProviderManager;
-
-    private EventDispatcherInterface|MockObject $eventDispatcher;
-
-    private RequestStack|MockObject $requestStack;
-
-    private RouterInterface|MockObject $router;
-
+    private Environment&MockObject $environment;
+    private ContentProviderManager&MockObject $contentProviderManager;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private RequestStack&MockObject $requestStack;
+    private RouterInterface&MockObject $router;
     private UiExtension $extension;
 
     #[\Override]

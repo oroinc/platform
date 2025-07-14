@@ -333,7 +333,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testAssociationWithMetaPropertiesInTargetMetadata()
+    public function testAssociationWithMetaPropertiesInTargetMetadata(): void
     {
         $object = [
             'code'       => 123,
@@ -375,7 +375,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testAssociationWithAssociationLevelMetaPropertiesInTargetMetadata()
+    public function testAssociationWithAssociationLevelMetaPropertiesInTargetMetadata(): void
     {
         $object = [
             'code'       => 123,

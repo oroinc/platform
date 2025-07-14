@@ -5,15 +5,14 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\SignalExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class SignalExtensionTest extends \PHPUnit\Framework\TestCase
+class SignalExtensionTest extends TestCase
 {
-    /** @var Context */
-    private $context;
-
-    /** @var SignalExtension */
-    private $extension;
+    private Context $context;
+    private SignalExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class SignalExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider signalDataProvider
      */
-    public function testOnBeforeReceive(int $signal)
+    public function testOnBeforeReceive(int $signal): void
     {
         $context = clone $this->context;
         $this->handleSignal($context, $signal);
@@ -39,7 +38,7 @@ class SignalExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Interrupt execution.', $context->getInterruptedReason());
     }
 
-    public function testOnBeforeReceiveInvalidSignal()
+    public function testOnBeforeReceiveInvalidSignal(): void
     {
         $context = clone $this->context;
         $this->handleInvalidSignal($context, SIGALRM);
@@ -53,7 +52,7 @@ class SignalExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider signalDataProvider
      */
-    public function testOnPostReceived(int $signal)
+    public function testOnPostReceived(int $signal): void
     {
         $context = clone $this->context;
         $this->handleSignal($context, $signal);
@@ -64,7 +63,7 @@ class SignalExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Interrupt execution.', $context->getInterruptedReason());
     }
 
-    public function testOnPostReceivedInvalidSignal()
+    public function testOnPostReceivedInvalidSignal(): void
     {
         $context = clone $this->context;
         $this->handleInvalidSignal($context, SIGALRM);
@@ -78,7 +77,7 @@ class SignalExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider signalDataProvider
      */
-    public function testIdle(int $signal)
+    public function testIdle(int $signal): void
     {
         $context = clone $this->context;
         $this->handleSignal($context, $signal);
@@ -89,7 +88,7 @@ class SignalExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Interrupt execution.', $context->getInterruptedReason());
     }
 
-    public function testOnIdleInvalidSignal()
+    public function testOnIdleInvalidSignal(): void
     {
         $context = clone $this->context;
         $this->handleInvalidSignal($context, SIGALRM);
@@ -117,7 +116,7 @@ class SignalExtensionTest extends \PHPUnit\Framework\TestCase
 
     private function handleSignal(Context $context, int $signal)
     {
-        /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger */
+        /** @var LoggerInterface&MockObject $logger */
         $logger = $context->getLogger();
         $logger->expects($this->exactly(3))
             ->method('debug')
@@ -132,7 +131,7 @@ class SignalExtensionTest extends \PHPUnit\Framework\TestCase
 
     private function handleInvalidSignal(Context $context, int $signal)
     {
-        /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger */
+        /** @var LoggerInterface&MockObject $logger */
         $logger = $context->getLogger();
         $logger->expects($this->once())
             ->method('debug')

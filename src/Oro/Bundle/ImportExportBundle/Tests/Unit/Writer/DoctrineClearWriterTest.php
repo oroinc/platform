@@ -8,17 +8,14 @@ use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 use Oro\Bundle\ImportExportBundle\Writer\DoctrineClearWriter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DoctrineClearWriterTest extends \PHPUnit\Framework\TestCase
+class DoctrineClearWriterTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextRegistry;
-
-    /** @var DoctrineClearWriter */
-    private $writer;
+    private ManagerRegistry&MockObject $registry;
+    private ContextRegistry&MockObject $contextRegistry;
+    private DoctrineClearWriter $writer;
 
     #[\Override]
     protected function setUp(): void
@@ -32,12 +29,10 @@ class DoctrineClearWriterTest extends \PHPUnit\Framework\TestCase
     public function testWrite(): void
     {
         $entityManager = $this->createMock(EntityManager::class);
-        $entityManager
-            ->expects($this->once())
+        $entityManager->expects($this->once())
             ->method('clear');
 
-        $this->registry
-            ->expects($this->once())
+        $this->registry->expects($this->once())
             ->method('getManager')
             ->willReturn($entityManager);
 
@@ -47,24 +42,20 @@ class DoctrineClearWriterTest extends \PHPUnit\Framework\TestCase
     public function testWriteWithoutDoctrineClear(): void
     {
         $entityManager = $this->createMock(EntityManager::class);
-        $entityManager
-            ->expects($this->once())
+        $entityManager->expects($this->once())
             ->method('clear');
 
-        $this->registry
-            ->expects($this->once())
+        $this->registry->expects($this->once())
             ->method('getManager')
             ->willReturn($entityManager);
 
         $stepExecution = $this->createMock(StepExecution::class);
         $context = $this->createMock(StepExecutionProxyContext::class);
-        $context
-            ->expects($this->once())
+        $context->expects($this->once())
             ->method('getValue')
             ->with(DoctrineClearWriter::SKIP_CLEAR)
             ->willReturn(false);
-        $this->contextRegistry
-            ->expects($this->once())
+        $this->contextRegistry->expects($this->once())
             ->method('getByStepExecution')
             ->with($stepExecution)
             ->willReturn($context);
@@ -75,19 +66,16 @@ class DoctrineClearWriterTest extends \PHPUnit\Framework\TestCase
 
     public function testWriteWithDoctrineClear(): void
     {
-        $this->registry
-            ->expects($this->never())
+        $this->registry->expects($this->never())
             ->method('getManager');
 
         $stepExecution = $this->createMock(StepExecution::class);
         $context = $this->createMock(StepExecutionProxyContext::class);
-        $context
-            ->expects($this->once())
+        $context->expects($this->once())
             ->method('getValue')
             ->with(DoctrineClearWriter::SKIP_CLEAR)
             ->willReturn(true);
-        $this->contextRegistry
-            ->expects($this->once())
+        $this->contextRegistry->expects($this->once())
             ->method('getByStepExecution')
             ->with($stepExecution)
             ->willReturn($context);

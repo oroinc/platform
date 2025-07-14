@@ -9,17 +9,17 @@ use Oro\Bundle\NavigationBundle\MenuUpdate\Applier\Model\MenuUpdateApplierContex
 use Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuItem\MenuUpdateToMenuItemPropagatorInterface;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
+class MenuUpdateApplierTest extends TestCase
 {
     use MenuItemTestTrait;
 
-    private MenuUpdateToMenuItemPropagatorInterface|\PHPUnit\Framework\MockObject\MockObject
-        $menuUpdateToMenuItemPropagator;
-
+    private MenuUpdateToMenuItemPropagatorInterface&MockObject $menuUpdateToMenuItemPropagator;
     private MenuUpdateApplier $applier;
 
     #[\Override]
@@ -41,8 +41,7 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $menuUpdate->setKey('item-1-1-1');
         $menuUpdate->setParentKey('item-2');
 
-        $this->menuUpdateToMenuItemPropagator
-            ->expects(self::once())
+        $this->menuUpdateToMenuItemPropagator->expects(self::once())
             ->method('propagateFromMenuUpdate')
             ->with($item, $menuUpdate, MenuUpdateToMenuItemPropagatorInterface::STRATEGY_FULL);
 
@@ -75,8 +74,7 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $menuUpdate->setKey('item-1-1-1');
         $menuUpdate->setParentKey('non-existing');
 
-        $this->menuUpdateToMenuItemPropagator
-            ->expects(self::once())
+        $this->menuUpdateToMenuItemPropagator->expects(self::once())
             ->method('propagateFromMenuUpdate')
             ->with($item, $menuUpdate, MenuUpdateToMenuItemPropagatorInterface::STRATEGY_FULL);
 
@@ -107,8 +105,7 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $menuUpdate->setKey('item-1-1-1-1');
         $menuUpdate->setParentKey('item-2');
 
-        $this->menuUpdateToMenuItemPropagator
-            ->expects(self::once())
+        $this->menuUpdateToMenuItemPropagator->expects(self::once())
             ->method('propagateFromMenuUpdate')
             ->with(
                 self::isInstanceOf(ItemInterface::class),
@@ -144,8 +141,7 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $menuUpdate->setParentKey('item-2');
         $menuUpdate->setCustom(true);
 
-        $this->menuUpdateToMenuItemPropagator
-            ->expects(self::once())
+        $this->menuUpdateToMenuItemPropagator->expects(self::once())
             ->method('propagateFromMenuUpdate')
             ->with(
                 self::isInstanceOf(ItemInterface::class),
@@ -179,8 +175,7 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $menuUpdate->setParentKey('non-existing');
         $menuUpdate->setCustom(true);
 
-        $this->menuUpdateToMenuItemPropagator
-            ->expects(self::once())
+        $this->menuUpdateToMenuItemPropagator->expects(self::once())
             ->method('propagateFromMenuUpdate')
             ->with(
                 self::isInstanceOf(ItemInterface::class),
@@ -214,8 +209,7 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $menuUpdate->setKey('item-1-1-1-1');
         $menuUpdate->setParentKey('non-existing');
 
-        $this->menuUpdateToMenuItemPropagator
-            ->expects(self::once())
+        $this->menuUpdateToMenuItemPropagator->expects(self::once())
             ->method('propagateFromMenuUpdate')
             ->with(
                 self::isInstanceOf(ItemInterface::class),
@@ -251,8 +245,7 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $menuUpdate = new MenuUpdateStub(42);
         $menuUpdate->setKey('item-new');
 
-        $this->menuUpdateToMenuItemPropagator
-            ->expects(self::once())
+        $this->menuUpdateToMenuItemPropagator->expects(self::once())
             ->method('propagateFromMenuUpdate')
             ->with(
                 self::isInstanceOf(ItemInterface::class),
@@ -291,8 +284,7 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $menuUpdate->setKey('item-new');
         $menuUpdate->setSynthetic(true);
 
-        $this->menuUpdateToMenuItemPropagator
-            ->expects(self::once())
+        $this->menuUpdateToMenuItemPropagator->expects(self::once())
             ->method('propagateFromMenuUpdate')
             ->with(
                 self::isInstanceOf(ItemInterface::class),
@@ -331,8 +323,7 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $menuUpdate->setKey('item-new');
         $menuUpdate->setCustom(true);
 
-        $this->menuUpdateToMenuItemPropagator
-            ->expects(self::once())
+        $this->menuUpdateToMenuItemPropagator->expects(self::once())
             ->method('propagateFromMenuUpdate')
             ->with(
                 self::isInstanceOf(ItemInterface::class),
@@ -369,8 +360,7 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
         $menuUpdate = new MenuUpdateStub(42);
         $menuUpdate->setKey($menu->getName());
 
-        $this->menuUpdateToMenuItemPropagator
-            ->expects(self::once())
+        $this->menuUpdateToMenuItemPropagator->expects(self::once())
             ->method('propagateFromMenuUpdate')
             ->with(
                 self::isInstanceOf(ItemInterface::class),

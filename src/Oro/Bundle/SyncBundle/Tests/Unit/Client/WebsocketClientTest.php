@@ -8,25 +8,18 @@ use Oro\Bundle\SyncBundle\Client\Wamp\WampClient;
 use Oro\Bundle\SyncBundle\Client\WebsocketClient;
 use Oro\Bundle\SyncBundle\Exception\ValidationFailedException;
 use Oro\Bundle\SyncBundle\Provider\WebsocketClientParametersProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WebsocketClientTest extends \PHPUnit\Framework\TestCase
+class WebsocketClientTest extends TestCase
 {
     private const TICKET = 'sampleTicket';
 
-    /** @var WampClientFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $wampClientFactory;
-
-    /** @var WebsocketClientParametersProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $clientParametersProvider;
-
-    /** @var TicketProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ticketProvider;
-
-    /** @var WampClient|\PHPUnit\Framework\MockObject\MockObject */
-    private $wampClient;
-
-    /** @var WebsocketClient */
-    private $websocketClient;
+    private WampClientFactoryInterface&MockObject $wampClientFactory;
+    private WebsocketClientParametersProviderInterface&MockObject $clientParametersProvider;
+    private TicketProviderInterface&MockObject $ticketProvider;
+    private WampClient&MockObject $wampClient;
+    private WebsocketClient $websocketClient;
 
     #[\Override]
     protected function setUp(): void
@@ -47,7 +40,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider connectDataProvider
      */
-    public function testConnect(string $target, string $expectedTarget)
+    public function testConnect(string $target, string $expectedTarget): void
     {
         $connectionSession = 'sampleSession';
 
@@ -98,7 +91,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testDisconnect()
+    public function testDisconnect(): void
     {
         $this->mockClientFactory();
         $this->wampClient->expects(self::once())
@@ -108,7 +101,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->websocketClient->disconnect());
     }
 
-    public function testIsConnected()
+    public function testIsConnected(): void
     {
         $this->mockClientFactory();
         $this->wampClient->expects(self::once())
@@ -118,7 +111,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->websocketClient->isConnected());
     }
 
-    public function testPublish()
+    public function testPublish(): void
     {
         $topicUri = 'sampleUri';
         $payload = 'samplePayload';
@@ -138,7 +131,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->websocketClient->publish($topicUri, $payload, $exclude, $eligible));
     }
 
-    public function testPublishValidationFailure()
+    public function testPublishValidationFailure(): void
     {
         $this->wampClientFactory->expects(self::never())
             ->method('createClient');
@@ -149,7 +142,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         $this->websocketClient->publish('sampleUrl', "\xB1\x31");
     }
 
-    public function testPrefix()
+    public function testPrefix(): void
     {
         $prefix = 'samplePrefix';
         $uri = 'sampleUri';
@@ -167,7 +160,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->websocketClient->prefix($prefix, $uri));
     }
 
-    public function testCall()
+    public function testCall(): void
     {
         $procUri = 'sampleUri';
         $arguments = ['sampleArgument'];
@@ -185,7 +178,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->websocketClient->call($procUri, $arguments));
     }
 
-    public function testEvent()
+    public function testEvent(): void
     {
         $topicUri = 'sampleUri';
         $payload = 'samplePayload';
@@ -203,7 +196,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->websocketClient->event($topicUri, $payload));
     }
 
-    public function testEventValidationFailure()
+    public function testEventValidationFailure(): void
     {
         $this->wampClientFactory->expects(self::never())
             ->method('createClient');

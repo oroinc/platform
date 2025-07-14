@@ -12,22 +12,17 @@ use Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension;
 use Oro\Bundle\SecurityBundle\Util\UriSecurityHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
+class OroSecurityExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var PermissionManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $permissionManager;
-
-    /** @var UriSecurityHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $uriSecurityHelper;
-
-    /** @var OroSecurityExtension */
-    private $extension;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private PermissionManager&MockObject $permissionManager;
+    private UriSecurityHelper&MockObject $uriSecurityHelper;
+    private OroSecurityExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -45,7 +40,7 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new OroSecurityExtension($container);
     }
 
-    public function testGetOrganizations()
+    public function testGetOrganizations(): void
     {
         $user = new User();
         $disabledOrganization = new Organization();
@@ -70,7 +65,7 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetCurrentOrganization()
+    public function testGetCurrentOrganization(): void
     {
         $organization = $this->createMock(Organization::class);
 
@@ -84,7 +79,7 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetCurrentOrganizationWhenNoOrganizationInToken()
+    public function testGetCurrentOrganizationWhenNoOrganizationInToken(): void
     {
         $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
@@ -95,7 +90,7 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPermission()
+    public function testGetPermission(): void
     {
         $aclPermission = new AclPermission();
         $aclPermission->setName('test name');

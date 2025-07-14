@@ -3,11 +3,11 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Log\Processor;
 
 use Oro\Component\MessageQueue\Log\Processor\RestoreOriginalChannelProcessor;
+use PHPUnit\Framework\TestCase;
 
-class RestoreOriginalChannelProcessorTest extends \PHPUnit\Framework\TestCase
+class RestoreOriginalChannelProcessorTest extends TestCase
 {
-    /** @var RestoreOriginalChannelProcessor */
-    private $processor;
+    private RestoreOriginalChannelProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -15,7 +15,7 @@ class RestoreOriginalChannelProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new RestoreOriginalChannelProcessor();
     }
 
-    public function testCouldBeInvokedWithoutSavedOriginalLogChannel()
+    public function testCouldBeInvokedWithoutSavedOriginalLogChannel(): void
     {
         $this->assertEquals(
             ['message' => 'test', 'context' => []],
@@ -23,7 +23,7 @@ class RestoreOriginalChannelProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldMoveSavedOriginalLogChannel()
+    public function testShouldMoveSavedOriginalLogChannel(): void
     {
         $this->assertEquals(
             ['message' => 'test', 'context' => [], 'channel' => 'test_channel'],

@@ -19,7 +19,7 @@ class ThemeConfigurationTest extends TestCase
     protected function setUp(): void
     {
         $this->configurationBuildersProvider = $this->createStub(ConfigurationBuildersProvider::class);
-        $this->configurationBuildersProvider
+        $this->configurationBuildersProvider->expects(self::any())
             ->method('getConfigurationTypes')
             ->willReturn(['type']);
     }

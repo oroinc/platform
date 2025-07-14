@@ -4,8 +4,9 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Model;
 
 use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
+use PHPUnit\Framework\TestCase;
 
-class EmailAddressWithContextTest extends \PHPUnit\Framework\TestCase
+class EmailAddressWithContextTest extends TestCase
 {
     private const EMAIL = 'some@mail.com';
 

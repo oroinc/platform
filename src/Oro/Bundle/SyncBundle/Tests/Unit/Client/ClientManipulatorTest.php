@@ -4,7 +4,6 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Client;
 
 use Gos\Bundle\WebSocketBundle\Client\Auth\WebsocketAuthenticationProviderInterface;
 use Gos\Bundle\WebSocketBundle\Client\ClientManipulatorInterface;
-use Gos\Bundle\WebSocketBundle\Client\ClientStorage;
 use Gos\Bundle\WebSocketBundle\Client\ClientStorageInterface;
 use Gos\Bundle\WebSocketBundle\Client\Exception\ClientNotFoundException;
 use Gos\Bundle\WebSocketBundle\Client\Exception\StorageException;
@@ -16,12 +15,14 @@ use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
 use Oro\Bundle\SyncBundle\Security\Token\TicketToken;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Bundle\UserBundle\Security\UserProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
+class ClientManipulatorTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
@@ -29,23 +30,12 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
     private const USERNAME = 'sampleUsername';
     private const CLIENT_STORAGE_TTL = 100;
 
-    /** @var ClientManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $decoratedClientManipulator;
-
-    /** @var ClientStorage */
-    private $clientStorage;
-
-    /** @var UserProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $userProvider;
-
-    /** @var TicketProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ticketProvider;
-
-    /** @var WebsocketAuthenticationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $websocketAuthenticationProvider;
-
-    /** @var ClientManipulator */
-    private $clientManipulator;
+    private ClientManipulatorInterface&MockObject $decoratedClientManipulator;
+    private ClientStorageInterface&MockObject $clientStorage;
+    private UserProvider&MockObject $userProvider;
+    private TicketProviderInterface&MockObject $ticketProvider;
+    private WebsocketAuthenticationProviderInterface&MockObject $websocketAuthenticationProvider;
+    private ClientManipulator $clientManipulator;
 
     #[\Override]
     protected function setUp(): void
@@ -210,7 +200,7 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
         self::assertNotEquals('ticket=abc', $connection->httpRequest->getUri()->getQuery());
     }
 
-    public function testGetAll()
+    public function testGetAll(): void
     {
         $anonymous = false;
         $topic = $this->createMock(Topic::class);
@@ -224,7 +214,7 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedResult, $this->clientManipulator->getAll($topic, $anonymous));
     }
 
-    public function testFindByRoles()
+    public function testFindByRoles(): void
     {
         $roles = ['sampleRole'];
         $topic = $this->createMock(Topic::class);

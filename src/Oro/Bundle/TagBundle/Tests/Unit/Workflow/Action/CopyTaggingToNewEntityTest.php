@@ -18,24 +18,19 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
-class CopyTaggingToNewEntityTest extends \PHPUnit\Framework\TestCase
+class CopyTaggingToNewEntityTest extends TestCase
 {
-    /** @var TagManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $tagManager;
-
-    /** @var TaggableHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $taggableHelper;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var CopyTaggingToNewEntity */
-    private $action;
+    private TagManager&MockObject $tagManager;
+    private TaggableHelper&MockObject $taggableHelper;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private CopyTaggingToNewEntity $action;
 
     #[\Override]
     protected function setUp(): void
@@ -53,7 +48,7 @@ class CopyTaggingToNewEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $options = [
             'source' => $this->createMock(PropertyPathInterface::class),
@@ -71,7 +66,7 @@ class CopyTaggingToNewEntityTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $inputData, string $exception, string $exceptionMessage)
+    public function testInitializeException(array $inputData, string $exception, string $exceptionMessage): void
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($exceptionMessage);
@@ -98,7 +93,7 @@ class CopyTaggingToNewEntityTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testExecuteMethod()
+    public function testExecuteMethod(): void
     {
         $source = $this->createMock(Taggable::class);
         $destination = $this->createMock(Taggable::class);
@@ -121,7 +116,8 @@ class CopyTaggingToNewEntityTest extends \PHPUnit\Framework\TestCase
 
         $em = $this->createMock(EntityManagerInterface::class);
 
-        $this->doctrineHelper->method('getEntityManagerForClass')
+        $this->doctrineHelper->expects(self::any())
+            ->method('getEntityManagerForClass')
             ->with(Tagging::class)
             ->willReturn($em);
 
@@ -162,7 +158,7 @@ class CopyTaggingToNewEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($data);
     }
 
-    public function testExecuteMethodExceptionSource()
+    public function testExecuteMethodExceptionSource(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -188,7 +184,7 @@ class CopyTaggingToNewEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($data);
     }
 
-    public function testExecuteMethodExceptionDestination()
+    public function testExecuteMethodExceptionDestination(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(

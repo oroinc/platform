@@ -6,11 +6,11 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Action\DatagridCallbackActionProvider;
 use Oro\Bundle\TestFrameworkBundle\Test\Stub\CallableStub;
+use PHPUnit\Framework\TestCase;
 
-class DatagridCallbackActionProviderTest extends \PHPUnit\Framework\TestCase
+class DatagridCallbackActionProviderTest extends TestCase
 {
-    /** @var DatagridCallbackActionProvider */
-    private $provider;
+    private DatagridCallbackActionProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -18,12 +18,12 @@ class DatagridCallbackActionProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new DatagridCallbackActionProvider();
     }
 
-    public function testHasActions()
+    public function testHasActions(): void
     {
         $this->assertTrue($this->provider->hasActions(DatagridConfiguration::create([])));
     }
 
-    public function testApplyActionsNothingToDo()
+    public function testApplyActionsNothingToDo(): void
     {
         $config = $this->createMock(DatagridConfiguration::class);
         $config->expects($this->once())
@@ -34,7 +34,7 @@ class DatagridCallbackActionProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->applyActions($config);
     }
 
-    public function testApplyActionsGotNonCallable()
+    public function testApplyActionsGotNonCallable(): void
     {
         $config = $this->createMock(DatagridConfiguration::class);
         $config->expects($this->once())
@@ -45,7 +45,7 @@ class DatagridCallbackActionProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->applyActions($config);
     }
 
-    public function testApplyActionsGotCallable()
+    public function testApplyActionsGotCallable(): void
     {
         $callable = $this->createMock(CallableStub::class);
 

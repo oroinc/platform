@@ -4,13 +4,13 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
+class RequiredAttributesListenerTest extends TestCase
 {
-    /** @var RequiredAttributesListener */
-    private $listener;
+    private RequiredAttributesListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new RequiredAttributesListener();
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $events = $this->listener->getSubscribedEvents();
         $this->assertCount(2, $events);
@@ -27,7 +27,7 @@ class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey(FormEvents::SUBMIT, $events);
     }
 
-    public function testOnSubmitNoWorkflowData()
+    public function testOnSubmitNoWorkflowData(): void
     {
         $data = $this->createMock(WorkflowData::class);
         $data->expects($this->never())
@@ -43,7 +43,7 @@ class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onSubmit($event);
     }
 
-    public function testOnPreSetDataOnlyWorkflowData()
+    public function testOnPreSetDataOnlyWorkflowData(): void
     {
         $data = new \stdClass();
 
@@ -57,7 +57,7 @@ class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onPreSetData($event);
     }
 
-    public function testEvents()
+    public function testEvents(): void
     {
         $attributeNames = ['test'];
         $values = ['test' => 'value'];

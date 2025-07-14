@@ -4,8 +4,9 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider\Rest\Exception;
 
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestResponseInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Exception\RestException;
+use PHPUnit\Framework\TestCase;
 
-class RestExceptionTest extends \PHPUnit\Framework\TestCase
+class RestExceptionTest extends TestCase
 {
     /**
      * @dataProvider exceptionDataProvider
@@ -17,7 +18,7 @@ class RestExceptionTest extends \PHPUnit\Framework\TestCase
         bool $isServerError,
         int $statusCode,
         string $reasonPhrase
-    ) {
+    ): void {
         $previous = new \Exception();
 
         $response = $this->createMock(RestResponseInterface::class);

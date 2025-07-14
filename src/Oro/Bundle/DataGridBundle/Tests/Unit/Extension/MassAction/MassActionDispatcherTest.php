@@ -21,12 +21,14 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHelper;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionParametersParser;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponseInterface;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
+class MassActionDispatcherTest extends TestCase
 {
     private const DATAGRID_NAME = 'datagridName';
     private const ACTION_NAME = 'actionName';
@@ -34,20 +36,11 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
     private static array $data = ['some' => 'data'];
     private static array $filters = ['someFilter' => 'data'];
 
-    /** @var MassActionHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $massActionHelper;
-
-    /** @var ManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var MassActionParametersParser|\PHPUnit\Framework\MockObject\MockObject */
-    private $massActionParametersParser;
-
-    /** @var IterableResultFactoryRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $iterableResultFactoryRegistry;
-
-    /** @var MassActionDispatcher */
-    private $massActionDispatcher;
+    private MassActionHelper&MockObject $massActionHelper;
+    private ManagerInterface&MockObject $manager;
+    private MassActionParametersParser&MockObject $massActionParametersParser;
+    private IterableResultFactoryRegistry&MockObject $iterableResultFactoryRegistry;
+    private MassActionDispatcher $massActionDispatcher;
 
     #[\Override]
     protected function setUp(): void
@@ -65,7 +58,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDispatchWhenNoItemsSelected()
+    public function testDispatchWhenNoItemsSelected(): void
     {
         $parameters = ['inset' => true, 'values' => []];
         $this->expectException(LogicException::class);
@@ -74,7 +67,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->massActionDispatcher->dispatch(self::DATAGRID_NAME, self::ACTION_NAME, $parameters, self::$data);
     }
 
-    public function testDispatchByRequestWhenNoItemsSelected()
+    public function testDispatchByRequestWhenNoItemsSelected(): void
     {
         $request = new Request();
         $this->massActionParametersParser->expects($this->once())
@@ -88,7 +81,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->massActionDispatcher->dispatchByRequest(self::DATAGRID_NAME, self::ACTION_NAME, $request);
     }
 
-    public function testDispatchWhenNoMassActionExtensionAppliedForGrid()
+    public function testDispatchWhenNoMassActionExtensionAppliedForGrid(): void
     {
         $parameters = ['inset' => true, 'values' => [1], 'filters' => self::$filters];
 
@@ -99,7 +92,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->massActionDispatcher->dispatch(self::DATAGRID_NAME, self::ACTION_NAME, $parameters, self::$data);
     }
 
-    public function testDispatchByRequestWhenNoMassActionExtensionAppliedForGrid()
+    public function testDispatchByRequestWhenNoMassActionExtensionAppliedForGrid(): void
     {
         $request = new Request();
         $this->massActionParametersParser->expects($this->once())
@@ -164,7 +157,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
             ->willThrowException(new LogicException('Mass action exception'));
     }
 
-    public function testDispatchWhenNoHandlerFoundForMassAction()
+    public function testDispatchWhenNoHandlerFoundForMassAction(): void
     {
         $parameters = ['inset' => true, 'values' => [1], 'filters' => self::$filters];
 
@@ -175,7 +168,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->massActionDispatcher->dispatch(self::DATAGRID_NAME, self::ACTION_NAME, $parameters, self::$data);
     }
 
-    public function testDispatchByRequestWhenNoHandlerFoundForMassAction()
+    public function testDispatchByRequestWhenNoHandlerFoundForMassAction(): void
     {
         $request = new Request();
         $this->massActionParametersParser->expects($this->once())
@@ -206,7 +199,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
             ->willThrowException(new LogicException('No handler exception'));
     }
 
-    public function testDispatchWhenDatasourceIsNotSupported()
+    public function testDispatchWhenDatasourceIsNotSupported(): void
     {
         $parameters = ['inset' => true, 'values' => [1], 'filters' => self::$filters];
 
@@ -217,7 +210,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->massActionDispatcher->dispatch(self::DATAGRID_NAME, self::ACTION_NAME, $parameters, self::$data);
     }
 
-    public function testDispatchByRequestWhenDatasourceIsNotSupported()
+    public function testDispatchByRequestWhenDatasourceIsNotSupported(): void
     {
         $request = new Request();
         $this->massActionParametersParser->expects($this->once())
@@ -273,7 +266,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
             ->willThrowException(new LogicException('Not supported datasource'));
     }
 
-    public function testDispatch()
+    public function testDispatch(): void
     {
         $parameters = ['inset' => true, 'values' => [1], 'filters' => self::$filters];
 
@@ -285,7 +278,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDispatchByRequest()
+    public function testDispatchByRequest(): void
     {
         self::$data[MassActionDispatcher::REQUEST_TYPE] = Request::METHOD_GET;
         $request = new Request(self::$data);
@@ -317,7 +310,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDispatchByRequestWhenHTTPMethodNotAllowed()
+    public function testDispatchByRequestWhenHTTPMethodNotAllowed(): void
     {
         self::$data[MassActionDispatcher::REQUEST_TYPE] = Request::METHOD_GET;
         $request = new Request(self::$data);

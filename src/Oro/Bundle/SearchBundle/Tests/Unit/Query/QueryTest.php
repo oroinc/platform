@@ -4,11 +4,12 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Query;
 
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class QueryTest extends \PHPUnit\Framework\TestCase
+class QueryTest extends TestCase
 {
     private $config = [
         'Oro\Bundle\DataBundle\Entity\Product' => [
@@ -54,7 +55,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    public function testSetMappingConfig()
+    public function testSetMappingConfig(): void
     {
         $query = new Query();
         $query->setMappingConfig($this->config);
@@ -63,7 +64,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('all_data', $query->getFields());
     }
 
-    public function testGetEntityByAlias()
+    public function testGetEntityByAlias(): void
     {
         $query = new Query();
         $query->setMappingConfig($this->config);
@@ -73,7 +74,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($query->getEntityByAlias('bad alias'));
     }
 
-    public function testStringCleanup()
+    public function testStringCleanup(): void
     {
         $testString = 'Re: FW: Test Sample - One äöü ßü abc 3 – Testing again RE FW Re';
 
@@ -96,7 +97,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProviderForClearString
      */
-    public function testClearString(string $textToClear, string $expected)
+    public function testClearString(string $textToClear, string $expected): void
     {
         $this->assertEquals($expected, Query::clearString($textToClear));
     }
@@ -110,7 +111,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testAddingSelect()
+    public function testAddingSelect(): void
     {
         $query = new Query();
         $query->addSelect('name', Query::TYPE_TEXT);
@@ -134,7 +135,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(4, $query->getSelect());
     }
 
-    public function testAddSelectArray()
+    public function testAddSelectArray(): void
     {
         $query = new Query();
         $query->addSelect([
@@ -157,7 +158,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(3, $query->getSelect());
     }
 
-    public function testStringQueryWithSelect()
+    public function testStringQueryWithSelect(): void
     {
         $query = new Query();
         $this->assertEquals('', $query->getStringQuery());
@@ -169,7 +170,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('select (text.language, integer.organization) from *', $query->getStringQuery());
     }
 
-    public function testSelectingWithAliases()
+    public function testSelectingWithAliases(): void
     {
         $query = new Query();
         $query->addSelect('text.foo as bar');
@@ -198,7 +199,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $query->getSelectAliases());
     }
 
-    public function testGetSelectWithAliases()
+    public function testGetSelectWithAliases(): void
     {
         $query = new Query();
         $query->addSelect('text.foo as bar');
@@ -209,7 +210,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['text.foo', 'text.faa'], $select);
     }
 
-    public function testGetAliases()
+    public function testGetAliases(): void
     {
         $query = new Query();
         $query->addSelect('text.foo as bar');
@@ -219,7 +220,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['text.foo' => 'bar', 'text.faa' => 'bor'], $query->getSelectAliases());
     }
 
-    public function testGetSelectDataFields()
+    public function testGetSelectDataFields(): void
     {
         $query = new Query();
         $this->assertSame([], $query->getSelectDataFields());
@@ -236,7 +237,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAggregateAccessors()
+    public function testAggregateAccessors(): void
     {
         $query = new Query();
 
@@ -252,7 +253,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $criteria = new Criteria();
         $query = new Query();
@@ -265,7 +266,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($cloneQuery->getHints());
     }
 
-    public function testHints()
+    public function testHints(): void
     {
         $query = new Query();
 

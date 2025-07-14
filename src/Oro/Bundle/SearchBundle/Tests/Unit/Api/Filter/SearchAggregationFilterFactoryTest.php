@@ -5,14 +5,13 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Api\Filter;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchAggregationFilter;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchAggregationFilterFactory;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolverFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SearchAggregationFilterFactoryTest extends \PHPUnit\Framework\TestCase
+class SearchAggregationFilterFactoryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SearchFieldResolverFactory */
-    private $searchFieldResolverFactory;
-
-    /** @var SearchAggregationFilterFactory */
-    private $factory;
+    private SearchFieldResolverFactory&MockObject $searchFieldResolverFactory;
+    private SearchAggregationFilterFactory $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class SearchAggregationFilterFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateFilter()
+    public function testCreateFilter(): void
     {
         $dataType = 'string';
 

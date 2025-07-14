@@ -12,19 +12,16 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdater;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TriggersBag;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowTransitionTriggersAssembler;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowTransitionTriggersListenerTest extends \PHPUnit\Framework\TestCase
+class WorkflowTransitionTriggersListenerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var WorkflowTransitionTriggersListener */
-    private $listener;
-
-    /** @var TransitionTriggersUpdater|\PHPUnit\Framework\MockObject\MockObject */
-    private $updater;
-
-    /** @var WorkflowTransitionTriggersAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    private $assembler;
+    private WorkflowTransitionTriggersListener $listener;
+    private TransitionTriggersUpdater&MockObject $updater;
+    private WorkflowTransitionTriggersAssembler&MockObject $assembler;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +32,7 @@ class WorkflowTransitionTriggersListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new WorkflowTransitionTriggersListener($this->assembler, $this->updater);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
             [
@@ -67,7 +64,7 @@ class WorkflowTransitionTriggersListenerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testCreateAndUpdateTriggers()
+    public function testCreateAndUpdateTriggers(): void
     {
         $definition = (new WorkflowDefinition())->setName('test');
 
@@ -92,7 +89,7 @@ class WorkflowTransitionTriggersListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->updateTriggers($event);//after event job
     }
 
-    public function testTriggersDelete()
+    public function testTriggersDelete(): void
     {
         $definition = new WorkflowDefinition();
         $event = new WorkflowChangesEvent($definition);

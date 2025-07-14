@@ -12,18 +12,16 @@ use Oro\Component\MessageQueue\Tests\Unit\Stub\JobAwareTopicInterfaceStub;
 use Oro\Component\MessageQueue\Topic\JobAwareTopicInterface;
 use Oro\Component\MessageQueue\Topic\TopicRegistry;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class JobMiddlewareTest extends \PHPUnit\Framework\TestCase
+class JobMiddlewareTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var JobRunner */
-    private $jobRunner;
-
-    /** @var TopicRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $topicRegistry;
+    private JobRunner $jobRunner;
+    private TopicRegistry&MockObject $topicRegistry;
     private JobMiddleware $middleware;
-
     private JobProcessor $jobProcessor;
 
     #[\Override]

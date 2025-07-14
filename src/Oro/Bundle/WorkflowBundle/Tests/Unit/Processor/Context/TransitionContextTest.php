@@ -6,6 +6,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -13,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class TransitionContextTest extends \PHPUnit\Framework\TestCase
+class TransitionContextTest extends TestCase
 {
     private TransitionContext $context;
 
@@ -26,7 +27,7 @@ class TransitionContextTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider constantMatch
      */
-    public function testConstantsUsedForAttributeMatching(string $constantValue, string $expectedValue)
+    public function testConstantsUsedForAttributeMatching(string $constantValue, string $expectedValue): void
     {
         $this->assertSame($expectedValue, $constantValue);
     }
@@ -47,12 +48,12 @@ class TransitionContextTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testDefaults()
+    public function testDefaults(): void
     {
         $this->assertDefaultValues();
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $this->context->set(TransitionContext::IS_START, true);
         $this->context->set(TransitionContext::SAVED, true);
@@ -75,8 +76,12 @@ class TransitionContextTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider accessorsStorageHelpers
      */
-    public function testAccessorStores(string $setAccessor, string $getAccessor, string $storageProperty, mixed $value)
-    {
+    public function testAccessorStores(
+        string $setAccessor,
+        string $getAccessor,
+        string $storageProperty,
+        mixed $value
+    ): void {
         $this->context->{$setAccessor}($value);
         $this->assertSame($value, $this->context->{$getAccessor}());
         $this->assertSame($value, $this->context->get($storageProperty));
@@ -94,13 +99,13 @@ class TransitionContextTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testResultTypeStoredAsString()
+    public function testResultTypeStoredAsString(): void
     {
         $this->context->setResultType(new ResultTypeStub('result type'));
         $this->assertSame('result type', $this->context->get(TransitionContext::RESULT_TYPE));
     }
 
-    public function testError()
+    public function testError(): void
     {
         $this->assertFalse($this->context->hasError());
         $this->assertEquals(TransitionContext::STATE_OK, $this->context->get(TransitionContext::STATE));
@@ -120,7 +125,7 @@ class TransitionContextTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider accessorsProperties
      */
-    public function testContextOwnPropertiesAccessors(string $setAccessor, string $getAccessor, mixed $value)
+    public function testContextOwnPropertiesAccessors(string $setAccessor, string $getAccessor, mixed $value): void
     {
         $this->context->{$setAccessor}($value);
         $this->assertSame($value, $this->context->{$getAccessor}());
@@ -149,7 +154,7 @@ class TransitionContextTest extends \PHPUnit\Framework\TestCase
      * Strict prevent from unexpected value retrieval in processors from badly configured context
      * @dataProvider strictAccessors
      */
-    public function testStrictGetters(string $accessor, ?string $storageKey = null, ?string $storageValue = null)
+    public function testStrictGetters(string $accessor, ?string $storageKey = null, ?string $storageValue = null): void
     {
         if ($storageKey !== null) {
             $this->context->set($storageKey, $storageValue);
@@ -178,7 +183,7 @@ class TransitionContextTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider hasAccessors
      */
-    public function testHas(string $setter, string $hasAccessor, mixed $value)
+    public function testHas(string $setter, string $hasAccessor, mixed $value): void
     {
         $this->assertFalse($this->context->{$hasAccessor}());
         $this->context->{$setter}($value);

@@ -14,8 +14,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class WidgetExtensionTest extends TestCase
 {
-    private RequestStack|MockObject $requestStack;
-
+    private RequestStack&MockObject $requestStack;
     private WidgetExtension $extension;
 
     #[\Override]
@@ -49,7 +48,7 @@ class WidgetExtensionTest extends TestCase
         $this->assertTrue($this->extension->isApplicable($configObject));
     }
 
-    public function testVisitMetadata()
+    public function testVisitMetadata(): void
     {
         $request = $this->createRequest(['_widgetId' => 1]);
         $this->requestStack->expects(self::once())

@@ -4,13 +4,16 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Doctrine\ORM\Query;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\SqlWalkerPass;
+use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Compiler\Stub\AstWalkerStub;
+use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Compiler\Stub\OutputResultModifierStub;
 use Oro\Component\DoctrineUtils\ORM\Walker\OutputAstWalkerInterface;
 use Oro\Component\DoctrineUtils\ORM\Walker\OutputResultModifierInterface;
 use Oro\Component\DoctrineUtils\ORM\Walker\SqlWalker;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class SqlWalkerPassTest extends \PHPUnit\Framework\TestCase
+class SqlWalkerPassTest extends TestCase
 {
     private SqlWalkerPass $compiler;
 
@@ -30,11 +33,11 @@ class SqlWalkerPassTest extends \PHPUnit\Framework\TestCase
         $container->register('service1', $astWalkerWithLowerPriority)
             ->addTag('oro_entity.sql_walker', ['priority' => -42]);
 
-        $astWalker = Stub\AstWalkerStub::class;
+        $astWalker = AstWalkerStub::class;
         $container->register('service2', $astWalker)
             ->addTag('oro_entity.sql_walker');
 
-        $outputResultModifier = Stub\OutputResultModifierStub::class;
+        $outputResultModifier = OutputResultModifierStub::class;
         $container->register('service3', $outputResultModifier)
             ->addTag('oro_entity.sql_walker');
 

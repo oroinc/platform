@@ -6,17 +6,16 @@ use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterfa
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistryInterface;
 use Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Twig\TwigFunction;
 
-class GetImportExportConfigurationExtensionTest extends \PHPUnit\Framework\TestCase
+class GetImportExportConfigurationExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var ImportExportConfigurationRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurationRegistry;
-
-    /** @var GetImportExportConfigurationExtension */
-    private $extension;
+    private ImportExportConfigurationRegistryInterface&MockObject $configurationRegistry;
+    private GetImportExportConfigurationExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class GetImportExportConfigurationExtensionTest extends \PHPUnit\Framework\TestC
         $this->extension = new GetImportExportConfigurationExtension($container);
     }
 
-    public function testGetFunctions()
+    public function testGetFunctions(): void
     {
         $expected = [
             new TwigFunction('get_import_export_configuration', [$this->extension, 'getConfiguration'])
@@ -39,7 +38,7 @@ class GetImportExportConfigurationExtensionTest extends \PHPUnit\Framework\TestC
         self::assertEquals($expected, $this->extension->getFunctions());
     }
 
-    public function testGetConfiguration()
+    public function testGetConfiguration(): void
     {
         $alias = 'test';
 

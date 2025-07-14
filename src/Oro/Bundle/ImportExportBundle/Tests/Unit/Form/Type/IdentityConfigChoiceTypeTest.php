@@ -10,6 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type\AbstractConfigTypeTestCase;
 use Oro\Bundle\ImportExportBundle\Form\Type\IdentityConfigChoiceType;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
@@ -17,11 +18,8 @@ use Symfony\Component\Form\FormInterface;
 
 class IdentityConfigChoiceTypeTest extends AbstractConfigTypeTestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var IdentityConfigChoiceType */
-    private $type;
+    private ManagerRegistry&MockObject $registry;
+    private IdentityConfigChoiceType $type;
 
     #[\Override]
     protected function setUp(): void

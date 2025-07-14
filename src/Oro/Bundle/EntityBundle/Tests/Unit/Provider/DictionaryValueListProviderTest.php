@@ -11,17 +11,14 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
+class DictionaryValueListProviderTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var DictionaryValueListProvider */
-    private $dictionaryValueListProvider;
+    private ConfigManager&MockObject $configManager;
+    private EntityManagerInterface&MockObject $em;
+    private DictionaryValueListProvider $dictionaryValueListProvider;
 
     #[\Override]
     protected function setUp(): void

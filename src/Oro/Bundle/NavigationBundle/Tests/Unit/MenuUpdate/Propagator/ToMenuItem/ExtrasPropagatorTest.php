@@ -11,8 +11,9 @@ use Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuItem\ExtrasPropagato
 use Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuUpdate\MenuItemToMenuUpdatePropagatorInterface;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
+use PHPUnit\Framework\TestCase;
 
-class ExtrasPropagatorTest extends \PHPUnit\Framework\TestCase
+class ExtrasPropagatorTest extends TestCase
 {
     use MenuItemTestTrait;
 
@@ -22,8 +23,7 @@ class ExtrasPropagatorTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $localizationHelper = $this->createMock(LocalizationHelper::class);
-        $localizationHelper
-            ->expects(self::any())
+        $localizationHelper->expects(self::any())
             ->method('getLocalizedValue')
             ->willReturnCallback(static fn ($collection) => $collection[0] ?? null);
 

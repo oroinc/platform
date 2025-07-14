@@ -15,15 +15,12 @@ use Oro\Component\Layout\LayoutRendererInterface;
 use Oro\Component\Layout\LayoutRendererRegistry;
 use Oro\Component\Layout\RawLayoutBuilderInterface;
 use Oro\Component\Layout\Tests\Unit\LayoutBuilderTest;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class CacheLayoutBuilderTest extends LayoutBuilderTest
 {
-    private EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
-
-    protected $layoutBuilder;
-
-    protected $layoutBuilderWithoutCache;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
 
     #[\Override]
     protected function setUp(): void
@@ -75,8 +72,7 @@ class CacheLayoutBuilderTest extends LayoutBuilderTest
 
     public function testGetLayoutWithCacheAndEventDispatcher(): void
     {
-        $this->eventDispatcher
-            ->expects(self::once())
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with(self::isInstanceOf(LayoutBuildAfterEvent::class))
             ->willReturnArgument(0);
@@ -88,8 +84,7 @@ class CacheLayoutBuilderTest extends LayoutBuilderTest
 
     public function testGetLayoutWithoutCacheAndEventDispatcher(): void
     {
-        $this->eventDispatcher
-            ->expects(self::once())
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with(self::isInstanceOf(LayoutBuildAfterEvent::class))
             ->willReturnArgument(0);

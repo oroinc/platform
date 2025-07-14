@@ -9,13 +9,14 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class ConfigHelperTest extends \PHPUnit\Framework\TestCase
+class ConfigHelperTest extends TestCase
 {
     /**
      * @dataProvider isConfigModelEntityProvider
      */
-    public function testIsConfigModelEntity(string $className, bool $expected)
+    public function testIsConfigModelEntity(string $className, bool $expected): void
     {
         $result = ConfigHelper::isConfigModelEntity($className);
         $this->assertEquals($expected, $result);
@@ -30,7 +31,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         string $propertyName,
         string $className,
         ?string $fieldName
-    ) {
+    ): void {
         $result = ConfigHelper::getTranslationKey($scope, $propertyName, $className, $fieldName);
         $this->assertEquals($expected, $result);
     }
@@ -42,7 +43,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         ?string $className,
         string $expectedModuleName,
         string $expectedEntityName
-    ) {
+    ): void {
         [$moduleName, $entityName] = ConfigHelper::getModuleAndEntityNames($className);
         $this->assertEquals($expectedModuleName, $moduleName);
         $this->assertEquals($expectedEntityName, $entityName);

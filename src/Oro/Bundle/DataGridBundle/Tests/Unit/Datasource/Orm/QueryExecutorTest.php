@@ -24,7 +24,7 @@ class QueryExecutorTest extends OrmTestCase
         $this->queryExecutor = new QueryExecutor();
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $datagrid = $this->createMock(DatagridInterface::class);
         $query = new Query($this->em);
@@ -40,7 +40,7 @@ class QueryExecutorTest extends OrmTestCase
         self::assertEquals([['id' => 1, 'name' => 'test']], $result);
     }
 
-    public function testExecuteWithExecuteFunctionAsClosure()
+    public function testExecuteWithExecuteFunctionAsClosure(): void
     {
         $datagrid = $this->createMock(DatagridInterface::class);
         $query = new Query($this->em);
@@ -59,7 +59,7 @@ class QueryExecutorTest extends OrmTestCase
         self::assertEquals([['id' => 1, 'name' => 'test']], $result);
     }
 
-    public function testExecuteWithExecuteFunctionAsCallable()
+    public function testExecuteWithExecuteFunctionAsCallable(): void
     {
         $datagrid = $this->createMock(DatagridInterface::class);
         $query = new Query($this->em);

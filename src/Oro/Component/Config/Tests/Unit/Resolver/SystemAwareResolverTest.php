@@ -7,17 +7,17 @@ use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\Controller\Invok
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\Controller\TestController;
 use Oro\Component\Config\Tests\Unit\Fixtures\TestService;
 use Oro\Component\Routing\Tests\Unit\Resolver\TestResource;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
+class SystemAwareResolverTest extends TestCase
 {
     public const CONST1 = 'const1';
     public const CONST2 = 'const2';
 
     private const STATIC_CLASS = SystemAwareResolverTest::class;
 
-    /** @var SystemAwareResolver */
-    private $resolver;
+    private SystemAwareResolver $resolver;
 
     #[\Override]
     protected function setUp(): void

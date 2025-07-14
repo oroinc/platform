@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 
 class SystemConfigTransportFactoryTest extends TestCase
 {
@@ -60,7 +61,7 @@ class SystemConfigTransportFactoryTest extends TestCase
             ->with($dsn)
             ->willReturn($realDsn);
 
-        $expectedTransport = $this->createMock(Transport\TransportInterface::class);
+        $expectedTransport = $this->createMock(TransportInterface::class);
         $this->transportFactoryBase->expects(self::once())
             ->method('supports')
             ->willReturn(true);

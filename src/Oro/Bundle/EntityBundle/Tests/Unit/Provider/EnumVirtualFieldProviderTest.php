@@ -7,15 +7,15 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EnumVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
+class EnumVirtualFieldProviderTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var EnumVirtualFieldProvider */
-    private $provider;
+    private ConfigManager&MockObject $configManager;
+    private EnumVirtualFieldProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +29,7 @@ class EnumVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVirtualFields()
+    public function testGetVirtualFields(): void
     {
         $className = 'Test\Entity';
         $this->initialize($className);
@@ -40,7 +40,7 @@ class EnumVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsVirtualField()
+    public function testIsVirtualField(): void
     {
         $className = 'Test\Entity';
         $this->initialize($className);
@@ -56,7 +56,7 @@ class EnumVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVirtualFieldQueryForEnum()
+    public function testGetVirtualFieldQueryForEnum(): void
     {
         $className = 'Test\Entity';
         $this->initialize($className);
@@ -71,7 +71,7 @@ class EnumVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
                 'join'   => [
                     'left' => [
                         [
-                            'join' => 'Oro\Bundle\EntityExtendBundle\Entity\EnumOption',
+                            'join' => EnumOption::class,
                             'alias' => 'target',
                             'conditionType' => 'WITH',
                             'condition' => 'JSON_EXTRACT(entity.serialized_data, \'enumField\') = target'
@@ -83,7 +83,7 @@ class EnumVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVirtualFieldQueryForMultiEnum()
+    public function testGetVirtualFieldQueryForMultiEnum(): void
     {
         $className = 'Test\Entity';
         $this->initialize($className);

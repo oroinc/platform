@@ -9,28 +9,18 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
-use Symfony\Component\Console\Input\Input;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 
-class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
+class WorkflowTransitCommandTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
-
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var Input|\PHPUnit\Framework\MockObject\MockObject */
-    private $input;
-
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repo;
-
-    /** @var OutputStub */
-    private $output;
-
-    /** @var WorkflowTransitCommand */
-    private $command;
+    private ManagerRegistry&MockObject $managerRegistry;
+    private WorkflowManager&MockObject $workflowManager;
+    private InputInterface&MockObject $input;
+    private EntityRepository&MockObject $repo;
+    private OutputStub $output;
+    private WorkflowTransitCommand $command;
 
     #[\Override]
     protected function setUp(): void
@@ -51,7 +41,7 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
         $this->output = new OutputStub();
     }
 
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $this->command->configure();
 
@@ -69,7 +59,7 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
         array $expectedOutput,
         ?\Exception $exception = null,
         ?\Exception $expectedException = null
-    ) {
+    ): void {
         $this->input->expects($this->exactly(2))
             ->method('getOption')
             ->willReturnMap([

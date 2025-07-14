@@ -46,10 +46,8 @@ class DebugTranslatorTest extends TestCase
     ];
 
     private string $cacheDir;
-
+    private ContainerInterface&MockObject $container;
     private DebugTranslator $translator;
-
-    private ContainerInterface|MockObject $container;
 
     #[\Override]
     protected function setUp(): void
@@ -60,9 +58,7 @@ class DebugTranslatorTest extends TestCase
 
     private function getTranslator(array $fallbackLocales = []): DebugTranslator
     {
-        $this
-            ->container
-            ->expects(self::atLeastOnce())
+        $this->container->expects(self::atLeastOnce())
             ->method('get')
             ->with('oro_database_translation')
             ->willReturn($this->getLoader());

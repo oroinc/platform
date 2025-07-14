@@ -5,10 +5,11 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Event;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Event\DefaultOwnerSetEvent;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class DefaultOwnerSetEventTest extends \PHPUnit\Framework\TestCase
+class DefaultOwnerSetEventTest extends TestCase
 {
-    public function testInterface()
+    public function testInterface(): void
     {
         $channel = new Integration();
         $someOwner = $this->createMock(User::class);

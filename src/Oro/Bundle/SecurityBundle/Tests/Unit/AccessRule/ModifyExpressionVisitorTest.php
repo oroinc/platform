@@ -7,8 +7,9 @@ use Oro\Bundle\SecurityBundle\AccessRule\Expr\CompositeExpression;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\ExpressionInterface;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Path;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Value;
+use PHPUnit\Framework\TestCase;
 
-class ModifyExpressionVisitorTest extends \PHPUnit\Framework\TestCase
+class ModifyExpressionVisitorTest extends TestCase
 {
     private ModifyExpressionVisitorStub $visitor;
 

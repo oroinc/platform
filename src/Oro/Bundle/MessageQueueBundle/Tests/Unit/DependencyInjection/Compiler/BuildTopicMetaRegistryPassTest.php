@@ -11,18 +11,17 @@ use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\S
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\UnknownTopicSubscriber;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class BuildTopicMetaRegistryPassTest extends \PHPUnit\Framework\TestCase
+class BuildTopicMetaRegistryPassTest extends TestCase
 {
     private BuildTopicMetaRegistryPass $compiler;
-
     private ContainerBuilder $container;
-
     private Definition $registryDefinition;
 
     #[\Override]

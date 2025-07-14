@@ -9,22 +9,17 @@ use Oro\Bundle\NavigationBundle\Provider\PinbarTabTitleProviderInterface;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\NavigationItemStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\PinbarTabStub;
 use Oro\Bundle\NavigationBundle\Utils\PinbarTabUrlNormalizer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PinbarTabBuilderTest extends \PHPUnit\Framework\TestCase
+class PinbarTabBuilderTest extends TestCase
 {
     private const TYPE = 'sample-type';
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var PinbarTabUrlNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $pinbarTabUrlNormalizer;
-
-    /** @var PinbarTabTitleProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $pinbarTabTitleProvider;
-
-    /** @var PinbarTabBuilder */
-    private $builder;
+    private EntityManager&MockObject $entityManager;
+    private PinbarTabUrlNormalizer&MockObject $pinbarTabUrlNormalizer;
+    private PinbarTabTitleProviderInterface&MockObject $pinbarTabTitleProvider;
+    private PinbarTabBuilder $builder;
 
     #[\Override]
     protected function setUp(): void

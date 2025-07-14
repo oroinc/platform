@@ -4,31 +4,29 @@ namespace Oro\Component\Routing\Tests\Unit\Resolver;
 
 use Oro\Component\Routing\Resolver\EnhancedRouteCollection;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
+class RouteCollectionAccessorTest extends TestCase
 {
-    /** @var EnhancedRouteCollection */
-    protected $collection;
-
-    /** @var RouteCollectionAccessor */
-    protected $accessor;
+    protected EnhancedRouteCollection $collection;
+    protected RouteCollectionAccessor $accessor;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->collection = new EnhancedRouteCollection();
-        $this->accessor   = new RouteCollectionAccessor($this->collection);
+        $this->accessor = new RouteCollectionAccessor($this->collection);
     }
 
-    public function testGetByPathForSpecificMethods()
+    public function testGetByPathForSpecificMethods(): void
     {
-        $route1  = new Route('/route1');
-        $route2Get  = new Route('/route2', [], [], [], '', [], 'GET');
+        $route1 = new Route('/route1');
+        $route2Get = new Route('/route2', [], [], [], '', [], 'GET');
         $route2Post = new Route('/route2', [], [], [], '', [], 'POST');
         $route3 = new Route('/route3', [], [], [], '', [], ['GET', 'POST']);
 
@@ -66,10 +64,10 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->accessor->getByPath('/unknown_route', ['GET'], false));
     }
 
-    public function testGetByPathForAnyMethods()
+    public function testGetByPathForAnyMethods(): void
     {
-        $route1  = new Route('/route1');
-        $route2Get  = new Route('/route2', [], [], [], '', [], 'GET');
+        $route1 = new Route('/route1');
+        $route2Get = new Route('/route2', [], [], [], '', [], 'GET');
         $route2Post = new Route('/route2', [], [], [], '', [], 'POST');
         $route3 = new Route('/route3', [], [], [], '', [], ['GET', 'POST']);
 
@@ -88,7 +86,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->accessor->getByPath('/unknown_route', [], false));
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $route1 = new Route('/route1');
         $route2 = new Route('/route2');
@@ -101,7 +99,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->accessor->getName(new Route('/route1')));
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $route1 = new Route('/route1');
         $route2 = new Route('/route2');
@@ -117,7 +115,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider insertDataProvider
      */
-    public function testInsert($targetRouteName, $prepend, $expected)
+    public function testInsert($targetRouteName, $prepend, $expected): void
     {
         $this->collection->add('route1', new Route('/route1'));
         $this->collection->add('route2', new Route('/route2'));
@@ -132,7 +130,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider insertDataProvider
      */
-    public function testInsertExistingRoute($targetRouteName, $prepend, $expected)
+    public function testInsertExistingRoute($targetRouteName, $prepend, $expected): void
     {
         $this->collection->add('route1', new Route('/route1'));
         $this->collection->add('test', new Route('/test'));
@@ -148,7 +146,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider insertDataProvider
      */
-    public function testInsertWithAlreadyBuiltRouteMap($targetRouteName, $prepend, $expected)
+    public function testInsertWithAlreadyBuiltRouteMap($targetRouteName, $prepend, $expected): void
     {
         $route1 = new Route('/route1');
         $route2 = new Route('/route2');
@@ -169,7 +167,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider insertDataProvider
      */
-    public function testInsertCollection($targetRouteName, $prepend, $expected)
+    public function testInsertCollection($targetRouteName, $prepend, $expected): void
     {
         $this->collection->add('route1', new Route('/route1'));
         $this->collection->add('route2', new Route('/route2'));
@@ -194,7 +192,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider insertDataProvider
      */
-    public function testInsertCollectionWithExistingRoute($targetRouteName, $prepend, $expected)
+    public function testInsertCollectionWithExistingRoute($targetRouteName, $prepend, $expected): void
     {
         $this->collection->add('route1', new Route('/route1'));
         $this->collection->add('test', new Route('/test'));
@@ -212,7 +210,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider insertDataProvider
      */
-    public function testInsertCollectionWithAlreadyBuiltRouteMap($targetRouteName, $prepend, $expected)
+    public function testInsertCollectionWithAlreadyBuiltRouteMap($targetRouteName, $prepend, $expected): void
     {
         $route1 = new Route('/route1');
         $route2 = new Route('/route2');
@@ -246,7 +244,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testAppend()
+    public function testAppend(): void
     {
         $this->collection->add('route1', new Route('/route1'));
         $this->collection->add('route2', new Route('/route2'));
@@ -258,7 +256,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($testRoute, $this->accessor->getByPath('/test', []));
     }
 
-    public function testAppendExistingRoute()
+    public function testAppendExistingRoute(): void
     {
         $this->collection->add('route1', new Route('/route1'));
         $this->collection->add('test', new Route('/test'));
@@ -271,7 +269,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($testRoute, $this->accessor->getByPath('/test', []));
     }
 
-    public function testAppendWithAlreadyBuiltRouteMap()
+    public function testAppendWithAlreadyBuiltRouteMap(): void
     {
         $route1 = new Route('/route1');
         $route2 = new Route('/route2');
@@ -289,7 +287,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($testRoute, $this->accessor->getByPath('/test', []));
     }
 
-    public function testAppendToEmptyCollection()
+    public function testAppendToEmptyCollection(): void
     {
         $testRoute = new Route('/test');
 
@@ -298,7 +296,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($testRoute, $this->accessor->getByPath('/test', []));
     }
 
-    public function testPrepend()
+    public function testPrepend(): void
     {
         $this->collection->add('route1', new Route('/route1'));
         $this->collection->add('route2', new Route('/route2'));
@@ -310,7 +308,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($testRoute, $this->accessor->getByPath('/test', []));
     }
 
-    public function testPrependExistingRoute()
+    public function testPrependExistingRoute(): void
     {
         $this->collection->add('route1', new Route('/route1'));
         $this->collection->add('test', new Route('/test'));
@@ -323,7 +321,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($testRoute, $this->accessor->getByPath('/test', []));
     }
 
-    public function testPrependWithAlreadyBuiltRouteMap()
+    public function testPrependWithAlreadyBuiltRouteMap(): void
     {
         $route1 = new Route('/route1');
         $route2 = new Route('/route2');
@@ -341,7 +339,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($testRoute, $this->accessor->getByPath('/test', []));
     }
 
-    public function testPrependToEmptyCollection()
+    public function testPrependToEmptyCollection(): void
     {
         $testRoute = new Route('/test');
 
@@ -350,7 +348,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($testRoute, $this->accessor->getByPath('/test', []));
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $this->collection->add('route1', new Route('/route1'));
         $this->collection->add('route2', new Route('/route2'));
@@ -360,7 +358,7 @@ class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->accessor->getByPath('/route1', []));
     }
 
-    public function testRemoveWithAlreadyBuiltRouteMap()
+    public function testRemoveWithAlreadyBuiltRouteMap(): void
     {
         $route1 = new Route('/route1');
         $route2 = new Route('/route2');

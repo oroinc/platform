@@ -6,13 +6,13 @@ use Oro\Bundle\UIBundle\Model\TreeCollection;
 use Oro\Bundle\UIBundle\Model\TreeItem;
 use Oro\Bundle\UIBundle\Validator\Constraints\MoveToChild;
 use Oro\Bundle\UIBundle\Validator\Constraints\MoveToChildValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MoveToChildValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
+    private TranslatorInterface&MockObject $translator;
 
     #[\Override]
     protected function setUp(): void

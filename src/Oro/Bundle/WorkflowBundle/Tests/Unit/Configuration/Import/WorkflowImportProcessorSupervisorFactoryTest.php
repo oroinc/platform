@@ -6,16 +6,14 @@ use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowImportProcessorSuperv
 use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowImportProcessorSupervisorFactory;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
 
-class WorkflowImportProcessorSupervisorFactoryTest extends \PHPUnit\Framework\TestCase
+class WorkflowImportProcessorSupervisorFactoryTest extends TestCase
 {
-    /** @var WorkflowConfigFinderBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private WorkflowConfigFinderBuilder $finderBuilder;
-
-    /** @var ConfigFileReaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private ConfigFileReaderInterface $reader;
-
+    private WorkflowConfigFinderBuilder&MockObject $finderBuilder;
+    private ConfigFileReaderInterface&MockObject $reader;
     private WorkflowImportProcessorSupervisorFactory $factory;
 
     #[\Override]

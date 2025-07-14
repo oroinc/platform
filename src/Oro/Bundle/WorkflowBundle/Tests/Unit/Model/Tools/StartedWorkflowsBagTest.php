@@ -3,13 +3,13 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Tools;
 
 use Oro\Bundle\WorkflowBundle\Model\Tools\StartedWorkflowsBag;
+use PHPUnit\Framework\TestCase;
 
-class StartedWorkflowsBagTest extends \PHPUnit\Framework\TestCase
+class StartedWorkflowsBagTest extends TestCase
 {
     private const WORKFLOW_NAME = 'test_flow';
 
-    /** @var StartedWorkflowsBag */
-    private $startedWorkflowsBag;
+    private StartedWorkflowsBag $startedWorkflowsBag;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +17,7 @@ class StartedWorkflowsBagTest extends \PHPUnit\Framework\TestCase
         $this->startedWorkflowsBag = new StartedWorkflowsBag();
     }
 
-    public function testGetWorkflowEntities()
+    public function testGetWorkflowEntities(): void
     {
         $entity1 = new \stdClass();
         $entity2 = new \stdClass();
@@ -34,7 +34,7 @@ class StartedWorkflowsBagTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider entityWorkflowProvider
      */
-    public function testHasWorkflowEntities(array $entityWorkflow, string $workflow, bool $expected)
+    public function testHasWorkflowEntities(array $entityWorkflow, string $workflow, bool $expected): void
     {
         foreach ($entityWorkflow as $item) {
             $this->startedWorkflowsBag->addWorkflowEntity($item['workflowName'], $item['entity']);
@@ -85,7 +85,7 @@ class StartedWorkflowsBagTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $entity1 = new \stdClass();
         $entity2 = new \stdClass();
@@ -98,7 +98,7 @@ class StartedWorkflowsBagTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(1, $this->startedWorkflowsBag->getWorkflowEntities(self::WORKFLOW_NAME));
     }
 
-    public function testRemoveWorkflow()
+    public function testRemoveWorkflow(): void
     {
         $entity1 = new \stdClass();
         $entity2 = new \stdClass();

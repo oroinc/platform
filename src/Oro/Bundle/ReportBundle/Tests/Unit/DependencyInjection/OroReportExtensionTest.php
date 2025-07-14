@@ -4,9 +4,10 @@ namespace Oro\Bundle\ReportBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\ReportBundle\DependencyInjection\Compiler\DbalConnectionCompilerPass;
 use Oro\Bundle\ReportBundle\DependencyInjection\OroReportExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroReportExtensionTest extends \PHPUnit\Framework\TestCase
+class OroReportExtensionTest extends TestCase
 {
     private ContainerBuilder $container;
     private OroReportExtension $extension;

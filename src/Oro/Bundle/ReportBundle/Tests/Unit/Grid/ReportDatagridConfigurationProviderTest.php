@@ -23,23 +23,19 @@ use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCase
+class ReportDatagridConfigurationProviderTest extends TestCase
 {
     private ReportDatagridConfigurationProvider $target;
-
-    private FunctionProviderInterface|\PHPUnit\Framework\MockObject\MockObject $functionProvider;
-
-    private VirtualFieldProviderInterface|\PHPUnit\Framework\MockObject\MockObject $virtualFieldProvider;
-
-    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $doctrine;
-
-    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
-
-    private CacheInterface|\PHPUnit\Framework\MockObject\MockObject $cache;
-
+    private FunctionProviderInterface&MockObject $functionProvider;
+    private VirtualFieldProviderInterface&MockObject $virtualFieldProvider;
+    private ManagerRegistry&MockObject $doctrine;
+    private ConfigManager&MockObject $configManager;
+    private CacheInterface&MockObject $cache;
     private ReportDatagridConfigurationBuilder $builder;
 
     #[\Override]
@@ -397,7 +393,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
         return $this->builder->getConfiguration();
     }
 
-    private function prepareMetadata(): ClassMetadata|\PHPUnit\Framework\MockObject\MockObject
+    private function prepareMetadata(): ClassMetadata&MockObject
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $em = $this->createMock(EntityManagerInterface::class);
@@ -411,10 +407,8 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
         return $metadata;
     }
 
-    private function getReportEntity(
-        string $entityClass,
-        array $definition
-    ): Report|\PHPUnit\Framework\MockObject\MockObject {
+    private function getReportEntity(string $entityClass, array $definition): Report&MockObject
+    {
         $report = $this->createMock(Report::class);
         $report->expects(self::any())
             ->method('getDefinition')

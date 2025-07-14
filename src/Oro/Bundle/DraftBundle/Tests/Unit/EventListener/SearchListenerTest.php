@@ -6,8 +6,9 @@ use Oro\Bundle\DraftBundle\EventListener\SearchListener;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
+use PHPUnit\Framework\TestCase;
 
-class SearchListenerTest extends \PHPUnit\Framework\TestCase
+class SearchListenerTest extends TestCase
 {
     /**
      * @dataProvider getPrepareEntityMapEvent

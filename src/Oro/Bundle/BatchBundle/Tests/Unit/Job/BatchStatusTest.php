@@ -3,8 +3,9 @@
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Job;
 
 use Oro\Bundle\BatchBundle\Job\BatchStatus;
+use PHPUnit\Framework\TestCase;
 
-class BatchStatusTest extends \PHPUnit\Framework\TestCase
+class BatchStatusTest extends TestCase
 {
     public function testToString(): void
     {

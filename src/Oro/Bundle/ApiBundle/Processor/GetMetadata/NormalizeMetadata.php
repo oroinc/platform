@@ -242,7 +242,7 @@ class NormalizeMetadata implements ProcessorInterface
         MetadataContext $context
     ): bool {
         $isPropertyAdded = false;
-        if ($targetClassMetadata->hasAssociation($linkedPropertyName)) {
+        if (isset($targetClassMetadata->associationMappings[$linkedPropertyName])) {
             $associationMetadata = $this->entityMetadataFactory->createAssociationMetadata(
                 $targetClassMetadata,
                 $linkedPropertyName
@@ -265,7 +265,7 @@ class NormalizeMetadata implements ProcessorInterface
             }
             $entityMetadata->addAssociation($associationMetadata);
             $isPropertyAdded = true;
-        } elseif ($targetClassMetadata->hasField($linkedPropertyName)) {
+        } elseif (isset($targetClassMetadata->fieldMappings[$linkedPropertyName])) {
             $fieldMetadata = $this->entityMetadataFactory->createFieldMetadata(
                 $targetClassMetadata,
                 $linkedPropertyName

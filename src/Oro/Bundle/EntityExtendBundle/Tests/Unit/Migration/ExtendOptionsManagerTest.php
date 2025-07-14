@@ -6,14 +6,14 @@ use Oro\Bundle\EntityConfigBundle\Tests\Unit\EntityConfig\Mock\ConfigurationHand
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
+class ExtendOptionsManagerTest extends TestCase
 {
-    /** @var ExtendOptionsManager */
-    private $manager;
+    private ExtendOptionsManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +21,7 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager = new ExtendOptionsManager(ConfigurationHandlerMock::getInstance());
     }
 
-    public function testSetTableMode()
+    public function testSetTableMode(): void
     {
         $this->manager->setTableMode('test_table', 'default');
         $this->assertEquals(
@@ -30,7 +30,7 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetColumnMode()
+    public function testSetColumnMode(): void
     {
         $this->manager->setColumnMode('test_table', 'test_clmn', 'default');
         $this->assertEquals(
@@ -39,7 +39,7 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetColumnType()
+    public function testSetColumnType(): void
     {
         $this->manager->setColumnType('test_table', 'test_clmn', 'int');
         $this->assertEquals(
@@ -56,7 +56,7 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
         array $options,
         array $prevValues,
         array $expected
-    ) {
+    ): void {
         if (!empty($prevValues)) {
             ReflectionUtil::setPropertyValue($this->manager, 'options', $prevValues);
         }
@@ -73,7 +73,7 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
         array $options,
         array $prevValues,
         array $expected
-    ) {
+    ): void {
         if (!empty($prevValues)) {
             ReflectionUtil::setPropertyValue($this->manager, 'options', $prevValues);
         }
@@ -81,7 +81,7 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->manager->getExtendOptions());
     }
 
-    public function testMergeColumnOptionsWhenThereIsNoExisting()
+    public function testMergeColumnOptionsWhenThereIsNoExisting(): void
     {
         $options = ['scope' => ['new_option' => true]];
         $this->manager->mergeColumnOptions('test_table', 'test_column', $options);
@@ -93,7 +93,7 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProviderForMergeColumnOptions
      */
-    public function testMergeColumnOptions(array $existingOptions, array $newOptions, array $expectedOptions)
+    public function testMergeColumnOptions(array $existingOptions, array $newOptions, array $expectedOptions): void
     {
         $objectKey = sprintf(ExtendOptionsManager::COLUMN_OPTION_FORMAT, 'test_table', 'test_column');
         ReflectionUtil::setPropertyValue($this->manager, 'options', [$objectKey => $existingOptions]);
@@ -274,7 +274,7 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    public function testRemoveTableOptions()
+    public function testRemoveTableOptions(): void
     {
         $tableName = 'test_table';
 
@@ -294,7 +294,7 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['_append' => []], $this->manager->getExtendOptions());
     }
 
-    public function testRemoveColumnOptions()
+    public function testRemoveColumnOptions(): void
     {
         $tableName = 'test_table';
         $columnName = 'test_column';
@@ -329,8 +329,8 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
             $key .= '!' . $columnName;
         }
 
-        $options      = $data[0];
-        $prevData     = $this->processSetOptionsData($key, $data[1]);
+        $options = $data[0];
+        $prevData = $this->processSetOptionsData($key, $data[1]);
         $expectedData = $this->processSetOptionsData($key, $data[2]);
 
         if (null === $columnName) {
@@ -361,23 +361,23 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
         return $options->toArray();
     }
 
-    public function testHasColumnOptionsWhenNoOptionsExist()
+    public function testHasColumnOptionsWhenNoOptionsExist(): void
     {
         $this->assertFalse($this->manager->hasColumnOptions('some_table', 'some_column'));
     }
 
-    public function testHasColumnOptionsWhenOptionsExist()
+    public function testHasColumnOptionsWhenOptionsExist(): void
     {
         $this->manager->setColumnOptions('some_table', 'some_column', ['some' => ['options']]);
         $this->assertTrue($this->manager->hasColumnOptions('some_table', 'some_column'));
     }
 
-    public function testGetColumnOptionsWhenNoOptionsExist()
+    public function testGetColumnOptionsWhenNoOptionsExist(): void
     {
         $this->assertEquals([], $this->manager->getColumnOptions('some_table', 'some_column'));
     }
 
-    public function testGetColumnOptionsWhenOptionsExist()
+    public function testGetColumnOptionsWhenOptionsExist(): void
     {
         $this->manager->setColumnOptions('some_table', 'some_column', ['some' => ['options']]);
         $this->assertEquals(['some' => ['options']], $this->manager->getColumnOptions('some_table', 'some_column'));

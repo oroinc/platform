@@ -39,7 +39,7 @@ class AutoResponseMessageProcessorTest extends TestCase
             ->with(123)
             ->willReturn($email);
 
-        $doctrine  = $this->createMock(ManagerRegistry::class);
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->once())
             ->method('getRepository')
             ->with(Email::class)

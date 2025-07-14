@@ -11,36 +11,23 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class BusinessUnitAclProviderTest extends \PHPUnit\Framework\TestCase
+class BusinessUnitAclProviderTest extends TestCase
 {
     private const ENTITY_NAME = 'test';
-    private const PERMISSION  = 'VIEW';
+    private const PERMISSION = 'VIEW';
 
-    /** @var BusinessUnitAclProvider */
-    private $provider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $aclVoter;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $treeProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $tree;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $user;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $organization;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private AclVoter&MockObject $aclVoter;
+    private OwnerTreeProvider&MockObject $treeProvider;
+    private OwnerTreeInterface&MockObject $tree;
+    private User&MockObject $user;
+    private Organization&MockObject $organization;
+    private BusinessUnitAclProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -91,7 +78,7 @@ class BusinessUnitAclProviderTest extends \PHPUnit\Framework\TestCase
             });
     }
 
-    public function testSystemLevel()
+    public function testSystemLevel(): void
     {
         $ids = [1, 2];
 
@@ -111,7 +98,7 @@ class BusinessUnitAclProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLocalLevel()
+    public function testLocalLevel(): void
     {
         $ids = [1, 2];
 
@@ -131,7 +118,7 @@ class BusinessUnitAclProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDeepLevel()
+    public function testDeepLevel(): void
     {
         $ids = [1, 2];
 
@@ -151,7 +138,7 @@ class BusinessUnitAclProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGlobalLevel()
+    public function testGlobalLevel(): void
     {
         $ids = [1, 2];
 
@@ -171,7 +158,7 @@ class BusinessUnitAclProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAccessNotGranted()
+    public function testAccessNotGranted(): void
     {
         $this->treeProvider->expects(self::never())
             ->method('getTree');

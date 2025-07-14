@@ -11,17 +11,14 @@ use Oro\Bundle\SearchBundle\Engine\Orm\OrmExpressionVisitor;
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison as SearchComparison;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class OrmExpressionVisitorTest extends \PHPUnit\Framework\TestCase
+class OrmExpressionVisitorTest extends TestCase
 {
-    /** @var BaseDriver|\PHPUnit\Framework\MockObject\MockObject */
-    private $driver;
-
-    /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $qb;
-
-    /** @var OrmExpressionVisitor */
-    private $visitor;
+    private BaseDriver&MockObject $driver;
+    private QueryBuilder&MockObject $qb;
+    private OrmExpressionVisitor $visitor;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +32,7 @@ class OrmExpressionVisitorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider filteringOperatorProvider
      */
-    public function testWalkComparisonFilteringOperator(string $operator, string $fieldName, string $expected)
+    public function testWalkComparisonFilteringOperator(string $operator, string $fieldName, string $expected): void
     {
         $index = 42;
         $type = Query::TYPE_INTEGER;

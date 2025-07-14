@@ -10,22 +10,17 @@ use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LocalizationChoicesProviderTest extends \PHPUnit\Framework\TestCase
+class LocalizationChoicesProviderTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationManager;
-
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
-
-    /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $languageProvider;
-
-    /** @var LocalizationChoicesProvider */
-    private $provider;
+    private LocalizationManager&MockObject $localizationManager;
+    private LocaleSettings&MockObject $localeSettings;
+    private LanguageProvider&MockObject $languageProvider;
+    private LocalizationChoicesProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -53,7 +48,7 @@ class LocalizationChoicesProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getLanguageChoicesDataProvider
      */
-    public function testGetLanguageChoices(bool $onlyEnabled)
+    public function testGetLanguageChoices(bool $onlyEnabled): void
     {
         $data = [
             $this->getEntity(Language::class, ['id' => 105, 'code' => 'en']),
@@ -82,7 +77,7 @@ class LocalizationChoicesProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetFormattingChoices()
+    public function testGetFormattingChoices(): void
     {
         $this->assertConfigManagerCalled();
 
@@ -94,11 +89,9 @@ class LocalizationChoicesProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('br_FR', $choices['bretón (Francia)']);
     }
 
-    public function testGetLocalizationChoices()
+    public function testGetLocalizationChoices(): void
     {
-        /** @var Localization $entity1 */
         $entity1 = $this->getEntity(Localization::class, ['id' => 100, 'name' => 'test1']);
-        /** @var Localization $entity2 */
         $entity2 = $this->getEntity(Localization::class, ['id' => 42, 'name' => 'test2']);
 
         $this->localizationManager->expects($this->once())
@@ -117,6 +110,8 @@ class LocalizationChoicesProviderTest extends \PHPUnit\Framework\TestCase
 
     private function assertConfigManagerCalled(): void
     {
-        $this->localeSettings->expects($this->once())->method('getLanguage')->willReturn('es');
+        $this->localeSettings->expects($this->once())
+            ->method('getLanguage')
+            ->willReturn('es');
     }
 }

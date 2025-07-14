@@ -4,23 +4,20 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Util;
 
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityExtendBundle\Form\Util\FieldSessionStorage;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class FieldSessionStorageTest extends \PHPUnit\Framework\TestCase
+class FieldSessionStorageTest extends TestCase
 {
     private const MODEL_ID = 42;
     private const FIELD_NAME = 'someFieldName';
     private const FIELD_TYPE = 'enum';
 
-    /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
-    private $session;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var FieldSessionStorage */
-    private $storage;
+    private Session&MockObject $session;
+    private RequestStack&MockObject $requestStack;
+    private FieldSessionStorage $storage;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,7 @@ class FieldSessionStorageTest extends \PHPUnit\Framework\TestCase
         $this->storage = new FieldSessionStorage($this->requestStack);
     }
 
-    public function testGetFieldInfo()
+    public function testGetFieldInfo(): void
     {
         $entityConfigModel = $this->createMock(EntityConfigModel::class);
         $entityConfigModel->expects($this->exactly(2))
@@ -78,7 +75,7 @@ class FieldSessionStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider absentFieldInfoDataProvider
      */
-    public function testHasFieldInfoWhenInfoIsAbsent(?string $fieldName, ?string $fieldType)
+    public function testHasFieldInfoWhenInfoIsAbsent(?string $fieldName, ?string $fieldType): void
     {
         $entityConfigModel = $this->createMock(EntityConfigModel::class);
         $entityConfigModel->expects($this->exactly(2))
@@ -96,7 +93,7 @@ class FieldSessionStorageTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->storage->hasFieldInfo($entityConfigModel));
     }
 
-    public function testHasFieldInfoWhenInfoExists()
+    public function testHasFieldInfoWhenInfoExists(): void
     {
         $entityConfigModel = $this->createMock(EntityConfigModel::class);
         $entityConfigModel->expects($this->exactly(2))
@@ -114,7 +111,7 @@ class FieldSessionStorageTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->storage->hasFieldInfo($entityConfigModel));
     }
 
-    public function testSaveFieldInfo()
+    public function testSaveFieldInfo(): void
     {
         $entityConfigModel = $this->createMock(EntityConfigModel::class);
         $entityConfigModel->expects($this->exactly(2))

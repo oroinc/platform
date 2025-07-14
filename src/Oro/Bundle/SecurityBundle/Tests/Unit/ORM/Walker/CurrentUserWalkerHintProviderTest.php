@@ -8,16 +8,15 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalkerHintProvider;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class CurrentUserWalkerHintProviderTest extends \PHPUnit\Framework\TestCase
+class CurrentUserWalkerHintProviderTest extends TestCase
 {
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var CurrentUserWalkerHintProvider */
-    private $provider;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private CurrentUserWalkerHintProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class CurrentUserWalkerHintProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new CurrentUserWalkerHintProvider($this->tokenStorage);
     }
 
-    public function testGetHintsWithoutToken()
+    public function testGetHintsWithoutToken(): void
     {
         $this->assertEquals(
             [
@@ -37,7 +36,7 @@ class CurrentUserWalkerHintProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetHintsWithNotSupportedToken()
+    public function testGetHintsWithNotSupportedToken(): void
     {
         $token = $this->createMock(TokenInterface::class);
         $this->tokenStorage->expects($this->once())
@@ -56,7 +55,7 @@ class CurrentUserWalkerHintProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetHintsWithNotOrganizationToken()
+    public function testGetHintsWithNotOrganizationToken(): void
     {
         $token = $this->createMock(TokenInterface::class);
         $this->tokenStorage->expects($this->once())
@@ -82,7 +81,7 @@ class CurrentUserWalkerHintProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetHints()
+    public function testGetHints(): void
     {
         $token = $this->createMock(OrganizationAwareTokenInterface::class);
         $this->tokenStorage->expects($this->once())
@@ -117,7 +116,7 @@ class CurrentUserWalkerHintProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetHintsWithCustomFields()
+    public function testGetHintsWithCustomFields(): void
     {
         $token = $this->createMock(OrganizationAwareTokenInterface::class);
         $this->tokenStorage->expects($this->once())

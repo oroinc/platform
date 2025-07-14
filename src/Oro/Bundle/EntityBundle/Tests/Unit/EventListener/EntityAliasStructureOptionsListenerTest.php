@@ -7,16 +7,15 @@ use Oro\Bundle\EntityBundle\EventListener\EntityAliasStructureOptionsListener;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityAliasStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
+class EntityAliasStructureOptionsListenerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityAliasResolver;
-
-    /** @var EntityAliasStructureOptionsListener */
-    private $listener;
+    private EntityAliasResolver&MockObject $entityAliasResolver;
+    private EntityAliasStructureOptionsListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class EntityAliasStructureOptionsListenerTest extends \PHPUnit\Framework\TestCas
     /**
      * @dataProvider onOptionsRequestDataProvider
      */
-    public function testOnOptionsRequest(bool $hasAlias)
+    public function testOnOptionsRequest(bool $hasAlias): void
     {
         $alias = 'ALIAS';
         $pluralAlias = 'PLURAL_ALIAS';

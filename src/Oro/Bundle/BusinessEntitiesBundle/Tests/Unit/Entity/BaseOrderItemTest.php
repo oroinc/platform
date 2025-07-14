@@ -4,8 +4,9 @@ namespace Oro\Bundle\BusinessEntitiesBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\BusinessEntitiesBundle\Entity\BaseOrder;
 use Oro\Bundle\BusinessEntitiesBundle\Entity\BaseOrderItem;
+use PHPUnit\Framework\TestCase;
 
-class BaseOrderItemTest extends \PHPUnit\Framework\TestCase
+class BaseOrderItemTest extends TestCase
 {
     private const TEST_STRING = 'testString';
     private const TEST_ID = 123;
@@ -22,7 +23,7 @@ class BaseOrderItemTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getSetDataProvider
      */
-    public function testSetGet(string $property, mixed $value = null, mixed $expected = null)
+    public function testSetGet(string $property, mixed $value = null, mixed $expected = null): void
     {
         if ($value !== null) {
             call_user_func([$this->entity, 'set' . ucfirst($property)], $value);

@@ -8,14 +8,14 @@ use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareProcessor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
+class ProcessorRegistryTest extends TestCase
 {
-    /** @var ProcessorRegistry */
-    private $registry;
+    private ProcessorRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +23,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry = new ProcessorRegistry();
     }
 
-    public function testRegisterProcessor()
+    public function testRegisterProcessor(): void
     {
         $entityName = 'entity_name';
         $alias = 'processor_alias';
@@ -55,7 +55,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRegisterProcessorFails()
+    public function testRegisterProcessorFails(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Processor with type "import" and alias "processor_alias" already exists');
@@ -70,7 +70,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->registerProcessor($processor, $type, $entityName, $alias);
     }
 
-    public function testUnregisterProcessor()
+    public function testUnregisterProcessor(): void
     {
         $fooType = ProcessorRegistry::TYPE_IMPORT;
         $fooEntityName = 'foo_entity_name';
@@ -100,7 +100,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasProcessor()
+    public function testHasProcessor(): void
     {
         $type = ProcessorRegistry::TYPE_IMPORT;
         $entityName = 'entity_name';
@@ -113,7 +113,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->registry->hasProcessor($type, $alias));
     }
 
-    public function testGetProcessor()
+    public function testGetProcessor(): void
     {
         $type = ProcessorRegistry::TYPE_IMPORT;
         $entityName = 'entity_name';
@@ -125,7 +125,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($processor, $this->registry->getProcessor($type, $alias));
     }
 
-    public function testGetProcessorFails()
+    public function testGetProcessorFails(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Processor with type "import" and alias "processor_alias" is not exist');
@@ -133,7 +133,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->getProcessor('import', 'processor_alias');
     }
 
-    public function testGetProcessorsByEntity()
+    public function testGetProcessorsByEntity(): void
     {
         $type = ProcessorRegistry::TYPE_IMPORT;
         $entityName = 'entity_name';
@@ -153,7 +153,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetProcessorsByEntityUnknown()
+    public function testGetProcessorsByEntityUnknown(): void
     {
         self::assertEquals(
             [],
@@ -161,7 +161,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetProcessorAliasesByEntityUnknown()
+    public function testGetProcessorAliasesByEntityUnknown(): void
     {
         self::assertEquals(
             [],
@@ -169,7 +169,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetProcessorAliasesByEntity()
+    public function testGetProcessorAliasesByEntity(): void
     {
         $type = ProcessorRegistry::TYPE_IMPORT;
         $entityName = 'entity_name';
@@ -187,7 +187,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetProcessorEntityName()
+    public function testGetProcessorEntityName(): void
     {
         $type = ProcessorRegistry::TYPE_IMPORT;
         $entityName = 'entity_name';
@@ -199,7 +199,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($entityName, $this->registry->getProcessorEntityName($type, $alias));
     }
 
-    public function testGetProcessorEntityNameFails()
+    public function testGetProcessorEntityNameFails(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Processor with type "import" and alias "foo_alias" is not exist');
@@ -212,7 +212,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processorsByTypeDataProvider
      */
-    public function testGetProcessorsByType(array $processors, string $type, array $expected)
+    public function testGetProcessorsByType(array $processors, string $type, array $expected): void
     {
         foreach ($processors as $processorType => $processorsByType) {
             foreach ($processorsByType as $processorName => $processor) {

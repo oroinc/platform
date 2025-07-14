@@ -12,19 +12,16 @@ use Oro\Bundle\SecurityBundle\AccessRule\Expr\NullComparison;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Path;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionDataBuilderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ActivityListAccessRuleTest extends \PHPUnit\Framework\TestCase
+class ActivityListAccessRuleTest extends TestCase
 {
     private const TEST_ACTIVITY_CLASS = 'Test\Entity';
 
-    /** @var AclConditionDataBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $builder;
-
-    /** @var ActivityListChainProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityListProvider;
-
-    /** @var ActivityListAccessRule */
-    private $rule;
+    private AclConditionDataBuilderInterface&MockObject $builder;
+    private ActivityListChainProvider&MockObject $activityListProvider;
+    private ActivityListAccessRule $rule;
 
     #[\Override]
     protected function setUp(): void
@@ -35,14 +32,14 @@ class ActivityListAccessRuleTest extends \PHPUnit\Framework\TestCase
         $this->rule = new ActivityListAccessRule($this->builder, $this->activityListProvider);
     }
 
-    public function testIsApplicableWithoutActivityOwnerTableAlias()
+    public function testIsApplicableWithoutActivityOwnerTableAlias(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, ActivityList::class, 'e');
 
         $this->assertFalse($this->rule->isApplicable($criteria));
     }
 
-    public function testIsApplicableWithActivityOwnerTableAlias()
+    public function testIsApplicableWithActivityOwnerTableAlias(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, ActivityList::class, 'e');
         $criteria->setOption(ActivityListAccessRule::ACTIVITY_OWNER_TABLE_ALIAS, 'test');
@@ -50,7 +47,7 @@ class ActivityListAccessRuleTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->rule->isApplicable($criteria));
     }
 
-    public function testProcessWithoutActivityOwnerTableAliasOption()
+    public function testProcessWithoutActivityOwnerTableAliasOption(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -61,7 +58,7 @@ class ActivityListAccessRuleTest extends \PHPUnit\Framework\TestCase
         $this->rule->process($criteria);
     }
 
-    public function testProcessWithEmptyActivityListProviders()
+    public function testProcessWithEmptyActivityListProviders(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, ActivityList::class, 'e');
         $criteria->setOption(ActivityListAccessRule::ACTIVITY_OWNER_TABLE_ALIAS, 'oa');
@@ -90,7 +87,7 @@ class ActivityListAccessRuleTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWhenAclClassEqualToActivityClass()
+    public function testProcessWhenAclClassEqualToActivityClass(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, ActivityList::class, 'e');
         $criteria->setOption(ActivityListAccessRule::ACTIVITY_OWNER_TABLE_ALIAS, 'oa');
@@ -138,7 +135,7 @@ class ActivityListAccessRuleTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWhenAclClassNotEqualToActivityClass()
+    public function testProcessWhenAclClassNotEqualToActivityClass(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, ActivityList::class, 'e');
         $criteria->setOption(ActivityListAccessRule::ACTIVITY_OWNER_TABLE_ALIAS, 'oa');

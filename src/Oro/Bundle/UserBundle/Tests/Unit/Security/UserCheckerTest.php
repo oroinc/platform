@@ -12,6 +12,8 @@ use Oro\Bundle\UserBundle\Exception\OrganizationException;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
 use Oro\Bundle\UserBundle\Security\UserChecker;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\DisabledException;
@@ -20,13 +22,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class UserCheckerTest extends \PHPUnit\Framework\TestCase
+class UserCheckerTest extends TestCase
 {
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var UserChecker */
-    private $userChecker;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private UserChecker $userChecker;
 
     #[\Override]
     protected function setUp(): void

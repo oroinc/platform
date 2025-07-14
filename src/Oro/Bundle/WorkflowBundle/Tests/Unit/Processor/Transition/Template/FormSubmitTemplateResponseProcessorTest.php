@@ -10,22 +10,17 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Template\FormSubmitTemplateResponseProcessor;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowItem\WorkflowItemSerializerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
-class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCase
+class FormSubmitTemplateResponseProcessorTest extends TestCase
 {
-    /** @var WorkflowItemSerializerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowItemSerializer;
-
-    /** @var ViewHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $viewHandler;
-
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $twig;
-
-    /** @var FormSubmitTemplateResponseProcessor */
-    private $processor;
+    private WorkflowItemSerializerInterface&MockObject $workflowItemSerializer;
+    private ViewHandlerInterface&MockObject $viewHandler;
+    private Environment&MockObject $twig;
+    private FormSubmitTemplateResponseProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -61,7 +56,7 @@ class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
         return $context;
     }
 
-    public function testCompleteResponseOk()
+    public function testCompleteResponseOk(): void
     {
         $context = $this->createContext('message1', 200);
 
@@ -89,7 +84,7 @@ class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
         $this->assertTrue($context->isProcessed());
     }
 
-    public function testCompleteResponseWithErrorCode()
+    public function testCompleteResponseWithErrorCode(): void
     {
         $context = $this->createContext('message2', 500);
 
@@ -119,7 +114,7 @@ class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
         $this->assertTrue($context->isProcessed());
     }
 
-    public function testCompleteResponseWithoutCode()
+    public function testCompleteResponseWithoutCode(): void
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())
@@ -163,7 +158,7 @@ class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
         $this->assertTrue($context->isProcessed());
     }
 
-    public function testShouldSkipUnsupportedResponseTypes()
+    public function testShouldSkipUnsupportedResponseTypes(): void
     {
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())

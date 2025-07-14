@@ -7,15 +7,15 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\ChangeRoleSubscriber;
 use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class AclRoleTypeTest extends \PHPUnit\Framework\TestCase
+class AclRoleTypeTest extends TestCase
 {
-    /** @var AclRoleType */
-    private $formType;
+    private AclRoleType $formType;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +23,7 @@ class AclRoleTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType = new AclRoleType();
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->exactly(4))
@@ -59,7 +59,7 @@ class AclRoleTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType->buildForm($builder, []);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
 

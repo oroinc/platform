@@ -5,15 +5,14 @@ namespace Oro\Bundle\ChartBundle\Tests\Unit\Model\Data\Transformer;
 use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory;
 use Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class TransformerFactoryTest extends \PHPUnit\Framework\TestCase
+class TransformerFactoryTest extends TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var TransformerFactory */
-    private $factory;
+    private ContainerInterface&MockObject $container;
+    private TransformerFactory $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class TransformerFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory = new TransformerFactory($this->container);
     }
 
-    public function testCreateTransformer()
+    public function testCreateTransformer(): void
     {
         $expected = $this->createMock(TransformerInterface::class);
 
@@ -36,7 +35,7 @@ class TransformerFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->factory->createTransformer($serviceId));
     }
 
-    public function testCreateTransformerFails()
+    public function testCreateTransformerFails(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(

@@ -12,11 +12,8 @@ use PHPUnit\Framework\TestCase;
 
 class HasActiveIntegrationTest extends TestCase
 {
-    /** @var ManagerRegistry|MockObject */
-    private $registry;
-
-    /** @var HasActiveIntegration */
-    private $condition;
+    private ManagerRegistry&MockObject $registry;
+    private HasActiveIntegration $condition;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +26,7 @@ class HasActiveIntegrationTest extends TestCase
     /**
      * @dataProvider failingOptionsDataProvider
      */
-    public function testInitializeException(array $options)
+    public function testInitializeException(array $options): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->condition->initialize($options);
@@ -43,13 +40,13 @@ class HasActiveIntegrationTest extends TestCase
         ];
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $options = ['test'];
         $this->assertSame($this->condition, $this->condition->initialize($options));
     }
 
-    public function testEvaluate()
+    public function testEvaluate(): void
     {
         $context = [];
         $type = 'testType';

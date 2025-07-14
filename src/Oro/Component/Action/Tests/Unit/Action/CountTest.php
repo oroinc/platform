@@ -7,13 +7,13 @@ use Oro\Component\Action\Action\Count;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class CountTest extends \PHPUnit\Framework\TestCase
+class CountTest extends TestCase
 {
-    /** @var Count */
-    private $action;
+    private Count $action;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +22,7 @@ class CountTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
-    public function testInitializeArrayException()
+    public function testInitializeArrayException(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Parameter `value` is required.');
@@ -30,7 +30,7 @@ class CountTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->action, $this->action->initialize([]));
     }
 
-    public function testInitializeAttributeException()
+    public function testInitializeAttributeException(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Parameter `attribute` is required.');
@@ -38,7 +38,7 @@ class CountTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->action, $this->action->initialize(['value' => []]));
     }
 
-    public function testInitializeAttributeWrongException()
+    public function testInitializeAttributeWrongException(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Parameter `attribute` must be a valid property definition.');
@@ -49,7 +49,7 @@ class CountTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider objectDataProvider
      */
-    public function testExecute(mixed $value, int $count)
+    public function testExecute(mixed $value, int $count): void
     {
         $context = new StubStorage();
 

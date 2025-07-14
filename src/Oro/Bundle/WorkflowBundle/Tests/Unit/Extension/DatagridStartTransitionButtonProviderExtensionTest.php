@@ -19,27 +19,18 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
+class DatagridStartTransitionButtonProviderExtensionTest extends TestCase
 {
-    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowRegistry;
-
-    /** @var RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $routeProvider;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var OriginalUrlProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $originalUrlProvider;
-
-    /** @var CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $applicationProvider;
-
-    /** @var DatagridStartTransitionButtonProviderExtension */
-    private $extension;
+    private WorkflowRegistry&MockObject $workflowRegistry;
+    private RouteProviderInterface&MockObject $routeProvider;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private OriginalUrlProvider&MockObject $originalUrlProvider;
+    private CurrentApplicationProviderInterface&MockObject $applicationProvider;
+    private DatagridStartTransitionButtonProviderExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -67,7 +58,7 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framew
         WorkflowDefinition $workflowDefinition,
         ButtonSearchContext $searchContext,
         string $application = CurrentApplicationProviderInterface::DEFAULT_APPLICATION
-    ) {
+    ): void {
         $transition = $this->createStartTransition();
 
         $transitionManager = $this->createMock(TransitionManager::class);
@@ -154,10 +145,12 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framew
     /**
      * @dataProvider isAvailableDataProvider
      */
-    public function testIsAvailable(Workflow $workflow, ButtonSearchContext $searchContext, bool $expected)
-    {
+    public function testIsAvailable(
+        Workflow&MockObject $workflow,
+        ButtonSearchContext $searchContext,
+        bool $expected
+    ): void {
         $workflowItem = $this->createMock(WorkflowItem::class);
-        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
         $workflow->expects($this->once())
             ->method('createWorkflowItem')
             ->willReturn($workflowItem);

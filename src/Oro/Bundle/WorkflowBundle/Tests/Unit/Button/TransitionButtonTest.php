@@ -8,26 +8,19 @@ use Oro\Bundle\WorkflowBundle\Button\TransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class TransitionButtonTest extends \PHPUnit\Framework\TestCase
+class TransitionButtonTest extends TestCase
 {
-    /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflow;
-
-    /** @var WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject */
-    private $definition;
-
-    /** @var Transition|\PHPUnit\Framework\MockObject\MockObject */
-    private $transition;
-
-    /** @var ButtonContext|\PHPUnit\Framework\MockObject\MockObject */
-    private $buttonContext;
-
-    /** @var TransitionButton */
-    private $button;
+    private Workflow&MockObject $workflow;
+    private WorkflowDefinition&MockObject $definition;
+    private Transition&MockObject $transition;
+    private ButtonContext&MockObject $buttonContext;
+    private TransitionButton $button;
 
     #[\Override]
     protected function setUp(): void
@@ -44,7 +37,7 @@ class TransitionButtonTest extends \PHPUnit\Framework\TestCase
         $this->button = new TransitionButton($this->transition, $this->workflow, $this->buttonContext);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->workflow->expects($this->once())
             ->method('getName')
@@ -56,7 +49,7 @@ class TransitionButtonTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test_workflow_name_test_transition_name', $this->button->getName());
     }
 
-    public function testGetLabel()
+    public function testGetLabel(): void
     {
         $label = 'test_label';
         $this->transition->expects($this->once())
@@ -66,7 +59,7 @@ class TransitionButtonTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($label, $this->button->getLabel());
     }
 
-    public function testGetIcon()
+    public function testGetIcon(): void
     {
         $this->assertNull($this->button->getIcon());
 
@@ -78,7 +71,7 @@ class TransitionButtonTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($icon, $this->button->getIcon());
     }
 
-    public function testGetOrder()
+    public function testGetOrder(): void
     {
         $this->definition->expects($this->once())
             ->method('getPriority')
@@ -86,7 +79,7 @@ class TransitionButtonTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, $this->button->getOrder());
     }
 
-    public function testGetTemplate()
+    public function testGetTemplate(): void
     {
         $this->assertEquals(TransitionButton::DEFAULT_TEMPLATE, $this->button->getTemplate());
     }
@@ -94,7 +87,7 @@ class TransitionButtonTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getTemplateDataDataProvider
      */
-    public function testGetTemplateData(array $customData = [])
+    public function testGetTemplateData(array $customData = []): void
     {
         $defaultData =             [
             'frontendOptions' => $this->transition->getFrontendOptions(),
@@ -129,32 +122,32 @@ class TransitionButtonTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetButtonContext()
+    public function testGetButtonContext(): void
     {
         $this->assertInstanceOf(ButtonContext::class, $this->button->getButtonContext());
     }
 
-    public function testGetGroup()
+    public function testGetGroup(): void
     {
         $this->assertEquals(ButtonInterface::DEFAULT_GROUP, $this->button->getGroup());
     }
 
-    public function testGetWorkflow()
+    public function testGetWorkflow(): void
     {
         $this->assertSame($this->workflow, $this->button->getWorkflow());
     }
 
-    public function testGetTransition()
+    public function testGetTransition(): void
     {
         $this->assertEquals($this->transition, $this->button->getTransition());
     }
 
-    public function testGetTranslationDomain()
+    public function testGetTranslationDomain(): void
     {
         $this->assertEquals('workflows', $this->button->getTranslationDomain());
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $newButton = clone $this->button;
         $this->assertEquals($newButton, $this->button);

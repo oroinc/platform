@@ -23,10 +23,11 @@ class EmailGuesserTest extends TestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->emailProcessorMock = self::createMock(EmailProcessor::class);
-        $this->classMetadataMock = self::createMock(ClassMetadata::class);
-        $this->configManagerMock = self::createMock(ConfigManager::class);
-        $this->extendEntityMetadataProvider = self::createMock(ExtendEntityMetadataProvider::class);
+        $this->emailProcessorMock = $this->createMock(EmailProcessor::class);
+        $this->classMetadataMock = $this->createMock(ClassMetadata::class);
+        $this->configManagerMock = $this->createMock(ConfigManager::class);
+        $this->extendEntityMetadataProvider = $this->createMock(ExtendEntityMetadataProvider::class);
+
         $this->processorHelper = new ProcessorHelper($this->configManagerMock, $this->extendEntityMetadataProvider);
     }
 
@@ -37,17 +38,14 @@ class EmailGuesserTest extends TestCase
     {
         $emailGuesser = new EmailGuesser($this->emailProcessorMock, $this->processorHelper);
 
-        $this->classMetadataMock
-            ->expects(self::once())
+        $this->classMetadataMock->expects(self::once())
             ->method('getName')
             ->willReturn(self::DUMMY_CLASS_NAME);
-        $this->extendEntityMetadataProvider
-            ->expects(self::once())
+        $this->extendEntityMetadataProvider->expects(self::once())
             ->method('getExtendEntityFieldsMetadata')
             ->with(self::DUMMY_CLASS_NAME)
             ->willReturn([$fieldName => [ExtendEntityMetadataProvider::IS_SERIALIZED => false]]);
-        $this->classMetadataMock
-            ->expects(self::once())
+        $this->classMetadataMock->expects(self::once())
             ->method('getFieldMapping')
             ->with($fieldName)
             ->willReturn(['type' => 'string']);
@@ -65,20 +63,17 @@ class EmailGuesserTest extends TestCase
     {
         $emailGuesser = new EmailGuesser($this->emailProcessorMock, $this->processorHelper);
 
-        $this->classMetadataMock
-            ->expects(self::exactly(2))
+        $this->classMetadataMock->expects(self::exactly(2))
             ->method('getName')
             ->willReturn(self::DUMMY_CLASS_NAME);
-        $this->extendEntityMetadataProvider
-            ->expects(self::exactly(2))
+        $this->extendEntityMetadataProvider->expects(self::exactly(2))
             ->method('getExtendEntityFieldsMetadata')
             ->with(self::DUMMY_CLASS_NAME)
             ->willReturn([$fieldName => [
                 ExtendEntityMetadataProvider::IS_SERIALIZED => true,
                 ExtendEntityMetadataProvider::FIELD_TYPE => 'string'
             ]]);
-        $this->classMetadataMock
-            ->expects(self::never())
+        $this->classMetadataMock->expects(self::never())
             ->method('getFieldMapping');
 
         self::assertEquals(
@@ -107,14 +102,11 @@ class EmailGuesserTest extends TestCase
     {
         $emailGuesser = new EmailGuesser($this->emailProcessorMock, $this->processorHelper);
 
-        $this->classMetadataMock
-            ->expects(self::never())
+        $this->classMetadataMock->expects(self::never())
             ->method('getName');
-        $this->extendEntityMetadataProvider
-            ->expects(self::never())
+        $this->extendEntityMetadataProvider->expects(self::never())
             ->method('getExtendEntityFieldsMetadata');
-        $this->classMetadataMock
-            ->expects(self::never())
+        $this->classMetadataMock->expects(self::never())
             ->method('getFieldMapping');
 
         self::assertNull($emailGuesser->guessProcessor($fieldName, $this->classMetadataMock));
@@ -142,17 +134,14 @@ class EmailGuesserTest extends TestCase
     {
         $emailGuesser = new EmailGuesser($this->emailProcessorMock, $this->processorHelper);
 
-        $this->classMetadataMock
-            ->expects(self::once())
+        $this->classMetadataMock->expects(self::once())
             ->method('getName')
             ->willReturn(self::DUMMY_CLASS_NAME);
-        $this->extendEntityMetadataProvider
-            ->expects(self::once())
+        $this->extendEntityMetadataProvider->expects(self::once())
             ->method('getExtendEntityFieldsMetadata')
             ->with(self::DUMMY_CLASS_NAME)
             ->willReturn([$fieldName => [ExtendEntityMetadataProvider::IS_SERIALIZED => false]]);
-        $this->classMetadataMock
-            ->expects(self::once())
+        $this->classMetadataMock->expects(self::once())
             ->method('getFieldMapping')
             ->with($fieldName)
             ->willReturn(['type' => 'not_string']);

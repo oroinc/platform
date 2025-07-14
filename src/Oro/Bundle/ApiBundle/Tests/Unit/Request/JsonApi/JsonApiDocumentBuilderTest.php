@@ -735,7 +735,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testAssociationWithAssociationLevelMetaPropertiesInTargetMetadata()
+    public function testAssociationWithAssociationLevelMetaPropertiesInTargetMetadata(): void
     {
         $object = [
             'code'       => 123,

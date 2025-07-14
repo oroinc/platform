@@ -13,19 +13,16 @@ use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\User;
 use Oro\Bundle\OrganizationBundle\Twig\OrganizationExtension;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class OrganizationExtensionTest extends \PHPUnit\Framework\TestCase
+class OrganizationExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var BusinessUnitManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $businessUnitManager;
-
-    /** @var OrganizationExtension */
-    private $extension;
+    private ConfigManager&MockObject $configManager;
+    private BusinessUnitManager&MockObject $businessUnitManager;
+    private OrganizationExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -49,7 +46,7 @@ class OrganizationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new OrganizationExtension($container);
     }
 
-    public function testGetOwnerType()
+    public function testGetOwnerType(): void
     {
         $entity = new BusinessUnit();
         $className = get_class($entity);
@@ -71,7 +68,7 @@ class OrganizationExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithoutOwnerType()
+    public function testWithoutOwnerType(): void
     {
         $entity = new BusinessUnit();
         $className = get_class($entity);
@@ -92,7 +89,7 @@ class OrganizationExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityOwner()
+    public function testGetEntityOwner(): void
     {
         $owner = new User();
         $entity = new Entity();
@@ -104,7 +101,7 @@ class OrganizationExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetOwnerFieldName()
+    public function testGetOwnerFieldName(): void
     {
         $entity = new BusinessUnit();
         $className = get_class($entity);
@@ -126,7 +123,7 @@ class OrganizationExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetBusinessUnitCount()
+    public function testGetBusinessUnitCount(): void
     {
         $repo = $this->createMock(BusinessUnitRepository::class);
         $repo->expects($this->once())

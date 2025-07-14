@@ -6,8 +6,9 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuFactory;
 use Knp\Menu\MenuItem;
 use Oro\Bundle\NavigationBundle\Menu\HideEmptyItemsBuilder;
+use PHPUnit\Framework\TestCase;
 
-class HideEmptyItemsBuilderTest extends \PHPUnit\Framework\TestCase
+class HideEmptyItemsBuilderTest extends TestCase
 {
     private HideEmptyItemsBuilder $hideEmptyItemsBuilder;
 

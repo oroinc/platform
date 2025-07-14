@@ -8,7 +8,7 @@ use Oro\Component\Layout\Block\Type\BaseType;
 
 class InputTypeTest extends BlockTypeTestCase
 {
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $this->assertEquals(
             [
@@ -19,7 +19,7 @@ class InputTypeTest extends BlockTypeTestCase
         );
     }
 
-    public function testGetBlockView()
+    public function testGetBlockView(): void
     {
         $type = 'button';
         $id = 'test_id';
@@ -48,7 +48,7 @@ class InputTypeTest extends BlockTypeTestCase
         $this->assertEquals($required, $view->vars['required']);
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $type = $this->getBlockType(InputType::NAME);
 

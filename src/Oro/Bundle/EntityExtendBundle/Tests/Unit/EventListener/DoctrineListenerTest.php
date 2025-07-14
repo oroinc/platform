@@ -16,9 +16,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class DoctrineListenerTest extends OrmTestCase
 {
-    private ExtendMetadataBuilder|MockObject $metadataBuilder;
+    private ExtendMetadataBuilder&MockObject $metadataBuilder;
     private AttributeReader $reader;
-    private ConfigProvider|MockObject $extendConfigProvider;
+    private ConfigProvider&MockObject $extendConfigProvider;
     private DoctrineListener $listener;
 
     #[\Override]
@@ -42,7 +42,7 @@ class DoctrineListenerTest extends OrmTestCase
         string $path,
         array $expectedValues,
         ?string $expectedException = null
-    ) {
+    ): void {
         if ($expectedException) {
             return;
         }
@@ -87,7 +87,7 @@ class DoctrineListenerTest extends OrmTestCase
         string $path,
         array $expectedValues,
         ?string $expectedException = null
-    ) {
+    ): void {
         if (null !== $expectedException) {
             $this->expectException($expectedException);
         }

@@ -6,19 +6,16 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
+class TranslationDomainProviderTest extends TestCase
 {
-    /** @var TranslationKeyRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var TranslationDomainProvider */
-    private $provider;
+    private TranslationKeyRepository&MockObject $repository;
+    private CacheInterface&MockObject $cache;
+    private TranslationDomainProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +33,7 @@ class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new TranslationDomainProvider($doctrine, $this->cache);
     }
 
-    public function testGetAvailableDomainsWithoutCache()
+    public function testGetAvailableDomainsWithoutCache(): void
     {
         $domains = ['domain1', 'domain2'];
 
@@ -54,7 +51,7 @@ class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($domains, $this->provider->getAvailableDomains());
     }
 
-    public function testGetAvailableDomainsWithCache()
+    public function testGetAvailableDomainsWithCache(): void
     {
         $domains = ['domain1', 'domain2'];
 
@@ -68,7 +65,7 @@ class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($domains, $this->provider->getAvailableDomains());
     }
 
-    public function testGetAvailableDomainChoicesWithoutCache()
+    public function testGetAvailableDomainChoicesWithoutCache(): void
     {
         $this->repository->expects(self::once())
             ->method('findAvailableDomains')
@@ -87,7 +84,7 @@ class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAvailableDomainChoicesWithCache()
+    public function testGetAvailableDomainChoicesWithCache(): void
     {
         $this->repository->expects(self::never())
             ->method('findAvailableDomains');

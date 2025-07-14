@@ -5,15 +5,14 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroup\PropertyMapper;
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class PropertyMapperTest extends \PHPUnit\Framework\TestCase
+class PropertyMapperTest extends TestCase
 {
-    /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextAccessor;
-
-    /** @var PropertyMapper */
-    private $propertyMapper;
+    private ContextAccessor&MockObject $contextAccessor;
+    private PropertyMapper $propertyMapper;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class PropertyMapperTest extends \PHPUnit\Framework\TestCase
         $this->propertyMapper = new PropertyMapper($this->contextAccessor);
     }
 
-    public function testMapToArgs()
+    public function testMapToArgs(): void
     {
         $pp1 = new PropertyPath('contextParam1');
         $pp2 = new PropertyPath('contextParam2');
@@ -61,7 +60,7 @@ class PropertyMapperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNonTraversableAssertionException()
+    public function testNonTraversableAssertionException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Parameters map must be array or implements \Traversable interface');
@@ -73,7 +72,7 @@ class PropertyMapperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTransfer()
+    public function testTransfer(): void
     {
         $from = (object)['k' => 'v'];
         $to = (object)['t' => null];

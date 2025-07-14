@@ -6,16 +6,15 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class DefaultValuesListenerTest extends \PHPUnit\Framework\TestCase
+class DefaultValuesListenerTest extends TestCase
 {
-    /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextAccessor;
-
-    /** @var DefaultValuesListener */
-    private $listener;
+    private ContextAccessor&MockObject $contextAccessor;
+    private DefaultValuesListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -25,14 +24,14 @@ class DefaultValuesListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new DefaultValuesListener($this->contextAccessor);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $events = $this->listener->getSubscribedEvents();
         $this->assertCount(1, $events);
         $this->assertArrayHasKey(FormEvents::PRE_SET_DATA, $events);
     }
 
-    public function testSetDefaultValues()
+    public function testSetDefaultValues(): void
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
         $defaultValues = ['test' => 'value'];

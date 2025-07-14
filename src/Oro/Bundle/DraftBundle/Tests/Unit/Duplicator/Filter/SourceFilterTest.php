@@ -3,17 +3,16 @@
 namespace Oro\Bundle\DraftBundle\Tests\Unit\Duplicator\Filter;
 
 use Oro\Bundle\DraftBundle\Duplicator\Filter\SourceFilter;
-use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\TestCase;
 
-class SourceFilterTest extends \PHPUnit\Framework\TestCase
+class SourceFilterTest extends TestCase
 {
     use EntityTrait;
 
     public function testApplyWithoutSource(): void
     {
-        /** @var DraftableInterface $draftSource */
         $source = $this->getEntity(DraftableEntityStub::class, ['id' => 1]);
         $filter = new SourceFilter($source);
         $object = new DraftableEntityStub();
@@ -24,7 +23,6 @@ class SourceFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyWithSource(): void
     {
-        /** @var DraftableInterface $draftSource */
         $source = $this->getEntity(DraftableEntityStub::class, ['id' => 2]);
         $filter = new SourceFilter($source);
         $object = new DraftableEntityStub();

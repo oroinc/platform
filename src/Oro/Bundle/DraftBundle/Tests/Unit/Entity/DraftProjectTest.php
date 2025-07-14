@@ -6,8 +6,9 @@ use Oro\Bundle\DraftBundle\Entity\DraftProject;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class DraftProjectTest extends \PHPUnit\Framework\TestCase
+class DraftProjectTest extends TestCase
 {
     use EntityTestCaseTrait;
 

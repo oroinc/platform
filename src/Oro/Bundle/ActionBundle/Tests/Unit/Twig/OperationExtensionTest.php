@@ -10,31 +10,22 @@ use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Oro\Bundle\ActionBundle\Twig\OperationExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class OperationExtensionTest extends \PHPUnit\Framework\TestCase
+class OperationExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     private const ROUTE = 'test_route';
     private const REQUEST_URI = '/test/request/uri';
 
-    /** @var RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $routeProvider;
-
-    /** @var ContextHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextHelper;
-
-    /** @var OptionsHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $optionsHelper;
-
-    /** @var ButtonProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $buttonProvider;
-
-    /** @var ButtonSearchContextProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $buttonSearchContextProvider;
-
-    /** @var OperationExtension */
-    private $extension;
+    private RouteProviderInterface&MockObject $routeProvider;
+    private ContextHelper&MockObject $contextHelper;
+    private OptionsHelper&MockObject $optionsHelper;
+    private ButtonProvider&MockObject $buttonProvider;
+    private ButtonSearchContextProvider&MockObject $buttonSearchContextProvider;
+    private OperationExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -59,7 +50,7 @@ class OperationExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider hasButtonsDataProvider
      */
-    public function testHasButtons(bool $value)
+    public function testHasButtons(bool $value): void
     {
         $this->contextHelper->expects($this->once())
             ->method('getContext')

@@ -3,8 +3,9 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\OptionValueBag;
+use PHPUnit\Framework\TestCase;
 
-class OptionValueBagTest extends \PHPUnit\Framework\TestCase
+class OptionValueBagTest extends TestCase
 {
     /**
      * @dataProvider buildValueProvider
@@ -12,7 +13,7 @@ class OptionValueBagTest extends \PHPUnit\Framework\TestCase
      * @param array $actions
      * @param mixed $expectedValue
      */
-    public function testBuildValue(array $actions, $expectedValue)
+    public function testBuildValue(array $actions, $expectedValue): void
     {
         $optionValueBag = $this->createOptionValueBag($actions);
         $this->assertEquals($expectedValue, $optionValueBag->buildValue());

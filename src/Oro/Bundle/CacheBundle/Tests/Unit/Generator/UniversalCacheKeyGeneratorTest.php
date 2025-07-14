@@ -4,14 +4,13 @@ namespace Oro\Bundle\CacheBundle\Tests\Unit\Generator;
 
 use Oro\Bundle\CacheBundle\Generator\ObjectCacheKeyGenerator;
 use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class UniversalCacheKeyGeneratorTest extends \PHPUnit\Framework\TestCase
+class UniversalCacheKeyGeneratorTest extends TestCase
 {
-    /** @var ObjectCacheKeyGenerator|\PHPUnit\Framework\MockObject\MockObject */
-    private $objectCacheKeyGenerator;
-
-    /** @var UniversalCacheKeyGenerator */
-    private $generator;
+    private ObjectCacheKeyGenerator&MockObject $objectCacheKeyGenerator;
+    private UniversalCacheKeyGenerator $generator;
 
     #[\Override]
     protected function setUp(): void

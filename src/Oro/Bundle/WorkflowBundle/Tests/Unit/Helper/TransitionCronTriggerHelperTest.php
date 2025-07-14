@@ -13,28 +13,21 @@ use Oro\Bundle\WorkflowBundle\Helper\WorkflowAwareEntityFetcher;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TransitionCronTriggerHelperTest extends \PHPUnit\Framework\TestCase
+class TransitionCronTriggerHelperTest extends TestCase
 {
     private const TRANSITION_NAME = 'test_transition';
     private const RELATED_CLASS_NAME = 'stdClass';
     private const RELATED_CLASS_ID_FIELD = 'id';
     private const FILTER = 'filter != null';
 
-    /** @var WorkflowItemRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var WorkflowAwareEntityFetcher|\PHPUnit\Framework\MockObject\MockObject */
-    private $fetcher;
-
-    /** @var TransitionCronTriggerHelper */
-    private $helper;
-
-    /** @var TransitionCronTrigger */
-    private $trigger;
+    private WorkflowItemRepository&MockObject $repository;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private WorkflowAwareEntityFetcher&MockObject $fetcher;
+    private TransitionCronTriggerHelper $helper;
+    private TransitionCronTrigger $trigger;
 
     #[\Override]
     protected function setUp(): void
@@ -55,7 +48,7 @@ class TransitionCronTriggerHelperTest extends \PHPUnit\Framework\TestCase
         $this->trigger->setTransitionName(self::TRANSITION_NAME)->setFilter(self::FILTER);
     }
 
-    public function testFetchEntitiesWithoutWorkflowItems()
+    public function testFetchEntitiesWithoutWorkflowItems(): void
     {
         $workflow = $this->getWorkflow();
         $expected = [new \stdClass(), new \stdClass()];
@@ -68,7 +61,7 @@ class TransitionCronTriggerHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->helper->fetchEntitiesWithoutWorkflowItems($this->trigger, $workflow));
     }
 
-    public function testFetchWorkflowItems()
+    public function testFetchWorkflowItems(): void
     {
         $data = [1, 2, 3, 4, 5];
         $steps = ['step1', 'step2'];

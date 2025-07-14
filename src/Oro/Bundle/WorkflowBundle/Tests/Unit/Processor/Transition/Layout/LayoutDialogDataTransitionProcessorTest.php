@@ -8,13 +8,13 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\LayoutDialogResultType;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Layout\LayoutDialogDataTransitionProcessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-class LayoutDialogDataTransitionProcessorTest extends \PHPUnit\Framework\TestCase
+class LayoutDialogDataTransitionProcessorTest extends TestCase
 {
-    /** @var LayoutDialogDataTransitionProcessor */
-    private $processor;
+    private LayoutDialogDataTransitionProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +22,7 @@ class LayoutDialogDataTransitionProcessorTest extends \PHPUnit\Framework\TestCas
         $this->processor = new LayoutDialogDataTransitionProcessor();
     }
 
-    public function testData()
+    public function testData(): void
     {
         $transition = $this->createMock(Transition::class);
 
@@ -61,7 +61,7 @@ class LayoutDialogDataTransitionProcessorTest extends \PHPUnit\Framework\TestCas
         $this->assertTrue($context->isProcessed());
     }
 
-    public function testSkipUnsupportedResultTypeContext()
+    public function testSkipUnsupportedResultTypeContext(): void
     {
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())

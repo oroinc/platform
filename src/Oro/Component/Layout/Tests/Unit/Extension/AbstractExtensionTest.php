@@ -11,32 +11,34 @@ use Oro\Component\Layout\Exception\UnexpectedTypeException;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutUpdateInterface;
 use Oro\Component\Layout\Tests\Unit\Fixtures\AbstractExtensionStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
+class AbstractExtensionTest extends TestCase
 {
-    public function testGetTypeNames()
+    public function testGetTypeNames(): void
     {
         $extension = $this->getAbstractExtension();
         $this->assertEquals(['test'], $extension->getTypeNames());
     }
 
-    public function testHasType()
+    public function testHasType(): void
     {
         $extension = $this->getAbstractExtension();
         $this->assertTrue($extension->hasType('test'));
         $this->assertFalse($extension->hasType('unknown'));
     }
 
-    public function testGetType()
+    public function testGetType(): void
     {
         $extension = $this->getAbstractExtension();
         $this->assertInstanceOf(BlockTypeInterface::class, $extension->getType('test'));
     }
 
-    public function testGetUnknownType()
+    public function testGetUnknownType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The block type "unknown" can not be loaded by this extension.');
@@ -45,14 +47,14 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->getType('unknown');
     }
 
-    public function testHasTypeExtensions()
+    public function testHasTypeExtensions(): void
     {
         $extension = $this->getAbstractExtension();
         $this->assertTrue($extension->hasTypeExtensions('test'));
         $this->assertFalse($extension->hasTypeExtensions('unknown'));
     }
 
-    public function testGetTypeExtensions()
+    public function testGetTypeExtensions(): void
     {
         $extension = $this->getAbstractExtension();
         $this->assertCount(1, $extension->getTypeExtensions('test'));
@@ -60,7 +62,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $extension->getTypeExtensions('unknown'));
     }
 
-    public function testHasLayoutUpdates()
+    public function testHasLayoutUpdates(): void
     {
         $extension = $this->getAbstractExtension();
         $this->assertTrue($extension->hasLayoutUpdates($this->getLayoutItem('test')));
@@ -74,7 +76,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($extension->hasLayoutUpdates($layoutItem));
     }
 
-    public function testGetLayoutUpdates()
+    public function testGetLayoutUpdates(): void
     {
         $layoutItem = $this->getLayoutItem('test');
 
@@ -95,13 +97,13 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(LayoutUpdateInterface::class, $layoutUpdates[0]);
     }
 
-    public function testHasContextConfigurators()
+    public function testHasContextConfigurators(): void
     {
         $extension = $this->getAbstractExtension();
         $this->assertTrue($extension->hasContextConfigurators());
     }
 
-    public function testGetContextConfigurators()
+    public function testGetContextConfigurators(): void
     {
         $extension = $this->getAbstractExtension();
         $configurators = $extension->getContextConfigurators();
@@ -109,34 +111,34 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(ContextConfiguratorInterface::class, $configurators[0]);
     }
 
-    public function testHasContextConfiguratorsWhenNoAnyRegistered()
+    public function testHasContextConfiguratorsWhenNoAnyRegistered(): void
     {
         $extension = new AbstractExtensionStub([], [], [], [], []);
 
         $this->assertFalse($extension->hasContextConfigurators());
     }
 
-    public function testGetContextConfiguratorsWhenNoAnyRegistered()
+    public function testGetContextConfiguratorsWhenNoAnyRegistered(): void
     {
         $extension = new AbstractExtensionStub([], [], [], [], []);
 
         $this->assertSame([], $extension->getContextConfigurators());
     }
 
-    public function testHasDataProvider()
+    public function testHasDataProvider(): void
     {
         $extension = $this->getAbstractExtension();
         $this->assertTrue($extension->hasDataProvider('test'));
         $this->assertFalse($extension->hasDataProvider('unknown'));
     }
 
-    public function testGetDataProvider()
+    public function testGetDataProvider(): void
     {
         $extension = $this->getAbstractExtension();
         $this->assertIsObject($extension->getDataProvider('test'));
     }
 
-    public function testGetUnknownDataProvider()
+    public function testGetUnknownDataProvider(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The data provider "unknown" can not be loaded by this extension.');
@@ -145,7 +147,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->getDataProvider('unknown');
     }
 
-    public function testLoadInvalidBlockTypeExtensions()
+    public function testLoadInvalidBlockTypeExtensions(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
@@ -156,7 +158,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->hasTypeExtensions('test');
     }
 
-    public function testLoadInvalidLayoutUpdates()
+    public function testLoadInvalidLayoutUpdates(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
@@ -167,7 +169,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->hasLayoutUpdates($this->getLayoutItem('test'));
     }
 
-    public function testLoadLayoutUpdatesWithInvalidId()
+    public function testLoadLayoutUpdatesWithInvalidId(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Invalid "layout item id" argument type. Expected "string", "integer" given.');
@@ -184,7 +186,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->hasLayoutUpdates($this->getLayoutItem('test'));
     }
 
-    public function testLoadLayoutUpdatesWithInvalidFormatOfReturnedData()
+    public function testLoadLayoutUpdatesWithInvalidFormatOfReturnedData(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Invalid "layout updates for item "test"" argument type. Expected "array",');
@@ -201,7 +203,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->hasLayoutUpdates($this->getLayoutItem('test'));
     }
 
-    public function testLoadInvalidContextConfigurators()
+    public function testLoadInvalidContextConfigurators(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
@@ -212,7 +214,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->hasContextConfigurators();
     }
 
-    public function testLoadInvalidBlockTypes()
+    public function testLoadInvalidBlockTypes(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
@@ -248,10 +250,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return LayoutItemInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getLayoutItem(string $id)
+    private function getLayoutItem(string $id): LayoutItemInterface&MockObject
     {
         $layoutItem = $this->createMock(LayoutItemInterface::class);
         $layoutItem->expects($this->any())

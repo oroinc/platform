@@ -3,13 +3,14 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu\Matcher\Voter;
 
 use Knp\Menu\ItemInterface;
-use Oro\Bundle\NavigationBundle\Menu\Matcher\Voter;
+use Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RequestVoter;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class RequestVoterTest extends \PHPUnit\Framework\TestCase
+class RequestVoterTest extends TestCase
 {
-    public function testUriVoterConstruct()
+    public function testUriVoterConstruct(): void
     {
         $uri = 'test.uri';
 
@@ -25,7 +26,7 @@ class RequestVoterTest extends \PHPUnit\Framework\TestCase
 
         $requestStack = new RequestStack();
         $requestStack->push($request);
-        $voter = new Voter\RequestVoter($requestStack);
+        $voter = new RequestVoter($requestStack);
 
         $this->assertTrue($voter->matchItem($itemMock));
     }

@@ -5,12 +5,12 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Formatter;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Formatter\DateTimeTypeFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DateTimeTypeFormatterTest extends \PHPUnit\Framework\TestCase
+class DateTimeTypeFormatterTest extends TestCase
 {
-    /** @var DateTimeTypeFormatter */
-    private $formatter;
+    private DateTimeTypeFormatter $formatter;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +24,7 @@ class DateTimeTypeFormatterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider formatTypeProvider
      */
-    public function testFormatType(string $value, string $type, ?\Exception $exception = null)
+    public function testFormatType(string $value, string $type, ?\Exception $exception = null): void
     {
         if (null !== $exception) {
             $this->expectException(get_class($exception));

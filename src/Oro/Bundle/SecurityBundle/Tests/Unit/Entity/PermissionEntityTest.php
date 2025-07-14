@@ -4,11 +4,11 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class PermissionEntityTest extends \PHPUnit\Framework\TestCase
+class PermissionEntityTest extends TestCase
 {
-    /** @var PermissionEntity */
-    private $object;
+    private PermissionEntity $object;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class PermissionEntityTest extends \PHPUnit\Framework\TestCase
         $this->object = new PermissionEntity();
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertNull($this->object->getId());
 
@@ -28,7 +28,7 @@ class PermissionEntityTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setGetDataProvider
      */
-    public function testSetGet(string $propertyName, mixed $value, mixed $defaultValue = null)
+    public function testSetGet(string $propertyName, mixed $value, mixed $defaultValue = null): void
     {
         $setter = 'set' . ucfirst($propertyName);
         $getter = 'get' . ucfirst($propertyName);

@@ -5,11 +5,12 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyServicesCompilerPass;
 use Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection\Fixtures;
 use Oro\Component\Config\CumulativeResourceManager;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class LazyServicesCompilerPassTest extends \PHPUnit\Framework\TestCase
+class LazyServicesCompilerPassTest extends TestCase
 {
-    public function testShouldMarkServicesAsLazy()
+    public function testShouldMarkServicesAsLazy(): void
     {
         $fooBundle = new Fixtures\FooBundle\FooBundle();
         $barBundle = new Fixtures\BarBundle\BarBundle();

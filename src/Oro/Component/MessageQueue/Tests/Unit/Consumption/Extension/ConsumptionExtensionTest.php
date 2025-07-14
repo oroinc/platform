@@ -9,18 +9,19 @@ use Oro\Component\MessageQueue\Log\ConsumerState;
 use Oro\Component\MessageQueue\Log\MessageProcessorClassProvider;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
+class ConsumptionExtensionTest extends TestCase
 {
-    private MessageProcessorClassProvider|\PHPUnit\Framework\MockObject\MockObject $messageProcessorClassProvider;
+    private MessageProcessorClassProvider&MockObject $messageProcessorClassProvider;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->messageProcessorClassProvider = $this->createMock(MessageProcessorClassProvider::class);
 
-        $this->messageProcessorClassProvider
-            ->expects(self::any())
+        $this->messageProcessorClassProvider->expects(self::any())
             ->method('getMessageProcessorClassByName')
             ->willReturnCallback(static fn (string $name) => str_replace('_', '', ucwords($name, '_')) . 'Class');
     }

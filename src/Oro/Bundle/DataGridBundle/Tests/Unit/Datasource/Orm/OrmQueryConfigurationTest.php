@@ -5,17 +5,15 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datasource\Orm;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD)
  */
-class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
+class OrmQueryConfigurationTest extends TestCase
 {
-    /** @var DatagridConfiguration */
-    private $config;
-
-    /** @var OrmQueryConfiguration */
-    private $query;
+    private DatagridConfiguration $config;
+    private OrmQueryConfiguration $query;
 
     #[\Override]
     protected function setUp(): void
@@ -24,12 +22,12 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->query = new OrmQueryConfiguration($this->config);
     }
 
-    public function testInitialDistinct()
+    public function testInitialDistinct(): void
     {
         self::assertFalse($this->query->getDistinct());
     }
 
-    public function testSetDistinct()
+    public function testSetDistinct(): void
     {
         self::assertSame($this->query, $this->query->setDistinct());
         self::assertTrue($this->query->getDistinct());
@@ -56,12 +54,12 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInitialSelect()
+    public function testInitialSelect(): void
     {
         self::assertSame([], $this->query->getSelect());
     }
 
-    public function testSetSelect()
+    public function testSetSelect(): void
     {
         self::assertSame($this->query, $this->query->setSelect(['column1', 'column2']));
         self::assertSame(['column1', 'column2'], $this->query->getSelect());
@@ -77,7 +75,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResetSelect()
+    public function testResetSelect(): void
     {
         $this->query->setSelect(['column1', 'column2']);
         self::assertSame($this->query, $this->query->resetSelect());
@@ -92,7 +90,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddSelect()
+    public function testAddSelect(): void
     {
         self::assertSame($this->query, $this->query->addSelect('column1'));
         self::assertSame(['column1'], $this->query->getSelect());
@@ -121,7 +119,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddSelectForMultipleItems()
+    public function testAddSelectForMultipleItems(): void
     {
         self::assertSame($this->query, $this->query->addSelect(['column1']));
         self::assertSame(['column1'], $this->query->getSelect());
@@ -150,12 +148,12 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetRootAliasWhenNoFromPart()
+    public function testGetRootAliasWhenNoFromPart(): void
     {
         self::assertNull($this->query->getRootAlias());
     }
 
-    public function testGetRootAliasForOnlyOneFrom()
+    public function testGetRootAliasForOnlyOneFrom(): void
     {
         $this->config->offsetSetByPath(
             '[source][query][from]',
@@ -166,7 +164,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('testAlias', $this->query->getRootAlias());
     }
 
-    public function testGetRootAliasWhenNoAliasInFrom()
+    public function testGetRootAliasWhenNoAliasInFrom(): void
     {
         $this->config->offsetSetByPath(
             '[source][query][from]',
@@ -177,7 +175,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->query->getRootAlias());
     }
 
-    public function testGetRootAliasForSeveralFrom()
+    public function testGetRootAliasForSeveralFrom(): void
     {
         $this->config->offsetSetByPath(
             '[source][query][from]',
@@ -189,12 +187,12 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('testAlias1', $this->query->getRootAlias());
     }
 
-    public function testGetRootEntityWhenNoFromPart()
+    public function testGetRootEntityWhenNoFromPart(): void
     {
         self::assertNull($this->query->getRootEntity());
     }
 
-    public function testGetRootEntityWhenLookAtExtendedEntityClassNameIsRequested()
+    public function testGetRootEntityWhenLookAtExtendedEntityClassNameIsRequested(): void
     {
         self::assertNull($this->query->getRootEntity(null, true));
 
@@ -210,7 +208,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('Test\Entity1', $this->query->getRootEntity(null, true));
     }
 
-    public function testGetRootEntityWithEntityClassResolver()
+    public function testGetRootEntityWithEntityClassResolver(): void
     {
         $entityClassResolver = $this->createMock(EntityClassResolver::class);
         $entityClassResolver->expects(self::once())
@@ -227,7 +225,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('Test\Entity', $this->query->getRootEntity($entityClassResolver));
     }
 
-    public function testGetRootEntityForOnlyOneFrom()
+    public function testGetRootEntityForOnlyOneFrom(): void
     {
         $this->config->offsetSetByPath(
             '[source][query][from]',
@@ -238,7 +236,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('Test\Entity', $this->query->getRootEntity());
     }
 
-    public function testGetRootEntityWhenNoEntityInFrom()
+    public function testGetRootEntityWhenNoEntityInFrom(): void
     {
         $this->config->offsetSetByPath(
             '[source][query][from]',
@@ -249,7 +247,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->query->getRootEntity());
     }
 
-    public function testGetRootEntityForSeveralFrom()
+    public function testGetRootEntityForSeveralFrom(): void
     {
         $this->config->offsetSetByPath(
             '[source][query][from]',
@@ -261,12 +259,12 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('Test\Entity1', $this->query->getRootEntity());
     }
 
-    public function testFindRootEntityWhenNoFromPart()
+    public function testFindRootEntityWhenNoFromPart(): void
     {
         self::assertNull($this->query->findRootAlias('Test\Entity'));
     }
 
-    public function testFindRootEntityWhenGivenEntityDoesNotExist()
+    public function testFindRootEntityWhenGivenEntityDoesNotExist(): void
     {
         $this->config->offsetSetByPath(
             '[source][query][from]',
@@ -278,7 +276,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->query->findRootAlias('Test\Entity3'));
     }
 
-    public function testFindRootEntity()
+    public function testFindRootEntity(): void
     {
         $this->config->offsetSetByPath(
             '[source][query][from]',
@@ -290,7 +288,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('testAlias2', $this->query->findRootAlias('Test\Entity2'));
     }
 
-    public function testFindRootEntityWithEntityClassResolver()
+    public function testFindRootEntityWithEntityClassResolver(): void
     {
         $entityClassResolver = $this->createMock(EntityClassResolver::class);
         $entityClassResolver->expects(self::any())
@@ -309,7 +307,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('testAlias2', $this->query->findRootAlias('Test\Entity2', $entityClassResolver));
     }
 
-    public function testGetJoinAliasForQueryWithoutJoins()
+    public function testGetJoinAliasForQueryWithoutJoins(): void
     {
         $this->query->addFrom('Test\RootEntity', 'rootAlias');
         self::assertEquals('auto_rel_1', $this->query->getJoinAlias('rootAlias.association1'));
@@ -320,7 +318,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('auto_rel_1', $this->query->getJoinAlias('rootAlias.association1'));
     }
 
-    public function testGetJoinAliasForJoinWithConditionForQueryWithoutJoins()
+    public function testGetJoinAliasForJoinWithConditionForQueryWithoutJoins(): void
     {
         $this->query->addFrom('Test\RootEntity', 'rootAlias');
         self::assertEquals('auto_rel_1', $this->query->getJoinAlias('rootAlias.association1'));
@@ -338,14 +336,14 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetJoinAliasForExistingJoin()
+    public function testGetJoinAliasForExistingJoin(): void
     {
         $this->query->addFrom('Test\RootEntity', 'rootAlias');
         $this->query->addLeftJoin('rootAlias.association1', 'joinAlias');
         self::assertEquals('joinAlias', $this->query->getJoinAlias('rootAlias.association1'));
     }
 
-    public function testGetJoinAliasForExistingJoinWithCondition()
+    public function testGetJoinAliasForExistingJoinWithCondition(): void
     {
         $this->query->addFrom('Test\RootEntity', 'rootAlias');
         $this->query->addLeftJoin('rootAlias.association1', 'joinAlias1');
@@ -357,7 +355,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetJoinAliasWhenExistingJoinHasDifferentCondition()
+    public function testGetJoinAliasWhenExistingJoinHasDifferentCondition(): void
     {
         $this->query->addFrom('Test\RootEntity', 'rootAlias');
         $this->query->addLeftJoin('rootAlias.association1', 'joinAlias1');
@@ -369,7 +367,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertAssociationJoinToSubqueryForInnerJoin()
+    public function testConvertAssociationJoinToSubqueryForInnerJoin(): void
     {
         $this->query->addSelect('joinAlias1.name as testColumn');
         $this->query->addFrom('Test\RootEntity', 'rootAlias');
@@ -400,7 +398,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertAssociationJoinToSubqueryForLeftJoin()
+    public function testConvertAssociationJoinToSubqueryForLeftJoin(): void
     {
         $this->query->addSelect('joinAlias1.name as testColumn');
         $this->query->addFrom('Test\RootEntity', 'rootAlias');
@@ -431,7 +429,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertAssociationJoinToSubqueryWhenAsKeywordIsNotLowercase()
+    public function testConvertAssociationJoinToSubqueryWhenAsKeywordIsNotLowercase(): void
     {
         $this->query->addSelect('joinAlias1.name As testColumn');
         $this->query->addFrom('Test\RootEntity', 'rootAlias');
@@ -462,7 +460,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertAssociationJoinToSubqueryForInvalidJoinAlias()
+    public function testConvertAssociationJoinToSubqueryForInvalidJoinAlias(): void
     {
         $this->query->addSelect('joinAlias1.name as testColumn');
         $this->query->addFrom('Test\RootEntity', 'rootAlias');
@@ -496,7 +494,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertAssociationJoinToSubqueryForInvalidColumnAlias()
+    public function testConvertAssociationJoinToSubqueryForInvalidColumnAlias(): void
     {
         $this->query->addSelect('joinAlias1.name as testColumn');
         $this->query->addFrom('Test\RootEntity', 'rootAlias');
@@ -530,7 +528,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertAssociationJoinToSubqueryForJoinWithConditions()
+    public function testConvertAssociationJoinToSubqueryForJoinWithConditions(): void
     {
         $this->query->addSelect('joinAlias1.name as testColumn');
         $this->query->addFrom('Test\RootEntity', 'rootAlias');
@@ -566,7 +564,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertEntityJoinToSubqueryForInnerJoin()
+    public function testConvertEntityJoinToSubqueryForInnerJoin(): void
     {
         $this->query->addSelect('joinAlias1.name as testColumn');
         $this->query->addFrom('Test\RootEntity', 'rootAlias');
@@ -598,7 +596,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertEntityJoinToSubqueryForLeftJoin()
+    public function testConvertEntityJoinToSubqueryForLeftJoin(): void
     {
         $this->query->addSelect('joinAlias1.name as testColumn');
         $this->query->addFrom('Test\RootEntity', 'rootAlias');
@@ -630,7 +628,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertEntityJoinToSubqueryWhenAsKeywordIsNotLovercase()
+    public function testConvertEntityJoinToSubqueryWhenAsKeywordIsNotLovercase(): void
     {
         $this->query->addSelect('joinAlias1.name As testColumn');
         $this->query->addFrom('Test\RootEntity', 'rootAlias');
@@ -662,7 +660,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertEntityJoinToSubqueryWhenJoinDoesNotHaveCondition()
+    public function testConvertEntityJoinToSubqueryWhenJoinDoesNotHaveCondition(): void
     {
         $this->query->addSelect('joinAlias1.name as testColumn');
         $this->query->addFrom('Test\RootEntity', 'rootAlias');
@@ -695,7 +693,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertEntityJoinToSubqueryForInvalidJoinAlias()
+    public function testConvertEntityJoinToSubqueryForInvalidJoinAlias(): void
     {
         $this->query->addSelect('joinAlias1.name as testColumn');
         $this->query->addFrom('Test\RootEntity', 'rootAlias');
@@ -735,7 +733,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertEntityJoinToSubqueryForInvalidColumnAlias()
+    public function testConvertEntityJoinToSubqueryForInvalidColumnAlias(): void
     {
         $this->query->addSelect('joinAlias1.name as testColumn');
         $this->query->addFrom('Test\RootEntity', 'rootAlias');
@@ -775,12 +773,12 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInitialFrom()
+    public function testInitialFrom(): void
     {
         self::assertSame([], $this->query->getFrom());
     }
 
-    public function testSetFrom()
+    public function testSetFrom(): void
     {
         self::assertSame(
             $this->query,
@@ -811,7 +809,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResetFrom()
+    public function testResetFrom(): void
     {
         $this->query->setFrom([
             ['table' => 'Test\Entity1', 'alias' => 'testAlias1'],
@@ -829,7 +827,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddFrom()
+    public function testAddFrom(): void
     {
         self::assertSame($this->query, $this->query->addFrom('Test\Entity1', 'testAlias1'));
         self::assertSame(
@@ -874,12 +872,12 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInitialInnerJoins()
+    public function testInitialInnerJoins(): void
     {
         self::assertSame([], $this->query->getInnerJoins());
     }
 
-    public function testSetInnerJoins()
+    public function testSetInnerJoins(): void
     {
         self::assertSame(
             $this->query,
@@ -912,7 +910,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddInnerJoin()
+    public function testAddInnerJoin(): void
     {
         self::assertSame($this->query, $this->query->addInnerJoin('alias.association1', 'testAlias1'));
         self::assertSame(
@@ -961,7 +959,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddInnerJoinWithCondition()
+    public function testAddInnerJoinWithCondition(): void
     {
         self::assertSame(
             $this->query,
@@ -999,12 +997,12 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInitialLeftJoins()
+    public function testInitialLeftJoins(): void
     {
         self::assertSame([], $this->query->getLeftJoins());
     }
 
-    public function testSetLeftJoins()
+    public function testSetLeftJoins(): void
     {
         self::assertSame(
             $this->query,
@@ -1037,7 +1035,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddLeftJoin()
+    public function testAddLeftJoin(): void
     {
         self::assertSame($this->query, $this->query->addLeftJoin('alias.association1', 'testAlias1'));
         self::assertSame(
@@ -1086,7 +1084,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddLeftJoinWithCondition()
+    public function testAddLeftJoinWithCondition(): void
     {
         self::assertSame(
             $this->query,
@@ -1124,12 +1122,12 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInitialWhere()
+    public function testInitialWhere(): void
     {
         self::assertSame([], $this->query->getWhere());
     }
 
-    public function testSetWhere()
+    public function testSetWhere(): void
     {
         self::assertSame(
             $this->query,
@@ -1150,7 +1148,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResetWhere()
+    public function testResetWhere(): void
     {
         $this->query->setWhere(['and' => ['column1 = 123']]);
         self::assertSame($this->query, $this->query->resetWhere());
@@ -1165,7 +1163,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddAndWhere()
+    public function testAddAndWhere(): void
     {
         self::assertSame($this->query, $this->query->addAndWhere('column1 = 123'));
         self::assertSame(['and' => ['column1 = 123']], $this->query->getWhere());
@@ -1198,7 +1196,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddAndWhereForMultipleItems()
+    public function testAddAndWhereForMultipleItems(): void
     {
         self::assertSame($this->query, $this->query->addAndWhere(['column1 = 123']));
         self::assertSame(['and' => ['column1 = 123']], $this->query->getWhere());
@@ -1231,7 +1229,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddOrWhere()
+    public function testAddOrWhere(): void
     {
         self::assertSame($this->query, $this->query->addOrWhere('column1 = 123'));
         self::assertSame(['or' => ['column1 = 123']], $this->query->getWhere());
@@ -1264,7 +1262,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddOrWhereForMultipleItems()
+    public function testAddOrWhereForMultipleItems(): void
     {
         self::assertSame($this->query, $this->query->addOrWhere(['column1 = 123']));
         self::assertSame(['or' => ['column1 = 123']], $this->query->getWhere());
@@ -1297,12 +1295,12 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInitialHaving()
+    public function testInitialHaving(): void
     {
         self::assertNull($this->query->getHaving());
     }
 
-    public function testSetHaving()
+    public function testSetHaving(): void
     {
         self::assertSame($this->query, $this->query->setHaving('column1,column2'));
         self::assertSame('column1,column2', $this->query->getHaving());
@@ -1318,7 +1316,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResetHaving()
+    public function testResetHaving(): void
     {
         $this->query->setHaving('column1,column2');
         self::assertSame($this->query, $this->query->resetHaving());
@@ -1333,7 +1331,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddHaving()
+    public function testAddHaving(): void
     {
         self::assertSame($this->query, $this->query->addHaving('column1'));
         self::assertSame('column1', $this->query->getHaving());
@@ -1362,12 +1360,12 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInitialGroupBy()
+    public function testInitialGroupBy(): void
     {
         self::assertNull($this->query->getGroupBy());
     }
 
-    public function testSetGroupBy()
+    public function testSetGroupBy(): void
     {
         self::assertSame($this->query, $this->query->setGroupBy('column1,column2'));
         self::assertSame('column1,column2', $this->query->getGroupBy());
@@ -1383,7 +1381,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResetGroupBy()
+    public function testResetGroupBy(): void
     {
         $this->query->setGroupBy('column1,column2');
         self::assertSame($this->query, $this->query->resetGroupBy());
@@ -1398,7 +1396,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddGroupBy()
+    public function testAddGroupBy(): void
     {
         self::assertSame($this->query, $this->query->addGroupBy('column1'));
         self::assertSame('column1', $this->query->getGroupBy());
@@ -1427,12 +1425,12 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInitialOrderBy()
+    public function testInitialOrderBy(): void
     {
         self::assertSame([], $this->query->getOrderBy());
     }
 
-    public function testSetOrderBy()
+    public function testSetOrderBy(): void
     {
         self::assertSame(
             $this->query,
@@ -1463,7 +1461,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResetOrderBy()
+    public function testResetOrderBy(): void
     {
         $this->query->setOrderBy([
             ['column' => 'column1', 'dir' => 'asc'],
@@ -1481,7 +1479,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddOrderBy()
+    public function testAddOrderBy(): void
     {
         self::assertSame($this->query, $this->query->addOrderBy('column1'));
         self::assertSame(
@@ -1526,12 +1524,12 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInitialHints()
+    public function testInitialHints(): void
     {
         self::assertSame([], $this->query->getHints());
     }
 
-    public function testSetHints()
+    public function testSetHints(): void
     {
         self::assertSame(
             $this->query,
@@ -1560,7 +1558,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResetHints()
+    public function testResetHints(): void
     {
         $this->query->setHints([
             'hint1',
@@ -1576,7 +1574,7 @@ class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddHint()
+    public function testAddHint(): void
     {
         self::assertSame($this->query, $this->query->addHint('hint1'));
         self::assertSame(

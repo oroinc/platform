@@ -6,13 +6,13 @@ use Oro\Component\Action\Action\CreateDateTime;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class CreateDateTimeTest extends \PHPUnit\Framework\TestCase
+class CreateDateTimeTest extends TestCase
 {
-    /** @var CreateDateTime */
-    private $action;
+    private CreateDateTime $action;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +21,7 @@ class CreateDateTimeTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
-    public function testInitializeExceptionNoAttribute()
+    public function testInitializeExceptionNoAttribute(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Option "attribute" name parameter is required');
@@ -29,7 +29,7 @@ class CreateDateTimeTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize([]);
     }
 
-    public function testInitializeExceptionInvalidAttribute()
+    public function testInitializeExceptionInvalidAttribute(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Option "attribute" must be valid property definition.');
@@ -37,7 +37,7 @@ class CreateDateTimeTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize(['attribute' => 'string']);
     }
 
-    public function testInitializeExceptionInvalidTime()
+    public function testInitializeExceptionInvalidTime(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Option "time" must be a string, boolean given.');
@@ -45,7 +45,7 @@ class CreateDateTimeTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize(['attribute' => new PropertyPath('test_attribute'), 'time' => true]);
     }
 
-    public function testInitializeExceptionInvalidTimezone()
+    public function testInitializeExceptionInvalidTimezone(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage(
@@ -58,7 +58,7 @@ class CreateDateTimeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeDataProvider
      */
-    public function testExecute(array $options, ?\DateTime $expectedResult = null, array $context = [])
+    public function testExecute(array $options, ?\DateTime $expectedResult = null, array $context = []): void
     {
         $context = new ItemStub($context);
         $attributeName = (string)$options['attribute'];

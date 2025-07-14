@@ -5,11 +5,11 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Provider;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\DataAuditBundle\Provider\AuditFieldTypeProvider;
+use PHPUnit\Framework\TestCase;
 
-class AuditFieldTypeProviderTest extends \PHPUnit\Framework\TestCase
+class AuditFieldTypeProviderTest extends TestCase
 {
-    /** @var AuditFieldTypeProvider */
-    private $provider;
+    private AuditFieldTypeProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +17,7 @@ class AuditFieldTypeProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new AuditFieldTypeProvider();
     }
 
-    public function testDefaultType()
+    public function testDefaultType(): void
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->once())
@@ -30,7 +30,7 @@ class AuditFieldTypeProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('string', $this->provider->getFieldType($metadata, 'field'));
     }
 
-    public function testCollection()
+    public function testCollection(): void
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->once())
@@ -43,7 +43,7 @@ class AuditFieldTypeProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('collection', $this->provider->getFieldType($metadata, 'field'));
     }
 
-    public function testUnidirectionalCollection()
+    public function testUnidirectionalCollection(): void
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->once())
@@ -56,7 +56,7 @@ class AuditFieldTypeProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('collection', $this->provider->getFieldType($metadata, 'stdClass::field'));
     }
 
-    public function testType()
+    public function testType(): void
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->once())
@@ -71,7 +71,7 @@ class AuditFieldTypeProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('integer', $this->provider->getFieldType($metadata, 'field'));
     }
 
-    public function testTypeByClass()
+    public function testTypeByClass(): void
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->once())

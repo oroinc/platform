@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
+use Oro\Bundle\ApiBundle\Request\DataType;
+
 /**
  * Helps to convert a data-type to a data-type that should be returned in API documentation.
  */
@@ -27,6 +29,11 @@ class ApiDocDataTypeConverter
      */
     public function convertDataType(string $dataType, string $view): string
     {
+        $dataTypeDetailDelimiterPos = strpos($dataType, DataType::DETAIL_DELIMITER);
+        if (false !== $dataTypeDetailDelimiterPos) {
+            $dataType = substr($dataType, 0, $dataTypeDetailDelimiterPos);
+        }
+
         return $this->viewMappings[$view][$dataType] ?? $this->defaultMapping[$dataType] ?? $dataType;
     }
 }

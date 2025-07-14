@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\TypeValidationLoaderPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class TypeValidationLoaderPassTest extends \PHPUnit\Framework\TestCase
+class TypeValidationLoaderPassTest extends TestCase
 {
     public function testProcess(): void
     {

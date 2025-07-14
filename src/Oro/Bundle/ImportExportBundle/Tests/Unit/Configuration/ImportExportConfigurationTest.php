@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfiguration;
+use PHPUnit\Framework\TestCase;
 
-class ImportExportConfigurationTest extends \PHPUnit\Framework\TestCase
+class ImportExportConfigurationTest extends TestCase
 {
-    public function testGetters()
+    public function testGetters(): void
     {
         $parameters = $this->getConfigurationParameters();
         $configuration = new ImportExportConfiguration($parameters);

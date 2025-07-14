@@ -6,11 +6,12 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\SecurityBundle\Migrations\Schema\LoadBasePermissionsQuery;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LoadBasePermissionsQueryTest extends \PHPUnit\Framework\TestCase
+class LoadBasePermissionsQueryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Connection */
-    protected $connection;
+    protected Connection&MockObject $connection;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +22,7 @@ class LoadBasePermissionsQueryTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new MySqlPlatform());
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $this->assertConnectionCalled(['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN'], 4);
 
@@ -30,7 +31,7 @@ class LoadBasePermissionsQueryTest extends \PHPUnit\Framework\TestCase
         $query->execute(new ArrayLogger());
     }
 
-    protected function assertConnectionCalled(array $permissions, int $countCalls)
+    protected function assertConnectionCalled(array $permissions, int $countCalls): void
     {
         $permissions = array_map(
             function ($permission) {
@@ -53,15 +54,13 @@ class LoadBasePermissionsQueryTest extends \PHPUnit\Framework\TestCase
 
         $this->connection->expects($this->exactly($countCalls))
             ->method('executeStatement')
-            ->willReturnCallback(
-                function ($query, array $params = [], array $types = []) use (&$data) {
-                    $index = array_search($params, $data, true);
+            ->willReturnCallback(function ($query, array $params = [], array $types = []) use (&$data) {
+                $index = array_search($params, $data, true);
 
-                    self::assertNotFalse($index);
-                    self::assertStringContainsString('INSERT INTO oro_security_permission', $query);
+                self::assertNotFalse($index);
+                self::assertStringContainsString('INSERT INTO oro_security_permission', $query);
 
-                    unset($data[$index]);
-                }
-            );
+                unset($data[$index]);
+            });
     }
 }

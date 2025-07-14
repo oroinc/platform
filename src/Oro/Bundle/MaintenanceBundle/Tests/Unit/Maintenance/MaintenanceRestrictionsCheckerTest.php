@@ -3,13 +3,14 @@
 namespace Oro\Bundle\MaintenanceBundle\Tests\Unit\Maintenance;
 
 use Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceRestrictionsChecker;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MaintenanceRestrictionsCheckerTest extends \PHPUnit\Framework\TestCase
+class MaintenanceRestrictionsCheckerTest extends TestCase
 {
     private function getMaintenanceRestrictionsChecker(
         ?string $path,

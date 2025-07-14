@@ -5,18 +5,14 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Cache;
 use Oro\Bundle\EntityBundle\Tools\CheckDatabaseStateManager;
 use Oro\Bundle\EntityExtendBundle\Cache\CacheWarmerAggregate;
 use Oro\Component\DependencyInjection\ServiceLink;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate as SymfonyCacheWarmerAggregate;
 
-class CacheWarmerAggregateTest extends \PHPUnit\Framework\TestCase
+class CacheWarmerAggregateTest extends TestCase
 {
-    /** @var SymfonyCacheWarmerAggregate */
-    private $cacheWarmer;
-
-    /** @var SymfonyCacheWarmerAggregate */
-    private $extendCacheWarmer;
-
-    /** @var CacheWarmerAggregate */
-    private $cacheWarmerAggregate;
+    private SymfonyCacheWarmerAggregate $cacheWarmer;
+    private SymfonyCacheWarmerAggregate $extendCacheWarmer;
+    private CacheWarmerAggregate $cacheWarmerAggregate;
 
     #[\Override]
     protected function setUp(): void
@@ -40,12 +36,12 @@ class CacheWarmerAggregateTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsOptional()
+    public function testIsOptional(): void
     {
         self::assertFalse($this->cacheWarmerAggregate->isOptional());
     }
 
-    public function testWarmUpWithoutOptionalWarmers()
+    public function testWarmUpWithoutOptionalWarmers(): void
     {
         $cacheDir = 'test';
 
@@ -68,7 +64,7 @@ class CacheWarmerAggregateTest extends \PHPUnit\Framework\TestCase
         $this->cacheWarmerAggregate->warmUp($cacheDir);
     }
 
-    public function testWarmUpWithOptionalWarmers()
+    public function testWarmUpWithOptionalWarmers(): void
     {
         $cacheDir = 'test';
 
@@ -92,7 +88,7 @@ class CacheWarmerAggregateTest extends \PHPUnit\Framework\TestCase
         $this->cacheWarmerAggregate->warmUp($cacheDir);
     }
 
-    public function testWarmUpWithOnlyOptionalWarmers()
+    public function testWarmUpWithOnlyOptionalWarmers(): void
     {
         $cacheDir = 'test';
 

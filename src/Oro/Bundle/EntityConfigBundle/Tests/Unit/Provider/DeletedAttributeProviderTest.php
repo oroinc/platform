@@ -9,17 +9,14 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\FieldConfigModelRepository;
 use Oro\Bundle\EntityConfigBundle\Provider\AttributeValueProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\DeletedAttributeProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DeletedAttributeProviderTest extends \PHPUnit\Framework\TestCase
+class DeletedAttributeProviderTest extends TestCase
 {
-    /** @var ConfigModelManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configModelManager;
-
-    /** @var AttributeValueProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeValueProvider;
-
-    /** @var DeletedAttributeProvider */
-    private $provider;
+    private ConfigModelManager&MockObject $configModelManager;
+    private AttributeValueProviderInterface&MockObject $attributeValueProvider;
+    private DeletedAttributeProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +27,7 @@ class DeletedAttributeProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new DeletedAttributeProvider($this->configModelManager, $this->attributeValueProvider);
     }
 
-    public function testGetAttributesByIdsDbFailed()
+    public function testGetAttributesByIdsDbFailed(): void
     {
         $this->configModelManager->expects($this->once())
             ->method('checkDatabase')
@@ -42,7 +39,7 @@ class DeletedAttributeProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($attributes);
     }
 
-    public function testGetAttributesByIds()
+    public function testGetAttributesByIds(): void
     {
         $ids = [333];
         $this->configModelManager->expects($this->once())
@@ -66,7 +63,7 @@ class DeletedAttributeProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($attributes);
     }
 
-    public function testRemoveAttributeValuesWithoutNames()
+    public function testRemoveAttributeValuesWithoutNames(): void
     {
         $attributeFamily = new AttributeFamily();
         $this->attributeValueProvider->expects($this->never())
@@ -78,7 +75,7 @@ class DeletedAttributeProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemoveAttributeValues()
+    public function testRemoveAttributeValues(): void
     {
         $attributeFamily = new AttributeFamily();
         $names = ['names'];

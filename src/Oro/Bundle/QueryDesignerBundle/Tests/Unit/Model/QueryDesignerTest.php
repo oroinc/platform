@@ -3,10 +3,11 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Model;
 
 use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
+use PHPUnit\Framework\TestCase;
 
-class QueryDesignerTest extends \PHPUnit\Framework\TestCase
+class QueryDesignerTest extends TestCase
 {
-    public function testConstructWithDefaultParameters()
+    public function testConstructWithDefaultParameters(): void
     {
         $queryDesigner = new QueryDesigner();
 
@@ -14,7 +15,7 @@ class QueryDesignerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($queryDesigner->getDefinition());
     }
 
-    public function testConstructWithCustomParameters()
+    public function testConstructWithCustomParameters(): void
     {
         $entity = 'Test\Entity';
         $definition = 'test definition';
@@ -25,7 +26,7 @@ class QueryDesignerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($definition, $queryDesigner->getDefinition());
     }
 
-    public function testSetEntity()
+    public function testSetEntity(): void
     {
         $entity = 'Test\Entity';
 
@@ -35,7 +36,7 @@ class QueryDesignerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($entity, $queryDesigner->getEntity());
     }
 
-    public function testSetDefinition()
+    public function testSetDefinition(): void
     {
         $definition = 'test definition';
 

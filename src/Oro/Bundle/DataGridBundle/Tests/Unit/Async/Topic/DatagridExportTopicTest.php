@@ -13,17 +13,16 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class DatagridExportTopicTest extends AbstractTopicTestCase
 {
-    private ConfigurationProviderInterface|MockObject $chainConfigurationProvider;
-
     private const VALID_GRID_NAME = 'grid-name';
     private const INVALID_GRID_NAME = 'invalid-grid-name';
+
+    private ConfigurationProviderInterface&MockObject $chainConfigurationProvider;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->chainConfigurationProvider = $this->createMock(ConfigurationProviderInterface::class);
-        $this->chainConfigurationProvider
-            ->expects(self::any())
+        $this->chainConfigurationProvider->expects(self::any())
             ->method('isValidConfiguration')
             ->willReturnMap([
                 [self::VALID_GRID_NAME, true],

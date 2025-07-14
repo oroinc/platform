@@ -10,14 +10,13 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityListener\AttributeGroupListener;
 use Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Validator\Constraints\AttributeGroupStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AttributeGroupListenerTest extends \PHPUnit\Framework\TestCase
+class AttributeGroupListenerTest extends TestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var AttributeGroupListener */
-    private $listener;
+    private EntityManagerInterface&MockObject $em;
+    private AttributeGroupListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class AttributeGroupListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new AttributeGroupListener(new SlugGenerator());
     }
 
-    public function testPrePersistCodeExist()
+    public function testPrePersistCodeExist(): void
     {
         $group = new AttributeGroupStub(1, 'label');
         $group->setCode('some-code');
@@ -47,7 +46,7 @@ class AttributeGroupListenerTest extends \PHPUnit\Framework\TestCase
         array $repositoryArgs,
         array $repositoryResults,
         string $expectedCodeSlug
-    ) {
+    ): void {
         $eventArgs = new LifecycleEventArgs($group, $this->em);
 
         $repository = $this->createMock(EntityRepository::class);

@@ -6,11 +6,11 @@ use Oro\Bundle\SearchBundle\Datagrid\Extension\Pager\IndexerPager;
 use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
+use PHPUnit\Framework\TestCase;
 
-class IndexerPagerTest extends \PHPUnit\Framework\TestCase
+class IndexerPagerTest extends TestCase
 {
-    /** @var IndexerPager */
-    private $pager;
+    private IndexerPager $pager;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class IndexerPagerTest extends \PHPUnit\Framework\TestCase
         $this->pager = new IndexerPager();
     }
 
-    public function testSetQueryIsUsedLater()
+    public function testSetQueryIsUsedLater(): void
     {
         $indexerQuery = $this->getMockBuilder(SearchQueryInterface::class)
             ->disableOriginalConstructor()
@@ -32,7 +32,7 @@ class IndexerPagerTest extends \PHPUnit\Framework\TestCase
         $this->pager->getNbResults();
     }
 
-    public function testInit()
+    public function testInit(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Indexer query must be set');
@@ -40,7 +40,7 @@ class IndexerPagerTest extends \PHPUnit\Framework\TestCase
         $this->pager->init();
     }
 
-    public function testGetNbResults()
+    public function testGetNbResults(): void
     {
         $totalCount = 123;
 
@@ -72,7 +72,7 @@ class IndexerPagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider maxPerPageDataProvider
      */
-    public function testSetGetMaxPerPage(int $maxPerPage, int $maxResults, int $firstResult)
+    public function testSetGetMaxPerPage(int $maxPerPage, int $maxResults, int $firstResult): void
     {
         $indexerQuery = $this->createMock(IndexerQuery::class);
         $indexerQuery->expects($this->once())
@@ -88,7 +88,7 @@ class IndexerPagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($maxPerPage, $this->pager->getMaxPerPage());
     }
 
-    public function testSetGetPage()
+    public function testSetGetPage(): void
     {
         $page = 2;
         $firstResult = 10;
@@ -104,7 +104,7 @@ class IndexerPagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($page, $this->pager->getPage());
     }
 
-    public function testGetFirstPreviousNextLastPage()
+    public function testGetFirstPreviousNextLastPage(): void
     {
         $page = 2;
         $maxPerPage = 20;
@@ -156,7 +156,7 @@ class IndexerPagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider haveToPaginateDataProvider
      */
-    public function testHaveToPaginate(bool $expected, int $page, int $maxPerPage, int $totalCount)
+    public function testHaveToPaginate(bool $expected, int $page, int $maxPerPage, int $totalCount): void
     {
         $indexerQuery = $this->createMock(IndexerQuery::class);
         $indexerQuery->expects($this->any())

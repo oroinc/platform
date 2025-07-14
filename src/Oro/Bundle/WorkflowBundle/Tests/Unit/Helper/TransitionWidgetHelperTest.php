@@ -5,15 +5,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class TransitionWidgetHelperTest extends \PHPUnit\Framework\TestCase
+class TransitionWidgetHelperTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var TransitionWidgetHelper */
-    private $helper;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private TransitionWidgetHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class TransitionWidgetHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getOrCreateEntityReferenceDataProvider
      */
-    public function testGetOrCreateEntityReference(string $entityClass, ?int $entityId = null)
+    public function testGetOrCreateEntityReference(string $entityClass, ?int $entityId = null): void
     {
         if ($entityId) {
             $this->doctrineHelper->expects($this->once())
@@ -43,7 +42,7 @@ class TransitionWidgetHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getOrCreateEntityReferenceDataProvider
      */
-    public function testGetOrCreateEntityReferenceException(string $entityClass, ?int $entityId = null)
+    public function testGetOrCreateEntityReferenceException(string $entityClass, ?int $entityId = null): void
     {
         $this->expectException(BadRequestHttpException::class);
         if ($entityId) {

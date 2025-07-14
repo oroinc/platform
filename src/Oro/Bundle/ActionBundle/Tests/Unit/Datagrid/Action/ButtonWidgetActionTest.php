@@ -4,15 +4,14 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\Action;
 
 use Oro\Bundle\ActionBundle\Datagrid\Action\ButtonWidgetAction;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ButtonWidgetActionTest extends \PHPUnit\Framework\TestCase
+class ButtonWidgetActionTest extends TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var ButtonWidgetAction */
-    private $action;
+    private TranslatorInterface&MockObject $translator;
+    private ButtonWidgetAction $action;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class ButtonWidgetActionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getOptionsProvider
      */
-    public function testGetOptions(array $config, string $link, ?string $title, ?string $translatedTitle)
+    public function testGetOptions(array $config, string $link, ?string $title, ?string $translatedTitle): void
     {
         $this->action->setOptions(ActionConfiguration::create($config));
 

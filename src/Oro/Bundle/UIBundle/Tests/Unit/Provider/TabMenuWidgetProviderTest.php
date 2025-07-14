@@ -7,14 +7,13 @@ use Oro\Bundle\UIBundle\Provider\TabMenuWidgetProvider;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\TestBaseClass;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\TestClass;
 use Oro\Bundle\UIBundle\Twig\TabExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TabMenuWidgetProviderTest extends \PHPUnit\Framework\TestCase
+class TabMenuWidgetProviderTest extends TestCase
 {
-    /** @var ObjectIdAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $objectIdAccessor;
-
-    /** @var TabExtension|\PHPUnit\Framework\MockObject\MockObject */
-    private $widgetProvider;
+    private ObjectIdAccessorInterface&MockObject $objectIdAccessor;
+    private TabExtension&MockObject $widgetProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class TabMenuWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->widgetProvider = $this->createMock(TabExtension::class);
     }
 
-    public function testSupportsWithoutEntityClass()
+    public function testSupportsWithoutEntityClass(): void
     {
         $provider = new TabMenuWidgetProvider(
             $this->objectIdAccessor,
@@ -35,7 +34,7 @@ class TabMenuWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($provider->supports(new \stdClass()));
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $provider = new TabMenuWidgetProvider(
             $this->objectIdAccessor,
@@ -49,7 +48,7 @@ class TabMenuWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($provider->supports(new \stdClass()));
     }
 
-    public function testGetWidgets()
+    public function testGetWidgets(): void
     {
         $entity = new TestClass();
         $entityId = 123;

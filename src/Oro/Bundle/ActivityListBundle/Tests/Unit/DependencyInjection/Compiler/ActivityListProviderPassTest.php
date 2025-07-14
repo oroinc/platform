@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ActivityListBundle\DependencyInjection\Compiler\ActivityListProviderPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -10,12 +11,10 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class ActivityListProviderPassTest extends \PHPUnit\Framework\TestCase
+class ActivityListProviderPassTest extends TestCase
 {
     private ContainerBuilder $container;
-
     private Definition $chainProvider;
-
     private ActivityListProviderPass $compiler;
 
     #[\Override]

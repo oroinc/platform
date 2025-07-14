@@ -9,17 +9,14 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AuditGridImpersonationListenerTest extends \PHPUnit\Framework\TestCase
+class AuditGridImpersonationListenerTest extends TestCase
 {
-    /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagrid;
-
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var AuditGridImpersonationListener */
-    private $listener;
+    private DatagridInterface&MockObject $datagrid;
+    private EntityRepository&MockObject $repository;
+    private AuditGridImpersonationListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -35,13 +32,13 @@ class AuditGridImpersonationListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new AuditGridImpersonationListener($doctrineHelper);
     }
 
-    public function testAddDataSupportNoData()
+    public function testAddDataSupportNoData(): void
     {
         $event = new OrmResultAfter($this->datagrid, []);
         $this->listener->addImpersonationSupport($event);
     }
 
-    public function testAddDataSupportNoIds()
+    public function testAddDataSupportNoIds(): void
     {
         $this->repository->expects($this->never())
             ->method('findBy');
@@ -53,7 +50,7 @@ class AuditGridImpersonationListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($record->getValue('impersonation'));
     }
 
-    public function testAddDataSupportNullIds()
+    public function testAddDataSupportNullIds(): void
     {
         $this->repository->expects($this->never())
             ->method('findBy');
@@ -65,7 +62,7 @@ class AuditGridImpersonationListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($record->getValue('impersonation'));
     }
 
-    public function testAddDataSupportNoImpersonations()
+    public function testAddDataSupportNoImpersonations(): void
     {
         $this->repository->expects($this->once())
             ->method('findBy')
@@ -78,7 +75,7 @@ class AuditGridImpersonationListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($record->getValue('impersonation'));
     }
 
-    public function testAddDataSupportSetImpersonation()
+    public function testAddDataSupportSetImpersonation(): void
     {
         $impersonation = $this->createMock(Impersonation::class);
         $impersonation->expects($this->any())
@@ -97,7 +94,7 @@ class AuditGridImpersonationListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($impersonation->getId(), $record->getValue('impersonation')->getId());
     }
 
-    public function testAddDataSupportSetNoMatchingImpersonation()
+    public function testAddDataSupportSetNoMatchingImpersonation(): void
     {
         $impersonation = $this->createMock(Impersonation::class);
         $impersonation->expects($this->any())
@@ -115,7 +112,7 @@ class AuditGridImpersonationListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($record->getValue('impersonation'));
     }
 
-    public function testAddDataSupportMultipleImpersonations()
+    public function testAddDataSupportMultipleImpersonations(): void
     {
         $impersonation = $this->createMock(Impersonation::class);
         $impersonation->expects($this->any())

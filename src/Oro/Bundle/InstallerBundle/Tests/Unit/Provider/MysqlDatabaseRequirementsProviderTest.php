@@ -12,10 +12,11 @@ use Oro\Bundle\InstallerBundle\Provider\MysqlDatabaseRequirementsProvider;
 use Oro\Component\Testing\Unit\ORM\Mocks\ConnectionMock;
 use Oro\Component\Testing\Unit\ORM\Mocks\DatabasePlatformMock;
 use Oro\Component\Testing\Unit\ORM\Mocks\DriverMock;
+use PHPUnit\Framework\TestCase;
 
-class MysqlDatabaseRequirementsProviderTest extends \PHPUnit\Framework\TestCase
+class MysqlDatabaseRequirementsProviderTest extends TestCase
 {
-    public function testCollectionSize()
+    public function testCollectionSize(): void
     {
         $provider = $this->getProvider($this->getDoctrine($this->getConnection()), []);
 
@@ -27,7 +28,7 @@ class MysqlDatabaseRequirementsProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(2, $collection);
     }
 
-    public function testRequiredVersionFulfilled()
+    public function testRequiredVersionFulfilled(): void
     {
         $provider = $this->getProvider($this->getDoctrine($this->getConnection()), []);
 
@@ -37,7 +38,7 @@ class MysqlDatabaseRequirementsProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($requirement->isFulfilled());
     }
 
-    public function testRequiredVersionNotFulfilled()
+    public function testRequiredVersionNotFulfilled(): void
     {
         $provider = $this->getProvider($this->getDoctrine($this->getConnection('1.0')), []);
 
@@ -47,7 +48,7 @@ class MysqlDatabaseRequirementsProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($requirement->isFulfilled());
     }
 
-    public function testRequiredPrivilegesIsGranted()
+    public function testRequiredPrivilegesIsGranted(): void
     {
         $provider = $this->getProvider($this->getDoctrine($this->getConnection()), $this->getRequiredPrivileges());
 
@@ -57,7 +58,7 @@ class MysqlDatabaseRequirementsProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($requirement->isFulfilled());
     }
 
-    public function testRequiredPrivilegesIsNotGranted()
+    public function testRequiredPrivilegesIsNotGranted(): void
     {
         $provider = $this->getProvider($this->getDoctrine($this->getConnection()), []);
 

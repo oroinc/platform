@@ -345,17 +345,13 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         );
 
         $association41ClassMetadata = $this->getClassMetadataMock('Test\Association41Target');
-        $association41ClassMetadata->expects(self::once())
-            ->method('hasAssociation')
-            ->with('association411')
-            ->willReturn(true);
-        $association41ClassMetadata->expects(self::once())
-            ->method('getAssociationMapping')
-            ->with('association411')
-            ->willReturn([
+        $association41ClassMetadata->fieldMappings = [];
+        $association41ClassMetadata->associationMappings = [
+            'association411' => [
                 'type'         => ClassMetadata::MANY_TO_ONE,
                 'targetEntity' => 'Test\Association411Target'
-            ]);
+            ]
+        ];
 
         $association411ClassMetadata = $this->getClassMetadataMock('Test\Association411Target');
         $association411ClassMetadata->expects(self::once())
@@ -365,9 +361,11 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             ->method('isInheritanceTypeNone')
             ->willReturn(true);
         $association411ClassMetadata->expects(self::once())
-            ->method('getFieldMapping')
+            ->method('getTypeOfField')
             ->with('id')
-            ->willReturn(['type' => 'integer']);
+            ->willReturn('integer');
+        $association411ClassMetadata->fieldMappings = ['id' => ['type' => 'integer']];
+        $association411ClassMetadata->associationMappings = [];
 
         $association411TargetMetadata = new EntityMetadata('Test\Association411Target');
 
@@ -433,18 +431,8 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
 
         $association51ClassMetadata = $this->getClassMetadataMock('Test\Association51Target');
-        $association51ClassMetadata->expects(self::once())
-            ->method('hasAssociation')
-            ->with('field511')
-            ->willReturn(false);
-        $association51ClassMetadata->expects(self::exactly(2))
-            ->method('hasField')
-            ->with('field511')
-            ->willReturn(true);
-        $association51ClassMetadata->expects(self::once())
-            ->method('getFieldMapping')
-            ->with('field511')
-            ->willReturn(['type' => 'string']);
+        $association51ClassMetadata->fieldMappings = ['field511' => ['type' => 'string']];
+        $association51ClassMetadata->associationMappings = [];
 
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
@@ -609,17 +597,13 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         );
 
         $association1ClassMetadata = $this->getClassMetadataMock('Test\Association1Target');
-        $association1ClassMetadata->expects(self::once())
-            ->method('hasAssociation')
-            ->with('realAssociation11')
-            ->willReturn(true);
-        $association1ClassMetadata->expects(self::once())
-            ->method('getAssociationMapping')
-            ->with('realAssociation11')
-            ->willReturn([
+        $association1ClassMetadata->fieldMappings = [];
+        $association1ClassMetadata->associationMappings = [
+            'realAssociation11' => [
                 'type'         => ClassMetadata::MANY_TO_ONE,
                 'targetEntity' => 'Test\Association11Target'
-            ]);
+            ]
+        ];
 
         $association11ClassMetadata = $this->getClassMetadataMock('Test\Association11Target');
         $association11ClassMetadata->expects(self::once())
@@ -629,9 +613,11 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             ->method('isInheritanceTypeNone')
             ->willReturn(true);
         $association11ClassMetadata->expects(self::once())
-            ->method('getFieldMapping')
+            ->method('getTypeOfField')
             ->with('id')
-            ->willReturn(['type' => 'integer']);
+            ->willReturn('integer');
+        $association11ClassMetadata->fieldMappings = ['id' => ['type' => 'integer']];
+        $association11ClassMetadata->associationMappings = [];
 
         $association11TargetMetadata = new EntityMetadata('Test\Association11Target');
 
@@ -728,17 +714,13 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         );
 
         $association1ClassMetadata = $this->getClassMetadataMock('Test\Association1Target');
-        $association1ClassMetadata->expects(self::once())
-            ->method('hasAssociation')
-            ->with('realAssociation11')
-            ->willReturn(true);
-        $association1ClassMetadata->expects(self::once())
-            ->method('getAssociationMapping')
-            ->with('realAssociation11')
-            ->willReturn([
+        $association1ClassMetadata->fieldMappings = [];
+        $association1ClassMetadata->associationMappings = [
+            'realAssociation11' => [
                 'type'         => ClassMetadata::MANY_TO_MANY,
                 'targetEntity' => 'Test\Association11Target'
-            ]);
+            ]
+        ];
 
         $association11ClassMetadata = $this->getClassMetadataMock('Test\Association11Target');
         $association11ClassMetadata->expects(self::once())
@@ -748,9 +730,11 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             ->method('isInheritanceTypeNone')
             ->willReturn(true);
         $association11ClassMetadata->expects(self::once())
-            ->method('getFieldMapping')
+            ->method('getTypeOfField')
             ->with('id')
-            ->willReturn(['type' => 'integer']);
+            ->willReturn('integer');
+        $association11ClassMetadata->fieldMappings = ['id' => ['type' => 'integer']];
+        $association11ClassMetadata->associationMappings = [];
 
         $association11TargetMetadata = new EntityMetadata('Test\Association11Target');
 

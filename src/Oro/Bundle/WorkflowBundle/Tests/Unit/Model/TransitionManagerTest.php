@@ -7,11 +7,12 @@ use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TransitionManagerTest extends \PHPUnit\Framework\TestCase
+class TransitionManagerTest extends TestCase
 {
-    /** @var TransitionManager */
-    private $transitionManager;
+    private TransitionManager $transitionManager;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +20,7 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
         $this->transitionManager = new TransitionManager();
     }
 
-    public function testGetTransitionsEmpty()
+    public function testGetTransitionsEmpty(): void
     {
         $this->assertInstanceOf(
             ArrayCollection::class,
@@ -27,7 +28,7 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTransition()
+    public function testGetTransition(): void
     {
         $transition = $this->getTransitionMock('transition');
 
@@ -43,7 +44,7 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
      * @param array $transitions
      * @param Transition|null $expected
      */
-    public function testGetStartTransition($name, array $transitions, ?Transition $expected = null)
+    public function testGetStartTransition($name, array $transitions, ?Transition $expected = null): void
     {
         $this->transitionManager->setTransitions($transitions);
 
@@ -93,7 +94,7 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSetTransitions()
+    public function testSetTransitions(): void
     {
         $transitionOne = $this->getTransitionMock('transition1');
         $transitionTwo = $this->getTransitionMock('transition2');
@@ -114,13 +115,7 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $transitions->toArray());
     }
 
-    /**
-     * @param string $name
-     * @param bool $isStart
-     * @param Step $step
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getTransitionMock($name, $isStart = false, $step = null)
+    private function getTransitionMock(string $name, bool $isStart = false, ?Step $step = null): Transition&MockObject
     {
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->any())
@@ -140,7 +135,7 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
         return $transition;
     }
 
-    public function testGetStartTransitions()
+    public function testGetStartTransitions(): void
     {
         $allowedStartTransition = $this->getTransitionMock('test_start', true);
         $allowedTransition = $this->getTransitionMock('test', false);
@@ -157,7 +152,7 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->transitionManager->getStartTransitions());
     }
 
-    public function testExtractTransitionException()
+    public function testExtractTransitionException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected transition argument type is string or Transition, but stdClass given');
@@ -166,7 +161,7 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
         $this->transitionManager->extractTransition($transition);
     }
 
-    public function testExtractTransitionStringUnknown()
+    public function testExtractTransitionStringUnknown(): void
     {
         $this->expectException(InvalidTransitionException::class);
         $this->expectExceptionMessage('Transition "test" is not exist in workflow.');
@@ -175,13 +170,13 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
         $this->transitionManager->extractTransition($transition);
     }
 
-    public function testExtractTransition()
+    public function testExtractTransition(): void
     {
         $transition = $this->getTransitionMock('test');
         $this->assertSame($transition, $this->transitionManager->extractTransition($transition));
     }
 
-    public function testExtractTransitionString()
+    public function testExtractTransitionString(): void
     {
         $transitionName = 'test';
         $transition = $this->getTransitionMock($transitionName);
@@ -190,7 +185,7 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($transition, $this->transitionManager->extractTransition($transitionName));
     }
 
-    public function testGetDefaultStartTransition()
+    public function testGetDefaultStartTransition(): void
     {
         $this->assertNull($this->transitionManager->getDefaultStartTransition());
 

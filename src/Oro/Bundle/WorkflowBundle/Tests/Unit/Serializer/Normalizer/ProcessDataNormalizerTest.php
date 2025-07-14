@@ -8,18 +8,15 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessDataNormalizer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Serializer;
 
-class ProcessDataNormalizerTest extends \PHPUnit\Framework\TestCase
+class ProcessDataNormalizerTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var Serializer|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializer;
-
-    /** @var ProcessDataNormalizer */
-    private $normalizer;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private Serializer&MockObject $serializer;
+    private ProcessDataNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,7 @@ class ProcessDataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeDataProvider
      */
-    public function testNormalize(ProcessData $object, array $context)
+    public function testNormalize(ProcessData $object, array $context): void
     {
         $entity = $object['data'];
         $entityId = 1;
@@ -93,8 +90,12 @@ class ProcessDataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeExceptionDataProvider
      */
-    public function testNormalizeException(ProcessData $object, array $context, string $exception, string $message)
-    {
+    public function testNormalizeException(
+        ProcessData $object,
+        array $context,
+        string $exception,
+        string $message
+    ): void {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
         $this->normalizer->normalize($object, 'json', $context);
@@ -118,7 +119,7 @@ class ProcessDataNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $data = ['data' => new \stdClass(), 'old' => 1, 'new' => 2];
         $class = ProcessData::class;
@@ -140,7 +141,7 @@ class ProcessDataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsNormalizationDataProvider
      */
-    public function testSupportsNormalization(mixed $data, bool $expected)
+    public function testSupportsNormalization(mixed $data, bool $expected): void
     {
         $this->assertEquals($expected, $this->normalizer->supportsNormalization($data));
     }
@@ -159,7 +160,7 @@ class ProcessDataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization(string $type, bool $expected)
+    public function testSupportsDenormalization(string $type, bool $expected): void
     {
         $this->assertEquals($expected, $this->normalizer->supportsDenormalization([], $type));
     }

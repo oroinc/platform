@@ -5,14 +5,13 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Tools;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Tools\DatagridParametersHelper;
 use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
+class DatagridParametersHelperTest extends TestCase
 {
-    /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagridParameters;
-
-    /** @var DatagridParametersHelper */
-    private $datagridParametersHelper;
+    private ParameterBag&MockObject $datagridParameters;
+    private DatagridParametersHelper $datagridParametersHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -209,7 +208,7 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testDatagridSkipExtensionParam()
+    public function testDatagridSkipExtensionParam(): void
     {
         $parameterBag = new ParameterBag();
         $this->datagridParametersHelper->setDatagridExtensionSkipped($parameterBag);

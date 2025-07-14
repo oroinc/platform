@@ -6,6 +6,7 @@ use Doctrine\ORM\Configuration as EntityManagerConfiguration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata as EntityClassMetadata;
 use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\ORM\Proxy\ProxyFactory;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadataFactory as EntityClassMetadataFactory;
@@ -17,15 +18,14 @@ use Oro\Bundle\EntityBundle\Tests\Unit\Stub\Entity4;
 use Oro\Bundle\EntityBundle\Tests\Unit\Stub\Entity5;
 use Oro\Bundle\EntityBundle\Tests\Unit\Stub\Proxies\__CG__\Oro\Bundle\EntityBundle\Tests\Unit\Stub\Entity1 as En1Proxy;
 use Oro\Bundle\EntityBundle\Validator\EntityValidationLoader;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class EntityValidationLoaderTest extends \PHPUnit\Framework\TestCase
+class EntityValidationLoaderTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var EntityValidationLoader */
-    private $loader;
+    private ManagerRegistry&MockObject $doctrine;
+    private EntityValidationLoader $loader;
 
     #[\Override]
     protected function setUp(): void
@@ -78,7 +78,7 @@ class EntityValidationLoaderTest extends \PHPUnit\Framework\TestCase
                 Entity4::class,
                 Entity5::class,
                 PersistentCollection::class,
-                \Doctrine\ORM\Proxy\Proxy::class,
+                Proxy::class,
                 \Doctrine\Persistence\Proxy::class,
                 \Doctrine\Common\Proxy\Proxy::class
             ],
@@ -120,7 +120,7 @@ class EntityValidationLoaderTest extends \PHPUnit\Framework\TestCase
                 Entity4::class,
                 Entity5::class,
                 PersistentCollection::class,
-                \Doctrine\ORM\Proxy\Proxy::class,
+                Proxy::class,
                 \Doctrine\Persistence\Proxy::class,
                 \Doctrine\Common\Proxy\Proxy::class
             ],

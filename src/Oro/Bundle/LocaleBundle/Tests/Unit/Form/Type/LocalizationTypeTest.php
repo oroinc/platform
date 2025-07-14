@@ -26,8 +26,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
 
     private const DATA_CLASS = Localization::class;
 
-    /** @var LocalizationType */
-    private $formType;
+    private LocalizationType $formType;
 
     private static array $languages = [
         '0' => 'en',
@@ -114,7 +113,6 @@ class LocalizationTypeTest extends FormIntegrationTestCase
         bool $rtlMode = false,
         ?Localization $parentLocalization = null
     ): Localization {
-        /** @var Localization $localization */
         $localization = $this->getEntity(
             Localization::class,
             [

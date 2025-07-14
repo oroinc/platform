@@ -6,6 +6,8 @@ use Oro\Bundle\DistributionBundle\Event\RouteCollectionEvent;
 use Oro\Bundle\DistributionBundle\Routing\AbstractLoader;
 use Oro\Bundle\DistributionBundle\Routing\SharedData;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -14,19 +16,12 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\RouteCollection;
 
-abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
+abstract class AbstractLoaderTest extends TestCase
 {
-    /** @var KernelInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $kernel;
-
-    /** @var RouteOptionsResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $routeOptionsResolver;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $eventDispatcher;
-
-    /** @var LoaderResolver */
-    protected $loaderResolver;
+    protected KernelInterface&MockObject $kernel;
+    protected RouteOptionsResolverInterface&MockObject $routeOptionsResolver;
+    protected EventDispatcherInterface&MockObject $eventDispatcher;
+    protected LoaderResolver $loaderResolver;
 
     #[\Override]
     protected function setUp(): void
@@ -50,20 +45,24 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
     {
         $dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures';
         $bundle = $this->createMock(BundleInterface::class);
-        $bundle->expects($this->any())->method('getPath')->willReturn($dir);
+        $bundle->expects($this->any())
+            ->method('getPath')
+            ->willReturn($dir);
 
-        $this->kernel->expects($this->once())->method('getBundles')->willReturn([$bundle, $bundle]);
+        $this->kernel->expects($this->once())
+            ->method('getBundles')
+            ->willReturn([$bundle, $bundle]);
 
-        $this->eventDispatcher->expects($this->once())->method('dispatch')->with(
-            $this->callback(
-                function (RouteCollectionEvent $event) use ($expected) {
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                $this->callback(function (RouteCollectionEvent $event) use ($expected) {
                     self::assertEquals($expected, $event->getCollection()->all());
 
                     return true;
-                }
-            ),
-            $this->isType('string')
-        );
+                }),
+                $this->isType('string')
+            );
 
         $routes = $this->getLoader()->load('file', 'type')->all();
         self::assertEquals($expected, $routes);
@@ -72,8 +71,11 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
 
     public function testDispatchEventWithoutEventDispatcher(): void
     {
-        $this->kernel->expects($this->once())->method('getBundles')->willReturn([]);
-        $this->eventDispatcher->expects($this->never())->method('dispatch');
+        $this->kernel->expects($this->once())
+            ->method('getBundles')
+            ->willReturn([]);
+        $this->eventDispatcher->expects($this->never())
+            ->method('dispatch');
         self::assertEquals(
             [],
             $this->getLoaderWithoutEventDispatcher()->load('file', 'type')->all()
@@ -87,8 +89,12 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
     {
         $dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures';
         $bundle = $this->createMock(BundleInterface::class);
-        $bundle->expects($this->any())->method('getPath')->willReturn($dir);
-        $this->kernel->expects($this->once())->method('getBundles')->willReturn([$bundle]);
+        $bundle->expects($this->any())
+            ->method('getPath')
+            ->willReturn($dir);
+        $this->kernel->expects($this->once())
+            ->method('getBundles')
+            ->willReturn([$bundle]);
 
         $cache = $this->getMockBuilder(SharedData::class)
             ->disableOriginalConstructor()
@@ -113,8 +119,12 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
     {
         $dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures';
         $bundle = $this->createMock(BundleInterface::class);
-        $bundle->expects($this->any())->method('getPath')->willReturn($dir);
-        $this->kernel->expects($this->once())->method('getBundles')->willReturn([$bundle]);
+        $bundle->expects($this->any())
+            ->method('getPath')
+            ->willReturn($dir);
+        $this->kernel->expects($this->once())
+            ->method('getBundles')
+            ->willReturn([$bundle]);
 
         $cache = $this->getMockBuilder(SharedData::class)
             ->disableOriginalConstructor()

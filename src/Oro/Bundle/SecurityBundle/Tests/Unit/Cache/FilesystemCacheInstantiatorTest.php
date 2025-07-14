@@ -4,8 +4,9 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Cache;
 
 use Oro\Bundle\SecurityBundle\Cache\FilesystemCacheInstantiator;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class FilesystemCacheInstantiatorTest extends \PHPUnit\Framework\TestCase
+class FilesystemCacheInstantiatorTest extends TestCase
 {
     use TempDirExtension;
 

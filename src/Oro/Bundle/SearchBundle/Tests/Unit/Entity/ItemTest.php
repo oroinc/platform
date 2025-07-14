@@ -8,11 +8,12 @@ use Oro\Bundle\SearchBundle\Entity\IndexDecimal;
 use Oro\Bundle\SearchBundle\Entity\IndexInteger;
 use Oro\Bundle\SearchBundle\Entity\IndexText;
 use Oro\Bundle\SearchBundle\Entity\Item;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ItemTest extends \PHPUnit\Framework\TestCase
+class ItemTest extends TestCase
 {
     private Item $item;
 
@@ -22,54 +23,54 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $this->item = new Item();
     }
 
-    public function testRecordId()
+    public function testRecordId(): void
     {
         $this->assertNull($this->item->getRecordId());
         $this->item->setRecordId(2);
         $this->assertEquals(2, $this->item->getRecordId());
     }
 
-    public function testChanged()
+    public function testChanged(): void
     {
         $this->assertEquals(false, $this->item->getChanged());
         $this->item->setChanged(true);
         $this->assertEquals(true, $this->item->getChanged());
     }
 
-    public function testCreatedAt()
+    public function testCreatedAt(): void
     {
         $this->assertNull($this->item->getCreatedAt());
         $this->item->setCreatedAt(new \DateTime('2013-01-01'));
         $this->assertEquals('2013-01-01', $this->item->getCreatedAt()->format('Y-m-d'));
     }
 
-    public function testUpdatedAt()
+    public function testUpdatedAt(): void
     {
         $this->assertNull($this->item->getUpdatedAt());
         $this->item->setUpdatedAt(new \DateTime('2013-01-01'));
         $this->assertEquals('2013-01-01', $this->item->getUpdatedAt()->format('Y-m-d'));
     }
 
-    public function testAlias()
+    public function testAlias(): void
     {
         $this->assertNull($this->item->getAlias());
         $this->item->setAlias('test alias');
         $this->assertEquals('test alias', $this->item->getAlias());
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertNull($this->item->getId());
     }
 
-    public function testEntity()
+    public function testEntity(): void
     {
         $this->assertNull($this->item->getEntity());
         $this->item->setEntity('test entity');
         $this->assertEquals('test entity', $this->item->getEntity());
     }
 
-    public function testIntegerField()
+    public function testIntegerField(): void
     {
         $fields = $this->item->getIntegerFields();
         $this->assertEquals(0, $fields->count());
@@ -82,7 +83,7 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $fields->count());
     }
 
-    public function testTextField()
+    public function testTextField(): void
     {
         $fields = $this->item->getTextFields();
         $this->assertEquals(0, $fields->count());
@@ -98,7 +99,7 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $fields->count());
     }
 
-    public function testDatetimeField()
+    public function testDatetimeField(): void
     {
         $fields = $this->item->getDatetimeFields();
         $this->assertEquals(0, $fields->count());
@@ -111,7 +112,7 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $fields->count());
     }
 
-    public function testDecimalField()
+    public function testDecimalField(): void
     {
         $fields = $this->item->getDecimalFields();
         $this->assertEquals(0, $fields->count());
@@ -124,7 +125,7 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $fields->count());
     }
 
-    public function testBeforeSave()
+    public function testBeforeSave(): void
     {
         $this->item->beforeSave();
         $date = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -134,7 +135,7 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($date->format('Y-m-d'), $updatedAt->format('Y-m-d'));
     }
 
-    public function testBeforeUpdate()
+    public function testBeforeUpdate(): void
     {
         $this->item->beforeUpdate();
         $date = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -142,7 +143,7 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($date->format('Y-m-d'), $updatedAt->format('Y-m-d'));
     }
 
-    public function testSaveItemData()
+    public function testSaveItemData(): void
     {
         $this->item->saveItemData(
             [
@@ -188,7 +189,7 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(5, $integerFields->get(3)->getValue());
     }
 
-    public function testSetGetWeight()
+    public function testSetGetWeight(): void
     {
         self::assertEquals(1.0, $this->item->getWeight());
 

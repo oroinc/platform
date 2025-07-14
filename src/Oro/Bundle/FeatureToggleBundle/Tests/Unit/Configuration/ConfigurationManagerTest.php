@@ -4,17 +4,16 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
+class ConfigurationManagerTest extends TestCase
 {
-    /** @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurationProvider;
-
-    /** @var ConfigurationManager */
-    private $configurationManager;
+    private ConfigurationProvider&MockObject $configurationProvider;
+    private ConfigurationManager $configurationManager;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
         $this->configurationManager = new ConfigurationManager($this->configurationProvider);
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $value = 'value';
 
@@ -35,7 +34,7 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($value, $this->configurationManager->get('feature', 'node', 'default'));
     }
 
-    public function testGetDefault()
+    public function testGetDefault(): void
     {
         $default = 'default';
 
@@ -46,7 +45,7 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($default, $this->configurationManager->get('feature', 'node', $default));
     }
 
-    public function testGetDefaultWhenFeatureValueIsNull()
+    public function testGetDefaultWhenFeatureValueIsNull(): void
     {
         $this->configurationProvider->expects($this->once())
             ->method('getFeaturesConfiguration')
@@ -55,7 +54,7 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->configurationManager->get('feature', 'node', 'default'));
     }
 
-    public function testGetFeaturesByResource()
+    public function testGetFeaturesByResource(): void
     {
         $resourceType = 'testType';
         $resource = 'testResource';
@@ -68,7 +67,7 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($features, $this->configurationManager->getFeaturesByResource($resourceType, $resource));
     }
 
-    public function testGetFeaturesByResourceWhenTheyDoesNotSet()
+    public function testGetFeaturesByResourceWhenTheyDoesNotSet(): void
     {
         $this->configurationProvider->expects($this->once())
             ->method('getResourcesConfiguration')
@@ -77,7 +76,7 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $this->configurationManager->getFeaturesByResource('testType', 'testResource'));
     }
 
-    public function testGetFeatureDependencies()
+    public function testGetFeatureDependencies(): void
     {
         $feature = 'feature3';
         $dependsOn = ['feature1', 'feature2'];
@@ -89,7 +88,7 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($dependsOn, $this->configurationManager->getFeatureDependencies($feature));
     }
 
-    public function testGetFeatureDependenciesWhenTheyDoesNotSet()
+    public function testGetFeatureDependenciesWhenTheyDoesNotSet(): void
     {
         $this->configurationProvider->expects($this->once())
             ->method('getDependenciesConfiguration')
@@ -98,7 +97,7 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $this->configurationManager->getFeatureDependencies('feature'));
     }
 
-    public function testGetFeatureDependents()
+    public function testGetFeatureDependents(): void
     {
         $feature = 'feature1';
         $dependents = ['feature2', 'feature3'];
@@ -110,7 +109,7 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($dependents, $this->configurationManager->getFeatureDependents($feature));
     }
 
-    public function testGetFeatureDependentsWhenTheyDoesNotSet()
+    public function testGetFeatureDependentsWhenTheyDoesNotSet(): void
     {
         $this->configurationProvider->expects($this->once())
             ->method('getDependentsConfiguration')
@@ -119,7 +118,7 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $this->configurationManager->getFeatureDependents('feature'));
     }
 
-    public function testGetFeatureByToggle()
+    public function testGetFeatureByToggle(): void
     {
         $this->configurationProvider->expects($this->once())
             ->method('getTogglesConfiguration')
@@ -128,7 +127,7 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('feature1', $this->configurationManager->getFeatureByToggle('toggle1'));
     }
 
-    public function testGetFeatureByToggleWhenItDoesNotSet()
+    public function testGetFeatureByToggleWhenItDoesNotSet(): void
     {
         $this->configurationProvider->expects($this->once())
             ->method('getTogglesConfiguration')
@@ -140,7 +139,7 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getResourcesByTypeProvider
      */
-    public function testGetResourcesByType(string $resourceType, array $configuration, array $expectedResources)
+    public function testGetResourcesByType(string $resourceType, array $configuration, array $expectedResources): void
     {
         $this->configurationProvider->expects($this->once())
             ->method('getResourcesConfiguration')

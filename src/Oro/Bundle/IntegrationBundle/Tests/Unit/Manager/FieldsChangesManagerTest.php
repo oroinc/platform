@@ -7,22 +7,17 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\IntegrationBundle\Entity\FieldsChanges;
 use Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FieldsChangesManagerTest extends \PHPUnit\Framework\TestCase
+class FieldsChangesManagerTest extends TestCase
 {
     private const CLASS_NAME = \stdClass::class;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repo;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var FieldsChangesManager */
-    private $manager;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityRepository&MockObject $repo;
+    private EntityManager&MockObject $em;
+    private FieldsChangesManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -53,7 +48,7 @@ class FieldsChangesManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getChangesDataProvider
      */
-    public function testGetChanges(?FieldsChanges $fieldsChanges, array $expected, bool $doRemove)
+    public function testGetChanges(?FieldsChanges $fieldsChanges, array $expected, bool $doRemove): void
     {
         if ($fieldsChanges) {
             $this->repo->expects($this->any())
@@ -102,7 +97,7 @@ class FieldsChangesManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setChangesDataProvider
      */
-    public function testSetChanges(?FieldsChanges $fieldsChanges, array $expected)
+    public function testSetChanges(?FieldsChanges $fieldsChanges, array $expected): void
     {
         $entity = new \stdClass();
         $this->repo->expects($this->any())
@@ -127,7 +122,7 @@ class FieldsChangesManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testRemoveChanges()
+    public function testRemoveChanges(): void
     {
         $entity = new \stdClass();
         $fieldsChanges = new FieldsChanges([]);

@@ -8,17 +8,14 @@ use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\EmailRecipientsProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
+class EmailRecipientsProviderTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var EmailRecipientsHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailRecipientsHelper;
-
-    /** @var EmailRecipientsProvider */
-    private $emailRecipientsProvider;
+    private ManagerRegistry&MockObject $doctrine;
+    private EmailRecipientsHelper&MockObject $emailRecipientsHelper;
+    private EmailRecipientsProvider $emailRecipientsProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +32,7 @@ class EmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testGetRecipients(EmailRecipientsProviderArgs $args, array $recipients)
+    public function testGetRecipients(EmailRecipientsProviderArgs $args, array $recipients): void
     {
         $userRepository = $this->createMock(UserRepository::class);
 

@@ -15,23 +15,16 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DeleteMassActionExtensionTest extends \PHPUnit\Framework\TestCase
+class DeleteMassActionExtensionTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassResolver;
-
-    /** @var OperationRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var ContextHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextHelper;
-
-    /** @var DeleteMassActionExtension */
-    private $extension;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityClassResolver&MockObject $entityClassResolver;
+    private OperationRegistry&MockObject $registry;
+    private ContextHelper&MockObject $contextHelper;
+    private DeleteMassActionExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -50,7 +43,7 @@ class DeleteMassActionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->setParameters(new ParameterBag());
     }
 
-    public function testSetGroups()
+    public function testSetGroups(): void
     {
         $data = ['test_group'];
 
@@ -62,7 +55,7 @@ class DeleteMassActionExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isApplicableDataProvider
      */
-    public function testIsApplicable(ActionData $actionData, ?Operation $operation = null, bool $expected = false)
+    public function testIsApplicable(ActionData $actionData, ?Operation $operation = null, bool $expected = false): void
     {
         $this->registry->expects($this->once())
             ->method('findByName')

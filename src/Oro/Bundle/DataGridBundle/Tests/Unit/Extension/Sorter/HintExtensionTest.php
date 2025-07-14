@@ -6,11 +6,11 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\HintExtension;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
+use PHPUnit\Framework\TestCase;
 
-class HintExtensionTest extends \PHPUnit\Framework\TestCase
+class HintExtensionTest extends TestCase
 {
-    /** @var HintExtension */
-    private $extension;
+    private HintExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -25,24 +25,24 @@ class HintExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->setParameters(new ParameterBag());
     }
 
-    public function testGetPriority()
+    public function testGetPriority(): void
     {
         self::assertSame(-261, $this->extension->getPriority());
     }
 
-    public function testIsApplicableForNotOrmDatasource()
+    public function testIsApplicableForNotOrmDatasource(): void
     {
         $config = DatagridConfiguration::create(['source' => ['type' => 'other']]);
         self::assertFalse($this->extension->isApplicable($config));
     }
 
-    public function testIsApplicableForOrmDatasource()
+    public function testIsApplicableForOrmDatasource(): void
     {
         $config = DatagridConfiguration::create(['source' => ['type' => 'orm']]);
         self::assertTrue($this->extension->isApplicable($config));
     }
 
-    public function testProcessConfigsWhenNoPreciseOrderByHint()
+    public function testProcessConfigsWhenNoPreciseOrderByHint(): void
     {
         $config = DatagridConfiguration::create([]);
         $this->extension->processConfigs($config);
@@ -52,7 +52,7 @@ class HintExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessConfigsWhenPreciseOrderByHintAlreadyExists()
+    public function testProcessConfigsWhenPreciseOrderByHintAlreadyExists(): void
     {
         $config = DatagridConfiguration::create(['source' => ['hints' => ['HINT_PRECISE_ORDER_BY']]]);
         $this->extension->processConfigs($config);
@@ -62,7 +62,7 @@ class HintExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessConfigsWhenPreciseOrderByHintAlreadyExistsAndWasAddedByItsName()
+    public function testProcessConfigsWhenPreciseOrderByHintAlreadyExistsAndWasAddedByItsName(): void
     {
         $config = DatagridConfiguration::create(['source' => ['hints' => ['oro_entity.precise_order_by']]]);
         $this->extension->processConfigs($config);
@@ -72,7 +72,7 @@ class HintExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessConfigsWhenPreciseOrderByHintAlreadyExistsFullDeclaration()
+    public function testProcessConfigsWhenPreciseOrderByHintAlreadyExistsFullDeclaration(): void
     {
         $config = DatagridConfiguration::create(
             ['source' => ['hints' => [['name' => 'HINT_PRECISE_ORDER_BY', 'value' => true]]]]
@@ -84,7 +84,7 @@ class HintExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessConfigsWhenPreciseOrderByHintAlreadyExistsFullDeclarationAndWasAddedByItsName()
+    public function testProcessConfigsWhenPreciseOrderByHintAlreadyExistsFullDeclarationAndWasAddedByItsName(): void
     {
         $config = DatagridConfiguration::create(
             ['source' => ['hints' => [['name' => 'oro_entity.precise_order_by', 'value' => true]]]]
@@ -96,7 +96,7 @@ class HintExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessConfigsWhenPreciseOrderByHintDisabled()
+    public function testProcessConfigsWhenPreciseOrderByHintDisabled(): void
     {
         $config = DatagridConfiguration::create(
             ['source' => ['hints' => [['name' => 'HINT_PRECISE_ORDER_BY', 'value' => false]]]]
@@ -108,7 +108,7 @@ class HintExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessConfigsWhenPreciseOrderByHintDisabledByItsName()
+    public function testProcessConfigsWhenPreciseOrderByHintDisabledByItsName(): void
     {
         $config = DatagridConfiguration::create(
             ['source' => ['hints' => [['name' => 'oro_entity.precise_order_by', 'value' => false]]]]

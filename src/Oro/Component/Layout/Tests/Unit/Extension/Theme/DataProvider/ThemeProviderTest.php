@@ -8,30 +8,21 @@ use Oro\Bundle\LocaleBundle\Provider\LocalizationProviderInterface;
 use Oro\Component\Layout\Extension\Theme\DataProvider\ThemeProvider;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class ThemeProviderTest extends \PHPUnit\Framework\TestCase
+class ThemeProviderTest extends TestCase
 {
-    /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $themeManager;
-
-    /** @var LocalizationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationProvider;
-
-    /** @var ThemeProvider */
-    private $provider;
-
-    /** @var PublicDirectoryProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $publicDirectoryProvider;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
+    private ThemeManager&MockObject $themeManager;
+    private LocalizationProviderInterface&MockObject $localizationProvider;
+    private ThemeProvider $provider;
+    private PublicDirectoryProvider&MockObject $publicDirectoryProvider;
+    private LoggerInterface&MockObject $logger;
 
     #[\Override]
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->themeManager = $this->createMock(ThemeManager::class);
         $this->localizationProvider = $this->createMock(LocalizationProviderInterface::class);
         $this->publicDirectoryProvider = $this->createMock(PublicDirectoryProvider::class);
@@ -54,6 +45,7 @@ class ThemeProviderTest extends \PHPUnit\Framework\TestCase
         mkdir($this->publicDirectory, 0777, true);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         if (is_dir($this->publicDirectory)) {
@@ -64,7 +56,7 @@ class ThemeProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetIcon(): void
     {
         $themeName = 'test';
-        $theme     = new Theme($themeName);
+        $theme = new Theme($themeName);
         $theme->setIcon('path/to/icon');
 
         $this->themeManager->expects(self::once())
@@ -94,7 +86,7 @@ class ThemeProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetStylesOutput(): void
     {
         $themeName = 'test';
-        $theme     = new Theme($themeName);
+        $theme = new Theme($themeName);
         $theme->setConfig([
             'assets' => [
                 'styles' => [
@@ -126,7 +118,7 @@ class ThemeProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetStylesOutputNull(): void
     {
         $themeName = 'test';
-        $theme     = new Theme($themeName);
+        $theme = new Theme($themeName);
 
         $this->themeManager->expects(self::once())
             ->method('getTheme')
@@ -308,7 +300,7 @@ class ThemeProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->createFileWithContent($filePath, $fileContent);
 
-        $this->publicDirectoryProvider
+        $this->publicDirectoryProvider->expects(self::any())
             ->method('getPublicDirectory')
             ->willReturn($this->publicDirectory);
 
@@ -333,7 +325,7 @@ class ThemeProviderTest extends \PHPUnit\Framework\TestCase
 
         $filePath = $this->publicDirectory . '/build/' . $themeName . '/' . $outputPath;
 
-        $this->publicDirectoryProvider
+        $this->publicDirectoryProvider->expects(self::any())
             ->method('getPublicDirectory')
             ->willReturn($this->publicDirectory);
 
@@ -367,7 +359,7 @@ class ThemeProviderTest extends \PHPUnit\Framework\TestCase
         $themeName = 'test';
         $sectionName = 'styles';
 
-        $this->publicDirectoryProvider
+        $this->publicDirectoryProvider->expects(self::any())
             ->method('getPublicDirectory')
             ->willReturn($this->publicDirectory);
 

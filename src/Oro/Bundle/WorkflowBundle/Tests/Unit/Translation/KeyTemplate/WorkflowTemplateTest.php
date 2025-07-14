@@ -12,34 +12,34 @@ class WorkflowTemplateTest extends TemplateTestCase
         return new WorkflowTemplate();
     }
 
-    public function testRootConst()
+    public function testRootConst(): void
     {
         $this->assertEquals('oro.workflow', WorkflowTemplate::KEY_PREFIX);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertName(WorkflowTemplate::NAME);
     }
 
     #[\Override]
-    public function testGetTemplate()
+    public function testGetTemplate(): void
     {
         $this->assertTemplate('oro.workflow.{{ workflow_name }}');
     }
 
     #[\Override]
-    public function testGetRequiredKeys()
+    public function testGetRequiredKeys(): void
     {
         $this->assertRequiredKeys(['workflow_name']);
     }
 
-    public function testGetKeyTemplate()
+    public function testGetKeyTemplate(): void
     {
         $this->assertEquals('{{ attr1 }}', $this->getTemplateInstance()->getKeyTemplate('attr1'));
     }
 
-    public function testGetKeyTemplates()
+    public function testGetKeyTemplates(): void
     {
         $this->assertKeyTemplates(['workflow_name' => '{{ workflow_name }}']);
     }

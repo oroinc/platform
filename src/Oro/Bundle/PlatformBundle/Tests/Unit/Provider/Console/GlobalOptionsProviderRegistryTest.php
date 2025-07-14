@@ -4,19 +4,16 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\Provider\Console;
 
 use Oro\Bundle\PlatformBundle\Provider\Console\GlobalOptionsProviderInterface;
 use Oro\Bundle\PlatformBundle\Provider\Console\GlobalOptionsProviderRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 
-class GlobalOptionsProviderRegistryTest extends \PHPUnit\Framework\TestCase
+class GlobalOptionsProviderRegistryTest extends TestCase
 {
-    /** @var GlobalOptionsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $firstProvider;
-
-    /** @var GlobalOptionsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $secondProvider;
-
-    /** @var GlobalOptionsProviderRegistry */
-    private $registry;
+    private GlobalOptionsProviderInterface&MockObject $firstProvider;
+    private GlobalOptionsProviderInterface&MockObject $secondProvider;
+    private GlobalOptionsProviderRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +26,7 @@ class GlobalOptionsProviderRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddGlobalOptions()
+    public function testAddGlobalOptions(): void
     {
         $command = $this->createMock(Command::class);
 
@@ -43,7 +40,7 @@ class GlobalOptionsProviderRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->addGlobalOptions($command);
     }
 
-    public function testResolveGlobalOptions()
+    public function testResolveGlobalOptions(): void
     {
         $input = $this->createMock(InputInterface::class);
 

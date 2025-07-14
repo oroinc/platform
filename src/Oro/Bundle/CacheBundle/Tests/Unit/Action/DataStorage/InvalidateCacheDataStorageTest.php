@@ -3,10 +3,11 @@
 namespace Oro\Bundle\CacheBundle\Tests\Unit\Action\DataStorage;
 
 use Oro\Bundle\CacheBundle\Action\DataStorage\InvalidateCacheDataStorage;
+use PHPUnit\Framework\TestCase;
 
-class InvalidateCacheDataStorageTest extends \PHPUnit\Framework\TestCase
+class InvalidateCacheDataStorageTest extends TestCase
 {
-    public function testCompiles()
+    public function testCompiles(): void
     {
         $storage = new InvalidateCacheDataStorage();
 

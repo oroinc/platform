@@ -9,20 +9,15 @@ use Oro\Bundle\CacheBundle\Action\Transformer\DateTimeToStringTransformerInterfa
 use Oro\Bundle\CacheBundle\Command\InvalidateCacheScheduleCommand;
 use Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager;
 use Oro\Bundle\CronBundle\Entity\Schedule;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class InvalidateCacheTimeProviderTest extends \PHPUnit\Framework\TestCase
+class InvalidateCacheTimeProviderTest extends TestCase
 {
-    /** @var InvalidateCacheScheduleArgumentsBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $scheduleArgsBuilder;
-
-    /** @var ScheduleManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $scheduleManager;
-
-    /** @var DateTimeToStringTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cronFormatTransformer;
-
-    /** @var InvalidateCacheTimeProvider */
-    private $provider;
+    private InvalidateCacheScheduleArgumentsBuilderInterface&MockObject $scheduleArgsBuilder;
+    private ScheduleManager&MockObject $scheduleManager;
+    private DateTimeToStringTransformerInterface&MockObject $cronFormatTransformer;
+    private InvalidateCacheTimeProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +33,7 @@ class InvalidateCacheTimeProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetByDataStorage()
+    public function testGetByDataStorage(): void
     {
         $args = ['1', '2'];
         $schedule = new Schedule();
@@ -63,7 +58,7 @@ class InvalidateCacheTimeProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetByDataStorageForNoSchedule()
+    public function testGetByDataStorageForNoSchedule(): void
     {
         $args = ['1', '2'];
 

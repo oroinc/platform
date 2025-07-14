@@ -13,17 +13,16 @@ use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvide
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\IndexEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
+class IndexEntityConfigDumperExtensionTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var IndexEntityConfigDumperExtension */
-    private $extension;
+    private ConfigManager&MockObject $configManager;
+    private IndexEntityConfigDumperExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -41,21 +40,21 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSupportsPreUpdate()
+    public function testSupportsPreUpdate(): void
     {
         $this->assertTrue(
             $this->extension->supports(ExtendConfigDumper::ACTION_PRE_UPDATE)
         );
     }
 
-    public function testSupportsPostUpdate()
+    public function testSupportsPostUpdate(): void
     {
         $this->assertFalse(
             $this->extension->supports(ExtendConfigDumper::ACTION_POST_UPDATE)
         );
     }
 
-    public function testPreUpdateForNotExtendEntity()
+    public function testPreUpdateForNotExtendEntity(): void
     {
         $config = new Config(new EntityConfigId('extend', 'Test\Entity'));
         $config->set('index', ['field1' => true]);
@@ -76,7 +75,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->preUpdate();
     }
 
-    public function testPreUpdateForEntityWithIsExtendAndFieldWithExtendButInvisibleInGrid()
+    public function testPreUpdateForEntityWithIsExtendAndFieldWithExtendButInvisibleInGrid(): void
     {
         $config = new Config(new EntityConfigId('extend', 'Test\Entity'));
         $config->set('is_extend', true);
@@ -114,7 +113,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->preUpdate();
     }
 
-    public function testPreUpdateForEntityWithIsExtendAndNotExtendField()
+    public function testPreUpdateForEntityWithIsExtendAndNotExtendField(): void
     {
         $config = new Config(new EntityConfigId('extend', 'Test\Entity'));
         $config->set('is_extend', true);
@@ -147,7 +146,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->preUpdate();
     }
 
-    public function testPreUpdateForEntityWithExtendAndFieldWithExtendButInvisibleInGrid()
+    public function testPreUpdateForEntityWithExtendAndFieldWithExtendButInvisibleInGrid(): void
     {
         $config = new Config(new EntityConfigId('extend', 'Test\Entity'));
         $config->set('is_extend', true);
@@ -185,7 +184,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->preUpdate();
     }
 
-    public function testPreUpdateForNewIndexedField()
+    public function testPreUpdateForNewIndexedField(): void
     {
         $config = new Config(new EntityConfigId('extend', 'Test\Entity'));
         $config->set('is_extend', true);
@@ -266,7 +265,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider preUpdateForRelationsProvider
      */
-    public function testPreUpdateForRelations(string $fieldType)
+    public function testPreUpdateForRelations(string $fieldType): void
     {
         $config = new Config(new EntityConfigId('extend', 'Test\Entity'));
         $config->set('is_extend', true);
@@ -308,7 +307,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testPreUpdateForRemoveIndexedField()
+    public function testPreUpdateForRemoveIndexedField(): void
     {
         $config = new Config(new EntityConfigId('extend', 'Test\Entity'));
         $config->set('is_extend', true);
@@ -360,7 +359,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPreUpdateForNoChanges()
+    public function testPreUpdateForNoChanges(): void
     {
         $config = new Config(new EntityConfigId('extend', 'Test\Entity1'));
         $config->set('is_extend', true);

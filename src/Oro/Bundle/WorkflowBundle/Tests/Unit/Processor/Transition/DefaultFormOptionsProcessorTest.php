@@ -6,11 +6,11 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFormOptionsProcessor;
+use PHPUnit\Framework\TestCase;
 
-class DefaultFormOptionsProcessorTest extends \PHPUnit\Framework\TestCase
+class DefaultFormOptionsProcessorTest extends TestCase
 {
-    /** @var DefaultFormOptionsProcessor */
-    private $processor;
+    private DefaultFormOptionsProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class DefaultFormOptionsProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new DefaultFormOptionsProcessor();
     }
 
-    public function testSkipCustomForm()
+    public function testSkipCustomForm(): void
     {
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())
@@ -35,7 +35,7 @@ class DefaultFormOptionsProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testFormOptionsFill()
+    public function testFormOptionsFill(): void
     {
         $formData = (object)['id' => 42];
 

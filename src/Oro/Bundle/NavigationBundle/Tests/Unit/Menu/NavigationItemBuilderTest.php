@@ -8,22 +8,17 @@ use Oro\Bundle\NavigationBundle\Provider\NavigationItemsProviderInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class NavigationItemBuilderTest extends \PHPUnit\Framework\TestCase
+class NavigationItemBuilderTest extends TestCase
 {
     private const ITEM_TYPE = 'favorite';
 
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var NavigationItemsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $navigationItemsProvider;
-
-    /** @var KnpItemInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $menu;
-
-    /** @var NavigationItemBuilder */
-    private $builder;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private NavigationItemsProviderInterface&MockObject $navigationItemsProvider;
+    private KnpItemInterface&MockObject $menu;
+    private NavigationItemBuilder $builder;
 
     #[\Override]
     protected function setUp(): void

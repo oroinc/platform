@@ -5,14 +5,13 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Datagrid;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Datagrid\ActionChecker;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ActionCheckerTest extends \PHPUnit\Framework\TestCase
+class ActionCheckerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
-    private $tokenAccessor;
-
-    /** @var ActionChecker */
-    private $actionChecker;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private ActionChecker $actionChecker;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class ActionCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider actionCheckDataProvider
      */
-    public function testCheckActions($current, $row, $result)
+    public function testCheckActions($current, $row, $result): void
     {
         $resultRecord = $this->createMock(ResultRecordInterface::class);
 

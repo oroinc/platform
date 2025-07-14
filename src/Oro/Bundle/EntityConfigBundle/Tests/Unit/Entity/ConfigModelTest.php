@@ -7,8 +7,9 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use PHPUnit\Framework\TestCase;
 
-class ConfigModelTest extends \PHPUnit\Framework\TestCase
+class ConfigModelTest extends TestCase
 {
     private const TEST_CLASS = 'Oro\Bundle\TestBundle\Entity\TestEntity';
     private const TEST_MODULE = 'OroTestBundle';
@@ -17,7 +18,7 @@ class ConfigModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider modelProvider
      */
-    public function testBaseProperties(ConfigModel $model)
+    public function testBaseProperties(ConfigModel $model): void
     {
         // test get/set mode
         $this->assertEquals(ConfigModel::MODE_DEFAULT, $model->getMode());
@@ -35,9 +36,9 @@ class ConfigModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('2013-01-01', $model->getUpdated()->format('Y-m-d'));
     }
 
-    public function testEntityConfigModel()
+    public function testEntityConfigModel(): void
     {
-        $className   = 'Test\TestClass';
+        $className = 'Test\TestClass';
         $entityModel = new EntityConfigModel($className);
 
         $this->assertEmpty($entityModel->getId());
@@ -48,7 +49,7 @@ class ConfigModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($className1, $entityModel->getClassName());
     }
 
-    public function testFieldsCollectionOfEntityConfigModel()
+    public function testFieldsCollectionOfEntityConfigModel(): void
     {
         $entityModel = new EntityConfigModel();
         $this->assertCount(0, $entityModel->getFields());
@@ -80,10 +81,10 @@ class ConfigModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($fieldModel1, $fields->first());
     }
 
-    public function testFieldConfigModel()
+    public function testFieldConfigModel(): void
     {
-        $fieldName   = 'testField';
-        $fieldType   = 'integer';
+        $fieldName = 'testField';
+        $fieldType = 'integer';
         $entityModel = new EntityConfigModel('Test\TestClass');
 
         $fieldModel = new FieldConfigModel($fieldName, $fieldType);
@@ -105,9 +106,9 @@ class ConfigModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider modelProvider
      */
-    public function testFromArrayAndToArray(ConfigModel $model)
+    public function testFromArrayAndToArray(ConfigModel $model): void
     {
-        $values  = [
+        $values = [
             'is_searchable' => true,
             'is_sortable'   => false,
             'doctrine'      => [
@@ -157,9 +158,9 @@ class ConfigModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider modelProvider
      */
-    public function testFromArray(ConfigModel $model)
+    public function testFromArray(ConfigModel $model): void
     {
-        $values  = [
+        $values = [
             'value1'   => 1,
             'value2'   => 2,
             'indexed1' => 3,

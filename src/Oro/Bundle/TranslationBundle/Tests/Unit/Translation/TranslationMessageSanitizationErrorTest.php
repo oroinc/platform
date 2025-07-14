@@ -3,10 +3,11 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
 use Oro\Bundle\TranslationBundle\Translation\TranslationMessageSanitizationError;
+use PHPUnit\Framework\TestCase;
 
-class TranslationMessageSanitizationErrorTest extends \PHPUnit\Framework\TestCase
+class TranslationMessageSanitizationErrorTest extends TestCase
 {
-    public function testGetters()
+    public function testGetters(): void
     {
         $error = new TranslationMessageSanitizationError('en', 'messages', 'key1', 'message1', 'sanitized message 1');
         $this->assertEquals('en', $error->getLocale());

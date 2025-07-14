@@ -7,14 +7,13 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\StartHandleProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class StartHandleProcessorTest extends \PHPUnit\Framework\TestCase
+class StartHandleProcessorTest extends TestCase
 {
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var StartHandleProcessor */
-    private $processor;
+    private WorkflowManager&MockObject $workflowManager;
+    private StartHandleProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class StartHandleProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new StartHandleProcessor($this->workflowManager);
     }
 
-    public function testHandling()
+    public function testHandling(): void
     {
         $entity = (object)['id' => 42];
 
@@ -56,7 +55,7 @@ class StartHandleProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testErrorProcessing()
+    public function testErrorProcessing(): void
     {
         $entity = (object)['id' => 42];
 
@@ -91,7 +90,7 @@ class StartHandleProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('normalize', $context->getFirstGroup());
     }
 
-    public function testSkipNotSavedForm()
+    public function testSkipNotSavedForm(): void
     {
         $context = new TransitionContext();
         $this->assertFalse($context->isSaved(), 'Context must be not saved by default');
@@ -100,7 +99,7 @@ class StartHandleProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testSkipContextWithFailures()
+    public function testSkipContextWithFailures(): void
     {
         $context = new TransitionContext();
         $context->setSaved(true);

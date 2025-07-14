@@ -8,18 +8,15 @@ use Knp\Menu\MenuItem;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\EventListener\NavigationListener;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class NavigationListenerTest extends \PHPUnit\Framework\TestCase
+class NavigationListenerTest extends TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var NavigationListener */
-    private $navigationListener;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private NavigationListener $navigationListener;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +30,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDisplayIsSet()
+    public function testDisplayIsSet(): void
     {
         $item = $this->createMock(ItemInterface::class);
         $menu = $this->createMock(ItemInterface::class);
@@ -62,7 +59,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider displayIsNotSetProvider
      */
-    public function testDisplayIsNotSet(?ItemInterface $item, bool $hasUser, bool $isGranted)
+    public function testDisplayIsNotSet(?ItemInterface $item, bool $hasUser, bool $isGranted): void
     {
         $menu = $this->createMock(ItemInterface::class);
         $event = $this->createMock(ConfigureMenuEvent::class);
@@ -107,7 +104,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testOnNavigationConfigureWithoutToken()
+    public function testOnNavigationConfigureWithoutToken(): void
     {
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
@@ -117,7 +114,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
             ->method('isGranted');
 
         $factory = new MenuFactory();
-        $menu  = new MenuItem('parent_item', $factory);
+        $menu = new MenuItem('parent_item', $factory);
         $menuListItem = new MenuItem('menu_list_default', $factory);
         $menu->addChild($menuListItem);
 
@@ -126,7 +123,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($menuListItem->isDisplayed());
     }
 
-    public function testOnNavigationConfigureWhenOroConfigSystemIsNotGranted()
+    public function testOnNavigationConfigureWhenOroConfigSystemIsNotGranted(): void
     {
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
@@ -140,7 +137,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $factory = new MenuFactory();
-        $menu  = new MenuItem('parent_item', $factory);
+        $menu = new MenuItem('parent_item', $factory);
         $menuListItem = new MenuItem('menu_list_default', $factory);
         $menu->addChild($menuListItem);
 
@@ -149,7 +146,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($menuListItem->isDisplayed());
     }
 
-    public function testOnNavigationConfigureWhenOroNavigationManageMenusIsNotGranted()
+    public function testOnNavigationConfigureWhenOroNavigationManageMenusIsNotGranted(): void
     {
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
@@ -163,7 +160,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $factory = new MenuFactory();
-        $menu  = new MenuItem('parent_item', $factory);
+        $menu = new MenuItem('parent_item', $factory);
         $menuListItem = new MenuItem('menu_list_default', $factory);
         $menu->addChild($menuListItem);
 
@@ -172,7 +169,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($menuListItem->isDisplayed());
     }
 
-    public function testOnNavigationConfigureWhenAccessIsGranted()
+    public function testOnNavigationConfigureWhenAccessIsGranted(): void
     {
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
@@ -186,7 +183,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $factory = new MenuFactory();
-        $menu  = new MenuItem('parent_item', $factory);
+        $menu = new MenuItem('parent_item', $factory);
         $menuListItem = new MenuItem('menu_list_default', $factory);
         $menu->addChild($menuListItem);
 

@@ -9,23 +9,23 @@ use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\JsonArrayChoiceFilter;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-class JsonArrayChoiceFilterTest extends \PHPUnit\Framework\TestCase
+class JsonArrayChoiceFilterTest extends TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var JsonArrayChoiceFilter */
-    private $filter;
+    private FormFactoryInterface&MockObject $formFactory;
+    private JsonArrayChoiceFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -43,7 +43,7 @@ class JsonArrayChoiceFilterTest extends \PHPUnit\Framework\TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::any())
             ->method('getExpressionBuilder')
-            ->willReturn(new Query\Expr());
+            ->willReturn(new Expr());
         $connection = $this->createMock(Connection::class);
         $em->expects(self::any())
             ->method('getConnection')
@@ -188,7 +188,7 @@ class JsonArrayChoiceFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider applyForPostgreSqlProvider
      */
-    public function testApplyForPostgreSql(array $data, ?string $expected)
+    public function testApplyForPostgreSql(array $data, ?string $expected): void
     {
         $ds = $this->getFilterDatasource(new PostgreSQL94Platform());
 
@@ -217,7 +217,7 @@ class JsonArrayChoiceFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider parseDataProvider
      */
-    public function testParseData(mixed $data, mixed $expected)
+    public function testParseData(mixed $data, mixed $expected): void
     {
         $this->assertEquals(
             $expected,

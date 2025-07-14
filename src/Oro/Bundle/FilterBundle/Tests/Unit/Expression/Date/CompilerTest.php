@@ -6,10 +6,11 @@ use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Expression\Date\Lexer;
 use Oro\Bundle\FilterBundle\Expression\Date\Parser;
 use Oro\Bundle\FilterBundle\Expression\Date\Token;
+use PHPUnit\Framework\TestCase;
 
-class CompilerTest extends \PHPUnit\Framework\TestCase
+class CompilerTest extends TestCase
 {
-    public function testCompile()
+    public function testCompile(): void
     {
         $expectedResult = 'Compiled String';
         $inputString = 'some test string';

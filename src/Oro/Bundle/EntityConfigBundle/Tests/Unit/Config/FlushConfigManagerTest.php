@@ -10,7 +10,6 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
@@ -22,34 +21,23 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\EntityConfig\Mock\ConfigurationHandlerMock;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
+class FlushConfigManagerTest extends TestCase
 {
     private const ENTITY_CLASS = DemoEntity::class;
 
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var ConfigModelManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $modelManager;
-
-    /** @var AuditManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $auditManager;
-
-    /** @var ConfigCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $configCache;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $testConfigProvider;
-
-    /** @var ConfigManager */
-    private $configManager;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private ConfigModelManager&MockObject $modelManager;
+    private AuditManager&MockObject $auditManager;
+    private ConfigCache&MockObject $configCache;
+    private ConfigProvider&MockObject $entityConfigProvider;
+    private ConfigProvider&MockObject $testConfigProvider;
+    private ConfigManager $configManager;
 
     #[\Override]
     protected function setUp(): void
@@ -342,14 +330,8 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->configManager->flush();
     }
 
-    /**
-     * @param EntityManager|\PHPUnit\Framework\MockObject\MockObject $em
-     * @param ConfigModel[]                                          $models
-     */
-    private function setFlushExpectations(
-        EntityManager|\PHPUnit\Framework\MockObject\MockObject $em,
-        array $models
-    ): void {
+    private function setFlushExpectations(EntityManager&MockObject $em, array $models): void
+    {
         $this->configCache->expects($this->once())
             ->method('deleteAllConfigurable');
         $this->auditManager->expects($this->once())

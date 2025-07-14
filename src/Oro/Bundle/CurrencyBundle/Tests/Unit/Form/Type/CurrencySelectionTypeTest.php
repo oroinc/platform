@@ -7,6 +7,7 @@ use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Utils\CurrencyNameHelperStub;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -15,11 +16,8 @@ use Symfony\Component\Intl\Currencies;
 
 class CurrencySelectionTypeTest extends FormIntegrationTestCase
 {
-    /** @var CurrencyProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $currencyProvider;
-
-    /** @var CurrencySelectionType */
-    private $formType;
+    private CurrencyProviderInterface&MockObject $currencyProvider;
+    private CurrencySelectionType $formType;
 
     #[\Override]
     protected function setUp(): void

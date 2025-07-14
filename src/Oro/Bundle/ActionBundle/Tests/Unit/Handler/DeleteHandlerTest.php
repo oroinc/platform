@@ -6,14 +6,13 @@ use Oro\Bundle\ActionBundle\Handler\DeleteHandler;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerInterface;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DeleteHandlerTest extends \PHPUnit\Framework\TestCase
+class DeleteHandlerTest extends TestCase
 {
-    /** @var EntityDeleteHandlerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $deleteHandlerRegistry;
-
-    /** @var DeleteHandler */
-    private $handler;
+    private EntityDeleteHandlerRegistry&MockObject $deleteHandlerRegistry;
+    private DeleteHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class DeleteHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new DeleteHandler($this->deleteHandlerRegistry);
     }
 
-    public function testHandleDelete()
+    public function testHandleDelete(): void
     {
         $entity = new TestEntity1();
 

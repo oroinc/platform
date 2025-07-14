@@ -8,8 +8,9 @@ use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestB
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigurationProviderTest extends TestCase
 {
     use TempDirExtension;
 
@@ -28,7 +29,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider configurationDataProvider
      */
-    public function testGetConfiguration(string $sectionName, array $expectedResult)
+    public function testGetConfiguration(string $sectionName, array $expectedResult): void
     {
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();

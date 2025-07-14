@@ -12,23 +12,20 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Component\Testing\Command\CommandTestingTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
+class ImpersonateUserCommandTest extends TestCase
 {
     use CommandTestingTrait;
 
     private const USERNAME = 'someuser';
 
-    /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $userManager;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
-
-    /** @var ImpersonateUserCommand */
-    private $command;
+    private UserManager&MockObject $userManager;
+    private ManagerRegistry&MockObject $managerRegistry;
+    private ImpersonateUserCommand $command;
 
     public function testSuccessfulExecuteReturnsZeroAndSuggestsURL(): void
     {

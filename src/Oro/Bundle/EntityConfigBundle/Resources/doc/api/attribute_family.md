@@ -69,7 +69,7 @@ Retrieve a record of label assigned to a specific attribute family record.
 
 #### get_relationship
 
-Retrieve IDs of label records assigned to a specific attribute family record.
+Retrieve the IDs of label records assigned to a specific attribute family record.
 
 #### update_relationship
 

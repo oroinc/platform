@@ -53,6 +53,11 @@ services:
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: boolean, priority: -10 }
 
+    oro_api.normalize_value.enum:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEnum
+        tags:
+            - { name: oro.api.processor, action: normalize_value, dataType: enum, priority: -10 }
+
     oro_api.normalize_value.decimal:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeDecimal
         tags:

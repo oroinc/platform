@@ -5,16 +5,15 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Twig;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
 use Oro\Bundle\EntityExtendBundle\Twig\EnumExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EnumExtensionTest extends \PHPUnit\Framework\TestCase
+class EnumExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var EnumOptionsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $enumOptionsProvider;
-
-    /** @var EnumExtension */
-    private $extension;
+    private EnumOptionsProvider&MockObject $enumOptionsProvider;
+    private EnumExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class EnumExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new EnumExtension($container);
     }
 
-    public function testTransEnum()
+    public function testTransEnum(): void
     {
         $values = [
             'Value 1' => 'test_enum_code.val1'
@@ -49,7 +48,7 @@ class EnumExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTransEnumWhenLabelIsZero()
+    public function testTransEnumWhenLabelIsZero(): void
     {
 
         $values = [
@@ -67,7 +66,7 @@ class EnumExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTransEnumWhenIdIsZero()
+    public function testTransEnumWhenIdIsZero(): void
     {
         $values = [
            'Value 1' => 'test_enum_code.0',
@@ -84,7 +83,7 @@ class EnumExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTransEnumWhenIdsAreNumeric()
+    public function testTransEnumWhenIdsAreNumeric(): void
     {
         $values = [
             'Value 1' => 'test_enum_code.05',
@@ -102,7 +101,7 @@ class EnumExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortEnum()
+    public function testSortEnum(): void
     {
         $values = [
             'Value 3' => 'test_enum_code.val3',

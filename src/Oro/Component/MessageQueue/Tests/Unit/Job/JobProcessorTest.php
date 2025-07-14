@@ -10,21 +10,18 @@ use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Job\JobRepositoryInterface;
 use Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class JobProcessorTest extends \PHPUnit\Framework\TestCase
+class JobProcessorTest extends TestCase
 {
-    /** @var JobRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRepository;
-
-    /** @var JobManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobManager;
-
-    /** @var JobProcessor */
-    private $jobProcessor;
+    private JobRepositoryInterface&MockObject $jobRepository;
+    private JobManagerInterface&MockObject $jobManager;
+    private JobProcessor $jobProcessor;
 
     #[\Override]
     protected function setUp(): void

@@ -4,14 +4,14 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\DependencyInjection\CompilerPa
 
 use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\ProcessorsPass;
 use Oro\Bundle\IntegrationBundle\Exception\LogicException;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ProcessorsPassTest extends \PHPUnit\Framework\TestCase
+class ProcessorsPassTest extends TestCase
 {
-    /** @var CompilerPassInterface */
-    private $compiler;
+    private CompilerPassInterface $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class ProcessorsPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new ProcessorsPass();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $registryDef = $container->register('oro_integration.processor_registry');
@@ -37,7 +37,7 @@ class ProcessorsPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWhenNoIntegrationType()
+    public function testProcessWhenNoIntegrationType(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Could not retrieve type attribute for "processor_1"');

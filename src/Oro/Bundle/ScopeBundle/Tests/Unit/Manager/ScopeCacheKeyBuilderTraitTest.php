@@ -7,8 +7,9 @@ use Oro\Bundle\ScopeBundle\Manager\ScopeCacheKeyBuilderInterface;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 use Oro\Bundle\ScopeBundle\Tests\Unit\Stub\StubEntity;
 use Oro\Bundle\ScopeBundle\Tests\Unit\Stub\TestScopeCacheKeyBuilder;
+use PHPUnit\Framework\TestCase;
 
-class ScopeCacheKeyBuilderTraitTest extends \PHPUnit\Framework\TestCase
+class ScopeCacheKeyBuilderTraitTest extends TestCase
 {
     private function getInnerBuilder(ScopeCriteria $criteria, ?string $cacheKey): ScopeCacheKeyBuilderInterface
     {
@@ -21,7 +22,7 @@ class ScopeCacheKeyBuilderTraitTest extends \PHPUnit\Framework\TestCase
         return $innerBuilder;
     }
 
-    public function testGetCacheKeyWhenInnerBuilderReturnsNull()
+    public function testGetCacheKeyWhenInnerBuilderReturnsNull(): void
     {
         $criteria = new ScopeCriteria(
             ['testParam' => 123],
@@ -31,7 +32,7 @@ class ScopeCacheKeyBuilderTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($builder->getCacheKey($criteria));
     }
 
-    public function testGetCacheKeyWithExistingEntity()
+    public function testGetCacheKeyWithExistingEntity(): void
     {
         $testParam = new StubEntity(123);
         $criteria = new ScopeCriteria(
@@ -45,7 +46,7 @@ class ScopeCacheKeyBuilderTraitTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetCacheKeyWithNewEntity()
+    public function testGetCacheKeyWithNewEntity(): void
     {
         $testParam = new StubEntity(null);
         $criteria = new ScopeCriteria(
@@ -59,7 +60,7 @@ class ScopeCacheKeyBuilderTraitTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetCacheKeyWithEntityId()
+    public function testGetCacheKeyWithEntityId(): void
     {
         $criteria = new ScopeCriteria(
             ['testParam' => 123],
@@ -72,7 +73,7 @@ class ScopeCacheKeyBuilderTraitTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetCacheKeyWithEntityNull()
+    public function testGetCacheKeyWithEntityNull(): void
     {
         $criteria = new ScopeCriteria(
             ['testParam' => null],
@@ -85,7 +86,7 @@ class ScopeCacheKeyBuilderTraitTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetCacheKeyWithoutEntity()
+    public function testGetCacheKeyWithoutEntity(): void
     {
         $criteria = new ScopeCriteria(
             [],
@@ -98,7 +99,7 @@ class ScopeCacheKeyBuilderTraitTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetCacheKeyWithArrayOfEntities()
+    public function testGetCacheKeyWithArrayOfEntities(): void
     {
         $testParam1 = new StubEntity(1);
         $testParam2 = new StubEntity(2);
@@ -113,7 +114,7 @@ class ScopeCacheKeyBuilderTraitTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetCacheKeyWithArrayOfEntityIds()
+    public function testGetCacheKeyWithArrayOfEntityIds(): void
     {
         $criteria = new ScopeCriteria(
             ['testParam' => [1, 2]],

@@ -3,12 +3,13 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\UIBundle\Tools\UrlHelper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\UrlHelper as SymfonyUrlHelper;
 use Symfony\Component\Routing\RequestContext;
 
-class UrlHelperTest extends \PHPUnit\Framework\TestCase
+class UrlHelperTest extends TestCase
 {
     public function testGetAbsoluteUrl(): void
     {

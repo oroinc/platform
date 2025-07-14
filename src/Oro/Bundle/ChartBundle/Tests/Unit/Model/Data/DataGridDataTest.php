@@ -11,13 +11,14 @@ use PHPUnit\Framework\TestCase;
 
 class DataGridDataTest extends TestCase
 {
-    private DatagridInterface|MockObject $grid;
+    private DatagridInterface&MockObject $grid;
     private DataGridData $data;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->grid = $this->createMock(DatagridInterface::class);
+
         $this->data = new DataGridData($this->grid);
     }
 
@@ -25,20 +26,17 @@ class DataGridDataTest extends TestCase
     {
         $rawData = ['foo' => 'bar'];
 
-        $resultRecord = self::createMock(ResultRecord::class);
-        $resultRecord
-            ->expects(self::once())
+        $resultRecord = $this->createMock(ResultRecord::class);
+        $resultRecord->expects(self::once())
             ->method('getDataArray')
             ->willReturn($rawData);
 
         $datasource = $this->createMock(DatasourceInterface::class);
-        $datasource
-            ->expects(self::once())
+        $datasource->expects(self::once())
             ->method('getResults')
             ->willReturn([$resultRecord]);
 
-        $this->grid
-            ->expects(self::once())
+        $this->grid->expects(self::once())
             ->method('getAcceptedDatasource')
             ->willReturn($datasource);
 

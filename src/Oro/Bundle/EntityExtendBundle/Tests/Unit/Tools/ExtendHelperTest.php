@@ -6,6 +6,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -14,12 +15,12 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class ExtendHelperTest extends \PHPUnit\Framework\TestCase
+class ExtendHelperTest extends TestCase
 {
     /**
      * @dataProvider getReverseRelationTypeProvider
      */
-    public function testGetReverseRelationType(string $type, string $expectedType)
+    public function testGetReverseRelationType(string $type, string $expectedType): void
     {
         $this->assertEquals(
             $expectedType,
@@ -44,7 +45,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         string $entityClassName,
         string $fieldName,
         string $expected
-    ) {
+    ): void {
         $this->assertEquals(
             $expected,
             ExtendHelper::buildToManyRelationTargetFieldName($entityClassName, $fieldName)
@@ -65,7 +66,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         string $targetEntityClassName,
         ?string $associationKind,
         string $expected
-    ) {
+    ): void {
         $this->assertEquals(
             $expected,
             ExtendHelper::buildAssociationName($targetEntityClassName, $associationKind)
@@ -90,7 +91,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testBuildRelationKey()
+    public function testBuildRelationKey(): void
     {
         $this->assertEquals(
             'manyToOne|Test\Entity|Test\TargetEntity|testField',
@@ -98,7 +99,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToggleRelationKeyWhenOwningAndTargetEntitiesAreNotEqual()
+    public function testToggleRelationKeyWhenOwningAndTargetEntitiesAreNotEqual(): void
     {
         $this->assertEquals(
             'manyToOne|Test\Entity|Test\TargetEntity|testField',
@@ -106,7 +107,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToggleRelationKeyWhenOwningAndTargetEntitiesAreNotEqualAndGivenKeyHasInverseSuffix()
+    public function testToggleRelationKeyWhenOwningAndTargetEntitiesAreNotEqualAndGivenKeyHasInverseSuffix(): void
     {
         $this->assertEquals(
             'manyToOne|Test\Entity|Test\TargetEntity|testField|inverse',
@@ -114,7 +115,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToggleRelationKeyWhenOwningAndTargetEntitiesAreEqualAndGivenKeyIsOwningSideKey()
+    public function testToggleRelationKeyWhenOwningAndTargetEntitiesAreEqualAndGivenKeyIsOwningSideKey(): void
     {
         $this->assertEquals(
             'manyToOne|Test\Entity|Test\Entity|testField|inverse',
@@ -122,7 +123,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToggleRelationKeyWhenOwningAndTargetEntitiesAreEqualAndGivenKeyIsInverseSideKey()
+    public function testToggleRelationKeyWhenOwningAndTargetEntitiesAreEqualAndGivenKeyIsInverseSideKey(): void
     {
         $this->assertEquals(
             'manyToOne|Test\Entity|Test\Entity|testField',
@@ -130,7 +131,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToggleRelationKeyWhenOwningAndTargetEntitiesAreEqualButKeyIsNotSupported()
+    public function testToggleRelationKeyWhenOwningAndTargetEntitiesAreEqualButKeyIsNotSupported(): void
     {
         $this->assertEquals(
             'manyToOne|Test\Entity|Test\Entity|testField|other',
@@ -138,7 +139,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToggleRelationKeyWhenGivenKeyIsInvalid()
+    public function testToggleRelationKeyWhenGivenKeyIsInvalid(): void
     {
         $this->assertEquals(
             'someInvalidValue',
@@ -146,7 +147,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetRelationType()
+    public function testGetRelationType(): void
     {
         $this->assertEquals(
             'manyToOne',
@@ -154,7 +155,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetRelationTypeForInverseRelationKey()
+    public function testGetRelationTypeForInverseRelationKey(): void
     {
         $this->assertEquals(
             'manyToOne',
@@ -165,7 +166,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidRelationKeysForGetRelationType
      */
-    public function testGetRelationTypeForInvalidRelationKey(?string $relationKey)
+    public function testGetRelationTypeForInvalidRelationKey(?string $relationKey): void
     {
         $this->assertNull(ExtendHelper::getRelationType($relationKey));
     }
@@ -183,7 +184,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildEnumCodeProvider
      */
-    public function testBuildEnumCode(string $enumName, string $expectedEnumCode)
+    public function testBuildEnumCode(string $enumName, string $expectedEnumCode): void
     {
         $this->assertEquals(
             $expectedEnumCode,
@@ -212,7 +213,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildEnumCodeForInvalidEnumNameProvider
      */
-    public function testBuildEnumCodeForInvalidEnumName(string $enumName)
+    public function testBuildEnumCodeForInvalidEnumName(string $enumName): void
     {
         $this->expectException(\InvalidArgumentException::class);
         ExtendHelper::buildEnumCode($enumName);
@@ -221,7 +222,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildEnumCodeForInvalidEnumNameProvider
      */
-    public function testBuildEnumCodeForInvalidEnumNameIgnoreException(string $enumValueName)
+    public function testBuildEnumCodeForInvalidEnumNameIgnoreException(string $enumValueName): void
     {
         $this->assertSame(
             '',
@@ -249,7 +250,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         string $fieldName,
         ?int $maxEnumCodeSize,
         string $expectedEnumCode
-    ) {
+    ): void {
         $this->assertEquals(
             $expectedEnumCode,
             ExtendHelper::generateEnumCode($entityClassName, $fieldName, $maxEnumCodeSize)
@@ -267,7 +268,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGenerateEnumCodeForEmptyClassName()
+    public function testGenerateEnumCodeForEmptyClassName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$entityClassName must not be empty.');
@@ -275,7 +276,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         ExtendHelper::generateEnumCode('', 'testField');
     }
 
-    public function testGenerateEnumCodeForEmptyFieldName()
+    public function testGenerateEnumCodeForEmptyFieldName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$fieldName must not be empty.');
@@ -286,7 +287,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildEnumValueIdProvider
      */
-    public function testBuildEnumValueId(string $enumValueName, string $expectedEnumValueId)
+    public function testBuildEnumValueId(string $enumValueName, string $expectedEnumValueId): void
     {
         $enumValueId = ExtendHelper::buildEnumInternalId($enumValueName);
         $this->assertEquals(
@@ -327,7 +328,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testBuildEnumValueIdWithCustomLocale()
+    public function testBuildEnumValueIdWithCustomLocale(): void
     {
         $locale = setlocale(LC_CTYPE, 0);
         if (false === $locale) {
@@ -346,7 +347,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildEnumValueIdForInvalidEnumValueNameProvider
      */
-    public function testBuildEnumValueIdForInvalidEnumValueName(string $enumValueName)
+    public function testBuildEnumValueIdForInvalidEnumValueName(string $enumValueName): void
     {
         $this->expectException(\InvalidArgumentException::class);
         ExtendHelper::buildEnumInternalId($enumValueName);
@@ -355,7 +356,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildEnumValueIdForInvalidEnumValueNameProvider
      */
-    public function testBuildEnumValueIdForInvalidEnumValueNameIgnoreException(string $enumValueName)
+    public function testBuildEnumValueIdForInvalidEnumValueNameIgnoreException(string $enumValueName): void
     {
         $this->assertSame(
             '',
@@ -363,7 +364,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEnumInternalId()
+    public function testGetEnumInternalId(): void
     {
         $this->assertEquals(
             'option1',
@@ -422,7 +423,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test_class', ExtendHelper::getEnumCode('Extend\Entity\EV_Test_Class'));
     }
 
-    public function testGetMultiEnumSnapshotFieldName()
+    public function testGetMultiEnumSnapshotFieldName(): void
     {
         $this->assertEquals(
             'testFieldSnapshot',
@@ -438,7 +439,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         string $enumCode,
         ?string $fieldName,
         string $expected
-    ) {
+    ): void {
         $this->assertEquals(
             $expected,
             ExtendHelper::getEnumTranslationKey($propertyName, $enumCode, $fieldName)
@@ -456,7 +457,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isCustomEntityProvider
      */
-    public function testIsCustomEntity(string $className, bool $expected)
+    public function testIsCustomEntity(string $className, bool $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -475,7 +476,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getShortClassNameProvider
      */
-    public function testGetShortClassName(string $className, string $expected)
+    public function testGetShortClassName(string $className, string $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -510,7 +511,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getExtendEntityProxyClassNameProvider
      */
-    public function testGetExtendEntityProxyClassName(string $className, string $expected)
+    public function testGetExtendEntityProxyClassName(string $className, string $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -535,7 +536,7 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider updatedPendingValueDataProvider
      */
-    public function testUpdatedPendingValue(int|array $currentVal, array $changeSet, int|array $expectedResult)
+    public function testUpdatedPendingValue(int|array $currentVal, array $changeSet, int|array $expectedResult): void
     {
         $this->assertEquals($expectedResult, ExtendHelper::updatedPendingValue($currentVal, $changeSet));
     }

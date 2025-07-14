@@ -6,17 +6,14 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\WorkflowBundle\Configuration\Checker\ConfigurationChecker;
 use Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
+class ActionPermissionProviderTest extends TestCase
 {
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var ConfigurationChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurationChecker;
-
-    /** @var ActionPermissionProvider */
-    private $provider;
+    private FeatureChecker&MockObject $featureChecker;
+    private ConfigurationChecker&MockObject $configurationChecker;
+    private ActionPermissionProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +32,7 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
         ResultRecordInterface $input,
         bool $featureEnabled,
         bool $configurationClean
-    ) {
+    ): void {
         $this->featureChecker->expects($this->any())
             ->method('isResourceEnabled')
             ->willReturn($featureEnabled);
@@ -185,7 +182,7 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
         ResultRecordInterface $input,
         bool $featureEnabled,
         bool $configurationClean
-    ) {
+    ): void {
         $this->featureChecker->expects($this->any())
             ->method('isResourceEnabled')
             ->willReturn($featureEnabled);

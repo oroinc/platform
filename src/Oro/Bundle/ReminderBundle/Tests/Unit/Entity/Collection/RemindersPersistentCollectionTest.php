@@ -7,20 +7,19 @@ use Oro\Bundle\ReminderBundle\Entity\Collection\RemindersPersistentCollection;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
+class RemindersPersistentCollectionTest extends TestCase
 {
     private const CLASS_NAME = 'Foo\\Entity';
     private const IDENTIFIER = 101;
 
-    /** @var ReminderRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var RemindersPersistentCollection */
-    private $collection;
+    private ReminderRepository&MockObject $repository;
+    private RemindersPersistentCollection $collection;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +32,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $foo = $this->createReminder(100);
         $bar = $this->createReminder(200);
@@ -44,7 +43,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->collection->isDirty());
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $foo = $this->createReminder(100);
         $bar = $this->createReminder(200);
@@ -56,7 +55,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->collection->isDirty());
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $foo = $this->createReminder(100);
         $bar = $this->createReminder(200);
@@ -72,7 +71,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->collection->isDirty());
     }
 
-    public function testRemoveElement()
+    public function testRemoveElement(): void
     {
         $foo = $this->createReminder(100);
         $bar = $this->createReminder(200);
@@ -89,7 +88,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->collection->isDirty());
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $foo = $this->createReminder(100);
         $bar = $this->createReminder(200);
@@ -105,7 +104,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->collection->isDirty());
     }
 
-    public function testGetSnapshot()
+    public function testGetSnapshot(): void
     {
         $foo = $this->createReminder(100);
         $bar = $this->createReminder(200);
@@ -117,7 +116,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([$foo, $bar], $this->collection->getSnapshot());
     }
 
-    public function testOffsetExists()
+    public function testOffsetExists(): void
     {
         $foo = $this->createReminder(100);
         $bar = $this->createReminder(200);
@@ -129,7 +128,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->collection->isDirty());
     }
 
-    public function testOffsetGet()
+    public function testOffsetGet(): void
     {
         $foo = $this->createReminder(100);
         $bar = $this->createReminder(200);
@@ -141,7 +140,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->collection->isDirty());
     }
 
-    public function testOffsetSet()
+    public function testOffsetSet(): void
     {
         $foo = $this->createReminder(100);
         $bar = $this->createReminder(200);
@@ -154,7 +153,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->collection->isDirty());
     }
 
-    public function testOffsetUnset()
+    public function testOffsetUnset(): void
     {
         $foo = $this->createReminder(100);
         $bar = $this->createReminder(200);
@@ -165,7 +164,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->collection->isDirty());
     }
 
-    public function testGetDeleteDiff()
+    public function testGetDeleteDiff(): void
     {
         $foo = $this->createReminder(100);
         $bar = $this->createReminder(200);
@@ -181,7 +180,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([1 => $bar, $baz], $this->collection->getDeleteDiff());
     }
 
-    public function testGetInsertDiff()
+    public function testGetInsertDiff(): void
     {
         $foo = $this->createReminder(100);
         $bar = $this->createReminder(200);

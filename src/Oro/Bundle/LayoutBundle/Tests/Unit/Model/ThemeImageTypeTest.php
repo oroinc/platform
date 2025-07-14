@@ -4,8 +4,9 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Model;
 
 use Oro\Bundle\LayoutBundle\Model\ThemeImageType;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
+use PHPUnit\Framework\TestCase;
 
-class ThemeImageTypeTest extends \PHPUnit\Framework\TestCase
+class ThemeImageTypeTest extends TestCase
 {
     private const NAME = 'main';
     private const LABEL = 'Main';
@@ -15,8 +16,7 @@ class ThemeImageTypeTest extends \PHPUnit\Framework\TestCase
     private const DIMENSION_2 = 'dim2';
     private const DIMENSION_3 = 'dim3';
 
-    /** @var ThemeImageType */
-    private $imageType;
+    private ThemeImageType $imageType;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +29,7 @@ class ThemeImageTypeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAccessors()
+    public function testAccessors(): void
     {
         $this->assertEquals(self::NAME, $this->imageType->getName());
         $this->assertEquals(self::LABEL, $this->imageType->getLabel());
@@ -40,7 +40,7 @@ class ThemeImageTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertHasDimension(50, 50);
     }
 
-    public function testMergeDimensions()
+    public function testMergeDimensions(): void
     {
         $this->imageType->mergeDimensions([
             new ThemeImageTypeDimension(self::DIMENSION_1, 20, 10),

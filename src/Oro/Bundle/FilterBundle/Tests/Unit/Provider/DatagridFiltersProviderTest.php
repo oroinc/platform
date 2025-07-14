@@ -8,14 +8,13 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\FilterBundle\Factory\FilterFactory;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Provider\DatagridFiltersProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
+class DatagridFiltersProviderTest extends TestCase
 {
-    /** @var FilterFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $filterFactory;
-
-    /** @var DatagridFiltersProvider */
-    private $provider;
+    private FilterFactory&MockObject $filterFactory;
+    private DatagridFiltersProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -297,10 +296,10 @@ class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetDatagridFiltersCombined(array $configData, array $expectedFilters): void
     {
-        $gridConfig    = $this->getGridConfig(OrmDatasource::TYPE, $configData);
+        $gridConfig = $this->getGridConfig(OrmDatasource::TYPE, $configData);
         $assertFilters = [];
-        $mockWith      = [];
-        $mockReturn    = [];
+        $mockWith = [];
+        $mockReturn = [];
         foreach ($expectedFilters as $filterName => $filterConfig) {
             $filter = $this->createMock(FilterInterface::class);
             $assertFilters[$filterName] = $filter;
@@ -308,7 +307,8 @@ class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
             $mockReturn[] = $filter;
         }
 
-        $this->filterFactory->method('createFilter')
+        $this->filterFactory->expects(self::any())
+            ->method('createFilter')
             ->withConsecutive(... $mockWith)
             ->willReturnOnConsecutiveCalls(... $mockReturn);
 

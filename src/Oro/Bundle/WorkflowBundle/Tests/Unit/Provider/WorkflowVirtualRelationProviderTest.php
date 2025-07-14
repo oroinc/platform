@@ -9,22 +9,19 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
+class WorkflowVirtualRelationProviderTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entitiesWithWorkflowCache;
-
-    /** @var WorkflowVirtualRelationProvider */
-    private $provider;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private CacheInterface&MockObject $entitiesWithWorkflowCache;
+    private WorkflowVirtualRelationProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +35,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsVirtualRelationAndUnknownRelationFieldName()
+    public function testIsVirtualRelationAndUnknownRelationFieldName(): void
     {
         $this->doctrineHelper->expects($this->never())
             ->method('getSingleEntityIdentifierFieldName');
@@ -48,7 +45,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->provider->isVirtualRelation('stdClass', 'unknown_relation'));
     }
 
-    public function testIsVirtualRelationAndNoApplicableWorkflows()
+    public function testIsVirtualRelationAndNoApplicableWorkflows(): void
     {
         $this->doctrineHelper->expects($this->never())
             ->method('getSingleEntityIdentifierFieldName');
@@ -66,7 +63,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fieldDataProvider
      */
-    public function testIsVirtualRelationAndKnownRelation(string $field)
+    public function testIsVirtualRelationAndKnownRelation(string $field): void
     {
         $this->doctrineHelper->expects($this->never())
             ->method('getSingleEntityIdentifierFieldName');
@@ -85,7 +82,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetVirtualRelationsAndNoApplicableWorkflows()
+    public function testGetVirtualRelationsAndNoApplicableWorkflows(): void
     {
         $this->doctrineHelper->expects($this->never())
             ->method('getSingleEntityIdentifierFieldName');
@@ -98,7 +95,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $this->provider->getVirtualRelations('stdClass'));
     }
 
-    public function testGetVirtualRelationsCachedEntitiesWithWorkflows()
+    public function testGetVirtualRelationsCachedEntitiesWithWorkflows(): void
     {
         $this->doctrineHelper->expects($this->never())
             ->method('getSingleEntityIdentifierFieldName');
@@ -125,7 +122,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVirtualRelationsNotCachedEntitiesWithWorkflows()
+    public function testGetVirtualRelationsNotCachedEntitiesWithWorkflows(): void
     {
         $className = 'stdClass';
 
@@ -150,7 +147,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVirtualRelationQueryAndNoApplicableWorkflows()
+    public function testGetVirtualRelationQueryAndNoApplicableWorkflows(): void
     {
         $this->doctrineHelper->expects($this->never())
             ->method('getSingleEntityIdentifierFieldName');
@@ -163,7 +160,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVirtualRelationQueryAndUnknownRelationFieldName()
+    public function testGetVirtualRelationQueryAndUnknownRelationFieldName(): void
     {
         $this->doctrineHelper->expects($this->never())
             ->method('getSingleEntityIdentifierFieldName');
@@ -173,7 +170,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $this->provider->getVirtualRelationQuery('stdClass', 'unknown_field'));
     }
 
-    public function testGetVirtualRelationQuery()
+    public function testGetVirtualRelationQuery(): void
     {
         $this->doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifierFieldName')
@@ -212,7 +209,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTargetJoinAlias()
+    public function testGetTargetJoinAlias(): void
     {
         $this->assertEquals('virtual_relation', $this->provider->getTargetJoinAlias('', 'virtual_relation'));
     }

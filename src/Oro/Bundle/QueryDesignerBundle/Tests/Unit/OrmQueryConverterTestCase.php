@@ -12,15 +12,12 @@ use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-abstract class OrmQueryConverterTestCase extends \PHPUnit\Framework\TestCase
+abstract class OrmQueryConverterTestCase extends TestCase
 {
-    /**
-     * @param array $config
-     *
-     * @return VirtualFieldProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getVirtualFieldProvider(array $config = []): VirtualFieldProviderInterface
+    protected function getVirtualFieldProvider(array $config = []): VirtualFieldProviderInterface&MockObject
     {
         $provider = $this->createMock(VirtualFieldProviderInterface::class);
         $provider->expects(self::any())
@@ -53,12 +50,7 @@ abstract class OrmQueryConverterTestCase extends \PHPUnit\Framework\TestCase
         return $provider;
     }
 
-    /**
-     * @param array $config
-     *
-     * @return VirtualRelationProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getVirtualRelationProvider(array $config = []): VirtualRelationProviderInterface
+    protected function getVirtualRelationProvider(array $config = []): VirtualRelationProviderInterface&MockObject
     {
         $provider = $this->createMock(VirtualRelationProviderInterface::class);
         $provider->expects(self::any())
@@ -94,12 +86,7 @@ abstract class OrmQueryConverterTestCase extends \PHPUnit\Framework\TestCase
         return $provider;
     }
 
-    /**
-     * @param array $config
-     *
-     * @return FunctionProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getFunctionProvider(array $config = []): FunctionProviderInterface
+    protected function getFunctionProvider(array $config = []): FunctionProviderInterface&MockObject
     {
         $provider = $this->createMock(FunctionProviderInterface::class);
         if (empty($config)) {
@@ -114,10 +101,7 @@ abstract class OrmQueryConverterTestCase extends \PHPUnit\Framework\TestCase
         return $provider;
     }
 
-    /**
-     * @return EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getEntityNameResolver(): EntityNameResolver
+    protected function getEntityNameResolver(): EntityNameResolver&MockObject
     {
         return $this->createMock(EntityNameResolver::class);
     }
@@ -156,9 +140,9 @@ abstract class OrmQueryConverterTestCase extends \PHPUnit\Framework\TestCase
      *                                 'Test\Entity1' => ['id'],
      *                                 'Test\Entity2' => ['id'],
      *
-     * @return ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
+     * @return ManagerRegistry&MockObject
      */
-    protected function getDoctrine(array $config = [], array $identifiersConfig = []): ManagerRegistry
+    protected function getDoctrine(array $config = [], array $identifiersConfig = []): ManagerRegistry&MockObject
     {
         $doctrine = $this->createMock(ManagerRegistry::class);
 

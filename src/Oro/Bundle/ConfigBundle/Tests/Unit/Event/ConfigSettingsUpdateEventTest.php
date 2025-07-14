@@ -4,16 +4,15 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Event;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigSettingsUpdateEventTest extends \PHPUnit\Framework\TestCase
+class ConfigSettingsUpdateEventTest extends TestCase
 {
     private const SETTINGS = ['a' => 'b'];
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ConfigSettingsUpdateEvent */
-    private $event;
+    private ConfigManager&MockObject $configManager;
+    private ConfigSettingsUpdateEvent $event;
 
     #[\Override]
     protected function setUp(): void

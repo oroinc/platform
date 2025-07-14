@@ -8,17 +8,14 @@ use Oro\Bundle\LocaleBundle\Provider\LocalizationProviderInterface;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class RtlModeContextConfiguratorTest extends \PHPUnit\Framework\TestCase
+class RtlModeContextConfiguratorTest extends TestCase
 {
-    /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $themeManager;
-
-    /** @var LocalizationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationProvider;
-
-    /** @var RtlModeContextConfigurator */
-    private $contextConfigurator;
+    private ThemeManager&MockObject $themeManager;
+    private LocalizationProviderInterface&MockObject $localizationProvider;
+    private RtlModeContextConfigurator $contextConfigurator;
 
     #[\Override]
     protected function setUp(): void

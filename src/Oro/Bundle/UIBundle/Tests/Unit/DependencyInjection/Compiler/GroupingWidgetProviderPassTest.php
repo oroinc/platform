@@ -3,19 +3,20 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\GroupingWidgetProviderPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class GroupingWidgetProviderPassTest extends \PHPUnit\Framework\TestCase
+class GroupingWidgetProviderPassTest extends TestCase
 {
     private const SERVICE_ID = 'test_service';
-    private const TAG_NAME   = 'test_tag';
-    private const PAGE_TYPE  = 1;
+    private const TAG_NAME = 'test_tag';
+    private const PAGE_TYPE = 1;
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
 

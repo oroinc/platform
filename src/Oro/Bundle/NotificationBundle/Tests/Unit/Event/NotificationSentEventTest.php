@@ -3,9 +3,10 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\NotificationBundle\Event\NotificationSentEvent;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\RawMessage;
 
-class NotificationSentEventTest extends \PHPUnit\Framework\TestCase
+class NotificationSentEventTest extends TestCase
 {
     public function testGetters(): void
     {

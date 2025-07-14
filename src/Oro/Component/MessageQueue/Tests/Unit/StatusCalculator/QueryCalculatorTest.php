@@ -7,14 +7,13 @@ use Oro\Component\MessageQueue\Checker\JobStatusChecker;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRepositoryInterface;
 use Oro\Component\MessageQueue\StatusCalculator\QueryCalculator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class QueryCalculatorTest extends \PHPUnit\Framework\TestCase
+class QueryCalculatorTest extends TestCase
 {
-    /** @var JobRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRepository;
-
-    /** @var QueryCalculator */
-    private $queryCalculator;
+    private JobRepositoryInterface&MockObject $jobRepository;
+    private QueryCalculator $queryCalculator;
 
     #[\Override]
     protected function setUp(): void
@@ -106,8 +105,7 @@ class QueryCalculatorTest extends \PHPUnit\Framework\TestCase
     public function testCalculateRootJobProgress(array $statuses, float $expectedStatusProgress): void
     {
         $rootJob = new Job();
-        $this->jobRepository
-            ->expects($this->once())
+        $this->jobRepository->expects($this->once())
             ->method('getChildStatusesWithJobCountByRootJob')
             ->with($rootJob)
             ->willReturn($statuses);
@@ -180,8 +178,7 @@ class QueryCalculatorTest extends \PHPUnit\Framework\TestCase
     public function testCalculateRootJobStatus(array $statuses, string $expectedStatus): void
     {
         $rootJob = new Job();
-        $this->jobRepository
-            ->expects($this->once())
+        $this->jobRepository->expects($this->once())
             ->method('getChildStatusesWithJobCountByRootJob')
             ->with($rootJob)
             ->willReturn($statuses);

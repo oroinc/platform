@@ -7,14 +7,13 @@ use Oro\Bundle\LayoutBundle\Layout\Block\Extension\DataCollectorExtension;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DataCollectorExtensionTest extends \PHPUnit\Framework\TestCase
+class DataCollectorExtensionTest extends TestCase
 {
-    /** @var LayoutDataCollector|\PHPUnit\Framework\MockObject\MockObject */
-    private $dataCollector;
-
-    /** @var DataCollectorExtension */
-    private $extension;
+    private LayoutDataCollector&MockObject $dataCollector;
+    private DataCollectorExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -24,12 +23,12 @@ class DataCollectorExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new DataCollectorExtension($this->dataCollector);
     }
 
-    public function testGetExtendedType()
+    public function testGetExtendedType(): void
     {
         $this->assertEquals(BaseType::NAME, $this->extension->getExtendedType());
     }
 
-    public function testFinishView()
+    public function testFinishView(): void
     {
         $view = $this->createMock(BlockView::class);
         $block = $this->createMock(BlockInterface::class);

@@ -5,17 +5,15 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Action;
 use Oro\Bundle\SecurityBundle\Action\GenerateUuidAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class GenerateUuidActionTest extends \PHPUnit\Framework\TestCase
+class GenerateUuidActionTest extends TestCase
 {
-    /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextAccessor;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dispatcher;
-
+    private ContextAccessor&MockObject $contextAccessor;
+    private EventDispatcherInterface&MockObject $dispatcher;
     private GenerateUuidAction $action;
 
     #[\Override]

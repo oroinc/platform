@@ -3,9 +3,10 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\DashboardBundle\DependencyInjection\OroDashboardExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroDashboardExtensionTest extends \PHPUnit\Framework\TestCase
+class OroDashboardExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

@@ -5,17 +5,14 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\ContentProvider;
 use Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface;
 use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ContentProviderManagerTest extends \PHPUnit\Framework\TestCase
+class ContentProviderManagerTest extends TestCase
 {
-    /** @var ContentProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $provider1;
-
-    /** @var ContentProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $provider2;
-
-    /** @var ContentProviderManager */
-    private $manager;
+    private ContentProviderInterface&MockObject $provider1;
+    private ContentProviderInterface&MockObject $provider2;
+    private ContentProviderManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +32,7 @@ class ContentProviderManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetContentProviderNames()
+    public function testGetContentProviderNames(): void
     {
         $this->assertEquals(
             ['provider1', 'provider2'],
@@ -43,7 +40,7 @@ class ContentProviderManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDisableContentProvider()
+    public function testDisableContentProvider(): void
     {
         $this->manager->disableContentProvider('provider1');
 
@@ -58,7 +55,7 @@ class ContentProviderManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDisableContentProviderForAlreadyDisabledProvider()
+    public function testDisableContentProviderForAlreadyDisabledProvider(): void
     {
         $this->manager->disableContentProvider('provider2');
 
@@ -74,7 +71,7 @@ class ContentProviderManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEnableContentProvider()
+    public function testEnableContentProvider(): void
     {
         $this->manager->enableContentProvider('provider2');
 
@@ -91,7 +88,7 @@ class ContentProviderManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEnableContentProviderForAlreadyEnabledProvider()
+    public function testEnableContentProviderForAlreadyEnabledProvider(): void
     {
         $this->manager->enableContentProvider('provider1');
 
@@ -107,7 +104,7 @@ class ContentProviderManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $this->manager->enableContentProvider('provider2');
         $this->manager->reset();
@@ -124,7 +121,7 @@ class ContentProviderManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetContentForSpecificName()
+    public function testGetContentForSpecificName(): void
     {
         $this->provider1->expects($this->once())
             ->method('getContent')
@@ -138,7 +135,7 @@ class ContentProviderManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetContentForSpecificNamesIncludingNameOfDisabledProvider()
+    public function testGetContentForSpecificNamesIncludingNameOfDisabledProvider(): void
     {
         $this->provider1->expects($this->once())
             ->method('getContent')

@@ -3,10 +3,11 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfiguration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurablePermissionConfigurationTest extends \PHPUnit\Framework\TestCase
+class ConfigurablePermissionConfigurationTest extends TestCase
 {
     private function processConfiguration(array $configs): array
     {
@@ -16,7 +17,7 @@ class ConfigurablePermissionConfigurationTest extends \PHPUnit\Framework\TestCas
     /**
      * @dataProvider configurationProvider
      */
-    public function testProcessConfiguration(array $config, array $expected)
+    public function testProcessConfiguration(array $config, array $expected): void
     {
         $this->assertEquals($expected, $this->processConfiguration(['oro_configurable_permissions' => $config]));
     }
@@ -113,7 +114,7 @@ class ConfigurablePermissionConfigurationTest extends \PHPUnit\Framework\TestCas
     /**
      * @dataProvider configurationExceptionProvider
      */
-    public function testProcessConfigurationException(array $config, string $exception, string $exceptionMessage)
+    public function testProcessConfigurationException(array $config, string $exception, string $exceptionMessage): void
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($exceptionMessage);

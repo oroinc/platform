@@ -8,19 +8,16 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Filter\LanguageFilter;
 use Oro\Bundle\TranslationBundle\Form\Type\Filter\LanguageFilterType;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
-class LanguageFilterTest extends \PHPUnit\Framework\TestCase
+class LanguageFilterTest extends TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var LanguageFilter */
-    private $filter;
+    private FormFactoryInterface&MockObject $formFactory;
+    private ManagerRegistry&MockObject $doctrine;
+    private LanguageFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +28,7 @@ class LanguageFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter = new LanguageFilter($this->formFactory, new FilterUtility(), $this->doctrine);
     }
 
-    public function testInit()
+    public function testInit(): void
     {
         $this->filter->init('test', []);
 
@@ -51,7 +48,7 @@ class LanguageFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetForm()
+    public function testGetForm(): void
     {
         $form = $this->createMock(FormInterface::class);
 

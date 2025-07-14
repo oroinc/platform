@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiFiltersAndSorters;
 
-use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,11 +29,6 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         foreach ($expectedRows as &$row) {
             $row['type'] = $entityType;
         }
-    }
-
-    private function isPostgreSql(): bool
-    {
-        return $this->getEntityManager()->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform;
     }
 
     /**
@@ -165,6 +159,14 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 ['fieldTime' => '10'],
                 $expectedRowsByTimeHour
             ],
+            'by backed enum (int) field' => [
+                ['fieldBackedEnumInt' => 'Item2'],
+                $expectedRows
+            ],
+            'by backed enum (string) field' => [
+                ['fieldBackedEnumStr' => 'Item2'],
+                $expectedRows
+            ],
             'by guid field' => [
                 ['fieldGuid' => '12c9746c-f44d-4a84-a72c-bdf750c70568'],
                 $expectedRows
@@ -245,6 +247,11 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $expectedRowsByTimeHour = [
             ['id' => '<toString(@TestItem3->id)>'],
             ['id' => '<toString(@EmptyItem->id)>']
+        ];
+        $expectedRowsByEnum = [
+            ['id' => '<toString(@TestItem1->id)>'],
+            ['id' => '<toString(@TestItem3->id)>'],
+            ['id' => '<toString(@AnotherItem->id)>']
         ];
 
         return [
@@ -327,6 +334,14 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             'by time field, hour' => [
                 ['fieldTime' => '10'],
                 $expectedRowsByTimeHour
+            ],
+            'by backed enum (int) field' => [
+                ['fieldBackedEnumInt' => 'Item2'],
+                $expectedRowsByEnum
+            ],
+            'by backed enum (string) field' => [
+                ['fieldBackedEnumStr' => 'Item2'],
+                $expectedRowsByEnum
             ],
             'by guid field' => [
                 ['fieldGuid' => '12c9746c-f44d-4a84-a72c-bdf750c70568'],
@@ -433,6 +448,14 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 ['fieldTime' => '10:11,11:13'],
                 $expectedRows
             ],
+            'by backed enum (int) field' => [
+                ['fieldBackedEnumInt' => 'Item1,Item3'],
+                $expectedRows
+            ],
+            'by backed enum (string) field' => [
+                ['fieldBackedEnumStr' => 'Item1,Item3'],
+                $expectedRows
+            ],
             'by guid field' => [
                 ['fieldGuid' => 'ae404bc5-c9bb-4677-9bad-21144c704734,311e3b02-3cd2-4228-aff3-bafe9b0826de'],
                 $expectedRows
@@ -472,12 +495,6 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $key = key($filter);
         $filter = [sprintf('filter[%s][neq]', $key) => $filter[$key]];
 
-        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
-        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
-        if ('fieldBoolean' === $key && $this->isPostgreSql()) {
-            $expectedRows = array_merge($expectedRows, [['id' => '<toString(@NullItem->id)>']]);
-        }
-
         $entityType = $this->getEntityType(TestAllDataTypes::class);
         $this->prepareExpectedRows($expectedRows, $entityType);
 
@@ -486,6 +503,9 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function notEqualArrayFilterDataProvider(): array
     {
         $expectedRows = [
@@ -496,6 +516,10 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $expectedRowsByMonth = [
             ['id' => '<toString(@TestItem2->id)>'],
             ['id' => '<toString(@EmptyItem->id)>']
+        ];
+        $expectedRowsByEnum = [
+            ['id' => '<toString(@TestItem2->id)>'],
+            ['id' => '<toString(@AnotherItem->id)>']
         ];
 
         return [
@@ -546,6 +570,14 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             'by time field, minute' => [
                 ['fieldTime' => '10:11,11:13'],
                 $expectedRows
+            ],
+            'by backed enum (int) field' => [
+                ['fieldBackedEnumInt' => 'Item1,Item3'],
+                $expectedRowsByEnum
+            ],
+            'by backed enum (string) field' => [
+                ['fieldBackedEnumStr' => 'Item1,Item3'],
+                $expectedRowsByEnum
             ],
             'by guid field' => [
                 ['fieldGuid' => 'ae404bc5-c9bb-4677-9bad-21144c704734,311e3b02-3cd2-4228-aff3-bafe9b0826de'],
@@ -948,6 +980,9 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function existsFilterDataProvider(): array
     {
         $expectedRows = [
@@ -956,6 +991,12 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             ['id' => '<toString(@TestItem3->id)>'],
             ['id' => '<toString(@AnotherItem->id)>'],
             ['id' => '<toString(@EmptyItem->id)>']
+        ];
+        $expectedRowsByEnum = [
+            ['id' => '<toString(@TestItem1->id)>'],
+            ['id' => '<toString(@TestItem2->id)>'],
+            ['id' => '<toString(@TestItem3->id)>'],
+            ['id' => '<toString(@AnotherItem->id)>']
         ];
 
         return [
@@ -1006,6 +1047,14 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             'by time field' => [
                 'fieldTime',
                 $expectedRows
+            ],
+            'by backed enum (int) field' => [
+                'fieldBackedEnumInt',
+                $expectedRowsByEnum
+            ],
+            'by backed enum (string) field' => [
+                'fieldBackedEnumStr',
+                $expectedRowsByEnum
             ],
             'by guid field' => [
                 'fieldGuid',
@@ -1131,6 +1180,10 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     public function notExistsFilterDataProvider(): array
     {
         $expectedRows = [['id' => '<toString(@NullItem->id)>']];
+        $expectedRowsByEnum = [
+            ['id' => '<toString(@EmptyItem->id)>'],
+            ['id' => '<toString(@NullItem->id)>']
+        ];
 
         return [
             'by string field' => [
@@ -1180,6 +1233,14 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             'by time field' => [
                 'fieldTime',
                 $expectedRows
+            ],
+            'by backed enum (int) field' => [
+                'fieldBackedEnumInt',
+                $expectedRowsByEnum
+            ],
+            'by backed enum (string) field' => [
+                'fieldBackedEnumStr',
+                $expectedRowsByEnum
             ],
             'by guid field' => [
                 'fieldGuid',
@@ -1297,6 +1358,14 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             ],
             'by time field' => [
                 ['fieldTime' => '10:12:13'],
+                $expectedRows
+            ],
+            'by backed enum (int) field' => [
+                ['fieldBackedEnumInt' => 'Item2'],
+                $expectedRows
+            ],
+            'by backed enum (string) field' => [
+                ['fieldBackedEnumStr' => 'Item2'],
                 $expectedRows
             ],
             'by guid field' => [

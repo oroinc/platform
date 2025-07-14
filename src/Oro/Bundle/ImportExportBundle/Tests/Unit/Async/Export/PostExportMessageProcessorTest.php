@@ -18,22 +18,19 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class PostExportMessageProcessorTest extends TestCase
 {
     private const USER_ID = 132;
 
-    private ImportExportResultSummarizer|\PHPUnit\Framework\MockObject\MockObject $importExportResultSummarizer;
-
-    private JobRepository|\PHPUnit\Framework\MockObject\MockObject $jobRepository;
-
-    private MessageProducer|\PHPUnit\Framework\MockObject\MockObject $messageProducer;
-
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
-
-    private ExportHandler|\PHPUnit\Framework\MockObject\MockObject $exportHandler;
-
+    private ImportExportResultSummarizer&MockObject $importExportResultSummarizer;
+    private JobRepository&MockObject $jobRepository;
+    private MessageProducer&MockObject $messageProducer;
+    private LoggerInterface&MockObject $logger;
+    private ExportHandler&MockObject $exportHandler;
     private PostExportMessageProcessor $postExportMessageProcessor;
 
     #[\Override]

@@ -7,15 +7,15 @@ use Oro\Component\Action\Action\AssignConstantValue;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
+class AssignConstantValueTest extends TestCase
 {
     public const TEST_CONSTANT = 'test_c';
 
-    /** @var ActionInterface */
-    private $action;
+    private ActionInterface $action;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +27,7 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidOptionsDataProvider
      */
-    public function testInitializeException(array $options)
+    public function testInitializeException(array $options): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->action->initialize($options);
@@ -48,7 +48,7 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testInitialize(array $options, string $attribute, string $value)
+    public function testInitialize(array $options, string $attribute, string $value): void
     {
         self::assertSame($this->action, $this->action->initialize($options));
 
@@ -64,7 +64,7 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testExecuteIncorrectUnknownConstant()
+    public function testExecuteIncorrectUnknownConstant(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Cannot evaluate value of "someValue", constant is not exist.');
@@ -80,7 +80,7 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    public function testExecuteIncorrectNoClass()
+    public function testExecuteIncorrectNoClass(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Cannot evaluate value of "UnknownClass1000::someValue", class is not exist.');
@@ -96,7 +96,7 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    public function testExecuteException()
+    public function testExecuteException(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage(
@@ -114,13 +114,13 @@ class AssignConstantValueTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $value = new PropertyPath('val');
         $attribute = new PropertyPath('attr');
 
         $context = new \stdClass();
-        $context->val = __CLASS__ . '::TEST_CONSTANT';
+        $context->val = self::class . '::TEST_CONSTANT';
         $context->attr = null;
 
         $this->action->initialize([$attribute, $value]);

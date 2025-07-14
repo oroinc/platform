@@ -9,19 +9,17 @@ use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
 use Oro\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FileManagerTest extends \PHPUnit\Framework\TestCase
+class FileManagerTest extends TestCase
 {
     use TempDirExtension;
 
-    /** @var GaufretteFileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $gaufretteFileManager;
-
-    /** @var FileManager */
-    private $fileManager;
+    private GaufretteFileManager $gaufretteFileManager;
+    private FileManager $fileManager;
 
     #[\Override]
     protected function setUp(): void

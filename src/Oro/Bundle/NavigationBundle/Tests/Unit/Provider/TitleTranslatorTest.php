@@ -4,12 +4,12 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NavigationBundle\Provider\TitleTranslator;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TitleTranslatorTest extends \PHPUnit\Framework\TestCase
+class TitleTranslatorTest extends TestCase
 {
-    /** @var TitleTranslator */
-    private $titleTranslator;
+    private TitleTranslator $titleTranslator;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +33,7 @@ class TitleTranslatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transDataProvider
      */
-    public function testTrans(string $titleTemplate, array $params, string $expectedResult)
+    public function testTrans(string $titleTemplate, array $params, string $expectedResult): void
     {
         $this->assertEquals(
             $expectedResult,

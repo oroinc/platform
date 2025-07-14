@@ -6,6 +6,7 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -15,14 +16,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class ChangePasswordSubscriberTest extends FormIntegrationTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var ChangePasswordSubscriber */
-    private $subscriber;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $token;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private TokenInterface&MockObject $token;
+    private ChangePasswordSubscriber $subscriber;
 
     #[\Override]
     protected function setUp(): void

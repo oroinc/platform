@@ -4,11 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Cache;
 
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCacheWarmer;
+use PHPUnit\Framework\TestCase;
 
-class EventTriggerCacheWarmerTest extends \PHPUnit\Framework\TestCase
+class EventTriggerCacheWarmerTest extends TestCase
 {
-    /** @var EventTriggerCacheWarmer */
-    private $warmer;
+    private EventTriggerCacheWarmer $warmer;
 
     #[\Override]
     protected function setUp(): void

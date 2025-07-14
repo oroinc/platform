@@ -5,10 +5,11 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Configuration;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationProviderInterface;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistry;
+use PHPUnit\Framework\TestCase;
 
-class ImportExportConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
+class ImportExportConfigurationRegistryTest extends TestCase
 {
-    public function testConfigurationAddedAndReturned()
+    public function testConfigurationAddedAndReturned(): void
     {
         $configurations = [
             $this->createMock(ImportExportConfigurationInterface::class),
@@ -41,7 +42,7 @@ class ImportExportConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame([$configurations[2]], $registry->getConfigurations($aliases[1]));
     }
 
-    public function testGetConfigurationForUndefinedAlias()
+    public function testGetConfigurationForUndefinedAlias(): void
     {
         $registry = new ImportExportConfigurationRegistry();
 

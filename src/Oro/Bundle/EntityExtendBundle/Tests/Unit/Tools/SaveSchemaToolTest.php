@@ -12,27 +12,18 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\Tools\SaveSchemaTool;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class SaveSchemaToolTest extends \PHPUnit\Framework\TestCase
+class SaveSchemaToolTest extends TestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
-
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var Configuration|\PHPUnit\Framework\MockObject\MockObject */
-    private $configuration;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var SaveSchemaTool|\PHPUnit\Framework\MockObject\MockObject */
-    private $schemaTool;
+    private EntityManagerInterface&MockObject $em;
+    private ManagerRegistry&MockObject $managerRegistry;
+    private Connection&MockObject $connection;
+    private Configuration&MockObject $configuration;
+    private LoggerInterface&MockObject $logger;
+    private SaveSchemaTool&MockObject $schemaTool;
 
     #[\Override]
     protected function setUp(): void
@@ -64,7 +55,7 @@ class SaveSchemaToolTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testGetUpdateSchemaSqlShouldAffectOnlyKnownDBTableParts()
+    public function testGetUpdateSchemaSqlShouldAffectOnlyKnownDBTableParts(): void
     {
         [$fromSchema, $toSchema] = $this->prepareSchemas();
 

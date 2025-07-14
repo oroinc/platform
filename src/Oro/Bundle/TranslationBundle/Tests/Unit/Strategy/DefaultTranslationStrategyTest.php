@@ -6,15 +6,14 @@ use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy;
 use Oro\Bundle\TranslationBundle\Strategy\DefaultTranslationStrategy;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DefaultTranslationStrategyTest extends \PHPUnit\Framework\TestCase
+class DefaultTranslationStrategyTest extends TestCase
 {
-    /** @var ApplicationState|\PHPUnit\Framework\MockObject\MockObject */
-    private $applicationState;
-    /** @var DefaultTranslationStrategy */
-    private $strategy;
-    /** @var LocalizationFallbackStrategy */
-    private $fallbackStrategy;
+    private ApplicationState&MockObject $applicationState;
+    private DefaultTranslationStrategy $strategy;
+    private LocalizationFallbackStrategy $fallbackStrategy;
 
     #[\Override]
     protected function setUp(): void
@@ -25,12 +24,12 @@ class DefaultTranslationStrategyTest extends \PHPUnit\Framework\TestCase
         $this->strategy = new DefaultTranslationStrategy($this->fallbackStrategy, $this->applicationState);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals('default', $this->strategy->getName());
     }
 
-    public function testIsApplicable()
+    public function testIsApplicable(): void
     {
         $this->assertTrue($this->strategy->isApplicable());
     }
@@ -57,7 +56,7 @@ class DefaultTranslationStrategyTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($localeFallbacks, $this->strategy->getLocaleFallbacks());
     }
 
-    public function testGetLocaleFallbacksNotInstalledApp()
+    public function testGetLocaleFallbacksNotInstalledApp(): void
     {
         $this->applicationState->expects(self::once())
             ->method('isInstalled')

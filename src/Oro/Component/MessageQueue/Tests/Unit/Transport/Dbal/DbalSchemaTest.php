@@ -6,10 +6,11 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
+use PHPUnit\Framework\TestCase;
 
-class DbalSchemaTest extends \PHPUnit\Framework\TestCase
+class DbalSchemaTest extends TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
+    public function testCouldBeConstructedWithRequiredArguments(): void
     {
         $schemaManger = $this->createMock(AbstractSchemaManager::class);
 
@@ -21,7 +22,7 @@ class DbalSchemaTest extends \PHPUnit\Framework\TestCase
         new DbalSchema($connection, 'table-name');
     }
 
-    public function testShouldCreateTable()
+    public function testShouldCreateTable(): void
     {
         $schemaManger = $this->createMock(AbstractSchemaManager::class);
 

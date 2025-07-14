@@ -8,23 +8,16 @@ use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\RawLayout;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class BlockBuilderTest extends \PHPUnit\Framework\TestCase
+class BlockBuilderTest extends TestCase
 {
-    /** @var RawLayout */
-    private $rawLayout;
-
-    /** @var BlockTypeHelperInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $typeHelper;
-
-    /** @var LayoutContext */
-    private $context;
-
-    /** @var LayoutManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $layoutManipulator;
-
-    /** @var BlockBuilder */
-    private $blockBuilder;
+    private RawLayout $rawLayout;
+    private BlockTypeHelperInterface&MockObject $typeHelper;
+    private LayoutContext $context;
+    private LayoutManipulatorInterface&MockObject $layoutManipulator;
+    private BlockBuilder $blockBuilder;
 
     #[\Override]
     protected function setUp(): void
@@ -42,22 +35,22 @@ class BlockBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTypeHelper()
+    public function testGetTypeHelper(): void
     {
         $this->assertSame($this->typeHelper, $this->blockBuilder->getTypeHelper());
     }
 
-    public function testGetContext()
+    public function testGetContext(): void
     {
         $this->assertSame($this->context, $this->blockBuilder->getContext());
     }
 
-    public function testGetLayoutManipulator()
+    public function testGetLayoutManipulator(): void
     {
         $this->assertSame($this->layoutManipulator, $this->blockBuilder->getLayoutManipulator());
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $id = 'test_id';
 
@@ -66,7 +59,7 @@ class BlockBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($id, $this->blockBuilder->getId());
     }
 
-    public function testGetTypeName()
+    public function testGetTypeName(): void
     {
         $id = 'test_id';
         $name = 'test_name';
@@ -78,7 +71,7 @@ class BlockBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($name, $this->blockBuilder->getTypeName());
     }
 
-    public function testGetTypeNameWhenBlockTypeIsAddedAsObject()
+    public function testGetTypeNameWhenBlockTypeIsAddedAsObject(): void
     {
         $id = 'test_id';
         $name = 'test_name';

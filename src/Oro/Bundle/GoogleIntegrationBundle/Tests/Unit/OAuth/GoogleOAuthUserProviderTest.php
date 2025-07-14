@@ -7,17 +7,14 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\GoogleIntegrationBundle\OAuth\GoogleOAuthUserProvider;
 use Oro\Bundle\GoogleIntegrationBundle\Tests\Unit\Stub\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class GoogleOAuthUserProviderTest extends \PHPUnit\Framework\TestCase
+class GoogleOAuthUserProviderTest extends TestCase
 {
-    /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $userManager;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var GoogleOAuthUserProvider */
-    private $userProvider;
+    private UserManager&MockObject $userManager;
+    private ConfigManager&MockObject $configManager;
+    private GoogleOAuthUserProvider $userProvider;
 
     #[\Override]
     protected function setUp(): void

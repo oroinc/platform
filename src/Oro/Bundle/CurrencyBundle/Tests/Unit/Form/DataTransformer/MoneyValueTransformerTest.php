@@ -3,11 +3,11 @@
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\CurrencyBundle\Form\DataTransformer\MoneyValueTransformer;
+use PHPUnit\Framework\TestCase;
 
-class MoneyValueTransformerTest extends \PHPUnit\Framework\TestCase
+class MoneyValueTransformerTest extends TestCase
 {
-    /** @var MoneyValueTransformer */
-    private $transformer;
+    private MoneyValueTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class MoneyValueTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformProvider
      */
-    public function testReverseTransform(string $rawValue, string $expectedValue)
+    public function testReverseTransform(string $rawValue, string $expectedValue): void
     {
         $this->assertSame($expectedValue, $this->transformer->reverseTransform($rawValue));
     }

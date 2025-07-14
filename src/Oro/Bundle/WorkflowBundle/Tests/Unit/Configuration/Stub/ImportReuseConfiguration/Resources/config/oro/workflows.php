@@ -1,5 +1,7 @@
 <?php
 
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+
 return [
     'workflow_with_config_reuse' => [
         'entity' => 'Some\Another\Entity',
@@ -51,7 +53,7 @@ return [
                     'icon' => 'foo',
                     'message' => 'hello'
                 ],
-                'form_type' => 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType',
+                'form_type' => WorkflowTransitionType::class,
                 'display_type' => 'dialog',
                 'destination_page' => '',
                 'form_options' => [],

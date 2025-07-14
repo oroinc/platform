@@ -6,27 +6,27 @@ use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumerMemoryExtension;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class LimitConsumerMemoryExtensionTest extends \PHPUnit\Framework\TestCase
+class LimitConsumerMemoryExtensionTest extends TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
+    public function testCouldBeConstructedWithRequiredArguments(): void
     {
         new LimitConsumerMemoryExtension(12345);
     }
 
-    public function testShouldThrowExceptionIfMemoryLimitIsNotInt()
+    public function testShouldThrowExceptionIfMemoryLimitIsNotInt(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected memory limit is int but got: "double"');
         new LimitConsumerMemoryExtension(0.0);
     }
 
-    public function testOnIdleShouldInterruptExecutionIfMemoryLimitReached()
+    public function testOnIdleShouldInterruptExecutionIfMemoryLimitReached(): void
     {
         $context = $this->createContext();
-        $context->getLogger()
-            ->expects($this->once())
+        $context->getLogger()->expects($this->once())
             ->method('debug')
             ->with($this->stringContains('Interrupt execution as memory limit reached.'));
 
@@ -40,11 +40,10 @@ class LimitConsumerMemoryExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($context->isExecutionInterrupted());
     }
 
-    public function testOnPostReceivedShouldInterruptExecutionIfMemoryLimitReached()
+    public function testOnPostReceivedShouldInterruptExecutionIfMemoryLimitReached(): void
     {
         $context = $this->createContext();
-        $context->getLogger()
-            ->expects($this->once())
+        $context->getLogger()->expects($this->once())
             ->method('debug')
             ->with($this->stringContains('Interrupt execution as memory limit reached.'));
 
@@ -58,11 +57,10 @@ class LimitConsumerMemoryExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($context->isExecutionInterrupted());
     }
 
-    public function testOnBeforeReceivedShouldInterruptExecutionIfMemoryLimitReached()
+    public function testOnBeforeReceivedShouldInterruptExecutionIfMemoryLimitReached(): void
     {
         $context = $this->createContext();
-        $context->getLogger()
-            ->expects($this->once())
+        $context->getLogger()->expects($this->once())
             ->method('debug')
             ->with($this->stringContains('Interrupt execution as memory limit reached.'));
 
@@ -76,7 +74,7 @@ class LimitConsumerMemoryExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($context->isExecutionInterrupted());
     }
 
-    public function testOnBeforeReceiveShouldNotInterruptExecutionIfMemoryLimitIsNotReached()
+    public function testOnBeforeReceiveShouldNotInterruptExecutionIfMemoryLimitIsNotReached(): void
     {
         $context = $this->createContext();
 
@@ -90,7 +88,7 @@ class LimitConsumerMemoryExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($context->isExecutionInterrupted());
     }
 
-    public function testOnIdleShouldNotInterruptExecutionIfMemoryLimitIsNotReached()
+    public function testOnIdleShouldNotInterruptExecutionIfMemoryLimitIsNotReached(): void
     {
         $context = $this->createContext();
 
@@ -104,7 +102,7 @@ class LimitConsumerMemoryExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($context->isExecutionInterrupted());
     }
 
-    public function testOnPostReceivedShouldNotInterruptExecutionIfMemoryLimitIsNotReached()
+    public function testOnPostReceivedShouldNotInterruptExecutionIfMemoryLimitIsNotReached(): void
     {
         $context = $this->createContext();
 

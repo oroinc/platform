@@ -3,13 +3,13 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipDecisionMakerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class OwnershipDecisionMakerPassTest extends \PHPUnit\Framework\TestCase
+class OwnershipDecisionMakerPassTest extends TestCase
 {
-    /** @var OwnershipDecisionMakerPass */
-    private $compiler;
+    private OwnershipDecisionMakerPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -17,14 +17,14 @@ class OwnershipDecisionMakerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new OwnershipDecisionMakerPass();
     }
 
-    public function testProcessNotRegisterOwnershipDecisionMaker()
+    public function testProcessNotRegisterOwnershipDecisionMaker(): void
     {
         $container = new ContainerBuilder();
 
         $this->compiler->process($container);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $chainOwnershipDecisionMakerDef = $container->register('oro_security.owner.ownership_decision_maker.chain');
@@ -45,7 +45,7 @@ class OwnershipDecisionMakerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessEmptyOwnershipDecisionMakers()
+    public function testProcessEmptyOwnershipDecisionMakers(): void
     {
         $container = new ContainerBuilder();
         $chainOwnershipDecisionMakerDef = $container->register('oro_security.owner.ownership_decision_maker.chain');

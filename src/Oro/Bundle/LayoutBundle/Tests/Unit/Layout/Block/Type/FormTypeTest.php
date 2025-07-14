@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormView;
 
 class FormTypeTest extends BlockTypeTestCase
 {
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $form = $this->createMock(FormView::class);
 
@@ -28,7 +28,7 @@ class FormTypeTest extends BlockTypeTestCase
         );
     }
 
-    public function testBuildBlock()
+    public function testBuildBlock(): void
     {
         $form = $this->createMock(FormView::class);
 
@@ -88,7 +88,7 @@ class FormTypeTest extends BlockTypeTestCase
             ->addType($formEnd);
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $type = $this->getBlockType(FormType::NAME);
 

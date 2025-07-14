@@ -9,26 +9,19 @@ use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
 use Oro\Bundle\NavigationBundle\Provider\TitleTranslator;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class TitleServiceTest extends \PHPUnit\Framework\TestCase
+class TitleServiceTest extends TestCase
 {
-    /** @var TitleReaderRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $titleReaderRegistry;
-
-    /** @var TitleTranslator|\PHPUnit\Framework\MockObject\MockObject */
-    private $titleTranslator;
-
-    /** @var BreadcrumbManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $breadcrumbManager;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $userConfigManager;
-
-    /** @var TitleService */
-    private $titleService;
+    private TitleReaderRegistry&MockObject $titleReaderRegistry;
+    private TitleTranslator&MockObject $titleTranslator;
+    private BreadcrumbManagerInterface&MockObject $breadcrumbManager;
+    private ConfigManager&MockObject $userConfigManager;
+    private TitleService $titleService;
 
     #[\Override]
     protected function setUp(): void
@@ -46,7 +39,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRender()
+    public function testRender(): void
     {
         $this->titleTranslator->expects($this->once())
             ->method('trans')
@@ -58,7 +51,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertIsString($result);
     }
 
-    public function testRenderStored()
+    public function testRenderStored(): void
     {
         $data = '{"template":"test template","short_template":"test short template","params":{"prm1":"val1"},'
             . '"prefix":"test prefix","suffix":"test suffix"}';
@@ -73,7 +66,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('translated template', $result);
     }
 
-    public function testRenderStoredForShortTemplate()
+    public function testRenderStoredForShortTemplate(): void
     {
         $data = '{"template":"test template","short_template":"test short template","params":{"prm1":"val1"},'
             . '"prefix":"test prefix","suffix":"test suffix"}';
@@ -88,7 +81,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('translated short template', $result);
     }
 
-    public function testRenderStoredWithoutOptionalData()
+    public function testRenderStoredWithoutOptionalData(): void
     {
         $data = '{"template":"test template","short_template":"test short template","params":{"prm1":"val1"}}';
 
@@ -102,7 +95,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('translated template', $result);
     }
 
-    public function testRenderStoredWithEmptyData()
+    public function testRenderStoredWithEmptyData(): void
     {
         $data = '{"template":null,"short_template":null,"params":[]}';
 
@@ -116,7 +109,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('', $result);
     }
 
-    public function testRenderStoredInvalidData()
+    public function testRenderStoredInvalidData(): void
     {
         $data = 'invalid';
 
@@ -130,7 +123,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('translated Untitled', $result);
     }
 
-    public function testRenderShort()
+    public function testRenderShort(): void
     {
         $shortTitle = 'short title';
         $this->titleTranslator->expects($this->once())
@@ -143,7 +136,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($result, $shortTitle);
     }
 
-    public function testSettersAndGetters()
+    public function testSettersAndGetters(): void
     {
         $testString = 'Test string';
         $testArray = ['test'];
@@ -174,7 +167,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($dataArray['params'], $this->titleService->getParams());
     }
 
-    public function testSetParamsObjectWithoutToString()
+    public function testSetParamsObjectWithoutToString(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -189,7 +182,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadByRoute()
+    public function testLoadByRoute(): void
     {
         $route = 'test_route';
         $testTitle = 'Test Title';
@@ -235,7 +228,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($testTitle, $this->titleService->getShortTemplate());
     }
 
-    public function testLoadByRouteForNullRoute()
+    public function testLoadByRouteForNullRoute(): void
     {
         $this->titleReaderRegistry->expects($this->never())
             ->method('getTitleByRoute');
@@ -256,7 +249,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('', $this->titleService->getShortTemplate());
     }
 
-    public function testLoadByRouteWhenTitleDoesNotExist()
+    public function testLoadByRouteWhenTitleDoesNotExist(): void
     {
         $route = 'test_route';
         $parentLabel = 'Parent Label';
@@ -302,7 +295,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($parentLabel, $this->titleService->getShortTemplate());
     }
 
-    public function testLoadByRouteWithMenuName()
+    public function testLoadByRouteWithMenuName(): void
     {
         $route = 'test_route';
         $testTitle = 'Test Title';
@@ -347,7 +340,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($testTitle, $this->titleService->getShortTemplate());
     }
 
-    public function testLoadByRouteWithPageTitleInsteadFirstBreadcrumbItem()
+    public function testLoadByRouteWithPageTitleInsteadFirstBreadcrumbItem(): void
     {
         $childRoute = 'child_route';
         $childTitle = 'Child Title';
@@ -396,7 +389,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($newChildTitle, $this->titleService->getShortTemplate());
     }
 
-    public function testLoadByRouteWithoutTitleAndWithBreadcrumbs()
+    public function testLoadByRouteWithoutTitleAndWithBreadcrumbs(): void
     {
         $childRoute = 'child_route';
         $childTitle = 'Child Title';
@@ -446,7 +439,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($childTitle, $this->titleService->getShortTemplate());
     }
 
-    public function testGetSerialized()
+    public function testGetSerialized(): void
     {
         $this->titleService->setTemplate('test template');
         $this->titleService->setShortTemplate('test short template');
@@ -461,7 +454,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSerializedWithoutOptionalData()
+    public function testGetSerializedWithoutOptionalData(): void
     {
         $this->titleService->setTemplate('test template');
         $this->titleService->setShortTemplate('test short template');
@@ -473,7 +466,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSerializedWithEmptyData()
+    public function testGetSerializedWithEmptyData(): void
     {
         $this->assertEquals(
             '{"template":null,"short_template":null,"params":[]}',
@@ -481,7 +474,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSerializedWithObjectInParams()
+    public function testGetSerializedWithObjectInParams(): void
     {
         $value = new LocalizedFallbackValue();
         $value->setString('String');
@@ -495,7 +488,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateTitle()
+    public function testCreateTitle(): void
     {
         $route = 'test_route';
         $testTitle = 'Test Title';
@@ -519,7 +512,7 @@ class TitleServiceTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateTitleForNullRoute()
+    public function testCreateTitleForNullRoute(): void
     {
         $this->breadcrumbManager->expects($this->never())
             ->method('getBreadcrumbLabels');

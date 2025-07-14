@@ -12,9 +12,9 @@ use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
 final class IntegerBuilderTest extends TestCase
 {
+    private Packages&MockObject $packages;
+    private FormBuilderInterface&MockObject $formBuilder;
     private IntegerBuilder $integerBuilder;
-    private Packages|MockObject $packages;
-    private FormBuilderInterface|MockObject $formBuilder;
 
     #[\Override]
     protected function setUp(): void
@@ -48,8 +48,7 @@ final class IntegerBuilderTest extends TestCase
      */
     public function testThatOptionBuiltCorrectly(array $option, array $expected): void
     {
-        $this->formBuilder
-            ->expects(self::once())
+        $this->formBuilder->expects(self::once())
             ->method('add')
             ->with(
                 $expected['name'],

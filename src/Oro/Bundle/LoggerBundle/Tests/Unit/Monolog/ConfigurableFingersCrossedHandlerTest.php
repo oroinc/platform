@@ -8,6 +8,7 @@ use Monolog\Logger;
 use Oro\Bundle\LoggerBundle\Monolog\ConfigurableFingersCrossedHandler;
 use Oro\Bundle\LoggerBundle\Monolog\LogLevelConfig;
 use Oro\Bundle\LoggerBundle\Test\MonologTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class ConfigurableFingersCrossedHandlerTest extends TestCase
@@ -15,17 +16,8 @@ class ConfigurableFingersCrossedHandlerTest extends TestCase
     use MonologTestCaseTrait;
 
     private ConfigurableFingersCrossedHandler $handler;
-
-    /**
-     * @var LogLevelConfig|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $config;
-
-    /**
-     * @var ActivationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $activationStrategy;
-
+    private LogLevelConfig&MockObject $config;
+    private ActivationStrategyInterface&MockObject $activationStrategy;
     private TestHandler $testNestedHandler;
 
     #[\Override]
@@ -38,7 +30,7 @@ class ConfigurableFingersCrossedHandlerTest extends TestCase
         $this->handler->setLogLevelConfig($this->config);
     }
 
-    public function testHandleInactiveConfig()
+    public function testHandleInactiveConfig(): void
     {
         $this->config->expects(self::once())
             ->method('isActive')
@@ -56,7 +48,7 @@ class ConfigurableFingersCrossedHandlerTest extends TestCase
         );
     }
 
-    public function testHandleActiveConfig()
+    public function testHandleActiveConfig(): void
     {
         $this->config->expects(self::once())
             ->method('isActive')
@@ -74,7 +66,7 @@ class ConfigurableFingersCrossedHandlerTest extends TestCase
         );
     }
 
-    public function testHandleBatchActiveConfig()
+    public function testHandleBatchActiveConfig(): void
     {
         $this->config->expects(self::atLeastOnce())
             ->method('isActive')
@@ -93,7 +85,7 @@ class ConfigurableFingersCrossedHandlerTest extends TestCase
         $this->assertCount(3, $this->testNestedHandler->getRecords());
     }
 
-    public function testHandleBatchInactiveConfig()
+    public function testHandleBatchInactiveConfig(): void
     {
         $this->config->expects(self::atLeastOnce())
             ->method('isActive')
@@ -109,7 +101,7 @@ class ConfigurableFingersCrossedHandlerTest extends TestCase
         $this->assertCount(5, $this->testNestedHandler->getRecords());
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $this->config->expects(self::atLeastOnce())
             ->method('isActive')

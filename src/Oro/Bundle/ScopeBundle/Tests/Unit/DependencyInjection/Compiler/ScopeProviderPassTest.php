@@ -4,16 +4,16 @@ namespace Oro\Bundle\ScopeBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ScopeBundle\DependencyInjection\Compiler\ScopeProviderPass;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class ScopeProviderPassTest extends \PHPUnit\Framework\TestCase
+class ScopeProviderPassTest extends TestCase
 {
-    /** @var ScopeProviderPass */
-    private $compiler;
+    private ScopeProviderPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +21,7 @@ class ScopeProviderPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new ScopeProviderPass();
     }
 
-    public function testProcessNoProviders()
+    public function testProcessNoProviders(): void
     {
         $container = new ContainerBuilder();
         $managerDef = $container->setDefinition(
@@ -40,7 +40,7 @@ class ScopeProviderPassTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $managerServiceLocatorDef->getArgument(0));
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $managerDef = $container->setDefinition(

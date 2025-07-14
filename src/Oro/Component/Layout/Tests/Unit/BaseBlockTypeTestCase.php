@@ -18,11 +18,8 @@ use Oro\Component\Layout\Layouts;
  */
 abstract class BaseBlockTypeTestCase extends LayoutTestCase
 {
-    /** @var LayoutContext */
-    protected $context;
-
-    /** @var LayoutFactoryInterface */
-    protected $layoutFactory;
+    protected LayoutContext $context;
+    protected LayoutFactoryInterface $layoutFactory;
 
     #[\Override]
     protected function setUp(): void

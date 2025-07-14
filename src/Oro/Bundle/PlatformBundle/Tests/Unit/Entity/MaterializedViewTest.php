@@ -4,8 +4,9 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\PlatformBundle\Entity\MaterializedView;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class MaterializedViewTest extends \PHPUnit\Framework\TestCase
+class MaterializedViewTest extends TestCase
 {
     use EntityTestCaseTrait;
 

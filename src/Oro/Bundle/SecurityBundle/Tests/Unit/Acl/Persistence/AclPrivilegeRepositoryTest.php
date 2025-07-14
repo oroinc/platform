@@ -18,6 +18,8 @@ use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\ClassSecurityMetadataStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity as OID;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
@@ -30,28 +32,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
+class AclPrivilegeRepositoryTest extends TestCase
 {
-    /** @var AclManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var AclExtensionSelector|\PHPUnit\Framework\MockObject\MockObject */
-    private $extensionSelector;
-
-    /** @var AclExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $extension;
-
-    /** @var AceManipulationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $aceProvider;
-
+    private AclManager&MockObject $manager;
+    private TranslatorInterface&MockObject $translator;
+    private AclExtensionSelector&MockObject $extensionSelector;
+    private AclExtensionInterface&MockObject $extension;
+    private AceManipulationHelper&MockObject $aceProvider;
     private array $expectationsForSetPermission;
     private array $triggeredExpectationsForSetPermission;
-
-    /** @var AclPrivilegeRepository */
-    private $repository;
+    private AclPrivilegeRepository $repository;
 
     #[\Override]
     protected function setUp(): void
@@ -126,7 +116,7 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPermissionNamesForSeveralAclExtensions()
+    public function testGetPermissionNamesForSeveralAclExtensions(): void
     {
         $extensionKey1 = 'test1';
         $permissions1 = ['VIEW', 'EDIT'];
@@ -556,13 +546,11 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $this->aceProvider->expects(self::any())
             ->method('getAces')
-            ->willReturnCallback(
-                static function ($acl, $type, $field) use (&$rootAcl, &$oid1Acl) {
-                    return $acl === $oid1Acl
-                        ? $oid1Acl->{"get{$type}Aces"}()
-                        : $rootAcl->{"get{$type}Aces"}();
-                }
-            );
+            ->willReturnCallback(static function ($acl, $type, $field) use (&$rootAcl, &$oid1Acl) {
+                return $acl === $oid1Acl
+                    ? $oid1Acl->{"get{$type}Aces"}()
+                    : $rootAcl->{"get{$type}Aces"}();
+            });
 
         $result = $this->repository->getPrivileges($sid);
         self::assertCount(1, $result);
@@ -742,23 +730,21 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
         $triggeredExpectationsForGetAces = &$this->triggeredExpectationsForGetAces;
         $this->manager->expects(self::any())
             ->method('getAces')
-            ->willReturnCallback(
-                function ($sid, $oid) use (&$expectations, &$triggeredExpectationsForGetAces) {
-                    /** @var ObjectIdentity $oid */
-                    foreach ($expectations as $expectedOid => $expectedAces) {
-                        if ($expectedOid === $oid->getIdentifier() . ':' . $oid->getType()) {
-                            $triggeredExpectationsForGetAces[$expectedOid] =
-                                isset($triggeredExpectationsForGetAces[$expectedOid])
-                                    ? $triggeredExpectationsForGetAces[$expectedOid] + 1
-                                    : 0;
+            ->willReturnCallback(function ($sid, $oid) use (&$expectations, &$triggeredExpectationsForGetAces) {
+                /** @var ObjectIdentity $oid */
+                foreach ($expectations as $expectedOid => $expectedAces) {
+                    if ($expectedOid === $oid->getIdentifier() . ':' . $oid->getType()) {
+                        $triggeredExpectationsForGetAces[$expectedOid] =
+                            isset($triggeredExpectationsForGetAces[$expectedOid])
+                                ? $triggeredExpectationsForGetAces[$expectedOid] + 1
+                                : 0;
 
-                            return $expectedAces;
-                        }
+                        return $expectedAces;
                     }
-
-                    return [];
                 }
-            );
+
+                return [];
+            });
     }
 
     public function testSavePrivilegesForNewRoleWithoutRoot(): void

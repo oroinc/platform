@@ -3,10 +3,11 @@
 namespace Oro\Component\DependencyInjection\Tests\Unit\Compiler;
 
 use Oro\Component\DependencyInjection\Tests\Unit\Stub\CompilerPassProviderStub;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class CompilerPassProviderTraitTest extends \PHPUnit\Framework\TestCase
+class CompilerPassProviderTraitTest extends TestCase
 {
     private CompilerPassProviderStub $stub;
 
@@ -19,8 +20,10 @@ class CompilerPassProviderTraitTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getDataProvider
      */
-    public function testFindCompilerPassByClassName(array $expectedBeforeOptimizationPasses, ?object $expectedResult)
-    {
+    public function testFindCompilerPassByClassName(
+        array $expectedBeforeOptimizationPasses,
+        ?object $expectedResult
+    ): void {
         $compilerPassConfig = $this->createMock(PassConfig::class);
         $compilerPassConfig->expects($this->once())
             ->method('getBeforeOptimizationPasses')

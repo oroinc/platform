@@ -5,10 +5,11 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Tools;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\FieldAccessorTestEntity;
 use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
+use PHPUnit\Framework\TestCase;
 
-class FieldAccessorTest extends \PHPUnit\Framework\TestCase
+class FieldAccessorTest extends TestCase
 {
-    public function testGetValue()
+    public function testGetValue(): void
     {
         $entity = new FieldAccessorTestEntity();
         $entity
@@ -21,7 +22,7 @@ class FieldAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('testAnotherName', FieldAccessor::getValue($entity, 'anotherName'));
     }
 
-    public function testSetValue()
+    public function testSetValue(): void
     {
         $entity = new FieldAccessorTestEntity();
         FieldAccessor::setValue($entity, 'name', 'testName');
@@ -33,7 +34,7 @@ class FieldAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('testAnotherName', $entity->getAnotherName());
     }
 
-    public function testAddAndRemoveValue()
+    public function testAddAndRemoveValue(): void
     {
         $entity = new FieldAccessorTestEntity();
         $this->assertCount(0, $entity->getRelatedEntities());
@@ -55,7 +56,7 @@ class FieldAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $entity->getAnotherRelatedEntities());
     }
 
-    public function testHasGetter()
+    public function testHasGetter(): void
     {
         $entity = new FieldAccessorTestEntity();
 

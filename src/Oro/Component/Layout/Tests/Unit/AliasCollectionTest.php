@@ -4,14 +4,14 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\AliasCollection;
 use Oro\Component\Layout\Exception\AliasAlreadyExistsException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class AliasCollectionTest extends \PHPUnit\Framework\TestCase
+class AliasCollectionTest extends TestCase
 {
-    /** @var AliasCollection */
-    private $aliasCollection;
+    private AliasCollection $aliasCollection;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class AliasCollectionTest extends \PHPUnit\Framework\TestCase
         $this->aliasCollection = new AliasCollection();
     }
 
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $this->assertTrue($this->aliasCollection->isEmpty());
 
@@ -30,7 +30,7 @@ class AliasCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->aliasCollection->isEmpty());
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $this->aliasCollection->add('test_alias', 'test_id');
 
@@ -38,7 +38,7 @@ class AliasCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->aliasCollection->isEmpty());
     }
 
-    public function testGetAliases()
+    public function testGetAliases(): void
     {
         $this->aliasCollection->add('test_alias', 'test_id');
         $this->aliasCollection->add('another_alias', 'test_alias');
@@ -52,7 +52,7 @@ class AliasCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $this->aliasCollection->add('test_alias', 'test_id');
         $this->aliasCollection->add('another_alias', 'test_alias');
@@ -62,14 +62,14 @@ class AliasCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test_id', $this->aliasCollection->getId('another_alias'));
     }
 
-    public function testAddDuplicate()
+    public function testAddDuplicate(): void
     {
         $this->aliasCollection->add('test_alias', 'test_id');
         $this->aliasCollection->add('test_alias', 'test_id');
         $this->assertTrue($this->aliasCollection->has('test_alias'));
     }
 
-    public function testRedefine()
+    public function testRedefine(): void
     {
         $this->expectException(AliasAlreadyExistsException::class);
         $this->expectExceptionMessage(
@@ -81,7 +81,7 @@ class AliasCollectionTest extends \PHPUnit\Framework\TestCase
         $this->aliasCollection->add('test_alias', 'another_id');
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         // another_alias -> test_alias -> test_id
         $this->aliasCollection->add('test_alias', 'test_id');
@@ -97,7 +97,7 @@ class AliasCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->aliasCollection->has('test_alias'));
     }
 
-    public function testRemoveIntermediateAlias()
+    public function testRemoveIntermediateAlias(): void
     {
         // last_alias -> another_alias -> test_alias -> test_id
         $this->aliasCollection->add('test_alias', 'test_id');
@@ -112,7 +112,7 @@ class AliasCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->aliasCollection->has('last_alias'));
     }
 
-    public function testRemoveById()
+    public function testRemoveById(): void
     {
         // another_alias -> test_alias -> test_id
         $this->aliasCollection->add('test_alias', 'test_id');
@@ -125,7 +125,7 @@ class AliasCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->aliasCollection->has('another_alias'));
     }
 
-    public function testGetIdUndefined()
+    public function testGetIdUndefined(): void
     {
         $this->assertNull($this->aliasCollection->getId('test_alias'));
     }
@@ -133,7 +133,7 @@ class AliasCollectionTest extends \PHPUnit\Framework\TestCase
     /**
      * No any exception is expected
      */
-    public function testRemoveUndefined()
+    public function testRemoveUndefined(): void
     {
         $this->aliasCollection->remove('test_alias');
     }
@@ -141,7 +141,7 @@ class AliasCollectionTest extends \PHPUnit\Framework\TestCase
     /**
      * No any exception is expected
      */
-    public function testRemoveByIdUndefined()
+    public function testRemoveByIdUndefined(): void
     {
         $this->aliasCollection->removeById('test_id');
     }

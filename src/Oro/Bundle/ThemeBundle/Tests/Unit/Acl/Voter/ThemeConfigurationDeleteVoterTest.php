@@ -17,12 +17,9 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class ThemeConfigurationDeleteVoterTest extends TestCase
 {
-    private EntityRepository|MockObject $repository;
-
-    private TokenInterface|MockObject $token;
-
-    private DoctrineHelper|MockObject $doctrineHelper;
-
+    private EntityRepository&MockObject $repository;
+    private TokenInterface&MockObject $token;
+    private DoctrineHelper&MockObject $doctrineHelper;
     private ThemeConfigurationDeleteVoter $voter;
 
     #[\Override]

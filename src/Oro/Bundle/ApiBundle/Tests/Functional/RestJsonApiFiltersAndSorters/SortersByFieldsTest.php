@@ -79,6 +79,13 @@ class SortersByFieldsTest extends RestJsonApiTestCase
             ['id' => '<toString(@TestItem1->id)>'],
             ['id' => '<toString(@EmptyItem->id)>']
         ];
+        $expectedRowsSortedByEnum = [
+            ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@TestItem3->id)>'],
+            ['id' => '<toString(@TestItem2->id)>'],
+            ['id' => '<toString(@TestItem1->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
+        ];
         $expectedRowsSortedByGuid = [
             ['id' => '<toString(@TestItem1->id)>'],
             ['id' => '<toString(@AnotherItem->id)>'],
@@ -102,27 +109,27 @@ class SortersByFieldsTest extends RestJsonApiTestCase
         ];
 
         return [
-            'by string field'          => [
+            'by string field' => [
                 '-fieldString',
                 $expectedRowsDefault
             ],
-            'by integer field'         => [
+            'by integer field' => [
                 '-fieldInt',
                 $expectedRowsSortedByNumber
             ],
-            'by smallint field'        => [
+            'by smallint field' => [
                 '-fieldSmallInt',
                 $expectedRowsSortedByNumber
             ],
-            'by bigint field'          => [
+            'by bigint field' => [
                 '-fieldBigInt',
                 $expectedRowsDefault
             ],
-            'by boolean field'         => [
+            'by boolean field' => [
                 '-fieldBoolean',
                 $expectedRowsSortedByBoolean
             ],
-            'by decimal field'         => [
+            'by decimal field' => [
                 '-fieldDecimal',
                 $expectedRowsSortedByNumber
             ],
@@ -130,47 +137,55 @@ class SortersByFieldsTest extends RestJsonApiTestCase
                 '-fieldDecimalDefault',
                 $expectedRowsSortedByNumber
             ],
-            'by float field'           => [
+            'by float field' => [
                 '-fieldFloat',
                 $expectedRowsSortedByNumber
             ],
-            'by datetime field'        => [
+            'by datetime field' => [
                 '-fieldDateTime',
                 $expectedRowsSortedByDateTime
             ],
-            'by date field'            => [
+            'by date field' => [
                 '-fieldDate',
                 $expectedRowsSortedByDate
             ],
-            'by time field'            => [
+            'by time field' => [
                 '-fieldTime',
                 $expectedRowsDefault
             ],
-            'by guid field'            => [
+            'by backed enum (int) field' => [
+                '-fieldBackedEnumInt',
+                $expectedRowsSortedByEnum
+            ],
+            'by backed enum (string) field' => [
+                '-fieldBackedEnumStr',
+                $expectedRowsSortedByEnum
+            ],
+            'by guid field' => [
                 '-fieldGuid',
                 $expectedRowsSortedByGuid
             ],
-            'by percent field'         => [
+            'by percent field' => [
                 '-fieldPercent',
                 $expectedRowsDefault
             ],
-            'by percent_100 field'     => [
+            'by percent_100 field' => [
                 '-fieldPercent100',
                 $expectedRowsDefault
             ],
-            'by money field'           => [
+            'by money field' => [
                 '-fieldMoney',
                 $expectedRowsSortedByMoney
             ],
-            'by duration field'        => [
+            'by duration field' => [
                 '-fieldDuration',
                 $expectedRowsDefault
             ],
-            'by money_value field'     => [
+            'by money_value field' => [
                 '-fieldMoneyValue',
                 $expectedRowsSortedByMoney
             ],
-            'by currency field'        => [
+            'by currency field' => [
                 '-fieldCurrency',
                 $expectedRowsSortedByCurrency
             ]

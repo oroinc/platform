@@ -8,22 +8,17 @@ use Oro\Bundle\ReminderBundle\Command\SendRemindersCommand;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
 use Oro\Bundle\ReminderBundle\Model\ReminderSender;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class SendRemindersCommandTest extends \PHPUnit\Framework\TestCase
+class SendRemindersCommandTest extends TestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var ReminderRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var ReminderSender|\PHPUnit\Framework\MockObject\MockObject */
-    private $sender;
-
-    /** @var SendRemindersCommand */
-    private $command;
+    private EntityManagerInterface&MockObject $entityManager;
+    private ReminderRepository&MockObject $repository;
+    private ReminderSender&MockObject $sender;
+    private SendRemindersCommand $command;
 
     #[\Override]
     protected function setUp(): void
@@ -45,12 +40,12 @@ class SendRemindersCommandTest extends \PHPUnit\Framework\TestCase
         $this->command = new SendRemindersCommand($doctrine, $this->sender);
     }
 
-    public function testGetDefaultDefinition()
+    public function testGetDefaultDefinition(): void
     {
         $this->assertEquals('*/1 * * * *', $this->command->getDefaultDefinition());
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $input = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -147,7 +142,7 @@ class SendRemindersCommandTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testExecuteNoRemindersToSend()
+    public function testExecuteNoRemindersToSend(): void
     {
         $input = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -163,7 +158,7 @@ class SendRemindersCommandTest extends \PHPUnit\Framework\TestCase
         $this->command->execute($input, $output);
     }
 
-    public function testExecuteRollbackTransaction()
+    public function testExecuteRollbackTransaction(): void
     {
         $input = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);

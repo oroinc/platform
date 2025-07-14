@@ -7,8 +7,9 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\DataCollector;
 use Oro\Bundle\LayoutBundle\DataCollector\DataCollectorLayoutNameProvider;
 use Oro\Bundle\LayoutBundle\DataCollector\DataCollectorLayoutNameProviderInterface;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\TestCase;
 
-class DataCollectorLayoutNameProviderTest extends \PHPUnit\Framework\TestCase
+class DataCollectorLayoutNameProviderTest extends TestCase
 {
     public function testGetNameByContextWhenNoProviders(): void
     {
@@ -24,15 +25,13 @@ class DataCollectorLayoutNameProviderTest extends \PHPUnit\Framework\TestCase
         $provider = new DataCollectorLayoutNameProvider([$innerProvider1, $innerProvider2]);
         $context = new LayoutContext();
 
-        $innerProvider1
-            ->expects(self::once())
+        $innerProvider1->expects(self::once())
             ->method('getNameByContext')
             ->with($context)
             ->willReturn('');
 
         $name = 'sample_name';
-        $innerProvider2
-            ->expects(self::once())
+        $innerProvider2->expects(self::once())
             ->method('getNameByContext')
             ->with($context)
             ->willReturn($name);

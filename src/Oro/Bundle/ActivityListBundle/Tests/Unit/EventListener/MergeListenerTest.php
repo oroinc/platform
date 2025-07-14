@@ -11,21 +11,16 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MergeListenerTest extends \PHPUnit\Framework\TestCase
+class MergeListenerTest extends TestCase
 {
-    /** @var EntityMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityMetadata;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityManager;
-
-    /** @var MergeListener */
-    private $listener;
+    private EntityMetadata&MockObject $entityMetadata;
+    private ConfigProvider&MockObject $configProvider;
+    private ActivityManager&MockObject $activityManager;
+    private MergeListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -61,7 +56,7 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnBuildMetadataNoActivities()
+    public function testOnBuildMetadataNoActivities(): void
     {
         $this->entityMetadata->expects($this->never())
             ->method('addFieldMetadata');
@@ -76,7 +71,7 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getDataProvider
      */
-    public function testOnBuildMetadata(array $keys)
+    public function testOnBuildMetadata(array $keys): void
     {
         $config = $this->createMock(ConfigInterface::class);
         $this->configProvider->expects($this->any())

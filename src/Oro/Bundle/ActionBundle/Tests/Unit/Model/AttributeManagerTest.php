@@ -6,10 +6,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
+use PHPUnit\Framework\TestCase;
 
-class AttributeManagerTest extends \PHPUnit\Framework\TestCase
+class AttributeManagerTest extends TestCase
 {
-    public function testSetAttributes()
+    public function testSetAttributes(): void
     {
         $attributeOne = $this->createMock(Attribute::class);
         $attributeOne->expects($this->any())
@@ -37,7 +38,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $attributes->toArray());
     }
 
-    public function testGetStepAttributes()
+    public function testGetStepAttributes(): void
     {
         $attributes = new ArrayCollection();
         $attributeManager = new AttributeManager();
@@ -45,7 +46,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($attributes, $attributeManager->getAttributes());
     }
 
-    public function testGetAttribute()
+    public function testGetAttribute(): void
     {
         $attribute = $this->createMock(Attribute::class);
         $attribute->expects($this->any())
@@ -58,7 +59,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($attribute, $attributeManager->getAttribute('test'));
     }
 
-    public function testEntityAttribute()
+    public function testEntityAttribute(): void
     {
         $attributeManager = new AttributeManager();
         $entityAttributeName = 'test';
@@ -73,7 +74,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($attribute, $attributeManager->getEntityAttribute());
     }
 
-    public function testEntityAttributeException()
+    public function testEntityAttributeException(): void
     {
         $this->expectException(UnknownAttributeException::class);
         $this->expectExceptionMessage('There is no entity attribute');
@@ -84,7 +85,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $attributeManager->getEntityAttribute();
     }
 
-    public function testGetAttributesByType()
+    public function testGetAttributesByType(): void
     {
         $attribute1 = $this->getAttributeObject('test1', 'string');
         $attribute2 = $this->getAttributeObject('test2', 'integer');

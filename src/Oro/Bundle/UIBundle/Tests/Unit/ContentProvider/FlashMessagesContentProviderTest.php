@@ -3,20 +3,17 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\ContentProvider;
 
 use Oro\Bundle\UIBundle\ContentProvider\FlashMessagesContentProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class FlashMessagesContentProviderTest extends \PHPUnit\Framework\TestCase
+class FlashMessagesContentProviderTest extends TestCase
 {
-    /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
-    private $session;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var FlashMessagesContentProvider */
-    private $provider;
+    private Session&MockObject $session;
+    private RequestStack&MockObject $requestStack;
+    private FlashMessagesContentProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +27,7 @@ class FlashMessagesContentProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new FlashMessagesContentProvider($this->requestStack);
     }
 
-    public function testGetContent()
+    public function testGetContent(): void
     {
         $messages = ['test'];
         $flashBag = $this->createMock(FlashBagInterface::class);

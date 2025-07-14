@@ -22,8 +22,7 @@ class DatagridPreExportTopicTest extends AbstractTopicTestCase
     protected function setUp(): void
     {
         $this->chainConfigurationProvider = $this->createMock(ConfigurationProviderInterface::class);
-        $this->chainConfigurationProvider
-            ->expects(self::any())
+        $this->chainConfigurationProvider->expects(self::any())
             ->method('isValidConfiguration')
             ->willReturnMap([
                 [self::VALID_GRID_NAME, true],

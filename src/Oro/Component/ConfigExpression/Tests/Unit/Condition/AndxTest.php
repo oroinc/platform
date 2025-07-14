@@ -3,46 +3,49 @@
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Condition\Andx;
+use Oro\Component\ConfigExpression\Condition\FalseCondition;
+use Oro\Component\ConfigExpression\Condition\TrueCondition;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
-class AndxTest extends \PHPUnit\Framework\TestCase
+class AndxTest extends TestCase
 {
-    private Condition\Andx $condition;
+    private Andx $condition;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->condition = new Condition\Andx();
+        $this->condition = new Andx();
     }
 
-    public function testEvaluateTrue()
+    public function testEvaluateTrue(): void
     {
         $this->assertSame(
             $this->condition,
             $this->condition->initialize(
                 [
-                    new Condition\TrueCondition(),
-                    new Condition\TrueCondition(),
+                    new TrueCondition(),
+                    new TrueCondition(),
                 ]
             )
         );
         $this->assertTrue($this->condition->evaluate('anything'));
     }
 
-    public function testEvaluateFalse()
+    public function testEvaluateFalse(): void
     {
         $currentConditionError = 'Current condition error';
-        $nestedConditionError  = 'Nested condition error';
+        $nestedConditionError = 'Nested condition error';
 
         $this->condition->setMessage($currentConditionError);
 
-        $falseConditionWithError = new Condition\FalseCondition();
+        $falseConditionWithError = new FalseCondition();
         $falseConditionWithError->setMessage($nestedConditionError);
 
         $this->condition->initialize(
             [
-                new Condition\TrueCondition(),
+                new TrueCondition(),
                 $falseConditionWithError,
             ]
         );
@@ -59,7 +62,7 @@ class AndxTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInitializeEmpty()
+    public function testInitializeEmpty(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have at least one element.');
@@ -70,7 +73,7 @@ class AndxTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray(array $options, ?string $message, array $expected)
+    public function testToArray(array $options, ?string $message, array $expected): void
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -84,7 +87,7 @@ class AndxTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                'options'  => [new Condition\TrueCondition()],
+                'options'  => [new TrueCondition()],
                 'message'  => null,
                 'expected' => [
                     '@and' => [
@@ -95,7 +98,7 @@ class AndxTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
             [
-                'options'  => [new Condition\TrueCondition(), new Condition\FalseCondition()],
+                'options'  => [new TrueCondition(), new FalseCondition()],
                 'message'  => 'Test',
                 'expected' => [
                     '@and' => [
@@ -113,7 +116,7 @@ class AndxTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile(array $options, ?string $message, string $expected)
+    public function testCompile(array $options, ?string $message, string $expected): void
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -127,12 +130,12 @@ class AndxTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                'options'  => [new Condition\TrueCondition()],
+                'options'  => [new TrueCondition()],
                 'message'  => null,
                 'expected' => '$factory->create(\'and\', [$factory->create(\'true\', [])])'
             ],
             [
-                'options'  => [new Condition\TrueCondition(), new Condition\FalseCondition()],
+                'options'  => [new TrueCondition(), new FalseCondition()],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'and\', '
                     . '[$factory->create(\'true\', []), $factory->create(\'false\', [])])'

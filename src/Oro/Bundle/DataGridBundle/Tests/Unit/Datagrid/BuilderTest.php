@@ -17,22 +17,21 @@ use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class BuilderTest extends \PHPUnit\Framework\TestCase
+class BuilderTest extends TestCase
 {
     private const TEST_DATASOURCE_TYPE = 'array';
-    private const TEST_DATAGRID_NAME   = 'testGrid';
+    private const TEST_DATAGRID_NAME = 'testGrid';
 
     private const DEFAULT_DATAGRID_CLASS = Datagrid::class;
     private const DEFAULT_ACCEPTOR_CLASS = Acceptor::class;
 
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var MemoryCacheProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $memoryCacheProvider;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private MemoryCacheProviderInterface&MockObject $memoryCacheProvider;
 
     #[\Override]
     protected function setUp(): void

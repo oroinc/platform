@@ -12,12 +12,12 @@ use Oro\Bundle\ImportExportBundle\Serializer\SerializerInterface;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Converter\Stub\EntityNameAwareDataConverter;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Converter\Stub\QueryBuilderAwareDataConverter;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ExportProcessorTest extends \PHPUnit\Framework\TestCase
+class ExportProcessorTest extends TestCase
 {
-    /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $context;
-
+    protected ContextInterface&MockObject $context;
     /** @var ExportProcessor */
     protected $processor;
 
@@ -32,7 +32,7 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new ExportProcessor();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Serializer must be injected.');
@@ -43,7 +43,7 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($entity);
     }
 
-    public function testProcessWithDataConverter()
+    public function testProcessWithDataConverter(): void
     {
         $entity = $this->createMock(\stdClass::class);
         $serializedValue = ['serialized'];
@@ -68,7 +68,7 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedValue, $this->processor->process($entity));
     }
 
-    public function testProcessWithoutDataConverter()
+    public function testProcessWithoutDataConverter(): void
     {
         $entity = $this->createMock(\stdClass::class);
         $expectedValue = ['expected'];
@@ -85,7 +85,7 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedValue, $this->processor->process($entity));
     }
 
-    public function testSetImportExportContextWithoutQueryBuilder()
+    public function testSetImportExportContextWithoutQueryBuilder(): void
     {
         $this->context->expects(self::once())
             ->method('getOption')
@@ -99,7 +99,7 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->setImportExportContext($this->context);
     }
 
-    public function testSetImportExportContextWithQueryBuilderIgnored()
+    public function testSetImportExportContextWithQueryBuilderIgnored(): void
     {
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
@@ -115,7 +115,7 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->setImportExportContext($this->context);
     }
 
-    public function testSetImportExportContextWithQueryBuilder()
+    public function testSetImportExportContextWithQueryBuilder(): void
     {
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
@@ -132,7 +132,7 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->setImportExportContext($this->context);
     }
 
-    public function testSetImportExportContextFailsWithInvalidQueryBuilder()
+    public function testSetImportExportContextFailsWithInvalidQueryBuilder(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
@@ -152,7 +152,7 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->setImportExportContext($this->context);
     }
 
-    public function testSetEntityName()
+    public function testSetEntityName(): void
     {
         $entityName = 'TestEntity';
 

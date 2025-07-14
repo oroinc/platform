@@ -12,24 +12,21 @@ use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-class BasicPermissionsDraftVoterTest extends \PHPUnit\Framework\TestCase
+class BasicPermissionsDraftVoterTest extends TestCase
 {
     use EntityTrait;
 
     public static $user;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var BasicPermissionsDraftVoter */
-    private $voter;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private BasicPermissionsDraftVoter $voter;
 
     #[\Override]
     protected function setUp(): void

@@ -10,21 +10,18 @@ use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
+class ConfigLayoutUpdateGeneratorTest extends TestCase
 {
-    /** @var ExpressionLanguageCacheWarmer|\PHPUnit\Framework\MockObject\MockObject */
-    private $cacheWarmer;
-
-    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $expressionValidator;
-
-    /** @var ConfigLayoutUpdateGenerator */
-    private $generator;
+    private ExpressionLanguageCacheWarmer&MockObject $cacheWarmer;
+    private ValidatorInterface&MockObject $expressionValidator;
+    private ConfigLayoutUpdateGenerator $generator;
 
     #[\Override]
     protected function setUp(): void

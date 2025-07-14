@@ -5,8 +5,9 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Event;
 use Oro\Bundle\NotificationBundle\Event\NotificationProcessRecipientsEvent;
 use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
+use PHPUnit\Framework\TestCase;
 
-class NotificationProcessRecipientsEventTest extends \PHPUnit\Framework\TestCase
+class NotificationProcessRecipientsEventTest extends TestCase
 {
     public function testConstructor(): void
     {

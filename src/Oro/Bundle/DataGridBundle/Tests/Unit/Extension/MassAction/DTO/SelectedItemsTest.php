@@ -3,10 +3,11 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction\DTO;
 
 use Oro\Bundle\DataGridBundle\Extension\MassAction\DTO\SelectedItems;
+use PHPUnit\Framework\TestCase;
 
-class SelectedItemsTest extends \PHPUnit\Framework\TestCase
+class SelectedItemsTest extends TestCase
 {
-    public function testIsEmptyWhenEmpty()
+    public function testIsEmptyWhenEmpty(): void
     {
         $selectedItems = new SelectedItems([], true);
 
@@ -16,7 +17,7 @@ class SelectedItemsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider notEmptyDataProvider
      */
-    public function testIsEmptyWhenNotEmpty(array $values, bool $inset)
+    public function testIsEmptyWhenNotEmpty(array $values, bool $inset): void
     {
         $selectedItems = new SelectedItems($values, $inset);
 
@@ -41,7 +42,7 @@ class SelectedItemsTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetValues()
+    public function testGetValues(): void
     {
         $values = [1, 2, 3];
         $selectedItems = new SelectedItems($values, true);
@@ -49,21 +50,21 @@ class SelectedItemsTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($values, $selectedItems->getValues());
     }
 
-    public function testIsInsetWhenTrue()
+    public function testIsInsetWhenTrue(): void
     {
         $selectedItems = new SelectedItems([], true);
 
         self::assertTrue($selectedItems->isInset());
     }
 
-    public function testIsInsetWhenFalse()
+    public function testIsInsetWhenFalse(): void
     {
         $selectedItems = new SelectedItems([], false);
 
         self::assertFalse($selectedItems->isInset());
     }
 
-    public function testCreateFromParametersWithDefaultValues()
+    public function testCreateFromParametersWithDefaultValues(): void
     {
         $selectedItems = SelectedItems::createFromParameters([]);
 
@@ -71,14 +72,14 @@ class SelectedItemsTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(true, $selectedItems->isInset());
     }
 
-    public function testCreateFromParametersWithInsetGiven()
+    public function testCreateFromParametersWithInsetGiven(): void
     {
         $expectedSelectedItems = new SelectedItems([], false);
 
         self::assertEquals($expectedSelectedItems, SelectedItems::createFromParameters(['inset' => false]));
     }
 
-    public function testCreateFromParametersWithValuesGiven()
+    public function testCreateFromParametersWithValuesGiven(): void
     {
         $values = [2, 9];
         $expectedSelectedItems = new SelectedItems($values, true);
@@ -86,7 +87,7 @@ class SelectedItemsTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedSelectedItems, SelectedItems::createFromParameters(['values' => $values]));
     }
 
-    public function testCreateFromParameters()
+    public function testCreateFromParameters(): void
     {
         $values = [2, 9];
         $inset = false;

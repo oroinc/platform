@@ -5,8 +5,9 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Api\Repository;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Oro\Bundle\ConfigBundle\Api\Repository\ConfigurationOptionFilterVisitor;
+use PHPUnit\Framework\TestCase;
 
-class ConfigurationOptionFilterVisitorTest extends \PHPUnit\Framework\TestCase
+class ConfigurationOptionFilterVisitorTest extends TestCase
 {
     private ConfigurationOptionFilterVisitor $visitor;
 

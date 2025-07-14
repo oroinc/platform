@@ -12,9 +12,11 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowScopeConfigurationException;
 use Oro\Bundle\WorkflowBundle\Scope\WorkflowScopeManager;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class WorkflowScopeManagerTest extends \PHPUnit\Framework\TestCase
+class WorkflowScopeManagerTest extends TestCase
 {
     use EntityTrait;
 
@@ -22,20 +24,11 @@ class WorkflowScopeManagerTest extends \PHPUnit\Framework\TestCase
     private const ENTITY_CLASS = 'stdClass';
     private const ENTITY_ID = 42;
 
-    /** @var ObjectRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $scopeManager;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var WorkflowScopeManager */
-    private $workflowScopeManager;
+    private ObjectRepository&MockObject $repository;
+    private ObjectManager&MockObject $manager;
+    private ScopeManager&MockObject $scopeManager;
+    private LoggerInterface&MockObject $logger;
+    private WorkflowScopeManager $workflowScopeManager;
 
     #[\Override]
     protected function setUp(): void
@@ -63,7 +56,7 @@ class WorkflowScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->workflowScopeManager = new WorkflowScopeManager($registry, $this->scopeManager, $this->logger);
     }
 
-    public function testUpdateScopes()
+    public function testUpdateScopes(): void
     {
         $scope1 = $this->createScope(101);
         $scope2 = $this->createScope(102);
@@ -102,7 +95,7 @@ class WorkflowScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$scope1, $scope2], array_values($definition->getScopes()->toArray()));
     }
 
-    public function testUpdateScopesWithResetFlag()
+    public function testUpdateScopesWithResetFlag(): void
     {
         $this->scopeManager->expects($this->never())
             ->method($this->anything());
@@ -129,7 +122,7 @@ class WorkflowScopeManagerTest extends \PHPUnit\Framework\TestCase
         WorkflowDefinition $definition,
         string $exception,
         string $exceptionMessage
-    ) {
+    ): void {
         $this->scopeManager->expects($this->once())
             ->method('getScopeEntities')
             ->with(WorkflowScopeManager::SCOPE_TYPE)

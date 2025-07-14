@@ -8,20 +8,15 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\WorkflowBundle\EventListener\GridsSubscriber;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class GridSubscriberTest extends \PHPUnit\Framework\TestCase
+class GridSubscriberTest extends TestCase
 {
-    /** @var GridsSubscriber|\PHPUnit\Framework\MockObject\MockObject */
-    private $gridSubscriber;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featurechecker;
-
-    /** @var QueryBuilder */
-    private $queryBuilder;
-
-    /** @var OrmResultBeforeQuery|\PHPUnit\Framework\MockObject\MockObject */
-    private $event;
+    private GridsSubscriber $gridSubscriber;
+    private FeatureChecker&MockObject $featurechecker;
+    private QueryBuilder $queryBuilder;
+    private OrmResultBeforeQuery&MockObject $event;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +33,7 @@ class GridSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->queryBuilder);
     }
 
-    public function testOnWorkflowsResultBeforeQueryWithDisabledEntities()
+    public function testOnWorkflowsResultBeforeQueryWithDisabledEntities(): void
     {
         $disabledEntities = [
             'Acme\Bundle\TestBundle\AcmeEntity',
@@ -59,7 +54,7 @@ class GridSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($disabledEntities, $this->queryBuilder->getParameter('relatedEntities')->getValue());
     }
 
-    public function testOnWorkflowsResultBeforeQueryWithoutDisabledEntities()
+    public function testOnWorkflowsResultBeforeQueryWithoutDisabledEntities(): void
     {
         $this->featurechecker->expects($this->once())
             ->method('getDisabledResourcesByType')
@@ -71,7 +66,7 @@ class GridSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('', (string) $this->queryBuilder->getDQLPart('where'));
     }
 
-    public function testOnProcessesResultBeforeQueryWithDisabledProcesses()
+    public function testOnProcessesResultBeforeQueryWithDisabledProcesses(): void
     {
         $disabledProcesses = ['activate_update_territory_assignment'];
         $this->featurechecker->expects($this->once())
@@ -85,7 +80,7 @@ class GridSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($disabledProcesses, $this->queryBuilder->getParameter('processes')->getValue());
     }
 
-    public function testOnProcessesResultBeforeQueryWithoutDisabledProcesses()
+    public function testOnProcessesResultBeforeQueryWithoutDisabledProcesses(): void
     {
         $this->featurechecker->expects($this->once())
             ->method('getDisabledResourcesByType')

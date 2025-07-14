@@ -5,6 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Datagrid\Extension;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
@@ -17,29 +18,20 @@ use Oro\Bundle\LocaleBundle\Datagrid\Extension\LocalizedValueExtension;
 use Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
+class LocalizedValueExtensionTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassResolver;
-
-    /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationHelper;
-
-    /** @var OrmDatasource|\PHPUnit\Framework\MockObject\MockObject */
-    private $datasource;
-
-    /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryBuilder;
-
-    /** @var LocalizedValueExtension */
-    private $extension;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityClassResolver&MockObject $entityClassResolver;
+    private LocalizationHelper&MockObject $localizationHelper;
+    private OrmDatasource&MockObject $datasource;
+    private QueryBuilder&MockObject $queryBuilder;
+    private LocalizedValueExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -59,7 +51,7 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->setParameters(new ParameterBag());
     }
 
-    public function testApplicable()
+    public function testApplicable(): void
     {
         $config = DatagridConfiguration::create([
             'properties' => [
@@ -81,7 +73,7 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->extension->isApplicable($config));
     }
 
-    public function testNotApplicable()
+    public function testNotApplicable(): void
     {
         $config = DatagridConfiguration::create([
             'properties' => [
@@ -92,7 +84,7 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->extension->isApplicable($config));
     }
 
-    public function testProcessConfigsWithoutCurrentLocalization()
+    public function testProcessConfigsWithoutCurrentLocalization(): void
     {
         $config = DatagridConfiguration::create([]);
         $clonedConfig = clone $config;
@@ -106,7 +98,7 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($config, $clonedConfig);
     }
 
-    public function testProcessConfigs()
+    public function testProcessConfigs(): void
     {
         $config = DatagridConfiguration::create([
             'properties' => [
@@ -137,7 +129,7 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedConfig->toArray(), $config->toArray());
     }
 
-    public function testVisitDatasourceWithCurrentLocalization()
+    public function testVisitDatasourceWithCurrentLocalization(): void
     {
         $config = DatagridConfiguration::create([]);
 
@@ -151,7 +143,7 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitDatasource($config, $this->datasource);
     }
 
-    public function testVisitDatasourceWithoutRootAlias()
+    public function testVisitDatasourceWithoutRootAlias(): void
     {
         $config = DatagridConfiguration::create([]);
 
@@ -165,7 +157,7 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitDatasource($config, $this->datasource);
     }
 
-    public function testVisitDatasource()
+    public function testVisitDatasource(): void
     {
         $config = DatagridConfiguration::create([
             'properties' => [
@@ -201,7 +193,7 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('innerJoin')
-            ->with('alias1.properties', 'columnNames', Expr\Join::WITH, 'columnNames.localization IS NULL')
+            ->with('alias1.properties', 'columnNames', Join::WITH, 'columnNames.localization IS NULL')
             ->willReturnSelf();
 
         $this->queryBuilder->expects($this->once())
@@ -222,7 +214,7 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitDatasource($config, $this->datasource);
     }
 
-    public function testVisitDatasourceAllowingEmpty()
+    public function testVisitDatasourceAllowingEmpty(): void
     {
         $config = DatagridConfiguration::create([
             'properties' => [
@@ -259,7 +251,7 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('leftJoin')
-            ->with('alias1.properties', 'columnNames', Expr\Join::WITH, 'columnNames.localization IS NULL')
+            ->with('alias1.properties', 'columnNames', Join::WITH, 'columnNames.localization IS NULL')
             ->willReturnSelf();
 
         $this->queryBuilder->expects($this->once())
@@ -284,7 +276,7 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitDatasource($config, $this->datasource);
     }
 
-    public function testVisitResultWithoutCurrentLocalization()
+    public function testVisitResultWithoutCurrentLocalization(): void
     {
         $config = DatagridConfiguration::create([]);
 
@@ -297,7 +289,7 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitResult($config, $result);
     }
 
-    public function testVisitResultWithoutRootAlias()
+    public function testVisitResultWithoutRootAlias(): void
     {
         $config = DatagridConfiguration::create([]);
 
@@ -310,7 +302,7 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitResult($config, $result);
     }
 
-    public function testVisitResult()
+    public function testVisitResult(): void
     {
         $config = DatagridConfiguration::create([
             'properties' => [
@@ -381,7 +373,7 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$record], $result->getData());
     }
 
-    public function testGetPriority()
+    public function testGetPriority(): void
     {
         $this->assertEquals(200, $this->extension->getPriority());
     }

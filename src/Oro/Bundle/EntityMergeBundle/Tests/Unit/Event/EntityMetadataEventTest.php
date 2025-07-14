@@ -4,14 +4,13 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityMetadataEventTest extends \PHPUnit\Framework\TestCase
+class EntityMetadataEventTest extends TestCase
 {
-    /** @var EntityMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityMetadata;
-
-    /** @var EntityMetadataEvent */
-    private $event;
+    private EntityMetadata&MockObject $entityMetadata;
+    private EntityMetadataEvent $event;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class EntityMetadataEventTest extends \PHPUnit\Framework\TestCase
         $this->event = new EntityMetadataEvent($this->entityMetadata);
     }
 
-    public function testGetEntityData()
+    public function testGetEntityData(): void
     {
         $this->assertEquals($this->entityMetadata, $this->event->getEntityMetadata());
     }

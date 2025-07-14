@@ -6,13 +6,14 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\TestDomainObject;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsComment;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
 
-class ObjectIdAccessorTest extends \PHPUnit\Framework\TestCase
+class ObjectIdAccessorTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
+    private DoctrineHelper&MockObject $doctrineHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +21,7 @@ class ObjectIdAccessorTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
     }
 
-    public function testGetIdPrefersInterfaceOverGetId()
+    public function testGetIdPrefersInterfaceOverGetId(): void
     {
         $accessor = new ObjectIdAccessor($this->doctrineHelper);
 
@@ -34,7 +35,7 @@ class ObjectIdAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('getObjectIdentifier()', $id);
     }
 
-    public function testGetIdWithoutDomainObjectInterface()
+    public function testGetIdWithoutDomainObjectInterface(): void
     {
         $accessor = new ObjectIdAccessor($this->doctrineHelper);
 
@@ -42,7 +43,7 @@ class ObjectIdAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('getId()', $id);
     }
 
-    public function testGetIdNull()
+    public function testGetIdNull(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
@@ -52,14 +53,14 @@ class ObjectIdAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getId(null);
     }
 
-    public function testGetIdNonValidObject()
+    public function testGetIdNonValidObject(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $accessor = new ObjectIdAccessor($this->doctrineHelper);
         $accessor->getId(new \stdClass());
     }
 
-    public function testGetIdEntity()
+    public function testGetIdEntity(): void
     {
         $accessor = new ObjectIdAccessor($this->doctrineHelper);
 

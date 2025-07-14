@@ -5,16 +5,15 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Twig;
 use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
 use Oro\Bundle\TranslationBundle\Twig\TranslationExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TranslationExtensionTest extends \PHPUnit\Framework\TestCase
+class TranslationExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var TranslationsDatagridRouteHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationRouteHelper;
-
-    /** @var TranslationExtension */
-    private $extension;
+    private TranslationsDatagridRouteHelper&MockObject $translationRouteHelper;
+    private TranslationExtension $extension;
 
     #[\Override]
     protected function setUp(): void

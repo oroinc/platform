@@ -8,8 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType as BaseTextareaType;
 
 class TextareaTypeTest extends AbstractConfigTypeTestCase
 {
-    /** @var TextareaType */
-    private $type;
+    private TextareaType $type;
 
     #[\Override]
     protected function setUp(): void

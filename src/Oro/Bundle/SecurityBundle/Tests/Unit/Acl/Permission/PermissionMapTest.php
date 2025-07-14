@@ -6,11 +6,11 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\ActionMaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionMap;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\TestHelper;
+use PHPUnit\Framework\TestCase;
 
-class PermissionMapTest extends \PHPUnit\Framework\TestCase
+class PermissionMapTest extends TestCase
 {
-    /** @var PermissionMap */
-    private $map;
+    private PermissionMap $map;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class PermissionMapTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMasksReturnsNullWhenNotSupportedMask()
+    public function testGetMasksReturnsNullWhenNotSupportedMask(): void
     {
         $this->assertNull($this->map->getMasks('IS_AUTHENTICATED_REMEMBERED', null));
     }
@@ -28,7 +28,7 @@ class PermissionMapTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getMasksProvider
      */
-    public function testGetMasks(object|string $object, string $name, array $mask)
+    public function testGetMasks(object|string $object, string $name, array $mask): void
     {
         $this->assertEquals($mask, $this->map->getMasks($name, $object));
     }
@@ -36,7 +36,7 @@ class PermissionMapTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider containsProvider
      */
-    public function testContains(string $name, bool $expectedResult)
+    public function testContains(string $name, bool $expectedResult): void
     {
         $this->assertEquals($expectedResult, $this->map->contains($name));
     }

@@ -8,31 +8,22 @@ use Gos\Bundle\WebSocketBundle\Router\WampRequest;
 use Oro\Bundle\SyncBundle\Topic\SecuredTopic;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class SecuredTopicTest extends \PHPUnit\Framework\TestCase
+class SecuredTopicTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var ClientManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $clientManipulator;
-
-    /** @var SecuredTopic */
-    private $securedTopic;
-
-    /** @var ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var Topic|\PHPUnit\Framework\MockObject\MockObject */
-    private $topic;
-
-    /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
-    private $parameterBag;
-
-    /** @var WampRequest|\PHPUnit\Framework\MockObject\MockObject */
-    private $request;
+    private ClientManipulatorInterface&MockObject $clientManipulator;
+    private SecuredTopic $securedTopic;
+    private ConnectionInterface&MockObject $connection;
+    private Topic&MockObject $topic;
+    private ParameterBag&MockObject $parameterBag;
+    private WampRequest $request;
 
     #[\Override]
     protected function setUp(): void

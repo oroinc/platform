@@ -7,14 +7,15 @@ use Knp\Menu\MenuFactory;
 use Knp\Menu\MenuItem;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Oro\Bundle\NavigationBundle\Menu\ChainBreadcrumbManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 
-class ChainBreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
+class ChainBreadcrumbManagerTest extends TestCase
 {
     private const MENU_NAME = 'test_menu';
 
-    /** @var FactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $factory;
+    private FactoryInterface&MockObject $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +23,7 @@ class ChainBreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $this->factory = $this->createMock(MenuFactory::class);
     }
 
-    public function testGetBreadcrumbs()
+    public function testGetBreadcrumbs(): void
     {
         $manager = $this->createMock(BreadcrumbManagerInterface::class);
         $manager->expects($this->once())
@@ -36,7 +37,7 @@ class ChainBreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $manager->getBreadcrumbs(self::MENU_NAME);
     }
 
-    public function testGetBreadcrumbsWithRoute()
+    public function testGetBreadcrumbsWithRoute(): void
     {
         $validRoute = 'valid_route';
         $invalidRoute = 'invalid_route';
@@ -108,7 +109,7 @@ class ChainBreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $manager->getBreadcrumbs(self::MENU_NAME, true, 'invalid_route');
     }
 
-    public function testGetMenu()
+    public function testGetMenu(): void
     {
         $manager = $this->createMock(BreadcrumbManagerInterface::class);
         $manager->expects($this->once())
@@ -122,7 +123,7 @@ class ChainBreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $manager->getMenu(self::MENU_NAME);
     }
 
-    public function testGetBreadcrumbArray()
+    public function testGetBreadcrumbArray(): void
     {
         $menuItem = new MenuItem('test', $this->factory);
 
@@ -138,7 +139,7 @@ class ChainBreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $manager->getBreadcrumbArray(self::MENU_NAME, $menuItem);
     }
 
-    public function testGetCurrentMenuItem()
+    public function testGetCurrentMenuItem(): void
     {
         $manager = $this->createMock(BreadcrumbManagerInterface::class);
         $manager->expects($this->once())
@@ -152,7 +153,7 @@ class ChainBreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $manager->getCurrentMenuItem(self::MENU_NAME);
     }
 
-    public function testGetBreadcrumbLabels()
+    public function testGetBreadcrumbLabels(): void
     {
         $route = new Route('test_route');
 
@@ -169,7 +170,7 @@ class ChainBreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $manager->getBreadcrumbLabels(self::MENU_NAME, $route);
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $manager = $this->createMock(BreadcrumbManagerInterface::class);
         $manager->expects($this->once())
@@ -183,7 +184,7 @@ class ChainBreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($manager->supports());
     }
 
-    public function testSupportsWhenNoManagersSupportRequest()
+    public function testSupportsWhenNoManagersSupportRequest(): void
     {
         $route = 'test';
 

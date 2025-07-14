@@ -6,16 +6,16 @@ use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationParentSelectType;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class LocalizationParentSelectTypeTest extends \PHPUnit\Framework\TestCase
+class LocalizationParentSelectTypeTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var LocalizationParentSelectType */
-    private $formType;
+    private LocalizationParentSelectType $formType;
 
     #[\Override]
     protected function setUp(): void
@@ -23,39 +23,37 @@ class LocalizationParentSelectTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType = new LocalizationParentSelectType();
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(OroEntitySelectOrCreateInlineType::class, $this->formType->getParent());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals(LocalizationParentSelectType::NAME, $this->formType->getName());
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $optionsResolver = $this->createMock(OptionsResolver::class);
         $optionsResolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'))
-            ->willReturnCallback(
-                function (array $options) use ($optionsResolver) {
-                    $this->assertArrayHasKey('autocomplete_alias', $options);
-                    $this->assertEquals('oro_localization_parent', $options['autocomplete_alias']);
+            ->willReturnCallback(function (array $options) use ($optionsResolver) {
+                $this->assertArrayHasKey('autocomplete_alias', $options);
+                $this->assertEquals('oro_localization_parent', $options['autocomplete_alias']);
 
-                    $this->assertArrayHasKey('configs', $options);
-                    $this->assertEquals(
-                        [
-                            'component' => 'autocomplete-entity-parent',
-                            'placeholder' => 'oro.locale.localization.form.placeholder.select_parent_localization'
-                        ],
-                        $options['configs']
-                    );
+                $this->assertArrayHasKey('configs', $options);
+                $this->assertEquals(
+                    [
+                        'component' => 'autocomplete-entity-parent',
+                        'placeholder' => 'oro.locale.localization.form.placeholder.select_parent_localization'
+                    ],
+                    $options['configs']
+                );
 
-                    return $optionsResolver;
-                }
-            );
+                return $optionsResolver;
+            });
 
         $this->formType->configureOptions($optionsResolver);
     }
@@ -63,7 +61,7 @@ class LocalizationParentSelectTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildViewDataProvider
      */
-    public function testBuildView(?object $parentData, ?int $expectedParentId, array $expectedIds)
+    public function testBuildView(?object $parentData, ?int $expectedParentId, array $expectedIds): void
     {
         $parentForm = $this->createMock(FormInterface::class);
         $parentForm->expects($this->once())

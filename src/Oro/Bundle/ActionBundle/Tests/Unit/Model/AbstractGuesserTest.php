@@ -12,31 +12,22 @@ use Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
+class AbstractGuesserTest extends TestCase
 {
-    /* @var FormRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $formRegistry;
-
-    /* @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
-
-    /* @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigProvider;
-
-    /* @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $formConfigProvider;
-
-    /* @var DoctrineTypeMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineTypeMappingProvider;
-
-    /* @var AbstractGuesser */
-    private $guesser;
+    private FormRegistry&MockObject $formRegistry;
+    private ManagerRegistry&MockObject $managerRegistry;
+    private ConfigProvider&MockObject $entityConfigProvider;
+    private ConfigProvider&MockObject $formConfigProvider;
+    private DoctrineTypeMappingProvider&MockObject $doctrineTypeMappingProvider;
+    private AbstractGuesser $guesser;
 
     #[\Override]
     protected function setUp(): void
@@ -59,7 +50,7 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
         $this->guesser->setDoctrineTypeMappingProvider($this->doctrineTypeMappingProvider);
     }
 
-    public function testGuessMetadataAndFieldNoEntityManagerException()
+    public function testGuessMetadataAndFieldNoEntityManagerException(): void
     {
         $this->expectException(AttributeException::class);
         $this->expectExceptionMessage("Can't get entity manager for class RootClass");
@@ -74,7 +65,7 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
         $this->guesser->guessMetadataAndField($rootClass, 'entity.field');
     }
 
-    public function testAddDoctrineTypeMapping()
+    public function testAddDoctrineTypeMapping(): void
     {
         $doctrineType = 'date';
         $attributeType = 'object';
@@ -115,13 +106,13 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessMetadataAndFieldOneElement()
+    public function testGuessMetadataAndFieldOneElement(): void
     {
         $this->assertNull($this->guesser->guessMetadataAndField('TestEntity', 'single_element_path'));
         $this->assertNull($this->guesser->guessMetadataAndField('TestEntity', new PropertyPath('single_element_path')));
     }
 
-    public function testGuessMetadataAndFieldInvalidComplexPath()
+    public function testGuessMetadataAndFieldInvalidComplexPath(): void
     {
         $propertyPath = 'entity.unknown_field';
         $rootClass = 'RootClass';
@@ -141,7 +132,7 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->guesser->guessMetadataAndField($rootClass, $propertyPath));
     }
 
-    public function testGuessMetadataAndFieldAssociationField()
+    public function testGuessMetadataAndFieldAssociationField(): void
     {
         $propertyPath = 'entity.association';
         $rootClass = 'RootClass';
@@ -160,7 +151,7 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessMetadataAndFieldSecondLevelAssociation()
+    public function testGuessMetadataAndFieldSecondLevelAssociation(): void
     {
         $propertyPath = 'entity.association.field';
         $rootClass = 'RootClass';
@@ -194,12 +185,12 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessParametersNoMetadataAndFieldGuess()
+    public function testGuessParametersNoMetadataAndFieldGuess(): void
     {
         $this->assertNull($this->guesser->guessParameters('TestEntity', 'single_element_path'));
     }
 
-    public function testGuessParametersFieldWithoutMapping()
+    public function testGuessParametersFieldWithoutMapping(): void
     {
         $propertyPath = 'entity.field';
         $rootClass = 'RootClass';
@@ -227,7 +218,7 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->guesser->guessParameters($rootClass, $propertyPath));
     }
 
-    public function testGuessParametersFieldWithMapping()
+    public function testGuessParametersFieldWithMapping(): void
     {
         $propertyPath = 'entity.field';
         $rootClass = 'RootClass';
@@ -272,7 +263,7 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessParametersSingleAssociation()
+    public function testGuessParametersSingleAssociation(): void
     {
         $propertyPath = 'entity.association';
         $rootClass = 'RootClass';
@@ -315,7 +306,7 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessParametersFieldFromEntityConfig()
+    public function testGuessParametersFieldFromEntityConfig(): void
     {
         $propertyPath = 'entity.field';
         $rootClass = 'RootClass';
@@ -357,7 +348,7 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessParametersCollectionAssociation()
+    public function testGuessParametersCollectionAssociation(): void
     {
         $propertyPath = 'entity.association';
         $rootClass = 'RootClass';

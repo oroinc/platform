@@ -15,9 +15,10 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class ExportMessageProcessorTest extends TestCase
 {
     public function testShouldReturnSubscribedTopics(): void
     {

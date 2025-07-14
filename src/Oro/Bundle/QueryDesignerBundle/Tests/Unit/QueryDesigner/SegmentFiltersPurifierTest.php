@@ -3,11 +3,11 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\QueryDesigner;
 
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SegmentFiltersPurifier;
+use PHPUnit\Framework\TestCase;
 
-class SegmentFiltersPurifierTest extends \PHPUnit\Framework\TestCase
+class SegmentFiltersPurifierTest extends TestCase
 {
-    /** @var SegmentFiltersPurifier */
-    private $segmentFiltersPurifier;
+    private SegmentFiltersPurifier $segmentFiltersPurifier;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class SegmentFiltersPurifierTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider purifyFiltersDataProvider
      */
-    public function testPurifyFilters(array $filters, array $expectedFilters)
+    public function testPurifyFilters(array $filters, array $expectedFilters): void
     {
         self::assertEquals($expectedFilters, $this->segmentFiltersPurifier->purifyFilters($filters));
     }

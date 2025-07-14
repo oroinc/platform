@@ -5,17 +5,16 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\EventListener;
 use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
 use Oro\Bundle\UIBundle\EventListener\ContentProviderListener;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class ContentProviderListenerTest extends \PHPUnit\Framework\TestCase
+class ContentProviderListenerTest extends TestCase
 {
-    /** @var ContentProviderManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $contentProviderManager;
-
-    /** @var ContentProviderListener */
-    private $listener;
+    private ContentProviderManager&MockObject $contentProviderManager;
+    private ContentProviderListener $listener;
 
     #[\Override]
     protected function setUp(): void

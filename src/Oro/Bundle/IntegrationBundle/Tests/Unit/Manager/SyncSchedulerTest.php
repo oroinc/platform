@@ -7,8 +7,9 @@ use Oro\Bundle\IntegrationBundle\Manager\SyncScheduler;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use PHPUnit\Framework\TestCase;
 
-class SyncSchedulerTest extends \PHPUnit\Framework\TestCase
+class SyncSchedulerTest extends TestCase
 {
     use MessageQueueExtension;
 

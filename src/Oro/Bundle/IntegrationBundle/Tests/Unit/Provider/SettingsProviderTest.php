@@ -9,17 +9,16 @@ use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestService;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Config\Resolver\SystemAwareResolver;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class SettingsProviderTest extends \PHPUnit\Framework\TestCase
+class SettingsProviderTest extends TestCase
 {
     use TempDirExtension;
 
-    /** @var SettingsProvider */
-    private $settingsProvider;
-
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
+    private SettingsProvider $settingsProvider;
+    private ContainerInterface&MockObject $container;
 
     #[\Override]
     protected function setUp(): void
@@ -45,7 +44,7 @@ class SettingsProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFormSettingsDataProvider
      */
-    public function testGetFormSettings($integrationType, $resolvedValue, $expectedResult)
+    public function testGetFormSettings($integrationType, $resolvedValue, $expectedResult): void
     {
         $this->container->expects($this->any())
             ->method('get')
@@ -123,7 +122,7 @@ class SettingsProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetFormSettingsForUndefinedForm()
+    public function testGetFormSettingsForUndefinedForm(): void
     {
         $this->assertSame(
             [],

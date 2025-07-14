@@ -6,8 +6,9 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutContextStack;
+use PHPUnit\Framework\TestCase;
 
-class LayoutContextStackTest extends \PHPUnit\Framework\TestCase
+class LayoutContextStackTest extends TestCase
 {
     private LayoutContextStack $layoutContextStack;
 

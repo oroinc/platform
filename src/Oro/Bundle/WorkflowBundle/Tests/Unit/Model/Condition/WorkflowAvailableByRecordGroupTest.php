@@ -7,17 +7,16 @@ use Oro\Bundle\WorkflowBundle\Model\Condition\WorkflowAvailableByRecordGroup;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowAvailableByRecordGroupTest extends \PHPUnit\Framework\TestCase
+class WorkflowAvailableByRecordGroupTest extends TestCase
 {
     private const GROUP_NAME = 'test_group_name';
     private const ENTITY_CLASS = 'stdClass';
 
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var WorkflowAvailableByRecordGroup */
-    private $condition;
+    private WorkflowManager&MockObject $workflowManager;
+    private WorkflowAvailableByRecordGroup $condition;
 
     #[\Override]
     protected function setUp(): void

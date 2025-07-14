@@ -10,22 +10,17 @@ use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-class LocalizationVoterTest extends \PHPUnit\Framework\TestCase
+class LocalizationVoterTest extends TestCase
 {
-    /** @var LocalizationRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var LocalizationVoter */
-    private $voter;
+    private LocalizationRepository&MockObject $repository;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ConfigManager&MockObject $configManager;
+    private LocalizationVoter $voter;
 
     #[\Override]
     protected function setUp(): void
@@ -52,8 +47,13 @@ class LocalizationVoterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider voteDataProvider
      */
-    public function testVote(?int $count, int $defaultLocalization, object $object, string $attribute, int $expected)
-    {
+    public function testVote(
+        ?int $count,
+        int $defaultLocalization,
+        object $object,
+        string $attribute,
+        int $expected
+    ): void {
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
             ->with(Localization::class)
@@ -62,7 +62,9 @@ class LocalizationVoterTest extends \PHPUnit\Framework\TestCase
         $this->repository->expects($this->any())
             ->method('getLocalizationsCount')
             ->willReturn($count);
-        $this->configManager->method('get')->willReturn($defaultLocalization);
+        $this->configManager->expects(self::any())
+            ->method('get')
+            ->willReturn($defaultLocalization);
 
         $this->assertEquals(
             $expected,

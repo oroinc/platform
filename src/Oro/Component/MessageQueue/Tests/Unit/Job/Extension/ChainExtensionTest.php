@@ -5,14 +5,13 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Job\Extension;
 use Oro\Component\MessageQueue\Job\Extension\ChainExtension;
 use Oro\Component\MessageQueue\Job\Extension\ExtensionInterface;
 use Oro\Component\MessageQueue\Job\Job;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChainExtensionTest extends \PHPUnit\Framework\TestCase
+class ChainExtensionTest extends TestCase
 {
-    /** @var ChainExtension */
-    protected $chainExtension;
-
-    /** @var ExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $subExtension;
+    protected ChainExtension $chainExtension;
+    protected ExtensionInterface&MockObject $subExtension;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $this->chainExtension = new ChainExtension([$this->subExtension]);
     }
 
-    public function testOnPreRunUnique()
+    public function testOnPreRunUnique(): void
     {
         $job = new Job();
 
@@ -32,7 +31,7 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $this->chainExtension->onPreRunUnique($job);
     }
 
-    public function testOnPostRunUnique()
+    public function testOnPostRunUnique(): void
     {
         $job = new Job();
 
@@ -43,7 +42,7 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $this->chainExtension->onPostRunUnique($job, true);
     }
 
-    public function testOnPreRunDelayed()
+    public function testOnPreRunDelayed(): void
     {
         $job = new Job();
 
@@ -54,7 +53,7 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $this->chainExtension->onPreRunDelayed($job);
     }
 
-    public function testOnPostRunDelayed()
+    public function testOnPostRunDelayed(): void
     {
         $job = new Job();
 
@@ -65,7 +64,7 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $this->chainExtension->onPostRunDelayed($job, true);
     }
 
-    public function testOnPreCreateDelayed()
+    public function testOnPreCreateDelayed(): void
     {
         $job = new Job();
 
@@ -76,7 +75,7 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $this->chainExtension->onPreCreateDelayed($job);
     }
 
-    public function testOnPostCreateDelayed()
+    public function testOnPostCreateDelayed(): void
     {
         $job = new Job();
 
@@ -87,7 +86,7 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $this->chainExtension->onPostCreateDelayed($job, true);
     }
 
-    public function testOnCancel()
+    public function testOnCancel(): void
     {
         $job = new Job();
 
@@ -98,7 +97,7 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $this->chainExtension->onCancel($job);
     }
 
-    public function testOnError()
+    public function testOnError(): void
     {
         $job = new Job();
 

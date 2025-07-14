@@ -6,18 +6,15 @@ use Oro\Bundle\UIBundle\Layout\Extension\IsMobileContextConfigurator;
 use Oro\Bundle\UIBundle\Provider\UserAgent;
 use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
 use Oro\Component\Layout\ContextInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class IsMobileContextConfiguratorTest extends \PHPUnit\Framework\TestCase
+class IsMobileContextConfiguratorTest extends TestCase
 {
-    /** @var UserAgentProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $userAgentProvider;
-
-    /** @var UserAgent|\PHPUnit\Framework\MockObject\MockObject */
-    private $userAgent;
-
-    /** @var IsMobileContextConfigurator */
-    private $isMobileContextConfigurator;
+    private UserAgentProvider&MockObject $userAgentProvider;
+    private UserAgent&MockObject $userAgent;
+    private IsMobileContextConfigurator $isMobileContextConfigurator;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +25,7 @@ class IsMobileContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->isMobileContextConfigurator = new IsMobileContextConfigurator($this->userAgentProvider);
     }
 
-    public function testConfigureContext()
+    public function testConfigureContext(): void
     {
         $optionResolver = $this->createMock(OptionsResolver::class);
         $optionResolver->expects($this->once())

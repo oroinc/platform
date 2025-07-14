@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\FieldNameLength;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\FieldNameLengthValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -13,8 +14,7 @@ class FieldNameLengthValidatorTest extends ConstraintValidatorTestCase
 {
     private const STRING = 'FieldNameFieldNameFieldNameFieldNameFieldName';
 
-    /** @var ExtendDbIdentifierNameGenerator|\PHPUnit\Framework\MockObject\MockObject */
-    private $nameGenerator;
+    private ExtendDbIdentifierNameGenerator&MockObject $nameGenerator;
 
     #[\Override]
     protected function setUp(): void

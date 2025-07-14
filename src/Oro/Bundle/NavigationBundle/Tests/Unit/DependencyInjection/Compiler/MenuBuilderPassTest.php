@@ -3,20 +3,18 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuBuilderPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class MenuBuilderPassTest extends \PHPUnit\Framework\TestCase
+class MenuBuilderPassTest extends TestCase
 {
     private ContainerBuilder $container;
-
     private Definition $chainMenuBuilder;
-
     private Definition $itemFactory;
-
     private MenuBuilderPass $compiler;
 
     #[\Override]

@@ -3,10 +3,11 @@
 namespace Oro\Bundle\SoapBundle\Tests\Unit\Request\Parameters\Filter;
 
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
+use PHPUnit\Framework\TestCase;
 
-class HttpDateTimeParameterFilterTest extends \PHPUnit\Framework\TestCase
+class HttpDateTimeParameterFilterTest extends TestCase
 {
-    public function testFilter()
+    public function testFilter(): void
     {
         $filter = new HttpDateTimeParameterFilter();
 

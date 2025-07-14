@@ -5,10 +5,11 @@ namespace Oro\Component\Layout\Tests\Unit\Loader\Visitor;
 use Oro\Component\Layout\Exception\UnexpectedTypeException;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
+use PHPUnit\Framework\TestCase;
 
-class VisitorCollectionTest extends \PHPUnit\Framework\TestCase
+class VisitorCollectionTest extends TestCase
 {
-    public function testShouldValidateConstructParameters()
+    public function testShouldValidateConstructParameters(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
@@ -18,7 +19,7 @@ class VisitorCollectionTest extends \PHPUnit\Framework\TestCase
         new VisitorCollection([new \stdClass()]);
     }
 
-    public function testShouldAcceptValidConditionsAsConstructorParameters()
+    public function testShouldAcceptValidConditionsAsConstructorParameters(): void
     {
         $collection = new VisitorCollection(
             [$this->createMock(VisitorInterface::class)]
@@ -27,7 +28,7 @@ class VisitorCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($collection);
     }
 
-    public function testAppendShouldValidateParameter()
+    public function testAppendShouldValidateParameter(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
@@ -39,7 +40,7 @@ class VisitorCollectionTest extends \PHPUnit\Framework\TestCase
         $collection->append(new \stdClass());
     }
 
-    public function testAppendShouldAcceptValidCondition()
+    public function testAppendShouldAcceptValidCondition(): void
     {
         $collection = new VisitorCollection();
         $this->assertEmpty($collection);

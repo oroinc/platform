@@ -11,23 +11,16 @@ use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Provider\FileTitleProvider;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FileTitleProviderTest extends \PHPUnit\Framework\TestCase
+class FileTitleProviderTest extends TestCase
 {
-    /** @var FileTitleProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerFileTitleProvider;
-
-    /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationHelper;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var FileTitleProvider */
-    private $provider;
-
-    /** @var File|\PHPUnit\Framework\MockObject\MockObject */
-    private $file;
+    private FileTitleProviderInterface&MockObject $innerFileTitleProvider;
+    private LocalizationHelper&MockObject $localizationHelper;
+    private ManagerRegistry&MockObject $doctrine;
+    private FileTitleProvider $provider;
+    private File&MockObject $file;
 
     #[\Override]
     protected function setUp(): void
@@ -49,8 +42,7 @@ class FileTitleProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTitleWhenNoDigitalAssetNoParent(): void
     {
-        $this->innerFileTitleProvider
-            ->expects($this->once())
+        $this->innerFileTitleProvider->expects($this->once())
             ->method('getTitle')
             ->with($this->file)
             ->willReturn($title = 'sample title');
@@ -60,8 +52,7 @@ class FileTitleProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTitleWhenNoDigitalAssetNoParentButLocalization(): void
     {
-        $this->innerFileTitleProvider
-            ->expects($this->once())
+        $this->innerFileTitleProvider->expects($this->once())
             ->method('getTitle')
             ->with($this->file, $localization = $this->createMock(Localization::class))
             ->willReturn($title = 'sample title');
@@ -75,25 +66,21 @@ class FileTitleProviderTest extends \PHPUnit\Framework\TestCase
             ->setParentEntityClass(DigitalAsset::class)
             ->setParentEntityId($parentEntityId = 10);
 
-        $this->doctrine
-            ->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getRepository')
             ->with(DigitalAsset::class)
             ->willReturn($repo = $this->createMock(EntityRepository::class));
 
-        $repo
-            ->expects($this->once())
+        $repo->expects($this->once())
             ->method('find')
             ->with($parentEntityId)
             ->willReturn($digitalAsset = $this->createMock(DigitalAsset::class));
 
-        $digitalAsset
-            ->expects($this->once())
+        $digitalAsset->expects($this->once())
             ->method('getTitles')
             ->willReturn($titles = $this->createMock(Collection::class));
 
-        $this->localizationHelper
-            ->expects($this->once())
+        $this->localizationHelper->expects($this->once())
             ->method('getLocalizedValue')
             ->with($titles)
             ->willReturn($title = 'sample title');
@@ -103,18 +90,15 @@ class FileTitleProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTitleWhenHasDigitalAsset(): void
     {
-        $this->file
-            ->expects($this->once())
+        $this->file->expects($this->once())
             ->method('getDigitalAsset')
             ->willReturn($digitalAsset = $this->createMock(DigitalAsset::class));
 
-        $digitalAsset
-            ->expects($this->once())
+        $digitalAsset->expects($this->once())
             ->method('getTitles')
             ->willReturn($titles = $this->createMock(Collection::class));
 
-        $this->localizationHelper
-            ->expects($this->once())
+        $this->localizationHelper->expects($this->once())
             ->method('getLocalizedValue')
             ->with($titles)
             ->willReturn($title = 'sample title');
@@ -124,18 +108,15 @@ class FileTitleProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTitleWhenHasDigitalAssetAndLocalization(): void
     {
-        $this->file
-            ->expects($this->once())
+        $this->file->expects($this->once())
             ->method('getDigitalAsset')
             ->willReturn($digitalAsset = $this->createMock(DigitalAsset::class));
 
-        $digitalAsset
-            ->expects($this->once())
+        $digitalAsset->expects($this->once())
             ->method('getTitles')
             ->willReturn($titles = $this->createMock(Collection::class));
 
-        $this->localizationHelper
-            ->expects($this->once())
+        $this->localizationHelper->expects($this->once())
             ->method('getLocalizedValue')
             ->with($titles)
             ->willReturn($title = 'sample title', $localization = $this->createMock(Localization::class));

@@ -10,20 +10,17 @@ use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapte
 use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchEnumFilter;
 use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchEnumFilterType;
 use Oro\Component\Exception\UnexpectedTypeException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-class SearchEnumFilterTest extends \PHPUnit\Framework\TestCase
+class SearchEnumFilterTest extends TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var DictionaryEntityDataProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $dictionaryEntityDataProvider;
-
-    /** @var SearchEnumFilter */
-    private $filter;
+    private FormFactoryInterface&MockObject $formFactory;
+    private DictionaryEntityDataProvider&MockObject $dictionaryEntityDataProvider;
+    private SearchEnumFilter $filter;
 
     #[\Override]
     protected function setUp(): void

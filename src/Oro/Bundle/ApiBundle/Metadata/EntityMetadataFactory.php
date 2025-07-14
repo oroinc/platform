@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Metadata;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\MappingException;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -45,8 +46,8 @@ class EntityMetadataFactory
         /** @var ClassMetadata $classMetadata */
         /** @var string $fieldName */
         [$classMetadata, $fieldName] = $this->getTargetClassMetadata($classMetadata, $propertyPath);
-        if (!$fieldType && $classMetadata->hasField($fieldName)) {
-            $fieldType = $this->getFieldType($classMetadata->getFieldMapping($fieldName));
+        if (!$fieldType && isset($classMetadata->fieldMappings[$fieldName])) {
+            $fieldType = $this->getFieldType($classMetadata->fieldMappings[$fieldName]);
         }
 
         return new MetaPropertyMetadata($fieldName, $fieldType);
@@ -60,14 +61,12 @@ class EntityMetadataFactory
         /** @var ClassMetadata $classMetadata */
         /** @var string $fieldName */
         [$classMetadata, $fieldName] = $this->getTargetClassMetadata($classMetadata, $propertyPath);
-        $mapping = $classMetadata->hasField($fieldName)
-            ? $classMetadata->getFieldMapping($fieldName)
-            : null;
+        $mapping = $classMetadata->fieldMappings[$fieldName] ?? null;
         if (!$fieldType && $mapping) {
             $fieldType = $this->getFieldType($mapping);
         }
         if (!$fieldType) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new \InvalidArgumentException(\sprintf(
                 'The data type for "%s::%s" is not defined.',
                 $classMetadata->name,
                 $fieldName
@@ -98,7 +97,10 @@ class EntityMetadataFactory
         /** @var ClassMetadata $classMetadata */
         /** @var string $associationName */
         [$classMetadata, $associationName] = $this->getTargetClassMetadata($classMetadata, $propertyPath);
-        $mapping = $classMetadata->getAssociationMapping($associationName);
+        $mapping = $classMetadata->associationMappings[$associationName] ?? null;
+        if (null === $mapping) {
+            throw MappingException::mappingNotFound($classMetadata->name, $associationName);
+        }
 
         $targetClass = $mapping[self::TARGET_ENTITY];
 
@@ -119,9 +121,7 @@ class EntityMetadataFactory
         } else {
             $targetIdFields = $targetMetadata->getIdentifierFieldNames();
             if (\count($targetIdFields) === 1) {
-                $associationMetadata->setDataType(
-                    $this->getFieldType($targetMetadata->getFieldMapping(reset($targetIdFields)))
-                );
+                $associationMetadata->setDataType($targetMetadata->getTypeOfField(reset($targetIdFields)));
             } else {
                 $associationMetadata->setDataType(DataType::STRING);
             }
@@ -191,16 +191,15 @@ class EntityMetadataFactory
         $fieldName = array_pop($path);
         $targetClassMetadata = $classMetadata;
         foreach ($path as $associationName) {
-            if (!$targetClassMetadata->hasAssociation($associationName)) {
+            $mapping = $targetClassMetadata->associationMappings[$associationName] ?? null;
+            if (!$mapping) {
                 $targetClassMetadata = null;
                 break;
             }
-            $targetClassMetadata = $this->doctrineHelper->getEntityMetadataForClass(
-                $targetClassMetadata->getAssociationTargetClass($associationName)
-            );
+            $targetClassMetadata = $this->doctrineHelper->getEntityMetadataForClass($mapping[self::TARGET_ENTITY]);
         }
         if (null === $targetClassMetadata) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new \InvalidArgumentException(\sprintf(
                 'Cannot find metadata by path "%s" starting with class "%s"',
                 implode(ConfigUtil::PATH_DELIMITER, $path),
                 $classMetadata->name

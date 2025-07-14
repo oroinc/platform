@@ -5,6 +5,8 @@ namespace Oro\Component\Routing\Tests\Unit\Loader;
 use Oro\Component\Routing\Loader\CumulativeRoutingFileLoader;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -12,19 +14,12 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
+class CumulativeRoutingFileLoaderTest extends TestCase
 {
-    /** @var KernelInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $kernel;
-
-    /** @var RouteOptionsResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $routeOptionsResolver;
-
-    /** @var LoaderResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $loaderResolver;
-
-    /** @var CumulativeRoutingFileLoader */
-    private $loader;
+    private KernelInterface&MockObject $kernel;
+    private RouteOptionsResolverInterface&MockObject $routeOptionsResolver;
+    private LoaderResolverInterface&MockObject $loaderResolver;
+    private CumulativeRoutingFileLoader $loader;
 
     #[\Override]
     protected function setUp(): void
@@ -56,7 +51,7 @@ class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
         $loadedRoutes->add('route1', new Route('/route1'));
         $loadedRoutes->add('route2', new Route('/route2', [], [], ['priority' => 1]));
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject[] $bundles */
+        /** @var BundleInterface[]&MockObject[] $bundles */
         $bundles = [
             'bundle1' => $this->createMock(BundleInterface::class),
             'bundle2' => $this->createMock(BundleInterface::class),
@@ -81,35 +76,31 @@ class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
 
         $this->loaderResolver->expects(self::exactly(2))
             ->method('resolve')
-            ->willReturnCallback(
-                function ($resource) use ($rootDir, $yamlLoader) {
-                    $resource = str_replace('\\', '/', $resource);
-                    if ($resource === str_replace('\\', '/', $rootDir . '/Bundle1/Resources/config/routing.yml')) {
-                        return $yamlLoader;
-                    }
-                    if ($resource === str_replace('\\', '/', $rootDir . '/Bundle2/Resources/config/routing.yml')) {
-                        return $yamlLoader;
-                    }
-
-                    return null;
+            ->willReturnCallback(function ($resource) use ($rootDir, $yamlLoader) {
+                $resource = str_replace('\\', '/', $resource);
+                if ($resource === str_replace('\\', '/', $rootDir . '/Bundle1/Resources/config/routing.yml')) {
+                    return $yamlLoader;
                 }
-            );
+                if ($resource === str_replace('\\', '/', $rootDir . '/Bundle2/Resources/config/routing.yml')) {
+                    return $yamlLoader;
+                }
+
+                return null;
+            });
 
         $yamlLoader->expects(self::exactly(2))
             ->method('load')
-            ->willReturnCallback(
-                function ($resource) use ($rootDir, $loadedRoutes) {
-                    $resource = str_replace('\\', '/', $resource);
-                    if ($resource === str_replace('\\', '/', $rootDir . '/Bundle1/Resources/config/routing.yml')) {
-                        return $loadedRoutes;
-                    }
-                    if ($resource === str_replace('\\', '/', $rootDir . '/Bundle2/Resources/config/routing.yml')) {
-                        return new RouteCollection();
-                    }
-
-                    return null;
+            ->willReturnCallback(function ($resource) use ($rootDir, $loadedRoutes) {
+                $resource = str_replace('\\', '/', $resource);
+                if ($resource === str_replace('\\', '/', $rootDir . '/Bundle1/Resources/config/routing.yml')) {
+                    return $loadedRoutes;
                 }
-            );
+                if ($resource === str_replace('\\', '/', $rootDir . '/Bundle2/Resources/config/routing.yml')) {
+                    return new RouteCollection();
+                }
+
+                return null;
+            });
 
         $this->routeOptionsResolver->expects(self::exactly(2))
             ->method('resolve')

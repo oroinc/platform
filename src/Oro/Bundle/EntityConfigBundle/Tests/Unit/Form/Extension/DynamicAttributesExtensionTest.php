@@ -20,6 +20,7 @@ use Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
@@ -35,23 +36,12 @@ class DynamicAttributesExtensionTest extends TypeTestCase
 {
     private const DATA_CLASS = TestActivityTarget::class;
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeManager;
-
-    /** @var AttributeConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeConfigHelper;
-
-    /** @var DynamicFieldsHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $dynamicFieldsHelper;
-
-    /** @var DynamicAttributesExtension */
-    private $extension;
+    private ConfigManager&MockObject $configManager;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private AttributeManager&MockObject $attributeManager;
+    private AttributeConfigHelper&MockObject $attributeConfigHelper;
+    private DynamicFieldsHelper&MockObject $dynamicFieldsHelper;
+    private DynamicAttributesExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -368,7 +358,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
         ];
     }
 
-    private function getForm(): FormInterface|\PHPUnit\Framework\MockObject\MockObject
+    private function getForm(): FormInterface&MockObject
     {
         $form = $this->createMock(FormInterface::class);
         $config = $this->createMock(FormConfigInterface::class);

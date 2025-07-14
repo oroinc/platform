@@ -10,12 +10,13 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message as TransportMessage;
 use Oro\Component\MessageQueue\Transport\Queue;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class RedeliveryMessageExtensionTest extends \PHPUnit\Framework\TestCase
+class RedeliveryMessageExtensionTest extends TestCase
 {
-    private DriverInterface|\PHPUnit\Framework\MockObject\MockObject $driver;
-
+    private DriverInterface&MockObject $driver;
     private RedeliveryMessageExtension $extension;
 
     #[\Override]

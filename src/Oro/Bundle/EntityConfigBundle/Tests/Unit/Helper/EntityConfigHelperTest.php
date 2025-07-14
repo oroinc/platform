@@ -10,20 +10,15 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity2;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity3;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
+class EntityConfigHelperTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    private $configProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface */
-    private $groupProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigInterface */
-    private $config;
-
-    /** @var EntityConfigHelper */
-    private $helper;
+    private ConfigProvider&MockObject $configProvider;
+    private AclGroupProviderInterface&MockObject $groupProvider;
+    private ConfigInterface&MockObject $config;
+    private EntityConfigHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +36,7 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getRoutesProvider
      */
-    public function testGetRoutes(array $inputData, array $expectedData)
+    public function testGetRoutes(array $inputData, array $expectedData): void
     {
         $configManager = $this->createMock(ConfigManager::class);
 
@@ -67,7 +62,7 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getConfigValueProvider
      */
-    public function testGetConfigValue(array $inputData, mixed $expectedData)
+    public function testGetConfigValue(array $inputData, mixed $expectedData): void
     {
         $this->configProvider->expects($this->once())
             ->method('getConfig')
@@ -85,7 +80,7 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider strictParamProvider
      */
-    public function testGetConfigValueStrictParam(bool $strict)
+    public function testGetConfigValueStrictParam(bool $strict): void
     {
         $this->configProvider->expects($this->once())
             ->method('getConfig')

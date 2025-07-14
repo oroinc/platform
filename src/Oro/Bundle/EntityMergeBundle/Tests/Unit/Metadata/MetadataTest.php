@@ -4,16 +4,17 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\Metadata\Metadata;
+use PHPUnit\Framework\TestCase;
 
-class MetadataTest extends \PHPUnit\Framework\TestCase
+class MetadataTest extends TestCase
 {
-    public function testGetExistingStrict()
+    public function testGetExistingStrict(): void
     {
         $metadata = new Metadata(['code' => 'value']);
         $this->assertEquals('value', $metadata->get('code', true));
     }
 
-    public function testGetNonExistingStrict()
+    public function testGetNonExistingStrict(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Option "code" not exists');
@@ -25,7 +26,7 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testGet(array $options, string $code, mixed $expectedValue)
+    public function testGet(array $options, string $code, mixed $expectedValue): void
     {
         $metadata = new Metadata($options);
         $this->assertEquals($expectedValue, $metadata->get($code));
@@ -34,9 +35,9 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testAllWithCallback()
+    public function testAllWithCallback(): void
     {
-        $options  = [
+        $options = [
             'first'  => true,
             'second' => false,
         ];
@@ -62,7 +63,7 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
         string $hasMethod,
         string $isMethod,
         string $isNotExpected = 'assertFalse'
-    ) {
+    ): void {
         $metadata = new Metadata($options);
         $metadata->set($code, $expectedValue);
         $this->$hasMethod($metadata->has($code));

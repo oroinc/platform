@@ -18,23 +18,18 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityWithWorkflow;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
+class WorkflowDataHelperTest extends TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclGroupProvider;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TranslatorInterface&MockObject $translator;
+    private UrlGeneratorInterface&MockObject $router;
+    private AclGroupProviderInterface&MockObject $aclGroupProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -190,7 +185,7 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider workflowsDataProvider
      */
-    public function testGetEntityWorkflowsData(array $workflowsData, array $expected)
+    public function testGetEntityWorkflowsData(array $workflowsData, array $expected): void
     {
         $entity = new EntityWithWorkflow();
 
@@ -225,7 +220,6 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
             ->method('hasForm')
             ->willReturn($hasForm);
 
-        /** @var Transition $transition */
         return $transition;
     }
 

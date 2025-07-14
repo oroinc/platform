@@ -14,7 +14,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
 {
     private const TEST_GRID_NAME = 'test';
 
-    public function testConfiguration()
+    public function testConfiguration(): void
     {
         $segment = $this->getSegment();
         $doctrineHelper = $this->getDoctrineHelper(
@@ -55,7 +55,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
      * Test grid definition when no route exists for entity in config
      * no grid actions should be added
      */
-    public function testNoRouteConfiguration()
+    public function testNoRouteConfiguration(): void
     {
         $segment = $this->getSegment();
         $doctrineHelper = $this->getDoctrineHelper(

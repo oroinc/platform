@@ -7,16 +7,15 @@ use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutorInterface;
 use Oro\Bundle\PlatformBundle\EventListener\AbstractDemoDataFixturesListener;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AbstractDemoDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
+class AbstractDemoDataFixturesListenerTest extends TestCase
 {
     private const LISTENERS = ['test_listener_1', 'test_listener_2'];
 
-    /** @var OptionalListenerManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $listenerManager;
-
-    /** @var AbstractDemoDataFixturesListener */
-    private $listener;
+    private OptionalListenerManager&MockObject $listenerManager;
+    private AbstractDemoDataFixturesListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +35,7 @@ class AbstractDemoDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnPreLoadForDemoFixtures()
+    public function testOnPreLoadForDemoFixtures(): void
     {
         $this->listenerManager->expects(self::once())
             ->method('disableListeners')
@@ -45,7 +44,7 @@ class AbstractDemoDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onPreLoad($this->getEvent(DataFixturesExecutorInterface::DEMO_FIXTURES));
     }
 
-    public function testOnPostLoadForDemoFixtures()
+    public function testOnPostLoadForDemoFixtures(): void
     {
         $this->listenerManager->expects(self::once())
             ->method('enableListeners')
@@ -54,7 +53,7 @@ class AbstractDemoDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onPostLoad($this->getEvent(DataFixturesExecutorInterface::DEMO_FIXTURES));
     }
 
-    public function testOnPreLoadForNotDemoFixtures()
+    public function testOnPreLoadForNotDemoFixtures(): void
     {
         $this->listenerManager->expects(self::never())
             ->method(self::anything());
@@ -62,7 +61,7 @@ class AbstractDemoDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onPreLoad($this->getEvent(DataFixturesExecutorInterface::MAIN_FIXTURES));
     }
 
-    public function testOnPostLoadForNotDemoFixtures()
+    public function testOnPostLoadForNotDemoFixtures(): void
     {
         $this->listenerManager->expects(self::never())
             ->method(self::anything());

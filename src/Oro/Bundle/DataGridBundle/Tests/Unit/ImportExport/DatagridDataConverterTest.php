@@ -6,21 +6,16 @@ use Oro\Bundle\DataGridBundle\ImportExport\DatagridColumnsFromContextProviderInt
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridDataConverter;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DatagridDataConverterTest extends \PHPUnit\Framework\TestCase
+class DatagridDataConverterTest extends TestCase
 {
-    /** @var DatagridColumnsFromContextProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagridColumnsFromContextProvider;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var Context|\PHPUnit\Framework\MockObject\MockObject */
-    private $context;
-
-    /** @var DatagridDataConverter */
-    private $datagridDataConverter;
+    private DatagridColumnsFromContextProviderInterface&MockObject $datagridColumnsFromContextProvider;
+    private TranslatorInterface&MockObject $translator;
+    private Context&MockObject $context;
+    private DatagridDataConverter $datagridDataConverter;
 
     #[\Override]
     protected function setUp(): void

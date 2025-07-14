@@ -5,18 +5,17 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Request\ParamConverter;
 use Doctrine\DBAL\Driver\PDOException;
 use Doctrine\DBAL\Exception\DriverException;
 use Oro\Bundle\EntityBundle\Request\ParamConverter\DoctrineParamConverterDecorator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class DoctrineParamConverterDecoratorTest extends \PHPUnit\Framework\TestCase
+class DoctrineParamConverterDecoratorTest extends TestCase
 {
-    /** @var ParamConverterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $paramConverter;
-
-    /** @var DoctrineParamConverterDecorator */
-    private $decorator;
+    private ParamConverterInterface&MockObject $paramConverter;
+    private DoctrineParamConverterDecorator $decorator;
 
     #[\Override]
     protected function setUp(): void

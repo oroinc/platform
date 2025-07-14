@@ -7,20 +7,17 @@ use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Entity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormInterface;
 
-class TagSubscriberTest extends \PHPUnit\Framework\TestCase
+class TagSubscriberTest extends TestCase
 {
-    /** @var TagManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var TaggableHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $taggableHelper;
-
-    /** @var TagSubscriber */
-    private $subscriber;
+    private TagManager&MockObject $manager;
+    private TaggableHelper&MockObject $taggableHelper;
+    private TagSubscriber $subscriber;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +28,7 @@ class TagSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber = new TagSubscriber($this->manager, $this->taggableHelper);
     }
 
-    public function testSubscribedEvents()
+    public function testSubscribedEvents(): void
     {
         $result = TagSubscriber::getSubscribedEvents();
 
@@ -43,7 +40,7 @@ class TagSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider entityProvider
      */
-    public function testPreSet(object $entity, bool $shouldSetData)
+    public function testPreSet(object $entity, bool $shouldSetData): void
     {
         $eventMock = $this->createMock(FormEvent::class);
 

@@ -19,30 +19,21 @@ use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ActionExtensionTest extends \PHPUnit\Framework\TestCase
+class ActionExtensionTest extends TestCase
 {
-    /** @var DatagridActionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $actionProvider;
-
-    /** @var ActionFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $actionFactory;
-
-    /** @var ActionMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $actionMetadataFactory;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var OwnershipQueryHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipQueryHelper;
-
-    /** @var ActionExtension */
-    private $extension;
+    private DatagridActionProviderInterface&MockObject $actionProvider;
+    private ActionFactory&MockObject $actionFactory;
+    private ActionMetadataFactory&MockObject $actionMetadataFactory;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private OwnershipQueryHelper&MockObject $ownershipQueryHelper;
+    private ActionExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -63,14 +54,14 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->setParameters(new ParameterBag());
     }
 
-    public function testIsApplicableWithoutEnableActionsParameter()
+    public function testIsApplicableWithoutEnableActionsParameter(): void
     {
         $config = DatagridConfiguration::create([]);
 
         self::assertTrue($this->extension->isApplicable($config));
     }
 
-    public function testIsNotApplicableInImportExportMode()
+    public function testIsNotApplicableInImportExportMode(): void
     {
         $params = new ParameterBag();
         $params->set(
@@ -82,7 +73,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->extension->isApplicable($config));
     }
 
-    public function testIsNotApplicableWhenExportMode()
+    public function testIsNotApplicableWhenExportMode(): void
     {
         $config = DatagridConfiguration::create([]);
         $this->extension->getParameters()->set(
@@ -93,7 +84,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->extension->isApplicable($config));
     }
 
-    public function testProcessConfigs()
+    public function testProcessConfigs(): void
     {
         $config = DatagridConfiguration::create([]);
 
@@ -108,7 +99,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->processConfigs($config);
     }
 
-    public function testVisitMetadataWithoutActions()
+    public function testVisitMetadataWithoutActions(): void
     {
         $config = DatagridConfiguration::create([]);
         $metadata = MetadataObject::create([]);
@@ -123,7 +114,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitMetadataWithActions()
+    public function testVisitMetadataWithActions(): void
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1'];
@@ -169,7 +160,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitMetadataWithAclProtectedActionAndAccessGranted()
+    public function testVisitMetadataWithAclProtectedActionAndAccessGranted(): void
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1'];
@@ -217,7 +208,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitMetadataWithAclProtectedActionAndAccessDenied()
+    public function testVisitMetadataWithAclProtectedActionAndAccessDenied(): void
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1'];
@@ -257,7 +248,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitResultWithoutActions()
+    public function testVisitResultWithoutActions(): void
     {
         $config = DatagridConfiguration::create([]);
         $result = ResultsObject::create([]);
@@ -273,7 +264,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitResultWithActions()
+    public function testVisitResultWithActions(): void
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1'];
@@ -320,7 +311,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitResultWithAclProtectedActionAndAccessGranted()
+    public function testVisitResultWithAclProtectedActionAndAccessGranted(): void
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1'];
@@ -369,7 +360,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitResultWithAclProtectedActionAndAccessDenied()
+    public function testVisitResultWithAclProtectedActionAndAccessDenied(): void
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1'];
@@ -410,7 +401,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitResultAfterVisitMetadata()
+    public function testVisitResultAfterVisitMetadata(): void
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1'];
@@ -459,7 +450,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitDatasourceForNotOrmDatasource()
+    public function testVisitDatasourceForNotOrmDatasource(): void
     {
         $config = DatagridConfiguration::create(
             [
@@ -474,7 +465,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function testVisitDatasourceForOrmDatasource()
+    public function testVisitDatasourceForOrmDatasource(): void
     {
         $config = DatagridConfiguration::create(
             [
@@ -500,7 +491,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($ownershipFields, ReflectionUtil::getPropertyValue($this->extension, 'ownershipFields'));
     }
 
-    public function testVisitDatasourceForOrmDatasourceButNoAclProtectedActions()
+    public function testVisitDatasourceForOrmDatasourceButNoAclProtectedActions(): void
     {
         $config = DatagridConfiguration::create(
             [
@@ -530,7 +521,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         return $config->offsetGetByPath('[properties][action_configuration]');
     }
 
-    public function testVisitResultWithOwnershipFieldsForActionWithoutAclResource()
+    public function testVisitResultWithOwnershipFieldsForActionWithoutAclResource(): void
     {
         $config = DatagridConfiguration::create([
             'actions' => [
@@ -555,7 +546,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertNull($actionConfiguration);
     }
 
-    public function testVisitResultWithOwnershipFieldsForActionWithAclResourceAndAccessDenied()
+    public function testVisitResultWithOwnershipFieldsForActionWithAclResourceAndAccessDenied(): void
     {
         $config = DatagridConfiguration::create([
             'actions' => [
@@ -628,7 +619,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testVisitResultWithOwnershipFieldsForActionWithAclResourceAndAccessGranted()
+    public function testVisitResultWithOwnershipFieldsForActionWithAclResourceAndAccessGranted(): void
     {
         $config = DatagridConfiguration::create([
             'actions' => [
@@ -661,7 +652,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertNull($actionConfiguration);
     }
 
-    public function testVisitResultWithOwnershipFieldsForActionWithAclResourceAndRecordOwnerIdIsNull()
+    public function testVisitResultWithOwnershipFieldsForActionWithAclResourceAndRecordOwnerIdIsNull(): void
     {
         $config = DatagridConfiguration::create([
             'actions' => [
@@ -690,7 +681,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertNull($actionConfiguration);
     }
 
-    public function testVisitResultWithOwnershipFieldsForActionWithAclResourceAndExistingActionConfiguration()
+    public function testVisitResultWithOwnershipFieldsForActionWithAclResourceAndExistingActionConfiguration(): void
     {
         $config = DatagridConfiguration::create([
             'actions'    => [
@@ -729,7 +720,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testVisitMetadataDisabledAction(): void
     {
-        $config   = DatagridConfiguration::create(
+        $config = DatagridConfiguration::create(
             [
                 'actions' => [
                     'action1' => ['type' => 'type1', 'disabled' => true],

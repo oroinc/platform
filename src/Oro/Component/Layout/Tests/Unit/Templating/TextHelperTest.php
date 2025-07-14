@@ -3,12 +3,12 @@
 namespace Oro\Component\Layout\Tests\Unit\Templating;
 
 use Oro\Component\Layout\Templating\TextHelper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TextHelperTest extends \PHPUnit\Framework\TestCase
+class TextHelperTest extends TestCase
 {
-    /** @var TextHelper */
-    private $helper;
+    private TextHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +26,7 @@ class TextHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processTextDataProvider
      */
-    public function testProcessText(array|string|null $value, array|string|null $expected, ?string $domain = null)
+    public function testProcessText(array|string|null $value, array|string|null $expected, ?string $domain = null): void
     {
         $this->assertSame($expected, $this->helper->processText($value, $domain));
     }

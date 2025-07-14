@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Authentication\Token;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -10,7 +11,7 @@ trait IntegrationTokenAwareTestTrait
     private function getTokenStorageMock(
         int $getTokenCallsCount = 1,
         int $setTokenCallsCount = 1,
-    ): \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface {
+    ): MockObject|TokenStorageInterface {
         $token = $this->createMock(TokenInterface::class);
         $token->expects(self::once())
             ->method('setAttribute')

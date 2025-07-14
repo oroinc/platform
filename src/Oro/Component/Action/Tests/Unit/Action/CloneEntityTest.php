@@ -10,6 +10,8 @@ use Oro\Component\Action\Action\CloneEntity;
 use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -18,22 +20,13 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CloneEntityTest extends \PHPUnit\Framework\TestCase
+class CloneEntityTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var FlashBagInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $flashBag;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var CloneEntity */
-    private $action;
+    private ManagerRegistry&MockObject $registry;
+    private TranslatorInterface&MockObject $translator;
+    private FlashBagInterface&MockObject $flashBag;
+    private LoggerInterface&MockObject $logger;
+    private CloneEntity $action;
 
     #[\Override]
     protected function setUp(): void
@@ -42,10 +35,12 @@ class CloneEntityTest extends \PHPUnit\Framework\TestCase
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->flashBag = $this->createMock(FlashBagInterface::class);
         $session = $this->createMock(Session::class);
-        $session->method('getFlashBag')
+        $session->expects(self::any())
+            ->method('getFlashBag')
             ->willReturn($this->flashBag);
         $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->method('getSession')
+        $requestStack->expects(self::any())
+            ->method('getSession')
             ->willReturn($session);
         $this->logger = $this->createMock(LoggerInterface::class);
 
@@ -62,7 +57,7 @@ class CloneEntityTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeDataProvider
      */
-    public function testExecute(array $options)
+    public function testExecute(array $options): void
     {
         $meta = $this->createMock(ClassMetadata::class);
         $meta->expects($this->any())
@@ -140,7 +135,7 @@ class CloneEntityTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testExecuteEntityNotManageable()
+    public function testExecuteEntityNotManageable(): void
     {
         $this->expectException(NotManageableEntityException::class);
         $this->expectExceptionMessage(sprintf('Entity class "%s" is not manageable.', \stdClass::class));
@@ -154,7 +149,7 @@ class CloneEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    public function testExecuteCantCreateEntity()
+    public function testExecuteCantCreateEntity(): void
     {
         $meta = $this->createMock(ClassMetadata::class);
         $meta->expects($this->any())

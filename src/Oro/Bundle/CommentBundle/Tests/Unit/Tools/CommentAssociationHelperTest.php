@@ -10,14 +10,13 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CommentAssociationHelperTest extends \PHPUnit\Framework\TestCase
+class CommentAssociationHelperTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var CommentAssociationHelper */
-    private $commentAssociationHelper;
+    private ConfigManager&MockObject $configManager;
+    private CommentAssociationHelper $commentAssociationHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class CommentAssociationHelperTest extends \PHPUnit\Framework\TestCase
         $this->commentAssociationHelper = new CommentAssociationHelper($this->configManager);
     }
 
-    public function testIsCommentAssociationEnabledForNotConfigurableEntity()
+    public function testIsCommentAssociationEnabledForNotConfigurableEntity(): void
     {
         $entityClass = 'Test\Entity';
 
@@ -43,7 +42,7 @@ class CommentAssociationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsCommentAssociationEnabledForDisabledAssociation()
+    public function testIsCommentAssociationEnabledForDisabledAssociation(): void
     {
         $entityClass = 'Test\Entity';
 
@@ -63,14 +62,14 @@ class CommentAssociationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsCommentAssociationEnabledForEnabledAssociation()
+    public function testIsCommentAssociationEnabledForEnabledAssociation(): void
     {
         $entityClass = 'Test\Entity';
 
         $config = new Config(new EntityConfigId('comment', $entityClass));
         $config->set('enabled', true);
 
-        $associationName   = ExtendHelper::buildAssociationName($entityClass);
+        $associationName = ExtendHelper::buildAssociationName($entityClass);
         $associationConfig = new Config(
             new FieldConfigId('extend', Comment::class, $associationName)
         );
@@ -97,14 +96,14 @@ class CommentAssociationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsCommentAssociationEnabledForEnabledButNotAccessibleAssociation()
+    public function testIsCommentAssociationEnabledForEnabledButNotAccessibleAssociation(): void
     {
         $entityClass = 'Test\Entity';
 
         $config = new Config(new EntityConfigId('comment', $entityClass));
         $config->set('enabled', true);
 
-        $associationName   = ExtendHelper::buildAssociationName($entityClass);
+        $associationName = ExtendHelper::buildAssociationName($entityClass);
         $associationConfig = new Config(
             new FieldConfigId('extend', Comment::class, $associationName)
         );
@@ -131,7 +130,7 @@ class CommentAssociationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsCommentAssociationEnabledForEnabledButNotAccessibleAssociationButWithAccessibleFalse()
+    public function testIsCommentAssociationEnabledForEnabledButNotAccessibleAssociationButWithAccessibleFalse(): void
     {
         $entityClass = 'Test\Entity';
 

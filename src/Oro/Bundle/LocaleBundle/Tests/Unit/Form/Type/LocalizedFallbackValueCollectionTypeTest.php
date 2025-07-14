@@ -8,6 +8,8 @@ use Oro\Bundle\LocaleBundle\Form\DataTransformer\LocalizedFallbackValueCollectio
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\CustomLocalizedFallbackValueStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -16,13 +18,10 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit\Framework\TestCase
+class LocalizedFallbackValueCollectionTypeTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var LocalizedFallbackValueCollectionType */
-    private $type;
+    private ManagerRegistry&MockObject $registry;
+    private LocalizedFallbackValueCollectionType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +31,7 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit\Framework\TestCa
         $this->type = new LocalizedFallbackValueCollectionType($this->registry);
     }
 
-    public function testSetDefaults()
+    public function testSetDefaults(): void
     {
         $expectedOptions = [
             'field' => 'string',
@@ -51,7 +50,7 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit\Framework\TestCa
         $this->type->configureOptions($resolver);
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $type = 'form_text';
         $options = ['key' => 'value'];

@@ -10,13 +10,15 @@ use Oro\Bundle\ConfigBundle\Event\ConfigGetEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 use Oro\Bundle\ConfigBundle\Provider\Value\ValueProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ConfigManagerTest extends \PHPUnit\Framework\TestCase
+class ConfigManagerTest extends TestCase
 {
     private array $settings = [
         'oro_user' => [
@@ -44,23 +46,12 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
-    private $dispatcher;
-
-    /** @var MemoryCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $memoryCache;
-
-    /** @var GlobalScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $globalScopeManager;
-
-    /** @var GlobalScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $userScopeManager;
-
-    /** @var ValueProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $defaultValueProvider;
-
-    /** @var ConfigManager */
-    private $manager;
+    private EventDispatcher&MockObject $dispatcher;
+    private MemoryCache&MockObject $memoryCache;
+    private GlobalScopeManager&MockObject $globalScopeManager;
+    private GlobalScopeManager&MockObject $userScopeManager;
+    private ValueProviderInterface&MockObject $defaultValueProvider;
+    private ConfigManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -150,7 +141,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
 
         $singleKeyBeforeEvent = new ConfigSettingsUpdateEvent($this->manager, $item1Value);
         $beforeEvent = new ConfigSettingsUpdateEvent($this->manager, $changes);
-        $afterEvent  = new ConfigUpdateEvent(
+        $afterEvent = new ConfigUpdateEvent(
             [$item1Name => ['old' => 'old value', 'new' => 'updated value']],
             'user',
             $idValue

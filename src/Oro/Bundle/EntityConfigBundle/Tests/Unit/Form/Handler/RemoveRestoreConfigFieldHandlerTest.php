@@ -14,41 +14,28 @@ use Oro\Bundle\EntityConfigBundle\Form\Handler\RemoveRestoreConfigFieldHandler;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
+class RemoveRestoreConfigFieldHandlerTest extends TestCase
 {
     private const SAMPLE_ERROR_MESSAGE = 'Restore error message';
     private const SAMPLE_SUCCESS_MESSAGE = 'Entity config was successfully saved';
     private const SAMPLE_VALIDATION_ERROR_MESSAGE1 = 'Validation error 1';
     private const SAMPLE_VALIDATION_ERROR_MESSAGE2 = 'Validation error 2';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var FieldNameValidationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $validationHelper;
-
-    /** @var ConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $configHelper;
-
-    /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
-    private $session;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var FieldConfigModel|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldConfigModel;
-
-    /** @var RemoveRestoreConfigFieldHandler */
-    private $handler;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private ConfigManager&MockObject $configManager;
+    private FieldNameValidationHelper&MockObject $validationHelper;
+    private ConfigHelper&MockObject $configHelper;
+    private Session&MockObject $session;
+    private RequestStack&MockObject $requestStack;
+    private FieldConfigModel&MockObject $fieldConfigModel;
+    private RemoveRestoreConfigFieldHandler $handler;
+    private ManagerRegistry&MockObject $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -90,7 +77,7 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('flush');
     }
 
-    public function testHandleRemove()
+    public function testHandleRemove(): void
     {
         $this->validationHelper->expects($this->once())
             ->method('getRemoveFieldValidationErrors')
@@ -129,7 +116,7 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $this->expectsJsonResponseWithContent($response, $expectedContent);
     }
 
-    public function testHandleRemoveValidationError()
+    public function testHandleRemoveValidationError(): void
     {
         $this->validationHelper->expects($this->once())
             ->method('getRemoveFieldValidationErrors')
@@ -173,7 +160,7 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $this->expectsJsonResponseWithContent($response, $expectedContent);
     }
 
-    public function testHandleRestoreWhenFieldCannotBeRestored()
+    public function testHandleRestoreWhenFieldCannotBeRestored(): void
     {
         $this->validationHelper->expects($this->once())
             ->method('canFieldBeRestored')
@@ -209,7 +196,7 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $this->expectsJsonResponseWithContent($response, $expectedContent);
     }
 
-    public function testHandleRestoreWhenFieldCanBeRestoredAndEntityClassNotExists()
+    public function testHandleRestoreWhenFieldCanBeRestoredAndEntityClassNotExists(): void
     {
         $entityClassName = 'ClassNotExists';
         $expectedState = ExtendScope::STATE_NEW;
@@ -230,7 +217,7 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $this->expectsJsonResponseWithContent($response, $expectedContent);
     }
 
-    public function testHandleRestoreWhenFieldCanBeRestoredAndEntityClassNotManaged()
+    public function testHandleRestoreWhenFieldCanBeRestoredAndEntityClassNotManaged(): void
     {
         $entityClassName = \stdClass::class;
         $expectedState = ExtendScope::STATE_NEW;
@@ -256,7 +243,7 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $this->expectsJsonResponseWithContent($response, $expectedContent);
     }
 
-    public function testHandleRestoreWhenFieldCanBeRestoredAndFieldPropertyNotExists()
+    public function testHandleRestoreWhenFieldCanBeRestoredAndFieldPropertyNotExists(): void
     {
         $entityClassName = TestActivityTarget::class;
         $expectedState = ExtendScope::STATE_NEW;
@@ -300,7 +287,7 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $this->expectsJsonResponseWithContent($response, $expectedContent);
     }
 
-    public function testHandleRestoreWhenFieldCanBeRestoredAndClassNameAndFieldExist()
+    public function testHandleRestoreWhenFieldCanBeRestoredAndClassNameAndFieldExist(): void
     {
         $entityClassName = TestActivityTarget::class;
         $expectedState = ExtendScope::STATE_RESTORE;
@@ -372,7 +359,7 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         return $entityConfig;
     }
 
-    private function prepareFieldConfig(): ConfigInterface|\PHPUnit\Framework\MockObject\MockObject
+    private function prepareFieldConfig(): ConfigInterface&MockObject
     {
         $fieldConfig = $this->createMock(ConfigInterface::class);
         $this->configHelper->expects($this->once())
@@ -401,7 +388,7 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->prepareEntityConfigModel($entityClassName);
         $entityConfig = $this->prepareEntityConfig();
-        $fieldConfig = $this->prepareFieldConfig($expectedState);
+        $fieldConfig = $this->prepareFieldConfig();
         $fieldConfig->expects($this->exactly(2))
             ->method('set')
             ->withConsecutive(

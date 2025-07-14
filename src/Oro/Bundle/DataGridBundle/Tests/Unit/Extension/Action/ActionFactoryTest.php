@@ -7,8 +7,9 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionFactory;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\TestCase;
 
-class ActionFactoryTest extends \PHPUnit\Framework\TestCase
+class ActionFactoryTest extends TestCase
 {
     private function getActionFactory(array $actions): ActionFactory
     {
@@ -20,7 +21,7 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase
         return new ActionFactory($containerBuilder->getContainer($this));
     }
 
-    public function testCreateActionWithoutType()
+    public function testCreateActionWithoutType(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The "type" option must be defined. Action: action1.');
@@ -29,7 +30,7 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase
         $factory->createAction('action1', []);
     }
 
-    public function testCreateUnregisteredAction()
+    public function testCreateUnregisteredAction(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unknown action type "type1". Action: action1.');
@@ -38,7 +39,7 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase
         $factory->createAction('action1', ['type' => 'type1']);
     }
 
-    public function testCreateActionForInvalidActionClass()
+    public function testCreateActionForInvalidActionClass(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(sprintf(
@@ -50,7 +51,7 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase
         $factory->createAction('action1', ['type' => 'type1']);
     }
 
-    public function testCreateAction()
+    public function testCreateAction(): void
     {
         $action = $this->createMock(ActionInterface::class);
         $actionName = 'action1';

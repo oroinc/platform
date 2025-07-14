@@ -4,8 +4,9 @@ namespace Oro\Bundle\DraftBundle\Tests\Unit\Duplicator;
 
 use Oro\Bundle\DraftBundle\Duplicator\Extension\AbstractDuplicatorExtension;
 use Oro\Bundle\DraftBundle\Duplicator\ExtensionProvider;
+use PHPUnit\Framework\TestCase;
 
-class ExtensionProviderTest extends \PHPUnit\Framework\TestCase
+class ExtensionProviderTest extends TestCase
 {
     public function testGetExtensions(): void
     {

@@ -9,13 +9,14 @@ use Oro\Component\Layout\Exception\InvalidArgumentException;
 use Oro\Component\Layout\Extension\PreloadedExtension;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutUpdateInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
+class PreloadedExtensionTest extends TestCase
 {
-    public function testTypeNames()
+    public function testTypeNames(): void
     {
         $extension = new PreloadedExtension(
             [
@@ -26,7 +27,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['test'], $extension->getTypeNames());
     }
 
-    public function testType()
+    public function testType(): void
     {
         $name = 'test';
         $type = $this->createMock(BlockTypeInterface::class);
@@ -43,7 +44,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($type, $extension->getType($name));
     }
 
-    public function testGetUnknownType()
+    public function testGetUnknownType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The type "unknown" can not be loaded by this extension.');
@@ -53,9 +54,9 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->getType('unknown');
     }
 
-    public function testBlockTypeExtensions()
+    public function testBlockTypeExtensions(): void
     {
-        $name          = 'test';
+        $name = 'test';
         $typeExtension = $this->createMock(BlockTypeExtensionInterface::class);
 
         $extension = new PreloadedExtension(
@@ -74,9 +75,9 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $extension->getTypeExtensions('unknown'));
     }
 
-    public function testGetLayoutUpdates()
+    public function testGetLayoutUpdates(): void
     {
-        $id           = 'test';
+        $id = 'test';
         $layoutUpdate = $this->createMock(LayoutUpdateInterface::class);
 
         $extension = new PreloadedExtension(
@@ -113,9 +114,9 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($layoutUpdate, $layoutUpdates[0]);
     }
 
-    public function testHasLayoutUpdates()
+    public function testHasLayoutUpdates(): void
     {
-        $id           = 'test';
+        $id = 'test';
         $layoutUpdate = $this->createMock(LayoutUpdateInterface::class);
 
         $extension = new PreloadedExtension(
@@ -146,7 +147,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($extension->hasLayoutUpdates($layoutItemAlias));
     }
 
-    public function testContextConfigurators()
+    public function testContextConfigurators(): void
     {
         $configurator = $this->createMock(ContextConfiguratorInterface::class);
 
@@ -164,7 +165,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($configurator, $result[0]);
     }
 
-    public function testContextConfiguratorsWheNoAnyRegistered()
+    public function testContextConfiguratorsWheNoAnyRegistered(): void
     {
         $extension = new PreloadedExtension([]);
 
@@ -172,9 +173,9 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $extension->getContextConfigurators());
     }
 
-    public function testDataProviders()
+    public function testDataProviders(): void
     {
-        $name         = 'test';
+        $name = 'test';
         $dataProvider = $this->createMock(\stdClass::class);
 
         $extension = new PreloadedExtension(
@@ -193,7 +194,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($dataProvider, $extension->getDataProvider($name));
     }
 
-    public function testGetUnknownDataProvider()
+    public function testGetUnknownDataProvider(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The data provider "unknown" can not be loaded by this extension.');
@@ -203,7 +204,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->getDataProvider('unknown');
     }
 
-    public function testConstructWithInvalidKeysForBlockTypes()
+    public function testConstructWithInvalidKeysForBlockTypes(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Keys of $types array must be strings.');
@@ -216,7 +217,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConstructWithInvalidBlockTypes()
+    public function testConstructWithInvalidBlockTypes(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Each item of $types array must be BlockTypeInterface.');
@@ -229,7 +230,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConstructWithInvalidKeysForBlockTypeExtensions()
+    public function testConstructWithInvalidKeysForBlockTypeExtensions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Keys of $typeExtensions array must be strings.');
@@ -243,7 +244,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConstructWithInvalidBlockTypeExtensions()
+    public function testConstructWithInvalidBlockTypeExtensions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Each item of $typeExtensions[] array must be BlockTypeExtensionInterface.');
@@ -257,7 +258,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConstructWithSingleBlockTypeExtensions()
+    public function testConstructWithSingleBlockTypeExtensions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -272,7 +273,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConstructWithInvalidKeysForLayoutUpdates()
+    public function testConstructWithInvalidKeysForLayoutUpdates(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Keys of $layoutUpdates array must be strings.');
@@ -287,7 +288,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConstructWithInvalidLayoutUpdates()
+    public function testConstructWithInvalidLayoutUpdates(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Each item of $layoutUpdates[] array must be LayoutUpdateInterface.');
@@ -302,7 +303,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConstructWithSingleLayoutUpdates()
+    public function testConstructWithSingleLayoutUpdates(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Each item of $layoutUpdates array must be array of LayoutUpdateInterface.');
@@ -316,7 +317,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConstructWithInvalidContextConfiguratorType()
+    public function testConstructWithInvalidContextConfiguratorType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -334,7 +335,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConstructWithInvalidKeysForDataProviders()
+    public function testConstructWithInvalidKeysForDataProviders(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Keys of $dataProviders array must be strings.');

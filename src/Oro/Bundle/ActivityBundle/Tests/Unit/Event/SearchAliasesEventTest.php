@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Event;
 
 use Oro\Bundle\ActivityBundle\Event\SearchAliasesEvent;
+use PHPUnit\Framework\TestCase;
 
-class SearchAliasesEventTest extends \PHPUnit\Framework\TestCase
+class SearchAliasesEventTest extends TestCase
 {
-    public function testEvent()
+    public function testEvent(): void
     {
         $aliases = ['test'];
         $event = new SearchAliasesEvent($aliases, []);

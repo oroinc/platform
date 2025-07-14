@@ -3,9 +3,10 @@
 namespace Oro\Bundle\SoapBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\SoapBundle\DependencyInjection\OroSoapExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroSoapExtensionTest extends \PHPUnit\Framework\TestCase
+class OroSoapExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

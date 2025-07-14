@@ -4,13 +4,13 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Model\Parameter;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class ParameterTest extends \PHPUnit\Framework\TestCase
+class ParameterTest extends TestCase
 {
     use EntityTestCaseTrait;
 
-    /** @var Parameter */
-    private $parameter;
+    private Parameter $parameter;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class ParameterTest extends \PHPUnit\Framework\TestCase
         $this->parameter = new Parameter('test');
     }
 
-    public function testSimpleGettersAndSetters()
+    public function testSimpleGettersAndSetters(): void
     {
         $this->assertEquals('test', $this->parameter->getName());
         self::assertPropertyAccessors(
@@ -30,7 +30,7 @@ class ParameterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDefaultBehavior()
+    public function testDefaultBehavior(): void
     {
         $this->assertFalse($this->parameter->hasMessage());
         $this->parameter->setMessage(null);
@@ -56,7 +56,7 @@ class ParameterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider defaultValueProvider
      */
-    public function testGetDefaultValue(mixed $value)
+    public function testGetDefaultValue(mixed $value): void
     {
         $this->parameter->setDefault($value);
 
@@ -80,12 +80,12 @@ class ParameterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertEquals('test', (string)$this->parameter);
     }
 
-    public function testNoDefaultConstant()
+    public function testNoDefaultConstant(): void
     {
         $this->parameter->setDefault(Parameter::NO_DEFAULT);
 

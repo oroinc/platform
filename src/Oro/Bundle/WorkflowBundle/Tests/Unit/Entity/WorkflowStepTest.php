@@ -6,11 +6,11 @@ use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowStepTest extends \PHPUnit\Framework\TestCase
+class WorkflowStepTest extends TestCase
 {
-    /** @var WorkflowStep */
-    private $step;
+    private WorkflowStep $step;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class WorkflowStepTest extends \PHPUnit\Framework\TestCase
         $this->step = new WorkflowStep();
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertNull($this->step->getId());
 
@@ -32,7 +32,7 @@ class WorkflowStepTest extends \PHPUnit\Framework\TestCase
      * @param string $property
      * @param mixed $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters($property, $value): void
     {
         $accessor = PropertyAccess::createPropertyAccessor();
         $accessor->setValue($this->step, $property, $value);
@@ -50,7 +50,7 @@ class WorkflowStepTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testImport()
+    public function testImport(): void
     {
         $this->step->setName('test');
         $this->step->setLabel('test');
@@ -66,7 +66,7 @@ class WorkflowStepTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($newStep->isFinal());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $label = 'Step Label';
         $this->step->setLabel($label);

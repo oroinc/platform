@@ -3,13 +3,14 @@
 namespace Oro\Bundle\SoapBundle\Tests\Unit\Request\Parameters\Filter;
 
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\BooleanParameterFilter;
+use PHPUnit\Framework\TestCase;
 
-class BooleanParameterFilterTest extends \PHPUnit\Framework\TestCase
+class BooleanParameterFilterTest extends TestCase
 {
     /**
      * @dataProvider filterDataProvider
      */
-    public function testFilter($expected, $rawValue)
+    public function testFilter($expected, $rawValue): void
     {
         $filter = new BooleanParameterFilter();
 

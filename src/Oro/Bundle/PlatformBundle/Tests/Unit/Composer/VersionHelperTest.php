@@ -5,12 +5,13 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\Composer;
 use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
 use Oro\Bundle\PlatformBundle\OroPlatformBundle;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class VersionHelperTest extends \PHPUnit\Framework\TestCase
+class VersionHelperTest extends TestCase
 {
-    public function testGetVersion()
+    public function testGetVersion(): void
     {
         $cache = $this->createMock(CacheInterface::class);
         $cache->expects($this->once())
@@ -28,7 +29,7 @@ class VersionHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($version, $version);
     }
 
-    public function testGetVersionNotAvailable()
+    public function testGetVersionNotAvailable(): void
     {
         $cache = $this->createMock(CacheInterface::class);
         $cache->expects($this->once())
@@ -43,7 +44,7 @@ class VersionHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('N/A', $helper->getVersion('non-' . OroPlatformBundle::PACKAGE_NAME));
     }
 
-    public function testGetVersionCached()
+    public function testGetVersionCached(): void
     {
         $cache = $this->createMock(CacheInterface::class);
         $cache->expects($this->once())

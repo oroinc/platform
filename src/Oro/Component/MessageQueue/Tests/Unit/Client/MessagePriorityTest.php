@@ -3,8 +3,9 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
 use Oro\Component\MessageQueue\Client\MessagePriority;
+use PHPUnit\Framework\TestCase;
 
-class MessagePriorityTest extends \PHPUnit\Framework\TestCase
+class MessagePriorityTest extends TestCase
 {
     public function testShouldVeryLowPriorityHasExpectedValue(): void
     {

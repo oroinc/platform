@@ -6,19 +6,18 @@ use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterInterface;
 use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterRegistry;
 use Oro\Bundle\LocaleBundle\Twig\DateFormatExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DateFormatExtensionTest extends \PHPUnit\Framework\TestCase
+class DateFormatExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     private const TEST_TYPE = 'test_format_type';
     private const TEST_FORMAT = 'MMM, d y t';
 
-    /** @var DateTimeFormatConverterRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $converterRegistry;
-
-    /** @var DateFormatExtension */
-    private $extension;
+    private DateTimeFormatConverterRegistry&MockObject $converterRegistry;
+    private DateFormatExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +31,7 @@ class DateFormatExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new DateFormatExtension($container);
     }
 
-    public function testGetDateFormat()
+    public function testGetDateFormat(): void
     {
         $locale = 'en';
         $dateType = 'short';
@@ -54,7 +53,7 @@ class DateFormatExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTimeFormat()
+    public function testGetTimeFormat(): void
     {
         $locale = 'en';
         $timeType = 'short';
@@ -76,7 +75,7 @@ class DateFormatExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDateTimeFormat()
+    public function testGetDateTimeFormat(): void
     {
         $locale = 'en';
         $dateType = 'medium';
@@ -103,7 +102,7 @@ class DateFormatExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDateTimeFormatterList()
+    public function testGetDateTimeFormatterList(): void
     {
         $formatConverters = [
             'first'  => $this->createMock(DateTimeFormatConverterInterface::class),

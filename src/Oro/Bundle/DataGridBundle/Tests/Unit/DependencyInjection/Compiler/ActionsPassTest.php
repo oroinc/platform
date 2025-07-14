@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\DataGridBundle\DependencyInjection\Compiler\ActionsPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -10,15 +11,13 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class ActionsPassTest extends \PHPUnit\Framework\TestCase
+class ActionsPassTest extends TestCase
 {
     private const FACTORY_SERVICE_ID = 'oro_datagrid.extension.action.factory';
-    private const TAG_NAME           = 'oro_datagrid.extension.action.type';
+    private const TAG_NAME = 'oro_datagrid.extension.action.type';
 
     private ActionsPass $actionsPass;
-
     private ContainerBuilder $container;
-
     private Definition $actionFactory;
 
     #[\Override]

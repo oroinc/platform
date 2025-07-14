@@ -7,32 +7,23 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class BusinessUnitHandlerTest extends \PHPUnit\Framework\TestCase
+class BusinessUnitHandlerTest extends TestCase
 {
     private const FORM_DATA = ['field' => 'value'];
 
-    /** @var Request */
-    private $request;
-
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
-
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var OwnerTreeProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownerTreeProvider;
-
-    /** @var BusinessUnit */
-    private $entity;
-
-    /** @var BusinessUnitHandler */
-    private $handler;
+    private Request $request;
+    private FormInterface&MockObject $form;
+    private ObjectManager&MockObject $manager;
+    private OwnerTreeProviderInterface&MockObject $ownerTreeProvider;
+    private BusinessUnit $entity;
+    private BusinessUnitHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -43,7 +34,7 @@ class BusinessUnitHandlerTest extends \PHPUnit\Framework\TestCase
         $this->manager = $this->createMock(ObjectManager::class);
         $this->form = $this->createMock(Form::class);
         $this->ownerTreeProvider = $this->createMock(OwnerTreeProviderInterface::class);
-        $this->entity  = new BusinessUnit();
+        $this->entity = new BusinessUnit();
 
         $this->handler = new BusinessUnitHandler(
             $this->form,
@@ -53,7 +44,7 @@ class BusinessUnitHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessValidData()
+    public function testProcessValidData(): void
     {
         $appendedUser = new User();
         $appendedUser->setId(1);
@@ -116,7 +107,7 @@ class BusinessUnitHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $removedUser->getBusinessUnits()->toArray());
     }
 
-    public function testBadMethod()
+    public function testBadMethod(): void
     {
         $this->request->setMethod('GET');
         $this->assertFalse($this->handler->process($this->entity));

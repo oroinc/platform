@@ -18,7 +18,7 @@ class OroThemeExtensionTest extends TestCase
         array $expectedThemeSettings,
         ?string $expectedActiveTheme,
         array $expectedSettings
-    ) {
+    ): void {
         $bundle1 = new Fixtures\FooBundle\FooBundle();
         $bundle2 = new Fixtures\BarBundle\BarBundle();
         CumulativeResourceManager::getInstance()

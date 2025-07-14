@@ -7,13 +7,14 @@ use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Oro\Component\DoctrineUtils\ORM\PlatformResultSetMapping;
+use PHPUnit\Framework\TestCase;
 
-class PlatformResultSetMappingTest extends \PHPUnit\Framework\TestCase
+class PlatformResultSetMappingTest extends TestCase
 {
     /**
      * @dataProvider databasePlatformProvider
      */
-    public function testBasicResultSetMapping(AbstractPlatform $platform, $expectedMapping)
+    public function testBasicResultSetMapping(AbstractPlatform $platform, $expectedMapping): void
     {
         $rsm = new PlatformResultSetMapping($platform);
 

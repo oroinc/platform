@@ -10,14 +10,13 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ActivityAssociationHelperTest extends \PHPUnit\Framework\TestCase
+class ActivityAssociationHelperTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ActivityAssociationHelper */
-    private $activityAssociationHelper;
+    private ConfigManager&MockObject $configManager;
+    private ActivityAssociationHelper $activityAssociationHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -27,9 +26,9 @@ class ActivityAssociationHelperTest extends \PHPUnit\Framework\TestCase
         $this->activityAssociationHelper = new ActivityAssociationHelper($this->configManager);
     }
 
-    public function testIsActivityAssociationEnabledForNotConfigurableEntity()
+    public function testIsActivityAssociationEnabledForNotConfigurableEntity(): void
     {
-        $entityClass   = 'Test\Entity';
+        $entityClass = 'Test\Entity';
         $activityClass = 'Test\Activity';
 
         $this->configManager->expects($this->once())
@@ -44,9 +43,9 @@ class ActivityAssociationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsActivityAssociationEnabledForDisabledAssociation()
+    public function testIsActivityAssociationEnabledForDisabledAssociation(): void
     {
-        $entityClass   = 'Test\Entity';
+        $entityClass = 'Test\Entity';
         $activityClass = 'Test\Activity';
 
         $config = new Config(new EntityConfigId('activity', $entityClass));
@@ -65,15 +64,15 @@ class ActivityAssociationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsActivityAssociationEnabledForEnabledAssociation()
+    public function testIsActivityAssociationEnabledForEnabledAssociation(): void
     {
-        $entityClass   = 'Test\Entity';
+        $entityClass = 'Test\Entity';
         $activityClass = 'Test\Activity';
 
         $config = new Config(new EntityConfigId('activity', $entityClass));
         $config->set('activities', [$activityClass]);
 
-        $associationName   = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
+        $associationName = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
         $associationConfig = new Config(
             new FieldConfigId('extend', $activityClass, $associationName)
         );
@@ -100,15 +99,15 @@ class ActivityAssociationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsActivityAssociationEnabledForEnabledButNotAccessibleAssociation()
+    public function testIsActivityAssociationEnabledForEnabledButNotAccessibleAssociation(): void
     {
-        $entityClass   = 'Test\Entity';
+        $entityClass = 'Test\Entity';
         $activityClass = 'Test\Activity';
 
         $config = new Config(new EntityConfigId('activity', $entityClass));
         $config->set('activities', [$activityClass]);
 
-        $associationName   = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
+        $associationName = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
         $associationConfig = new Config(
             new FieldConfigId('extend', $activityClass, $associationName)
         );
@@ -135,9 +134,9 @@ class ActivityAssociationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsActivityAssociationEnabledForEnabledButNotAccessibleAssociationButWithAccessibleFalse()
+    public function testIsActivityAssociationEnabledForEnabledButNotAccessibleAssociationButWithAccessibleFalse(): void
     {
-        $entityClass   = 'Test\Entity';
+        $entityClass = 'Test\Entity';
         $activityClass = 'Test\Activity';
 
         $config = new Config(new EntityConfigId('activity', $entityClass));
@@ -159,7 +158,7 @@ class ActivityAssociationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasActivityAssociationsForNotConfigurableEntity()
+    public function testHasActivityAssociationsForNotConfigurableEntity(): void
     {
         $entityClass = 'Test\Entity';
 
@@ -175,9 +174,9 @@ class ActivityAssociationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasActivityAssociations()
+    public function testHasActivityAssociations(): void
     {
-        $entityClass    = 'Test\Entity';
+        $entityClass = 'Test\Entity';
         $activity1Class = 'Test\Activity1';
         $activity2Class = 'Test\Activity2';
 

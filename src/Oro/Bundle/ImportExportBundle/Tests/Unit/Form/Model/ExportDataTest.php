@@ -4,13 +4,14 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Form\Model;
 
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
+use PHPUnit\Framework\TestCase;
 
-class ExportDataTest extends \PHPUnit\Framework\TestCase
+class ExportDataTest extends TestCase
 {
     /**
      * @dataProvider propertiesDataProvider
      */
-    public function testSettersAndGetters(string $property, mixed $value)
+    public function testSettersAndGetters(string $property, mixed $value): void
     {
         $obj = new ExportData();
 

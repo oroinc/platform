@@ -7,14 +7,13 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuItem;
 use Oro\Bundle\SecurityBundle\Menu\Builder\StripDangerousProtocolsBuilder;
 use Oro\Bundle\SecurityBundle\Util\UriSecurityHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class StripDangerousProtocolsBuilderTest extends \PHPUnit\Framework\TestCase
+class StripDangerousProtocolsBuilderTest extends TestCase
 {
-    /** @var UriSecurityHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $uriSecurityHelper;
-
-    /** @var StripDangerousProtocolsBuilder */
-    private $builder;
+    private UriSecurityHelper&MockObject $uriSecurityHelper;
+    private StripDangerousProtocolsBuilder $builder;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class StripDangerousProtocolsBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildDataProvider
      */
-    public function testBuild(ItemInterface $menuItem, ItemInterface $expectedMenuItem)
+    public function testBuild(ItemInterface $menuItem, ItemInterface $expectedMenuItem): void
     {
         $this->uriSecurityHelper->expects($this->any())
             ->method('stripDangerousProtocols')

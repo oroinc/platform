@@ -4,11 +4,11 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
 use Doctrine\Persistence\Mapping\Driver\MappingDriver;
 use Oro\Bundle\EntityBundle\ORM\MappingDriverChain;
+use PHPUnit\Framework\TestCase;
 
-class MappingDriverChainTest extends \PHPUnit\Framework\TestCase
+class MappingDriverChainTest extends TestCase
 {
-    /** @var MappingDriverChain */
-    private $chain;
+    private MappingDriverChain $chain;
 
     #[\Override]
     protected function setUp(): void
@@ -16,10 +16,12 @@ class MappingDriverChainTest extends \PHPUnit\Framework\TestCase
         $this->chain = new MappingDriverChain();
     }
 
-    public function testTransientCache()
+    public function testTransientCache(): void
     {
         $mappingDriver = $this->createMock(MappingDriver::class);
-        $mappingDriver->expects($this->once())->method('isTransient')->willReturn(true);
+        $mappingDriver->expects($this->once())
+            ->method('isTransient')
+            ->willReturn(true);
 
         $this->chain->addDriver($mappingDriver, \stdClass::class);
 

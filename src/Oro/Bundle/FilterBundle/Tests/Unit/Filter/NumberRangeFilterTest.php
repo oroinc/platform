@@ -34,7 +34,7 @@ class NumberRangeFilterTest extends NumberFilterTest
      * @dataProvider parseDataProvider
      */
     #[\Override]
-    public function testParseData($data, $expected)
+    public function testParseData($data, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -45,7 +45,7 @@ class NumberRangeFilterTest extends NumberFilterTest
     /**
      * @dataProvider applyRangeProvider
      */
-    public function testApplyRange(array $data, array $expected)
+    public function testApplyRange(array $data, array $expected): void
     {
         $ds = $this->getFilterDatasource();
         $this->filter->apply($ds, $data);
@@ -151,7 +151,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         ];
     }
 
-    public function testPrepareDataWhenNoValueAndRangeRelatedFilterType()
+    public function testPrepareDataWhenNoValueAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN, 'value' => null, 'value_end' => null],
@@ -161,7 +161,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithNullValueAndRangeRelatedFilterType()
+    public function testPrepareDataWithNullValueAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => null, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN, 'value_end' => null],
@@ -172,7 +172,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithNullEndValueAndRangeRelatedFilterType()
+    public function testPrepareDataWithNullEndValueAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value_end' => null, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN, 'value' => null],
@@ -183,7 +183,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithNullValuesAndRangeRelatedFilterType()
+    public function testPrepareDataWithNullValuesAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => null, 'value_end' => null, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN],
@@ -195,7 +195,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithEmptyStringValueAndRangeRelatedFilterType()
+    public function testPrepareDataWithEmptyStringValueAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => null, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN, 'value_end' => null],
@@ -206,7 +206,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithEmptyStringEndValueAndRangeRelatedFilterType()
+    public function testPrepareDataWithEmptyStringEndValueAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value_end' => null, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN, 'value' => null],
@@ -217,7 +217,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithEmptyStringValuesAndRangeRelatedFilterType()
+    public function testPrepareDataWithEmptyStringValuesAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => null, 'value_end' => null, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN],
@@ -229,7 +229,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithZeroValueAsStringAndRangeRelatedFilterType()
+    public function testPrepareDataWithZeroValueAsStringAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => 0.0, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN, 'value_end' => null],
@@ -240,7 +240,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithZeroEndValueAsStringAndRangeRelatedFilterType()
+    public function testPrepareDataWithZeroEndValueAsStringAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value_end' => 0.0, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN, 'value' => null],
@@ -251,7 +251,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithZeroValuesAsStringAndRangeRelatedFilterType()
+    public function testPrepareDataWithZeroValuesAsStringAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => 0.0, 'value_end' => 0.0, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN],
@@ -263,7 +263,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithZeroValueAsIntegerAndRangeRelatedFilterType()
+    public function testPrepareDataWithZeroValueAsIntegerAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => 0.0, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN, 'value_end' => null],
@@ -274,7 +274,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithZeroEndValueAsIntegerAndRangeRelatedFilterType()
+    public function testPrepareDataWithZeroEndValueAsIntegerAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value_end' => 0.0, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN, 'value' => null],
@@ -285,7 +285,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithZeroValuesAsIntegerAndRangeRelatedFilterType()
+    public function testPrepareDataWithZeroValuesAsIntegerAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => 0.0, 'value_end' => 0.0, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN],
@@ -297,7 +297,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithIntegerValueAndRangeRelatedFilterType()
+    public function testPrepareDataWithIntegerValueAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => 123.0, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN, 'value_end' => null],
@@ -308,7 +308,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithIntegerEndValueAndRangeRelatedFilterType()
+    public function testPrepareDataWithIntegerEndValueAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value_end' => 123.0, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN, 'value' => null],
@@ -319,7 +319,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithIntegerValuesAndRangeRelatedFilterType()
+    public function testPrepareDataWithIntegerValuesAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => 123.0, 'value_end' => 234.0, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN],
@@ -331,7 +331,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithIntegerValueAsStringAndRangeRelatedFilterType()
+    public function testPrepareDataWithIntegerValueAsStringAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => 123.0, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN, 'value_end' => null],
@@ -342,7 +342,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithIntegerEndValueAsStringAndRangeRelatedFilterType()
+    public function testPrepareDataWithIntegerEndValueAsStringAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value_end' => 123.0, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN, 'value' => null],
@@ -353,7 +353,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithIntegerValuesAsStringAndRangeRelatedFilterType()
+    public function testPrepareDataWithIntegerValuesAsStringAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => 123.0, 'value_end' => 234.0, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN],
@@ -365,7 +365,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithFloatValueAndRangeRelatedFilterType()
+    public function testPrepareDataWithFloatValueAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => 123.1, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN, 'value_end' => null],
@@ -376,7 +376,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithFloatEndValueAndRangeRelatedFilterType()
+    public function testPrepareDataWithFloatEndValueAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value_end' => 123.1, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN, 'value' => null],
@@ -387,7 +387,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithFloatValuesAndRangeRelatedFilterType()
+    public function testPrepareDataWithFloatValuesAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => 123.1, 'value_end' => 234.9, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN],
@@ -399,7 +399,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithFloatValueAsStringAndRangeRelatedFilterType()
+    public function testPrepareDataWithFloatValueAsStringAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => 123.1, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN, 'value_end' => null],
@@ -410,7 +410,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithFloatEndValueAsStringAndRangeRelatedFilterType()
+    public function testPrepareDataWithFloatEndValueAsStringAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value_end' => 123.1, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN, 'value' => null],
@@ -421,7 +421,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithFloatValuesAsStringAndRangeRelatedFilterType()
+    public function testPrepareDataWithFloatValuesAsStringAndRangeRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => 123.1, 'type' => (string)NumberRangeFilterTypeInterface::TYPE_BETWEEN, 'value_end' => null],
@@ -432,7 +432,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         );
     }
 
-    public function testPrepareDataWithNotNumericStringValueAndRangeRelatedFilterType()
+    public function testPrepareDataWithNotNumericStringValueAndRangeRelatedFilterType(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->filter->prepareData([
@@ -441,7 +441,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         ]);
     }
 
-    public function testPrepareDataWithNotNumericStringEndValueAndRangeRelatedFilterType()
+    public function testPrepareDataWithNotNumericStringEndValueAndRangeRelatedFilterType(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->filter->prepareData([
@@ -450,7 +450,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         ]);
     }
 
-    public function testPrepareDataWithNotNumericStringValuesAndRangeRelatedFilterType()
+    public function testPrepareDataWithNotNumericStringValuesAndRangeRelatedFilterType(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->filter->prepareData([
@@ -460,7 +460,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         ]);
     }
 
-    public function testPrepareDataWithArrayValueAndRangeRelatedFilterType()
+    public function testPrepareDataWithArrayValueAndRangeRelatedFilterType(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The value is not valid. Expected a scalar value, "array" given');
@@ -470,7 +470,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         ]);
     }
 
-    public function testPrepareDataWithArrayEndValueAndRangeRelatedFilterType()
+    public function testPrepareDataWithArrayEndValueAndRangeRelatedFilterType(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The value is not valid. Expected a scalar value, "array" given');
@@ -480,7 +480,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         ]);
     }
 
-    public function testPrepareDataWithArrayValuesAndRangeRelatedFilterType()
+    public function testPrepareDataWithArrayValuesAndRangeRelatedFilterType(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The value is not valid. Expected a scalar value, "array" given');

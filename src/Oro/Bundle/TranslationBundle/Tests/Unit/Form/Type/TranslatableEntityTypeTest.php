@@ -9,7 +9,6 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Gedmo\Translatable\TranslatableListener;
@@ -18,6 +17,7 @@ use Oro\Bundle\TranslationBundle\Form\DataTransformer\CollectionToArrayTransform
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\TranslationBundle\Tests\Unit\Form\Type\Stub\TestEntity;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
@@ -32,23 +32,14 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
     private const TEST_IDENTIFIER = 'testId';
     private const TEST_PROPERTY = 'testProperty';
 
-    /** @var EntityRepository */
-    private $entityRepository;
+    private ?EntityRepository $entityRepository = null;
+    private ?QueryBuilder $queryBuilder = null;
+    private AbstractQuery&MockObject $query;
+    private TranslatableEntityType $type;
 
-    /** @var QueryBuilder */
-    private $queryBuilder;
+    private array $testChoices = ['one', 'two', 'three'];
 
-    /** @var Query|\PHPUnit\Framework\MockObject\MockObject */
-    private $query;
-
-    /** @var TranslatableEntityType */
-    private $type;
-
-    /** @var array */
-    private $testChoices = ['one', 'two', 'three'];
-
-    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclHelper;
+    private AclHelper&MockObject $aclHelper;
 
     #[\Override]
     protected function setUp(): void

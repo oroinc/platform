@@ -4,26 +4,23 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\EmbeddedFormBundle\Manager\CsrfTokenStorage;
 use Oro\Bundle\EmbeddedFormBundle\Manager\SessionIdProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class CsrfTokenStorageTest extends \PHPUnit\Framework\TestCase
+class CsrfTokenStorageTest extends TestCase
 {
     private const TEST_SESSION_ID = 'test_sid';
     private const TEST_CSRF_TOKEN_ID = 'test_token_id';
     private const TEST_CSRF_TOKEN_LIFETIME = 123;
 
-    /** @var ArrayAdapter */
-    private $tokenCache;
-
-    /** @var SessionIdProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $sessionIdProvider;
-
-    /** @var CsrfTokenStorage */
-    private $csrfTokenStorage;
+    private ArrayAdapter $tokenCache;
+    private SessionIdProviderInterface&MockObject $sessionIdProvider;
+    private CsrfTokenStorage $csrfTokenStorage;
 
     #[\Override]
     protected function setUp(): void

@@ -4,11 +4,12 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Converter;
 
 use Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
  */
-class AbstractTableDataConverterTest extends \PHPUnit\Framework\TestCase
+class AbstractTableDataConverterTest extends TestCase
 {
     private array $headerConversionRules = [
         'First Name' => 'firstName',
@@ -35,8 +36,7 @@ class AbstractTableDataConverterTest extends \PHPUnit\Framework\TestCase
         'emails:2',
     ];
 
-    /** @var AbstractTableDataConverter */
-    private $dataConverter;
+    private AbstractTableDataConverter $dataConverter;
 
     #[\Override]
     protected function setUp(): void
@@ -55,7 +55,7 @@ class AbstractTableDataConverterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider convertToExportDataProvider
      */
-    public function testConvertToExportFormat(array $importedRecord, array $result)
+    public function testConvertToExportFormat(array $importedRecord, array $result): void
     {
         $this->assertEquals($result, $this->dataConverter->convertToExportFormat($importedRecord));
     }
@@ -114,7 +114,7 @@ class AbstractTableDataConverterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider convertToImportDataProvider
      */
-    public function testConvertToImportFormat(array $exportedRecord, array $result, bool $skipNull = true)
+    public function testConvertToImportFormat(array $exportedRecord, array $result, bool $skipNull = true): void
     {
         $this->assertEquals($result, $this->dataConverter->convertToImportFormat($exportedRecord, $skipNull));
     }
@@ -237,7 +237,7 @@ class AbstractTableDataConverterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testConvertToExportFormatExtraFields()
+    public function testConvertToExportFormatExtraFields(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage("Backend header doesn't contain fields: fax");

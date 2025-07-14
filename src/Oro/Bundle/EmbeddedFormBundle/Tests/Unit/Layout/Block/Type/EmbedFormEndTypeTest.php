@@ -11,13 +11,13 @@ use Symfony\Component\Form\FormView;
 
 class EmbedFormEndTypeTest extends BlockTypeTestCase
 {
-    public function testResolveOptionsWithoutFormName()
+    public function testResolveOptionsWithoutFormName(): void
     {
         $options = $this->resolveOptions(EmbedFormEndType::NAME, []);
         $this->assertEquals('form', $options['form_name']);
     }
 
-    public function testGetBlockView()
+    public function testGetBlockView(): void
     {
         $formName = 'test_form';
         $formView = new FormView();
@@ -39,7 +39,7 @@ class EmbedFormEndTypeTest extends BlockTypeTestCase
         $this->assertTrue($view->vars['render_rest']);
     }
 
-    public function testGetBlockViewViewWithoutForm()
+    public function testGetBlockViewViewWithoutForm(): void
     {
         $this->expectException(\OutOfBoundsException::class);
         $this->expectExceptionMessage('Undefined index: test_form.');
@@ -50,7 +50,7 @@ class EmbedFormEndTypeTest extends BlockTypeTestCase
         );
     }
 
-    public function testGetBlockViewViewWithInvalidForm()
+    public function testGetBlockViewViewWithInvalidForm(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(sprintf(
@@ -68,7 +68,7 @@ class EmbedFormEndTypeTest extends BlockTypeTestCase
         );
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $type = $this->getBlockType(EmbedFormEndType::NAME);
 

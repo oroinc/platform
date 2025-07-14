@@ -6,16 +6,15 @@ use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class UpdateExtendConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
+class UpdateExtendConfigMigrationQueryTest extends TestCase
 {
     use TempDirExtension;
 
-    /** @var CommandExecutor|\PHPUnit\Framework\MockObject\MockObject */
-    private $commandExecutor;
-
-    /** @var string */
-    private $temporaryFilePath;
+    private CommandExecutor&MockObject $commandExecutor;
+    private string $temporaryFilePath;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
             . 'test_options.bin';
     }
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $options = ['test'];
 
@@ -55,7 +54,7 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
         self::assertFileDoesNotExist($this->temporaryFilePath);
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $logger = new ArrayLogger();
         $options = ['test'];

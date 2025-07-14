@@ -12,18 +12,17 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\BaseContextInitProcessor;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Context\ResultTypeStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
+class BaseContextInitProcessorTest extends TestCase
 {
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var BaseContextInitProcessor */
-    private $processor;
+    private WorkflowManager&MockObject $workflowManager;
+    private BaseContextInitProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +31,7 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new BaseContextInitProcessor($this->workflowManager);
     }
 
-    public function testTransitionSpecified()
+    public function testTransitionSpecified(): void
     {
         $this->expectException(\TypeError::class);
         if (PHP_VERSION_ID < 80000) {
@@ -45,7 +44,7 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process(new TransitionContext());
     }
 
-    public function testNoItemAndWorkflowSpecified()
+    public function testNoItemAndWorkflowSpecified(): void
     {
         $this->expectException(\TypeError::class);
         if (PHP_VERSION_ID < 80000) {
@@ -61,7 +60,7 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testWorkflowExceptionUnknownWorkflowCatch()
+    public function testWorkflowExceptionUnknownWorkflowCatch(): void
     {
         $context = new TransitionContext();
         $context->setTransitionName('transition');
@@ -80,7 +79,7 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($exception, $context->getError());
     }
 
-    public function testWorkflowExceptionUnknownTransitionCatch()
+    public function testWorkflowExceptionUnknownTransitionCatch(): void
     {
         $context = new TransitionContext();
         $context->setWorkflowName('known_workflow');
@@ -109,7 +108,7 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($exception, $context->getError());
     }
 
-    public function testStartContextInit()
+    public function testStartContextInit(): void
     {
         $request = $this->createMock(Request::class);
 
@@ -120,8 +119,8 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
         $context->setRequest($request);
         $context->setResultType(new ResultTypeStub('type', true));
 
-        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
-        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
+        /** @var Workflow&MockObject $workflow */
+        /** @var Transition&MockObject $transition */
         [$workflow, $transition] = $this->extractWorkflowAndTransition('the_workflow', 'the_transition');
 
         $transition->expects($this->once())
@@ -167,15 +166,15 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
         return [$workflow, $transition];
     }
 
-    public function testRegularContextInitAttributes()
+    public function testRegularContextInitAttributes(): void
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->once())
             ->method('getWorkflowName')
             ->willReturn('the_workflow');
 
-        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
-        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
+        /** @var Workflow&MockObject $workflow */
+        /** @var Transition&MockObject $transition */
         [$workflow, $transition] = $this->extractWorkflowAndTransition('the_workflow', 'the_transition');
 
         $transition->expects($this->once())

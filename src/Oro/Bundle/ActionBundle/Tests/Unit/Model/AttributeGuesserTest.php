@@ -11,30 +11,21 @@ use Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 
-class AttributeGuesserTest extends \PHPUnit\Framework\TestCase
+class AttributeGuesserTest extends TestCase
 {
-    /* @var FormRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $formRegistry;
-
-    /* @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
-
-    /* @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigProvider;
-
-    /* @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $formConfigProvider;
-
-    /* @var DoctrineTypeMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineTypeMappingProvider;
-
-    /* @var AttributeGuesser */
-    private $guesser;
+    private FormRegistry&MockObject $formRegistry;
+    private ManagerRegistry&MockObject $managerRegistry;
+    private ConfigProvider&MockObject $entityConfigProvider;
+    private ConfigProvider&MockObject $formConfigProvider;
+    private DoctrineTypeMappingProvider&MockObject $doctrineTypeMappingProvider;
+    private AttributeGuesser $guesser;
 
     #[\Override]
     protected function setUp(): void
@@ -62,7 +53,7 @@ class AttributeGuesserTest extends \PHPUnit\Framework\TestCase
         Attribute $attribute,
         array $formMapping = [],
         array $formConfig = []
-    ) {
+    ): void {
         foreach ($formMapping as $mapping) {
             $this->guesser->addFormTypeMapping(
                 $mapping['attributeType'],
@@ -129,7 +120,7 @@ class AttributeGuesserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider guessClassAttributeFormDataProvider
      */
-    public function testGuessClassAttributeForm(?TypeGuess $expected, Attribute $attribute)
+    public function testGuessClassAttributeForm(?TypeGuess $expected, Attribute $attribute): void
     {
         $entityClass = 'TestEntity';
         $fieldName = 'field';

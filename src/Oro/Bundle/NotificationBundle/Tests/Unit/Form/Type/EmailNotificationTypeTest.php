@@ -27,6 +27,7 @@ use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\Form\Type\Stub\EntityTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormInterface;
@@ -38,11 +39,8 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
 {
     use EntityTrait;
 
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var EmailNotificationType */
-    private $formType;
+    private ConfigProvider&MockObject $configProvider;
+    private EmailNotificationType $formType;
 
     #[\Override]
     protected function setUp(): void

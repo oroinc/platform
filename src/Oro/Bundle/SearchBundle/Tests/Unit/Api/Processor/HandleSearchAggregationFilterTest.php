@@ -11,8 +11,7 @@ use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
 class HandleSearchAggregationFilterTest extends GetListProcessorTestCase
 {
-    /** @var HandleSearchAggregationFilter */
-    private $processor;
+    private HandleSearchAggregationFilter $processor;
 
     #[\Override]
     protected function setUp(): void

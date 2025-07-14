@@ -28,10 +28,9 @@ class TransitionTest extends TestCase
 {
     use EntityTestCaseTrait;
 
-    private TransitionOptionsResolver|MockObject $optionsResolver;
-    private EventDispatcher|MockObject $eventDispatcher;
-    private TranslatorInterface|MockObject $translator;
-
+    private TransitionOptionsResolver&MockObject $optionsResolver;
+    private EventDispatcher&MockObject $eventDispatcher;
+    private TranslatorInterface&MockObject $translator;
     private Transition $transition;
 
     #[\Override]
@@ -546,7 +545,7 @@ class TransitionTest extends TestCase
         self::assertEquals($formConfiguration['data_attribute'], $this->transition->getFormDataAttribute());
     }
 
-    public function testStepToWithoutConditionalSteps()
+    public function testStepToWithoutConditionalSteps(): void
     {
         $step1 = new Step();
         $workflowItem = new WorkflowItem();
@@ -557,7 +556,7 @@ class TransitionTest extends TestCase
         $this->assertSame($step1, $this->transition->getResolvedStepTo($workflowItem));
     }
 
-    public function testStepToWithMatchedConditionalSteps()
+    public function testStepToWithMatchedConditionalSteps(): void
     {
         $step1 = new Step();
         $step1->setName('step1');
@@ -578,7 +577,7 @@ class TransitionTest extends TestCase
         $this->assertSame($step2, $this->transition->getResolvedStepTo($workflowItem));
     }
 
-    public function testStepToWithNotMatchedConditionalSteps()
+    public function testStepToWithNotMatchedConditionalSteps(): void
     {
         $this->transition->setName('transition_name');
         $this->transition->setLabel('transition_label');

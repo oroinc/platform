@@ -5,18 +5,15 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Log\Handler;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use Oro\Component\MessageQueue\Log\Handler\ResendJobHandler;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class ResendJobHandlerTest extends \PHPUnit\Framework\TestCase
+class ResendJobHandlerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
-    private $jobLogger;
-
-    /** @var ConsumerState */
-    private $consumerState;
-
-    /** @var ResendJobHandler */
-    private $handler;
+    private LoggerInterface&MockObject $jobLogger;
+    private ConsumerState $consumerState;
+    private ResendJobHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -27,18 +24,18 @@ class ResendJobHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new ResendJobHandler($this->jobLogger, $this->consumerState);
     }
 
-    public function testIsHandlingWithoutJob()
+    public function testIsHandlingWithoutJob(): void
     {
         self::assertFalse($this->handler->isHandling([]));
     }
 
-    public function testIsHandlingWithJob()
+    public function testIsHandlingWithJob(): void
     {
         $this->consumerState->setJob($this->createMock(Job::class));
         self::assertTrue($this->handler->isHandling([]));
     }
 
-    public function testHandleWithoutJob()
+    public function testHandleWithoutJob(): void
     {
         $record = [
             'message' => 'test message',
@@ -53,7 +50,7 @@ class ResendJobHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->handler->handle($record));
     }
 
-    public function testHandleWithJob()
+    public function testHandleWithJob(): void
     {
         $record = [
             'message' => 'test message',

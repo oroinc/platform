@@ -11,17 +11,14 @@ use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\CommentBundle\Api\CommentAssociationProvider;
 use Oro\Bundle\CommentBundle\Api\Processor\ExcludeChangeCommentSubresources;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ExcludeChangeCommentSubresourcesTest extends \PHPUnit\Framework\TestCase
+class ExcludeChangeCommentSubresourcesTest extends TestCase
 {
-    /** @var CommentAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $commentAssociationProvider;
-
-    /** @var ExcludeChangeCommentSubresources */
-    private $processor;
-
-    /** @var CollectSubresourcesContext */
-    private $context;
+    private CommentAssociationProvider&MockObject $commentAssociationProvider;
+    private ExcludeChangeCommentSubresources $processor;
+    private CollectSubresourcesContext $context;
 
     #[\Override]
     protected function setUp(): void

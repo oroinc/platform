@@ -5,12 +5,12 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\SecurityBundle\Util\UriSecurityHelper;
 use Oro\Bundle\SecurityBundle\Validator\Constraints\NotDangerousProtocol;
 use Oro\Bundle\SecurityBundle\Validator\Constraints\NotDangerousProtocolValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NotDangerousProtocolValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var UriSecurityHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $uriSecurityHelper;
+    private UriSecurityHelper&MockObject $uriSecurityHelper;
 
     #[\Override]
     protected function setUp(): void

@@ -9,6 +9,7 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\TestClass;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\TestClassMagicCall;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\TestClassMagicGet;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\Ticket5775Object;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
@@ -20,7 +21,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
+class PropertyAccessorTest extends TestCase
 {
     private PropertyAccessorInterface $propertyAccessor;
 
@@ -75,7 +76,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getValidPropertyPaths
      */
-    public function testGetValue(object|array $objectOrArray, string $path, mixed $value)
+    public function testGetValue(object|array $objectOrArray, string $path, mixed $value): void
     {
         $this->assertSame($value, $this->propertyAccessor->getValue($objectOrArray, $path));
     }
@@ -83,13 +84,16 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getValidPropertyPathsWhenIndexExceptionsDisabled
      */
-    public function testGetValueWhenIndexExceptionsDisabled(object|array $objectOrArray, string $path, mixed $value)
-    {
+    public function testGetValueWhenIndexExceptionsDisabled(
+        object|array $objectOrArray,
+        string $path,
+        mixed $value
+    ): void {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();
         $this->assertSame($value, $this->propertyAccessor->getValue($objectOrArray, $path));
     }
 
-    public function testGetValueThrowsExceptionForInvalidPropertyPathType()
+    public function testGetValueThrowsExceptionForInvalidPropertyPathType(): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->getValue(new \stdClass(), 123);
@@ -98,7 +102,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPathsWithMissingProperty
      */
-    public function testGetValueThrowsExceptionIfPropertyNotFound(object|array $objectOrArray, string $path)
+    public function testGetValueThrowsExceptionIfPropertyNotFound(object|array $objectOrArray, string $path): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->getValue($objectOrArray, $path);
@@ -110,7 +114,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     public function testGetValueThrowsNoExceptionIfIndexNotFoundAndIndexExceptionsDisabled(
         object|array $objectOrArray,
         string $path
-    ) {
+    ): void {
         // When exceptions are disabled, non-existing indices can be read. In this case, null is returned
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax(
             ReflectionExtractor::DISALLOW_MAGIC_METHODS,
@@ -122,7 +126,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPathsWithMissingIndex
      */
-    public function testGetValueThrowsExceptionIfIndexNotFound(object|array $objectOrArray, string $path)
+    public function testGetValueThrowsExceptionIfIndexNotFound(object|array $objectOrArray, string $path): void
     {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax(
             throw: PropertyAccessorWithDotArraySyntax::THROW_ON_INVALID_INDEX
@@ -131,19 +135,19 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->propertyAccessor->getValue($objectOrArray, $path);
     }
 
-    public function testGetValueThrowsExceptionIfNotArrayAccess()
+    public function testGetValueThrowsExceptionIfNotArrayAccess(): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->getValue(new \stdClass(), 'index');
     }
 
-    public function testGetValueReadsMagicGet()
+    public function testGetValueReadsMagicGet(): void
     {
         $this->assertSame('John', $this->propertyAccessor->getValue(new TestClassMagicGet('John'), 'magicProperty'));
     }
 
     // https://github.com/symfony/symfony/pull/4450
-    public function testGetValueReadsMagicGetThatReturnsConstant()
+    public function testGetValueReadsMagicGetThatReturnsConstant(): void
     {
         $this->assertSame(
             'constant value',
@@ -151,14 +155,14 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetValueDoesNotReadMagicCallByDefault()
+    public function testGetValueDoesNotReadMagicCallByDefault(): void
     {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->getValue(new TestClassMagicCall('John'), 'magicCallProperty');
     }
 
-    public function testGetValueReadsMagicCallIfEnabled()
+    public function testGetValueReadsMagicCallIfEnabled(): void
     {
         $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(ReflectionExtractor::ALLOW_MAGIC_GET);
 
@@ -169,7 +173,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     }
 
     // https://github.com/symfony/symfony/pull/4450
-    public function testGetValueReadsMagicCallThatReturnsConstant()
+    public function testGetValueReadsMagicCallThatReturnsConstant(): void
     {
         $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(ReflectionExtractor::ALLOW_MAGIC_CALL);
 
@@ -182,14 +186,14 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getValidPropertyPaths
      */
-    public function testSetValue(object|array $objectOrArray, string $path)
+    public function testSetValue(object|array $objectOrArray, string $path): void
     {
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
 
         $this->assertSame('Updated', $this->propertyAccessor->getValue($objectOrArray, $path));
     }
 
-    public function testSetValueThrowsExceptionForInvalidPropertyPathType()
+    public function testSetValueThrowsExceptionForInvalidPropertyPathType(): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $testObject = new \stdClass();
@@ -200,7 +204,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPathsWithMissingProperty
      */
-    public function testSetValueThrowsExceptionIfPropertyNotFound(object|array $objectOrArray, string $path)
+    public function testSetValueThrowsExceptionIfPropertyNotFound(object|array $objectOrArray, string $path): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
@@ -209,7 +213,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPathsWithMissingIndex
      */
-    public function testSetValueThrowsNoExceptionIfIndexNotFound(object|array $objectOrArray, string $path)
+    public function testSetValueThrowsNoExceptionIfIndexNotFound(object|array $objectOrArray, string $path): void
     {
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
 
@@ -222,7 +226,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     public function testSetValueThrowsNoExceptionIfIndexNotFoundAndIndexExceptionsDisabled(
         object|array $objectOrArray,
         string $path
-    ) {
+    ): void {
         $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(
             ReflectionExtractor::DISALLOW_MAGIC_METHODS,
             PropertyAccessorWithDotArraySyntax::THROW_ON_INVALID_INDEX
@@ -232,7 +236,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('Updated', $this->propertyAccessor->getValue($objectOrArray, $path));
     }
 
-    public function testSetValueThrowsExceptionIfNotArrayAccess()
+    public function testSetValueThrowsExceptionIfNotArrayAccess(): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $testObject = new \stdClass();
@@ -240,7 +244,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->propertyAccessor->setValue($testObject, 'index', 'Updated');
     }
 
-    public function testSetValueThrowsExceptionIfThereIsInvalidItemInGraph()
+    public function testSetValueThrowsExceptionIfThereIsInvalidItemInGraph(): void
     {
         $this->expectException(InvalidPropertyPathException::class);
         $objectOrArray = new \stdClass();
@@ -249,7 +253,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->propertyAccessor->setValue($objectOrArray, 'root.index.firstName.', 'Updated');
     }
 
-    public function testSetValueUpdatesMagicSet()
+    public function testSetValueUpdatesMagicSet(): void
     {
         $author = new TestClassMagicGet('John');
 
@@ -258,7 +262,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Updated', $author->__get('magicProperty'));
     }
 
-    public function testSetValueThrowsExceptionIfThereAreMissingParameters()
+    public function testSetValueThrowsExceptionIfThereAreMissingParameters(): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $testObject = new TestClass('John');
@@ -266,7 +270,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->propertyAccessor->setValue($testObject, 'publicAccessorWithMoreRequiredParameters', 'Updated');
     }
 
-    public function testSetValueDoesNotUpdateMagicCallByDefault()
+    public function testSetValueDoesNotUpdateMagicCallByDefault(): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $author = new TestClassMagicCall('John');
@@ -274,7 +278,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->propertyAccessor->setValue($author, 'magicCallProperty', 'Updated');
     }
 
-    public function testSetValueUpdatesMagicCallIfEnabled()
+    public function testSetValueUpdatesMagicCallIfEnabled(): void
     {
         $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(ReflectionExtractor::ALLOW_MAGIC_CALL);
 
@@ -288,7 +292,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPathsWithUnexpectedType
      */
-    public function testSetValueThrowsExceptionIfNotObjectOrArray(mixed $objectOrArray, string $path)
+    public function testSetValueThrowsExceptionIfNotObjectOrArray(mixed $objectOrArray, string $path): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('PropertyAccessor requires a graph of objects or arrays to operate on');
@@ -299,7 +303,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getValidPropertyPathsForRemove
      */
-    public function testRemove(object|array $objectOrArray, string $path)
+    public function testRemove(object|array $objectOrArray, string $path): void
     {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax(
             throw: PropertyAccessorWithDotArraySyntax::THROW_ON_INVALID_INDEX
@@ -308,7 +312,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
         if (count(func_get_args()) === 3) {
             $expectedValue = func_get_args()[2];
-            $actualValue   = $this->propertyAccessor->getValue($objectOrArray, $path);
+            $actualValue = $this->propertyAccessor->getValue($objectOrArray, $path);
             $this->assertSame($expectedValue, $actualValue);
         } else {
             try {
@@ -319,7 +323,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testRemoveThrowsExceptionForInvalidPropertyPathType()
+    public function testRemoveThrowsExceptionForInvalidPropertyPathType(): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $testObject = new \stdClass();
@@ -330,7 +334,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPathsWithMissingProperty
      */
-    public function testRemoveThrowsExceptionIfPropertyNotFound(object|array $objectOrArray, string $path)
+    public function testRemoveThrowsExceptionIfPropertyNotFound(object|array $objectOrArray, string $path): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->remove($objectOrArray, $path);
@@ -339,7 +343,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPathsWithMissingIndex
      */
-    public function testRemoveThrowsNoExceptionIfIndexNotFound(object|array $objectOrArray, string $path)
+    public function testRemoveThrowsNoExceptionIfIndexNotFound(object|array $objectOrArray, string $path): void
     {
         $clone = unserialize(serialize($objectOrArray));
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax(
@@ -357,7 +361,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($clone, $objectOrArray);
     }
 
-    public function testRemoveThrowsExceptionIfNotArrayAccess()
+    public function testRemoveThrowsExceptionIfNotArrayAccess(): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $testObject = new \stdClass();
@@ -365,7 +369,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->propertyAccessor->remove($testObject, 'index');
     }
 
-    public function testRemoveThrowsExceptionIfThereIsInvalidItemInGraph()
+    public function testRemoveThrowsExceptionIfThereIsInvalidItemInGraph(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $objectOrArray = new \stdClass();
@@ -374,7 +378,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->propertyAccessor->remove($objectOrArray, 'root.index.firstName');
     }
 
-    public function testRemoveUpdatesMagicUnset()
+    public function testRemoveUpdatesMagicUnset(): void
     {
         $author = new TestClassMagicGet('John');
 
@@ -383,7 +387,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($author->__get('magicProperty'));
     }
 
-    public function testRemoveThrowsExceptionIfThereAreMissingParameters()
+    public function testRemoveThrowsExceptionIfThereAreMissingParameters(): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $testObject = new TestClass('John');
@@ -391,7 +395,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->propertyAccessor->remove($testObject, 'publicAccessorWithMoreRequiredParameters');
     }
 
-    public function testRemoveThrowsExceptionIfPublicPropertyHasNoUnsetter()
+    public function testRemoveThrowsExceptionIfPublicPropertyHasNoUnsetter(): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $testObject = new TestClass('John');
@@ -399,7 +403,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->propertyAccessor->remove($testObject, 'publicProperty');
     }
 
-    public function testRemoveThrowsExceptionIfProtectedProperty()
+    public function testRemoveThrowsExceptionIfProtectedProperty(): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $testObject = new TestClass('John');
@@ -407,7 +411,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->propertyAccessor->remove($testObject, 'protectedProperty');
     }
 
-    public function testRemoveThrowsExceptionIfPrivateProperty()
+    public function testRemoveThrowsExceptionIfPrivateProperty(): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $testObject = new TestClass('John');
@@ -415,7 +419,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->propertyAccessor->remove($testObject, 'privateProperty');
     }
 
-    public function testRemoveDoesNotUpdateMagicCallByDefault()
+    public function testRemoveDoesNotUpdateMagicCallByDefault(): void
     {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax(
             ReflectionExtractor::DISALLOW_MAGIC_METHODS,
@@ -426,7 +430,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->propertyAccessor->remove($author, 'magicCallProperty');
     }
 
-    public function testRemoveUpdatesMagicCallIfEnabled()
+    public function testRemoveUpdatesMagicCallIfEnabled(): void
     {
         $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(ReflectionExtractor::ALLOW_MAGIC_CALL);
 
@@ -440,7 +444,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPathsWithUnexpectedType
      */
-    public function testRemoveThrowsExceptionIfNotObjectOrArray(mixed $objectOrArray, string $path)
+    public function testRemoveThrowsExceptionIfNotObjectOrArray(mixed $objectOrArray, string $path): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('PropertyAccessor requires a graph of objects or arrays to operate on');
@@ -448,14 +452,14 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->propertyAccessor->remove($objectOrArray, $path);
     }
 
-    public function testGetValueWhenArrayValueIsNull()
+    public function testGetValueWhenArrayValueIsNull(): void
     {
         $this->assertNull(
             $this->propertyAccessor->getValue(['index' => ['nullable' => null]], 'index.nullable')
         );
     }
 
-    public function testGetValueWhenArrayValueIsNullAndIndexExceptionsDisabled()
+    public function testGetValueWhenArrayValueIsNullAndIndexExceptionsDisabled(): void
     {
         $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(
             ReflectionExtractor::DISALLOW_MAGIC_METHODS,
@@ -469,7 +473,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getValidPropertyPaths
      */
-    public function testIsReadable(object|array $objectOrArray, string $path)
+    public function testIsReadable(object|array $objectOrArray, string $path): void
     {
         $this->assertTrue($this->propertyAccessor->isReadable($objectOrArray, $path));
     }
@@ -477,7 +481,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getValidPropertyPathsWhenIndexExceptionsDisabled
      */
-    public function testIsReadableWhenIndexExceptionsDisabled(object|array $objectOrArray, string $path)
+    public function testIsReadableWhenIndexExceptionsDisabled(object|array $objectOrArray, string $path): void
     {
         $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(
             ReflectionExtractor::DISALLOW_MAGIC_METHODS,
@@ -492,7 +496,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPathsWithMissingProperty
      */
-    public function testIsReadableReturnsFalseIfPropertyNotFound(object|array $objectOrArray, string $path)
+    public function testIsReadableReturnsFalseIfPropertyNotFound(object|array $objectOrArray, string $path): void
     {
         $this->assertFalse($this->propertyAccessor->isReadable($objectOrArray, $path));
     }
@@ -500,7 +504,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPathsWithMissingIndex
      */
-    public function testIsReadableReturnsFalseIfIndexNotFound(object|array $objectOrArray, string $path)
+    public function testIsReadableReturnsFalseIfIndexNotFound(object|array $objectOrArray, string $path): void
     {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax(
             throw: PropertyAccessorWithDotArraySyntax::THROW_ON_INVALID_INDEX
@@ -515,7 +519,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     public function testIsReadableReturnsTrueIfIndexNotFoundAndIndexExceptionsDisabled(
         object|array $objectOrArray,
         string $path
-    ) {
+    ): void {
         // When exceptions are disabled, non-existing indices can be read.
         // In this case, null is returned by getValue method
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax(
@@ -524,18 +528,18 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->propertyAccessor->isReadable($objectOrArray, $path));
     }
 
-    public function testIsReadableRecognizesMagicGet()
+    public function testIsReadableRecognizesMagicGet(): void
     {
         $this->assertTrue($this->propertyAccessor->isReadable(new TestClassMagicGet('John'), 'magicProperty'));
     }
 
-    public function testIsReadableDoesNotRecognizeMagicCallByDefault()
+    public function testIsReadableDoesNotRecognizeMagicCallByDefault(): void
     {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         $this->assertFalse($this->propertyAccessor->isReadable(new TestClassMagicCall('John'), 'magicCallProperty'));
     }
 
-    public function testIsReadableRecognizesMagicCallIfEnabled()
+    public function testIsReadableRecognizesMagicCallIfEnabled(): void
     {
         $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(ReflectionExtractor::ALLOW_MAGIC_GET);
 
@@ -545,7 +549,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPathsWithUnexpectedType
      */
-    public function testIsReadableReturnsFalseIfNotObjectOrArray(mixed $objectOrArray, string $path)
+    public function testIsReadableReturnsFalseIfNotObjectOrArray(mixed $objectOrArray, string $path): void
     {
         $this->assertFalse($this->propertyAccessor->isReadable($objectOrArray, $path));
     }
@@ -553,7 +557,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getValidPropertyPaths
      */
-    public function testIsWritable(object|array $objectOrArray, string $path)
+    public function testIsWritable(object|array $objectOrArray, string $path): void
     {
         $this->assertTrue($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
@@ -561,7 +565,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPathsWithMissingProperty
      */
-    public function testIsWritableReturnsFalseIfPropertyNotFound(object|array $objectOrArray, string $path)
+    public function testIsWritableReturnsFalseIfPropertyNotFound(object|array $objectOrArray, string $path): void
     {
         $this->assertFalse($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
@@ -569,7 +573,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPathsWithMissingIndex
      */
-    public function testIsWritableReturnsTrueIfIndexNotFound(object|array $objectOrArray, string $path)
+    public function testIsWritableReturnsTrueIfIndexNotFound(object|array $objectOrArray, string $path): void
     {
         // Non-existing indices can be written. Arrays are created on-demand.
         $this->assertTrue($this->propertyAccessor->isWritable($objectOrArray, $path));
@@ -581,7 +585,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     public function testIsWritableReturnsTrueIfIndexNotFoundAndIndexExceptionsDisabled(
         object|array $objectOrArray,
         string $path
-    ) {
+    ): void {
         // Non-existing indices can be written even if exceptions are enabled
         $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(
             ReflectionExtractor::DISALLOW_MAGIC_METHODS,
@@ -590,17 +594,17 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
 
-    public function testIsWritableRecognizesMagicSet()
+    public function testIsWritableRecognizesMagicSet(): void
     {
         $this->assertTrue($this->propertyAccessor->isWritable(new TestClassMagicGet('John'), 'magicProperty'));
     }
 
-    public function testIsWritableDoesNotRecognizeMagicCallByDefault()
+    public function testIsWritableDoesNotRecognizeMagicCallByDefault(): void
     {
         $this->assertFalse($this->propertyAccessor->isWritable(new TestClassMagicCall('John'), 'magicCallProperty'));
     }
 
-    public function testIsWritableRecognizesMagicCallIfEnabled()
+    public function testIsWritableRecognizesMagicCallIfEnabled(): void
     {
         $this->propertyAccessor = new PropertyAccessorWithDotArraySyntax(ReflectionExtractor::ALLOW_MAGIC_CALL);
 
@@ -610,7 +614,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPathsWithUnexpectedType
      */
-    public function testIsWritableReturnsFalseIfNotObjectOrArray(mixed $objectOrArray, string $path)
+    public function testIsWritableReturnsFalseIfNotObjectOrArray(mixed $objectOrArray, string $path): void
     {
         $this->assertFalse($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
@@ -713,7 +717,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testTicket5755()
+    public function testTicket5755(): void
     {
         $object = new Ticket5775Object();
 
@@ -722,7 +726,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('foobar', $object->getProperty());
     }
 
-    public function testSetValueDeepWithMagicGetter()
+    public function testSetValueDeepWithMagicGetter(): void
     {
         $obj = new TestClassMagicGet('foo');
         $obj->publicProperty = ['foo' => ['bar' => 'some_value']];

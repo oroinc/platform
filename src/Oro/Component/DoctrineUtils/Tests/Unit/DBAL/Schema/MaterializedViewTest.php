@@ -4,8 +4,9 @@ namespace Oro\Component\DoctrineUtils\Tests\Unit\DBAL\Schema;
 
 use Doctrine\DBAL\Platforms\PostgreSQL100Platform;
 use Oro\Component\DoctrineUtils\DBAL\Schema\MaterializedView;
+use PHPUnit\Framework\TestCase;
 
-class MaterializedViewTest extends \PHPUnit\Framework\TestCase
+class MaterializedViewTest extends TestCase
 {
     public function testProperties(): void
     {

@@ -3,14 +3,15 @@
 namespace Oro\Component\Layout\Tests\Unit\ExpressionLanguage;
 
 use Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\Node\UnaryNode;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
-class ExpressionManipulatorTest extends \PHPUnit\Framework\TestCase
+class ExpressionManipulatorTest extends TestCase
 {
-    public function testToArray()
+    public function testToArray(): void
     {
         $expected = [
             'expression' => '!true === false',

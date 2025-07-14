@@ -8,25 +8,22 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File as HttpFile;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
+class ConfigFileDataTransformerTest extends TestCase
 {
     private const FILE_ID = 1;
     private const FILENAME = 'filename.jpg';
 
     private array $constraints = ['constraints'];
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $validator;
-
-    /** @var ConfigFileDataTransformer */
-    private $transformer;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ValidatorInterface&MockObject $validator;
+    private ConfigFileDataTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void
@@ -38,12 +35,12 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
         $this->transformer->setFileConstraints($this->constraints);
     }
 
-    public function testTransformNull()
+    public function testTransformNull(): void
     {
         self::assertNull($this->transformer->transform(null));
     }
 
-    public function testTransformConfigValue()
+    public function testTransformConfigValue(): void
     {
         $file = $this->createMock(File::class);
         $file->expects(self::any())
@@ -78,12 +75,12 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(self::FILENAME, $transformedFile->getFilename());
     }
 
-    public function testReverseTransformNull()
+    public function testReverseTransformNull(): void
     {
         self::assertEquals('', $this->transformer->reverseTransform(null));
     }
 
-    public function testReverseTransformEmptyFile()
+    public function testReverseTransformEmptyFile(): void
     {
         $file = $this->createMock(File::class);
         $file->expects(self::any())
@@ -93,7 +90,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('', $this->transformer->reverseTransform($file));
     }
 
-    public function testReverseTransformValidFile()
+    public function testReverseTransformValidFile(): void
     {
         $httpFile = $this->getHttpFile();
 
@@ -124,7 +121,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(self::FILE_ID, $this->transformer->reverseTransform($file));
     }
 
-    public function testReverseTransformInvalidFile()
+    public function testReverseTransformInvalidFile(): void
     {
         $httpFile = $this->getHttpFile();
 
@@ -155,7 +152,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(self::FILE_ID, $this->transformer->reverseTransform($file));
     }
 
-    public function testReverseTransformInvalidFileWithoutPersistedEntity()
+    public function testReverseTransformInvalidFileWithoutPersistedEntity(): void
     {
         $httpFile = $this->getHttpFile();
 
@@ -200,7 +197,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(null, $this->transformer->reverseTransform($file));
     }
 
-    private function getEntityManager(): EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+    private function getEntityManager(): EntityManagerInterface&MockObject
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $this->doctrineHelper->expects(self::any())

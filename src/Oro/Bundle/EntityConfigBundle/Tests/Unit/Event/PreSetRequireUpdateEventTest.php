@@ -4,10 +4,11 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Event\PreSetRequireUpdateEvent;
+use PHPUnit\Framework\TestCase;
 
-class PreSetRequireUpdateEventTest extends \PHPUnit\Framework\TestCase
+class PreSetRequireUpdateEventTest extends TestCase
 {
-    public function testIsUpdateRequired()
+    public function testIsUpdateRequired(): void
     {
         $configManager = $this->createMock(ConfigManager::class);
 

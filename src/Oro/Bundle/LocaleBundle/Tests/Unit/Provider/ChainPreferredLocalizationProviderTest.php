@@ -5,17 +5,14 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Provider;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Provider\ChainPreferredLocalizationProvider;
 use Oro\Bundle\LocaleBundle\Provider\PreferredLocalizationProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChainPreferredLocalizationProviderTest extends \PHPUnit\Framework\TestCase
+class ChainPreferredLocalizationProviderTest extends TestCase
 {
-    /** @var PreferredLocalizationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerProviderA;
-
-    /** @var PreferredLocalizationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerProviderB;
-
-    /** @var ChainPreferredLocalizationProvider */
-    private $provider;
+    private PreferredLocalizationProviderInterface&MockObject $innerProviderA;
+    private PreferredLocalizationProviderInterface&MockObject $innerProviderB;
+    private ChainPreferredLocalizationProvider $provider;
 
     #[\Override]
     protected function setUp(): void

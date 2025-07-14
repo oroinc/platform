@@ -9,17 +9,14 @@ use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\EntityBundle\EventListener\EntityRelationGridListener;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityRelationGridListenerTest extends \PHPUnit\Framework\TestCase
+class EntityRelationGridListenerTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $cm;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EntityRelationGridListener */
-    private $listener;
+    private ConfigManager&MockObject $cm;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityRelationGridListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +30,7 @@ class EntityRelationGridListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider parametersProvider
      */
-    public function testOnBuildAfter(array $parameters, array|bool $expectedBindParamsCall)
+    public function testOnBuildAfter(array $parameters, array|bool $expectedBindParamsCall): void
     {
         $grid = $this->createMock(DatagridInterface::class);
         $datasource = $this->createMock(OrmDatasource::class);
@@ -62,7 +59,7 @@ class EntityRelationGridListenerTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'identifier found, expected bind of "relation" param' => [
-                '$parameters'             => ['id' => rand(1, 100)],
+                '$parameters'             => ['id' => random_int(1, 100)],
                 '$expectedBindParamsCall' => ['relation' => 'id'],
             ],
             'empty parameters, bind should not be performed'      => [

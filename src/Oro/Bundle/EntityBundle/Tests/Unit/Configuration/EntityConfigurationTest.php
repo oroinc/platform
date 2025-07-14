@@ -3,10 +3,11 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
-class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
+class EntityConfigurationTest extends TestCase
 {
     private function processConfiguration(array $config): array
     {
@@ -18,7 +19,7 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidEntityAliasDataProvider
      */
-    public function testEntityAliasesForInvalidAlias(string $alias)
+    public function testEntityAliasesForInvalidAlias(string $alias): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(sprintf(
@@ -43,7 +44,7 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidEntityAliasDataProvider
      */
-    public function testEntityAliasesForInvalidPluralAlias(string $alias)
+    public function testEntityAliasesForInvalidPluralAlias(string $alias): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(sprintf(
@@ -74,7 +75,7 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testEntityNameFormatsForFallbackToUndefinedType()
+    public function testEntityNameFormatsForFallbackToUndefinedType(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
@@ -93,7 +94,7 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEntityNameFormatsForSelfCyclicDependency()
+    public function testEntityNameFormatsForSelfCyclicDependency(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The text representation format "long" have a cyclic dependency on itself.');
@@ -109,7 +110,7 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEntityNameFormatsForOneLevelCyclicDependency()
+    public function testEntityNameFormatsForOneLevelCyclicDependency(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
@@ -130,7 +131,7 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEntityNameFormatsForTwoLevelCyclicDependency()
+    public function testEntityNameFormatsForTwoLevelCyclicDependency(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
@@ -154,7 +155,7 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEntityNameFormatsForCyclicDependency()
+    public function testEntityNameFormatsForCyclicDependency(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(

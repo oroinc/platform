@@ -12,35 +12,20 @@ use Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassActionHa
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MergeMassActionHandlerTest extends \PHPUnit\Framework\TestCase
+class MergeMassActionHandlerTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var MassActionHandlerArgs|\PHPUnit\Framework\MockObject\MockObject */
-    private $args;
-
-    /** @var array */
-    private $optionsArray;
-
-    /** @var IterableResultInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $iteratedResult;
-
-    /** @var ResultRecord|\PHPUnit\Framework\MockObject\MockObject */
-    private $firstResultRecord;
-
-    /** @var ResultRecord|\PHPUnit\Framework\MockObject\MockObject */
-    private $secondResultRecord;
-
-    /** @var EntityStub */
-    private $firstEntity;
-
-    /** @var EntityStub */
-    private $secondEntity;
-
-    /** @var MergeMassActionHandler */
-    private $handler;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private MassActionHandlerArgs&MockObject $args;
+    private array $optionsArray = [];
+    private IterableResultInterface&MockObject $iteratedResult;
+    private ResultRecord&MockObject $firstResultRecord;
+    private ResultRecord&MockObject $secondResultRecord;
+    private EntityStub $firstEntity;
+    private EntityStub $secondEntity;
+    private MergeMassActionHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -93,7 +78,7 @@ class MergeMassActionHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new MergeMassActionHandler($this->doctrineHelper);
     }
 
-    public function testMethodDoesNotThrowAnExceptionIfAllDataIsCorrect()
+    public function testMethodDoesNotThrowAnExceptionIfAllDataIsCorrect(): void
     {
         $this->setIteratedResultMock();
 
@@ -108,7 +93,7 @@ class MergeMassActionHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('options', $result);
     }
 
-    public function testHandleMustThrowInvalidArgumentExceptionIfEntityNameIsEmpty()
+    public function testHandleMustThrowInvalidArgumentExceptionIfEntityNameIsEmpty(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Entity name is missing.');
@@ -118,7 +103,7 @@ class MergeMassActionHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->handle($this->args);
     }
 
-    public function testHandleMustReturnRequestedEntitiesForMerge()
+    public function testHandleMustReturnRequestedEntitiesForMerge(): void
     {
         $this->setIteratedResultMock();
         $result = $this->handler->handle($this->args);
@@ -130,7 +115,7 @@ class MergeMassActionHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->secondEntity->getId(), $secondActual->getId());
     }
 
-    public function testHandleShouldCallDoctrineHelperMethodGetEntitiesByIdsWithCorrectData()
+    public function testHandleShouldCallDoctrineHelperMethodGetEntitiesByIdsWithCorrectData(): void
     {
         $expectedIdFirst = 100;
         $expectedIdSecond = 200;

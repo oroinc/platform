@@ -12,17 +12,14 @@ use Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\Walker\TranslatableSqlWalker;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChoiceFieldHelperTest extends \PHPUnit\Framework\TestCase
+class ChoiceFieldHelperTest extends TestCase
 {
-    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclHelper;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ChoiceFieldHelper */
-    private $choiceHelper;
+    private AclHelper&MockObject $aclHelper;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ChoiceFieldHelper $choiceHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +30,7 @@ class ChoiceFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->choiceHelper = new ChoiceFieldHelper($this->doctrineHelper, $this->aclHelper);
     }
 
-    public function testGuessLabelFieldHasLabelField()
+    public function testGuessLabelFieldHasLabelField(): void
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->once())
@@ -46,7 +43,7 @@ class ChoiceFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('label', $this->choiceHelper->guessLabelField($metadata, 'column_name'));
     }
 
-    public function testGuessLabelFieldHasStringField()
+    public function testGuessLabelFieldHasStringField(): void
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())
@@ -62,7 +59,7 @@ class ChoiceFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('stringField', $this->choiceHelper->guessLabelField($metadata, 'column_name'));
     }
 
-    public function testGuessLabelFieldExceptionNoStringField()
+    public function testGuessLabelFieldExceptionNoStringField(): void
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())
@@ -76,7 +73,7 @@ class ChoiceFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->choiceHelper->guessLabelField($metadata, 'column_name');
     }
 
-    public function testGetChoices()
+    public function testGetChoices(): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $qb = $this->createMock(QueryBuilder::class);
@@ -109,7 +106,7 @@ class ChoiceFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->choiceHelper->getChoices('entity', 'key', 'label'));
     }
 
-    public function testGetTranslatedChoices()
+    public function testGetTranslatedChoices(): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $qb = $this->createMock(QueryBuilder::class);

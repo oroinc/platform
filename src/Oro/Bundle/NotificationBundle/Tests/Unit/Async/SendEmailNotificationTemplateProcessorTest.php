@@ -24,8 +24,8 @@ class SendEmailNotificationTemplateProcessorTest extends TestCase
 
     private const RECIPIENT_USER_ID = 7;
 
-    private EmailNotificationManager|MockObject $emailNotificationManager;
-    private EntityManagerInterface|MockObject $entityManager;
+    private EmailNotificationManager&MockObject $emailNotificationManager;
+    private EntityManagerInterface&MockObject $entityManager;
     private SendEmailNotificationTemplateProcessor $processor;
 
     #[\Override]

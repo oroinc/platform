@@ -11,9 +11,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class MenuChoiceBuilderTest extends TestCase
 {
+    private FormBuilderInterface&MockObject $formBuilder;
     private MenuChoiceBuilder $menuChoiceBuilder;
-
-    private FormBuilderInterface|MockObject $formBuilder;
 
     #[\Override]
     protected function setUp(): void
@@ -46,8 +45,7 @@ final class MenuChoiceBuilderTest extends TestCase
      */
     public function testThatOptionBuiltCorrectly(array $option, array $expected): void
     {
-        $this->formBuilder
-            ->expects(self::once())
+        $this->formBuilder->expects(self::once())
             ->method('add')
             ->with(
                 $expected['name'],

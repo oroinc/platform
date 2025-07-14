@@ -5,15 +5,14 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Autocomplete;
 use Oro\Bundle\DataAuditBundle\Autocomplete\ImpersonationSearchHandler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ImpersonationSearchHandlerTest extends \PHPUnit\Framework\TestCase
+class ImpersonationSearchHandlerTest extends TestCase
 {
-    /** @var ImpersonationSearchHandler */
-    private $searchHandler;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
+    private ImpersonationSearchHandler $searchHandler;
+    private DoctrineHelper&MockObject $doctrineHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -30,13 +29,13 @@ class ImpersonationSearchHandlerTest extends \PHPUnit\Framework\TestCase
         $this->searchHandler = new ImpersonationSearchHandler($this->doctrineHelper, $translator);
     }
 
-    public function testGetEntityName()
+    public function testGetEntityName(): void
     {
         $this->assertIsString($this->searchHandler->getEntityName());
         $this->assertSame(Impersonation::class, $this->searchHandler->getEntityName());
     }
 
-    public function testGetProperties()
+    public function testGetProperties(): void
     {
         $this->assertIsArray($this->searchHandler->getProperties());
 
@@ -47,7 +46,7 @@ class ImpersonationSearchHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('ipAddressToken', $properties[2]);
     }
 
-    public function testConvertItemInvalidType()
+    public function testConvertItemInvalidType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -57,7 +56,7 @@ class ImpersonationSearchHandlerTest extends \PHPUnit\Framework\TestCase
         $this->searchHandler->convertItem(new \stdClass());
     }
 
-    public function testConvertItemNoToken()
+    public function testConvertItemNoToken(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -69,7 +68,7 @@ class ImpersonationSearchHandlerTest extends \PHPUnit\Framework\TestCase
         $this->searchHandler->convertItem($impresonation);
     }
 
-    public function testConvertItemNoIpAddress()
+    public function testConvertItemNoIpAddress(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -84,7 +83,7 @@ class ImpersonationSearchHandlerTest extends \PHPUnit\Framework\TestCase
         $this->searchHandler->convertItem($impresonation);
     }
 
-    public function testConvertItem()
+    public function testConvertItem(): void
     {
         $impresonation = $this->createMock(Impersonation::class);
         $impresonation->expects($this->once())

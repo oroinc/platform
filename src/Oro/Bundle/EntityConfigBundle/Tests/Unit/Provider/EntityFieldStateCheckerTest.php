@@ -9,24 +9,21 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\EntityFieldStateChecker;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
-class EntityFieldStateCheckerTest extends \PHPUnit\Framework\TestCase
+class EntityFieldStateCheckerTest extends TestCase
 {
     private const SCOPE_EXTEND = 'extend';
     private const CODE_EXTEND_FIRST = 'code_extend_first';
     private const FORM_TYPE_EXTEND = 'form_type_extend';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var EntityFieldStateChecker */
-    private $entityFieldStateChecker;
+    private ConfigManager&MockObject $configManager;
+    private FormFactoryInterface&MockObject $formFactory;
+    private EntityFieldStateChecker $entityFieldStateChecker;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +33,7 @@ class EntityFieldStateCheckerTest extends \PHPUnit\Framework\TestCase
         $this->entityFieldStateChecker = new EntityFieldStateChecker($this->configManager, $this->formFactory);
     }
 
-    public function testIsSchemaUpdateNeededWhenNoProviders()
+    public function testIsSchemaUpdateNeededWhenNoProviders(): void
     {
         $fieldConfigModel = $this->createMock(FieldConfigModel::class);
         $this->configManager->expects($this->once())
@@ -46,7 +43,7 @@ class EntityFieldStateCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->entityFieldStateChecker->isSchemaUpdateNeeded($fieldConfigModel));
     }
 
-    public function testIsSchemaUpdateNeededWhenNoChangeSet()
+    public function testIsSchemaUpdateNeededWhenNoChangeSet(): void
     {
         $fieldConfigModel = $this->createMock(FieldConfigModel::class);
 
@@ -77,7 +74,7 @@ class EntityFieldStateCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->entityFieldStateChecker->isSchemaUpdateNeeded($fieldConfigModel));
     }
 
-    public function testIsSchemaUpdateNeededWhenNoSchemaUpdateRequiredForCode()
+    public function testIsSchemaUpdateNeededWhenNoSchemaUpdateRequiredForCode(): void
     {
         $fieldConfigModel = $this->createMock(FieldConfigModel::class);
 
@@ -112,7 +109,7 @@ class EntityFieldStateCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->entityFieldStateChecker->isSchemaUpdateNeeded($fieldConfigModel));
     }
 
-    public function testIsSchemaUpdateNeededWhenNoFormItemsForCode()
+    public function testIsSchemaUpdateNeededWhenNoFormItemsForCode(): void
     {
         $fieldConfigModel = $this->createMock(FieldConfigModel::class);
 
@@ -152,7 +149,7 @@ class EntityFieldStateCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->entityFieldStateChecker->isSchemaUpdateNeeded($fieldConfigModel));
     }
 
-    public function testIsSchemaUpdateNeededWhenNoUpdateNeededByCallback()
+    public function testIsSchemaUpdateNeededWhenNoUpdateNeededByCallback(): void
     {
         $fieldConfigModel = $this->createMock(FieldConfigModel::class);
 
@@ -215,7 +212,7 @@ class EntityFieldStateCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->entityFieldStateChecker->isSchemaUpdateNeeded($fieldConfigModel));
     }
 
-    public function testIsSchemaUpdate()
+    public function testIsSchemaUpdate(): void
     {
         $fieldConfigModel = $this->createMock(FieldConfigModel::class);
 

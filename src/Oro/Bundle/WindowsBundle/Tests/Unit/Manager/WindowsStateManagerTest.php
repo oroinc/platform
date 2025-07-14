@@ -11,31 +11,22 @@ use Oro\Bundle\WindowsBundle\Entity\WindowsState;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateManager;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
+class WindowsStateManagerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
-    private $tokenStorage;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
-    private $em;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WindowsStateRepository */
-    private $repo;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ClassMetadata */
-    private $classMetadata;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WindowsStateRequestManager */
-    private $requestStateManager;
-
-    /** @var WindowsStateManager */
-    private $manager;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private EntityManager&MockObject $em;
+    private WindowsStateRepository&MockObject $repo;
+    private ClassMetadata&MockObject $classMetadata;
+    private WindowsStateRequestManager&MockObject $requestStateManager;
+    private WindowsStateManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -70,14 +61,13 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
 
     private function createWindowState(array $data = [], ?int $id = 123): WindowsState
     {
-        /** @var WindowsState $state */
         $state = $this->getEntity(WindowsState::class, ['id' => $id]);
         $state->setData($data);
 
         return $state;
     }
 
-    public function testCreateWindowsState()
+    public function testCreateWindowsState(): void
     {
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
@@ -106,7 +96,7 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->createWindowsState();
     }
 
-    public function testUpdateWindowState()
+    public function testUpdateWindowState(): void
     {
         $windowId = 42;
         $user = new User();
@@ -131,7 +121,7 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->updateWindowsState($windowId);
     }
 
-    public function testDeleteWindowsState()
+    public function testDeleteWindowsState(): void
     {
         $user = new User();
         $windowId = 42;
@@ -154,7 +144,7 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->deleteWindowsState($windowId);
     }
 
-    public function testGetWindowsStates()
+    public function testGetWindowsStates(): void
     {
         $user = new User();
 
@@ -182,7 +172,7 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($windowStates, $this->manager->getWindowsStates());
     }
 
-    public function testGetWindowsState()
+    public function testGetWindowsState(): void
     {
         $user = new User();
         $windowStateId = 42;
@@ -208,7 +198,7 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($windowState, $this->manager->getWindowsState($windowStateId));
     }
 
-    public function testFilterId()
+    public function testFilterId(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Wrong $windowId type');
@@ -224,7 +214,7 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getWindowsState('bbb');
     }
 
-    public function testUserEmptyToken()
+    public function testUserEmptyToken(): void
     {
         $this->expectException(AccessDeniedException::class);
 
@@ -235,7 +225,7 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getWindowsState(42);
     }
 
-    public function testUserEmptyUser()
+    public function testUserEmptyUser(): void
     {
         $this->expectException(AccessDeniedException::class);
 

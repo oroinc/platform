@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
 
 class EnumNormalizerTest extends TestCase
 {
-    private FieldHelper|MockObject $fieldHelper;
-    private EnumOptionsProvider|MockObject $enumOptionsProvider;
+    private FieldHelper&MockObject $fieldHelper;
+    private EnumOptionsProvider&MockObject $enumOptionsProvider;
     private EnumNormalizer $normalizer;
 
     #[\Override]
@@ -29,7 +29,7 @@ class EnumNormalizerTest extends TestCase
     /**
      * @dataProvider supportsNormalizationDataProvider
      */
-    public function testSupportsNormalization(mixed $value, bool $expected)
+    public function testSupportsNormalization(mixed $value, bool $expected): void
     {
         $this->assertEquals($expected, $this->normalizer->supportsNormalization($value));
     }
@@ -49,7 +49,7 @@ class EnumNormalizerTest extends TestCase
     /**
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization(mixed $value, bool $expected)
+    public function testSupportsDenormalization(mixed $value, bool $expected): void
     {
         $type = is_object($value) ? get_class($value) : gettype($value);
 
@@ -71,8 +71,12 @@ class EnumNormalizerTest extends TestCase
     /**
      * @dataProvider normalizeDataProvider
      */
-    public function testNormalize(mixed $value, ?array $expected, array $context = [], string $extendScope = 'System')
-    {
+    public function testNormalize(
+        mixed $value,
+        ?array $expected,
+        array $context = [],
+        string $extendScope = 'System'
+    ): void {
         $type = is_object($value) ? get_class($value) : gettype($value);
 
         $this->fieldHelper->expects($this->any())

@@ -4,14 +4,12 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Datagrid\Extension\MassAction\Actions
 
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\Actions\ResetPasswordMassAction;
+use PHPUnit\Framework\TestCase;
 
-class ResetPasswordMassActionTest extends \PHPUnit\Framework\TestCase
+class ResetPasswordMassActionTest extends TestCase
 {
-    /** @var ResetPasswordMassAction */
-    private $resetAction;
-
-    /** @var ActionConfiguration */
-    private $configuration;
+    private ResetPasswordMassAction $resetAction;
+    private ActionConfiguration $configuration;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +23,7 @@ class ResetPasswordMassActionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetOptions()
+    public function testSetOptions(): void
     {
         $this->resetAction = new ResetPasswordMassAction();
         $this->resetAction->setOptions($this->configuration);

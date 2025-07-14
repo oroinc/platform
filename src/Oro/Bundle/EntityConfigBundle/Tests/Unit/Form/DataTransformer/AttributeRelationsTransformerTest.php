@@ -7,11 +7,11 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\EntityConfigBundle\Form\DataTransformer\AttributeRelationsTransformer;
+use PHPUnit\Framework\TestCase;
 
-class AttributeRelationsTransformerTest extends \PHPUnit\Framework\TestCase
+class AttributeRelationsTransformerTest extends TestCase
 {
-    /** @var AttributeRelationsTransformer */
-    private $dataTransformer;
+    private AttributeRelationsTransformer $dataTransformer;
 
     #[\Override]
     protected function setUp(): void

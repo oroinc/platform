@@ -15,7 +15,7 @@ class WidgetFilterTypeTest extends TypeTestCase
             'entity'     => 'TestClass',
             'definition' => '{"filters":[]}'
         ];
-        $form     = $this->factory->create(WidgetFilterType::class, null, ['entity' => 'TestClass']);
+        $form = $this->factory->create(WidgetFilterType::class, null, ['entity' => 'TestClass']);
         $form->submit($formData);
 
         $this->assertTrue($form->isValid());

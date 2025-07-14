@@ -8,11 +8,12 @@ use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\FilterBundle\Filter\FilterBagInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 
-class ActivityListFilterHelperTest extends \PHPUnit\Framework\TestCase
+class ActivityListFilterHelperTest extends TestCase
 {
-    public function testAddFiltersToQuery()
+    public function testAddFiltersToQuery(): void
     {
         $filterBag = $this->createMock(FilterBagInterface::class);
         $routingHelper = $this->createMock(EntityRoutingHelper::class);

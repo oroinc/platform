@@ -8,8 +8,9 @@ use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class EmailNotificationTest extends \PHPUnit\Framework\TestCase
+class EmailNotificationTest extends TestCase
 {
     private EmailNotification $entity;
 
@@ -22,14 +23,14 @@ class EmailNotificationTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->entity->getId());
     }
 
-    public function testGetterSetterForEntityName()
+    public function testGetterSetterForEntityName(): void
     {
         $this->assertNull($this->entity->getEntityName());
         $this->entity->setEntityName('testName');
         $this->assertEquals('testName', $this->entity->getEntityName());
     }
 
-    public function testGetterSetterForTemplate()
+    public function testGetterSetterForTemplate(): void
     {
         $emailTemplate = $this->createMock(EmailTemplate::class);
         $this->assertNull($this->entity->getTemplate());
@@ -37,7 +38,7 @@ class EmailNotificationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($emailTemplate, $this->entity->getTemplate());
     }
 
-    public function testGetterSetterForEvent()
+    public function testGetterSetterForEvent(): void
     {
         $this->assertNull($this->entity->getEventName());
 
@@ -45,7 +46,7 @@ class EmailNotificationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test.name', $this->entity->getEventName());
     }
 
-    public function testGetterSetterForRecipients()
+    public function testGetterSetterForRecipients(): void
     {
         $this->assertNull($this->entity->getRecipientList());
 
@@ -54,7 +55,7 @@ class EmailNotificationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($list, $this->entity->getRecipientList());
     }
 
-    public function testGetUsersRecipientsList()
+    public function testGetUsersRecipientsList(): void
     {
         $this->assertTrue($this->entity->getRecipientUsersList()->isEmpty());
 
@@ -73,7 +74,7 @@ class EmailNotificationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($collection, $actual);
     }
 
-    public function testGetGroupsRecipientsList()
+    public function testGetGroupsRecipientsList(): void
     {
         $this->assertTrue($this->entity->getRecipientGroupsList()->isEmpty());
 

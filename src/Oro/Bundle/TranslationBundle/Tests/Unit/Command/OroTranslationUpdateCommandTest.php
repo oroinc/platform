@@ -13,24 +13,19 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Helper\FileBasedLanguageHelper;
 use Oro\Component\Testing\Command\CommandTestingTrait;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Locales;
 
-class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
+class OroTranslationUpdateCommandTest extends TestCase
 {
     use CommandTestingTrait;
     use TempDirExtension;
 
-    /** @var TranslationDownloader|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationDownloader;
-
-    /** @var LanguageRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $languageRepository;
-
-    /** @var FileBasedLanguageHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileBasedLanguageHelper;
-
-    /** @var OroTranslationUpdateCommand */
-    private $command;
+    private TranslationDownloader&MockObject $translationDownloader;
+    private LanguageRepository&MockObject $languageRepository;
+    private FileBasedLanguageHelper&MockObject $fileBasedLanguageHelper;
+    private OroTranslationUpdateCommand $command;
 
     #[\Override]
     protected function setUp(): void

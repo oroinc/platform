@@ -12,6 +12,7 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFa
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -19,7 +20,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\RememberMe\RememberMeDetails;
 use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
 
-class OrganizationRememberMeAuthenticationAuthenticatorTest extends \PHPUnit\Framework\TestCase
+class OrganizationRememberMeAuthenticationAuthenticatorTest extends TestCase
 {
     private MockObject&RememberMeHandlerInterface $rememberMeHandler;
     private TokenStorage $tokenStorage;
@@ -44,7 +45,7 @@ class OrganizationRememberMeAuthenticationAuthenticatorTest extends \PHPUnit\Fra
         $this->authenticator->setOrganizationGuesser($this->organizationGuesser);
     }
 
-    public function testAuthenticate()
+    public function testAuthenticate(): void
     {
         $user = $this->createMock(AbstractUser::class);
         $organization = new Organization();

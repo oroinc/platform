@@ -3,10 +3,11 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Grid\Action;
 
 use Oro\Bundle\EntityExtendBundle\Grid\Action\AjaxDeleteFieldAction;
+use PHPUnit\Framework\TestCase;
 
-class AjaxDeleteFieldActionTest extends \PHPUnit\Framework\TestCase
+class AjaxDeleteFieldActionTest extends TestCase
 {
-    public function testGetOptions()
+    public function testGetOptions(): void
     {
         $action = new AjaxDeleteFieldAction();
         $options = $action->getOptions()->toArray();

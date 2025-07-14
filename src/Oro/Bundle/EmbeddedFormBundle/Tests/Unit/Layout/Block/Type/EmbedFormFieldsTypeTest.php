@@ -20,7 +20,7 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testConfigureOptions(array $options, array $expected)
+    public function testConfigureOptions(array $options, array $expected): void
     {
         $resolvedOptions = $this->resolveOptions(EmbedFormFieldsType::NAME, $options);
         $this->assertEquals($expected, $resolvedOptions);
@@ -104,7 +104,7 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
         ];
     }
 
-    public function testBuildBlock()
+    public function testBuildBlock(): void
     {
         $formName = 'test_form';
 
@@ -139,7 +139,7 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
         );
     }
 
-    public function testBuildBlockWithoutForm()
+    public function testBuildBlockWithoutForm(): void
     {
         $this->expectException(\OutOfBoundsException::class);
         $this->expectExceptionMessage('Undefined index: test_form.');
@@ -157,7 +157,7 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
         $type->buildBlock($builder, new Options($options));
     }
 
-    public function testBuildBlockWithInvalidForm()
+    public function testBuildBlockWithInvalidForm(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(sprintf(
@@ -182,7 +182,7 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
         $type->buildBlock($builder, new Options($options));
     }
 
-    public function testBuildView()
+    public function testBuildView(): void
     {
         $formLayoutBuilder = $this->createMock(FormLayoutBuilderInterface::class);
         $type = new EmbedFormFieldsType($formLayoutBuilder);
@@ -200,7 +200,7 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
         $this->assertEquals(null, $view->vars['form_data']);
     }
 
-    public function testFinishView()
+    public function testFinishView(): void
     {
         $formLayoutBuilder = $this->createMock(FormLayoutBuilderInterface::class);
         $type = new EmbedFormFieldsType($formLayoutBuilder);
@@ -261,7 +261,7 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
         $this->assertTrue($formView['field3']['field32']->isRendered());
     }
 
-    public function testFinishViewWhenFormBlockIsRoot()
+    public function testFinishViewWhenFormBlockIsRoot(): void
     {
         $formLayoutBuilder = $this->createMock(FormLayoutBuilderInterface::class);
         $type = new EmbedFormFieldsType($formLayoutBuilder);
@@ -315,7 +315,7 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
         $this->assertTrue($formView['field3']['field32']->isRendered());
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $type = $this->getBlockType(EmbedFormFieldsType::NAME);
 

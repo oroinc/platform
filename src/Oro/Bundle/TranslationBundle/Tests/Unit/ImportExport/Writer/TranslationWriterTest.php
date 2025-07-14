@@ -9,24 +9,17 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\ImportExport\Writer\TranslationWriter;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class TranslationWriterTest extends \PHPUnit\Framework\TestCase
+class TranslationWriterTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var TranslationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationManager;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var EventDispatcher */
-    private $eventDispatcher;
-
-    /** @var TranslationWriter */
-    private $writer;
+    private ManagerRegistry&MockObject $registry;
+    private TranslationManager&MockObject $translationManager;
+    private EntityManagerInterface&MockObject $entityManager;
+    private EventDispatcher $eventDispatcher;
+    private TranslationWriter $writer;
 
     #[\Override]
     protected function setUp(): void
@@ -35,8 +28,7 @@ class TranslationWriterTest extends \PHPUnit\Framework\TestCase
         $this->translationManager = $this->createMock(TranslationManager::class);
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);
-        $this->eventDispatcher
-            ->expects($this->any())
+        $this->eventDispatcher->expects($this->any())
             ->method('getListeners')
             ->willReturn([]);
 
@@ -49,7 +41,7 @@ class TranslationWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer = new TranslationWriter($this->registry, $this->translationManager, $this->eventDispatcher);
     }
 
-    public function testWrite()
+    public function testWrite(): void
     {
         $items = [
             $this->getTranslation('key1', 'value1', 'domain1', 'lang1'),
@@ -110,7 +102,7 @@ class TranslationWriterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWriteWithException()
+    public function testWriteWithException(): void
     {
         $items = [$this->getTranslation('key1', 'value1', 'domain1', 'lang1')];
 
@@ -133,7 +125,7 @@ class TranslationWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer->write($items);
     }
 
-    public function testWriteWithExceptionAndClosedEntityManager()
+    public function testWriteWithExceptionAndClosedEntityManager(): void
     {
         $items = [$this->getTranslation('key1', 'value1', 'domain1', 'lang1')];
 

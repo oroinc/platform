@@ -6,6 +6,7 @@ use Oro\Bundle\GaufretteBundle\DependencyInjection\Compiler\ConfigureGaufretteFi
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Bundle\GaufretteBundle\Tests\Unit\Fixtures\CustomFileManager;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -13,13 +14,10 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ConfigureGaufretteFileManagersPassTest extends \PHPUnit\Framework\TestCase
+class ConfigureGaufretteFileManagersPassTest extends TestCase
 {
-    /** @var ExtendedContainerBuilder */
-    private $container;
-
-    /** @var ConfigureGaufretteFileManagersPass */
-    private $compiler;
+    private ExtendedContainerBuilder $container;
+    private ConfigureGaufretteFileManagersPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -36,14 +34,14 @@ class ConfigureGaufretteFileManagersPassTest extends \PHPUnit\Framework\TestCase
         return $this->container->setDefinition($id, new ChildDefinition($parentId));
     }
 
-    public function testNoFilesystemMapService()
+    public function testNoFilesystemMapService(): void
     {
         $this->container->setExtensionConfig('knp_gaufrette', []);
 
         $this->compiler->process($this->container);
     }
 
-    public function testPrivateDirectoryAwareFileManager()
+    public function testPrivateDirectoryAwareFileManager(): void
     {
         $this->container->setExtensionConfig('knp_gaufrette', [
             ['filesystems' => ['test_fs' => ['adapter' => 'private']]]
@@ -60,7 +58,7 @@ class ConfigureGaufretteFileManagersPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPublicDirectoryAwareFileManager()
+    public function testPublicDirectoryAwareFileManager(): void
     {
         $this->container->setExtensionConfig('knp_gaufrette', [
             ['filesystems' => ['test_fs' => ['adapter' => 'public']]]
@@ -77,7 +75,7 @@ class ConfigureGaufretteFileManagersPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNotDirectoryAwareFileManager()
+    public function testNotDirectoryAwareFileManager(): void
     {
         $this->container->setExtensionConfig('knp_gaufrette', [
             ['filesystems' => ['test_fs' => ['adapter' => 'adapter1']]]
@@ -94,7 +92,7 @@ class ConfigureGaufretteFileManagersPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAbstractFileManager()
+    public function testAbstractFileManager(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "file_manager1" service must be abstract.');
@@ -110,7 +108,7 @@ class ConfigureGaufretteFileManagersPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($this->container);
     }
 
-    public function testDirectoryAwareFileManagerWhenFilesystemArgumentIsDicParameter()
+    public function testDirectoryAwareFileManagerWhenFilesystemArgumentIsDicParameter(): void
     {
         $this->container->setExtensionConfig('knp_gaufrette', [
             ['filesystems' => ['test_fs' => ['adapter' => 'private']]]
@@ -128,7 +126,7 @@ class ConfigureGaufretteFileManagersPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCustomDirectoryAwareFileManager()
+    public function testCustomDirectoryAwareFileManager(): void
     {
         $this->container->setExtensionConfig('knp_gaufrette', [
             ['filesystems' => ['test_fs' => ['adapter' => 'private']]]
@@ -146,7 +144,7 @@ class ConfigureGaufretteFileManagersPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCustomDirectoryAwareFileManagerWhenClassNameIsDicParameter()
+    public function testCustomDirectoryAwareFileManagerWhenClassNameIsDicParameter(): void
     {
         $this->container->setExtensionConfig('knp_gaufrette', [
             ['filesystems' => ['test_fs' => ['adapter' => 'private']]]
@@ -165,7 +163,7 @@ class ConfigureGaufretteFileManagersPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFileManagerWithInvalidClass()
+    public function testFileManagerWithInvalidClass(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
@@ -184,7 +182,7 @@ class ConfigureGaufretteFileManagersPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($this->container);
     }
 
-    public function testFileManagerWithInvalidFirstArgument()
+    public function testFileManagerWithInvalidFirstArgument(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -201,7 +199,7 @@ class ConfigureGaufretteFileManagersPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($this->container);
     }
 
-    public function testFileManagerWithoutArguments()
+    public function testFileManagerWithoutArguments(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -217,7 +215,7 @@ class ConfigureGaufretteFileManagersPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($this->container);
     }
 
-    public function testFileManagerWithUndefinedFilesystem()
+    public function testFileManagerWithUndefinedFilesystem(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -235,7 +233,7 @@ class ConfigureGaufretteFileManagersPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($this->container);
     }
 
-    public function testNotDirectoryAwareFileManagerWasChangedToDirectoryAwareFileManager()
+    public function testNotDirectoryAwareFileManagerWasChangedToDirectoryAwareFileManager(): void
     {
         $this->container->setExtensionConfig('knp_gaufrette', [
             ['filesystems' => ['test_fs' => ['adapter' => 'adapter1']]],
@@ -253,7 +251,7 @@ class ConfigureGaufretteFileManagersPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDirectoryAwareFileManagerWasChangedToNotDirectoryAwareFileManager()
+    public function testDirectoryAwareFileManagerWasChangedToNotDirectoryAwareFileManager(): void
     {
         $this->container->setExtensionConfig('knp_gaufrette', [
             ['filesystems' => ['test_fs' => ['adapter' => 'private']]],

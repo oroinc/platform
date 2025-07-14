@@ -19,12 +19,13 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
+class WorkflowDefinitionConfigurationBuilderTest extends TestCase
 {
-    /** @var WorkflowAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowAssembler;
+    private WorkflowAssembler&MockObject $workflowAssembler;
 
     #[\Override]
     protected function setUp(): void
@@ -64,7 +65,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\Test
     /**
      * @dataProvider buildFromConfigurationDataProvider
      */
-    public function testBuildFromConfiguration(array $inputData, array $expectedData, array $expectedAcls = [])
+    public function testBuildFromConfiguration(array $inputData, array $expectedData, array $expectedAcls = []): void
     {
         $workflowConfiguration = current($inputData);
         $definition = new WorkflowDefinition();
@@ -289,7 +290,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\Test
         return array_intersect_key($configuration, array_flip($configurationKeys));
     }
 
-    public function testBuildFromConfigurationWhenNoEntityInConfiguration()
+    public function testBuildFromConfigurationWhenNoEntityInConfiguration(): void
     {
         $this->expectException(MissedRequiredOptionException::class);
         $this->expectExceptionMessage('The "entity" configuration option is required.');
@@ -298,7 +299,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\Test
         $builder->buildFromConfiguration(['test_workflow' => ['label' => 'My Entity']]);
     }
 
-    public function testWithExtensions()
+    public function testWithExtensions(): void
     {
         $firstExtension = $this->createMock(WorkflowDefinitionBuilderExtensionInterface::class);
         $interruptionExtension = $this->createMock(WorkflowDefinitionBuilderExtensionInterface::class);

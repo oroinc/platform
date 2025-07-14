@@ -16,21 +16,16 @@ use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
-class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
+class ReplaceStrategyTest extends TestCase
 {
-    /** @var ReplaceStrategy */
-    private $strategy;
-
-    /** @var ActivityListManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityListManager;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityManager;
+    private ReplaceStrategy $strategy;
+    private ActivityListManager&MockObject $activityListManager;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ActivityManager&MockObject $activityManager;
 
     #[\Override]
     protected function setUp(): void
@@ -47,7 +42,7 @@ class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNotSupports()
+    public function testNotSupports(): void
     {
         $fieldData = new FieldData(new EntityData(new EntityMetadata(), []), new FieldMetadata());
         $fieldData->setMode(MergeModes::ACTIVITY_UNITE);
@@ -55,7 +50,7 @@ class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->strategy->supports($fieldData));
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $fieldData = new FieldData(new EntityData(new EntityMetadata(), []), new FieldMetadata());
         $fieldData->setMode(MergeModes::ACTIVITY_REPLACE);
@@ -63,7 +58,7 @@ class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->strategy->supports($fieldData));
     }
 
-    public function testMerge()
+    public function testMerge(): void
     {
         $account1 = new User();
         $account2 = new User();
@@ -106,7 +101,7 @@ class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
         $this->strategy->merge($fieldData);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals('activity_replace', $this->strategy->getName());
     }

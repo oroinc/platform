@@ -6,16 +6,15 @@ use Oro\Component\Action\Action\AssignValue;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class AssignValueTest extends \PHPUnit\Framework\TestCase
+class AssignValueTest extends TestCase
 {
-    /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextAccessor;
-
-    /** @var AssignValue */
-    private $action;
+    private ContextAccessor&MockObject $contextAccessor;
+    private AssignValue $action;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +28,7 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidOptionsNumberDataProvider
      */
-    public function testInitializeExceptionParametersCount(array $options)
+    public function testInitializeExceptionParametersCount(array $options): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute and value parameters are required.');
@@ -51,7 +50,7 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidOptionsAttributeDataProvider
      */
-    public function testInitializeExceptionInvalidAttribute(array $options)
+    public function testInitializeExceptionInvalidAttribute(array $options): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute must be valid property definition.');
@@ -67,7 +66,7 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testInitializeExceptionNoAttribute()
+    public function testInitializeExceptionNoAttribute(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute must be defined.');
@@ -75,7 +74,7 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize(['some' => 'test', 'value' => 'test']);
     }
 
-    public function testInitializeExceptionNoValue()
+    public function testInitializeExceptionNoValue(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Value must be defined.');
@@ -86,7 +85,7 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testInitialize(array $options)
+    public function testInitialize(array $options): void
     {
         self::assertInstanceOf(AssignValue::class, $this->action->initialize($options));
 
@@ -125,7 +124,7 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testExecute(array $options)
+    public function testExecute(array $options): void
     {
         $context = [];
         $optionsData = array_values($options);

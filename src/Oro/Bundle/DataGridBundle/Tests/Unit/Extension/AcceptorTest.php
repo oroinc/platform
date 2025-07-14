@@ -8,14 +8,12 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface;
+use PHPUnit\Framework\TestCase;
 
-class AcceptorTest extends \PHPUnit\Framework\TestCase
+class AcceptorTest extends TestCase
 {
-    /** @var DatagridConfiguration */
-    private $config;
-
-    /** @var Acceptor */
-    private $acceptor;
+    private DatagridConfiguration $config;
+    private Acceptor $acceptor;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +26,7 @@ class AcceptorTest extends \PHPUnit\Framework\TestCase
     /**
      * Test addExtension and sorting y priority, test getExtensions
      */
-    public function testExtension()
+    public function testExtension(): void
     {
         $extMock1 = $this->createMock(ExtensionVisitorInterface::class);
         $extMock2 = $this->createMock(ExtensionVisitorInterface::class);
@@ -58,7 +56,7 @@ class AcceptorTest extends \PHPUnit\Framework\TestCase
     /**
      * Test methods getConfig, setConfig
      */
-    public function testSetConfig()
+    public function testSetConfig(): void
     {
         $this->assertSame($this->config, $this->acceptor->getConfig());
 
@@ -72,7 +70,7 @@ class AcceptorTest extends \PHPUnit\Framework\TestCase
     /**
      * Test method acceptDatasource
      */
-    public function testAcceptDatasource()
+    public function testAcceptDatasource(): void
     {
         $datasourceMock = $this->createMock(DatasourceInterface::class);
 
@@ -88,7 +86,7 @@ class AcceptorTest extends \PHPUnit\Framework\TestCase
     /**
      * Test method acceptResult
      */
-    public function testAcceptResults()
+    public function testAcceptResults(): void
     {
         $result = ResultsObject::create([]);
 
@@ -104,7 +102,7 @@ class AcceptorTest extends \PHPUnit\Framework\TestCase
     /**
      * Test method acceptMetadata
      */
-    public function testAcceptMetadata()
+    public function testAcceptMetadata(): void
     {
         $data = MetadataObject::create([]);
 

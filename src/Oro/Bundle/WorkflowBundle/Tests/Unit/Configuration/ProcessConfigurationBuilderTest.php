@@ -7,17 +7,17 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Component\Action\Exception\InvalidParameterException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
+class ProcessConfigurationBuilderTest extends TestCase
 {
     private const TEST_DEFINITION_NAME = 'test_definition';
 
-    /** @var ProcessConfigurationBuilder */
-    private $builder;
+    private ProcessConfigurationBuilder $builder;
 
     #[\Override]
     protected function setUp(): void
@@ -55,7 +55,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
      * @param array $expected
      * @dataProvider buildProcessDefinitionDataProvider
      */
-    public function testBuildProcessDefinition($name, array $configuration, array $expected)
+    public function testBuildProcessDefinition($name, array $configuration, array $expected): void
     {
         $definition = $this->builder->buildProcessDefinition($name, $configuration);
 
@@ -107,7 +107,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildProcessDefinitionsDataProvider
      */
-    public function testBuildProcessDefinitions(array $configuration, array $expected)
+    public function testBuildProcessDefinitions(array $configuration, array $expected): void
     {
         $definitions = $this->builder->buildProcessDefinitions($configuration);
 
@@ -142,7 +142,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildProcessTriggerDataProvider
      */
-    public function testBuildProcessTrigger(array $configuration, array $expected)
+    public function testBuildProcessTrigger(array $configuration, array $expected): void
     {
         $triggerDefinition = new ProcessDefinition();
         $trigger = $this->builder->buildProcessTrigger($configuration, $triggerDefinition);
@@ -221,7 +221,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
      * @param string $message
      * @dataProvider buildProcessTriggerExceptionDataProvider
      */
-    public function testBuildProcessTriggerException(array $configuration, $exception, $message)
+    public function testBuildProcessTriggerException(array $configuration, $exception, $message): void
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
@@ -275,7 +275,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildProcessTriggersDataProvider
      */
-    public function testBuildProcessTriggers(array $configuration, array $expected)
+    public function testBuildProcessTriggers(array $configuration, array $expected): void
     {
         $testDefinition = new ProcessDefinition();
         $testDefinition->setName(self::TEST_DEFINITION_NAME);
@@ -329,7 +329,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testBuildProcessTriggersException()
+    public function testBuildProcessTriggersException(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Process definition "not_existing_definition" not found');

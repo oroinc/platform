@@ -4,12 +4,12 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilder;
 
-class OrganizationTypeTest extends \PHPUnit\Framework\TestCase
+class OrganizationTypeTest extends TestCase
 {
-    /** @var OrganizationType */
-    private $formType;
+    private OrganizationType $formType;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class OrganizationTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType = new OrganizationType($tokenAccessor);
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilder::class);
 

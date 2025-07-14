@@ -7,18 +7,13 @@ use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 
 class TestEmail implements EmailInterface
 {
-    /** @var int */
-    protected $id;
+    private ?int $id;
+    private ?string $email;
+    private ?EmailOwnerInterface $owner;
 
-    /** @var string */
-    protected $email;
-
-    /** @var EmailOwnerInterface */
-    protected $owner;
-
-    public function __construct($id = null, $owner = null, $email = null)
+    public function __construct(?int $id = null, ?EmailOwnerInterface $owner = null, ?string $email = null)
     {
-        $this->id    = $id;
+        $this->id = $id;
         $this->owner = $owner;
         $this->email = $email;
     }

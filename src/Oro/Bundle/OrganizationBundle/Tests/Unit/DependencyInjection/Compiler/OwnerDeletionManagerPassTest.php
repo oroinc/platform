@@ -4,13 +4,14 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\OrganizationBundle\DependencyInjection\Compiler\OwnerDeletionManagerPass;
 use Oro\Bundle\OrganizationBundle\Ownership\OwnerDeletionManager;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class OwnerDeletionManagerPassTest extends \PHPUnit\Framework\TestCase
+class OwnerDeletionManagerPassTest extends TestCase
 {
     private OwnerDeletionManagerPass $compiler;
 

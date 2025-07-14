@@ -5,14 +5,15 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 use Oro\Bundle\UIBundle\Provider\ActionButtonLabelProvider;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\TestBaseClass;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\TestClass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ActionButtonLabelProviderTest extends \PHPUnit\Framework\TestCase
+class ActionButtonLabelProviderTest extends TestCase
 {
     /**
      * @dataProvider dataProvider
      */
-    public function testProvider(?object $obj, string $expectedLabel, string $expectedWidgetTitle)
+    public function testProvider(?object $obj, string $expectedLabel, string $expectedWidgetTitle): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $provider = new ActionButtonLabelProvider(

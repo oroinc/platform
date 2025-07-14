@@ -12,9 +12,10 @@ use PHPUnit\Framework\TestCase;
 
 class OperationFeatureGuardListenerTest extends TestCase
 {
-    private FeatureChecker|MockObject $featureChecker;
+    private FeatureChecker&MockObject $featureChecker;
     private OperationFeatureGuardListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);

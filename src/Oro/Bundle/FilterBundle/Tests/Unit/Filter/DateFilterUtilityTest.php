@@ -8,11 +8,11 @@ use Oro\Bundle\FilterBundle\Filter\DateFilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use PHPUnit\Framework\TestCase;
 
-class DateFilterUtilityTest extends \PHPUnit\Framework\TestCase
+class DateFilterUtilityTest extends TestCase
 {
-    /** @var DateFilterUtility */
-    private $utility;
+    private DateFilterUtility $utility;
 
     #[\Override]
     protected function setUp(): void
@@ -42,7 +42,7 @@ class DateFilterUtilityTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider parseDataProvider
      */
-    public function testParse(?array $data, string $fieldName, $expectedResults)
+    public function testParse(?array $data, string $fieldName, $expectedResults): void
     {
         $this->assertEquals($expectedResults, $this->utility->parseData($fieldName, $data));
     }

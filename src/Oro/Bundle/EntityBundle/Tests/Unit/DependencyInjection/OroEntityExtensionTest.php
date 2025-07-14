@@ -6,9 +6,10 @@ use Oro\Bundle\EntityBundle\DependencyInjection\OroEntityExtension;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroEntityExtensionTest extends \PHPUnit\Framework\TestCase
+class OroEntityExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

@@ -22,10 +22,8 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 
 class OperationAssemblerTest extends TestCase
 {
-    private ServiceProviderInterface|MockObject $serviceProvider;
-
-    /** @var OperationAssembler */
-    private $assembler;
+    private ServiceProviderInterface&MockObject $serviceProvider;
+    private OperationAssembler $assembler;
 
     #[\Override]
     protected function setUp(): void
@@ -46,7 +44,7 @@ class OperationAssemblerTest extends TestCase
     /**
      * @dataProvider assembleProvider
      */
-    public function testCreateOperation(array $configuration, array $expected)
+    public function testCreateOperation(array $configuration, array $expected): void
     {
         foreach ($configuration as $name => $config) {
             $operation = $this->assembler->createOperation($name, $config);
@@ -55,7 +53,7 @@ class OperationAssemblerTest extends TestCase
         }
     }
 
-    public function testCreateOperationWithMissedRequiredOptions()
+    public function testCreateOperationWithMissedRequiredOptions(): void
     {
         $this->expectException(MissedRequiredOptionException::class);
         $this->expectExceptionMessage('Option "label" is required');
@@ -207,7 +205,7 @@ class OperationAssemblerTest extends TestCase
         ];
     }
 
-    public function testCreateOperationWithService()
+    public function testCreateOperationWithService(): void
     {
         $service = $this->createMock(OperationServiceInterface::class);
         $this->serviceProvider->expects($this->once())

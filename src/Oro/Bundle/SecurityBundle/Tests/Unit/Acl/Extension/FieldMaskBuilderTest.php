@@ -3,13 +3,14 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
 use Oro\Bundle\SecurityBundle\Acl\Extension\FieldMaskBuilder;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
+class FieldMaskBuilderTest extends TestCase
 {
-    public function testViewGroup()
+    public function testViewGroup(): void
     {
         $this->assertEquals(
             FieldMaskBuilder::GROUP_VIEW,
@@ -21,7 +22,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateGroup()
+    public function testCreateGroup(): void
     {
         $this->assertEquals(
             FieldMaskBuilder::GROUP_CREATE,
@@ -29,7 +30,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEditGroup()
+    public function testEditGroup(): void
     {
         $this->assertEquals(
             FieldMaskBuilder::GROUP_EDIT,
@@ -41,7 +42,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAllGroup()
+    public function testAllGroup(): void
     {
         $this->assertEquals(
             FieldMaskBuilder::GROUP_ALL,
@@ -51,7 +52,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemoveServiceBits()
+    public function testRemoveServiceBits(): void
     {
         $this->assertEquals(
             FieldMaskBuilder::REMOVE_SERVICE_BITS,
@@ -59,7 +60,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testServiceBits()
+    public function testServiceBits(): void
     {
         $this->assertEquals(
             FieldMaskBuilder::SERVICE_BITS,
@@ -67,7 +68,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEmptyPattern()
+    public function testGetEmptyPattern(): void
     {
         $builder = new FieldMaskBuilder();
 
@@ -77,7 +78,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternViewBasic()
+    public function testGetPatternViewBasic(): void
     {
         $builder = new FieldMaskBuilder();
         $builder->add(FieldMaskBuilder::MASK_VIEW_BASIC);
@@ -88,7 +89,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternEditBasic()
+    public function testGetPatternEditBasic(): void
     {
         $builder = new FieldMaskBuilder();
         $builder->add(FieldMaskBuilder::MASK_EDIT_BASIC);
@@ -99,7 +100,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternBasic()
+    public function testGetPatternBasic(): void
     {
         $builder = new FieldMaskBuilder();
         $builder->add(FieldMaskBuilder::GROUP_BASIC);
@@ -110,7 +111,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternViewLocal()
+    public function testGetPatternViewLocal(): void
     {
         $builder = new FieldMaskBuilder();
         $builder->add(FieldMaskBuilder::MASK_VIEW_LOCAL);
@@ -121,7 +122,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternEditLocal()
+    public function testGetPatternEditLocal(): void
     {
         $builder = new FieldMaskBuilder();
         $builder->add(FieldMaskBuilder::MASK_EDIT_LOCAL);
@@ -132,7 +133,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternLocal()
+    public function testGetPatternLocal(): void
     {
         $builder = new FieldMaskBuilder();
         $builder->add(FieldMaskBuilder::GROUP_LOCAL);
@@ -143,7 +144,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternViewDeep()
+    public function testGetPatternViewDeep(): void
     {
         $builder = new FieldMaskBuilder();
         $builder->add(FieldMaskBuilder::MASK_VIEW_DEEP);
@@ -154,7 +155,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternEditDeep()
+    public function testGetPatternEditDeep(): void
     {
         $builder = new FieldMaskBuilder();
         $builder->add(FieldMaskBuilder::MASK_EDIT_DEEP);
@@ -165,7 +166,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternDeep()
+    public function testGetPatternDeep(): void
     {
         $builder = new FieldMaskBuilder();
         $builder->add(FieldMaskBuilder::GROUP_DEEP);
@@ -176,7 +177,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternViewGlobal()
+    public function testGetPatternViewGlobal(): void
     {
         $builder = new FieldMaskBuilder();
         $builder->add(FieldMaskBuilder::MASK_VIEW_GLOBAL);
@@ -187,7 +188,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternEditGlobal()
+    public function testGetPatternEditGlobal(): void
     {
         $builder = new FieldMaskBuilder();
         $builder->add(FieldMaskBuilder::MASK_EDIT_GLOBAL);
@@ -198,7 +199,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternGlobal()
+    public function testGetPatternGlobal(): void
     {
         $builder = new FieldMaskBuilder();
         $builder->add(FieldMaskBuilder::GROUP_GLOBAL);
@@ -209,7 +210,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternViewSystem()
+    public function testGetPatternViewSystem(): void
     {
         $builder = new FieldMaskBuilder();
         $builder->add(FieldMaskBuilder::MASK_VIEW_SYSTEM);
@@ -220,7 +221,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternEditSystem()
+    public function testGetPatternEditSystem(): void
     {
         $builder = new FieldMaskBuilder();
         $builder->add(FieldMaskBuilder::MASK_EDIT_SYSTEM);
@@ -231,7 +232,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternCreateSystem()
+    public function testGetPatternCreateSystem(): void
     {
         $builder = new FieldMaskBuilder();
         $builder->add(FieldMaskBuilder::MASK_CREATE_SYSTEM);
@@ -242,7 +243,7 @@ class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternSystem()
+    public function testGetPatternSystem(): void
     {
         $builder = new FieldMaskBuilder();
         $builder->add(FieldMaskBuilder::GROUP_SYSTEM);

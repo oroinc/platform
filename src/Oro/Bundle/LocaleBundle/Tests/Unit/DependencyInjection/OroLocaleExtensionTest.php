@@ -4,11 +4,12 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\LocaleBundle\Configuration\DefaultCurrencyValueProvider;
 use Oro\Bundle\LocaleBundle\DependencyInjection\OroLocaleExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class OroLocaleExtensionTest extends \PHPUnit\Framework\TestCase
+class OroLocaleExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

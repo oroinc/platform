@@ -45,7 +45,7 @@ class DraftableFilterExtensionTest extends TestCase
             ->method('getFilters')
             ->willReturn($filters);
 
-        $this->doctrine ->expects(self::once())
+        $this->doctrine->expects(self::once())
             ->method('getManager')
             ->willReturn($em);
 
@@ -71,7 +71,7 @@ class DraftableFilterExtensionTest extends TestCase
             ->method('getFilters')
             ->willReturn($filters);
 
-        $this->doctrine ->expects(self::once())
+        $this->doctrine->expects(self::once())
             ->method('getManager')
             ->willReturn($em);
 

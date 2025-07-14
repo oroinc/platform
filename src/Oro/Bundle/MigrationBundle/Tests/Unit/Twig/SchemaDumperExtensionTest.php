@@ -10,19 +10,16 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\MigrationBundle\Twig\SchemaDumperExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SchemaDumperExtensionTest extends \PHPUnit\Framework\TestCase
+class SchemaDumperExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var AbstractPlatform|\PHPUnit\Framework\MockObject\MockObject */
-    private $platform;
-
-    /** @var SchemaDumperExtension */
-    private $extension;
+    private ManagerRegistry&MockObject $doctrine;
+    private AbstractPlatform&MockObject $platform;
+    private SchemaDumperExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +37,7 @@ class SchemaDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new SchemaDumperExtension($container);
     }
 
-    public function testGetStringColumnOptions()
+    public function testGetStringColumnOptions(): void
     {
         $this->platform->expects($this->once())
             ->method('isCommentedDoctrineType')
@@ -61,7 +58,7 @@ class SchemaDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(255, $result['length']);
     }
 
-    public function testGetIntegerColumnOptions()
+    public function testGetIntegerColumnOptions(): void
     {
         $this->platform->expects($this->once())
             ->method('isCommentedDoctrineType')

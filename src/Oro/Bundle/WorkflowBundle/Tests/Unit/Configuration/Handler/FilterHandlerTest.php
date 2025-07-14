@@ -5,13 +5,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Handler;
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\FilterHandler;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use PHPUnit\Framework\TestCase;
 
-class FilterHandlerTest extends \PHPUnit\Framework\TestCase
+class FilterHandlerTest extends TestCase
 {
     /**
      * @dataProvider handleProvider
      */
-    public function testHandle(array $config, array $expected)
+    public function testHandle(array $config, array $expected): void
     {
         $filterHandler = new FilterHandler();
 

@@ -4,12 +4,13 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\InterruptConsumptionExtension;
 use Oro\Bundle\MessageQueueBundle\EventListener\UpdateSchemaListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
 
-class UpdateSchemaListenerTest extends \PHPUnit\Framework\TestCase
+class UpdateSchemaListenerTest extends TestCase
 {
-    private CacheItemPoolInterface|\PHPUnit\Framework\MockObject\MockObject $interruptConsumptionCache;
-
+    private CacheItemPoolInterface&MockObject $interruptConsumptionCache;
     private UpdateSchemaListener $listener;
 
     #[\Override]

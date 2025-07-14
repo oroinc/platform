@@ -17,34 +17,23 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
+class ExtendConfigDumperTest extends TestCase
 {
     use TempDirExtension;
 
     private const CLASS_NAMESPACE = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\Dumper';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $entityManagerBag;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ConfigProviderMock */
-    private $configProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $generator;
-
-    /** @var string */
-    private $cacheDir;
-
-    /** @var ExtendConfigDumper */
-    private $dumper;
-
-    /** @var ExtendEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendEntityConfigProvider;
+    private EntityManagerBag&MockObject $entityManagerBag;
+    private ConfigManager&MockObject $configManager;
+    private ConfigProviderMock $configProvider;
+    private EntityGenerator&MockObject $generator;
+    private string $cacheDir;
+    private ExtendConfigDumper $dumper;
+    private ExtendEntityConfigProviderInterface&MockObject $extendEntityConfigProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -86,7 +75,7 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCheckConfigWhenClassesExists()
+    public function testCheckConfigWhenClassesExists(): void
     {
         $fs = new Filesystem();
         $fs->mkdir(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
@@ -112,7 +101,7 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
         $fs->remove(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
     }
 
-    public function testCheckConfig()
+    public function testCheckConfig(): void
     {
         $this->configProvider->addEntityConfig(
             self::CLASS_NAMESPACE . '\Entity\TestEntity1',
@@ -171,7 +160,7 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCheckConfigWhenItIsAlreadyUpToDate()
+    public function testCheckConfigWhenItIsAlreadyUpToDate(): void
     {
         $this->configProvider->addEntityConfig(
             self::CLASS_NAMESPACE . '\Entity\TestEntity1',
@@ -210,7 +199,7 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
         $dumper->checkConfig();
     }
 
-    public function testUpdateConfig()
+    public function testUpdateConfig(): void
     {
         $this->entityManagerBag->expects($this->exactly(2))
             ->method('getEntityManagers')

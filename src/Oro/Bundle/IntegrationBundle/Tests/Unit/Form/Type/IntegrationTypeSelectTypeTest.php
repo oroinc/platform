@@ -5,21 +5,18 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationTypeSelectType;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class IntegrationTypeSelectTypeTest extends \PHPUnit\Framework\TestCase
+class IntegrationTypeSelectTypeTest extends TestCase
 {
-    /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var Packages|\PHPUnit\Framework\MockObject\MockObject */
-    private $assetHelper;
-
-    /** @var IntegrationTypeSelectType */
-    private $type;
+    private TypesRegistry&MockObject $registry;
+    private Packages&MockObject $assetHelper;
+    private IntegrationTypeSelectType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +27,7 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit\Framework\TestCase
         $this->type = new IntegrationTypeSelectType($this->registry, $this->assetHelper);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = new OptionsResolver();
         $this->registry->expects($this->once())
@@ -75,7 +72,7 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBuildView()
+    public function testBuildView(): void
     {
         $view = $this->createMock(FormView::class);
         $form = $this->createMock(Form::class);
@@ -86,12 +83,12 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('oro.integration.form.no_available_integrations', $view->vars['configs']['placeholder']);
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(Select2ChoiceType::class, $this->type->getParent());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals('oro_integration_type_select', $this->type->getName());
     }

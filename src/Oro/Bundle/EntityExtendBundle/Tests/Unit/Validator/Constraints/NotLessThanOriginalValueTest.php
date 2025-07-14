@@ -3,17 +3,18 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotLessThanOriginalValue;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
-class NotLessThanOriginalValueTest extends \PHPUnit\Framework\TestCase
+class NotLessThanOriginalValueTest extends TestCase
 {
-    public function testGetRequiredOptions()
+    public function testGetRequiredOptions(): void
     {
         $constraint = new NotLessThanOriginalValue(['scope' => 'extended', 'option' => 'length']);
         self::assertEquals(['scope', 'option'], $constraint->getRequiredOptions());
     }
 
-    public function testTryToConstructWithoutOptions()
+    public function testTryToConstructWithoutOptions(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage(
@@ -23,7 +24,7 @@ class NotLessThanOriginalValueTest extends \PHPUnit\Framework\TestCase
         new NotLessThanOriginalValue();
     }
 
-    public function testTryToConstructWithoutScopeOption()
+    public function testTryToConstructWithoutScopeOption(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage(
@@ -33,7 +34,7 @@ class NotLessThanOriginalValueTest extends \PHPUnit\Framework\TestCase
         new NotLessThanOriginalValue(['option' => 'length']);
     }
 
-    public function testTryToConstructWithoutOptionNameOption()
+    public function testTryToConstructWithoutOptionNameOption(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage(

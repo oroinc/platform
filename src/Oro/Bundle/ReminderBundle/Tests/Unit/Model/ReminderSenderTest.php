@@ -6,14 +6,13 @@ use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\ReminderSender;
 use Oro\Bundle\ReminderBundle\Model\SendProcessorInterface;
 use Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ReminderSenderTest extends \PHPUnit\Framework\TestCase
+class ReminderSenderTest extends TestCase
 {
-    /** @var SendProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var ReminderSender */
-    private $sender;
+    private SendProcessorRegistry&MockObject $registry;
+    private ReminderSender $sender;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class ReminderSenderTest extends \PHPUnit\Framework\TestCase
         $this->sender = new ReminderSender($this->registry);
     }
 
-    public function testPush()
+    public function testPush(): void
     {
         $method = 'foo_method';
 
@@ -44,7 +43,7 @@ class ReminderSenderTest extends \PHPUnit\Framework\TestCase
         $this->sender->push($reminder);
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $fooProcessor = $this->createMock(SendProcessorInterface::class);
         $barProcessor = $this->createMock(SendProcessorInterface::class);

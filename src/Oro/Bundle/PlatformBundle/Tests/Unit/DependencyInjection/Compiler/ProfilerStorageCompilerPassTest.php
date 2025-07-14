@@ -4,14 +4,14 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\ProfilerStorageCompilerPass;
 use Oro\Bundle\PlatformBundle\Profiler\RepeatableFileProfilerStorage;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 
-class ProfilerStorageCompilerPassTest extends \PHPUnit\Framework\TestCase
+class ProfilerStorageCompilerPassTest extends TestCase
 {
-    /** @var ProfilerStorageCompilerPass */
-    private $compiler;
+    private ProfilerStorageCompilerPass $compiler;
 
     #[\Override]
     protected function setUp(): void

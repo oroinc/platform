@@ -4,13 +4,14 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\TranslationBundle\Form\DataTransformer\CollectionToArrayTransformer;
+use PHPUnit\Framework\TestCase;
 
-class CollectionToArrayTransformerTest extends \PHPUnit\Framework\TestCase
+class CollectionToArrayTransformerTest extends TestCase
 {
     /**
      * @dataProvider transformDataProvider
      */
-    public function testTransform(ArrayCollection|array $data, array $result)
+    public function testTransform(ArrayCollection|array $data, array $result): void
     {
         $transformer = new CollectionToArrayTransformer();
 

@@ -8,11 +8,12 @@ use Doctrine\ORM\Query;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
 use Oro\Component\DoctrineUtils\ORM\QueryWalkerHintProviderInterface;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
+class QueryHintResolverTest extends TestCase
 {
     private function getQueryHintResolver(
         array $walkers = [],
@@ -49,7 +50,7 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         return new Query($em);
     }
 
-    public function testAddHint()
+    public function testAddHint(): void
     {
         $query = $this->getQuery();
 
@@ -69,7 +70,7 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddAlreadyExistingHint()
+    public function testAddAlreadyExistingHint(): void
     {
         $query = $this->getQuery();
         $query->setHint('test', true);
@@ -90,7 +91,7 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddHintCustomOutputWalker()
+    public function testAddHintCustomOutputWalker(): void
     {
         $query = $this->getQuery();
 
@@ -110,7 +111,7 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddAlreadyExistingHintCustomOutputWalker()
+    public function testAddAlreadyExistingHintCustomOutputWalker(): void
     {
         $query = $this->getQuery();
         $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, 'walker_class');
@@ -131,7 +132,7 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddHintCustomTreeWalker()
+    public function testAddHintCustomTreeWalker(): void
     {
         $query = $this->getQuery();
 
@@ -151,7 +152,7 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddAlreadyExistingHintCustomTreeWalker()
+    public function testAddAlreadyExistingHintCustomTreeWalker(): void
     {
         $query = $this->getQuery();
         $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, ['walker_class']);
@@ -172,7 +173,7 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddHintCustomTreeWalkerWithExistingAnotherWalker()
+    public function testAddHintCustomTreeWalkerWithExistingAnotherWalker(): void
     {
         $query = $this->getQuery();
         $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, ['another_walker_class']);
@@ -193,7 +194,7 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddHints()
+    public function testAddHints(): void
     {
         $query = $this->getQuery();
         $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, ['another_walker_class']);
@@ -216,7 +217,7 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddHintsWithParameters()
+    public function testAddHintsWithParameters(): void
     {
         $query = $this->getQuery();
         $query->setParameter('parameter_name', 10);
@@ -240,7 +241,7 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResolveHints()
+    public function testResolveHints(): void
     {
         $query = $this->getQuery();
         $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, ['another_walker_class']);
@@ -291,7 +292,7 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResolveCustomHintName()
+    public function testResolveCustomHintName(): void
     {
         $queryHintResolver = $this->getQueryHintResolver(
             [
@@ -315,7 +316,7 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResolveDoctrineHintName()
+    public function testResolveDoctrineHintName(): void
     {
         $queryHintResolver = $this->getQueryHintResolver();
         $this->assertEquals(
@@ -328,7 +329,7 @@ class QueryHintResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResolveUndefinedHintName()
+    public function testResolveUndefinedHintName(): void
     {
         $queryHintResolver = $this->getQueryHintResolver();
         $this->assertEquals(

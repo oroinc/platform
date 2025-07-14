@@ -4,14 +4,13 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\ContentProvider;
 
 use Oro\Bundle\NavigationBundle\ContentProvider\TitleContentProvider;
 use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TitleContentProviderTest extends \PHPUnit\Framework\TestCase
+class TitleContentProviderTest extends TestCase
 {
-    /** @var TitleServiceInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $titleService;
-
-    /** @var TitleContentProvider */
-    private $provider;
+    private TitleServiceInterface&MockObject $titleService;
+    private TitleContentProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class TitleContentProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new TitleContentProvider($this->titleService);
     }
 
-    public function testGetContent()
+    public function testGetContent(): void
     {
         $this->titleService->expects($this->once())
             ->method('render')

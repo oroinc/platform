@@ -4,10 +4,11 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Model;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
+use PHPUnit\Framework\TestCase;
 
-class AclPermissionTest extends \PHPUnit\Framework\TestCase
+class AclPermissionTest extends TestCase
 {
-    public function testAclPermission()
+    public function testAclPermission(): void
     {
         $obj = new AclPermission('TestName', AccessLevel::BASIC_LEVEL);
         $this->assertEquals('TestName', $obj->getName());

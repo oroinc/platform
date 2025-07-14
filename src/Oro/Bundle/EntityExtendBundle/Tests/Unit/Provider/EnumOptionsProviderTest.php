@@ -9,20 +9,17 @@ use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumOptionRepository;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EnumOptionsProviderTest extends \PHPUnit\Framework\TestCase
+class EnumOptionsProviderTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EnumTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var EnumOptionsProvider */
-    private $provider;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EnumTranslationCache&MockObject $cache;
+    private EnumOptionsProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +30,7 @@ class EnumOptionsProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new EnumOptionsProvider($this->doctrineHelper, $this->cache);
     }
 
-    public function testGetEnumChoicesWithoutCachedValue()
+    public function testGetEnumChoicesWithoutCachedValue(): void
     {
         $enumClass = EnumOption::class;
         $expected = ['Test Value' => 'test_val'];
@@ -50,7 +47,7 @@ class EnumOptionsProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $this->provider->getEnumChoicesByCode($enumClass));
     }
 
-    public function testGetEnumChoicesWithCachedValue()
+    public function testGetEnumChoicesWithCachedValue(): void
     {
         $enumClass = EnumOption::class;
         $expected = ['Test' => '1'];
@@ -69,7 +66,7 @@ class EnumOptionsProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expected, $this->provider->getEnumChoicesByCode($enumClass));
     }
 
-    public function testGetEnumChoicesByCodeWithoutCachedValue()
+    public function testGetEnumChoicesByCodeWithoutCachedValue(): void
     {
         $enumCode = 'test_enum';
         $enumClass = EnumOption::class;
@@ -88,7 +85,7 @@ class EnumOptionsProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $this->provider->getEnumChoicesByCode($enumCode));
     }
 
-    public function testGetEnumChoicesByCodeWithCachedValue()
+    public function testGetEnumChoicesByCodeWithCachedValue(): void
     {
         $enumCode = 'test_enum';
         $enumClass = EnumOption::class;
@@ -107,7 +104,7 @@ class EnumOptionsProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $this->provider->getEnumChoicesByCode($enumCode));
     }
 
-    public function testGetEnumValueByCode()
+    public function testGetEnumValueByCode(): void
     {
         $enumCode = 'test_enum_code';
         $enumClass = EnumOption::class;
@@ -127,7 +124,7 @@ class EnumOptionsProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame($value, $this->provider->getEnumOptionByCode($enumCode, 'test_val'));
     }
 
-    public function testGetDefaultEnumValues()
+    public function testGetDefaultEnumValues(): void
     {
         $enumClass = EnumOption::class;
         $value = new TestEnumValue('test_enum_code', 'Test', 'test', 1);
@@ -144,7 +141,7 @@ class EnumOptionsProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame([$value], $this->provider->getDefaultEnumOptions($enumClass));
     }
 
-    public function testGetDefaultEnumValuesByCode()
+    public function testGetDefaultEnumValuesByCode(): void
     {
         $enumCode = 'test_enum_code';
         $enumClass = EnumOption::class;
@@ -167,7 +164,7 @@ class EnumOptionsProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame([$value], $this->provider->getDefaultEnumOptionsByCode($enumCode));
     }
 
-    public function testGetDefaultEnumValue()
+    public function testGetDefaultEnumValue(): void
     {
         $enumClass = EnumOption::class;
         $value = new TestEnumValue('test_enum_code', 'Test', 'test', 1);
@@ -184,7 +181,7 @@ class EnumOptionsProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame($value, $this->provider->getDefaultEnumOptionByCode($enumClass));
     }
 
-    public function testGetDefaultEnumValueWhenNoDefaultEnumValues()
+    public function testGetDefaultEnumValueWhenNoDefaultEnumValues(): void
     {
         $enumClass = EnumOption::class;
 
@@ -200,7 +197,7 @@ class EnumOptionsProviderTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->provider->getDefaultEnumOptionByCode($enumClass));
     }
 
-    public function testGetDefaultEnumValueByCode()
+    public function testGetDefaultEnumValueByCode(): void
     {
         $enumCode = 'test_enum_code';
         $enumClass = EnumOption::class;
@@ -223,7 +220,7 @@ class EnumOptionsProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame($value, $this->provider->getDefaultEnumOptionByCode($enumCode));
     }
 
-    public function testGetDefaultEnumValueByCodeWhenNoDefaultEnumValues()
+    public function testGetDefaultEnumValueByCodeWhenNoDefaultEnumValues(): void
     {
         $enumCode = 'test_enum';
         $enumClass = EnumOption::class;

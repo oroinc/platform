@@ -8,17 +8,14 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsByFieldTypeProvider;
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormTypeProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ExtendFieldFormOptionsByFieldTypeProviderTest extends \PHPUnit\Framework\TestCase
+class ExtendFieldFormOptionsByFieldTypeProviderTest extends TestCase
 {
-    /** @var EntityConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigManager;
-
-    /** @var ExtendFieldFormTypeProvider */
-    private $extendFieldFormTypeProvider;
-
-    /** @var ExtendFieldFormOptionsByFieldTypeProvider */
-    private $provider;
+    private EntityConfigManager&MockObject $entityConfigManager;
+    private ExtendFieldFormTypeProvider $extendFieldFormTypeProvider;
+    private ExtendFieldFormOptionsByFieldTypeProvider $provider;
 
     #[\Override]
     protected function setUp(): void

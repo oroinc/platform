@@ -8,6 +8,7 @@ use Oro\Bundle\NavigationBundle\Provider\TitleService;
 use Oro\Bundle\NavigationBundle\Provider\TitleTranslator;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -17,23 +18,12 @@ use Symfony\Contracts\Cache\ItemInterface;
 
 class RouteChoiceTypeTest extends FormIntegrationTestCase
 {
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var TitleReaderRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $readerRegistry;
-
-    /** @var TitleTranslator|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var TitleService|\PHPUnit\Framework\MockObject\MockObject */
-    private $titleService;
-
-    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var RouteChoiceType */
-    private $formType;
+    private RouterInterface&MockObject $router;
+    private TitleReaderRegistry&MockObject $readerRegistry;
+    private TitleTranslator&MockObject $translator;
+    private TitleService&MockObject $titleService;
+    private CacheInterface&MockObject $cache;
+    private RouteChoiceType $formType;
 
     #[\Override]
     protected function setUp(): void

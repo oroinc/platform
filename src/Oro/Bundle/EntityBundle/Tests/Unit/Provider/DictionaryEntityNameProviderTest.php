@@ -11,20 +11,17 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DictionaryEntityNameProviderTest extends \PHPUnit\Framework\TestCase
+class DictionaryEntityNameProviderTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var DictionaryEntityNameProvider */
-    private $entityNameProvider;
+    private ConfigManager&MockObject $configManager;
+    private ManagerRegistry&MockObject $doctrine;
+    private DictionaryEntityNameProvider $entityNameProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -65,7 +62,7 @@ class DictionaryEntityNameProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($hasField);
     }
 
-    public function testGetNameForNotManageableEntity()
+    public function testGetNameForNotManageableEntity(): void
     {
         $entity = new DictionaryEntity();
         $entity->setName('testName');
@@ -81,7 +78,7 @@ class DictionaryEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameDQLForNotManageableEntity()
+    public function testGetNameDQLForNotManageableEntity(): void
     {
         $this->configManager->expects(self::once())
             ->method('hasConfig')
@@ -93,7 +90,7 @@ class DictionaryEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameForNotDictionaryEntity()
+    public function testGetNameForNotDictionaryEntity(): void
     {
         $entity = new DictionaryEntity();
         $entity->setName('testName');
@@ -115,7 +112,7 @@ class DictionaryEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameDQLForNotDictionaryEntity()
+    public function testGetNameDQLForNotDictionaryEntity(): void
     {
         $groupingConfig = $this->getEntityConfig('grouping', DictionaryEntity::class);
 
@@ -133,7 +130,7 @@ class DictionaryEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameForDictionaryWithoutConfiguredAndDefaultRepresentationField()
+    public function testGetNameForDictionaryWithoutConfiguredAndDefaultRepresentationField(): void
     {
         $entity = new DictionaryEntity();
         $entity->setName('testName');
@@ -160,7 +157,7 @@ class DictionaryEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameDQLForDictionaryWithoutConfiguredAndDefaultRepresentationField()
+    public function testGetNameDQLForDictionaryWithoutConfiguredAndDefaultRepresentationField(): void
     {
         $groupingConfig = $this->getEntityConfig('grouping', DictionaryEntity::class, ['groups' => ['dictionary']]);
         $dictionaryConfig = $this->getEntityConfig('dictionary', DictionaryEntity::class);
@@ -183,7 +180,7 @@ class DictionaryEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameForDictionaryWithoutConfiguredRepresentationField()
+    public function testGetNameForDictionaryWithoutConfiguredRepresentationField(): void
     {
         $entity = new DictionaryEntity();
         $entity->setName('testName');
@@ -211,7 +208,7 @@ class DictionaryEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameDQLForDictionaryWithoutConfiguredRepresentationField()
+    public function testGetNameDQLForDictionaryWithoutConfiguredRepresentationField(): void
     {
         $groupingConfig = $this->getEntityConfig('grouping', DictionaryEntity::class, ['groups' => ['dictionary']]);
         $dictionaryConfig = $this->getEntityConfig('dictionary', DictionaryEntity::class);
@@ -235,7 +232,7 @@ class DictionaryEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameForDictionaryWithConfiguredRepresentationField()
+    public function testGetNameForDictionaryWithConfiguredRepresentationField(): void
     {
         $entity = new DictionaryEntity();
         $entity->setName('testName');
@@ -265,7 +262,7 @@ class DictionaryEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameDQLForDictionaryWithConfiguredRepresentationField()
+    public function testGetNameDQLForDictionaryWithConfiguredRepresentationField(): void
     {
         $groupingConfig = $this->getEntityConfig('grouping', DictionaryEntity::class, ['groups' => ['dictionary']]);
         $dictionaryConfig = $this->getEntityConfig(
@@ -291,7 +288,7 @@ class DictionaryEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameForDictionaryWithoutConfiguredRepresentationFieldButWithSearchFields()
+    public function testGetNameForDictionaryWithoutConfiguredRepresentationFieldButWithSearchFields(): void
     {
         $entity = new DictionaryEntity();
         $entity->setName('testName');
@@ -321,7 +318,7 @@ class DictionaryEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameDQLForDictionaryWithoutConfiguredRepresentationFieldButWithSearchFields()
+    public function testGetNameDQLForDictionaryWithoutConfiguredRepresentationFieldButWithSearchFields(): void
     {
         $groupingConfig = $this->getEntityConfig('grouping', DictionaryEntity::class, ['groups' => ['dictionary']]);
         $dictionaryConfig = $this->getEntityConfig(

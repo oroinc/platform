@@ -3,9 +3,10 @@
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\LoggerBundle\DependencyInjection\OroLoggerExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroLoggerExtensionTest extends \PHPUnit\Framework\TestCase
+class OroLoggerExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

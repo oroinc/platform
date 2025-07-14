@@ -5,16 +5,15 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\EventListener;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
 use Oro\Bundle\ImportExportBundle\Event\StrategyValidationEvent;
 use Oro\Bundle\ImportExportBundle\EventListener\StrategyValidationEventListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
-class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
+class StrategyValidationEventListenerTest extends TestCase
 {
-    /** @var ConfigurableTableDataConverter|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurableDataConverter;
-
-    /** @var StrategyValidationEventListener */
-    private $listener;
+    private ConfigurableTableDataConverter&MockObject $configurableDataConverter;
+    private StrategyValidationEventListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new StrategyValidationEventListener($this->configurableDataConverter);
     }
 
-    public function testViolationsEmpty()
+    public function testViolationsEmpty(): void
     {
         $violations = new ConstraintViolationList();
         $event = new StrategyValidationEvent($violations);
@@ -33,7 +32,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $event->getErrors());
     }
 
-    public function testViolationsWithEmptyPath()
+    public function testViolationsWithEmptyPath(): void
     {
         $violations = new ConstraintViolationList([$this->getViolation()]);
         $event = new StrategyValidationEvent($violations);
@@ -44,7 +43,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['testerror'], $event->getErrors());
     }
 
-    public function testViolationsAppendPath()
+    public function testViolationsAppendPath(): void
     {
         $violations = new ConstraintViolationList([$this->getViolation('prop')]);
         $event = new StrategyValidationEvent($violations);
@@ -56,7 +55,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['prop: testerror'], $event->getErrors());
     }
 
-    public function testViolationsReplacePathByHeader()
+    public function testViolationsReplacePathByHeader(): void
     {
         $violations = new ConstraintViolationList([$this->getViolation('prop')]);
         $event = new StrategyValidationEvent($violations);

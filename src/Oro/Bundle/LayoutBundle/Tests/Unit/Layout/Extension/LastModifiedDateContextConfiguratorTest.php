@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
-use Oro\Bundle\LayoutBundle\Layout\Extension\ActionContextConfigurator;
 use Oro\Bundle\LayoutBundle\Layout\Extension\LastModifiedDateContextConfigurator;
 use Oro\Component\Layout\Extension\Theme\ResourceProvider\LastModificationDateProvider;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LastModifiedDateContextConfiguratorTest extends \PHPUnit\Framework\TestCase
+class LastModifiedDateContextConfiguratorTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LastModificationDateProvider */
-    private $lastModificationDateProvider;
-
-    /** @var ActionContextConfigurator */
-    private $contextConfigurator;
+    private LastModificationDateProvider&MockObject $lastModificationDateProvider;
+    private LastModifiedDateContextConfigurator $contextConfigurator;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +21,7 @@ class LastModifiedDateContextConfiguratorTest extends \PHPUnit\Framework\TestCas
         $this->contextConfigurator = new LastModifiedDateContextConfigurator($this->lastModificationDateProvider);
     }
 
-    public function testConfigureContextWithDefaultAction()
+    public function testConfigureContextWithDefaultAction(): void
     {
         $context = new LayoutContext();
 
@@ -33,7 +31,7 @@ class LastModifiedDateContextConfiguratorTest extends \PHPUnit\Framework\TestCas
         $this->assertIsString($context['last_modification_date']);
     }
 
-    public function testConfigureContext()
+    public function testConfigureContext(): void
     {
         $lastModificationDate = new \DateTime('now - 1 hour', new \DateTimeZone('UTC'));
         $context = new LayoutContext();
@@ -51,7 +49,7 @@ class LastModifiedDateContextConfiguratorTest extends \PHPUnit\Framework\TestCas
         );
     }
 
-    public function testConfigureContextWhenLastModificationDateDoesNotExist()
+    public function testConfigureContextWhenLastModificationDateDoesNotExist(): void
     {
         $context = new LayoutContext();
 

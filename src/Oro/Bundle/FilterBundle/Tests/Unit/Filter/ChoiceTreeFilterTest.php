@@ -5,6 +5,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 use Oro\Bundle\FilterBundle\Filter\ChoiceTreeFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -13,17 +14,10 @@ use Symfony\Component\Routing\RouterInterface;
 
 class ChoiceTreeFilterTest extends OrmTestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dispatcher;
-
-    /** @var ChoiceTreeFilter */
-    private $filter;
+    private FormFactoryInterface&MockObject $formFactory;
+    private RouterInterface&MockObject $router;
+    private EventDispatcherInterface&MockObject $dispatcher;
+    private ChoiceTreeFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +34,7 @@ class ChoiceTreeFilterTest extends OrmTestCase
         );
     }
 
-    public function testGetMetadata()
+    public function testGetMetadata(): void
     {
         $this->initMockFormFactory();
         $expectedMetadata = $this->getDefaultExpectedData();
@@ -51,7 +45,7 @@ class ChoiceTreeFilterTest extends OrmTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testMetadataParameterLazyTrue()
+    public function testMetadataParameterLazyTrue(): void
     {
         $this->initMockFormFactory();
 
@@ -70,7 +64,7 @@ class ChoiceTreeFilterTest extends OrmTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testMetadataParameterAutocompleteAlias()
+    public function testMetadataParameterAutocompleteAlias(): void
     {
         $this->initMockFormFactory();
 
@@ -87,10 +81,13 @@ class ChoiceTreeFilterTest extends OrmTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testMetadataParameterAutocompleteUrl()
+    public function testMetadataParameterAutocompleteUrl(): void
     {
         $this->initMockFormFactory();
-        $this->router->expects(self::once())->method('generate')->with('test_route_name')->willReturn('test_url');
+        $this->router->expects(self::once())
+            ->method('generate')
+            ->with('test_route_name')
+            ->willReturn('test_url');
 
         $params = [
             'autocomplete_url' => 'test_route_name'
@@ -105,7 +102,7 @@ class ChoiceTreeFilterTest extends OrmTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testMetadataParameterRenderedPropertyName()
+    public function testMetadataParameterRenderedPropertyName(): void
     {
         $this->initMockFormFactory();
         $params = [
@@ -143,11 +140,15 @@ class ChoiceTreeFilterTest extends OrmTestCase
         $formViewType->vars['choices'] = [];
         $formView = $this->createMock(FormView::class);
         $formView->children['type'] = $formViewType;
-        $form->expects(self::once())->method('createView')->willReturn($formView);
-        $this->formFactory->expects(self::once())->method('create')->willReturn($form);
+        $form->expects(self::once())
+            ->method('createView')
+            ->willReturn($formView);
+        $this->formFactory->expects(self::once())
+            ->method('create')
+            ->willReturn($form);
     }
 
-    public function testPrepareData()
+    public function testPrepareData(): void
     {
         $data = [];
         self::assertSame($data, $this->filter->prepareData($data));

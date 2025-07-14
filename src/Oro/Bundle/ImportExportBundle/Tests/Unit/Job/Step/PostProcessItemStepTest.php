@@ -11,11 +11,11 @@ use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Job\Step\PostProcessItemStep;
+use PHPUnit\Framework\TestCase;
 
-class PostProcessItemStepTest extends \PHPUnit\Framework\TestCase
+class PostProcessItemStepTest extends TestCase
 {
-    /** @var PostProcessItemStep */
-    private $itemStep;
+    private PostProcessItemStep $itemStep;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +31,7 @@ class PostProcessItemStepTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeDataProvider
      */
-    public function testDoExecute(string $jobName, string $contextKeys)
+    public function testDoExecute(string $jobName, string $contextKeys): void
     {
         $stepExecution = $this->createMock(StepExecution::class);
 

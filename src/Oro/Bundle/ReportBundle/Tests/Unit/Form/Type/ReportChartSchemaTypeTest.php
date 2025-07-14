@@ -11,8 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportChartSchemaTypeTest extends FormIntegrationTestCase
 {
-    /** @var ReportChartSchemaType */
-    private $type;
+    private ReportChartSchemaType $type;
 
     #[\Override]
     protected function setUp(): void

@@ -10,21 +10,16 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
+class ImportStrategyListenerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    private $translator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ImportStrategyHelper */
-    private $strategyHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    private $configManager;
-
-    /** @var ImportStrategyListener */
-    private $listener;
+    private TranslatorInterface&MockObject $translator;
+    private ImportStrategyHelper&MockObject $strategyHelper;
+    private ConfigManager&MockObject $configManager;
+    private ImportStrategyListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -44,7 +39,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnProcessAfterWhenWrongEntity()
+    public function testOnProcessAfterWhenWrongEntity(): void
     {
         $strategy = $this->createMock(StrategyInterface::class);
         $context = $this->createMock(ContextInterface::class);
@@ -63,7 +58,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
         self::assertNotNull($event->getEntity());
     }
 
-    public function testOnProcessAfterWhenNoExistingEntity()
+    public function testOnProcessAfterWhenNoExistingEntity(): void
     {
         $strategy = $this->createMock(StrategyInterface::class);
         $context = $this->createMock(ContextInterface::class);
@@ -84,7 +79,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
         self::assertNotNull($event->getEntity());
     }
 
-    public function testOnProcessAfterWhenNotAttribute()
+    public function testOnProcessAfterWhenNotAttribute(): void
     {
         $strategy = $this->createMock(StrategyInterface::class);
         $context = $this->createMock(ContextInterface::class);
@@ -110,7 +105,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
         self::assertNotNull($event->getEntity());
     }
 
-    public function testOnProcessAfterWhenExistingIsAttributeToo()
+    public function testOnProcessAfterWhenExistingIsAttributeToo(): void
     {
         $strategy = $this->createMock(StrategyInterface::class);
         $context = $this->createMock(ContextInterface::class);
@@ -148,7 +143,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
         self::assertNotNull($event->getEntity());
     }
 
-    public function testOnProcessAfter()
+    public function testOnProcessAfter(): void
     {
         $strategy = $this->createMock(StrategyInterface::class);
         $context = $this->createMock(ContextInterface::class);

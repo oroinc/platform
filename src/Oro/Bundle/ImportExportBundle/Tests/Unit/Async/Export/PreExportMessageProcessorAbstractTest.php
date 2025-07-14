@@ -15,35 +15,24 @@ use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
+class PreExportMessageProcessorAbstractTest extends TestCase
 {
     private const USER_ID = 54;
     private const JOB_UNIQUE_NAME = 'job_unique_name';
 
-    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRunner;
-
-    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $messageProducer;
-
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var DependentJobService|\PHPUnit\Framework\MockObject\MockObject */
-    private $dependentJob;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var ExportHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $exportHandler;
-
-    /** @var PreExportMessageProcessorStub */
-    private $processor;
+    private JobRunner&MockObject $jobRunner;
+    private MessageProducerInterface&MockObject $messageProducer;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private DependentJobService&MockObject $dependentJob;
+    private LoggerInterface&MockObject $logger;
+    private ExportHandler&MockObject $exportHandler;
+    private PreExportMessageProcessorStub $processor;
 
     #[\Override]
     protected function setUp(): void

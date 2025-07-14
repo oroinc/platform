@@ -16,6 +16,7 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\KernelStub;
 use Oro\Component\AmqpMessageQueue\Provider\TransportConnectionConfigProvider;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
@@ -26,7 +27,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Yaml\Yaml;
 
-class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
+class OroTestFrameworkExtensionTest extends TestCase
 {
     use TempDirExtension;
 

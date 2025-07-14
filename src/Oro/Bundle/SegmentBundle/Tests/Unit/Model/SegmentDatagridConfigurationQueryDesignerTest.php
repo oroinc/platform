@@ -12,7 +12,7 @@ use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 
 class SegmentDatagridConfigurationQueryDesignerTest extends SegmentDefinitionTestCase
 {
-    public function testQueryDesignerForValidDefinition()
+    public function testQueryDesignerForValidDefinition(): void
     {
         $segment = $this->getSegment([
             'columns' => [
@@ -77,7 +77,7 @@ class SegmentDatagridConfigurationQueryDesignerTest extends SegmentDefinitionTes
         $this->assertEquals($segment->getEntity(), $queryDesigner->getEntity());
     }
 
-    public function testQueryDesignerForInvalidDefinition()
+    public function testQueryDesignerForInvalidDefinition(): void
     {
         $this->expectException(InvalidConfigurationException::class);
 
@@ -91,7 +91,7 @@ class SegmentDatagridConfigurationQueryDesignerTest extends SegmentDefinitionTes
         $queryDesigner->getDefinition();
     }
 
-    public function testQueryDesignerForNewSegment()
+    public function testQueryDesignerForNewSegment(): void
     {
         $definition = QueryDefinitionUtil::encodeDefinition($this->getDefaultDefinition());
         $segment = new Segment();

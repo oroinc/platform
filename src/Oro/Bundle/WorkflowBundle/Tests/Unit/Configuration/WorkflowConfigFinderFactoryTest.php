@@ -4,15 +4,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\WorkflowBundle\Configuration\ConfigFinderFactory;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
 
-class WorkflowConfigFinderFactoryTest extends \PHPUnit\Framework\TestCase
+class WorkflowConfigFinderFactoryTest extends TestCase
 {
-    /** @var ConfigFinderFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $finderFactory;
-
-    /** @var WorkflowConfigFinderBuilder */
-    private $workflowConfigFinderBuilder;
+    private ConfigFinderFactory&MockObject $finderFactory;
+    private WorkflowConfigFinderBuilder $workflowConfigFinderBuilder;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class WorkflowConfigFinderFactoryTest extends \PHPUnit\Framework\TestCase
         $this->workflowConfigFinderBuilder = new WorkflowConfigFinderBuilder($this->finderFactory);
     }
 
-    public function testExceptionOnNotConfiguredSubDirectory()
+    public function testExceptionOnNotConfiguredSubDirectory(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage(
@@ -32,7 +31,7 @@ class WorkflowConfigFinderFactoryTest extends \PHPUnit\Framework\TestCase
         $this->workflowConfigFinderBuilder->create();
     }
 
-    public function testExceptionOnNotConfiguredConfigFileName()
+    public function testExceptionOnNotConfiguredConfigFileName(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage(
@@ -44,7 +43,7 @@ class WorkflowConfigFinderFactoryTest extends \PHPUnit\Framework\TestCase
         $this->workflowConfigFinderBuilder->create();
     }
 
-    public function testConfiguredPropertiesPassToFactory()
+    public function testConfiguredPropertiesPassToFactory(): void
     {
         $finder1 = $this->createMock(Finder::class);
         $finder2 = $this->createMock(Finder::class);

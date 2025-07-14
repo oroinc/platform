@@ -4,16 +4,17 @@ namespace Oro\Bundle\HelpBundle\Tests\Unit\Attribute;
 
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\HelpBundle\Attribute\Help;
+use PHPUnit\Framework\TestCase;
 
-class HelpTest extends \PHPUnit\Framework\TestCase
+class HelpTest extends TestCase
 {
-    public function testGetAlias()
+    public function testGetAlias(): void
     {
         $attribute = new Help();
         $this->assertEquals(Help::ALIAS, $attribute->getAliasName());
     }
 
-    public function testAllowArray()
+    public function testAllowArray(): void
     {
         $attribute = new Help();
         $this->assertTrue($attribute->allowArray());
@@ -25,7 +26,7 @@ class HelpTest extends \PHPUnit\Framework\TestCase
      * @param string $value
      * @param string $optionKey
      */
-    public function testSettersAndGetters($property, $value, $optionKey)
+    public function testSettersAndGetters($property, $value, $optionKey): void
     {
         $obj = new Help(...[$property => $value]);
 

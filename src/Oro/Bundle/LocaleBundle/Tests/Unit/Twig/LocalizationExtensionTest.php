@@ -7,22 +7,17 @@ use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Twig\LocalizationExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LocalizationExtensionTest extends \PHPUnit\Framework\TestCase
+class LocalizationExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LanguageCodeFormatter */
-    private $languageCodeFormatter;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FormattingCodeFormatter */
-    private $formattingCodeFormatter;
-
-    /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationHelper;
-
-    /** @var LocalizationExtension */
-    private $extension;
+    private LanguageCodeFormatter&MockObject $languageCodeFormatter;
+    private FormattingCodeFormatter&MockObject $formattingCodeFormatter;
+    private LocalizationHelper&MockObject $localizationHelper;
+    private LocalizationExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +35,7 @@ class LocalizationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new LocalizationExtension($container);
     }
 
-    public function testGetFormattingTitleByCode()
+    public function testGetFormattingTitleByCode(): void
     {
         $expected = 'result';
 
@@ -55,7 +50,7 @@ class LocalizationExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLanguageTitleByCode()
+    public function testGetLanguageTitleByCode(): void
     {
         $expected = 'result';
 

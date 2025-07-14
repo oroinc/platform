@@ -14,7 +14,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 class NormalizeEntityClassTest extends BatchUpdateItemProcessorTestCase
 {
     private ValueNormalizer&MockObject $valueNormalizer;
-
     private ResourcesProvider&MockObject $resourcesProvider;
     private NormalizeEntityClass $processor;
 

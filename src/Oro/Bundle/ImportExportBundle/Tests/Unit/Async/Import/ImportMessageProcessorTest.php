@@ -15,22 +15,18 @@ use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class ImportMessageProcessorTest extends TestCase
 {
-    private ImportHandler|\PHPUnit\Framework\MockObject\MockObject $importHandler;
-
-    private JobRunner|\PHPUnit\Framework\MockObject\MockObject $jobRunner;
-
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
-
-    private ImportExportResultSummarizer|\PHPUnit\Framework\MockObject\MockObject $importExportResultSummarizer;
-
-    private FileManager|\PHPUnit\Framework\MockObject\MockObject $fileManager;
-
-    private PostponedRowsHandler|\PHPUnit\Framework\MockObject\MockObject $postponedRowsHandler;
-
+    private ImportHandler&MockObject $importHandler;
+    private JobRunner&MockObject $jobRunner;
+    private LoggerInterface&MockObject $logger;
+    private ImportExportResultSummarizer&MockObject $importExportResultSummarizer;
+    private FileManager&MockObject $fileManager;
+    private PostponedRowsHandler&MockObject $postponedRowsHandler;
     private ImportMessageProcessor $processor;
 
     #[\Override]

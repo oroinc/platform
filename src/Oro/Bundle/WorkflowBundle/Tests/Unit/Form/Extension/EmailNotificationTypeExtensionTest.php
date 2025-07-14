@@ -6,6 +6,7 @@ use Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationType;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\EmailNotificationTypeListener;
 use Oro\Bundle\WorkflowBundle\Form\Extension\EmailNotificationTypeExtension;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -13,11 +14,8 @@ use Symfony\Component\Form\FormView;
 
 class EmailNotificationTypeExtensionTest extends FormIntegrationTestCase
 {
-    /** @var EmailNotificationTypeListener|\PHPUnit\Framework\MockObject\MockObject */
-    private $listener;
-
-    /** @var EmailNotificationTypeExtension */
-    private $extension;
+    private EmailNotificationTypeListener&MockObject $listener;
+    private EmailNotificationTypeExtension $extension;
 
     #[\Override]
     protected function setUp(): void

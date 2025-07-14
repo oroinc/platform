@@ -7,8 +7,9 @@ use Oro\Bundle\LocaleBundle\Tests\Unit\Configuration\Fixtures\TestBundle1\TestBu
 use Oro\Bundle\LocaleBundle\Tests\Unit\Configuration\Fixtures\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class AddressFormatConfigurationProviderTest extends \PHPUnit\Framework\TestCase
+class AddressFormatConfigurationProviderTest extends TestCase
 {
     use TempDirExtension;
 
@@ -31,7 +32,7 @@ class AddressFormatConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->configurationProvider = new AddressFormatConfigurationProvider($cacheFile, false);
     }
 
-    public function testGetConfiguration()
+    public function testGetConfiguration(): void
     {
         $this->assertEquals(
             [

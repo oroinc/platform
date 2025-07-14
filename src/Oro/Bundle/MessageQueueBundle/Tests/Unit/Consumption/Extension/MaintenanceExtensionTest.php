@@ -5,12 +5,13 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 use Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceModeState;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\MaintenanceExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class MaintenanceExtensionTest extends \PHPUnit\Framework\TestCase
+class MaintenanceExtensionTest extends TestCase
 {
-    private MaintenanceModeState|\PHPUnit\Framework\MockObject\MockObject $maintenance;
-
+    private MaintenanceModeState&MockObject $maintenance;
     private MaintenanceExtension $extension;
 
     #[\Override]

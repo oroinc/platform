@@ -11,19 +11,16 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateProcessor;
 use Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateProcessorResult;
 use Oro\Component\Testing\Command\CommandTestingTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class UpdateCommandTest extends \PHPUnit\Framework\TestCase
+class UpdateCommandTest extends TestCase
 {
     use CommandTestingTrait;
 
-    /** @var EntityExtendUpdateProcessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityExtendUpdateProcessor;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var UpdateCommand */
-    private $command;
+    private EntityExtendUpdateProcessor&MockObject $entityExtendUpdateProcessor;
+    private ConfigManager&MockObject $configManager;
+    private UpdateCommand $command;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,7 @@ class UpdateCommandTest extends \PHPUnit\Framework\TestCase
         $this->command = new UpdateCommand($this->entityExtendUpdateProcessor, $this->configManager);
     }
 
-    public function testExecuteSuccess()
+    public function testExecuteSuccess(): void
     {
         $this->entityExtendUpdateProcessor->expects(self::once())
             ->method('processUpdate')
@@ -50,7 +47,7 @@ class UpdateCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertOutputContains($commandTester, 'The update complete.');
     }
 
-    public function testExecuteFailed()
+    public function testExecuteFailed(): void
     {
         $this->entityExtendUpdateProcessor->expects(self::once())
             ->method('processUpdate')
@@ -65,7 +62,7 @@ class UpdateCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertProducedError($commandTester, 'The update failed.');
     }
 
-    public function testExecuteWithDryRunAndNoChanges()
+    public function testExecuteWithDryRunAndNoChanges(): void
     {
         $entityConfig = new Config(
             new EntityConfigId('extend', 'Test\Entity'),
@@ -85,7 +82,7 @@ class UpdateCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertOutputContains($commandTester, 'There are no changes that require the database schema update.');
     }
 
-    public function testExecuteWithDryRunAndHaveChanges()
+    public function testExecuteWithDryRunAndHaveChanges(): void
     {
         $entityConfig = new Config(
             new EntityConfigId('extend', 'Test\Entity'),

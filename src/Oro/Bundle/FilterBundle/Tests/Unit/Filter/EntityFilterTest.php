@@ -7,18 +7,15 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEntity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 
-class EntityFilterTest extends \PHPUnit\Framework\TestCase
+class EntityFilterTest extends TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var EntityFilter */
-    private $filter;
+    private FormFactoryInterface&MockObject $formFactory;
+    private ManagerRegistry&MockObject $doctrine;
+    private EntityFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +30,7 @@ class EntityFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWithoutValue()
+    public function testPrepareDataWithoutValue(): void
     {
         $data = [];
 
@@ -44,7 +41,7 @@ class EntityFilterTest extends \PHPUnit\Framework\TestCase
         self::assertSame($data, $this->filter->prepareData($data));
     }
 
-    public function testPrepareDataWithNullValue()
+    public function testPrepareDataWithNullValue(): void
     {
         $data = ['value' => null];
 
@@ -55,7 +52,7 @@ class EntityFilterTest extends \PHPUnit\Framework\TestCase
         self::assertSame($data, $this->filter->prepareData($data));
     }
 
-    public function testPrepareDataWithEntityIdValueAndNoEntityClass()
+    public function testPrepareDataWithEntityIdValueAndNoEntityClass(): void
     {
         $data = ['value' => 123];
 
@@ -66,7 +63,7 @@ class EntityFilterTest extends \PHPUnit\Framework\TestCase
         self::assertSame($data, $this->filter->prepareData($data));
     }
 
-    public function testPrepareDataWithEntityIdsValueAndNoEntityClass()
+    public function testPrepareDataWithEntityIdsValueAndNoEntityClass(): void
     {
         $data = ['value' => [123]];
 
@@ -77,7 +74,7 @@ class EntityFilterTest extends \PHPUnit\Framework\TestCase
         self::assertSame($data, $this->filter->prepareData($data));
     }
 
-    public function testPrepareDataWithEntityIdValueForNonManageableEntity()
+    public function testPrepareDataWithEntityIdValueForNonManageableEntity(): void
     {
         $data = ['value' => 123];
 
@@ -90,7 +87,7 @@ class EntityFilterTest extends \PHPUnit\Framework\TestCase
         self::assertSame(['value' => null], $this->filter->prepareData($data));
     }
 
-    public function testPrepareDataWithEntityIdsValueForNonManageableEntity()
+    public function testPrepareDataWithEntityIdsValueForNonManageableEntity(): void
     {
         $data = ['value' => [123]];
 
@@ -103,7 +100,7 @@ class EntityFilterTest extends \PHPUnit\Framework\TestCase
         self::assertSame(['value' => []], $this->filter->prepareData($data));
     }
 
-    public function testPrepareDataWithEntityIdValue()
+    public function testPrepareDataWithEntityIdValue(): void
     {
         $data = ['value' => 123];
 
@@ -122,7 +119,7 @@ class EntityFilterTest extends \PHPUnit\Framework\TestCase
         self::assertSame(['value' => $entity], $this->filter->prepareData($data));
     }
 
-    public function testPrepareDataWithEntityIdsValue()
+    public function testPrepareDataWithEntityIdsValue(): void
     {
         $data = ['value' => [123]];
 

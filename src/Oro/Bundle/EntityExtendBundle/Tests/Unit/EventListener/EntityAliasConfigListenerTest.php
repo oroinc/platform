@@ -10,17 +10,14 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\EventListener\EntityAliasConfigListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityAliasConfigListenerTest extends \PHPUnit\Framework\TestCase
+class EntityAliasConfigListenerTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityAliasResolver;
-
-    /** @var EntityAliasConfigListener */
-    private $listener;
+    private ConfigManager&MockObject $configManager;
+    private EntityAliasResolver&MockObject $entityAliasResolver;
+    private EntityAliasConfigListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +28,7 @@ class EntityAliasConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new EntityAliasConfigListener($this->entityAliasResolver);
     }
 
-    public function testPreFlushNewEntityCreated()
+    public function testPreFlushNewEntityCreated(): void
     {
         $config = new Config(new EntityConfigId('extend', 'Test\Entity'));
         $event = new PreFlushConfigEvent(['extend' => $config], $this->configManager);
@@ -46,7 +43,7 @@ class EntityAliasConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preFlush($event);
     }
 
-    public function testPreFlushNewEntityAdded()
+    public function testPreFlushNewEntityAdded(): void
     {
         $config = new Config(new EntityConfigId('extend', 'Test\Entity'));
         $event = new PreFlushConfigEvent(['extend' => $config], $this->configManager);
@@ -61,7 +58,7 @@ class EntityAliasConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preFlush($event);
     }
 
-    public function testPreFlushNoExtendConfig()
+    public function testPreFlushNoExtendConfig(): void
     {
         $event = new PreFlushConfigEvent([], $this->configManager);
 
@@ -71,7 +68,7 @@ class EntityAliasConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preFlush($event);
     }
 
-    public function testPreFlushNewFieldCreated()
+    public function testPreFlushNewFieldCreated(): void
     {
         $config = new Config(new FieldConfigId('extend', 'Test\Entity', 'field1'));
         $event = new PreFlushConfigEvent(['extend' => $config], $this->configManager);

@@ -8,23 +8,18 @@ use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FieldMetadataTest extends \PHPUnit\Framework\TestCase
+class FieldMetadataTest extends TestCase
 {
-    /** @var array */
-    private $options;
-
-    /** @var DoctrineMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineMetadata;
-
-    /** @var EntityMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityMetadata;
-
-    /** @var FieldMetadata */
-    private $fieldMetadata;
+    private array $options;
+    private DoctrineMetadata&MockObject $doctrineMetadata;
+    private EntityMetadata&MockObject $entityMetadata;
+    private FieldMetadata $fieldMetadata;
 
     #[\Override]
     protected function setUp(): void
@@ -36,13 +31,13 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->fieldMetadata = new FieldMetadata($this->options, $this->doctrineMetadata);
     }
 
-    public function testGetEntityMetadata()
+    public function testGetEntityMetadata(): void
     {
         $this->fieldMetadata->setEntityMetadata($this->entityMetadata);
         $this->assertEquals($this->entityMetadata, $this->fieldMetadata->getEntityMetadata());
     }
 
-    public function testGetEntityMetadataFails()
+    public function testGetEntityMetadataFails(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Entity metadata is not configured.');
@@ -50,12 +45,12 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->fieldMetadata->getEntityMetadata();
     }
 
-    public function testGetDoctrineMetadata()
+    public function testGetDoctrineMetadata(): void
     {
         $this->assertEquals($this->doctrineMetadata, $this->fieldMetadata->getDoctrineMetadata());
     }
 
-    public function testGetDoctrineMetadataFails()
+    public function testGetDoctrineMetadataFails(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Doctrine metadata is not configured.');
@@ -64,7 +59,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $metadata->getDoctrineMetadata();
     }
 
-    public function testHasDoctrineMetadata()
+    public function testHasDoctrineMetadata(): void
     {
         $metadata = new FieldMetadata($this->options);
         $this->assertFalse($metadata->hasDoctrineMetadata());
@@ -73,7 +68,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($metadata->hasDoctrineMetadata());
     }
 
-    public function testGetFieldName()
+    public function testGetFieldName(): void
     {
         $fieldName = 'field';
 
@@ -82,21 +77,21 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($fieldName, $this->fieldMetadata->getFieldName());
     }
 
-    public function testGetSourceFieldName()
+    public function testGetSourceFieldName(): void
     {
         $fieldName = 'field';
         $this->fieldMetadata->set('source_field_name', $fieldName);
         $this->assertEquals($fieldName, $this->fieldMetadata->getSourceFieldName());
     }
 
-    public function testGetSourceFieldNameWhenOptionEmpty()
+    public function testGetSourceFieldNameWhenOptionEmpty(): void
     {
         $fieldName = 'field';
         $this->fieldMetadata->set('field_name', $fieldName);
         $this->assertEquals($fieldName, $this->fieldMetadata->getSourceFieldName());
     }
 
-    public function testGetSourceClassNameByEntityMetadata()
+    public function testGetSourceClassNameByEntityMetadata(): void
     {
         $className = 'Foo\\Entity';
         $this->entityMetadata->expects($this->once())
@@ -107,14 +102,14 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($className, $this->fieldMetadata->getSourceClassName());
     }
 
-    public function testGetSourceClassNameByOption()
+    public function testGetSourceClassNameByOption(): void
     {
         $className = 'Foo\\Entity';
         $this->fieldMetadata->set('source_class_name', $className);
         $this->assertEquals($className, $this->fieldMetadata->getSourceClassName());
     }
 
-    public function testIsDefinedBySourceEntityTrue()
+    public function testIsDefinedBySourceEntityTrue(): void
     {
         $className = 'Foo\\Entity';
 
@@ -128,7 +123,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->fieldMetadata->isDefinedBySourceEntity());
     }
 
-    public function testIsDefinedBySourceEntityFalse()
+    public function testIsDefinedBySourceEntityFalse(): void
     {
         $className = 'Foo\\Entity';
         $sourceClassName = 'Bar\\Entity';
@@ -143,7 +138,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->fieldMetadata->isDefinedBySourceEntity());
     }
 
-    public function testGetFieldNameFails()
+    public function testGetFieldNameFails(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot get field name from merge field metadata.');
@@ -151,7 +146,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->fieldMetadata->getFieldName();
     }
 
-    public function testGetMergeMode()
+    public function testGetMergeMode(): void
     {
         $mergeModes = [MergeModes::REPLACE, MergeModes::UNITE];
         $this->assertNull($this->fieldMetadata->getMergeMode());
@@ -160,7 +155,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MergeModes::REPLACE, $this->fieldMetadata->getMergeMode());
     }
 
-    public function testHasMergeMode()
+    public function testHasMergeMode(): void
     {
         $mergeModes = [MergeModes::REPLACE];
         $this->fieldMetadata->set('merge_modes', $mergeModes);
@@ -169,7 +164,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->fieldMetadata->hasMergeMode(MergeModes::UNITE));
     }
 
-    public function testAddMergeMode()
+    public function testAddMergeMode(): void
     {
         $this->assertEquals([], $this->fieldMetadata->getMergeModes());
         $this->fieldMetadata->addMergeMode(MergeModes::REPLACE);
@@ -179,7 +174,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([MergeModes::UNITE, MergeModes::REPLACE], $this->fieldMetadata->getMergeModes());
     }
 
-    public function testIsCollectionFalseWhenNotHasDoctrineMetadata()
+    public function testIsCollectionFalseWhenNotHasDoctrineMetadata(): void
     {
         $metadata = new FieldMetadata();
         $metadata->set('is_collection', true);
@@ -189,7 +184,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($metadata->isCollection());
     }
 
-    public function testIsCollectionFalseWhenNotAssociation()
+    public function testIsCollectionFalseWhenNotAssociation(): void
     {
         $this->doctrineMetadata->expects($this->once())
             ->method('isAssociation')
@@ -197,7 +192,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->fieldMetadata->isCollection());
     }
 
-    public function testIsCollectionTrueWhenManyToMany()
+    public function testIsCollectionTrueWhenManyToMany(): void
     {
         $this->doctrineMetadata->expects($this->once())
             ->method('isAssociation')
@@ -210,7 +205,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->fieldMetadata->isCollection());
     }
 
-    public function testIsCollectionTrueWhenOneToManyDefinedBySourceEntity()
+    public function testIsCollectionTrueWhenOneToManyDefinedBySourceEntity(): void
     {
         $className = 'Foo\\Entity';
 
@@ -235,7 +230,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->fieldMetadata->isCollection());
     }
 
-    public function testIsCollectionTrueWhenManyToOneDefinedBySourceEntity()
+    public function testIsCollectionTrueWhenManyToOneDefinedBySourceEntity(): void
     {
         $className = 'Foo\\Entity';
         $sourceClassName = 'Bar\\Entity';
@@ -262,7 +257,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->fieldMetadata->isCollection());
     }
 
-    public function testOneToManyRelationShouldBeCloned()
+    public function testOneToManyRelationShouldBeCloned(): void
     {
         $fieldMetadata = new FieldMetadata([], new DoctrineMetadata([
             'type' => ClassMetadataInfo::ONE_TO_MANY,

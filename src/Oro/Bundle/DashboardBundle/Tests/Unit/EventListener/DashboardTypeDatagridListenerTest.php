@@ -9,18 +9,15 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumOptionRepository;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DashboardTypeDatagridListenerTest extends \PHPUnit\Framework\TestCase
+class DashboardTypeDatagridListenerTest extends TestCase
 {
-    /** @var EnumOptionRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var DashboardTypeDatagridListener */
-    private $listener;
+    private EnumOptionRepository&MockObject $repository;
+    private TranslatorInterface&MockObject $translator;
+    private DashboardTypeDatagridListener $listener;
 
     #[\Override]
     protected function setUp(): void

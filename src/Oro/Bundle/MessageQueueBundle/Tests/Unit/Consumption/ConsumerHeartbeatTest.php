@@ -4,23 +4,23 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption;
 
 use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
 use Oro\Bundle\MessageQueueBundle\Consumption\StateDriverInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConsumerHeartbeatTest extends \PHPUnit\Framework\TestCase
+class ConsumerHeartbeatTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $driver;
-
-    /** @var ConsumerHeartbeat */
-    private $consumerHeartbeat;
+    private StateDriverInterface&MockObject $driver;
+    private ConsumerHeartbeat $consumerHeartbeat;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->driver = $this->createMock(StateDriverInterface::class);
+
         $this->consumerHeartbeat = new ConsumerHeartbeat($this->driver, 15);
     }
 
-    public function testTick()
+    public function testTick(): void
     {
         $this->driver->expects(self::once())
             ->method('setChangeStateDateWithTimeGap')
@@ -29,7 +29,7 @@ class ConsumerHeartbeatTest extends \PHPUnit\Framework\TestCase
         $this->consumerHeartbeat->tick();
     }
 
-    public function testIsAliveWithOverdueState()
+    public function testIsAliveWithOverdueState(): void
     {
         $date = new \DateTime('now', new \DateTimeZone('UTC'));
         $date->sub(new \DateInterval('PT17M'));
@@ -41,7 +41,7 @@ class ConsumerHeartbeatTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->consumerHeartbeat->isAlive());
     }
 
-    public function testIsAliveWithCorrectState()
+    public function testIsAliveWithCorrectState(): void
     {
         $date = new \DateTime('now', new \DateTimeZone('UTC'));
         $date->sub(new \DateInterval('PT5M'));
@@ -53,7 +53,7 @@ class ConsumerHeartbeatTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->consumerHeartbeat->isAlive());
     }
 
-    public function testIsAliveWithNullStateDate()
+    public function testIsAliveWithNullStateDate(): void
     {
         $this->driver->expects(self::once())
             ->method('getChangeStateDate')

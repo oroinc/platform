@@ -4,11 +4,11 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\QueryDesigner;
 
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryBuilderGroupingOrmQueryConverterContext;
+use PHPUnit\Framework\TestCase;
 
-class QueryBuilderGroupingOrmQueryConverterContextTest extends \PHPUnit\Framework\TestCase
+class QueryBuilderGroupingOrmQueryConverterContextTest extends TestCase
 {
-    /** @var QueryBuilderGroupingOrmQueryConverterContext */
-    private $context;
+    private QueryBuilderGroupingOrmQueryConverterContext $context;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class QueryBuilderGroupingOrmQueryConverterContextTest extends \PHPUnit\Framewor
         $this->context = new QueryBuilderGroupingOrmQueryConverterContext();
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $initialContext = clone $this->context;
 
@@ -27,20 +27,20 @@ class QueryBuilderGroupingOrmQueryConverterContextTest extends \PHPUnit\Framewor
         self::assertEquals($initialContext, $this->context);
     }
 
-    public function testQueryBuilder()
+    public function testQueryBuilder(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
         $this->context->setQueryBuilder($qb);
         self::assertSame($qb, $this->context->getQueryBuilder());
     }
 
-    public function testGetQueryBuilderWhenItWasNotSet()
+    public function testGetQueryBuilderWhenItWasNotSet(): void
     {
         $this->expectException(\TypeError::class);
         $this->context->getQueryBuilder();
     }
 
-    public function testRootEntityAlias()
+    public function testRootEntityAlias(): void
     {
         self::assertNull($this->context->getRootEntityAlias());
 

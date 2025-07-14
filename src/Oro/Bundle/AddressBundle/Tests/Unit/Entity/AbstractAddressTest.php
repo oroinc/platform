@@ -6,17 +6,18 @@ use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class AbstractAddressTest extends \PHPUnit\Framework\TestCase
+class AbstractAddressTest extends TestCase
 {
     /**
      * @dataProvider propertiesDataProvider
      */
-    public function testSettersAndGetters(string $property, $value)
+    public function testSettersAndGetters(string $property, $value): void
     {
         $address = $this->createAddress();
 
@@ -50,7 +51,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testBeforeSave()
+    public function testBeforeSave(): void
     {
         $address = $this->createAddress();
 
@@ -65,7 +66,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsWithDelta($address->getCreated(), $address->getUpdated(), 1);
     }
 
-    public function testBeforeUpdate()
+    public function testBeforeUpdate(): void
     {
         $address = $this->createAddress();
 
@@ -78,7 +79,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertNotNull($address->getUpdated());
     }
 
-    public function testGetRegionName()
+    public function testGetRegionName(): void
     {
         $address = $this->createAddress();
         $address->setRegionText('New York');
@@ -94,7 +95,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('California', $address->getRegionName());
     }
 
-    public function testGetRegionCode()
+    public function testGetRegionCode(): void
     {
         $address = $this->createAddress();
 
@@ -109,7 +110,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('CA', $address->getRegionCode());
     }
 
-    public function testGetCountryName()
+    public function testGetCountryName(): void
     {
         $address = $this->createAddress();
 
@@ -124,7 +125,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('USA', $address->getCountryName());
     }
 
-    public function testGetCountryIso2()
+    public function testGetCountryIso2(): void
     {
         $address = $this->createAddress();
 
@@ -139,7 +140,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('US', $address->getCountryIso2());
     }
 
-    public function testGetCountryIso3()
+    public function testGetCountryIso3(): void
     {
         $address = $this->createAddress();
 
@@ -157,7 +158,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toStringDataProvider
      */
-    public function testToString(array $actualData, string $expected)
+    public function testToString(array $actualData, string $expected): void
     {
         $address = $this->createAddress();
 
@@ -229,7 +230,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    public function testRegionText()
+    public function testRegionText(): void
     {
         $address = $this->createAddress();
 
@@ -240,7 +241,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('text region', $address->getUniversalRegion());
     }
 
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $address = $this->createAddress();
         $this->assertTrue($address->isEmpty());
@@ -249,7 +250,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider emptyCheckPropertiesDataProvider
     */
-    public function testIsNotEmpty(string $property, $value)
+    public function testIsNotEmpty(string $property, $value): void
     {
         $address = $this->createAddress();
         call_user_func_array([$address, 'set' . ucfirst($property)], [$value]);
@@ -277,7 +278,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isEqualDataProvider
      */
-    public function testIsEqual(AbstractAddress $one, ?AbstractAddress $two, bool $expectedResult)
+    public function testIsEqual(AbstractAddress $one, ?AbstractAddress $two, bool $expectedResult): void
     {
         $this->assertEquals($expectedResult, $one->isEqual($two));
     }

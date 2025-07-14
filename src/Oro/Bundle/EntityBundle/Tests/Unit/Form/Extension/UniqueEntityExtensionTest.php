@@ -7,35 +7,24 @@ use Oro\Bundle\EntityBundle\Form\Extension\UniqueEntityExtension;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UniqueEntityExtensionTest extends \PHPUnit\Framework\TestCase
+class UniqueEntityExtensionTest extends TestCase
 {
     private const ENTITY = 'Namespace\EntityName';
 
-    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $validator;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $config;
-
-    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $validatorMetadata;
-
-    /** @var FormBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $builder;
-
-    /** @var UniqueEntityExtension */
-    private $extension;
+    private ValidatorInterface&MockObject $validator;
+    private ConfigProvider&MockObject $configProvider;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ConfigInterface&MockObject $config;
+    private ClassMetadata&MockObject $validatorMetadata;
+    private FormBuilder&MockObject $builder;
+    private UniqueEntityExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -62,7 +51,7 @@ class UniqueEntityExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithoutClass()
+    public function testWithoutClass(): void
     {
         $this->validatorMetadata->expects($this->never())
             ->method('addConstraint');
@@ -70,7 +59,7 @@ class UniqueEntityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->buildForm($this->builder, []);
     }
 
-    public function testForNotManageableEntity()
+    public function testForNotManageableEntity(): void
     {
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntity')
@@ -86,7 +75,7 @@ class UniqueEntityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->buildForm($this->builder, ['data_class' => self::ENTITY]);
     }
 
-    public function testWithoutConfig()
+    public function testWithoutConfig(): void
     {
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntity')
@@ -104,7 +93,7 @@ class UniqueEntityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->buildForm($this->builder, ['data_class' => self::ENTITY]);
     }
 
-    public function testWithoutUniqueKeyOption()
+    public function testWithoutUniqueKeyOption(): void
     {
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntity')
@@ -127,7 +116,7 @@ class UniqueEntityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->buildForm($this->builder, ['data_class' => self::ENTITY]);
     }
 
-    public function testWithConfigAndKeys()
+    public function testWithConfigAndKeys(): void
     {
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntity')

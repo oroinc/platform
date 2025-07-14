@@ -9,6 +9,8 @@ use Oro\Bundle\EntityBundle\Form\Guesser\FormConfigGuesser;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
@@ -16,19 +18,12 @@ use Symfony\Component\Form\Guess\ValueGuess;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
+class FormConfigGuesserTest extends TestCase
 {
-    /** @var FormConfigGuesser */
-    private $guesser;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $formConfigProvider;
+    private FormConfigGuesser $guesser;
+    private ManagerRegistry&MockObject $managerRegistry;
+    private ConfigProvider&MockObject $entityConfigProvider;
+    private ConfigProvider&MockObject $formConfigProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -44,28 +39,28 @@ class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessRequired()
+    public function testGuessRequired(): void
     {
         $guess = $this->guesser->guessRequired('Test/Entity', 'testProperty');
 
         $this->assertValueGuess($guess, false, ValueGuess::LOW_CONFIDENCE);
     }
 
-    public function testGuessMaxLength()
+    public function testGuessMaxLength(): void
     {
         $guess = $this->guesser->guessMaxLength('Test/Entity', 'testProperty');
 
         $this->assertValueGuess($guess, null, ValueGuess::LOW_CONFIDENCE);
     }
 
-    public function testGuessPattern()
+    public function testGuessPattern(): void
     {
         $guess = $this->guesser->guessMaxLength('Test/Entity', 'testProperty');
 
         $this->assertValueGuess($guess, null, ValueGuess::LOW_CONFIDENCE);
     }
 
-    public function testGuessNoEntityManager()
+    public function testGuessNoEntityManager(): void
     {
         $class = 'Test/Entity';
         $property = 'testProperty';
@@ -78,7 +73,7 @@ class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertDefaultTypeGuess($this->guesser->guessType($class, $property));
     }
 
-    public function testGuessNoMetadata()
+    public function testGuessNoMetadata(): void
     {
         $class = 'Test/Entity';
         $property = 'testProperty';
@@ -88,7 +83,7 @@ class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertDefaultTypeGuess($this->guesser->guessType($class, $property));
     }
 
-    public function testGuessNoFormConfig()
+    public function testGuessNoFormConfig(): void
     {
         $class = 'Test/Entity';
         $property = 'testProperty';
@@ -103,7 +98,7 @@ class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertDefaultTypeGuess($this->guesser->guessType($class, $property));
     }
 
-    public function testGuessNoFormType()
+    public function testGuessNoFormType(): void
     {
         $class = 'Test/Entity';
         $property = 'testProperty';
@@ -114,7 +109,7 @@ class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertDefaultTypeGuess($this->guesser->guessType($class, $property));
     }
 
-    public function testGuessOnlyFormType()
+    public function testGuessOnlyFormType(): void
     {
         $class = 'Test/Entity';
         $property = 'testProperty';
@@ -128,7 +123,7 @@ class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertTypeGuess($guess, $formType, [], TypeGuess::HIGH_CONFIDENCE);
     }
 
-    public function testGuessOnlyFormTypeWithLabel()
+    public function testGuessOnlyFormTypeWithLabel(): void
     {
         $class = 'Test/Entity';
         $property = 'testProperty';
@@ -144,7 +139,7 @@ class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertTypeGuess($guess, $formType, ['label' => $label], TypeGuess::HIGH_CONFIDENCE);
     }
 
-    public function testGuessFormTypeWithOptions()
+    public function testGuessFormTypeWithOptions(): void
     {
         $class = 'Test/Entity';
         $property = 'testProperty';
@@ -163,7 +158,7 @@ class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertTypeGuess($guess, $formType, $formOptions, TypeGuess::HIGH_CONFIDENCE);
     }
 
-    public function testGuessByAssociationClass()
+    public function testGuessByAssociationClass(): void
     {
         $class = 'Test/Entity';
         $property = 'testProperty';

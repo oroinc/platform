@@ -23,21 +23,28 @@ class LoadDataFixturesCommandTest extends TestCase
 {
     private const string STUBS_DIR = __DIR__ . DIRECTORY_SEPARATOR . 'Stubs';
 
-    private DataFixturesLoader|MockObject $dataFixturesLoader;
+    private DataFixturesLoader&MockObject $dataFixturesLoader;
     private LoadDataFixturesCommand $command;
 
+    #[\Override]
     protected function setUp(): void
     {
         $kernel = $this->createMock(KernelInterface::class);
-        $kernel->method('getProjectDir')->willReturn(self::STUBS_DIR . DIRECTORY_SEPARATOR . 'application');
+        $kernel->expects(self::any())
+            ->method('getProjectDir')
+            ->willReturn(self::STUBS_DIR . DIRECTORY_SEPARATOR . 'application');
 
         $testBundle = new TestBundle('StubBundle');
         $testBundle->setPath(\implode(DIRECTORY_SEPARATOR, [self::STUBS_DIR, 'bundles', 'StubBundle']));
 
-        $kernel->method('getBundles')->willReturn([$testBundle]);
+        $kernel->expects(self::any())
+            ->method('getBundles')
+            ->willReturn([$testBundle]);
 
         $this->dataFixturesLoader = $this->createMock(DataFixturesLoader::class);
-        $this->dataFixturesLoader->method('getFixtures')->willReturn([]);
+        $this->dataFixturesLoader->expects(self::any())
+            ->method('getFixtures')
+            ->willReturn([]);
 
         $this->command = new LoadDataFixturesCommand(
             $kernel,
@@ -56,10 +63,12 @@ class LoadDataFixturesCommandTest extends TestCase
         $output = $this->createMock(OutputInterface::class);
 
         $input = $this->createMock(InputInterface::class);
-        $input->method('getOption')->willReturnMap([
-            ['fixtures-type', DataFixturesExecutorInterface::DEMO_FIXTURES],
-            ['no-bundles', null]
-        ]);
+        $input->expects(self::any())
+            ->method('getOption')
+            ->willReturnMap([
+                ['fixtures-type', DataFixturesExecutorInterface::DEMO_FIXTURES],
+                ['no-bundles', null]
+            ]);
 
         $this->dataFixturesLoader->expects(static::exactly(2))
             ->method('loadFromDirectory')
@@ -76,10 +85,12 @@ class LoadDataFixturesCommandTest extends TestCase
         $output = $this->createMock(OutputInterface::class);
 
         $input = $this->createMock(InputInterface::class);
-        $input->method('getOption')->willReturnMap([
-            ['fixtures-type', DataFixturesExecutorInterface::DEMO_FIXTURES],
-            ['no-bundles', true]
-        ]);
+        $input->expects(self::any())
+            ->method('getOption')
+            ->willReturnMap([
+                ['fixtures-type', DataFixturesExecutorInterface::DEMO_FIXTURES],
+                ['no-bundles', true]
+            ]);
 
         $this->dataFixturesLoader->expects(static::once())
             ->method('loadFromDirectory')

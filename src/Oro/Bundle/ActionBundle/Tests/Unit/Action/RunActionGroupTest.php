@@ -9,20 +9,19 @@ use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class RunActionGroupTest extends \PHPUnit\Framework\TestCase
+class RunActionGroupTest extends TestCase
 {
     private const ACTION_GROUP_NAME = 'test_action_group';
 
-    /** @var ActionGroupRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $actionGroupRegistry;
-
-    /** @var RunActionGroup */
-    private $actionGroup;
+    private ActionGroupRegistry&MockObject $actionGroupRegistry;
+    private RunActionGroup $actionGroup;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +32,7 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
         $this->actionGroup->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
-    public function testOptionNamesRequirements()
+    public function testOptionNamesRequirements(): void
     {
         self::assertEquals(RunActionGroup::OPTION_ACTION_GROUP, 'action_group');
         self::assertEquals(RunActionGroup::OPTION_PARAMETERS_MAP, 'parameters_mapping');
@@ -41,7 +40,7 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(RunActionGroup::OPTION_RESULT, 'result');
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $parametersMap = [
             'entity_class' => 'testClass',
@@ -67,7 +66,7 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $inputData, string $exception, string $exceptionMessage)
+    public function testInitializeException(array $inputData, string $exception, string $exceptionMessage): void
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($exceptionMessage);
@@ -126,7 +125,7 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testExecuteActionWithoutInitialization()
+    public function testExecuteActionWithoutInitialization(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Uninitialized action execution.');
@@ -143,7 +142,7 @@ class RunActionGroupTest extends \PHPUnit\Framework\TestCase
         ActionData $arguments,
         ActionData $returnVal,
         ActionData $expected
-    ) {
+    ): void {
         $data = new ActionData($context);
 
         $actionGroup = $this->createMock(ActionGroup::class);

@@ -16,6 +16,7 @@ use Oro\Bundle\FormBundle\Form\Extension\JsValidationExtension;
 use Oro\Bundle\TranslationBundle\Form\Extension\TranslatableChoiceTypeExtension;
 use Oro\Bundle\TranslationBundle\Translation\IdentityTranslator;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -37,11 +38,8 @@ class FieldTypeTest extends TypeTestCase
     private const FIELDS_GROUP = 'oro.entity_extend.form.data_type_group.fields';
     private const RELATIONS_GROUP = 'oro.entity_extend.form.data_type_group.relations';
 
-    /** @var FieldType */
-    private $type;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
+    private FieldType $type;
+    private ConfigManager&MockObject $configManager;
 
     private array $defaultFieldTypeChoices = [
         self::FIELDS_GROUP    => [

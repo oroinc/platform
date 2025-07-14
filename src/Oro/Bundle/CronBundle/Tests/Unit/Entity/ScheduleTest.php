@@ -4,8 +4,9 @@ namespace Oro\Bundle\CronBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class ScheduleTest extends \PHPUnit\Framework\TestCase
+class ScheduleTest extends TestCase
 {
     private Schedule $object;
 
@@ -15,13 +16,13 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
         $this->object = new Schedule();
     }
 
-    public function testConstructorSetsDefaultArguments()
+    public function testConstructorSetsDefaultArguments(): void
     {
         self::assertEquals([], $this->object->getArguments());
         self::assertEquals(\md5(\json_encode([])), $this->object->getArgumentsHash());
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         self::assertNull($this->object->getId());
 
@@ -39,7 +40,7 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
         mixed $testValue,
         mixed $defaultValue = null,
         mixed $expectedValue = null
-    ) {
+    ): void {
         $setter = 'set' . \ucfirst($propertyName);
         $getter = 'get' . \ucfirst($propertyName);
 
@@ -68,7 +69,7 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSetArguments()
+    public function testSetArguments(): void
     {
         $args = ['test' => 'value', 'some' => 'data'];
         $this->object->setArguments($args);
@@ -78,7 +79,7 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(\md5(\json_encode($args)), $this->object->getArgumentsHash());
     }
 
-    public function testGetHash()
+    public function testGetHash(): void
     {
         $args = ['test' => 'value', 'some' => 'data'];
         $this->object->setArguments($args);
@@ -87,7 +88,7 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(\md5(\json_encode($args)), $this->object->getArgumentsHash());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         ReflectionUtil::setId($this->object, 42);
 

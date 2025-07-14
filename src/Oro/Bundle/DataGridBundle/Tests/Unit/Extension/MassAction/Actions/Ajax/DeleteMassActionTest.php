@@ -5,12 +5,12 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction\Actions\Ajax
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\DeleteMassAction;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class DeleteMassActionTest extends \PHPUnit\Framework\TestCase
+class DeleteMassActionTest extends TestCase
 {
-    /** @var DeleteMassAction */
-    private $action;
+    private DeleteMassAction $action;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class DeleteMassActionTest extends \PHPUnit\Framework\TestCase
         $this->action = new DeleteMassAction();
     }
 
-    public function testSetOptions()
+    public function testSetOptions(): void
     {
         $this->action->setOptions(
             ActionConfiguration::create(

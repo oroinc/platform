@@ -5,19 +5,18 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\DataTransformer;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Bundle\SecurityBundle\Form\DataTransformer\CryptedDataTransformer;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
+class CryptedDataTransformerTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
     private const ENCRYPTED_STRING = 'encryptedSample';
     private const DECRYPTED_STRING = 'sample';
 
-    /** @var CryptedDataTransformer */
-    private $transformer;
-
-    /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $crypter;
+    private CryptedDataTransformer $transformer;
+    private SymmetricCrypterInterface&MockObject $crypter;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +30,7 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformDataProvider
      */
-    public function testTransform(?string $value, ?string $expected)
+    public function testTransform(?string $value, ?string $expected): void
     {
         $this->crypter->expects(self::any())
             ->method('decryptData')
@@ -51,7 +50,7 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testTransformWithException()
+    public function testTransformWithException(): void
     {
         $this->crypter->expects(self::once())
             ->method('decryptData')
@@ -67,7 +66,7 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformDataProvider
      */
-    public function testReverseTransform(?string $value, ?string $expected)
+    public function testReverseTransform(?string $value, ?string $expected): void
     {
         $this->crypter->expects(self::any())
             ->method('encryptData')

@@ -6,29 +6,29 @@ use Oro\Component\MessageQueue\Client\CallbackMessageBuilder;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 use Oro\Component\Testing\ClassExtensionTrait;
+use PHPUnit\Framework\TestCase;
 
-class TraceableMessageProducerTest extends \PHPUnit\Framework\TestCase
+class TraceableMessageProducerTest extends TestCase
 {
     use ClassExtensionTrait;
 
-    public function testShouldImplementMessageProducerInterface()
+    public function testShouldImplementMessageProducerInterface(): void
     {
         $this->assertClassImplements(MessageProducerInterface::class, TraceableMessageProducer::class);
     }
 
-    public function testCouldBeConstructedWithInternalMessageProducer()
+    public function testCouldBeConstructedWithInternalMessageProducer(): void
     {
-        new TraceableMessageProducer($this->createMessageProducer());
+        new TraceableMessageProducer($this->createMock(MessageProducerInterface::class));
     }
 
-    public function testShouldPassAllArgumentsToInternalMessageProducerSendMethod()
+    public function testShouldPassAllArgumentsToInternalMessageProducerSendMethod(): void
     {
         $topic = 'theTopic';
         $body = 'theBody';
 
-        $internalMessageProducer = $this->createMessageProducer();
-        $internalMessageProducer
-            ->expects($this->once())
+        $internalMessageProducer = $this->createMock(MessageProducerInterface::class);
+        $internalMessageProducer->expects($this->once())
             ->method('send')
             ->with($topic, $body);
 
@@ -37,9 +37,9 @@ class TraceableMessageProducerTest extends \PHPUnit\Framework\TestCase
         $messageProducer->send($topic, $body);
     }
 
-    public function testShouldAllowGetInfoSentToSameTopic()
+    public function testShouldAllowGetInfoSentToSameTopic(): void
     {
-        $messageProducer = new TraceableMessageProducer($this->createMessageProducer());
+        $messageProducer = new TraceableMessageProducer($this->createMock(MessageProducerInterface::class));
 
         $messageProducer->send('aFooTopic', 'aFooBody');
         $messageProducer->send('aFooTopic', 'aFooBody');
@@ -50,9 +50,9 @@ class TraceableMessageProducerTest extends \PHPUnit\Framework\TestCase
         ], $messageProducer->getTraces());
     }
 
-    public function testShouldAllowGetInfoSentToDifferentTopics()
+    public function testShouldAllowGetInfoSentToDifferentTopics(): void
     {
-        $messageProducer = new TraceableMessageProducer($this->createMessageProducer());
+        $messageProducer = new TraceableMessageProducer($this->createMock(MessageProducerInterface::class));
 
         $messageProducer->send('aFooTopic', 'aFooBody');
         $messageProducer->send('aBarTopic', 'aBarBody');
@@ -63,9 +63,9 @@ class TraceableMessageProducerTest extends \PHPUnit\Framework\TestCase
         ], $messageProducer->getTraces());
     }
 
-    public function testShouldResolveMessageIfItRepresentsByBuilder()
+    public function testShouldResolveMessageIfItRepresentsByBuilder(): void
     {
-        $messageProducer = new TraceableMessageProducer($this->createMessageProducer());
+        $messageProducer = new TraceableMessageProducer($this->createMock(MessageProducerInterface::class));
 
         $messageProducer->send('aFooTopic', new CallbackMessageBuilder(function () {
             return 'aFooBody';
@@ -76,11 +76,10 @@ class TraceableMessageProducerTest extends \PHPUnit\Framework\TestCase
         ], $messageProducer->getTraces());
     }
 
-    public function testShouldNotStoreAnythingIfInternalMessageProducerThrowsException()
+    public function testShouldNotStoreAnythingIfInternalMessageProducerThrowsException(): void
     {
-        $internalMessageProducer = $this->createMessageProducer();
-        $internalMessageProducer
-            ->expects($this->once())
+        $internalMessageProducer = $this->createMock(MessageProducerInterface::class);
+        $internalMessageProducer->expects($this->once())
             ->method('send')
             ->willThrowException(new \Exception());
 
@@ -94,9 +93,9 @@ class TraceableMessageProducerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testShouldAllowClearStoredTraces()
+    public function testShouldAllowClearStoredTraces(): void
     {
-        $messageProducer = new TraceableMessageProducer($this->createMessageProducer());
+        $messageProducer = new TraceableMessageProducer($this->createMock(MessageProducerInterface::class));
 
         $messageProducer->send('aFooTopic', 'aFooBody');
 
@@ -105,13 +104,5 @@ class TraceableMessageProducerTest extends \PHPUnit\Framework\TestCase
 
         $messageProducer->clearTraces();
         $this->assertSame([], $messageProducer->getTraces());
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface
-     */
-    protected function createMessageProducer()
-    {
-        return $this->createMock(MessageProducerInterface::class);
     }
 }

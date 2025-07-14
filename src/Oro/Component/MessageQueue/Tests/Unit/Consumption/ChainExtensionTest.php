@@ -6,30 +6,33 @@ use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
+use PHPUnit\Framework\TestCase;
 
-class ChainExtensionTest extends \PHPUnit\Framework\TestCase
+class ChainExtensionTest extends TestCase
 {
     use ClassExtensionTrait;
 
-    public function testShouldImplementExtensionInterface()
+    public function testShouldImplementExtensionInterface(): void
     {
         $this->assertClassImplements(ExtensionInterface::class, ChainExtension::class);
     }
 
-    public function testCouldBeConstructedWithExtensionsArray()
+    public function testCouldBeConstructedWithExtensionsArray(): void
     {
-        new ChainExtension([$this->createExtension(), $this->createExtension()]);
+        new ChainExtension(
+            [$this->createMock(ExtensionInterface::class), $this->createMock(ExtensionInterface::class)]
+        );
     }
 
-    public function testShouldProxyOnStartToAllInternalExtensions()
+    public function testShouldProxyOnStartToAllInternalExtensions(): void
     {
-        $context = $this->createContext();
+        $context = $this->createMock(Context::class);
 
-        $fooExtension = $this->createExtension();
+        $fooExtension = $this->createMock(ExtensionInterface::class);
         $fooExtension->expects($this->once())
             ->method('onStart')
             ->with($this->identicalTo($context));
-        $barExtension = $this->createExtension();
+        $barExtension = $this->createMock(ExtensionInterface::class);
         $barExtension->expects($this->once())
             ->method('onStart')
             ->with($this->identicalTo($context));
@@ -38,15 +41,15 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $chainExtension->onStart($context);
     }
 
-    public function testShouldProxyOnBeforeReceiveToAllInternalExtensions()
+    public function testShouldProxyOnBeforeReceiveToAllInternalExtensions(): void
     {
-        $context = $this->createContext();
+        $context = $this->createMock(Context::class);
 
-        $fooExtension = $this->createExtension();
+        $fooExtension = $this->createMock(ExtensionInterface::class);
         $fooExtension->expects($this->once())
             ->method('onBeforeReceive')
             ->with($this->identicalTo($context));
-        $barExtension = $this->createExtension();
+        $barExtension = $this->createMock(ExtensionInterface::class);
         $barExtension->expects($this->once())
             ->method('onBeforeReceive')
             ->with($this->identicalTo($context));
@@ -55,15 +58,15 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $chainExtension->onBeforeReceive($context);
     }
 
-    public function testShouldProxyOnPreReceiveToAllInternalExtensions()
+    public function testShouldProxyOnPreReceiveToAllInternalExtensions(): void
     {
-        $context = $this->createContext();
+        $context = $this->createMock(Context::class);
 
-        $fooExtension = $this->createExtension();
+        $fooExtension = $this->createMock(ExtensionInterface::class);
         $fooExtension->expects($this->once())
             ->method('onPreReceived')
             ->with($this->identicalTo($context));
-        $barExtension = $this->createExtension();
+        $barExtension = $this->createMock(ExtensionInterface::class);
         $barExtension->expects($this->once())
             ->method('onPreReceived')
             ->with($this->identicalTo($context));
@@ -72,15 +75,15 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $chainExtension->onPreReceived($context);
     }
 
-    public function testShouldProxyOnPostReceiveToAllInternalExtensions()
+    public function testShouldProxyOnPostReceiveToAllInternalExtensions(): void
     {
-        $context = $this->createContext();
+        $context = $this->createMock(Context::class);
 
-        $fooExtension = $this->createExtension();
+        $fooExtension = $this->createMock(ExtensionInterface::class);
         $fooExtension->expects($this->once())
             ->method('onPostReceived')
             ->with($this->identicalTo($context));
-        $barExtension = $this->createExtension();
+        $barExtension = $this->createMock(ExtensionInterface::class);
         $barExtension->expects($this->once())
             ->method('onPostReceived')
             ->with($this->identicalTo($context));
@@ -89,15 +92,15 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $chainExtension->onPostReceived($context);
     }
 
-    public function testShouldProxyOnIdleToAllInternalExtensions()
+    public function testShouldProxyOnIdleToAllInternalExtensions(): void
     {
-        $context = $this->createContext();
+        $context = $this->createMock(Context::class);
 
-        $fooExtension = $this->createExtension();
+        $fooExtension = $this->createMock(ExtensionInterface::class);
         $fooExtension->expects($this->once())
             ->method('onIdle')
             ->with($this->identicalTo($context));
-        $barExtension = $this->createExtension();
+        $barExtension = $this->createMock(ExtensionInterface::class);
         $barExtension->expects($this->once())
             ->method('onIdle')
             ->with($this->identicalTo($context));
@@ -106,36 +109,20 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $chainExtension->onIdle($context);
     }
 
-    public function testShouldProxyOnInterruptedToAllInternalExtensions()
+    public function testShouldProxyOnInterruptedToAllInternalExtensions(): void
     {
-        $context = $this->createContext();
+        $context = $this->createMock(Context::class);
 
-        $fooExtension = $this->createExtension();
+        $fooExtension = $this->createMock(ExtensionInterface::class);
         $fooExtension->expects($this->once())
             ->method('onInterrupted')
             ->with($this->identicalTo($context));
-        $barExtension = $this->createExtension();
+        $barExtension = $this->createMock(ExtensionInterface::class);
         $barExtension->expects($this->once())
             ->method('onInterrupted')
             ->with($this->identicalTo($context));
 
         $chainExtension = new ChainExtension([$fooExtension, $barExtension]);
         $chainExtension->onInterrupted($context);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|Context
-     */
-    protected function createContext()
-    {
-        return $this->createMock(Context::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ExtensionInterface
-     */
-    protected function createExtension()
-    {
-        return $this->createMock(ExtensionInterface::class);
     }
 }

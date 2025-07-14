@@ -7,14 +7,14 @@ use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvide
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for ExtendOptionsParser and ExtendOptionsBuilder
  */
-class ExtendOptionsParserTest extends \PHPUnit\Framework\TestCase
+class ExtendOptionsParserTest extends TestCase
 {
-    /** @var ExtendOptionsParser */
-    private $extendOptionsParser;
+    private ExtendOptionsParser $extendOptionsParser;
 
     #[\Override]
     protected function setUp(): void
@@ -51,7 +51,7 @@ class ExtendOptionsParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider parseOptionsProvider
      */
-    public function testParseOptions(array $options, array $expected)
+    public function testParseOptions(array $options, array $expected): void
     {
         $result = $this->extendOptionsParser->parseOptions($options);
         $this->assertEquals($expected, $result);

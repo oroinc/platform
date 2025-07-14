@@ -7,20 +7,17 @@ use Oro\Component\Layout\DataProviderDecorator;
 use Oro\Component\Layout\Exception\InvalidArgumentException;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutRegistryInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DataAccessorTest extends \PHPUnit\Framework\TestCase
+class DataAccessorTest extends TestCase
 {
-    /** @var LayoutRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var LayoutContext */
-    private $context;
-
-    /** @var DataAccessor */
-    private $dataAccessor;
+    private LayoutRegistryInterface&MockObject $registry;
+    private LayoutContext $context;
+    private DataAccessor $dataAccessor;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,7 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $name = 'foo';
         $expectedData = new \stdClass();
@@ -47,7 +44,7 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(new DataProviderDecorator($expectedData), $this->dataAccessor->get($name));
     }
 
-    public function testArrayAccessGet()
+    public function testArrayAccessGet(): void
     {
         $name = 'foo';
         $expectedData = new \stdClass();
@@ -60,7 +57,7 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(new DataProviderDecorator($expectedData), $this->dataAccessor[$name]);
     }
 
-    public function testGetFromContextData()
+    public function testGetFromContextData(): void
     {
         $name = 'foo';
         $expectedData = new \stdClass();
@@ -78,7 +75,7 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedData, $this->dataAccessor->get($name));
     }
 
-    public function testArrayAccessGetFromContextData()
+    public function testArrayAccessGetFromContextData(): void
     {
         $name = 'foo';
         $expectedData = new \stdClass();
@@ -96,7 +93,7 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedData, $this->dataAccessor[$name]);
     }
 
-    public function testGetFromContextThrowsExceptionIfContextDataDoesNotExist()
+    public function testGetFromContextThrowsExceptionIfContextDataDoesNotExist(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Could not load the data provider "foo".');
@@ -112,7 +109,7 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->dataAccessor->get($name);
     }
 
-    public function testArrayAccessGetFromContextThrowsExceptionIfContextDataDoesNotExist()
+    public function testArrayAccessGetFromContextThrowsExceptionIfContextDataDoesNotExist(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Could not load the data provider "foo".');
@@ -128,7 +125,7 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->dataAccessor[$name];
     }
 
-    public function testArrayAccessExistsForUnknownDataProvider()
+    public function testArrayAccessExistsForUnknownDataProvider(): void
     {
         $name = 'foo';
         $this->context->resolve();
@@ -141,7 +138,7 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(isset($this->dataAccessor[$name]));
     }
 
-    public function testArrayAccessExists()
+    public function testArrayAccessExists(): void
     {
         $name = 'foo';
         $expectedData = new \stdClass();
@@ -158,7 +155,7 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(new DataProviderDecorator($expectedData), $this->dataAccessor[$name]);
     }
 
-    public function testArrayAccessExistsForContextData()
+    public function testArrayAccessExistsForContextData(): void
     {
         $name = 'foo';
         $this->context->data()->set($name, 'val');
@@ -172,7 +169,7 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(isset($this->dataAccessor[$name]));
     }
 
-    public function testArrayAccessSetThrowsException()
+    public function testArrayAccessSetThrowsException(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Not supported');
@@ -180,7 +177,7 @@ class DataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->dataAccessor['foo'] = 'bar';
     }
 
-    public function testArrayAccessRemoveThrowsException()
+    public function testArrayAccessRemoveThrowsException(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Not supported');

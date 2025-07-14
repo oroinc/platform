@@ -13,22 +13,17 @@ use Oro\Bundle\DigitalAssetBundle\EventListener\FileDigitalAssetChangedListener;
 use Oro\Bundle\DigitalAssetBundle\Reflector\FileReflector;
 use Oro\Bundle\DigitalAssetBundle\Tests\Unit\Stub\FileStub;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FileDigitalAssetChangedListenerTest extends \PHPUnit\Framework\TestCase
+class FileDigitalAssetChangedListenerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var FileReflector|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileReflector;
-
-    /** @var FileDigitalAssetChangedListener */
-    private $listener;
-
-    /** @var LifecycleEventArgs|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventArgs;
-
-    /** @var File|\PHPUnit\Framework\MockObject\MockObject */
-    private $file;
+    private FileReflector&MockObject $fileReflector;
+    private FileDigitalAssetChangedListener $listener;
+    private LifecycleEventArgs&MockObject $eventArgs;
+    private File&MockObject $file;
 
     #[\Override]
     protected function setUp(): void

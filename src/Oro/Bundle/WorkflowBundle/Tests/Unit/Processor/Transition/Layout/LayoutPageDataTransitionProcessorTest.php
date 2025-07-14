@@ -10,17 +10,16 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Layout\LayoutPageDataTransitionProcessor;
 use Oro\Bundle\WorkflowBundle\Translation\Helper\TransitionTranslationHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 
-class LayoutPageDataTransitionProcessorTest extends \PHPUnit\Framework\TestCase
+class LayoutPageDataTransitionProcessorTest extends TestCase
 {
-    /** @var TransitionTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $helper;
-
-    /** @var LayoutPageDataTransitionProcessor */
-    private $processor;
+    private TransitionTranslationHelper&MockObject $helper;
+    private LayoutPageDataTransitionProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class LayoutPageDataTransitionProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new LayoutPageDataTransitionProcessor($this->helper);
     }
 
-    public function testData()
+    public function testData(): void
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())
@@ -91,7 +90,7 @@ class LayoutPageDataTransitionProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($context->isProcessed());
     }
 
-    public function testSkipByUnsupportedResultType()
+    public function testSkipByUnsupportedResultType(): void
     {
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())

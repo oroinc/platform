@@ -31,7 +31,7 @@ class GoogleResourceOwnerFactoryTest extends TestCase
         $this->storage = $this->createMock(RequestDataStorageInterface::class);
     }
 
-    public function testCreateGoogleResourceOwner()
+    public function testCreateGoogleResourceOwner(): void
     {
         $this->configManager->expects($this->exactly(2))
             ->method('get')
@@ -63,7 +63,7 @@ class GoogleResourceOwnerFactoryTest extends TestCase
         $this->assertEquals('clientSecret', $resourceOwner->getOption('client_secret'));
     }
 
-    public function testEmptyClientIdCreateGoogleResourceOwner()
+    public function testEmptyClientIdCreateGoogleResourceOwner(): void
     {
         $this->configManager->expects($this->exactly(2))
             ->method('get')
@@ -95,7 +95,7 @@ class GoogleResourceOwnerFactoryTest extends TestCase
         $this->assertEquals('clientSecret', $resourceOwner->getOption('client_secret'));
     }
 
-    public function testEmptyClientSecretCreateGoogleResourceOwner()
+    public function testEmptyClientSecretCreateGoogleResourceOwner(): void
     {
         $this->configManager->expects($this->exactly(2))
             ->method('get')
@@ -105,7 +105,8 @@ class GoogleResourceOwnerFactoryTest extends TestCase
             )
             ->willReturnOnConsecutiveCalls('clientId', null);
 
-        $this->crypter->expects($this->never())->method('decryptData');
+        $this->crypter->expects($this->never())
+            ->method('decryptData');
 
         $factory = new GoogleResourceOwnerFactory();
 

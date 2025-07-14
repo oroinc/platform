@@ -4,12 +4,12 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DefaultColumnOptionsGuesser;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface as Property;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Guess\Guess;
 
-class DefaultColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
+class DefaultColumnOptionsGuesserTest extends TestCase
 {
-    /** @var DefaultColumnOptionsGuesser */
-    private $guesser;
+    private DefaultColumnOptionsGuesser $guesser;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class DefaultColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider guessFormatterProvider
      */
-    public function testGuessFormatter($type, $expected)
+    public function testGuessFormatter($type, $expected): void
     {
         $guess = $this->guesser->guessFormatter('TestClass', 'testProp', $type);
         $this->assertEquals($expected, $guess->getOptions());

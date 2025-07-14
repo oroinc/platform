@@ -9,13 +9,15 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\DoctrineUtils\ORM\FieldUpdatesChecker;
 use Oro\Component\DoctrineUtils\Tests\Unit\Stub\DummyEntity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FieldUpdatesCheckerTest extends \PHPUnit\Framework\TestCase
+class FieldUpdatesCheckerTest extends TestCase
 {
     private const RELATION_FIELD = 'relationEntity';
     private const RELATION_COLLECTION_FIELD = 'relationEntityCollection';
 
-    public function testIsFieldChangedWhenUnitOfWorkHasUpdates()
+    public function testIsFieldChangedWhenUnitOfWorkHasUpdates(): void
     {
         $updatedEntityOne = (new DummyEntity())->setId(1);
 
@@ -33,7 +35,7 @@ class FieldUpdatesCheckerTest extends \PHPUnit\Framework\TestCase
         ));
     }
 
-    public function testIsFieldChangedWhenUnitOfWorkHasUpdatesWithCollection()
+    public function testIsFieldChangedWhenUnitOfWorkHasUpdatesWithCollection(): void
     {
         $changedEntityOne = (new DummyEntity())->setId(1);
         $changedEntityTwo = (new DummyEntity())->setId(2);
@@ -54,7 +56,7 @@ class FieldUpdatesCheckerTest extends \PHPUnit\Framework\TestCase
         ));
     }
 
-    public function testIsFieldChangedWhenUnitOfWorkHasNoUpdates()
+    public function testIsFieldChangedWhenUnitOfWorkHasNoUpdates(): void
     {
         $changedEntityOne = (new DummyEntity())->setId(1);
 
@@ -73,7 +75,7 @@ class FieldUpdatesCheckerTest extends \PHPUnit\Framework\TestCase
         ));
     }
 
-    public function testIsFieldChangedWhenUnitOfWorkHasUpdatesDeletesAndInsertions()
+    public function testIsFieldChangedWhenUnitOfWorkHasUpdatesDeletesAndInsertions(): void
     {
         $updatedEntityOne = (new DummyEntity())->setId(1);
 
@@ -114,18 +116,11 @@ class FieldUpdatesCheckerTest extends \PHPUnit\Framework\TestCase
         ));
     }
 
-    /**
-     * @param array $insertedEntities
-     * @param array $updatedEntities
-     * @param array $deletedEntities
-     *
-     * @return ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
     private function getManagerRegistry(
         array $updatedEntities = [],
         array $insertedEntities = [],
         array $deletedEntities = []
-    ) {
+    ): ManagerRegistry&MockObject {
         $uow = $this->createMock(UnitOfWork::class);
         $uow->expects($this->any())
             ->method('getScheduledEntityUpdates')

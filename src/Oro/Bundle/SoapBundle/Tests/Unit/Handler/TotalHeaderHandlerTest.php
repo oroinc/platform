@@ -20,19 +20,18 @@ use Oro\Bundle\SoapBundle\Handler\Context;
 use Oro\Bundle\SoapBundle\Handler\TotalHeaderHandler;
 use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
+class TotalHeaderHandlerTest extends TestCase
 {
-    /** @var TotalHeaderHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $handler;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
+    private TotalHeaderHandler&MockObject $handler;
+    private EntityManagerInterface&MockObject $em;
 
     #[\Override]
     protected function setUp(): void
@@ -73,7 +72,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSupportsWithTotalCountAndAction()
+    public function testSupportsWithTotalCountAndAction(): void
     {
         $context = $this->createContext(null, RestApiReadInterface::ACTION_LIST);
         $context->set('totalCount', 22);
@@ -81,7 +80,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->handler->supports($context));
     }
 
-    public function testDoesNotSupportWithOtherThenListActions()
+    public function testDoesNotSupportWithOtherThenListActions(): void
     {
         $context = $this->createContext(null, RestApiReadInterface::ACTION_READ);
         $context->set('totalCount', 22);
@@ -89,7 +88,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->handler->supports($context));
     }
 
-    public function testSupportsWithValidQueryAndAction()
+    public function testSupportsWithValidQueryAndAction(): void
     {
         $context = $this->createContext(null, RestApiReadInterface::ACTION_LIST);
         $context->set('query', $this->getMockForAbstractClass(AbstractQuery::class, [], '', false));
@@ -97,7 +96,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->handler->supports($context));
     }
 
-    public function testDoesNotSupportWithOtherThenListActionsButValidQuery()
+    public function testDoesNotSupportWithOtherThenListActionsButValidQuery(): void
     {
         $context = $this->createContext(null, RestApiReadInterface::ACTION_READ);
         $context->set('query', $this->getMockForAbstractClass(AbstractQuery::class, [], '', false));
@@ -105,7 +104,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->handler->supports($context));
     }
 
-    public function testSupportsWithEntityManagerAwareController()
+    public function testSupportsWithEntityManagerAwareController(): void
     {
         $context = $this->createContext(
             $this->createMock(EntityManagerAwareInterface::class),
@@ -115,7 +114,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->handler->supports($context));
     }
 
-    public function testDoesNotSupportWithAnotherThenListActionsEvenControllerIsEntityManagerAwareController()
+    public function testDoesNotSupportWithAnotherThenListActionsEvenControllerIsEntityManagerAwareController(): void
     {
         $context = $this->createContext(
             $this->createMock(EntityManagerAwareInterface::class),
@@ -125,7 +124,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->handler->supports($context));
     }
 
-    public function testHandleWithTotalCountCallback()
+    public function testHandleWithTotalCountCallback(): void
     {
         $testCount = 22;
 
@@ -146,7 +145,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame((string) $testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
     }
 
-    public function testHandleWithQueryBuilder()
+    public function testHandleWithQueryBuilder(): void
     {
         $testCount = 22;
 
@@ -169,7 +168,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame((string) $testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
     }
 
-    public function testHandleWithQuery()
+    public function testHandleWithQuery(): void
     {
         $testCount = 22;
 
@@ -188,7 +187,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame((string) $testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
     }
 
-    public function testHandleWithSqlQueryBuilder()
+    public function testHandleWithSqlQueryBuilder(): void
     {
         $testCount = 22;
 
@@ -239,7 +238,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame((string) $testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
     }
 
-    public function testHandleWithSqlQuery()
+    public function testHandleWithSqlQuery(): void
     {
         $testCount = 22;
 
@@ -283,7 +282,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame((string) $testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
     }
 
-    public function testHandleWithJustManagerAwareController()
+    public function testHandleWithJustManagerAwareController(): void
     {
         $testCount = 22;
 
@@ -333,7 +332,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame((string) $testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
     }
 
-    public function testHandleWithInvalidQueryValueThrowException()
+    public function testHandleWithInvalidQueryValueThrowException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $context = $this->createContext();
@@ -342,7 +341,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->handle($context);
     }
 
-    public function testHandleWithInvalidTotalCountValueThrowException()
+    public function testHandleWithInvalidTotalCountValueThrowException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $context = $this->createContext();
@@ -351,7 +350,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->handle($context);
     }
 
-    public function testHandleWithInvalidTotalCountCallbackThrowException()
+    public function testHandleWithInvalidTotalCountCallbackThrowException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $context = $this->createContext();

@@ -6,10 +6,11 @@ use Oro\Component\Layout\CallbackLayoutUpdate;
 use Oro\Component\Layout\Exception\UnexpectedTypeException;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
+use PHPUnit\Framework\TestCase;
 
-class CallbackLayoutUpdateTest extends \PHPUnit\Framework\TestCase
+class CallbackLayoutUpdateTest extends TestCase
 {
-    public function testInvalidCallbackType()
+    public function testInvalidCallbackType(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "callable", "integer" given.');
@@ -17,7 +18,7 @@ class CallbackLayoutUpdateTest extends \PHPUnit\Framework\TestCase
         new CallbackLayoutUpdate(123);
     }
 
-    public function testCallbackCall()
+    public function testCallbackCall(): void
     {
         $layoutUpdate = new CallbackLayoutUpdate([$this, 'callbackFunction']);
 

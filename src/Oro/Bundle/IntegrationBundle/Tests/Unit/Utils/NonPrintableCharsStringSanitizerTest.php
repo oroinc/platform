@@ -3,11 +3,11 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\IntegrationBundle\Utils\NonPrintableCharsStringSanitizer;
+use PHPUnit\Framework\TestCase;
 
-class NonPrintableCharsStringSanitizerTest extends \PHPUnit\Framework\TestCase
+class NonPrintableCharsStringSanitizerTest extends TestCase
 {
-    /** @var NonPrintableCharsStringSanitizer */
-    private $sanitizer;
+    private NonPrintableCharsStringSanitizer $sanitizer;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class NonPrintableCharsStringSanitizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider removeNonPrintableCharactersDataProvider
      */
-    public function testRemoveNonPrintableCharacters(string $string, string $expectedString)
+    public function testRemoveNonPrintableCharacters(string $string, string $expectedString): void
     {
         $actualString = $this->sanitizer->removeNonPrintableCharacters($string);
 

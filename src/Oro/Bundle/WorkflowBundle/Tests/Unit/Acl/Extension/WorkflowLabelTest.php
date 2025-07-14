@@ -3,11 +3,12 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Extension;
 
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowLabel;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class WorkflowLabelTest extends \PHPUnit\Framework\TestCase
+class WorkflowLabelTest extends TestCase
 {
-    public function testTrans()
+    public function testTrans(): void
     {
         $label = new WorkflowLabel('test');
 
@@ -20,7 +21,7 @@ class WorkflowLabelTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('translated', $label->trans($translator));
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $label = new WorkflowLabel('test');
 
@@ -29,7 +30,7 @@ class WorkflowLabelTest extends \PHPUnit\Framework\TestCase
         $this->assertNotSame($label, $unserialized);
     }
 
-    public function testSetState()
+    public function testSetState(): void
     {
         $label = new WorkflowLabel('test');
 

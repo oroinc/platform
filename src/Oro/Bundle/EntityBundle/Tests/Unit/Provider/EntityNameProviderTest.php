@@ -14,21 +14,18 @@ use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntityWithMagicEnumField
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntityWithMagicHiddenField;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
+class EntityNameProviderTest extends TestCase
 {
-    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadata;
-
-    /** @var ConfigProviderMock */
-    private $extendConfigProvider;
-
-    /** @var EntityNameProvider */
-    private $entityNameProvider;
+    private ClassMetadata&MockObject $metadata;
+    private ConfigProviderMock $extendConfigProvider;
+    private EntityNameProvider $entityNameProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -53,13 +50,13 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameForUnsupportedFormat()
+    public function testGetNameForUnsupportedFormat(): void
     {
         $result = $this->entityNameProvider->getName('test', null, new TestEntity());
         self::assertFalse($result);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $entity = new TestEntity();
         $entity->setName('test');
@@ -81,7 +78,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test', $result);
     }
 
-    public function testGetNameForExtendedEntity()
+    public function testGetNameForExtendedEntity(): void
     {
         $entity = new TestEntity();
         $entity->setName('test');
@@ -127,7 +124,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameForNotManageableEntity()
+    public function testGetNameForNotManageableEntity(): void
     {
         $entity = new \stdClass();
 
@@ -135,7 +132,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($result);
     }
 
-    public function testGetNameNoAppropriateField()
+    public function testGetNameNoAppropriateField(): void
     {
         $entity = new TestEntity();
 
@@ -143,7 +140,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($result);
     }
 
-    public function testGetNameWhenEmptyNameButHasIdentifier()
+    public function testGetNameWhenEmptyNameButHasIdentifier(): void
     {
         $entity = new TestEntity(123);
 
@@ -156,7 +153,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame('123', $result);
     }
 
-    public function testGetNameForEntityWithHiddenField()
+    public function testGetNameForEntityWithHiddenField(): void
     {
         $entity = new TestEntityWithHiddenField(1, 'hidden');
         $entity->setName('test');
@@ -186,7 +183,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test', $result);
     }
 
-    public function testGetNameForEntityWithEnumField()
+    public function testGetNameForEntityWithEnumField(): void
     {
         $entity = new TestEntityWithEnumField(1);
         $entity->setName('enum');
@@ -219,7 +216,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('enum', $result);
     }
 
-    public function testGetNameForEntityWithEnumFieldThanHasAccessViaMagicMethods()
+    public function testGetNameForEntityWithEnumFieldThanHasAccessViaMagicMethods(): void
     {
         $entity = new TestEntityWithMagicEnumField(1);
         $entity->setName('enum');
@@ -249,7 +246,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('enum Option1', $result);
     }
 
-    public function testGetNameForEntityWithHiddenFieldThanHasAccessViaMagicMethods()
+    public function testGetNameForEntityWithHiddenFieldThanHasAccessViaMagicMethods(): void
     {
         $entity = new TestEntityWithMagicHiddenField(1, 'hidden');
         $entity->setName('test');
@@ -279,7 +276,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test hidden', $result);
     }
 
-    public function testGetNameFullEmptyNameButNoIdentifier()
+    public function testGetNameFullEmptyNameButNoIdentifier(): void
     {
         $entity = new TestEntity(123);
         $this->initEntityFieldsMetadata(false);
@@ -288,13 +285,13 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($result);
     }
 
-    public function testGetNameDQLForUnsupportedFormat()
+    public function testGetNameDQLForUnsupportedFormat(): void
     {
         $result = $this->entityNameProvider->getNameDQL('test', null, TestEntity::class, 'alias');
         self::assertFalse($result);
     }
 
-    public function testGetNameDQLShortNoIdentifier()
+    public function testGetNameDQLShortNoIdentifier(): void
     {
         $this->metadata->expects(self::atLeastOnce())
             ->method('getName')
@@ -316,7 +313,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('alias.name', $result);
     }
 
-    public function testGetNameDQLShortForExtendedEntity()
+    public function testGetNameDQLShortForExtendedEntity(): void
     {
         $this->initEntityFieldsMetadata(
             false,
@@ -345,7 +342,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($shortFormatDQL);
     }
 
-    public function testGetNameDQLShortWithIdentifier()
+    public function testGetNameDQLShortWithIdentifier(): void
     {
         $this->initEntityFieldsMetadata(true);
 
@@ -353,25 +350,25 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('COALESCE(CAST(alias.name AS string), CAST(alias.id AS string))', $result);
     }
 
-    public function testGetNameDQLForNotManageableEntity()
+    public function testGetNameDQLForNotManageableEntity(): void
     {
         $result = $this->entityNameProvider->getNameDQL('short', null, 'Test\Class', 'alias');
         self::assertFalse($result);
     }
 
-    public function testGetNameDQLNoAppropriateField()
+    public function testGetNameDQLNoAppropriateField(): void
     {
         $result = $this->entityNameProvider->getNameDQL('short', null, TestEntity::class, 'alias');
         self::assertFalse($result);
     }
 
-    public function testGetNameDQLShortNoAppropriateField()
+    public function testGetNameDQLShortNoAppropriateField(): void
     {
         $result = $this->entityNameProvider->getNameDQL('short', null, TestEntity::class, 'alias');
         self::assertFalse($result);
     }
 
-    public function testGetNameDQLFullNoAppropriateFields()
+    public function testGetNameDQLFullNoAppropriateFields(): void
     {
         $this->metadata->expects(self::once())
             ->method('getFieldNames')
@@ -380,7 +377,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($result);
     }
 
-    public function testGetNameDQLFull()
+    public function testGetNameDQLFull(): void
     {
         $this->initEntityFieldsMetadata(true);
 
@@ -391,7 +388,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameDQLFullNoIdentifier()
+    public function testGetNameDQLFullNoIdentifier(): void
     {
         $this->initEntityFieldsMetadata(false);
 
@@ -399,7 +396,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('CONCAT_WS(\' \', alias.name, alias.description)', $result);
     }
 
-    public function testGetNameDQLFullForExtendedEntity()
+    public function testGetNameDQLFullForExtendedEntity(): void
     {
         $this->initEntityFieldsMetadata(
             false,
@@ -428,7 +425,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('alias.description', $result);
     }
 
-    public function testGetNameDQLForEntityWithHiddenField()
+    public function testGetNameDQLForEntityWithHiddenField(): void
     {
         $this->metadata->expects(self::atLeastOnce())
             ->method('getName')
@@ -461,7 +458,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameDQLForEntityWithEnumField()
+    public function testGetNameDQLForEntityWithEnumField(): void
     {
         $this->metadata->expects(self::atLeastOnce())
             ->method('getName')
@@ -494,7 +491,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameDQLForEntityWithHiddenFieldThanHasAccessViaMagicMethods()
+    public function testGetNameDQLForEntityWithHiddenFieldThanHasAccessViaMagicMethods(): void
     {
         $this->metadata->expects(self::atLeastOnce())
             ->method('getName')
@@ -527,7 +524,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameDQLForEntityWithEnumFieldThanHasAccessViaMagicMethods()
+    public function testGetNameDQLForEntityWithEnumFieldThanHasAccessViaMagicMethods(): void
     {
         $this->metadata->expects(self::atLeastOnce())
             ->method('getName')

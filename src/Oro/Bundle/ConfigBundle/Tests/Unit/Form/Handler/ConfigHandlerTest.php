@@ -5,25 +5,20 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Handler;
 use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Form\Handler\ConfigHandler;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class ConfigHandlerTest extends \PHPUnit\Framework\TestCase
+class ConfigHandlerTest extends TestCase
 {
     private const FORM_DATA = ['field' => 'value'];
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
-
-    /** @var Request */
-    private $request;
-
-    /** @var ConfigHandler */
-    private $handler;
+    private ConfigManager&MockObject $configManager;
+    private FormInterface&MockObject $form;
+    private Request $request;
+    private ConfigHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -36,12 +31,12 @@ class ConfigHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new ConfigHandler($this->configManager);
     }
 
-    public function testGetConfigManager()
+    public function testGetConfigManager(): void
     {
         $this->assertSame($this->configManager, $this->handler->getConfigManager());
     }
 
-    public function testProcessWithoutAdditionalHandler()
+    public function testProcessWithoutAdditionalHandler(): void
     {
         $settings = [];
 
@@ -80,7 +75,7 @@ class ConfigHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->handler->process($this->form, $this->request));
     }
 
-    public function testProcessWithAdditionalHandler()
+    public function testProcessWithAdditionalHandler(): void
     {
         $settings = [];
         $changeSet = new ConfigChangeSet([]);
@@ -133,7 +128,7 @@ class ConfigHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($isAdditionalHandlerCalled, 'isAdditionalHandlerCalled');
     }
 
-    public function testBadRequest()
+    public function testBadRequest(): void
     {
         $settings = [];
 
@@ -159,7 +154,7 @@ class ConfigHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->handler->process($this->form, $this->request));
     }
 
-    public function testFormNotValid()
+    public function testFormNotValid(): void
     {
         $settings = [];
 

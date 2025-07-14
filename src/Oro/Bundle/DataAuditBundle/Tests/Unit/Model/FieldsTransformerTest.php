@@ -4,11 +4,11 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Model;
 
 use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\DataAuditBundle\Model\FieldsTransformer;
+use PHPUnit\Framework\TestCase;
 
-class FieldsTransformerTest extends \PHPUnit\Framework\TestCase
+class FieldsTransformerTest extends TestCase
 {
-    /** @var FieldsTransformer */
-    private $transformer;
+    private FieldsTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class FieldsTransformerTest extends \PHPUnit\Framework\TestCase
         $this->transformer = new FieldsTransformer();
     }
 
-    public function testGetDataShouldRetrieveOldFormadUsingFields()
+    public function testGetDataShouldRetrieveOldFormadUsingFields(): void
     {
         $oldDate = new \DateTime();
         $newDate = new \DateTime();

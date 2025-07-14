@@ -21,7 +21,7 @@ class ImapEmailRepositoryTest extends OrmTestCase
         $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
     }
 
-    public function testGetEmailsByUidsQueryBuilder()
+    public function testGetEmailsByUidsQueryBuilder(): void
     {
         $folder = new EmailFolder();
         $uids = [1, 2];
@@ -43,7 +43,7 @@ class ImapEmailRepositoryTest extends OrmTestCase
         $this->assertEquals($uids, $query->getParameter('uids')->getValue());
     }
 
-    public function testGetEmailsByMessageIdsQueryBuilder()
+    public function testGetEmailsByMessageIdsQueryBuilder(): void
     {
         $origin = new UserEmailOrigin();
         $messageIds = ['msg1', 'msg2'];

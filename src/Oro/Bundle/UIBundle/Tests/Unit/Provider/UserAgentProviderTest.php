@@ -3,17 +3,16 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class UserAgentProviderTest extends \PHPUnit\Framework\TestCase
+class UserAgentProviderTest extends TestCase
 {
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var UserAgentProvider */
-    private $userAgentProvider;
+    private RequestStack&MockObject $requestStack;
+    private UserAgentProvider $userAgentProvider;
 
     #[\Override]
     protected function setUp(): void

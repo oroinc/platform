@@ -9,17 +9,14 @@ use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Provider\Filter\ChoiceTreeUserProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChoiceTreeUserProviderTest extends \PHPUnit\Framework\TestCase
+class ChoiceTreeUserProviderTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclHelper;
-
-    /** @var ChoiceTreeUserProvider */
-    private $choiceTreeUserProvider;
+    private ManagerRegistry&MockObject $doctrine;
+    private AclHelper&MockObject $aclHelper;
+    private ChoiceTreeUserProvider $choiceTreeUserProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,7 @@ class ChoiceTreeUserProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetList()
+    public function testGetList(): void
     {
         $query = $this->createMock(AbstractQuery::class);
         $qb = $this->getMockBuilder(QueryBuilder::class)
@@ -64,7 +61,7 @@ class ChoiceTreeUserProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->getExpectedData(), $result);
     }
 
-    public function testGetEmptyList()
+    public function testGetEmptyList(): void
     {
         $query = $this->createMock(AbstractQuery::class);
         $qb = $this->getMockBuilder(QueryBuilder::class)

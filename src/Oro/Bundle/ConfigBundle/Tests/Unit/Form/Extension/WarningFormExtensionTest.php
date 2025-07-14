@@ -13,12 +13,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WarningFormExtensionTest extends TestCase
 {
-    public function testGetExtendedTypes()
+    public function testGetExtendedTypes(): void
     {
         static::assertContains(FormType::class, WarningFormExtension::getExtendedTypes());
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects(static::once())
@@ -30,7 +30,7 @@ class WarningFormExtensionTest extends TestCase
         (new WarningFormExtension())->configureOptions($resolver);
     }
 
-    public function testBuildViewWithoutWarning()
+    public function testBuildViewWithoutWarning(): void
     {
         $extension = new WarningFormExtension();
 
@@ -41,7 +41,7 @@ class WarningFormExtensionTest extends TestCase
         static::assertArrayNotHasKey('warning', $view->vars);
     }
 
-    public function testBuildViewWithWarning()
+    public function testBuildViewWithWarning(): void
     {
         $extension = new WarningFormExtension();
 

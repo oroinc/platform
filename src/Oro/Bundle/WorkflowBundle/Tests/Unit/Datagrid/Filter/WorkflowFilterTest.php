@@ -8,21 +8,16 @@ use Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowFilter;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 
-class WorkflowFilterTest extends \PHPUnit\Framework\TestCase
+class WorkflowFilterTest extends TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationHelper;
-
-    /** @var WorkflowFilter */
-    private $filter;
+    private FormFactoryInterface&MockObject $formFactory;
+    private ManagerRegistry&MockObject $doctrine;
+    private WorkflowTranslationHelper&MockObject $translationHelper;
+    private WorkflowFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +34,7 @@ class WorkflowFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInit()
+    public function testInit(): void
     {
         $this->filter->init('test', []);
 

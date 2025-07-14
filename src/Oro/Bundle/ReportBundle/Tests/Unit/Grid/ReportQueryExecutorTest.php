@@ -15,22 +15,19 @@ use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Grid\ReportQueryExecutor;
 use Oro\Component\Testing\TempDirExtension;
 use Oro\Component\Testing\Unit\ORM\Mocks\EntityManagerMock;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ReportQueryExecutorTest extends \PHPUnit\Framework\TestCase
+class ReportQueryExecutorTest extends TestCase
 {
     use TempDirExtension;
 
     private const REPORT_CONNECTION_NAME = 'report_connection';
     private const CUSTOM_REPORT_DATAGRID_PREFIX = 'acme_report_';
 
-    /** @var QueryExecutorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $baseQueryExecutor;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var ReportQueryExecutor */
-    private $reportQueryExecutor;
+    private QueryExecutorInterface&MockObject $baseQueryExecutor;
+    private ManagerRegistry&MockObject $doctrine;
+    private ReportQueryExecutor $reportQueryExecutor;
 
     #[\Override]
     protected function setUp(): void
@@ -71,7 +68,7 @@ class ReportQueryExecutorTest extends \PHPUnit\Framework\TestCase
         return $datagrid;
     }
 
-    public function testExecuteForNotReportDatagrid()
+    public function testExecuteForNotReportDatagrid(): void
     {
         $em = $this->getEntityManager();
         $datagrid = $this->getDatagrid('some_grid');
@@ -89,7 +86,7 @@ class ReportQueryExecutorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($rows, $result);
     }
 
-    public function testExecuteWithExecuteFunctionForNotReportDatagrid()
+    public function testExecuteWithExecuteFunctionForNotReportDatagrid(): void
     {
         $em = $this->getEntityManager();
         $datagrid = $this->getDatagrid('some_grid');
@@ -113,7 +110,7 @@ class ReportQueryExecutorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reportGridNameDataProvider
      */
-    public function testExecuteForReportDatagrid(string $gridName)
+    public function testExecuteForReportDatagrid(string $gridName): void
     {
         $em = $this->getEntityManager();
         $datagrid = $this->getDatagrid($gridName);
@@ -151,7 +148,7 @@ class ReportQueryExecutorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testExecuteWithExecuteFunctionForReportDatagrid()
+    public function testExecuteWithExecuteFunctionForReportDatagrid(): void
     {
         $em = $this->getEntityManager();
         $datagrid = $this->getDatagrid(Report::GRID_PREFIX . 'test');
@@ -184,7 +181,7 @@ class ReportQueryExecutorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($connection, $em->getConnection());
     }
 
-    public function testExecuteShouldRestoreOriginalConnectionEvenIfExceptionHappens()
+    public function testExecuteShouldRestoreOriginalConnectionEvenIfExceptionHappens(): void
     {
         $exception = new \Exception('some error');
         $em = $this->getEntityManager();

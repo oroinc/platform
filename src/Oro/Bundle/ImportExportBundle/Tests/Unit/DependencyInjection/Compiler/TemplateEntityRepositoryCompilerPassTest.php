@@ -3,13 +3,13 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\TemplateEntityRepositoryCompilerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class TemplateEntityRepositoryCompilerPassTest extends \PHPUnit\Framework\TestCase
+class TemplateEntityRepositoryCompilerPassTest extends TestCase
 {
-    /** @var TemplateEntityRepositoryCompilerPass */
-    private $compiler;
+    private TemplateEntityRepositoryCompilerPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -17,14 +17,14 @@ class TemplateEntityRepositoryCompilerPassTest extends \PHPUnit\Framework\TestCa
         $this->compiler = new TemplateEntityRepositoryCompilerPass();
     }
 
-    public function testProcessNoTemplateManager()
+    public function testProcessNoTemplateManager(): void
     {
         $container = new ContainerBuilder();
 
         $this->compiler->process($container);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $templateManagerDef = $container->register('oro_importexport.template_fixture.manager');
@@ -42,7 +42,7 @@ class TemplateEntityRepositoryCompilerPassTest extends \PHPUnit\Framework\TestCa
         );
     }
 
-    public function testProcessWhenNoFixtures()
+    public function testProcessWhenNoFixtures(): void
     {
         $container = new ContainerBuilder();
         $templateManagerDef = $container->register('oro_importexport.template_fixture.manager');

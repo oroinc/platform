@@ -8,14 +8,14 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface;
 use Oro\Bundle\EntityConfigBundle\Attribute\Type\ManyToManyAttributeType;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
 {
-    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    protected $metadata;
+    protected ClassMetadata&MockObject $metadata;
 
     #[\Override]
     protected function setUp(): void
@@ -45,14 +45,14 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         ];
     }
 
-    public function testIsSortable()
+    public function testIsSortable(): void
     {
         $this->attribute->fromArray('extend', ['target_entity' => LocalizedFallbackValue::class]);
 
         $this->assertTrue($this->getAttributeType()->isSortable($this->attribute));
     }
 
-    public function testGetSearchableValue()
+    public function testGetSearchableValue(): void
     {
         $value1 = new LocalizedFallbackValue();
         $value1->setString('test')->setLocalization($this->localization);
@@ -67,7 +67,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetSearchableException()
+    public function testGetSearchableException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Value must be an array or Traversable, [string] given');
@@ -75,7 +75,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         $this->getAttributeType()->getSearchableValue($this->attribute, '', $this->localization);
     }
 
-    public function testGetSearchableValueLocalizable()
+    public function testGetSearchableValueLocalizable(): void
     {
         $this->attribute->fromArray('extend', ['target_entity' => LocalizedFallbackValue::class]);
 
@@ -89,7 +89,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetFilterableValue()
+    public function testGetFilterableValue(): void
     {
         $value1 = new LocalizedFallbackValue();
         $value1->setString('test')->setLocalization($this->localization);
@@ -104,7 +104,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetFilterableValueException()
+    public function testGetFilterableValueException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Value must be an array or Traversable, [string] given');
@@ -112,7 +112,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         $this->getAttributeType()->getFilterableValue($this->attribute, '', $this->localization);
     }
 
-    public function testGetFilterableValueLocalizableByExtendedScope()
+    public function testGetFilterableValueLocalizableByExtendedScope(): void
     {
         $this->attribute->fromArray('extend', ['target_entity' => LocalizedFallbackValue::class]);
 
@@ -129,7 +129,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetFilterableValueNoDoctrineMetadata()
+    public function testGetFilterableValueNoDoctrineMetadata(): void
     {
         $this->attribute->fromArray('extend', []);
 
@@ -150,7 +150,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetFilterableValueLocalizableByDoctrineMetadata()
+    public function testGetFilterableValueLocalizableByDoctrineMetadata(): void
     {
         $this->attribute->fromArray('extend', []);
 
@@ -173,7 +173,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetSortableValueByExtendedScope()
+    public function testGetSortableValueByExtendedScope(): void
     {
         $this->attribute->fromArray('extend', ['target_entity' => LocalizedFallbackValue::class]);
 
@@ -190,7 +190,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetSortableValueByDoctrineMetadata()
+    public function testGetSortableValueByDoctrineMetadata(): void
     {
         $this->attribute->fromArray('extend', []);
 
@@ -213,7 +213,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetSortableValueNoDoctrineMetadata()
+    public function testGetSortableValueNoDoctrineMetadata(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not supported');
@@ -234,7 +234,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
             ->getSortableValue($this->attribute, new ArrayCollection([$value]), $this->localization);
     }
 
-    public function testGetSortableValueException()
+    public function testGetSortableValueException(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not supported');
@@ -242,7 +242,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         $this->getAttributeType()->getSortableValue($this->attribute, null, $this->localization);
     }
 
-    public function testGetSortableValueExceptionByExtendedScope()
+    public function testGetSortableValueExceptionByExtendedScope(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not supported');
@@ -255,7 +255,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         $this->getAttributeType()->getSortableValue($this->attribute, null, $this->localization);
     }
 
-    public function testGetSortableValueExceptionByDoctrineMetadata()
+    public function testGetSortableValueExceptionByDoctrineMetadata(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not supported');

@@ -22,45 +22,24 @@ use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
 use Oro\Component\Exception\UnexpectedTypeException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 
-class ActivityListFilterTest extends \PHPUnit\Framework\TestCase
+class ActivityListFilterTest extends TestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $qb;
-
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var FilterExecutionContext|\PHPUnit\Framework\MockObject\MockObject */
-    private $filterExecutionContext;
-
-    /** @var ActivityAssociationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityAssociationHelper;
-
-    /** @var ActivityListChainProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityListChainProvider;
-
-    /** @var ActivityListFilterHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityListFilterHelper;
-
-    /** @var EntityRoutingHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityRouterHelper;
-
-    /** @var QueryDesignerManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryDesignerManager;
-
-    /** @var RelatedActivityDatagridFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $relatedActivityDatagridFactory;
-
-    /** @var ActivityListFilter */
-    private $activityListFilter;
+    private EntityManagerInterface&MockObject $em;
+    private QueryBuilder&MockObject $qb;
+    private FormFactoryInterface&MockObject $formFactory;
+    private ManagerRegistry&MockObject $doctrine;
+    private FilterExecutionContext&MockObject $filterExecutionContext;
+    private ActivityAssociationHelper&MockObject $activityAssociationHelper;
+    private ActivityListChainProvider&MockObject $activityListChainProvider;
+    private ActivityListFilterHelper&MockObject $activityListFilterHelper;
+    private EntityRoutingHelper&MockObject $entityRouterHelper;
+    private QueryDesignerManager&MockObject $queryDesignerManager;
+    private RelatedActivityDatagridFactory&MockObject $relatedActivityDatagridFactory;
+    private ActivityListFilter $activityListFilter;
 
     #[\Override]
     protected function setUp(): void
@@ -99,14 +78,14 @@ class ActivityListFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApplyShouldThrowExceptionIfWrongDatasourceTypeIsGiven()
+    public function testApplyShouldThrowExceptionIfWrongDatasourceTypeIsGiven(): void
     {
         $this->expectException(UnexpectedTypeException::class);
 
         $this->activityListFilter->apply($this->createMock(FilterDatasourceAdapterInterface::class), []);
     }
 
-    public function testApply()
+    public function testApply(): void
     {
         $ds = $this->createMock(OrmFilterDatasourceAdapter::class);
 

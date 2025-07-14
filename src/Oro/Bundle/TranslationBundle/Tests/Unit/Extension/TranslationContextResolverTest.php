@@ -3,15 +3,14 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Extension;
 
 use Oro\Bundle\TranslationBundle\Extension\TranslationContextResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TranslationContextResolverTest extends \PHPUnit\Framework\TestCase
+class TranslationContextResolverTest extends TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var TranslationContextResolver */
-    private $extension;
+    private TranslatorInterface&MockObject $translator;
+    private TranslationContextResolver $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class TranslationContextResolverTest extends \PHPUnit\Framework\TestCase
         $this->extension = new TranslationContextResolver($this->translator);
     }
 
-    public function testResolve()
+    public function testResolve(): void
     {
         $this->translator->expects($this->once())
             ->method('trans')

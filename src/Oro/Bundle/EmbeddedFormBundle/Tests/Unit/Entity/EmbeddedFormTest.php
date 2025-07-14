@@ -4,11 +4,11 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use PHPUnit\Framework\TestCase;
 
-class EmbeddedFormTest extends \PHPUnit\Framework\TestCase
+class EmbeddedFormTest extends TestCase
 {
-    /** @var EmbeddedForm */
-    private $entity;
+    private EmbeddedForm $entity;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class EmbeddedFormTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getSetDataProvider
      */
-    public function testGetSet($property, $value, $expected)
+    public function testGetSet($property, $value, $expected): void
     {
         if ($value !== null) {
             call_user_func([$this->entity, 'set' . ucfirst($property)], $value);
@@ -36,7 +36,7 @@ class EmbeddedFormTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testShouldSetEntityPropertiesAndReturnBack()
+    public function testShouldSetEntityPropertiesAndReturnBack(): void
     {
         $formType = 'Test\Type';
         $css = 'test styles';

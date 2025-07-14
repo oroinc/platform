@@ -4,16 +4,14 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class BusinessUnitTreeTypeTest extends \PHPUnit\Framework\TestCase
+class BusinessUnitTreeTypeTest extends TestCase
 {
-    /** @var BusinessUnitTreeType */
-    private $formType;
-
-    /** @var BusinessUnitManager */
-    private $buManager;
+    private BusinessUnitTreeType $formType;
+    private BusinessUnitManager $buManager;
 
     #[\Override]
     protected function setUp(): void
@@ -23,17 +21,17 @@ class BusinessUnitTreeTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType = new BusinessUnitTreeType($this->buManager);
     }
 
-    public function testParent()
+    public function testParent(): void
     {
         $this->assertEquals(ChoiceType::class, $this->formType->getParent());
     }
 
-    public function testName()
+    public function testName(): void
     {
         $this->assertEquals('oro_business_unit_tree', $this->formType->getName());
     }
 
-    public function testOptions()
+    public function testOptions(): void
     {
         $this->buManager->expects($this->once())
             ->method('getBusinessUnitsTree')

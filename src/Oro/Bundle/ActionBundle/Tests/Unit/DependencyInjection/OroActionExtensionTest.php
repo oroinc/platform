@@ -6,9 +6,10 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\ActionBundle\DependencyInjection\OroActionExtension;
 use Oro\Bundle\ActionBundle\OroActionBundle;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroActionExtensionTest extends \PHPUnit\Framework\TestCase
+class OroActionExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

@@ -10,20 +10,15 @@ use Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
+class ActivityInheritanceTargetsHelperTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var SubQueryLimitHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $limitHelper;
-
-    /** @var ActivityInheritanceTargetsHelper */
-    private $activityInheritanceTargetsHelper;
+    private ConfigManager&MockObject $configManager;
+    private ManagerRegistry&MockObject $doctrine;
+    private SubQueryLimitHelper&MockObject $limitHelper;
+    private ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -39,13 +34,13 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasInheritancesDoNotHasConfig()
+    public function testHasInheritancesDoNotHasConfig(): void
     {
         $result = $this->activityInheritanceTargetsHelper->hasInheritances('');
         $this->assertFalse($result);
     }
 
-    public function testHasInheritancesNullModel()
+    public function testHasInheritancesNullModel(): void
     {
         $this->configManager->expects($this->once())
             ->method('hasConfigEntityModel')
@@ -55,7 +50,7 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function testHasInheritancesEmptyValues()
+    public function testHasInheritancesEmptyValues(): void
     {
         $config = $this->createMock(Config::class);
         $config->expects($this->once())
@@ -75,7 +70,7 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function testHasInheritancesNullValues()
+    public function testHasInheritancesNullValues(): void
     {
         $config = $this->createMock(Config::class);
         $config->expects($this->once())
@@ -95,7 +90,7 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function testHasInheritancesNotConfigured()
+    public function testHasInheritancesNotConfigured(): void
     {
         $config = $this->createMock(Config::class);
         $config->expects($this->once())
@@ -115,7 +110,7 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function testHasInheritancesConfigured()
+    public function testHasInheritancesConfigured(): void
     {
         $config = $this->createMock(Config::class);
         $config->expects($this->once())
@@ -135,7 +130,7 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function testApplyInheritanceActivity()
+    public function testApplyInheritanceActivity(): void
     {
         $mainQb = $this->prepareMock();
 

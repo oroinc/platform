@@ -3,11 +3,11 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Action;
+use PHPUnit\Framework\TestCase;
 
-class ActionTest extends \PHPUnit\Framework\TestCase
+class ActionTest extends TestCase
 {
-    /** @var Action */
-    private $action;
+    private Action $action;
 
     #[\Override]
     protected function setUp(): void
@@ -15,22 +15,22 @@ class ActionTest extends \PHPUnit\Framework\TestCase
         $this->action = new Action('test_action', ['arg1']);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals('test_action', $this->action->getName());
     }
 
-    public function testGetArguments()
+    public function testGetArguments(): void
     {
         $this->assertEquals(['arg1'], $this->action->getArguments());
     }
 
-    public function testGetArgument()
+    public function testGetArgument(): void
     {
         $this->assertEquals('arg1', $this->action->getArgument(0));
     }
 
-    public function testSetArgument()
+    public function testSetArgument(): void
     {
         $this->action->setArgument(0, 'updated');
         $this->assertEquals('updated', $this->action->getArgument(0));

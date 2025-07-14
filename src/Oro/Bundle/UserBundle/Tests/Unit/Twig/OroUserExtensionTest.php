@@ -6,16 +6,15 @@ use Oro\Bundle\UserBundle\Model\Gender;
 use Oro\Bundle\UserBundle\Provider\GenderProvider;
 use Oro\Bundle\UserBundle\Twig\OroUserExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class OroUserExtensionTest extends \PHPUnit\Framework\TestCase
+class OroUserExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var GenderProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $genderProvider;
-
-    /** @var OroUserExtension */
-    private $extension;
+    private GenderProvider&MockObject $genderProvider;
+    private OroUserExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +28,7 @@ class OroUserExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new OroUserExtension($container);
     }
 
-    public function testGetGenderLabel()
+    public function testGetGenderLabel(): void
     {
         $label = 'Male';
         $this->genderProvider->expects($this->once())

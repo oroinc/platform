@@ -3,15 +3,15 @@
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AddressBundle\Form\Type\EmailType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\EmailType as SymfonyEmailType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\FormBuilder;
 
-class EmailTypeTest extends \PHPUnit\Framework\TestCase
+class EmailTypeTest extends TestCase
 {
-    /** @var EmailType */
-    private $type;
+    private EmailType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
         $this->type = new EmailType();
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->exactly(3))

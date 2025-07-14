@@ -6,14 +6,13 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Repository\CountryRepository;
 use Oro\Bundle\AddressBundle\Provider\CountryProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CountryProviderTest extends \PHPUnit\Framework\TestCase
+class CountryProviderTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var CountryProvider */
-    private $provider;
+    private ManagerRegistry&MockObject $doctrine;
+    private CountryProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class CountryProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new CountryProvider($this->doctrine);
     }
 
-    public function testGetCountryChoices()
+    public function testGetCountryChoices(): void
     {
         $countryRepository = $this->createMock(CountryRepository::class);
         $this->doctrine->expects(self::once())

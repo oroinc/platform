@@ -3,16 +3,17 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\SecurityBundle\DependencyInjection\Configuration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit\Framework\TestCase
+class ConfigurationTest extends TestCase
 {
     private function processConfiguration(array $config): array
     {
         return (new Processor())->processConfiguration(new Configuration(), $config);
     }
 
-    public function testProcessEmptyConfiguration()
+    public function testProcessEmptyConfiguration(): void
     {
         $expected = [
             'csrf_cookie' => [
@@ -32,7 +33,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $processedConfig);
     }
 
-    public function testProcessPermissionsPolicy()
+    public function testProcessPermissionsPolicy(): void
     {
         $expected = [
             'csrf_cookie' => [

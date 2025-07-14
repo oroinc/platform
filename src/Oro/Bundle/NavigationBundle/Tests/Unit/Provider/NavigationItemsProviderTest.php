@@ -10,24 +10,17 @@ use Oro\Bundle\NavigationBundle\Provider\NavigationItemsProvider;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\NavigationItemStub;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 
-class NavigationItemsProviderTest extends \PHPUnit\Framework\TestCase
+class NavigationItemsProviderTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ItemFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $itemFactory;
-
-    /** @var UrlMatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $urlMatcher;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var NavigationItemsProvider */
-    private $provider;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ItemFactory&MockObject $itemFactory;
+    private UrlMatcherInterface&MockObject $urlMatcher;
+    private FeatureChecker&MockObject $featureChecker;
+    private NavigationItemsProvider $provider;
 
     #[\Override]
     protected function setUp(): void

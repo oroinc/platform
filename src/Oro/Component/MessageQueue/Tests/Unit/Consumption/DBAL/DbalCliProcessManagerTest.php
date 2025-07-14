@@ -3,8 +3,9 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\DBAL;
 
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalCliProcessManager;
+use PHPUnit\Framework\TestCase;
 
-class DbalCliProcessManagerTest extends \PHPUnit\Framework\TestCase
+class DbalCliProcessManagerTest extends TestCase
 {
     public function testShouldReturnListOfProcessesPids(): void
     {

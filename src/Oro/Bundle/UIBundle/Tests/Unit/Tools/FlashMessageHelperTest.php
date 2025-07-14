@@ -4,27 +4,20 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\UIBundle\Tools\FlashMessageHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FlashMessageHelperTest extends \PHPUnit\Framework\TestCase
+class FlashMessageHelperTest extends TestCase
 {
-    /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
-    private $session;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $htmlTagHelper;
-
-    /** @var FlashMessageHelper */
-    private $helper;
+    private Session&MockObject $session;
+    private RequestStack&MockObject $requestStack;
+    private TranslatorInterface&MockObject $translator;
+    private HtmlTagHelper&MockObject $htmlTagHelper;
+    private FlashMessageHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +32,7 @@ class FlashMessageHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper = new FlashMessageHelper($this->requestStack, $this->translator, $this->htmlTagHelper);
     }
 
-    public function testAddFlashMessage()
+    public function testAddFlashMessage(): void
     {
         $type = 'info';
         $message = 'some.test.message.key';

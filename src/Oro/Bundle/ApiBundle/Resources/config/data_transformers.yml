@@ -26,6 +26,11 @@ services:
         tags:
             - { name: oro.api.data_transformer, dataType: time, requestType: rest }
 
+    oro_api.data_transformer.enum:
+        class: Oro\Bundle\ApiBundle\DataTransformer\EnumToStringTransformer
+        tags:
+            - { name: oro.api.data_transformer, dataType: enum }
+
     oro_api.data_transformer.entity_type:
         class: Oro\Bundle\ApiBundle\DataTransformer\EntityClassToEntityTypeTransformer
         arguments:

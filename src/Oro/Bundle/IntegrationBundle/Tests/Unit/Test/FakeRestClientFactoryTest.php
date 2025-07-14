@@ -5,19 +5,17 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Test;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestResponseInterface;
 use Oro\Bundle\IntegrationBundle\Test\FakeRestClient;
 use Oro\Bundle\IntegrationBundle\Test\FakeRestClientFactory;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class FakeRestClientFactoryTest is unit test for fake factory
  */
-class FakeRestClientFactoryTest extends \PHPUnit\Framework\TestCase
+class FakeRestClientFactoryTest extends TestCase
 {
     private const FAKE_BASE_URL = 'http://localhost';
 
-    /** @var string */
-    private $fixtureFileName;
-
-    /** @var FakeRestClientFactory */
-    private $factory;
+    private string $fixtureFileName;
+    private FakeRestClientFactory $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +24,7 @@ class FakeRestClientFactoryTest extends \PHPUnit\Framework\TestCase
         $this->fixtureFileName = __DIR__ . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'foo.yml';
     }
 
-    public function testCreateFakeClient()
+    public function testCreateFakeClient(): void
     {
         $this->assertInstanceOf(
             FakeRestClient::class,
@@ -34,13 +32,13 @@ class FakeRestClientFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadFixtureFromFile()
+    public function testLoadFixtureFromFile(): void
     {
         $fixtures = FakeRestClientFactory::getFixturesFromFile($this->fixtureFileName);
         $this->assertEquals('bar', $fixtures['/foo']['body']);
     }
 
-    public function testCreateClientWithFixtures()
+    public function testCreateClientWithFixtures(): void
     {
         $this->factory->setFixtureFile($this->fixtureFileName);
         $client = $this->factory->createRestClient(self::FAKE_BASE_URL, []);
@@ -49,7 +47,7 @@ class FakeRestClientFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['baz'], $client->getJSON('/bar'));
     }
 
-    public function testCreateClientWithDefaultResponse()
+    public function testCreateClientWithDefaultResponse(): void
     {
         $this->factory->setFixtureFile($this->fixtureFileName);
         $client = $this->factory->createRestClient(self::FAKE_BASE_URL, []);

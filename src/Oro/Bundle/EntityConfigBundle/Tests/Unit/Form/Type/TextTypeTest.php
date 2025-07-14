@@ -8,8 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType as BaseTextType;
 
 class TextTypeTest extends AbstractConfigTypeTestCase
 {
-    /** @var TextType */
-    private $type;
+    private TextType $type;
 
     #[\Override]
     protected function setUp(): void

@@ -7,17 +7,14 @@ use Oro\Bundle\NavigationBundle\Entity\Builder\HistoryItemBuilder;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class HistoryItemBuilderTest extends \PHPUnit\Framework\TestCase
+class HistoryItemBuilderTest extends TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var ItemFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $factory;
-
-    /** @var HistoryItemBuilder */
-    private $builder;
+    private EntityManager&MockObject $em;
+    private ItemFactory&MockObject $factory;
+    private HistoryItemBuilder $builder;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +25,7 @@ class HistoryItemBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder = new HistoryItemBuilder($this->em, $this->factory);
     }
 
-    public function testBuildItem()
+    public function testBuildItem(): void
     {
         $itemBuilder = $this->builder;
         $itemBuilder->setClassName(NavigationHistoryItem::class);
@@ -49,7 +46,7 @@ class HistoryItemBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(User::class, $item->getUser());
     }
 
-    public function testFindItem()
+    public function testFindItem(): void
     {
         $itemBuilder = $this->builder;
         $itemBuilder->setClassName(NavigationHistoryItem::class);

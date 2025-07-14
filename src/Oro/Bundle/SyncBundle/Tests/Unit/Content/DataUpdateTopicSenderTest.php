@@ -5,27 +5,22 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Content;
 use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class DataUpdateTopicSenderTest extends \PHPUnit\Framework\TestCase
+class DataUpdateTopicSenderTest extends TestCase
 {
     private const TEST_USERNAME = 'usernameTeST';
     private const TEST_TAG1 = 'TestTag1';
     private const TEST_TAG2 = 'TestTag2';
 
-    /** @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $websocketClient;
-
-    /** @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $connectionChecker;
-
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var DataUpdateTopicSender */
-    private $dataUpdateTopicSender;
+    private WebsocketClientInterface&MockObject $websocketClient;
+    private ConnectionChecker&MockObject $connectionChecker;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private DataUpdateTopicSender $dataUpdateTopicSender;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +36,7 @@ class DataUpdateTopicSenderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSendWithLoggedInUser()
+    public function testSendWithLoggedInUser(): void
     {
         $token = $this->createMock(TokenInterface::class);
         $user = $this->createMock(UserInterface::class);
@@ -72,7 +67,7 @@ class DataUpdateTopicSenderTest extends \PHPUnit\Framework\TestCase
         $this->dataUpdateTopicSender->send($tags);
     }
 
-    public function testSendWithoutToken()
+    public function testSendWithoutToken(): void
     {
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
@@ -94,7 +89,7 @@ class DataUpdateTopicSenderTest extends \PHPUnit\Framework\TestCase
         $this->dataUpdateTopicSender->send($tags);
     }
 
-    public function testSendWhenTypeOfLoggedInUserIsNotSupported()
+    public function testSendWhenTypeOfLoggedInUserIsNotSupported(): void
     {
         $token = $this->createMock(TokenInterface::class);
 
@@ -121,7 +116,7 @@ class DataUpdateTopicSenderTest extends \PHPUnit\Framework\TestCase
         $this->dataUpdateTopicSender->send($tags);
     }
 
-    public function testSendWithoutTags()
+    public function testSendWithoutTags(): void
     {
         $this->tokenStorage->expects(self::never())
             ->method('getToken');
@@ -135,7 +130,7 @@ class DataUpdateTopicSenderTest extends \PHPUnit\Framework\TestCase
         $this->dataUpdateTopicSender->send([]);
     }
 
-    public function testSendNoConnection()
+    public function testSendNoConnection(): void
     {
         $this->tokenStorage->expects(self::never())
             ->method('getToken');

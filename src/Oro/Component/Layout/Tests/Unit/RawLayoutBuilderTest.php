@@ -24,7 +24,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->rawLayoutBuilder = new RawLayoutBuilder();
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $this->rawLayoutBuilder
             ->add('root', null, 'root');
@@ -33,7 +33,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->assertTrue($this->rawLayoutBuilder->isEmpty());
     }
 
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $this->assertTrue($this->rawLayoutBuilder->isEmpty());
 
@@ -43,7 +43,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->assertFalse($this->rawLayoutBuilder->isEmpty());
     }
 
-    public function testResolveId()
+    public function testResolveId(): void
     {
         $this->rawLayoutBuilder
             ->add('root', null, 'root')
@@ -55,7 +55,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->assertEquals('root', $this->rawLayoutBuilder->resolveId('root_alias2'));
     }
 
-    public function testGetParentId()
+    public function testGetParentId(): void
     {
         $this->rawLayoutBuilder
             ->add('root', null, 'root')
@@ -68,7 +68,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
     /**
      * @dataProvider isParentForDataProvider
      */
-    public function testIsParentFor($expected, $parentId, $id)
+    public function testIsParentFor($expected, $parentId, $id): void
     {
         $this->rawLayoutBuilder
             ->add('root', null, 'root')
@@ -93,7 +93,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         ];
     }
 
-    public function testHasAlias()
+    public function testHasAlias(): void
     {
         $this->rawLayoutBuilder
             ->add('root', null, 'root')
@@ -105,7 +105,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->assertTrue($this->rawLayoutBuilder->hasAlias('root_alias2'));
     }
 
-    public function testGetAliases()
+    public function testGetAliases(): void
     {
         $this->rawLayoutBuilder
             ->add('root', null, 'root')
@@ -120,21 +120,21 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->assertEquals([], $this->rawLayoutBuilder->getAliases('unknown'));
     }
 
-    public function testGetType()
+    public function testGetType(): void
     {
         $this->rawLayoutBuilder->add('root', null, 'root');
 
         $this->assertEquals('root', $this->rawLayoutBuilder->getType('root'));
     }
 
-    public function testGetTypeWithBlockTypeAsAlreadyCreatedBlockTypeObject()
+    public function testGetTypeWithBlockTypeAsAlreadyCreatedBlockTypeObject(): void
     {
         $this->rawLayoutBuilder->add('root', null, new RootType());
 
         $this->assertEquals('root', $this->rawLayoutBuilder->getType('root'));
     }
 
-    public function testGetTypeWithException()
+    public function testGetTypeWithException(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -144,7 +144,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->rawLayoutBuilder->getType('unknown');
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $this->rawLayoutBuilder
             ->add('root', null, 'root')
@@ -156,7 +156,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->assertTrue($this->rawLayoutBuilder->has('logo'));
     }
 
-    public function testAddWithBlockTypeAsAlreadyCreatedBlockTypeObject()
+    public function testAddWithBlockTypeAsAlreadyCreatedBlockTypeObject(): void
     {
         $type = $this->createMock(BlockTypeInterface::class);
         $this->rawLayoutBuilder->add('root', null, $type);
@@ -169,7 +169,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
     /**
      * @dataProvider emptyStringDataProvider
      */
-    public function testAddWithEmptyBlockType($blockType)
+    public function testAddWithEmptyBlockType($blockType): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -180,7 +180,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->rawLayoutBuilder->add('root', null, $blockType);
     }
 
-    public function testAddWithInvalidBlockType()
+    public function testAddWithInvalidBlockType(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -194,7 +194,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
     /**
      * @dataProvider invalidBlockTypeNameDataProvider
      */
-    public function testAddWithInvalidBlockTypeName($blockType)
+    public function testAddWithInvalidBlockTypeName($blockType): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -210,7 +210,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->rawLayoutBuilder->add('root', null, $blockType);
     }
 
-    public function testAddToUnknownParent()
+    public function testAddToUnknownParent(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -222,7 +222,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->add('test', 'root', 'root');
     }
 
-    public function testRemoveUnknownItem()
+    public function testRemoveUnknownItem(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -233,7 +233,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->remove('root');
     }
 
-    public function testMoveUnknownItem()
+    public function testMoveUnknownItem(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -244,7 +244,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->move('root', 'destination');
     }
 
-    public function testAddAliasForUnknownItem()
+    public function testAddAliasForUnknownItem(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -255,7 +255,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->addAlias('test', 'root');
     }
 
-    public function testRemoveUnknownAlias()
+    public function testRemoveUnknownAlias(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot remove "test" alias. Reason: The "test" item alias does not exist.');
@@ -267,7 +267,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
     /**
      * @dataProvider emptyStringDataProvider
      */
-    public function testSetOptionWithEmptyName($name)
+    public function testSetOptionWithEmptyName($name): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -278,7 +278,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->setOption('root', $name, 123);
     }
 
-    public function testSetOptionForAlreadyResolvedItem()
+    public function testSetOptionForAlreadyResolvedItem(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -293,7 +293,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->setOption('root', 'test', 123);
     }
 
-    public function testSetOptionForUnknownItem()
+    public function testSetOptionForUnknownItem(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -307,7 +307,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
     /**
      * @dataProvider emptyStringDataProvider
      */
-    public function testAppendOptionWithEmptyName($name)
+    public function testAppendOptionWithEmptyName($name): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -318,7 +318,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->appendOption('root', $name, 123);
     }
 
-    public function testAppendOptionForAlreadyResolvedItem()
+    public function testAppendOptionForAlreadyResolvedItem(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -333,7 +333,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->appendOption('root', 'test', 123);
     }
 
-    public function testAppendOptionForUnknownItem()
+    public function testAppendOptionForUnknownItem(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -347,7 +347,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
     /**
      * @dataProvider emptyStringDataProvider
      */
-    public function testSubtractOptionWithEmptyName($name)
+    public function testSubtractOptionWithEmptyName($name): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -358,7 +358,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->subtractOption('root', $name, 123);
     }
 
-    public function testSubtractOptionForAlreadyResolvedItem()
+    public function testSubtractOptionForAlreadyResolvedItem(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -373,7 +373,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->subtractOption('root', 'test', 123);
     }
 
-    public function testSubtractOptionForUnknownItem()
+    public function testSubtractOptionForUnknownItem(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -387,7 +387,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
     /**
      * @dataProvider emptyStringDataProvider
      */
-    public function testReplaceOptionWithEmptyName($name)
+    public function testReplaceOptionWithEmptyName($name): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -398,7 +398,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->replaceOption('root', $name, 123, 456);
     }
 
-    public function testReplaceOptionForAlreadyResolvedItem()
+    public function testReplaceOptionForAlreadyResolvedItem(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -413,7 +413,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->replaceOption('root', 'test', 123, 456);
     }
 
-    public function testReplaceOptionForUnknownItem()
+    public function testReplaceOptionForUnknownItem(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -427,7 +427,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
     /**
      * @dataProvider emptyStringDataProvider
      */
-    public function testRemoveOptionWithEmptyName($name)
+    public function testRemoveOptionWithEmptyName($name): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -438,7 +438,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->removeOption('root', $name);
     }
 
-    public function testRemoveOptionForAlreadyResolvedItem()
+    public function testRemoveOptionForAlreadyResolvedItem(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -453,7 +453,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->removeOption('root', 'test');
     }
 
-    public function testRemoveOptionForUnknownItem()
+    public function testRemoveOptionForUnknownItem(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -464,7 +464,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->removeOption('root', 'test');
     }
 
-    public function testChangeBlockType()
+    public function testChangeBlockType(): void
     {
         $this->rawLayoutBuilder->add('root', null, 'root');
 
@@ -475,7 +475,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         );
     }
 
-    public function testChangeBlockTypeAndOptions()
+    public function testChangeBlockTypeAndOptions(): void
     {
         $this->rawLayoutBuilder->add('root', null, 'root', ['foo' => 'bar']);
 
@@ -498,7 +498,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         );
     }
 
-    public function testChangeBlockTypeWithAlreadyCreatedBlockTypeObject()
+    public function testChangeBlockTypeWithAlreadyCreatedBlockTypeObject(): void
     {
         $type = $this->createMock(BlockTypeInterface::class);
         $this->rawLayoutBuilder->add('root', null, $type);
@@ -508,7 +508,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         );
     }
 
-    public function testChangeBlockTypeForAlreadyResolvedItem()
+    public function testChangeBlockTypeForAlreadyResolvedItem(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -527,7 +527,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
     /**
      * @dataProvider emptyStringDataProvider
      */
-    public function testChangeBlockTypeWithEmptyBlockType($blockType)
+    public function testChangeBlockTypeWithEmptyBlockType($blockType): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -538,7 +538,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->rawLayoutBuilder->changeBlockType('root', $blockType);
     }
 
-    public function testChangeBlockTypeWithInvalidBlockType()
+    public function testChangeBlockTypeWithInvalidBlockType(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -553,7 +553,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
     /**
      * @dataProvider invalidBlockTypeNameDataProvider
      */
-    public function testChangeBlockTypeWithInvalidBlockTypeName($blockType)
+    public function testChangeBlockTypeWithInvalidBlockTypeName($blockType): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -570,7 +570,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->rawLayoutBuilder->changeBlockType('root', $blockType);
     }
 
-    public function testChangeBlockTypeWithInvalidOptionCallback()
+    public function testChangeBlockTypeWithInvalidOptionCallback(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -582,7 +582,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->rawLayoutBuilder->changeBlockType('root', 'my_root', 123);
     }
 
-    public function testSetBlockThemeForUnknownItem()
+    public function testSetBlockThemeForUnknownItem(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot set theme(s) for "root" item. Reason: The "root" item does not exist.');
@@ -591,7 +591,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->setBlockTheme('@My/Layout/my_theme.html.twig', 'root');
     }
 
-    public function testSetRootBlockThemeForUnknownItem()
+    public function testSetRootBlockThemeForUnknownItem(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot set theme(s) for "" item. Reason: The root item does not exist.');
@@ -600,7 +600,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->setBlockTheme('@My/Layout/my_theme.html.twig');
     }
 
-    public function testGetOptions()
+    public function testGetOptions(): void
     {
         $this->rawLayoutBuilder
             ->add('root', null, 'root')
@@ -616,7 +616,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         );
     }
 
-    public function testGetOptionsForUnknownItem()
+    public function testGetOptionsForUnknownItem(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot get options for "root" item. Reason: The "root" item does not exist.');

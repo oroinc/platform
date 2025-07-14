@@ -3,20 +3,19 @@
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractChoiceType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AbstractChoiceTypeTest extends \PHPUnit\Framework\TestCase
+class AbstractChoiceTypeTest extends TestCase
 {
     private const TRANSLATION_PREFIX = 'trans_';
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var AbstractChoiceType */
-    private $instance;
+    private TranslatorInterface&MockObject $translator;
+    private AbstractChoiceType $instance;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +37,7 @@ class AbstractChoiceTypeTest extends \PHPUnit\Framework\TestCase
         ?string $parentTranslationDomain = null,
         array $expectedChoices = [],
         array $inputChoices = []
-    ) {
+    ): void {
         // expectations for translator
         if ($expectedChoices) {
             $prefix = self::TRANSLATION_PREFIX;

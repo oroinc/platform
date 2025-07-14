@@ -9,11 +9,11 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Factory\MetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Metadata\Factory\Fixture as Entity;
 use Oro\Component\PhpUtils\Attribute\Reader\AttributeReader;
+use PHPUnit\Framework\TestCase;
 
-class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
+class MetadataFactoryTest extends TestCase
 {
-    /** @var MetadataFactory */
-    private $metadataFactory;
+    private MetadataFactory $metadataFactory;
 
     #[\Override]
     protected function setUp(): void

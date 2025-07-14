@@ -8,24 +8,17 @@ use Oro\Bundle\MessageQueueBundle\Tests\Unit\Mocks\ChainExtensionAwareClearer;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class ContainerResetExtensionTest extends \PHPUnit\Framework\TestCase
+class ContainerResetExtensionTest extends TestCase
 {
-    /** @var ClearerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $clearer1;
-
-    /** @var ClearerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $clearer2;
-
-    /** @var ChainExtensionAwareClearer|\PHPUnit\Framework\MockObject\MockObject */
-    private $chainExtensionAwareClearer;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var ContainerResetExtension */
-    private $extension;
+    private ClearerInterface&MockObject $clearer1;
+    private ClearerInterface&MockObject $clearer2;
+    private ChainExtensionAwareClearer&MockObject $chainExtensionAwareClearer;
+    private LoggerInterface&MockObject $logger;
+    private ContainerResetExtension $extension;
 
     #[\Override]
     protected function setUp(): void

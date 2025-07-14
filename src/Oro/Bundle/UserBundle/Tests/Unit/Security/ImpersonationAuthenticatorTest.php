@@ -12,6 +12,8 @@ use Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,25 +24,14 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
-class ImpersonationAuthenticatorTest extends \PHPUnit\Framework\TestCase
+class ImpersonationAuthenticatorTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var UsernamePasswordOrganizationTokenFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenFactory;
-
-    /** @var OrganizationGuesserInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $organizationGuesser;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var ImpersonationAuthenticator */
-    private $authenticator;
+    private ManagerRegistry&MockObject $doctrine;
+    private UsernamePasswordOrganizationTokenFactoryInterface&MockObject $tokenFactory;
+    private OrganizationGuesserInterface&MockObject $organizationGuesser;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private UrlGeneratorInterface&MockObject $router;
+    private ImpersonationAuthenticator $authenticator;
 
     #[\Override]
     protected function setUp(): void

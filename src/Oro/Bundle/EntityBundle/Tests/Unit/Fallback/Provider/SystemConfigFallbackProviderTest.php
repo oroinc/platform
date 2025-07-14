@@ -13,10 +13,8 @@ use PHPUnit\Framework\TestCase;
 
 class SystemConfigFallbackProviderTest extends TestCase
 {
-    private ConfigManager|MockObject $configManager;
-
-    private ConfigProvider|MockObject $configProvider;
-
+    private ConfigManager&MockObject $configManager;
+    private ConfigProvider&MockObject $configProvider;
     private SystemConfigFallbackProvider $systemConfigFallbackProvider;
 
     #[\Override]

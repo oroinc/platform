@@ -3,8 +3,9 @@
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\BatchBundle\Tools\ChunksHelper;
+use PHPUnit\Framework\TestCase;
 
-class ChunksHelperTest extends \PHPUnit\Framework\TestCase
+class ChunksHelperTest extends TestCase
 {
     /**
      * @dataProvider chunksDataProvider

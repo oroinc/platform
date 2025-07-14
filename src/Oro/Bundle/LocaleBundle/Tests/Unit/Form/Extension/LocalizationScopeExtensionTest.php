@@ -10,16 +10,14 @@ use Oro\Bundle\ScopeBundle\Form\Type\ScopeType;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Validator\Validation;
 
 class LocalizationScopeExtensionTest extends FormIntegrationTestCase
 {
-    /** @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $scopeManager;
-
-    /** @var LocalizationScopeExtension */
-    private $localizationScopeExtension;
+    private ScopeManager&MockObject $scopeManager;
+    private LocalizationScopeExtension $localizationScopeExtension;
 
     #[\Override]
     protected function setUp(): void

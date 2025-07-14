@@ -8,15 +8,16 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\MigrationState;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration;
+use PHPUnit\Framework\TestCase;
 
-class UpdateBundleVersionMigrationTest extends \PHPUnit\Framework\TestCase
+class UpdateBundleVersionMigrationTest extends TestCase
 {
     /**
      * @dataProvider upProvider
      */
-    public function testUp(array $migrations, array $expectedUpdates)
+    public function testUp(array $migrations, array $expectedUpdates): void
     {
-        $queryBag        = new QueryBag();
+        $queryBag = new QueryBag();
         $updateMigration = new UpdateBundleVersionMigration($migrations);
         $updateMigration->up(new Schema(), $queryBag);
 

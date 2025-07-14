@@ -7,11 +7,11 @@ use Oro\Component\Layout\Loader\Generator\Extension\ImportsAwareLayoutUpdateVisi
 use Oro\Component\Layout\Loader\Generator\Extension\ImportsLayoutUpdateExtension;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
+use PHPUnit\Framework\TestCase;
 
-class ImportsLayoutUpdateExtensionTest extends \PHPUnit\Framework\TestCase
+class ImportsLayoutUpdateExtensionTest extends TestCase
 {
-    /** @var ImportsLayoutUpdateExtension */
-    private $extension;
+    private ImportsLayoutUpdateExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new ImportsLayoutUpdateExtension();
     }
 
-    public function testPrepareWithNodeImports()
+    public function testPrepareWithNodeImports(): void
     {
         $source = [
             ImportsLayoutUpdateExtension::NODE_IMPORTS => [
@@ -58,7 +58,7 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider prepareWithoutNodeImportsDataProvider
      */
-    public function testPrepareWithoutNodeImports(array $source)
+    public function testPrepareWithoutNodeImports(array $source): void
     {
         $collection = $this->createMock(VisitorCollection::class);
         $collection->expects($this->never())
@@ -80,7 +80,7 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testPrepareWithImportedLayoutUpdate()
+    public function testPrepareWithImportedLayoutUpdate(): void
     {
         $filename = str_replace(
             '/',
@@ -96,7 +96,7 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->prepare(new GeneratorData([], $filename), $collection);
     }
 
-    public function testPrepareWithNotImportedLayoutUpdate()
+    public function testPrepareWithNotImportedLayoutUpdate(): void
     {
         $filename = str_replace(
             '/',
@@ -111,7 +111,7 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->prepare(new GeneratorData([], $filename), $collection);
     }
 
-    public function testPrepareImportedLayoutUpdateWithImports()
+    public function testPrepareImportedLayoutUpdateWithImports(): void
     {
         $filename = str_replace(
             '/',

@@ -3,13 +3,13 @@
 namespace Oro\Component\Layout\Tests\Unit\Block\OptionsResolver;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\Exception\AccessException;
 use Symfony\Component\OptionsResolver\Options;
 
-class OptionsResolverTest extends \PHPUnit\Framework\TestCase
+class OptionsResolverTest extends TestCase
 {
-    /** @var OptionsResolver */
-    private $optionResolver;
+    private OptionsResolver $optionResolver;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +17,7 @@ class OptionsResolverTest extends \PHPUnit\Framework\TestCase
         $this->optionResolver = new OptionsResolver();
     }
 
-    public function testAccessorsAndResolve()
+    public function testAccessorsAndResolve(): void
     {
         $this->optionResolver->setDefault('default_option', 'default_value');
         $this->optionResolver->setDefaults(
@@ -74,7 +74,7 @@ class OptionsResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testArrayAccessAndCountable()
+    public function testArrayAccessAndCountable(): void
     {
         $this->optionResolver->setDefault('default_option', 'default_value');
 
@@ -93,7 +93,7 @@ class OptionsResolverTest extends \PHPUnit\Framework\TestCase
         $this->optionResolver->resolve([]);
     }
 
-    public function testOffsetSet()
+    public function testOffsetSet(): void
     {
         $this->expectException(AccessException::class);
         $this->expectExceptionMessage('Setting options via array access is not supported. Use setDefault() instead.');
@@ -109,7 +109,7 @@ class OptionsResolverTest extends \PHPUnit\Framework\TestCase
         $this->optionResolver->resolve([]);
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $this->optionResolver->setRequired('test');
         $this->optionResolver->clear();

@@ -10,13 +10,12 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\CustomFormOptionsProcessor;
 use Oro\Component\Action\Action\ActionInterface;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CustomFormOptionsProcessorTest extends \PHPUnit\Framework\TestCase
+class CustomFormOptionsProcessorTest extends TestCase
 {
-    private FormInitListener|MockObject $formInitListener;
-
-    /** @var CustomFormOptionsProcessor */
-    private $processor;
+    private FormInitListener&MockObject $formInitListener;
+    private CustomFormOptionsProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class CustomFormOptionsProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new CustomFormOptionsProcessor($this->formInitListener);
     }
 
-    public function testSkipDefaultTransitionForms()
+    public function testSkipDefaultTransitionForms(): void
     {
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())
@@ -43,7 +42,7 @@ class CustomFormOptionsProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testWithFormInit()
+    public function testWithFormInit(): void
     {
         $formData = (object)['id' => 42];
 
@@ -94,7 +93,7 @@ class CustomFormOptionsProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($formData, $context->getFormData());
     }
 
-    public function testWithoutFormInit()
+    public function testWithoutFormInit(): void
     {
         $formData = (object)['id' => 42];
 

@@ -6,18 +6,17 @@ use Oro\Bundle\CronBundle\Command\CronCommandFeatureCheckerInterface;
 use Oro\Bundle\CronBundle\EventListener\CronCommandListener;
 use Oro\Bundle\CronBundle\Tests\Unit\Stub\ActivableCronCommandStub;
 use Oro\Bundle\CronBundle\Tests\Unit\Stub\CronCommandStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-class CronCommandListenerTest extends \PHPUnit\Framework\TestCase
+class CronCommandListenerTest extends TestCase
 {
-    /** @var CronCommandFeatureCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $commandFeatureChecker;
-
-    /** @var CronCommandListener */
-    private $listener;
+    private CronCommandFeatureCheckerInterface&MockObject $commandFeatureChecker;
+    private CronCommandListener $listener;
 
     #[\Override]
     protected function setUp(): void

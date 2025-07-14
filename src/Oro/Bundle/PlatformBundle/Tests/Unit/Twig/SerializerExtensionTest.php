@@ -5,16 +5,15 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\Twig;
 use JMS\Serializer\SerializerInterface;
 use Oro\Bundle\PlatformBundle\Twig\SerializerExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SerializerExtensionTest extends \PHPUnit\Framework\TestCase
+class SerializerExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var SerializerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializer;
-
-    /** @var SerializerExtension */
-    private $extension;
+    private SerializerInterface&MockObject $serializer;
+    private SerializerExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +31,7 @@ class SerializerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new SerializerExtension($container);
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $obj = new \stdClass();
         $serializedData = 'serialized';

@@ -14,6 +14,7 @@ class RoutePrioritizingListenerTest extends TestCase
 {
     private RoutePrioritizingListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listener = new RoutePrioritizingListener();

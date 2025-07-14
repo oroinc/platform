@@ -10,11 +10,12 @@ use Doctrine\ORM\Query\QueryException;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\DQLExpressionVerifier;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\ExpressionVerifierInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DQLExpressionVerifierTest extends \PHPUnit\Framework\TestCase
+class DQLExpressionVerifierTest extends TestCase
 {
-    /** @var ExpressionVerifierInterface */
-    private $verifier;
+    private ExpressionVerifierInterface $verifier;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +23,7 @@ class DQLExpressionVerifierTest extends \PHPUnit\Framework\TestCase
         $this->verifier = new DQLExpressionVerifier();
     }
 
-    public function testValidSelectDQL()
+    public function testValidSelectDQL(): void
     {
         $query = $this->createQuery(SelectStatement::class);
         $query->expects($this->once())
@@ -42,7 +43,7 @@ class DQLExpressionVerifierTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validNonSelectDQLProvider
      */
-    public function testValidNonSelectDQL(string $class)
+    public function testValidNonSelectDQL(string $class): void
     {
         $query = $this->createQuery($class);
         $query->expects($this->never())
@@ -63,7 +64,7 @@ class DQLExpressionVerifierTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testVerifyQueryException()
+    public function testVerifyQueryException(): void
     {
         $exception = new QueryException('WRONG DQL');
 
@@ -86,7 +87,7 @@ class DQLExpressionVerifierTest extends \PHPUnit\Framework\TestCase
         $this->verifier->verify($query);
     }
 
-    public function testVerifyWithInvalidData()
+    public function testVerifyWithInvalidData(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$expression must be instance of Doctrine\ORM\AbstractQuery. "string" given');
@@ -94,10 +95,7 @@ class DQLExpressionVerifierTest extends \PHPUnit\Framework\TestCase
         $this->verifier->verify('string');
     }
 
-    /**
-     * @return AbstractQuery|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createQuery(string $statementClass)
+    private function createQuery(string $statementClass): AbstractQuery&MockObject
     {
         $statement = $this->createMock($statementClass);
 

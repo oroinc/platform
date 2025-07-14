@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class PermissionsPolicyHeaderRequestListenerTest extends TestCase
 {
-    private PermissionsPolicyHeaderProvider|MockObject $headerProvider;
+    private PermissionsPolicyHeaderProvider&MockObject $headerProvider;
     private PermissionsPolicyHeaderRequestListener $listener;
 
     #[\Override]
@@ -26,7 +26,7 @@ class PermissionsPolicyHeaderRequestListenerTest extends TestCase
         );
     }
 
-    public function testNotMasterRequest()
+    public function testNotMasterRequest(): void
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = $this->createMock(Request::class);
@@ -39,7 +39,7 @@ class PermissionsPolicyHeaderRequestListenerTest extends TestCase
         $this->listener->onKernelResponse($event);
     }
 
-    public function testDisabledHeader()
+    public function testDisabledHeader(): void
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = $this->createMock(Request::class);
@@ -57,7 +57,7 @@ class PermissionsPolicyHeaderRequestListenerTest extends TestCase
         $this->assertFalse($response->headers->has('Permissions-Policy'));
     }
 
-    public function testEnabledHeader()
+    public function testEnabledHeader(): void
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = $this->createMock(Request::class);

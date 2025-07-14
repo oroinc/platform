@@ -6,19 +6,19 @@ use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Bundle\UIBundle\Tools\HTMLPurifier\Error;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
+class HtmlTagHelperTest extends TestCase
 {
     use TempDirExtension;
 
-    private HtmlTagProvider|\PHPUnit\Framework\MockObject\MockObject $htmlTagProvider;
-
-    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
-
+    private HtmlTagProvider&MockObject $htmlTagProvider;
+    private TranslatorInterface&MockObject $translator;
     private HtmlTagHelper $helper;
 
     #[\Override]
@@ -80,8 +80,12 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider iframeDataProvider
      */
-    public function testSanitizeIframe(string $value, array $allowedElements, string $allowedTags, string $expected)
-    {
+    public function testSanitizeIframe(
+        string $value,
+        array $allowedElements,
+        string $allowedTags,
+        string $expected
+    ): void {
         $this->htmlTagProvider->expects($this->once())
             ->method('getIframeRegexp')
             ->willReturn('<^https?://(www.)?(youtube.com/embed/|player.vimeo.com/video/)>');
@@ -299,7 +303,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetStripped()
+    public function testGetStripped(): void
     {
         $actualString = '<div class="new">test1 test2</div><div class="new">test3   test4</div>';
         $expectedString = 'test1 test2 test3 test4';
@@ -318,7 +322,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider shortStringProvider
      */
-    public function testGetShort(string $expected, string $actual, int $maxLength)
+    public function testGetShort(string $expected, string $actual, int $maxLength): void
     {
         $shortBody = $this->helper->shorten($actual, $maxLength);
         $this->assertEquals($expected, $shortBody);
@@ -334,7 +338,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testHtmlPurify()
+    public function testHtmlPurify(): void
     {
         $this->htmlTagProvider->expects($this->once())
             ->method('getUriSchemes')
@@ -369,7 +373,7 @@ STR;
         $this->assertEquals($expected, $this->helper->purify($testString));
     }
 
-    public function testEscape()
+    public function testEscape(): void
     {
         $testString = <<<HTML
 <span>same line</span><span>same line2</span>
@@ -389,7 +393,7 @@ HTML;
     /**
      * @dataProvider longStringProvider
      */
-    public function testStripLongWords(string $value, string $expected)
+    public function testStripLongWords(string $value, string $expected): void
     {
         $result = $this->helper->stripLongWords($value);
 

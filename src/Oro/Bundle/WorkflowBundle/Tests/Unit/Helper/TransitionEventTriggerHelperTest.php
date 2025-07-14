@@ -7,17 +7,14 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TransitionEventTriggerHelperTest extends \PHPUnit\Framework\TestCase
+class TransitionEventTriggerHelperTest extends TestCase
 {
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var TransitionEventTrigger */
-    private $trigger;
-
-    /** @var TransitionEventTriggerHelper */
-    private $helper;
+    private WorkflowManager&MockObject $workflowManager;
+    private TransitionEventTrigger $trigger;
+    private TransitionEventTriggerHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +33,7 @@ class TransitionEventTriggerHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider checkRequireDataProvider
      */
-    public function testIsRequirePass(string $require, bool $expected)
+    public function testIsRequirePass(string $require, bool $expected): void
     {
         $entity1 = new \stdClass();
         $entity1->testField1 = 'test value 1';
@@ -91,7 +88,7 @@ class TransitionEventTriggerHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testIsRequirePassWrongEntity()
+    public function testIsRequirePassWrongEntity(): void
     {
         $entity = new \stdClass();
         $entity->testField2 = 'test value';
@@ -102,7 +99,7 @@ class TransitionEventTriggerHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->helper->isRequirePass($this->trigger, $entity, new \stdClass()));
     }
 
-    public function testGetMainEntityWrongEntity()
+    public function testGetMainEntityWrongEntity(): void
     {
         $entity = new \stdClass();
         $entity->testField2 = 'test value 2';
@@ -118,7 +115,7 @@ class TransitionEventTriggerHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildContextValuesProvider
      */
-    public function testBuildContextValues(array $expected, array $arguments)
+    public function testBuildContextValues(array $expected, array $arguments): void
     {
         $this->assertSame(
             $expected,

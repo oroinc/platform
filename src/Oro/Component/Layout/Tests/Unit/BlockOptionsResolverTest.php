@@ -6,14 +6,13 @@ use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\BlockOptionsResolver;
 use Oro\Component\Layout\LayoutRegistryInterface;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\LogoType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class BlockOptionsResolverTest extends \PHPUnit\Framework\TestCase
+class BlockOptionsResolverTest extends TestCase
 {
-    /** @var LayoutRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var BlockOptionsResolver */
-    private $blockOptionsResolver;
+    private LayoutRegistryInterface&MockObject $registry;
+    private BlockOptionsResolver $blockOptionsResolver;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class BlockOptionsResolverTest extends \PHPUnit\Framework\TestCase
         $this->blockOptionsResolver = new BlockOptionsResolver($this->registry);
     }
 
-    public function testResolveOptionsByBlockName()
+    public function testResolveOptionsByBlockName(): void
     {
         $this->registry->expects($this->exactly(2))
             ->method('getType')
@@ -38,7 +37,7 @@ class BlockOptionsResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test_title', $result['title']);
     }
 
-    public function testResolveOptionsByAlreadyCreatedBlockTypeObject()
+    public function testResolveOptionsByAlreadyCreatedBlockTypeObject(): void
     {
         $this->registry->expects($this->once())
             ->method('getType')
@@ -53,7 +52,7 @@ class BlockOptionsResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test_title', $result['title']);
     }
 
-    public function testResolveOptionsForBaseTypeByBlockName()
+    public function testResolveOptionsForBaseTypeByBlockName(): void
     {
         $this->registry->expects($this->once())
             ->method('getType')
@@ -67,7 +66,7 @@ class BlockOptionsResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test', $result['translation_domain']);
     }
 
-    public function testResolveOptionsForBaseTypeByAlreadyCreatedBlockTypeObject()
+    public function testResolveOptionsForBaseTypeByAlreadyCreatedBlockTypeObject(): void
     {
         $this->registry->expects($this->never())
             ->method('getType');

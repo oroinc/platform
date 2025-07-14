@@ -3,13 +3,14 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation;
 
 use Oro\Bundle\WorkflowBundle\Translation\WorkflowConfigurationTranslationFieldsIterator;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit\Framework\TestCase
+class WorkflowConfigurationTranslationFieldsIteratorTest extends TestCase
 {
     /**
      * @dataProvider iterateReadCases
      */
-    public function testIterateRead(string $workflowName, array $config, array $readResultExpected)
+    public function testIterateRead(string $workflowName, array $config, array $readResultExpected): void
     {
         $iterator = new WorkflowConfigurationTranslationFieldsIterator($workflowName, $config);
 
@@ -110,7 +111,7 @@ class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit\Framew
     /**
      * @dataProvider iterateWriteCases
      */
-    public function testIterateWrite(string $workflowName, array $config, array $expected)
+    public function testIterateWrite(string $workflowName, array $config, array $expected): void
     {
         $iterator = new WorkflowConfigurationTranslationFieldsIterator($workflowName, $config);
 

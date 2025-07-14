@@ -5,15 +5,15 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Provider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
+class PropertyConfigContainerTest extends TestCase
 {
-    /** @var PropertyConfigContainer */
-    private $configContainer;
+    private PropertyConfigContainer $configContainer;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +21,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         $this->configContainer = new PropertyConfigContainer([]);
     }
 
-    public function testConfigGetterAndSetter()
+    public function testConfigGetterAndSetter(): void
     {
         $config = ['test' => 'testVal'];
 
@@ -29,7 +29,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($config, $this->configContainer->getConfig());
     }
 
-    public function testGetItemsWithDefaultParams()
+    public function testGetItemsWithDefaultParams(): void
     {
         $this->configContainer->setConfig(['entity' => ['items' => ['test' => 'testVal']]]);
         $result = $this->configContainer->getItems();
@@ -44,7 +44,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         string|EntityConfigId|FieldConfigId $type,
         array $config,
         array $expectedValues
-    ) {
+    ): void {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getItems($type);
 
@@ -58,7 +58,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         string|EntityConfigId|FieldConfigId $type,
         array $config,
         array $expectedValues
-    ) {
+    ): void {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getRequiredPropertyValues($type);
 
@@ -74,7 +74,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         string|EntityConfigId|FieldConfigId $type,
         array $config,
         array $expectedValues
-    ) {
+    ): void {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getNotAuditableValues($type);
 
@@ -90,7 +90,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         string|EntityConfigId|FieldConfigId $type,
         array $config,
         array $expectedValues
-    ) {
+    ): void {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getTranslatableValues($type);
 
@@ -106,7 +106,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         string|EntityConfigId|FieldConfigId $type,
         array $config,
         array $expectedValues
-    ) {
+    ): void {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getIndexedValues($type);
 
@@ -123,7 +123,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ?string $fieldType,
         array $config,
         array $expectedValues
-    ) {
+    ): void {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getFormItems($type, $fieldType);
 
@@ -135,7 +135,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * Cache should independently maintain data for different fieldTypes and all items.
      */
-    public function testGetFormItemsCache()
+    public function testGetFormItemsCache(): void
     {
         $this->configContainer->setConfig(['field' => $this->getItemsForFormItemsTest()]);
         $result = $this->configContainer->getFormItems(PropertyConfigContainer::TYPE_FIELD, 'string');
@@ -187,7 +187,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ?string $fieldType,
         array $config,
         bool $expectedValue
-    ) {
+    ): void {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->hasForm($type, $fieldType);
 
@@ -203,7 +203,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         string|EntityConfigId|FieldConfigId $type,
         array $config,
         array $expectedValues
-    ) {
+    ): void {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getFormConfig($type);
 
@@ -217,7 +217,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         string|EntityConfigId|FieldConfigId $type,
         array $config,
         ?array $expectedValues
-    ) {
+    ): void {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getFormBlockConfig($type);
 
@@ -231,7 +231,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         string|EntityConfigId|FieldConfigId $type,
         array $config,
         array $expectedValues
-    ) {
+    ): void {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getGridActions($type);
 
@@ -245,7 +245,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         string|EntityConfigId|FieldConfigId $type,
         array $config,
         array $expectedValues
-    ) {
+    ): void {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getLayoutActions($type);
 
@@ -259,7 +259,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         string|EntityConfigId|FieldConfigId $type,
         array $config,
         array $expectedValues
-    ) {
+    ): void {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getJsModules($type);
 
@@ -269,7 +269,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isSchemaUpdateRequiredProvider
      */
-    public function testIsSchemaUpdateRequired(string $code, string $type, bool $expected)
+    public function testIsSchemaUpdateRequired(string $code, string $type, bool $expected): void
     {
         $config = [
             'entity' => [

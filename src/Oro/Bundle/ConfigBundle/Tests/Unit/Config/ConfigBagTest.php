@@ -6,16 +6,17 @@ use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\DataTransformerInterface;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
 use Oro\Bundle\ConfigBundle\Exception\UnexpectedTypeException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ConfigBagTest extends \PHPUnit\Framework\TestCase
+class ConfigBagTest extends TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
+    private ContainerInterface&MockObject $container;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +29,7 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         return new ConfigBag($config, $this->container);
     }
 
-    public function testGetConfig()
+    public function testGetConfig(): void
     {
         $config = ['key' => 'value'];
 
@@ -37,7 +38,7 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($config, $configBag->getConfig());
     }
 
-    public function testGetDataTransformerWhenContainerReturnsNull()
+    public function testGetDataTransformerWhenContainerReturnsNull(): void
     {
         $this->container->expects($this->once())
             ->method('get')
@@ -56,7 +57,7 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(null, $configBag->getDataTransformer('test_key'));
     }
 
-    public function testGetDataTransformerWhenServiceNotFound()
+    public function testGetDataTransformerWhenServiceNotFound(): void
     {
         $this->expectException(ServiceNotFoundException::class);
 
@@ -77,7 +78,7 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(null, $configBag->getDataTransformer('test_key'));
     }
 
-    public function testGetDataTransformer()
+    public function testGetDataTransformer(): void
     {
         $transformer = $this->createMock(DataTransformerInterface::class);
         $this->container->expects($this->once())
@@ -97,7 +98,7 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($transformer, $configBag->getDataTransformer('test_key'));
     }
 
-    public function testGetDataTransformerWithUnexpectedType()
+    public function testGetDataTransformerWithUnexpectedType(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(sprintf('Expected argument of type "%s"', DataTransformerInterface::class));
@@ -119,7 +120,7 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         $configBag->getDataTransformer('test_key');
     }
 
-    public function testGetFieldsRootWhenFieldsRootDoesNotExist()
+    public function testGetFieldsRootWhenFieldsRootDoesNotExist(): void
     {
         $config = [];
         $configBag = $this->createConfigBag($config);
@@ -127,7 +128,7 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($configBag->getFieldsRoot('test'));
     }
 
-    public function testGetFieldsRootWhenFieldsRootExists()
+    public function testGetFieldsRootWhenFieldsRootExists(): void
     {
         $config = [
             ProcessorDecorator::FIELDS_ROOT => [
@@ -139,7 +140,7 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('value', $configBag->getFieldsRoot('test'));
     }
 
-    public function testGetTreeRootWhenTreeRootDoesNotExist()
+    public function testGetTreeRootWhenTreeRootDoesNotExist(): void
     {
         $config = [];
         $configBag = $this->createConfigBag($config);
@@ -147,7 +148,7 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($configBag->getTreeRoot('test'));
     }
 
-    public function testGetTreeRootWhenTreeRootExists()
+    public function testGetTreeRootWhenTreeRootExists(): void
     {
         $config = [
             ProcessorDecorator::TREE_ROOT => [
@@ -159,7 +160,7 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('value', $configBag->getTreeRoot('test'));
     }
 
-    public function testGetGroupsNodeWhenGroupsNodeDoesNotExist()
+    public function testGetGroupsNodeWhenGroupsNodeDoesNotExist(): void
     {
         $config = [];
         $configBag = $this->createConfigBag($config);
@@ -167,7 +168,7 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($configBag->getGroupsNode('test'));
     }
 
-    public function testGetGroupsNodeWhenGroupsNodeExists()
+    public function testGetGroupsNodeWhenGroupsNodeExists(): void
     {
         $config = [
             ProcessorDecorator::GROUPS_NODE => [

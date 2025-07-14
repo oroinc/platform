@@ -6,16 +6,17 @@ use Oro\Component\MessageQueue\Client\MessageBodyResolver;
 use Oro\Component\MessageQueue\Consumption\Exception\InvalidMessageBodyException;
 use Oro\Component\MessageQueue\Topic\TopicInterface;
 use Oro\Component\MessageQueue\Topic\TopicRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class MessageBodyResolverTest extends \PHPUnit\Framework\TestCase
+class MessageBodyResolverTest extends TestCase
 {
     private const TOPIC_NAME = 'sample.topic';
 
+    private TopicInterface&MockObject $topic;
     private MessageBodyResolver $resolver;
-
-    private TopicInterface|\PHPUnit\Framework\MockObject\MockObject $topic;
 
     #[\Override]
     protected function setUp(): void
@@ -23,8 +24,7 @@ class MessageBodyResolverTest extends \PHPUnit\Framework\TestCase
         $topicRegistry = $this->createMock(TopicRegistry::class);
 
         $this->topic = $this->createMock(TopicInterface::class);
-        $topicRegistry
-            ->expects(self::once())
+        $topicRegistry->expects(self::once())
             ->method('get')
             ->with(self::TOPIC_NAME)
             ->willReturn($this->topic);
@@ -84,8 +84,7 @@ class MessageBodyResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testResolveBodyWhenScalarAndHasDefinedOptions(): void
     {
-        $this->topic
-            ->expects(self::once())
+        $this->topic->expects(self::once())
             ->method('configureMessageBody')
             ->willReturnCallback(static function (OptionsResolver $optionsResolver) {
                 $optionsResolver
@@ -98,8 +97,7 @@ class MessageBodyResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testResolveBodyWhenScalarButNormalizesToArray(): void
     {
-        $this->topic
-            ->expects(self::once())
+        $this->topic->expects(self::once())
             ->method('configureMessageBody')
             ->willReturnCallback(static function (OptionsResolver $optionsResolver) {
                 $optionsResolver
@@ -112,8 +110,7 @@ class MessageBodyResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testResolveBodyWhenScalarButNormalizesToNull(): void
     {
-        $this->topic
-            ->expects(self::once())
+        $this->topic->expects(self::once())
             ->method('configureMessageBody')
             ->willReturnCallback(static function (OptionsResolver $optionsResolver) {
                 $optionsResolver
@@ -126,8 +123,7 @@ class MessageBodyResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testResolveBodyWhenScalarAndHasDefinedOptionsAndInvalid(): void
     {
-        $this->topic
-            ->expects(self::once())
+        $this->topic->expects(self::once())
             ->method('configureMessageBody')
             ->willReturnCallback(static function (OptionsResolver $optionsResolver) {
                 $optionsResolver
@@ -142,8 +138,7 @@ class MessageBodyResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testResolveBodyWhenNotScalarAndHasDefinedOptions(): void
     {
-        $this->topic
-            ->expects(self::once())
+        $this->topic->expects(self::once())
             ->method('configureMessageBody')
             ->willReturnCallback(static function (OptionsResolver $optionsResolver) {
                 $optionsResolver->setDefault('sample_key', 'sample_value');
@@ -154,8 +149,7 @@ class MessageBodyResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testResolveBodyWhenNotScalarAndHasDefinedOptionsAndInvalid(): void
     {
-        $this->topic
-            ->expects(self::once())
+        $this->topic->expects(self::once())
             ->method('configureMessageBody')
             ->willReturnCallback(static function (OptionsResolver $optionsResolver) {
                 $optionsResolver->setDefined('sample_key');

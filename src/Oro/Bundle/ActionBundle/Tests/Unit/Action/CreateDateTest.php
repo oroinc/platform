@@ -7,15 +7,15 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class CreateDateTest extends \PHPUnit\Framework\TestCase
+class CreateDateTest extends TestCase
 {
     private const TIMEZONE = 'Europe/London';
 
-    /** @var CreateDate */
-    private $action;
+    private CreateDate $action;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +29,7 @@ class CreateDateTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
-    public function testInitializeExceptionInvalidTime()
+    public function testInitializeExceptionInvalidTime(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Option "date" must be a string, boolean given.');
@@ -40,7 +40,7 @@ class CreateDateTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeDataProvider
      */
-    public function testExecute(array $options, ?\DateTime $expectedResult = null)
+    public function testExecute(array $options, ?\DateTime $expectedResult = null): void
     {
         $context = new ItemStub([]);
         $attributeName = (string)$options['attribute'];

@@ -6,8 +6,9 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Oro\Bundle\EntityBundle\DBAL\Types\ConfigObjectType;
 use Oro\Component\Config\Common\ConfigObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigObjectTest extends \PHPUnit\Framework\TestCase
+class ConfigObjectTest extends TestCase
 {
     private ConfigObjectType $type;
 
@@ -20,7 +21,7 @@ class ConfigObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider testConvertToPHPValueDataProvider
      */
-    public function testConvertToPHPValue(?bool $inputData, ?bool $expectedResult, bool $exception = false)
+    public function testConvertToPHPValue(?bool $inputData, ?bool $expectedResult, bool $exception = false): void
     {
         if ($exception) {
             $this->expectException(ConversionException::class);
@@ -35,7 +36,7 @@ class ConfigObjectTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetConfigObjectFromConvertToPHPValueMethod()
+    public function testGetConfigObjectFromConvertToPHPValueMethod(): void
     {
         $testArray = ['name' => 'test'];
         $result = $this->type->convertToPHPValue(
@@ -49,7 +50,7 @@ class ConfigObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider testConvertToDatabaseValueDataProvider
      */
-    public function testConvertToDatabaseValue(mixed $inputData, ?string $expectedResult)
+    public function testConvertToDatabaseValue(mixed $inputData, ?string $expectedResult): void
     {
         $this->assertSame(
             $expectedResult,

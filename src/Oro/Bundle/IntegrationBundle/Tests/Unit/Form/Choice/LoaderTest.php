@@ -13,7 +13,7 @@ class LoaderTest extends OrmTestCase
     /**
      * @dataProvider allowedTypesProvider
      */
-    public function testQueryConfiguration(?array $allowedTypes, string $expectedDQL)
+    public function testQueryConfiguration(?array $allowedTypes, string $expectedDQL): void
     {
         $aclHelper = $this->createMock(AclHelper::class);
 

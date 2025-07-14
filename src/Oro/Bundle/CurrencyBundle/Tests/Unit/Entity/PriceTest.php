@@ -4,8 +4,9 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
+use PHPUnit\Framework\TestCase;
 
-class PriceTest extends \PHPUnit\Framework\TestCase
+class PriceTest extends TestCase
 {
     private const VALUE = 100;
     private const CURRENCY = 'USD';
@@ -13,7 +14,7 @@ class PriceTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider propertiesDataProvider
      */
-    public function testSettersAndGetters(string $property, mixed $value)
+    public function testSettersAndGetters(string $property, mixed $value): void
     {
         $obj = new Price();
 
@@ -30,7 +31,7 @@ class PriceTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $price = Price::create(self::VALUE, self::CURRENCY);
         $this->assertInstanceOf(Price::class, $price);

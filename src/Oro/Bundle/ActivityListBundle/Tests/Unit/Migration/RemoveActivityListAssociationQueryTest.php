@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Migration;
 
 use Oro\Bundle\ActivityListBundle\Migration\RemoveActivityListAssociationQuery;
+use PHPUnit\Framework\TestCase;
 
-class RemoveActivityListAssociationQueryTest extends \PHPUnit\Framework\TestCase
+class RemoveActivityListAssociationQueryTest extends TestCase
 {
-    public function testInitialized()
+    public function testInitialized(): void
     {
         $query = new RemoveActivityListAssociationQuery('Some\Entity', true);
         self::assertEquals(

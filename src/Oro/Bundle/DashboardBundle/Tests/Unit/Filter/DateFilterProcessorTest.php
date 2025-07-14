@@ -10,20 +10,15 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
+class DateFilterProcessorTest extends TestCase
 {
-    /** @var DateRangeFilter|\PHPUnit\Framework\MockObject\MockObject */
-    private $dateFilter;
-
-    /** @var DateFilterModifier|\PHPUnit\Framework\MockObject\MockObject */
-    private $modifier;
-
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
-
-    /** @var DateFilterProcessor */
-    private $processor;
+    private DateRangeFilter&MockObject $dateFilter;
+    private DateFilterModifier&MockObject $modifier;
+    private LocaleSettings&MockObject $localeSettings;
+    private DateFilterProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +30,7 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new DateFilterProcessor($this->dateFilter, $this->modifier, $this->localeSettings);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
 
@@ -65,7 +60,7 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($qb, ['start' => 'start_value', 'end' => 'end_value', 'a' => 'b'], 'test_field');
     }
 
-    public function testGetModifiedDateData()
+    public function testGetModifiedDateData(): void
     {
         $this->modifier->expects($this->once())
             ->method('modify')
@@ -88,7 +83,7 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDateFromString()
+    public function testPrepareDateFromString(): void
     {
         $this->localeSettings->expects($this->once())
             ->method('getTimeZone')
@@ -100,7 +95,7 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDateFromDateTime()
+    public function testPrepareDateFromDateTime(): void
     {
         $date = new \DateTime('now');
 
@@ -110,7 +105,7 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($date, $this->processor->prepareDate($date));
     }
 
-    public function testApplyDateRangeFilterToQueryMoreThan()
+    public function testApplyDateRangeFilterToQueryMoreThan(): void
     {
         $this->localeSettings->expects($this->once())
             ->method('getTimeZone')
@@ -155,7 +150,7 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApplyDateRangeFilterToQueryLessThan()
+    public function testApplyDateRangeFilterToQueryLessThan(): void
     {
         $this->localeSettings->expects($this->once())
             ->method('getTimeZone')
@@ -200,7 +195,7 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApplyDateRangeFilterToQueryAllTime()
+    public function testApplyDateRangeFilterToQueryAllTime(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->never())
@@ -231,7 +226,7 @@ class DateFilterProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->applyDateRangeFilterToQuery($qb, ['start' => 'start_value', 'end' => 'end_value'], 'alias');
     }
 
-    public function testApplyDateRangeFilterToQuery()
+    public function testApplyDateRangeFilterToQuery(): void
     {
         $this->localeSettings->expects($this->atLeastOnce())
             ->method('getTimeZone')

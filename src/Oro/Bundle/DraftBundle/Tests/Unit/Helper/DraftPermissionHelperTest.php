@@ -7,14 +7,13 @@ use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DraftPermissionHelperTest extends \PHPUnit\Framework\TestCase
+class DraftPermissionHelperTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessor */
-    private $tokenAccessor;
-
-    /** @var DraftPermissionHelper */
-    private $helper;
+    private TokenAccessor&MockObject $tokenAccessor;
+    private DraftPermissionHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -26,8 +25,7 @@ class DraftPermissionHelperTest extends \PHPUnit\Framework\TestCase
     public function testGeneratePermissions(): void
     {
         $user = new User();
-        $this->tokenAccessor
-            ->expects($this->any())
+        $this->tokenAccessor->expects($this->any())
             ->method('getUser')
             ->willReturn($user);
 

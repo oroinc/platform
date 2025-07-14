@@ -3,7 +3,6 @@
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme;
 
 use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
-use Oro\Component\Layout\Extension\Theme\PathProvider\ChainPathProvider;
 use Oro\Component\Layout\Extension\Theme\ResourceProvider\ResourceProviderInterface;
 use Oro\Component\Layout\Extension\Theme\ThemeExtension;
 use Oro\Component\Layout\LayoutContext;
@@ -14,19 +13,16 @@ use Oro\Component\Layout\Loader\Driver\DriverInterface;
 use Oro\Component\Layout\Loader\LayoutUpdateLoader;
 use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\StubContextAwarePathProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ThemeExtensionTest extends \PHPUnit\Framework\TestCase
+class ThemeExtensionTest extends TestCase
 {
-    private ChainPathProvider|\PHPUnit\Framework\MockObject\MockObject $pathProvider;
-
-    private DriverInterface|\PHPUnit\Framework\MockObject\MockObject $phpDriver;
-
-    private DriverInterface|\PHPUnit\Framework\MockObject\MockObject $yamlDriver;
-
-    private DependencyInitializer|\PHPUnit\Framework\MockObject\MockObject $dependencyInitializer;
-
-    private ResourceProviderInterface|\PHPUnit\Framework\MockObject\MockObject $resourceProvider;
-
+    private StubContextAwarePathProvider&MockObject $pathProvider;
+    private DriverInterface&MockObject $phpDriver;
+    private DriverInterface&MockObject $yamlDriver;
+    private DependencyInitializer&MockObject $dependencyInitializer;
+    private ResourceProviderInterface&MockObject $resourceProvider;
     private ThemeExtension $extension;
 
     #[\Override]

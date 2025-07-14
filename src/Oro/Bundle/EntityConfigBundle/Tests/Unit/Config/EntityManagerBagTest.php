@@ -5,14 +5,13 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityManagerBagTest extends \PHPUnit\Framework\TestCase
+class EntityManagerBagTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var EntityManagerBag */
-    private $entityManagerBag;
+    private ManagerRegistry&MockObject $doctrine;
+    private EntityManagerBag $entityManagerBag;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class EntityManagerBagTest extends \PHPUnit\Framework\TestCase
         $this->entityManagerBag = new EntityManagerBag($this->doctrine);
     }
 
-    public function testGetEntityManagersWithoutAdditionalEntityManagers()
+    public function testGetEntityManagersWithoutAdditionalEntityManagers(): void
     {
         $defaultEm = $this->createMock(EntityManager::class);
 
@@ -36,7 +35,7 @@ class EntityManagerBagTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($defaultEm, $result[0]);
     }
 
-    public function testGetEntityManagers()
+    public function testGetEntityManagers(): void
     {
         $defaultEm = $this->createMock(EntityManager::class);
         $anotherEm = $this->createMock(EntityManager::class);

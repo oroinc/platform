@@ -4,6 +4,8 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\UserBundle\EventListener\PasswordChangeExceptionListener;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
@@ -13,14 +15,11 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PasswordChangeExceptionListenerTest extends \PHPUnit\Framework\TestCase
+class PasswordChangeExceptionListenerTest extends TestCase
 {
-    private SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session;
-
-    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
-
-    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
-
+    private SessionInterface&MockObject $session;
+    private RequestStack&MockObject $requestStack;
+    private TranslatorInterface&MockObject $translator;
     private PasswordChangeExceptionListener $listener;
 
     #[\Override]

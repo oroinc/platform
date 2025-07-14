@@ -23,19 +23,18 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
+class DatagridActionButtonProviderTest extends TestCase
 {
     private const PROVIDER_ALIAS = 'test_mass_action_provider';
     private const TEST_ROUTE = 'test_route';
     private const TEST_ROUTE_PARAMS = '%7B%22gridName%22%3A%22customer-view-quote-grid%22%7D';
 
-    /** @var ButtonProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $buttonProvider;
-
-    /** @var DatagridActionButtonProvider */
-    private $provider;
+    private ButtonProvider&MockObject $buttonProvider;
+    private DatagridActionButtonProvider $provider;
 
     #[\Override]
     protected function setUp(): void

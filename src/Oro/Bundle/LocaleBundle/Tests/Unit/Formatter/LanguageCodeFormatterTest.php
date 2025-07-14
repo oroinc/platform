@@ -4,20 +4,16 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LanguageCodeFormatterTest extends TestCase
 {
-    /** @var LanguageCodeFormatter */
-    private $formatter;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    private $translator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LocaleSettings */
-    private $localeSettings;
+    private LanguageCodeFormatter $formatter;
+    private TranslatorInterface&MockObject $translator;
+    private LocaleSettings&MockObject $localeSettings;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +29,7 @@ class LanguageCodeFormatterTest extends TestCase
     /**
      * @dataProvider formatLanguageCodeProvider
      */
-    public function testFormatLanguageCode(string $value, string $expected)
+    public function testFormatLanguageCode(string $value, string $expected): void
     {
         $this->translator->expects($value ? $this->never() : $this->once())
             ->method('trans')
@@ -80,7 +76,7 @@ class LanguageCodeFormatterTest extends TestCase
     /**
      * @dataProvider formatLocaleCodeProvider
      */
-    public function testFormatLocaleCode(string $value, string $expected)
+    public function testFormatLocaleCode(string $value, string $expected): void
     {
         $this->translator->expects($value ? $this->never() : $this->once())
             ->method('trans')

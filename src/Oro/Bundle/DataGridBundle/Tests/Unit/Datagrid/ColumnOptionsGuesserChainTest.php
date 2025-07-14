@@ -7,10 +7,11 @@ use Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 use Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class ColumnOptionsGuesserChainTest extends \PHPUnit\Framework\TestCase
+class ColumnOptionsGuesserChainTest extends TestCase
 {
-    public function testConstructorWithInvalidGuesser()
+    public function testConstructorWithInvalidGuesser(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(sprintf(
@@ -20,7 +21,7 @@ class ColumnOptionsGuesserChainTest extends \PHPUnit\Framework\TestCase
         new ColumnOptionsGuesserChain([new \stdClass()]);
     }
 
-    public function testConstructorWithInvalidGuesserScalar()
+    public function testConstructorWithInvalidGuesserScalar(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(sprintf(
@@ -30,7 +31,7 @@ class ColumnOptionsGuesserChainTest extends \PHPUnit\Framework\TestCase
         new ColumnOptionsGuesserChain(['test']);
     }
 
-    public function testConstructorWithInvalidGuesserNull()
+    public function testConstructorWithInvalidGuesserNull(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(sprintf(
@@ -40,7 +41,7 @@ class ColumnOptionsGuesserChainTest extends \PHPUnit\Framework\TestCase
         new ColumnOptionsGuesserChain([null]);
     }
 
-    public function testConstructorWithChainGuessers()
+    public function testConstructorWithChainGuessers(): void
     {
         $guesser1 = $this->createMock(ColumnOptionsGuesserInterface::class);
         $guesser2 = $this->createMock(ColumnOptionsGuesserInterface::class);
@@ -57,17 +58,17 @@ class ColumnOptionsGuesserChainTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessFormatter()
+    public function testGuessFormatter(): void
     {
         $this->doTestGuess('guessFormatter');
     }
 
-    public function testGuessSorter()
+    public function testGuessSorter(): void
     {
         $this->doTestGuess('guessSorter');
     }
 
-    public function testGuessFilter()
+    public function testGuessFilter(): void
     {
         $this->doTestGuess('guessFilter');
     }

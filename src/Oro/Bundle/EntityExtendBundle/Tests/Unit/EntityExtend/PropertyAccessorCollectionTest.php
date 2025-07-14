@@ -13,11 +13,11 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAccessTest
 {
-    public function testSetValueCallsAdderAndRemoverForCollections()
+    public function testSetValueCallsAdderAndRemoverForCollections(): void
     {
-        $axesBefore     = $this->getContainer([1 => 'second', 3 => 'fourth', 4 => 'fifth']);
-        $axesMerged     = $this->getContainer([1 => 'first', 2 => 'second', 3 => 'third']);
-        $axesAfter      = $this->getContainer([1 => 'second', 5 => 'first', 6 => 'third']);
+        $axesBefore = $this->getContainer([1 => 'second', 3 => 'fourth', 4 => 'fifth']);
+        $axesMerged = $this->getContainer([1 => 'first', 2 => 'second', 3 => 'third']);
+        $axesAfter = $this->getContainer([1 => 'second', 5 => 'first', 6 => 'third']);
         $axesMergedCopy = is_object($axesMerged) ? clone $axesMerged : $axesMerged;
 
         // Don't use a mock in order to test whether the collections are
@@ -32,11 +32,11 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
         $this->assertEquals($axesMergedCopy, $axesMerged);
     }
 
-    public function testAddValueToCollections()
+    public function testAddValueToCollections(): void
     {
-        $axesBefore     = $this->getContainer([1 => 'second', 3 => 'fourth', 4 => 'fifth']);
-        $axesMerged     = $this->getContainer([1 => 'first', 2 => 'second', 3 => 'third']);
-        $axesAfter      = $this->getContainer([1 => 'second', 3 => 'fourth', 4 => 'fifth', 5 => 'first']);
+        $axesBefore = $this->getContainer([1 => 'second', 3 => 'fourth', 4 => 'fifth']);
+        $axesMerged = $this->getContainer([1 => 'first', 2 => 'second', 3 => 'third']);
+        $axesAfter = $this->getContainer([1 => 'second', 3 => 'fourth', 4 => 'fifth', 5 => 'first']);
         $axesMergedCopy = is_object($axesMerged) ? clone $axesMerged : $axesMerged;
 
         // Don't use a mock in order to test whether the collections are
@@ -51,12 +51,12 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
         $this->assertEquals($axesMergedCopy, $axesMerged);
     }
 
-    public function testSetValueCallsAdderAndRemoverForNestedCollections()
+    public function testSetValueCallsAdderAndRemoverForNestedCollections(): void
     {
-        $car        = $this->createMock(CompositeCar::class);
-        $structure  = $this->createMock(CarStructure::class);
+        $car = $this->createMock(CompositeCar::class);
+        $structure = $this->createMock(CarStructure::class);
         $axesBefore = $this->getContainer([1 => 'second', 3 => 'fourth']);
-        $axesAfter  = $this->getContainer([0 => 'first', 1 => 'second', 2 => 'third']);
+        $axesAfter = $this->getContainer([0 => 'first', 1 => 'second', 2 => 'third']);
 
         $car->expects($this->any())
             ->method('getStructure')
@@ -75,7 +75,7 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
         $this->propertyAccessor->setValue($car, 'structure.axes', $axesAfter);
     }
 
-    public function testSetValueFailsIfNoAdderNorRemoverFound()
+    public function testSetValueFailsIfNoAdderNorRemoverFound(): void
     {
         $this->expectException(NoSuchPropertyException::class);
 
@@ -91,28 +91,28 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
         $propertyAccessor->setValue($car, 'axes', $axesAfter);
     }
 
-    public function testIsWritableReturnsTrueIfAdderAndRemoverExists()
+    public function testIsWritableReturnsTrueIfAdderAndRemoverExists(): void
     {
         $car = $this->createMock(Car::class);
 
         $this->assertTrue($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
-    public function testIsWritableReturnsFalseIfOnlyAdderExists()
+    public function testIsWritableReturnsFalseIfOnlyAdderExists(): void
     {
         $car = $this->createMock(CarOnlyAdder::class);
 
         $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
-    public function testIsWritableReturnsFalseIfOnlyRemoverExists()
+    public function testIsWritableReturnsFalseIfOnlyRemoverExists(): void
     {
         $car = $this->createMock(CarOnlyRemover::class);
 
         $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
-    public function testIsWritableReturnsFalseIfNoAdderNorRemoverExists()
+    public function testIsWritableReturnsFalseIfNoAdderNorRemoverExists(): void
     {
         $car = $this->createMock(CarNoAdderAndRemover::class);
 

@@ -6,19 +6,18 @@ use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\EventListener\ReportCacheCleanerListener;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Cache\CacheInterface;
 
-class ReportCacheCleanerListenerTest extends \PHPUnit\Framework\TestCase
+class ReportCacheCleanerListenerTest extends TestCase
 {
     use EntityTrait;
 
     private const PREFIX_CACHE_KEY = 'test_cache_key';
 
-    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var ReportCacheCleanerListener */
-    private $listener;
+    private CacheInterface&MockObject $cache;
+    private ReportCacheCleanerListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +32,7 @@ class ReportCacheCleanerListenerTest extends \PHPUnit\Framework\TestCase
         return $this->getEntity(Report::class, ['id' => 1]);
     }
 
-    public function testCacheDoesNotHaveKey()
+    public function testCacheDoesNotHaveKey(): void
     {
         $this->cache->expects(self::once())
             ->method('delete');
@@ -41,7 +40,7 @@ class ReportCacheCleanerListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postUpdate($this->getReport(), $this->createMock(LifecycleEventArgs::class));
     }
 
-    public function testPostUpdateSuccess()
+    public function testPostUpdateSuccess(): void
     {
         $this->cache->expects(self::once())
             ->method('delete')

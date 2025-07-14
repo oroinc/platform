@@ -5,15 +5,15 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection\Compiler;
 use Metadata\Cache\PsrCacheAdapter;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\JmsSerializerPass;
 use Oro\Bundle\PlatformBundle\Twig\SerializerExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class JmsSerializerPassTest extends \PHPUnit\Framework\TestCase
+class JmsSerializerPassTest extends TestCase
 {
-    /** @var JmsSerializerPass */
-    private $compiler;
+    private JmsSerializerPass $compiler;
 
     #[\Override]
     protected function setUp(): void

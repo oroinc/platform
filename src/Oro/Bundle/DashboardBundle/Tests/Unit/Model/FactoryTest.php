@@ -13,20 +13,15 @@ use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\DashboardType\DashboardTestType;
 use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Entity\DashboardWithType;
 use Oro\Bundle\EntityExtendBundle\Model\EnumOption;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FactoryTest extends \PHPUnit\Framework\TestCase
+class FactoryTest extends TestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var StateManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $stateManager;
-
-    /** @var WidgetConfigs|\PHPUnit\Framework\MockObject\MockObject */
-    private $widgetConfigs;
-
-    /** @var Factory */
-    private $dashboardFactory;
+    private ConfigProvider&MockObject $configProvider;
+    private StateManager&MockObject $stateManager;
+    private WidgetConfigs&MockObject $widgetConfigs;
+    private Factory $dashboardFactory;
 
     #[\Override]
     protected function setUp(): void

@@ -5,17 +5,14 @@ namespace Oro\Bundle\ActivityBundle\Tests\Unit\Provider;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Provider\ActivityActionWidgetProvider;
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ActivityActionWidgetProviderTest extends \PHPUnit\Framework\TestCase
+class ActivityActionWidgetProviderTest extends TestCase
 {
-    /** @var ActivityActionWidgetProvider */
-    private $provider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $activityManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $placeholderProvider;
+    private ActivityManager&MockObject $activityManager;
+    private PlaceholderProvider&MockObject $placeholderProvider;
+    private ActivityActionWidgetProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -32,9 +29,9 @@ class ActivityActionWidgetProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsProvider
      */
-    public function testSupports($isSupported)
+    public function testSupports($isSupported): void
     {
-        $entity      = new \stdClass();
+        $entity = new \stdClass();
         $entityClass = 'stdClass';
 
         $this->activityManager->expects($this->once())
@@ -53,11 +50,10 @@ class ActivityActionWidgetProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetWidgets()
+    public function testGetWidgets(): void
     {
-        $entity      = new \stdClass();
+        $entity = new \stdClass();
         $entityClass = 'stdClass';
-        $entityId    = 123;
 
         $activities = [
             [

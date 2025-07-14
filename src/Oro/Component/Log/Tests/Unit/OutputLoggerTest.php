@@ -3,13 +3,14 @@
 namespace Oro\Component\Log\Tests\Unit;
 
 use Oro\Component\Log\OutputLogger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class OutputLoggerTest extends \PHPUnit\Framework\TestCase
+class OutputLoggerTest extends TestCase
 {
-    /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $output;
+    private OutputInterface&MockObject $output;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +27,7 @@ class OutputLoggerTest extends \PHPUnit\Framework\TestCase
         string $level,
         string $message,
         array $context
-    ) {
+    ): void {
         $this->output->expects($this->any())
             ->method('getVerbosity')
             ->willReturn($verbosity);
@@ -51,7 +52,7 @@ class OutputLoggerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider withTagsProvider
      */
-    public function testLogWithTags(string $level, string $message, string $expected)
+    public function testLogWithTags(string $level, string $message, string $expected): void
     {
         $this->output->expects($this->once())
             ->method('getVerbosity')

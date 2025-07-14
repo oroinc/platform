@@ -8,16 +8,17 @@ use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 
-class SendEmailNotificationProcessorTest extends \PHPUnit\Framework\TestCase
+class SendEmailNotificationProcessorTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private MailerInterface|\PHPUnit\Framework\MockObject\MockObject $mailer;
-
+    private MailerInterface&MockObject $mailer;
     private SendEmailNotificationProcessor $processor;
 
     #[\Override]
@@ -34,9 +35,9 @@ class SendEmailNotificationProcessorTest extends \PHPUnit\Framework\TestCase
 
         $embeddedImagesInSymfonyEmailHandler->expects(self::any())
             ->method('handleEmbeddedImages')
-            ->willReturnCallback(
-                static fn (SymfonyEmail $symfonyEmail) => $symfonyEmail->html('sample body with images extracted')
-            );
+            ->willReturnCallback(static function (SymfonyEmail $symfonyEmail) {
+                return $symfonyEmail->html('sample body with images extracted');
+            });
     }
 
     /**

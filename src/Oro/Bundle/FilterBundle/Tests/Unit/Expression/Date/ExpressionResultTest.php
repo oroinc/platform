@@ -6,11 +6,12 @@ use Carbon\Carbon;
 use Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult;
 use Oro\Bundle\FilterBundle\Expression\Date\Token;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ExpressionResultTest extends \PHPUnit\Framework\TestCase
+class ExpressionResultTest extends TestCase
 {
     /**
      * @dataProvider dateProvider
@@ -88,7 +89,7 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider thisDayModifyProvider
      */
-    public function testThisDayModify(string $timeZone, int $modifier)
+    public function testThisDayModify(string $timeZone, int $modifier): void
     {
         $token = new Token(Token::TYPE_VARIABLE, $modifier);
         $expression = new ExpressionResult($token, $timeZone);
@@ -238,7 +239,7 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedMonth, (int)$result->month);
     }
 
-    public function testThisYearModify()
+    public function testThisYearModify(): void
     {
         $expression = new ExpressionResult(new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_THIS_YEAR));
         $result = $expression->getValue();
@@ -255,7 +256,7 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, (int)$result->year);
     }
 
-    public function testReverseAddition()
+    public function testReverseAddition(): void
     {
         $expression = new ExpressionResult(2);
 
@@ -269,7 +270,7 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
         $this->assertSame((int)$expectedResult, (int)$result->day);
     }
 
-    public function testReverseSubtractionDay()
+    public function testReverseSubtractionDay(): void
     {
         $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
 
@@ -282,7 +283,7 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedDay, (int)$result);
     }
 
-    public function testReverseSubtractionMonth()
+    public function testReverseSubtractionMonth(): void
     {
         $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
 
@@ -297,7 +298,7 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedMonth, (int)$result);
     }
 
-    public function testReverseSubtractionYear()
+    public function testReverseSubtractionYear(): void
     {
         $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
 
@@ -310,7 +311,7 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedMonth, (int)$result);
     }
 
-    public function testReverseSubtractionQuarter()
+    public function testReverseSubtractionQuarter(): void
     {
         $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
 
@@ -325,7 +326,7 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedMonth, (int)$result);
     }
 
-    public function testReverseSubtractionWeek()
+    public function testReverseSubtractionWeek(): void
     {
         $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
         // Needed because Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult changes first day of week
@@ -343,7 +344,7 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getStartOfOperations
      */
-    public function testStartOfOperations(ExpressionResult $expression, \DateTimeImmutable $expected)
+    public function testStartOfOperations(ExpressionResult $expression, \DateTimeImmutable $expected): void
     {
         /** @var Carbon $exprValue */
         $exprValue = $expression->getValue();
@@ -414,7 +415,7 @@ class ExpressionResultTest extends \PHPUnit\Framework\TestCase
         string $operation,
         ExpressionResult $expression,
         int|\DateTimeImmutable $expected
-    ) {
+    ): void {
         // expression result operations are designed so that the result of (int - expression) is int
         // and (int + expression) is expression
         if ('subtract' === $operation) {

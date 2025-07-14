@@ -10,17 +10,14 @@ use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationProviderInterface;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
+class LocalizationHelperTest extends TestCase
 {
-    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationManager;
-
-    /** @var LocalizationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $currentLocalizationProvider;
-
-    /** @var LocalizationHelper */
-    private $helper;
+    private LocalizationManager&MockObject $localizationManager;
+    private LocalizationProviderInterface&MockObject $currentLocalizationProvider;
+    private LocalizationHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -52,7 +49,7 @@ class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
         return $localizedFallbackValue;
     }
 
-    public function testGetCurrentLocalization()
+    public function testGetCurrentLocalization(): void
     {
         $localization = new Localization();
 
@@ -63,7 +60,7 @@ class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($localization, $this->helper->getCurrentLocalization());
     }
 
-    public function testGetLocalizations()
+    public function testGetLocalizations(): void
     {
         $localizations = [new Localization()];
 
@@ -74,7 +71,7 @@ class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($localizations, $this->helper->getLocalizations());
     }
 
-    public function testGetLocalizedValue()
+    public function testGetLocalizedValue(): void
     {
         $localization1 = $this->getLocalization(1);
         $localization2 = $this->getLocalization(2);
@@ -100,7 +97,7 @@ class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->getLocalizedValue($badValues, $localization1);
     }
 
-    public function testGetFirstNonEmptyLocalizedValueForDefaultString()
+    public function testGetFirstNonEmptyLocalizedValueForDefaultString(): void
     {
         $defaultValue = new LocalizedFallbackValue();
         $defaultValue->setString('0');
@@ -112,7 +109,7 @@ class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($defaultValue, $this->helper->getFirstNonEmptyLocalizedValue($values));
     }
 
-    public function testGetFirstNonEmptyLocalizedValueForDefaultText()
+    public function testGetFirstNonEmptyLocalizedValueForDefaultText(): void
     {
         $defaultValue = new LocalizedFallbackValue();
         $defaultValue->setText('0');
@@ -124,7 +121,7 @@ class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($defaultValue, $this->helper->getFirstNonEmptyLocalizedValue($values));
     }
 
-    public function testGetFirstNonEmptyLocalizedValueWithoutDefault()
+    public function testGetFirstNonEmptyLocalizedValueWithoutDefault(): void
     {
         $value = new LocalizedFallbackValue();
         $value->setString('0');
@@ -134,7 +131,7 @@ class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->helper->getFirstNonEmptyLocalizedValue($values));
     }
 
-    public function testGetFirstNonEmptyLocalizedValueWithoutDefaultText()
+    public function testGetFirstNonEmptyLocalizedValueWithoutDefaultText(): void
     {
         $value = new LocalizedFallbackValue();
         $value->setText('0');
@@ -144,7 +141,7 @@ class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->helper->getFirstNonEmptyLocalizedValue($values));
     }
 
-    public function testGetFirstNonEmptyLocalizedValueNull()
+    public function testGetFirstNonEmptyLocalizedValueNull(): void
     {
         $value = new LocalizedFallbackValue();
         $value->setText('');

@@ -12,13 +12,14 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
+class DateFilterSubscriberTest extends TestCase
 {
     private const TIMEZONE = 'Asia/Tokyo';
 

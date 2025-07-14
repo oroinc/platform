@@ -3,11 +3,11 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Serializer;
 
 use Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewVarsNormalizer;
+use PHPUnit\Framework\TestCase;
 
-class BlockViewVarsNormalizerTest extends \PHPUnit\Framework\TestCase
+class BlockViewVarsNormalizerTest extends TestCase
 {
-    /** @var BlockViewVarsNormalizer */
-    private $normalizer;
+    private BlockViewVarsNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void

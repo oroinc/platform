@@ -7,8 +7,9 @@ use Oro\Bundle\BatchBundle\Test\BufferedWarningHandler;
 use Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub\Processor;
 use Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub\Reader;
 use Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub\Writer;
+use PHPUnit\Framework\TestCase;
 
-class StepExecutorTest extends \PHPUnit\Framework\TestCase
+class StepExecutorTest extends TestCase
 {
     public function testExceptions(): void
     {

@@ -9,7 +9,6 @@ class PdoMysqlTest extends AbstractPdoTest
     #[\Override]
     protected function setUp(): void
     {
-        parent::setUp();
         $this->driver = new PdoMysql();
     }
 
@@ -21,7 +20,7 @@ class PdoMysqlTest extends AbstractPdoTest
         string $type,
         array $existingAliases,
         array $expected
-    ) {
+    ): void {
         $this->assertEquals($expected, $this->driver->getJoinAttributes($fieldName, $type, $existingAliases));
     }
 

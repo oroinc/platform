@@ -14,18 +14,15 @@ use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class RolePrivilegeCapabilityProviderTest extends \PHPUnit\Framework\TestCase
+class RolePrivilegeCapabilityProviderTest extends TestCase
 {
-    /** @var AclRoleHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclRoleHandler;
-
-    /** @var RolePrivilegeCategoryProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $categoryProvider;
-
-    /** @var RolePrivilegeCapabilityProvider */
-    private $capabilityProvider;
+    private AclRoleHandler&MockObject $aclRoleHandler;
+    private RolePrivilegeCategoryProvider&MockObject $categoryProvider;
+    private RolePrivilegeCapabilityProvider $capabilityProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -44,7 +41,7 @@ class RolePrivilegeCapabilityProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getCapabilitiesDataProvider
      */
-    public function testGetCapabilities(array $categories, array $privileges, array $expected)
+    public function testGetCapabilities(array $categories, array $privileges, array $expected): void
     {
         $role = $this->createMock(AbstractRole::class);
 

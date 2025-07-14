@@ -5,10 +5,11 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Metadata\Driver;
 use Oro\Bundle\EntityConfigBundle\Metadata\Driver\AttributeDriver;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\EntityForAttributeTests;
 use Oro\Component\PhpUtils\Attribute\Reader\AttributeReader;
+use PHPUnit\Framework\TestCase;
 
-class AttributeDriverTest extends \PHPUnit\Framework\TestCase
+class AttributeDriverTest extends TestCase
 {
-    public function testLoadMetadataForClass()
+    public function testLoadMetadataForClass(): void
     {
         $driver = new AttributeDriver(new AttributeReader());
 
@@ -50,7 +51,7 @@ class AttributeDriverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadMetadataForClassForNonConfigurableEntity()
+    public function testLoadMetadataForClassForNonConfigurableEntity(): void
     {
         $driver = new AttributeDriver(new AttributeReader());
 

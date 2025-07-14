@@ -53,11 +53,10 @@ class EntityLoaderTest extends TestCase
         $classMetadata->expects(self::once())
             ->method('getSingleIdentifierFieldName')
             ->willReturn('id');
-        $fieldMapping = ['type' => 'integer'];
         $classMetadata->expects(self::once())
-            ->method('getFieldMapping')
+            ->method('getTypeOfField')
             ->with('id')
-            ->willReturn($fieldMapping);
+            ->willReturn('integer');
         $em->expects(self::once())
             ->method('getClassMetadata')
             ->with($entityClass)
@@ -92,11 +91,10 @@ class EntityLoaderTest extends TestCase
         $classMetadata->expects(self::once())
             ->method('getSingleIdentifierFieldName')
             ->willReturn('id');
-        $fieldMapping = ['type' => 'integer'];
         $classMetadata->expects(self::once())
-            ->method('getFieldMapping')
+            ->method('getTypeOfField')
             ->with('id')
-            ->willReturn($fieldMapping);
+            ->willReturn('integer');
         $em->expects(self::once())
             ->method('getClassMetadata')
             ->with($entityClass)
@@ -127,11 +125,10 @@ class EntityLoaderTest extends TestCase
         $classMetadata->expects(self::once())
             ->method('getSingleIdentifierFieldName')
             ->willReturn('id');
-        $fieldMapping = ['type' => 'integer'];
         $classMetadata->expects(self::once())
-            ->method('getFieldMapping')
+            ->method('getTypeOfField')
             ->with('id')
-            ->willReturn($fieldMapping);
+            ->willReturn('integer');
 
         $em = $this->createMock(EntityManagerInterface::class);
 
@@ -174,11 +171,10 @@ class EntityLoaderTest extends TestCase
         $classMetadata->expects(self::once())
             ->method('getSingleIdentifierFieldName')
             ->willReturn('id');
-        $fieldMapping = ['type' => 'integer'];
         $classMetadata->expects(self::once())
-            ->method('getFieldMapping')
+            ->method('getTypeOfField')
             ->with('id')
-            ->willReturn($fieldMapping);
+            ->willReturn('integer');
 
         $em = $this->createMock(EntityManagerInterface::class);
 

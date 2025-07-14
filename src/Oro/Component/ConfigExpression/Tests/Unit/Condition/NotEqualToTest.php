@@ -3,26 +3,27 @@
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Condition\NotEqualTo;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class NotEqualToTest extends \PHPUnit\Framework\TestCase
+class NotEqualToTest extends TestCase
 {
-    /** @var Condition\NotEqualTo */
-    protected $condition;
+    private Condition\NotEqualTo $condition;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->condition = new Condition\NotEqualTo();
+        $this->condition = new NotEqualTo();
         $this->condition->setContextAccessor(new ContextAccessor());
     }
 
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, $context, $expectedResult)
+    public function testEvaluate(array $options, $context, $expectedResult): void
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -78,7 +79,7 @@ class NotEqualToTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray($options, $message, $expected)
+    public function testToArray($options, $message, $expected): void
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -122,7 +123,7 @@ class NotEqualToTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile($options, $message, $expected)
+    public function testCompile($options, $message, $expected): void
     {
         $this->condition->initialize($options);
         if ($message !== null) {

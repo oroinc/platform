@@ -7,11 +7,12 @@ use Oro\Component\Config\Tests\Unit\Fixtures\ConfigCacheStub;
 use Oro\Component\Config\Tests\Unit\Fixtures\PhpArrayConfigProviderStub;
 use Oro\Component\Config\Tests\Unit\Fixtures\ResourceStub;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ConfigCacheTest extends \PHPUnit\Framework\TestCase
+class ConfigCacheTest extends TestCase
 {
     use TempDirExtension;
 

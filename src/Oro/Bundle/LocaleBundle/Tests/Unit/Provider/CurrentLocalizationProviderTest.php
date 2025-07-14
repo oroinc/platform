@@ -16,12 +16,9 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
 class CurrentLocalizationProviderTest extends TestCase
 {
     private static string $defaultLocale;
-
-    private LocalizationManager|MockObject $localizationManager;
-
-    private LocaleAwareInterface|MockObject $translator;
-
-    private TranslatableListener|MockObject $translatableListener;
+    private LocalizationManager&MockObject $localizationManager;
+    private LocaleAwareInterface&MockObject $translator;
+    private TranslatableListener&MockObject $translatableListener;
 
     #[\Override]
     public static function setUpBeforeClass(): void
@@ -102,21 +99,17 @@ class CurrentLocalizationProviderTest extends TestCase
             ->setFormattingCode('de_DE');
 
         $extension = $this->createMock(CurrentLocalizationExtensionInterface::class);
-        $extension
-            ->expects(self::never())
+        $extension->expects(self::never())
             ->method('getCurrentLocalization');
 
-        $this->localizationManager
-            ->expects(self::never())
+        $this->localizationManager->expects(self::never())
             ->method('getDefaultLocalization');
 
-        $this->translator
-            ->expects(self::once())
+        $this->translator->expects(self::once())
             ->method('setLocale')
             ->with($explicitLocalization->getLanguageCode());
 
-        $this->translatableListener
-            ->expects(self::once())
+        $this->translatableListener->expects(self::once())
             ->method('setTranslatableLocale')
             ->with($explicitLocalization->getLanguageCode());
 
@@ -137,22 +130,18 @@ class CurrentLocalizationProviderTest extends TestCase
             ->setFormattingCode('de_DE');
 
         $extension = $this->createMock(CurrentLocalizationExtensionInterface::class);
-        $extension
-            ->expects(self::exactly(2))
+        $extension->expects(self::exactly(2))
             ->method('getCurrentLocalization')
             ->willReturn($currentLocalization);
 
-        $this->localizationManager
-            ->expects(self::never())
+        $this->localizationManager->expects(self::never())
             ->method('getDefaultLocalization');
 
-        $this->translator
-            ->expects(self::once())
+        $this->translator->expects(self::once())
             ->method('setLocale')
             ->with($currentLocalization->getLanguageCode());
 
-        $this->translatableListener
-            ->expects(self::once())
+        $this->translatableListener->expects(self::once())
             ->method('setTranslatableLocale')
             ->with($currentLocalization->getLanguageCode());
 
@@ -173,23 +162,19 @@ class CurrentLocalizationProviderTest extends TestCase
             ->setFormattingCode('de_DE');
 
         $extension = $this->createMock(CurrentLocalizationExtensionInterface::class);
-        $extension
-            ->expects(self::exactly(2))
+        $extension->expects(self::exactly(2))
             ->method('getCurrentLocalization')
             ->willReturn(null);
 
-        $this->localizationManager
-            ->expects(self::once())
+        $this->localizationManager->expects(self::once())
             ->method('getDefaultLocalization')
             ->willReturn($defaultLocalization);
 
-        $this->translator
-            ->expects(self::once())
+        $this->translator->expects(self::once())
             ->method('setLocale')
             ->with($defaultLocalization->getLanguageCode());
 
-        $this->translatableListener
-            ->expects(self::once())
+        $this->translatableListener->expects(self::once())
             ->method('setTranslatableLocale')
             ->with($defaultLocalization->getLanguageCode());
 
@@ -206,23 +191,19 @@ class CurrentLocalizationProviderTest extends TestCase
     public function testSetCurrentLocalizationWithNullWhenNoDefaultLocalization(): void
     {
         $extension = $this->createMock(CurrentLocalizationExtensionInterface::class);
-        $extension
-            ->expects(self::exactly(2))
+        $extension->expects(self::exactly(2))
             ->method('getCurrentLocalization')
             ->willReturn(null);
 
-        $this->localizationManager
-            ->expects(self::once())
+        $this->localizationManager->expects(self::once())
             ->method('getDefaultLocalization')
             ->willReturn(null);
 
-        $this->translator
-            ->expects(self::once())
+        $this->translator->expects(self::once())
             ->method('setLocale')
             ->with(Configuration::DEFAULT_LANGUAGE);
 
-        $this->translatableListener
-            ->expects(self::once())
+        $this->translatableListener->expects(self::once())
             ->method('setTranslatableLocale')
             ->with(Configuration::DEFAULT_LANGUAGE);
 

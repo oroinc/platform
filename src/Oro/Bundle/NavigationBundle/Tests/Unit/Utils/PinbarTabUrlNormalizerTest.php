@@ -3,8 +3,9 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\NavigationBundle\Utils\PinbarTabUrlNormalizer;
+use PHPUnit\Framework\TestCase;
 
-class PinbarTabUrlNormalizerTest extends \PHPUnit\Framework\TestCase
+class PinbarTabUrlNormalizerTest extends TestCase
 {
     /**
      * @dataProvider urlsDataProvider

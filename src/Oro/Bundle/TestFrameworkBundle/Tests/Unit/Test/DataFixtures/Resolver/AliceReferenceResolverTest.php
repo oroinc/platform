@@ -8,14 +8,13 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver\AliceReferenceResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AliceReferenceResolverTest extends \PHPUnit\Framework\TestCase
+class AliceReferenceResolverTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var AliceReferenceResolver */
-    private $aliceReferenceResolver;
+    private ManagerRegistry&MockObject $registry;
+    private AliceReferenceResolver $aliceReferenceResolver;
 
     #[\Override]
     protected function setUp(): void
@@ -43,7 +42,7 @@ class AliceReferenceResolverTest extends \PHPUnit\Framework\TestCase
         bool $isContains,
         ?object $objectFromDb,
         $expectedValue
-    ) {
+    ): void {
         $this->aliceReferenceResolver->setReferences(new Collection(['ref' => $object]));
 
         $entityManager = $this->createMock(EntityManagerInterface::class);

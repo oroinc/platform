@@ -10,25 +10,18 @@ use Oro\Bundle\EntityBundle\Event\PreloadEntityEvent;
 use Oro\Bundle\EntityBundle\Manager\PreloadingManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
+class PreloadingManagerTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityAliasResolver;
-
-    /** @var PropertyAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $propertyAccessor;
-
-    /** @var PreloadingManager */
-    private $manager;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private EntityAliasResolver&MockObject $entityAliasResolver;
+    private PropertyAccessorInterface&MockObject $propertyAccessor;
+    private PreloadingManager $manager;
 
     #[\Override]
     protected function setUp(): void

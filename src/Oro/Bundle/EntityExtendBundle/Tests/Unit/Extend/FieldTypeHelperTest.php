@@ -4,11 +4,11 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Extend;
 
 use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use PHPUnit\Framework\TestCase;
 
-class FieldTypeHelperTest extends \PHPUnit\Framework\TestCase
+class FieldTypeHelperTest extends TestCase
 {
-    /** @var FieldTypeHelper */
-    private $helper;
+    private FieldTypeHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +24,7 @@ class FieldTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getUnderlyingTypeProvider
      */
-    public function testGetUnderlyingType(string $type, string $expectedType)
+    public function testGetUnderlyingType(string $type, string $expectedType): void
     {
         $this->assertEquals(
             $expectedType,
@@ -48,7 +48,7 @@ class FieldTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider relationCHeckTestProvider
      */
-    public function testIsRelation(string $fieldType, bool $expected)
+    public function testIsRelation(string $fieldType, bool $expected): void
     {
         $this->assertSame($expected, FieldTypeHelper::isRelation($fieldType));
     }

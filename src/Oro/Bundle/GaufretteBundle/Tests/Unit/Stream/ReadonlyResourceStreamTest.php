@@ -4,11 +4,11 @@ namespace Oro\Bundle\GaufretteBundle\Tests\Unit\Stream;
 
 use Gaufrette\StreamMode;
 use Oro\Bundle\GaufretteBundle\Stream\ReadonlyResourceStream;
+use PHPUnit\Framework\TestCase;
 
-class ReadonlyResourceStreamTest extends \PHPUnit\Framework\TestCase
+class ReadonlyResourceStreamTest extends TestCase
 {
-    /** @var ReadonlyResourceStream */
-    private $stream;
+    private ReadonlyResourceStream $stream;
 
     #[\Override]
     protected function setUp(): void
@@ -17,12 +17,12 @@ class ReadonlyResourceStreamTest extends \PHPUnit\Framework\TestCase
         $this->stream = new ReadonlyResourceStream($resource);
     }
 
-    public function testOpenRead()
+    public function testOpenRead(): void
     {
         $this->stream->open(new StreamMode('r'));
     }
 
-    public function testOpenReadAndCreate()
+    public function testOpenReadAndCreate(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The ReadonlyResourceStream does not allow write.');
@@ -30,7 +30,7 @@ class ReadonlyResourceStreamTest extends \PHPUnit\Framework\TestCase
         $this->stream->open(new StreamMode('r+'));
     }
 
-    public function testOpenWrite()
+    public function testOpenWrite(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The ReadonlyResourceStream does not allow write.');
@@ -38,14 +38,14 @@ class ReadonlyResourceStreamTest extends \PHPUnit\Framework\TestCase
         $this->stream->open(new StreamMode('w'));
     }
 
-    public function testReadEof()
+    public function testReadEof(): void
     {
         $this->assertFalse($this->stream->eof());
         $this->assertEquals('Test data', $this->stream->read(100));
         $this->assertTrue($this->stream->eof());
     }
 
-    public function testWrite()
+    public function testWrite(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The ReadonlyResourceStream does not allow write.');
@@ -53,7 +53,7 @@ class ReadonlyResourceStreamTest extends \PHPUnit\Framework\TestCase
         $this->stream->write('test');
     }
 
-    public function testClose()
+    public function testClose(): void
     {
         $this->stream->close();
 
@@ -61,7 +61,7 @@ class ReadonlyResourceStreamTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(is_resource($this->stream->cast(1)));
     }
 
-    public function testFlush()
+    public function testFlush(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The ReadonlyResourceStream does not allow write.');
@@ -69,7 +69,7 @@ class ReadonlyResourceStreamTest extends \PHPUnit\Framework\TestCase
         $this->stream->flush();
     }
 
-    public function testSeek()
+    public function testSeek(): void
     {
         $this->stream->seek(2);
         $this->assertEquals(2, $this->stream->tell());
@@ -78,13 +78,13 @@ class ReadonlyResourceStreamTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(100, $this->stream->tell());
     }
 
-    public function testStat()
+    public function testStat(): void
     {
         $stat = $this->stream->stat();
         $this->assertEquals(9, $stat['size']);
     }
 
-    public function testUnlink()
+    public function testUnlink(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The ReadonlyResourceStream does not allow unlink.');

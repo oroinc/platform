@@ -4,14 +4,13 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Transformer;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Transformer\MessageTransformer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MessageTransformerTest extends \PHPUnit\Framework\TestCase
+class MessageTransformerTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var MessageTransformer */
-    private $transformer;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private MessageTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +19,7 @@ class MessageTransformerTest extends \PHPUnit\Framework\TestCase
         $this->transformer = new MessageTransformer($this->doctrineHelper);
     }
 
-    public function testTransform()
+    public function testTransform(): void
     {
         $entity = new \stdClass();
         $entities = [$entity];
@@ -41,7 +40,7 @@ class MessageTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTransformFewDifferentEntities()
+    public function testTransformFewDifferentEntities(): void
     {
         $entity1 = new \stdClass();
         $entity2 = new \stdClass();
@@ -66,7 +65,7 @@ class MessageTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTransformChunk()
+    public function testTransformChunk(): void
     {
         $entitiesCount = MessageTransformer::CHUNK_SIZE * 3 + 10;
         $entities = array_fill(0, $entitiesCount, new \stdClass());
@@ -93,7 +92,7 @@ class MessageTransformerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testTransformChunkStrictly()
+    public function testTransformChunkStrictly(): void
     {
         $entitiesCount = MessageTransformer::CHUNK_SIZE;
         $entities = array_fill(0, $entitiesCount, new \stdClass());
@@ -115,7 +114,7 @@ class MessageTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(MessageTransformer::CHUNK_SIZE, $messages[0]['entityIds']);
     }
 
-    public function testTransformEmpty()
+    public function testTransformEmpty(): void
     {
         $entities = [];
 

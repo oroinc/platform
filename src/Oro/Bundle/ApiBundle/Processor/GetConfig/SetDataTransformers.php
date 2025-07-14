@@ -4,9 +4,11 @@ namespace Oro\Bundle\ApiBundle\Processor\GetConfig;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry;
 use Oro\Bundle\ApiBundle\PostProcessor\PostProcessingDataTransformer;
 use Oro\Bundle\ApiBundle\PostProcessor\PostProcessorRegistry;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -63,13 +65,7 @@ class SetDataTransformers implements ProcessorInterface
             if (!$field->hasDataTransformers()) {
                 $targetConfig = $field->getTargetEntity();
                 if (null === $targetConfig) {
-                    $dataType = $field->getDataType();
-                    if (!$dataType && null !== $metadata) {
-                        $propertyPath = $field->getPropertyPath($fieldName);
-                        if ($metadata->hasField($propertyPath)) {
-                            $dataType = $metadata->getTypeOfField($propertyPath);
-                        }
-                    }
+                    $dataType = $this->getDataType($fieldName, $field, $metadata);
                     if ($dataType) {
                         $dataTransformer = $this->dataTransformerRegistry->getDataTransformer($dataType, $requestType);
                         if (null !== $dataTransformer) {
@@ -102,5 +98,24 @@ class SetDataTransformers implements ProcessorInterface
                 }
             }
         }
+    }
+
+    private function getDataType(
+        string $fieldName,
+        EntityDefinitionFieldConfig $field,
+        ?ClassMetadata $metadata
+    ): ?string {
+        $dataType = $field->getDataType();
+        if (!$dataType && null !== $metadata) {
+            $dataType = $metadata->getTypeOfField($field->getPropertyPath($fieldName));
+        }
+        if ($dataType) {
+            $dataTypeDetailDelimiterPos = strpos($dataType, DataType::DETAIL_DELIMITER);
+            if (false !== $dataTypeDetailDelimiterPos) {
+                $dataType = substr($dataType, 0, $dataTypeDetailDelimiterPos);
+            }
+        }
+
+        return $dataType;
     }
 }

@@ -6,11 +6,11 @@ use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\SegmentBundle\Query\FilterProcessorContext;
+use PHPUnit\Framework\TestCase;
 
-class FilterProcessorContextTest extends \PHPUnit\Framework\TestCase
+class FilterProcessorContextTest extends TestCase
 {
-    /** @var FilterProcessorContext */
-    private $context;
+    private FilterProcessorContext $context;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class FilterProcessorContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new FilterProcessorContext();
     }
 
-    public function testShouldBePossibleToInitWithoutColumns()
+    public function testShouldBePossibleToInitWithoutColumns(): void
     {
         $entity = 'Test\Entity';
         $definition = ['key' => 'value'];
@@ -30,7 +30,7 @@ class FilterProcessorContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($definition, $this->context->getDefinition());
     }
 
-    public function testShouldNotBePossibleToInitWithoutEntity()
+    public function testShouldNotBePossibleToInitWithoutEntity(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The entity must be specified.');

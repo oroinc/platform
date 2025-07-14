@@ -12,10 +12,12 @@ use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle4\TestB
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle5\TestBundle5;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
-class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigurationProviderTest extends TestCase
 {
     use TempDirExtension;
 
@@ -82,9 +84,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    /** @var ConfigurationExtension|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurationExtension;
-
+    private ConfigurationExtension&MockObject $configurationExtension;
     private string $cacheFile;
 
     #[\Override]
@@ -122,7 +122,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFeaturesConfiguration()
+    public function testGetFeaturesConfiguration(): void
     {
         $configurationProvider = $this->getConfigurationProvider([TestBundle1::class, TestBundle2::class]);
 
@@ -132,7 +132,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResourcesConfiguration()
+    public function testGetResourcesConfiguration(): void
     {
         $configurationProvider = $this->getConfigurationProvider([TestBundle1::class, TestBundle2::class]);
 
@@ -142,7 +142,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDependenciesConfiguration()
+    public function testGetDependenciesConfiguration(): void
     {
         $configurationProvider = $this->getConfigurationProvider([TestBundle1::class, TestBundle2::class]);
 
@@ -152,7 +152,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDependentsConfiguration()
+    public function testGetDependentsConfiguration(): void
     {
         $configurationProvider = $this->getConfigurationProvider([TestBundle1::class, TestBundle2::class]);
 
@@ -162,7 +162,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDependenciesConfigurationCircularReferenceTwoLevel()
+    public function testGetDependenciesConfigurationCircularReferenceTwoLevel(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The feature "feature1" has circular reference on itself.');
@@ -171,7 +171,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $configurationProvider->getDependenciesConfiguration();
     }
 
-    public function testGetDependenciesConfigurationCircularReferenceOneLevel()
+    public function testGetDependenciesConfigurationCircularReferenceOneLevel(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The feature "feature1" has circular reference on itself.');
@@ -180,7 +180,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $configurationProvider->getDependenciesConfiguration();
     }
 
-    public function testGetFeatureByToggle()
+    public function testGetFeatureByToggle(): void
     {
         $configurationProvider = $this->getConfigurationProvider([TestBundle1::class, TestBundle2::class]);
 
@@ -190,7 +190,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFeatureByToggleWhenSameToggleUsedForSeveralFeatures()
+    public function testGetFeatureByToggleWhenSameToggleUsedForSeveralFeatures(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
@@ -202,7 +202,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $configurationProvider->getTogglesConfiguration();
     }
 
-    public function testClearCache()
+    public function testClearCache(): void
     {
         $this->configurationExtension->expects(self::once())
             ->method('clearConfigurationCache');

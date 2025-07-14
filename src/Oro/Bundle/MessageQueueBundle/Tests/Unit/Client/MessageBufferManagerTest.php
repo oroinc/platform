@@ -7,14 +7,13 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
 use Oro\Bundle\MessageQueueBundle\Client\MessageBufferManager;
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\Mocks\ConnectionWithTransactionWatcher;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MessageBufferManagerTest extends \PHPUnit\Framework\TestCase
+class MessageBufferManagerTest extends TestCase
 {
-    /** @var BufferedMessageProducer|\PHPUnit\Framework\MockObject\MockObject */
-    private $bufferedProducer;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
+    private BufferedMessageProducer&MockObject $bufferedProducer;
+    private ManagerRegistry&MockObject $doctrine;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class MessageBufferManagerTest extends \PHPUnit\Framework\TestCase
         return new MessageBufferManager($this->bufferedProducer, $this->doctrine, $connectionName);
     }
 
-    public function testFlushBufferWhenBufferingDisabled()
+    public function testFlushBufferWhenBufferingDisabled(): void
     {
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
@@ -42,7 +41,7 @@ class MessageBufferManagerTest extends \PHPUnit\Framework\TestCase
         $manager->flushBuffer();
     }
 
-    public function testFlushBufferWhenNoMessagedInBuffer()
+    public function testFlushBufferWhenNoMessagedInBuffer(): void
     {
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
@@ -57,7 +56,7 @@ class MessageBufferManagerTest extends \PHPUnit\Framework\TestCase
         $manager->flushBuffer();
     }
 
-    public function testFlushBufferWhenConnectionIsNotTransactionWatcherAware()
+    public function testFlushBufferWhenConnectionIsNotTransactionWatcherAware(): void
     {
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
@@ -77,7 +76,7 @@ class MessageBufferManagerTest extends \PHPUnit\Framework\TestCase
         $manager->flushBuffer();
     }
 
-    public function testFlushBufferWithoutActiveTransaction()
+    public function testFlushBufferWithoutActiveTransaction(): void
     {
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
@@ -100,7 +99,7 @@ class MessageBufferManagerTest extends \PHPUnit\Framework\TestCase
         $manager->flushBuffer();
     }
 
-    public function testFlushBufferWithActiveTransaction()
+    public function testFlushBufferWithActiveTransaction(): void
     {
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
@@ -123,7 +122,7 @@ class MessageBufferManagerTest extends \PHPUnit\Framework\TestCase
         $manager->flushBuffer();
     }
 
-    public function testForceFlushBuffer()
+    public function testForceFlushBuffer(): void
     {
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
@@ -140,7 +139,7 @@ class MessageBufferManagerTest extends \PHPUnit\Framework\TestCase
         $manager->flushBuffer(true);
     }
 
-    public function testFlushBufferWithNotDefaultConnection()
+    public function testFlushBufferWithNotDefaultConnection(): void
     {
         $connectionName = 'test_connection';
         $this->bufferedProducer->expects(self::once())

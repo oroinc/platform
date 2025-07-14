@@ -2,7 +2,11 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit;
 
-use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormEndType;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormFieldsType;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormFieldType;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormStartType;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormType;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\GroupingFormLayoutBuilder;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
@@ -16,8 +20,7 @@ use Symfony\Component\Form\Extension\Core\Type\TimeType;
  */
 abstract class BlockTypeTestCase extends BaseBlockTypeTestCase
 {
-    /** @var GroupingFormLayoutBuilder */
-    protected $formLayoutBuilder;
+    protected GroupingFormLayoutBuilder $formLayoutBuilder;
 
     #[\Override]
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
@@ -33,10 +36,10 @@ abstract class BlockTypeTestCase extends BaseBlockTypeTestCase
         ]);
 
         $layoutFactoryBuilder
-            ->addType(new Type\EmbedFormType())
-            ->addType(new Type\EmbedFormFieldsType($this->formLayoutBuilder))
-            ->addType(new Type\EmbedFormStartType())
-            ->addType(new Type\EmbedFormEndType())
-            ->addType(new Type\EmbedFormFieldType());
+            ->addType(new EmbedFormType())
+            ->addType(new EmbedFormFieldsType($this->formLayoutBuilder))
+            ->addType(new EmbedFormStartType())
+            ->addType(new EmbedFormEndType())
+            ->addType(new EmbedFormFieldType());
     }
 }

@@ -31,7 +31,7 @@ class Office365ResourceOwnerFactoryTest extends TestCase
         $this->storage = $this->createMock(RequestDataStorageInterface::class);
     }
 
-    public function testCreateOffice365ResourceOwner()
+    public function testCreateOffice365ResourceOwner(): void
     {
         $this->configManager->expects($this->exactly(2))
             ->method('get')
@@ -63,7 +63,7 @@ class Office365ResourceOwnerFactoryTest extends TestCase
         $this->assertEquals('clientSecret', $resourceOwner->getOption('client_secret'));
     }
 
-    public function testEmptyClientIdCreateOffice365ResourceOwner()
+    public function testEmptyClientIdCreateOffice365ResourceOwner(): void
     {
         $this->configManager->expects($this->exactly(2))
             ->method('get')
@@ -95,7 +95,7 @@ class Office365ResourceOwnerFactoryTest extends TestCase
         $this->assertEquals('clientSecret', $resourceOwner->getOption('client_secret'));
     }
 
-    public function testEmptyClientSecretCreateOffice365ResourceOwner()
+    public function testEmptyClientSecretCreateOffice365ResourceOwner(): void
     {
         $this->configManager->expects($this->exactly(2))
             ->method('get')
@@ -105,7 +105,8 @@ class Office365ResourceOwnerFactoryTest extends TestCase
             )
             ->willReturnOnConsecutiveCalls('clientId', null);
 
-        $this->crypter->expects($this->never())->method('decryptData');
+        $this->crypter->expects($this->never())
+            ->method('decryptData');
 
         $factory = new Office365ResourceOwnerFactory();
 

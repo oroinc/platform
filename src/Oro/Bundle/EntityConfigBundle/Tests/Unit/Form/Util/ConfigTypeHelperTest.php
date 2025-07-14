@@ -9,14 +9,13 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
+class ConfigTypeHelperTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ConfigTypeHelper */
-    private $typeHelper;
+    private ConfigManager&MockObject $configManager;
+    private ConfigTypeHelper $typeHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +28,7 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFieldNameProvider
      */
-    public function testGetFieldName(ConfigIdInterface $configId, ?string $expected)
+    public function testGetFieldName(ConfigIdInterface $configId, ?string $expected): void
     {
         $this->assertSame(
             $expected,
@@ -48,7 +47,7 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFieldTypeProvider
      */
-    public function testGetFieldType(ConfigIdInterface $configId, ?string $expected)
+    public function testGetFieldType(ConfigIdInterface $configId, ?string $expected): void
     {
         $this->assertSame(
             $expected,
@@ -64,7 +63,7 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetImmutableNoConfig()
+    public function testGetImmutableNoConfig(): void
     {
         $scope = 'test_scope';
         $className = 'Test\Entity';
@@ -89,7 +88,7 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getImmutableProvider
      */
-    public function testGetImmutable(mixed $value, ?string $fieldName = null)
+    public function testGetImmutable(mixed $value, ?string $fieldName = null): void
     {
         $scope = 'test_scope';
         $className = 'Test\Entity';
@@ -142,7 +141,7 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
         bool $expected,
         ?string $fieldName = null,
         ?string $constraintName = null
-    ) {
+    ): void {
         $scope = 'test_scope';
         $className = 'Test\Entity';
 

@@ -7,16 +7,15 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TemplateResultType;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Template\DefaultFormTemplateResponseProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
-class DefaultFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCase
+class DefaultFormTemplateResponseProcessorTest extends TestCase
 {
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $twig;
-
-    /** @var DefaultFormTemplateResponseProcessor */
-    private $processor;
+    private Environment&MockObject $twig;
+    private DefaultFormTemplateResponseProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +31,7 @@ class DefaultFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCa
      * @param string|null $dialogTemplate
      * @param string $expectedToRender
      */
-    public function testRenderedResponseResult($dialogTemplate, $expectedToRender)
+    public function testRenderedResponseResult($dialogTemplate, $expectedToRender): void
     {
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())
@@ -71,7 +70,7 @@ class DefaultFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCa
         ];
     }
 
-    public function testSkipUnsupportedResultTypeContextSaved()
+    public function testSkipUnsupportedResultTypeContextSaved(): void
     {
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
@@ -85,7 +84,7 @@ class DefaultFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCa
         $this->processor->process($context);
     }
 
-    public function testSkipUnsupportedResultTypeContextResultType()
+    public function testSkipUnsupportedResultTypeContextResultType(): void
     {
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())

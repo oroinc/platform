@@ -3,15 +3,14 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Converter;
 
 use Oro\Bundle\DataGridBundle\Converter\UrlConverter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 
-class UrlConverterTest extends \PHPUnit\Framework\TestCase
+class UrlConverterTest extends TestCase
 {
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var UrlConverter */
-    private $urlConverter;
+    private RouterInterface&MockObject $router;
+    private UrlConverter $urlConverter;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class UrlConverterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider convertGridUrlToPageUrlInvalidUrlProvider
      */
-    public function testConvertGridUrlToPageUrlInvalidUrl(string $url, string $gridName, string $expectedResult)
+    public function testConvertGridUrlToPageUrlInvalidUrl(string $url, string $gridName, string $expectedResult): void
     {
         $this->assertEquals(
             $expectedResult,
@@ -62,7 +61,7 @@ class UrlConverterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testConvertGridUrlToPageUrlTryConvertPageUrl()
+    public function testConvertGridUrlToPageUrlTryConvertPageUrl(): void
     {
         $gridName = 'quotes-grid';
 
@@ -100,7 +99,7 @@ class UrlConverterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertGridUrlToPageUrl()
+    public function testConvertGridUrlToPageUrl(): void
     {
         $gridName = 'quotes-grid';
         $pageParams = [
@@ -136,7 +135,7 @@ class UrlConverterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertGridUrlToPageUrlWithRouteParams()
+    public function testConvertGridUrlToPageUrlWithRouteParams(): void
     {
         $gridName = 'quotes-grid';
         $pageParams = [

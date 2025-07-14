@@ -5,18 +5,17 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Client;
 use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
 use Oro\Bundle\MessageQueueBundle\Client\CommandWatcher;
 use Oro\Component\MessageQueue\Client\ConsumeMessagesCommand;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CommandWatcherTest extends \PHPUnit\Framework\TestCase
+class CommandWatcherTest extends TestCase
 {
-    /** @var BufferedMessageProducer|\PHPUnit\Framework\MockObject\MockObject */
-    private $bufferedProducer;
-
-    /** @var CommandWatcher */
-    private $commandWatcher;
+    private BufferedMessageProducer&MockObject $bufferedProducer;
+    private CommandWatcher $commandWatcher;
 
     #[\Override]
     protected function setUp(): void

@@ -8,25 +8,20 @@ use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AttributesImportTopicSenderTest extends \PHPUnit\Framework\TestCase
+class AttributesImportTopicSenderTest extends TestCase
 {
     use EntityTrait;
 
     private const CONFIG_MODEL_ID = 33;
     private const USER_ID = 44;
 
-    /** @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $websocketClient;
-
-    /** @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $connectionChecker;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var AttributesImportTopicSender */
-    private $attributesImportTopicSender;
+    private WebsocketClientInterface&MockObject $websocketClient;
+    private ConnectionChecker&MockObject $connectionChecker;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private AttributesImportTopicSender $attributesImportTopicSender;
 
     #[\Override]
     protected function setUp(): void
@@ -42,7 +37,7 @@ class AttributesImportTopicSenderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTopicWhenNoUser()
+    public function testGetTopicWhenNoUser(): void
     {
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
@@ -54,7 +49,7 @@ class AttributesImportTopicSenderTest extends \PHPUnit\Framework\TestCase
         $this->attributesImportTopicSender->getTopic(self::CONFIG_MODEL_ID);
     }
 
-    public function testGetTopicWhenNotIntegerConfigModelId()
+    public function testGetTopicWhenNotIntegerConfigModelId(): void
     {
         $this->tokenAccessor->expects($this->never())
             ->method('getUser');
@@ -65,7 +60,7 @@ class AttributesImportTopicSenderTest extends \PHPUnit\Framework\TestCase
         $this->attributesImportTopicSender->getTopic('something');
     }
 
-    public function testGetTopic()
+    public function testGetTopic(): void
     {
         $user = $this->getEntity(User::class, ['id' => self::USER_ID]);
         $this->tokenAccessor->expects($this->once())
@@ -78,7 +73,7 @@ class AttributesImportTopicSenderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $user = $this->getEntity(User::class, ['id' => self::USER_ID]);
 
@@ -100,7 +95,7 @@ class AttributesImportTopicSenderTest extends \PHPUnit\Framework\TestCase
         $this->attributesImportTopicSender->send(self::CONFIG_MODEL_ID);
     }
 
-    public function testSendNoConnection()
+    public function testSendNoConnection(): void
     {
         $this->tokenAccessor->expects($this->never())
             ->method($this->anything());

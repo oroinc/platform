@@ -7,11 +7,11 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestrictionIdentity;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowRestrictionIdentityTest extends \PHPUnit\Framework\TestCase
+class WorkflowRestrictionIdentityTest extends TestCase
 {
-    /** @var WorkflowRestrictionIdentity */
-    private $identity;
+    private WorkflowRestrictionIdentity $identity;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class WorkflowRestrictionIdentityTest extends \PHPUnit\Framework\TestCase
         $this->identity = new WorkflowRestrictionIdentity();
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertNull($this->identity->getId());
 
@@ -34,7 +34,7 @@ class WorkflowRestrictionIdentityTest extends \PHPUnit\Framework\TestCase
      * @param string $property
      * @param mixed  $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters($property, $value): void
     {
         $accessor = PropertyAccess::createPropertyAccessor();
         $accessor->setValue($this->identity, $property, $value);

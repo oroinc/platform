@@ -3,11 +3,11 @@
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\SegmentWidget;
 
 use Oro\Bundle\DataAuditBundle\SegmentWidget\ContextChecker;
+use PHPUnit\Framework\TestCase;
 
-class ContextCheckerTest extends \PHPUnit\Framework\TestCase
+class ContextCheckerTest extends TestCase
 {
-    /** @var ContextChecker */
-    private $contextChecker;
+    private ContextChecker $contextChecker;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class ContextCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isApplicableDataProvider
      */
-    public function testIsApplicable(array $context, bool $result)
+    public function testIsApplicable(array $context, bool $result): void
     {
         $this->assertEquals($result, $this->contextChecker->isApplicableInContext($context));
     }

@@ -4,12 +4,13 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\LocaleBundle\Form\Type\NameFormatType;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class NameFormatTypeTest extends \PHPUnit\Framework\TestCase
+class NameFormatTypeTest extends TestCase
 {
-    public function testFormType()
+    public function testFormType(): void
     {
         $nameFormatter = $this->createMock(NameFormatter::class);
         $format = '%test%';

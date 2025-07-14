@@ -4,8 +4,9 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM\Event;
 
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\ORM\Event\PreClearEventArgs;
+use PHPUnit\Framework\TestCase;
 
-class PreClearEventArgsTest extends \PHPUnit\Framework\TestCase
+class PreClearEventArgsTest extends TestCase
 {
     public function testGetEntityManager(): void
     {

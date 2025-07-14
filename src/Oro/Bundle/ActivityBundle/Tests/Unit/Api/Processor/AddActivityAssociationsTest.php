@@ -5,14 +5,12 @@ namespace Oro\Bundle\ActivityBundle\Tests\Unit\Api\Processor;
 use Oro\Bundle\ActivityBundle\Api\ActivityAssociationProvider;
 use Oro\Bundle\ActivityBundle\Api\Processor\AddActivityAssociations;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\ConfigProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class AddActivityAssociationsTest extends ConfigProcessorTestCase
 {
-    /** @var ActivityAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityAssociationProvider;
-
-    /** @var AddActivityAssociations */
-    private $processor;
+    private ActivityAssociationProvider&MockObject $activityAssociationProvider;
+    private AddActivityAssociations $processor;
 
     #[\Override]
     protected function setUp(): void

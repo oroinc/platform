@@ -7,14 +7,13 @@ use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\FeatureCheckProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FeatureCheckProcessorTest extends \PHPUnit\Framework\TestCase
+class FeatureCheckProcessorTest extends TestCase
 {
-    /** @var FeatureCheckProcessor */
-    private $processor;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
+    private FeatureCheckProcessor $processor;
+    private FeatureChecker&MockObject $featureChecker;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class FeatureCheckProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new FeatureCheckProcessor($this->featureChecker);
     }
 
-    public function testSkipFailed()
+    public function testSkipFailed(): void
     {
         $context = new TransitionContext();
         $context->setError(new \Exception('message'));
@@ -37,7 +36,7 @@ class FeatureCheckProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($context->hasError());
     }
 
-    public function testProcessCheckOk()
+    public function testProcessCheckOk(): void
     {
         $context = new TransitionContext();
         $context->setWorkflowName('workflow_ok');
@@ -52,7 +51,7 @@ class FeatureCheckProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($context->hasError());
     }
 
-    public function testProcessCheckFalse()
+    public function testProcessCheckFalse(): void
     {
         $context = new TransitionContext();
         $context->setWorkflowName('workflow_ok');

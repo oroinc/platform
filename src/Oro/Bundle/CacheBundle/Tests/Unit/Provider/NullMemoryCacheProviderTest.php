@@ -3,11 +3,11 @@
 namespace Oro\Bundle\CacheBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\CacheBundle\Provider\NullMemoryCacheProvider;
+use PHPUnit\Framework\TestCase;
 
-class NullMemoryCacheProviderTest extends \PHPUnit\Framework\TestCase
+class NullMemoryCacheProviderTest extends TestCase
 {
-    /** @var NullMemoryCacheProvider */
-    private $provider;
+    private NullMemoryCacheProvider $provider;
 
     #[\Override]
     protected function setUp(): void

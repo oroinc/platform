@@ -7,18 +7,17 @@ use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LayoutBundle\Provider\Image\ConfigImagePlaceholderProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ConfigImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigImagePlaceholderProviderTest extends TestCase
 {
     private const CONFIG_KEY = 'oro_test.key';
 
-    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
-
-    private DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject $doctrineHelper;
-
-    private AttachmentManager|\PHPUnit\Framework\MockObject\MockObject $attachmentManager;
-
+    private ConfigManager&MockObject $configManager;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private AttachmentManager&MockObject $attachmentManager;
     private ConfigImagePlaceholderProvider $provider;
 
     #[\Override]

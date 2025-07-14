@@ -71,7 +71,9 @@ class CompleteDefinitionHelperTestCase extends TestCase
             ->willReturnCallback(function () use ($classMetadata) {
                 return ClassMetadata::INHERITANCE_TYPE_NONE === $classMetadata->inheritanceType;
             });
-        $classMetadata->expects(self::any())->method('getName')->willReturn($className);
+        $classMetadata->expects(self::any())
+            ->method('getName')
+            ->willReturn($className);
 
         return $classMetadata;
     }

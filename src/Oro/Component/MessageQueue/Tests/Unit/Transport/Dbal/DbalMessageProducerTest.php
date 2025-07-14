@@ -10,11 +10,12 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageProducer;
 use Oro\Component\MessageQueue\Transport\Exception\RuntimeException;
 use Oro\Component\MessageQueue\Transport\Queue;
 use Oro\Component\MessageQueue\Util\JSON;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DbalMessageProducerTest extends \PHPUnit\Framework\TestCase
+class DbalMessageProducerTest extends TestCase
 {
-    private DbalConnection|\PHPUnit\Framework\MockObject\MockObject $connection;
-
+    private DbalConnection&MockObject $connection;
     private DbalMessageProducer $messageProducer;
 
     #[\Override]
@@ -51,13 +52,11 @@ class DbalMessageProducerTest extends \PHPUnit\Framework\TestCase
                 'delayed_until' => Types::INTEGER,
             ]);
 
-        $this->connection
-            ->expects(self::once())
+        $this->connection->expects(self::once())
             ->method('getDBALConnection')
             ->willReturn($dbalConnection);
 
-        $this->connection
-            ->expects(self::once())
+        $this->connection->expects(self::once())
             ->method('getTableName')
             ->willReturn('oro_message_queue');
 
@@ -81,13 +80,11 @@ class DbalMessageProducerTest extends \PHPUnit\Framework\TestCase
                 'delayed_until' => Types::INTEGER,
             ]);
 
-        $this->connection
-            ->expects(self::once())
+        $this->connection->expects(self::once())
             ->method('getDBALConnection')
             ->willReturn($dbalConnection);
 
-        $this->connection
-            ->expects(self::once())
+        $this->connection->expects(self::once())
             ->method('getTableName')
             ->willReturn('oro_message_queue');
 
@@ -120,13 +117,11 @@ class DbalMessageProducerTest extends \PHPUnit\Framework\TestCase
             ])
             ->willThrowException(new \Exception());
 
-        $this->connection
-            ->expects(self::once())
+        $this->connection->expects(self::once())
             ->method('getDBALConnection')
             ->willReturn($dbalConnection);
 
-        $this->connection
-            ->expects(self::once())
+        $this->connection->expects(self::once())
             ->method('getTableName')
             ->willReturn('oro_message_queue');
 

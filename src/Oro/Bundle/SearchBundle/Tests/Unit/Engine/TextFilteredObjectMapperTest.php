@@ -33,7 +33,7 @@ class TextFilteredObjectMapperTest extends ObjectMapperTest
      * Overwritten due to ORM limitations
      */
     #[\Override]
-    public function testAllTextLimitation()
+    public function testAllTextLimitation(): void
     {
         // create a product name exceeding the 256 length limitation
         $productName = 'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234'

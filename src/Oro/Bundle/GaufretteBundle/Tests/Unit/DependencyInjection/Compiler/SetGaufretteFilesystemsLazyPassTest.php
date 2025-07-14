@@ -4,17 +4,15 @@ namespace Oro\Bundle\GaufretteBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\GaufretteBundle\DependencyInjection\Compiler\SetGaufretteFilesystemsLazyPass;
 use Oro\Bundle\GaufretteBundle\FilesystemMap;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 
-class SetGaufretteFilesystemsLazyPassTest extends \PHPUnit\Framework\TestCase
+class SetGaufretteFilesystemsLazyPassTest extends TestCase
 {
-    /** @var ContainerBuilder */
-    private $container;
-
-    /** @var SetGaufretteFilesystemsLazyPass */
-    private $compiler;
+    private ContainerBuilder $container;
+    private SetGaufretteFilesystemsLazyPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +21,7 @@ class SetGaufretteFilesystemsLazyPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new SetGaufretteFilesystemsLazyPass();
     }
 
-    public function testNoFilesystemMapService()
+    public function testNoFilesystemMapService(): void
     {
         $this->expectException(ServiceNotFoundException::class);
         $this->expectExceptionMessage('You have requested a non-existent service "knp_gaufrette.filesystem_map".');
@@ -31,7 +29,7 @@ class SetGaufretteFilesystemsLazyPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($this->container);
     }
 
-    public function testNoFirstArgumentInFilesystemMapService()
+    public function testNoFirstArgumentInFilesystemMapService(): void
     {
         $this->container->register('knp_gaufrette.filesystem_map', FilesystemMap::class);
 
@@ -43,7 +41,7 @@ class SetGaufretteFilesystemsLazyPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($this->container);
     }
 
-    public function testFirstArgumentInFilesystemMapServiceIsNotArray()
+    public function testFirstArgumentInFilesystemMapServiceIsNotArray(): void
     {
         $this->container->register('knp_gaufrette.filesystem_map', FilesystemMap::class)
             ->addArgument(null);
@@ -56,7 +54,7 @@ class SetGaufretteFilesystemsLazyPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($this->container);
     }
 
-    public function testFirstArgumentInFilesystemMapServiceIsUnexpectedArray()
+    public function testFirstArgumentInFilesystemMapServiceIsUnexpectedArray(): void
     {
         $this->container->register('knp_gaufrette.filesystem_map', FilesystemMap::class)
             ->addArgument(['key' => 'val']);
@@ -70,7 +68,7 @@ class SetGaufretteFilesystemsLazyPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($this->container);
     }
 
-    public function testShouldMarkAllFilesystemsAsLazy()
+    public function testShouldMarkAllFilesystemsAsLazy(): void
     {
         $this->container->register('knp_gaufrette.filesystem_map', FilesystemMap::class)
             ->addArgument([

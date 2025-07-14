@@ -4,11 +4,11 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Provider\BusinessUnitPhoneProvider;
+use PHPUnit\Framework\TestCase;
 
-class BusinessUnitPhoneProviderTest extends \PHPUnit\Framework\TestCase
+class BusinessUnitPhoneProviderTest extends TestCase
 {
-    /** @var BusinessUnitPhoneProvider */
-    private $provider;
+    private BusinessUnitPhoneProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class BusinessUnitPhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new BusinessUnitPhoneProvider();
     }
 
-    public function testGetPhoneNumber()
+    public function testGetPhoneNumber(): void
     {
         $entity = new BusinessUnit();
 
@@ -31,7 +31,7 @@ class BusinessUnitPhoneProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPhoneNumbers()
+    public function testGetPhoneNumbers(): void
     {
         $entity = new BusinessUnit();
 

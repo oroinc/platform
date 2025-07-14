@@ -5,10 +5,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger\Verifier;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerCompoundVerifier;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerVerifierInterface;
+use PHPUnit\Framework\TestCase;
 
-class TransitionEventTriggerCompoundVerifierTest extends \PHPUnit\Framework\TestCase
+class TransitionEventTriggerCompoundVerifierTest extends TestCase
 {
-    public function testAddVerifier()
+    public function testAddVerifier(): void
     {
         $trigger = new TransitionEventTrigger();
 

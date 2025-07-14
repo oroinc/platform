@@ -3,10 +3,11 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Model;
 
 use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
+use PHPUnit\Framework\TestCase;
 
-class EntityFieldStructureTest extends \PHPUnit\Framework\TestCase
+class EntityFieldStructureTest extends TestCase
 {
-    public function testName()
+    public function testName(): void
     {
         $field = new EntityFieldStructure();
         self::assertNull($field->getName());
@@ -16,7 +17,7 @@ class EntityFieldStructureTest extends \PHPUnit\Framework\TestCase
         self::assertSame($value, $field->getName());
     }
 
-    public function testNormalizedName()
+    public function testNormalizedName(): void
     {
         $field = new EntityFieldStructure();
         self::assertNull($field->getNormalizedName());
@@ -27,7 +28,7 @@ class EntityFieldStructureTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function testLabel()
+    public function testLabel(): void
     {
         $field = new EntityFieldStructure();
         self::assertNull($field->getLabel());
@@ -37,7 +38,7 @@ class EntityFieldStructureTest extends \PHPUnit\Framework\TestCase
         self::assertSame($value, $field->getLabel());
     }
 
-    public function testType()
+    public function testType(): void
     {
         $field = new EntityFieldStructure();
         self::assertNull($field->getType());
@@ -47,7 +48,7 @@ class EntityFieldStructureTest extends \PHPUnit\Framework\TestCase
         self::assertSame($value, $field->getType());
     }
 
-    public function testRelationType()
+    public function testRelationType(): void
     {
         $field = new EntityFieldStructure();
         self::assertNull($field->getRelationType());
@@ -57,7 +58,7 @@ class EntityFieldStructureTest extends \PHPUnit\Framework\TestCase
         self::assertSame($value, $field->getRelationType());
     }
 
-    public function testRelatedEntityName()
+    public function testRelatedEntityName(): void
     {
         $field = new EntityFieldStructure();
         self::assertNull($field->getRelatedEntityName());
@@ -67,7 +68,7 @@ class EntityFieldStructureTest extends \PHPUnit\Framework\TestCase
         self::assertSame($value, $field->getRelatedEntityName());
     }
 
-    public function testOptions()
+    public function testOptions(): void
     {
         $field = new EntityFieldStructure();
         self::assertSame([], $field->getOptions());
@@ -80,7 +81,7 @@ class EntityFieldStructureTest extends \PHPUnit\Framework\TestCase
         self::assertSame(['option1' => 'value1'], $field->getOptions());
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $field = new EntityFieldStructure();
         $field->setName('field1');

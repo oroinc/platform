@@ -7,19 +7,16 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 use Oro\Bundle\NotificationBundle\Provider\DoctrineListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class DoctrineListenerTest extends \PHPUnit\Framework\TestCase
+class DoctrineListenerTest extends TestCase
 {
-    /** @var EntityPool|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityPool;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var DoctrineListener */
-    private $listener;
+    private EntityPool&MockObject $entityPool;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private DoctrineListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +27,7 @@ class DoctrineListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new DoctrineListener($this->entityPool, $this->eventDispatcher);
     }
 
-    public function testPostFlush()
+    public function testPostFlush(): void
     {
         $args = $this->createMock(PostFlushEventArgs::class);
 
@@ -50,7 +47,7 @@ class DoctrineListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider eventDataProvider
      */
-    public function testEventDispatchers(string $methodName, string $eventName)
+    public function testEventDispatchers(string $methodName, string $eventName): void
     {
         $args = $this->createMock(LifecycleEventArgs::class);
         $args->expects($this->once())

@@ -6,33 +6,24 @@ use Knp\Menu\MenuItem;
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
 use Oro\Bundle\UIBundle\Twig\TabExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class TabExtensionTest extends \PHPUnit\Framework\TestCase
+class TabExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $environment;
-
-    /** @var MenuExtension|\PHPUnit\Framework\MockObject\MockObject */
-    private $menuExtension;
-
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var TabExtension */
-    private $extension;
+    private Environment&MockObject $environment;
+    private MenuExtension&MockObject $menuExtension;
+    private RouterInterface&MockObject $router;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TranslatorInterface&MockObject $translator;
+    private TabExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -53,7 +44,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new TabExtension($container);
     }
 
-    public function testTabPanel()
+    public function testTabPanel(): void
     {
         $expected = 'test';
 
@@ -71,7 +62,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMenuTabPanelWithoutAnyParameters()
+    public function testMenuTabPanelWithoutAnyParameters(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Extra parameter "widgetRoute" should be defined for');
@@ -93,7 +84,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
         self::callTwigFunction($this->extension, 'menuTabPanel', [$this->environment, []]);
     }
 
-    public function testMenuTabPanel()
+    public function testMenuTabPanel(): void
     {
         $expected = 'test';
         $child = $this->createMenuItem(null, ['uri' => 'test', 'widgetAcl' => 'testAcl']);
@@ -125,7 +116,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider menuProvider
      */
-    public function testGetTabs(array $options, ?array $tab, array $tabOptions, array $acl, $isDisplayed = true)
+    public function testGetTabs(array $options, ?array $tab, array $tabOptions, array $acl, $isDisplayed = true): void
     {
         $child = $this->createMenuItem(null, $options);
         $child->expects($this->once())
@@ -252,10 +243,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return MenuItem|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createMenuItem(?MenuItem $child = null, array $options = []): MenuItem
+    private function createMenuItem(?MenuItem $child = null, array $options = []): MenuItem&MockObject
     {
         $menuItem = $this->createMock(MenuItem::class);
         if ($child) {

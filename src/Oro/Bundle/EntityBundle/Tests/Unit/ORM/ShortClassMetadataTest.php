@@ -3,10 +3,11 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
 use Oro\Bundle\EntityBundle\ORM\ShortClassMetadata;
+use PHPUnit\Framework\TestCase;
 
-class ShortClassMetadataTest extends \PHPUnit\Framework\TestCase
+class ShortClassMetadataTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $metadata = new ShortClassMetadata('Test\Entity');
         $this->assertEquals('Test\Entity', $metadata->name);
@@ -24,7 +25,7 @@ class ShortClassMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($metadata->hasAssociations);
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $metadata = new ShortClassMetadata('Test\Entity');
         $this->assertEquals($metadata, unserialize(serialize($metadata)));
@@ -36,7 +37,7 @@ class ShortClassMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($metadata, unserialize(serialize($metadata)));
     }
 
-    public function testSetState()
+    public function testSetState(): void
     {
         $metadata = ShortClassMetadata::__set_state([
             'name'               => 'Test\Entity',

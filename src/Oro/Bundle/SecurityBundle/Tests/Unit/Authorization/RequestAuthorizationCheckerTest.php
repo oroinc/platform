@@ -6,22 +6,17 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
 use Oro\Bundle\SecurityBundle\Metadata\AclAttributeProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
+class RequestAuthorizationCheckerTest extends TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassResolver;
-
-    /** @var AclAttributeProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeProvider;
-
-    /** @var RequestAuthorizationChecker */
-    private $requestAuthorizationChecker;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private EntityClassResolver&MockObject $entityClassResolver;
+    private AclAttributeProvider&MockObject $attributeProvider;
+    private RequestAuthorizationChecker $requestAuthorizationChecker;
 
     #[\Override]
     protected function setUp(): void
@@ -37,7 +32,7 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetRequestAcl()
+    public function testGetRequestAcl(): void
     {
         $request = new Request();
         $request->attributes->add(['_controller' => 'testController::testAction']);
@@ -60,7 +55,7 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Acme\Bundle\TestBundle\Entity\Test', $acl->getClass());
     }
 
-    public function testGetRequestAclWhenAclNotFound()
+    public function testGetRequestAclWhenAclNotFound(): void
     {
         $request = new Request();
         $request->attributes->add(['_controller' => 'testController::testAction']);
@@ -77,7 +72,7 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($returnAcl);
     }
 
-    public function testGeRequestAclForInvokableController()
+    public function testGeRequestAclForInvokableController(): void
     {
         $request = new Request();
         $request->attributes->add(['_controller' => 'testController']);
@@ -100,7 +95,7 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Acme\Bundle\TestBundle\Entity\Test', $acl->getClass());
     }
 
-    public function testGeRequestAclForInvokableControllerWhenAclNotFound()
+    public function testGeRequestAclForInvokableControllerWhenAclNotFound(): void
     {
         $request = new Request();
         $request->attributes->add(['_controller' => 'testController']);
@@ -120,7 +115,7 @@ class RequestAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isRequestObjectIsGrantedProvider
      */
-    public function testIsRequestObjectIsGranted(string $requestController, bool $isGrant, int $result)
+    public function testIsRequestObjectIsGranted(string $requestController, bool $isGrant, int $result): void
     {
         $object = new \stdClass();
         $request = new Request();

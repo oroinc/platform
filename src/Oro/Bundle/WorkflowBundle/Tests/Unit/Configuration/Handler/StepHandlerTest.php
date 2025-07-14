@@ -4,11 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Handler;
 
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\StepHandler;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use PHPUnit\Framework\TestCase;
 
-class StepHandlerTest extends \PHPUnit\Framework\TestCase
+class StepHandlerTest extends TestCase
 {
-    /** @var StepHandler */
-    private $handler;
+    private StepHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class StepHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider handleDataProvider
      */
-    public function testHandle(array $expected, array $input)
+    public function testHandle(array $expected, array $input): void
     {
         $this->assertEquals($expected, $this->handler->handle($input));
     }
@@ -164,7 +164,7 @@ class StepHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testHandleEmptyConfiguration()
+    public function testHandleEmptyConfiguration(): void
     {
         $configuration = [
             WorkflowConfiguration::NODE_STEPS => [

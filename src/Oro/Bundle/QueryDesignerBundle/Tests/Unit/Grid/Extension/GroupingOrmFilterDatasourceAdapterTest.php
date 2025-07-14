@@ -5,6 +5,7 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\Extension;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\GroupingOrmFilterDatasourceAdapter;
+use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 
 /**
@@ -12,11 +13,11 @@ use Oro\Component\Testing\Unit\ORM\OrmTestCase;
  */
 class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
 {
-    public function testNoRestrictions()
+    public function testNoRestrictions(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -28,11 +29,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testOneRestriction()
+    public function testOneRestriction(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -46,11 +47,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testOneComputedRestriction()
+    public function testOneComputedRestriction(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.status, COUNT(u.id)'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->groupBy('u.status');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -65,11 +66,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testSeveralRestrictions()
+    public function testSeveralRestrictions(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -86,11 +87,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testSeveralComputedRestrictions()
+    public function testSeveralComputedRestrictions(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.status, COUNT(u.id)'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->groupBy('u.status');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -107,11 +108,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testEmptyGroup()
+    public function testEmptyGroup(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -126,11 +127,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testOneRestrictionInGroup()
+    public function testOneRestrictionInGroup(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -146,11 +147,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testOneComputedRestrictionInGroup()
+    public function testOneComputedRestrictionInGroup(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.status, COUNT(u.id)'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->groupBy('u.status');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -167,11 +168,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testSeveralRestrictionsInGroup()
+    public function testSeveralRestrictionsInGroup(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -190,11 +191,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testSeveralComputedRestrictionsInGroup()
+    public function testSeveralComputedRestrictionsInGroup(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.status, COUNT(u.id)'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->groupBy('u.status');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -213,11 +214,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testNestedGroupsWithOneRestrictionInNestedGroup()
+    public function testNestedGroupsWithOneRestrictionInNestedGroup(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -239,11 +240,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testNestedGroupsWithOneComputedRestrictionInNestedGroup()
+    public function testNestedGroupsWithOneComputedRestrictionInNestedGroup(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.status, COUNT(u.id)'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->groupBy('u.status')
             ->andHaving('MAX(u.id) > 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
@@ -266,11 +267,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testNestedGroupsWithSameCondition()
+    public function testNestedGroupsWithSameCondition(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -293,11 +294,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testNestedComputedGroupsWithSameCondition()
+    public function testNestedComputedGroupsWithSameCondition(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.status, COUNT(u.id)'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->groupBy('u.status');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -320,11 +321,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testNestedGroupsWithDifferentConditions()
+    public function testNestedGroupsWithDifferentConditions(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -347,11 +348,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testNestedComputedGroupsWithDifferentConditions()
+    public function testNestedComputedGroupsWithDifferentConditions(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.status, COUNT(u.id)'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->groupBy('u.status');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -374,11 +375,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testComplexExpr()
+    public function testComplexExpr(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -414,11 +415,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testComplexComputedExpr()
+    public function testComplexComputedExpr(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.status, COUNT(u.id)'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->groupBy('u.status')
             ->having('COUNT(u.id) = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
@@ -457,11 +458,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testComputedWithUnComputedRestrictionsTogether()
+    public function testComputedWithUnComputedRestrictionsTogether(): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.status, COUNT(u.id)'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->groupBy('u.status');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -480,14 +481,14 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    public function testComputedWithUnComputedRestrictionsTogetherShouldReturnExceptionWhenRestrictionsAreMixed()
+    public function testComputedWithUnComputedRestrictionsTogetherShouldReturnExceptionWhenRestrictionsAreMixed(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Computed conditions cannot be mixed with uncomputed.');
 
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.status, COUNT(u.id)'])
-            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->from(CmsUser::class, 'u')
             ->groupBy('u.status');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 

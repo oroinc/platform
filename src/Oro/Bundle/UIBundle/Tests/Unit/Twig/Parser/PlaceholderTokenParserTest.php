@@ -3,6 +3,8 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig\Parser;
 
 use Oro\Bundle\UIBundle\Twig\Parser\PlaceholderTokenParser;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Twig\Compiler;
 use Twig\ExpressionParser;
 use Twig\Node\Expression\AbstractExpression;
@@ -16,16 +18,11 @@ use Twig\Parser;
 use Twig\Token;
 use Twig\TokenStream;
 
-class PlaceholderTokenParserTest extends \PHPUnit\Framework\TestCase
+class PlaceholderTokenParserTest extends TestCase
 {
-    /** @var TokenStream */
-    private $stream;
-
-    /** @var Compiler|\PHPUnit\Framework\MockObject\MockObject */
-    private $compiler;
-
-    /** @var PlaceholderTokenParser */
-    private $tokenParser;
+    private TokenStream $stream;
+    private Compiler&MockObject $compiler;
+    private PlaceholderTokenParser $tokenParser;
 
     #[\Override]
     protected function setUp(): void

@@ -14,9 +14,8 @@ use PHPUnit\Framework\TestCase;
 
 class EntityStructureOptionsListenerTest extends TestCase
 {
+    private EntityAliasResolver&MockObject $entityAliasResolver;
     private EntityStructureOptionsListener $listener;
-
-    private EntityAliasResolver|MockObject $entityAliasResolver;
 
     #[\Override]
     protected function setUp(): void
@@ -56,13 +55,11 @@ class EntityStructureOptionsListenerTest extends TestCase
         $fieldWithoutEntityAlias->setName(sprintf('%s::std_a366db2', \stdClass::class));
         $entityStructureToCheck->addField($fieldWithoutEntityAlias);
 
-        $this->entityAliasResolver
-            ->expects(self::exactly(2))
+        $this->entityAliasResolver->expects(self::exactly(2))
             ->method('hasAlias')
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $this->entityAliasResolver
-            ->expects(self::exactly(1))
+        $this->entityAliasResolver->expects(self::exactly(1))
             ->method('getAlias')
             ->willReturn('cms_address');
 

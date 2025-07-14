@@ -10,11 +10,12 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class IndexEntitiesByRangeMessageProcessorTest extends TestCase
 {
-    public function testCouldBeConstructedWithRequiredAttributes()
+    public function testCouldBeConstructedWithRequiredAttributes(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -26,7 +27,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
         );
     }
 
-    public function testShouldBeSubscribedForTopics()
+    public function testShouldBeSubscribedForTopics(): void
     {
         $this->assertEquals(
             [
@@ -36,7 +37,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
         );
     }
 
-    public function testShouldRejectMessageIfClassIsNotSetInMessage()
+    public function testShouldRejectMessageIfClassIsNotSetInMessage(): void
     {
         $doctrine = $this->createMock(ManagerRegistry::class);
 
@@ -67,7 +68,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldRejectMessageIfOffsetIsNotSetInMessage()
+    public function testShouldRejectMessageIfOffsetIsNotSetInMessage(): void
     {
         $doctrine = $this->createMock(ManagerRegistry::class);
 
@@ -99,7 +100,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldRejectMessageIfLimitIsNotSetInMessage()
+    public function testShouldRejectMessageIfLimitIsNotSetInMessage(): void
     {
         $doctrine = $this->createMock(ManagerRegistry::class);
 
@@ -131,7 +132,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldRejectMessageIfEntityManagerWasNotFoundForClass()
+    public function testShouldRejectMessageIfEntityManagerWasNotFoundForClass(): void
     {
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->once())

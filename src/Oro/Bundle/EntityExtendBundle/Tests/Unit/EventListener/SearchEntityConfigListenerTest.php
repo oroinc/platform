@@ -13,23 +13,18 @@ use Oro\Bundle\EntityExtendBundle\EventListener\SearchEntityConfigListener;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
+class SearchEntityConfigListenerTest extends TestCase
 {
     private const TEST_CLASS = 'Test\Class';
     private const TEST_FIELD = 'testField';
 
-    /** @var SearchMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $searchMappingProvider;
-
-    /** @var IndexerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $searchIndexer;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var SearchEntityConfigListener */
-    private $listener;
+    private SearchMappingProvider&MockObject $searchMappingProvider;
+    private IndexerInterface&MockObject $searchIndexer;
+    private ConfigManager&MockObject $configManager;
+    private SearchEntityConfigListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -57,7 +52,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         return $config;
     }
 
-    public function testShouldRunReindexWhenSearchableFlagIsChangedAndFieldIsInActiveState()
+    public function testShouldRunReindexWhenSearchableFlagIsChangedAndFieldIsInActiveState(): void
     {
         $searchConfig = $this->getFieldConfig('search');
         $configs = [
@@ -87,7 +82,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($this->getClassNames($this->listener));
     }
 
-    public function testShouldRunReindexOnlyOnceWhenSeveralFieldsRequiredReindex()
+    public function testShouldRunReindexOnlyOnceWhenSeveralFieldsRequiredReindex(): void
     {
         $searchConfig1 = new Config(new FieldConfigId('search', self::TEST_CLASS, 'field1'));
         $extendConfig1 = new Config(new FieldConfigId('extend', self::TEST_CLASS, 'field1'));
@@ -128,7 +123,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($this->getClassNames($this->listener));
     }
 
-    public function testShouldRunReindexForEachTypeOfEntityWhenItsFieldsRequiredReindex()
+    public function testShouldRunReindexForEachTypeOfEntityWhenItsFieldsRequiredReindex(): void
     {
         $searchConfig1 = new Config(new FieldConfigId('search', 'Test\Class1', 'field1'));
         $extendConfig1 = new Config(new FieldConfigId('extend', 'Test\Class1', 'field1'));
@@ -169,7 +164,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($this->getClassNames($this->listener));
     }
 
-    public function testShouldNotReindexForEntityNotHavingSearchConfigSingleEntity()
+    public function testShouldNotReindexForEntityNotHavingSearchConfigSingleEntity(): void
     {
         $searchConfig = $this->getFieldConfig('search');
         $configs = [
@@ -198,7 +193,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($this->getClassNames($this->listener));
     }
 
-    public function testShouldNotReindexForEntityNotHavingSearchConfigMultipleEntities()
+    public function testShouldNotReindexForEntityNotHavingSearchConfigMultipleEntities(): void
     {
         $searchConfig1 = new Config(new FieldConfigId('search', 'Test\Class1', 'field1'));
         $extendConfig1 = new Config(new FieldConfigId('extend', 'Test\Class1', 'field1'));
@@ -239,7 +234,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($this->getClassNames($this->listener));
     }
 
-    public function testShouldIgnoreFieldWhenSearchableFlagIsChangedButFieldIsNotInActiveState()
+    public function testShouldIgnoreFieldWhenSearchableFlagIsChangedButFieldIsNotInActiveState(): void
     {
         $searchConfig = $this->getFieldConfig('search');
         $configs = [
@@ -263,7 +258,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($this->getClassNames($this->listener));
     }
 
-    public function testShouldIgnoreFieldDoesNotHaveSearchConfig()
+    public function testShouldIgnoreFieldDoesNotHaveSearchConfig(): void
     {
         $configs = [
             'extend' => $this->getFieldConfig('extend', ['state' => ExtendScope::STATE_ACTIVE])
@@ -280,7 +275,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postFlush(new PostFlushConfigEvent([], $this->configManager));
     }
 
-    public function testShouldIgnoreFieldWhenSearchableFlagIsNotChanged()
+    public function testShouldIgnoreFieldWhenSearchableFlagIsNotChanged(): void
     {
         $searchConfig = $this->getFieldConfig('search');
         $configs = [
@@ -302,7 +297,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postFlush(new PostFlushConfigEvent([], $this->configManager));
     }
 
-    public function testShouldIgnoreFieldWhenSearchableFlagIsChangedButFieldDoesNotHaveExtendConfig()
+    public function testShouldIgnoreFieldWhenSearchableFlagIsChangedButFieldDoesNotHaveExtendConfig(): void
     {
         $searchConfig = $this->getFieldConfig('search');
         $configs = [

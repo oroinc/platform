@@ -27,18 +27,20 @@ use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 class TestHelper
 {
-    public static function get(\PHPUnit\Framework\TestCase $testCase)
+    public static function get(TestCase $testCase)
     {
         return new TestHelper($testCase);
     }
 
-    /** @var \PHPUnit\Framework\TestCase */
+    /** @var TestCase */
     private $testCase;
 
-    public function __construct(\PHPUnit\Framework\TestCase $testCase)
+    public function __construct(TestCase $testCase)
     {
         $this->testCase = $testCase;
     }
@@ -255,12 +257,7 @@ class TestHelper
         );
     }
 
-    /**
-     * @param \PHPUnit\Framework\TestCase $testCase
-     *
-     * @return PermissionManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getPermissionManagerMock(\PHPUnit\Framework\TestCase $testCase)
+    private function getPermissionManagerMock(TestCase $testCase): PermissionManager&MockObject
     {
         $permissionManager = $testCase->getMockBuilder(PermissionManager::class)
             ->disableOriginalConstructor()
@@ -279,12 +276,7 @@ class TestHelper
         return $permissionManager;
     }
 
-    /**
-     * @param \PHPUnit\Framework\TestCase $testCase
-     *
-     * @return AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getGroupProviderMock(\PHPUnit\Framework\TestCase $testCase)
+    private function getGroupProviderMock(TestCase $testCase): AclGroupProviderInterface&MockObject
     {
         $aclGroupProvider = $testCase->getMockBuilder(AclGroupProviderInterface::class)->getMock();
         $aclGroupProvider->expects($testCase->any())

@@ -5,12 +5,12 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Filter;
 use Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\Config\Resolver\ResolverInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class WidgetConfigVisibilityFilterTest extends \PHPUnit\Framework\TestCase
+class WidgetConfigVisibilityFilterTest extends TestCase
 {
-    /** @var WidgetConfigVisibilityFilter */
-    private $widgetConfigVisibilityFilter;
+    private WidgetConfigVisibilityFilter $widgetConfigVisibilityFilter;
 
     #[\Override]
     protected function setUp(): void
@@ -48,7 +48,7 @@ class WidgetConfigVisibilityFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider filterConfigsProvider
      */
-    public function testFilterConfigs(array $configs, ?string $widgetName, array $expectedConfigs)
+    public function testFilterConfigs(array $configs, ?string $widgetName, array $expectedConfigs): void
     {
         $this->assertEquals(
             $expectedConfigs,

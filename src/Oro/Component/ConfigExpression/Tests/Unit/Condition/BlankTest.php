@@ -3,26 +3,27 @@
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Condition\Blank;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class BlankTest extends \PHPUnit\Framework\TestCase
+class BlankTest extends TestCase
 {
-    private Condition\Blank $condition;
+    private Blank $condition;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->condition = new Condition\Blank();
+        $this->condition = new Blank();
         $this->condition->setContextAccessor(new ContextAccessor());
     }
 
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, $context, $expectedResult)
+    public function testEvaluate(array $options, $context, $expectedResult): void
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -64,7 +65,7 @@ class BlankTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testAddError()
+    public function testAddError(): void
     {
         $context = ['foo' => 'bar'];
         $options = [new PropertyPath('foo')];
@@ -84,7 +85,7 @@ class BlankTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInitializeFailsWhenEmptyOptions()
+    public function testInitializeFailsWhenEmptyOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 element, but 0 given.');
@@ -95,7 +96,7 @@ class BlankTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray(array $options, ?string $message, array $expected)
+    public function testToArray(array $options, ?string $message, array $expected): void
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -137,7 +138,7 @@ class BlankTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile(array $options, ?string $message, string $expected)
+    public function testCompile(array $options, ?string $message, string $expected): void
     {
         $this->condition->initialize($options);
         if ($message !== null) {

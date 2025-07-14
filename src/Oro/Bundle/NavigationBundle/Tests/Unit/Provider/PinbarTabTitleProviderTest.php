@@ -10,19 +10,16 @@ use Oro\Bundle\NavigationBundle\Provider\TitleService;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\NavigationItemStub;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PinbarTabTitleProviderTest extends \PHPUnit\Framework\TestCase
+class PinbarTabTitleProviderTest extends TestCase
 {
     private const TITLE_TEMPLATE = 'title-template';
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var TitleService|\PHPUnit\Framework\MockObject\MockObject */
-    private $titleService;
-
-    /** @var PinbarTabTitleProvider */
-    private $provider;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private TitleService&MockObject $titleService;
+    private PinbarTabTitleProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -97,7 +94,7 @@ class PinbarTabTitleProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetTitlesWithSomeTitlesAlreadyOccupied()
+    public function testGetTitlesWithSomeTitlesAlreadyOccupied(): void
     {
         $navigationItem = new NavigationItemStub([
             'title' => self::TITLE_TEMPLATE,

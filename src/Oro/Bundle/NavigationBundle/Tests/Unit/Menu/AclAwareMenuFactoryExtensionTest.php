@@ -8,6 +8,8 @@ use Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
 use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
@@ -17,25 +19,14 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
+class AclAwareMenuFactoryExtensionTest extends TestCase
 {
-    /** @var UrlMatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $urlMatcher;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var ClassAuthorizationChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $classAuthorizationChecker;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var MenuFactory */
-    private $factory;
+    private UrlMatcherInterface&MockObject $urlMatcher;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private ClassAuthorizationChecker&MockObject $classAuthorizationChecker;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private LoggerInterface&MockObject $logger;
+    private MenuFactory $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -69,7 +60,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsWithResourceIdDataProvider
      */
-    public function testBuildOptionsWithResourceId(array $options, bool $isAllowed)
+    public function testBuildOptionsWithResourceId(array $options, bool $isAllowed): void
     {
         $this->tokenAccessor->expects($this->once())
             ->method('getToken')
@@ -129,7 +120,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsWithoutLoggedUser
      */
-    public function testBuildOptionsWithoutLoggedUser(array $options, bool $isAllowed)
+    public function testBuildOptionsWithoutLoggedUser(array $options, bool $isAllowed): void
     {
         $this->tokenAccessor->expects($this->any())
             ->method('getToken')
@@ -166,7 +157,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testBuildOptionsWithRouteNotFound()
+    public function testBuildOptionsWithRouteNotFound(): void
     {
         $options = ['route' => 'no-route'];
 
@@ -185,7 +176,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($item->getExtra('isAllowed'));
     }
 
-    public function testBuildOptionsAlreadyProcessed()
+    public function testBuildOptionsAlreadyProcessed(): void
     {
         $options = [
             'extras' => [
@@ -204,7 +195,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider aclPolicyProvider
      */
-    public function testDefaultPolicyOverride(array $options, bool $expected)
+    public function testDefaultPolicyOverride(array $options, bool $expected): void
     {
         $this->tokenAccessor->expects($this->once())
             ->method('getToken')
@@ -231,7 +222,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider emptyUriProvider
      */
-    public function testBuildOptionsWithEmptyUri(string $uri)
+    public function testBuildOptionsWithEmptyUri(string $uri): void
     {
         $options = ['uri' => $uri];
 
@@ -264,7 +255,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testBuildOptionsWithUnknownUri()
+    public function testBuildOptionsWithUnknownUri(): void
     {
         $options = ['uri' => 'unknown'];
 
@@ -291,7 +282,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($item->getExtra('isAllowed'));
     }
 
-    public function testBuildOptionsWithEmptyRoute()
+    public function testBuildOptionsWithEmptyRoute(): void
     {
         $options = ['route' => ''];
 
@@ -313,7 +304,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsWithRouteDataProvider
      */
-    public function testBuildOptionsWithRoute(array $options, bool $isAllowed, int $callsCount)
+    public function testBuildOptionsWithRoute(array $options, bool $isAllowed, int $callsCount): void
     {
         $this->tokenAccessor->expects($this->once())
             ->method('getToken')
@@ -371,7 +362,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsWithUriDataProvider
      */
-    public function testBuildOptionsWithUri(array $options, bool $isAllowed)
+    public function testBuildOptionsWithUri(array $options, bool $isAllowed): void
     {
         $class = 'controller';
         $method = 'action';
@@ -411,7 +402,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testAclCacheByResourceId()
+    public function testAclCacheByResourceId(): void
     {
         $options = ['extras' => ['acl_resource_id' => 'resource_id']];
 
@@ -434,7 +425,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testAclCacheByKey()
+    public function testAclCacheByKey(): void
     {
         $options = ['route' => 'route_name'];
 
@@ -457,7 +448,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(MenuItem::class, $item);
     }
 
-    public function testBuildOptionsWithoutToken()
+    public function testBuildOptionsWithoutToken(): void
     {
         $options = ['route' => 'no-route', 'check_access_not_logged_in' => true];
 
@@ -475,25 +466,21 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildOptionsWithInvokableController(): void
     {
-        $this->tokenAccessor
-            ->expects(self::once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getToken')
             ->willReturn($this->createMock(TokenInterface::class));
-        $this->tokenAccessor
-            ->expects(self::once())
+        $this->tokenAccessor->expects(self::once())
             ->method('hasUser')
             ->willReturn(true);
 
         $controllerClassProvider = $this->createMock(ControllerClassProvider::class);
-        $controllerClassProvider
-            ->expects(self::once())
+        $controllerClassProvider->expects(self::once())
             ->method('getControllers')
             ->willReturn([
                 'sample_route' => ['Acme\Controller\SampleController'],
             ]);
 
-        $this->classAuthorizationChecker
-            ->expects(self::once())
+        $this->classAuthorizationChecker->expects(self::once())
             ->method('isClassMethodGranted')
             ->with('Acme\Controller\SampleController', '__invoke')
             ->willReturn(true);

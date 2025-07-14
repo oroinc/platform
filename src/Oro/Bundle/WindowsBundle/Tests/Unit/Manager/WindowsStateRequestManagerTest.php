@@ -3,16 +3,15 @@
 namespace Oro\Bundle\WindowsBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class WindowsStateRequestManagerTest extends \PHPUnit\Framework\TestCase
+class WindowsStateRequestManagerTest extends TestCase
 {
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var WindowsStateRequestManager */
-    private $manager;
+    private RequestStack&MockObject $requestStack;
+    private WindowsStateRequestManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class WindowsStateRequestManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager = new WindowsStateRequestManager($this->requestStack);
     }
 
-    public function testGetDataMissingRequest()
+    public function testGetDataMissingRequest(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Missing $request');
@@ -34,7 +33,7 @@ class WindowsStateRequestManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getData();
     }
 
-    public function testGetDataMissingData()
+    public function testGetDataMissingData(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Missing data in $request');
@@ -47,7 +46,7 @@ class WindowsStateRequestManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getData();
     }
 
-    public function testGetDataMissingUrl()
+    public function testGetDataMissingUrl(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Missing url in $data');
@@ -60,7 +59,7 @@ class WindowsStateRequestManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getData();
     }
 
-    public function testCleanUrlIsEmpty()
+    public function testCleanUrlIsEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$cleanUrl is empty');
@@ -73,7 +72,7 @@ class WindowsStateRequestManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getData();
     }
 
-    public function testGetData()
+    public function testGetData(): void
     {
         $request = new Request([], ['data' => ['url' => 'localhost/path']], [], [], [], ['SCRIPT_NAME' => 'localhost']);
         $this->requestStack->expects($this->once())
@@ -86,7 +85,7 @@ class WindowsStateRequestManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider uriDataProvider
      */
-    public function testGetUri(string $expected, array $data)
+    public function testGetUri(string $expected, array $data): void
     {
         $this->assertStringStartsWith($expected, $this->manager->getUri($data));
     }
@@ -111,7 +110,7 @@ class WindowsStateRequestManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testDataEmpty()
+    public function testDataEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('cleanUrl is missing');

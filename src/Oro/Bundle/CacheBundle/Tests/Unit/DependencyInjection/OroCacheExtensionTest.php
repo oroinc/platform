@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\CacheBundle\DependencyInjection\OroCacheExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 
-class OroCacheExtensionTest extends \PHPUnit\Framework\TestCase
+class OroCacheExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

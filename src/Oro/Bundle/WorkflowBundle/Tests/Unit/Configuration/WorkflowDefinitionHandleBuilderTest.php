@@ -7,10 +7,11 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowDefinitionHandleBuilderTest extends \PHPUnit\Framework\TestCase
+class WorkflowDefinitionHandleBuilderTest extends TestCase
 {
-    public function testBuildFromRawConfiguration()
+    public function testBuildFromRawConfiguration(): void
     {
         $rawConfiguration = ['name' => 'test_workflow'];
         $handledConfiguration = ['name' => 'test_workflow', 'label' => 'Test Workflow'];

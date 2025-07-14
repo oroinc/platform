@@ -5,17 +5,14 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Strategy;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
+class TranslationStrategyProviderTest extends TestCase
 {
-    /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $defaultStrategy;
-
-    /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $customStrategy;
-
-    /** @var TranslationStrategyProvider */
-    private $provider;
+    private TranslationStrategyInterface&MockObject $defaultStrategy;
+    private TranslationStrategyInterface&MockObject $customStrategy;
+    private TranslationStrategyProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -39,12 +36,12 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new TranslationStrategyProvider([$this->defaultStrategy, $this->customStrategy]);
     }
 
-    public function testGetStrategy()
+    public function testGetStrategy(): void
     {
         $this->assertEquals($this->defaultStrategy, $this->provider->getStrategy());
     }
 
-    public function testSetStrategy()
+    public function testSetStrategy(): void
     {
         $this->assertSame($this->defaultStrategy, $this->provider->getStrategy());
 
@@ -53,7 +50,7 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->customStrategy, $this->provider->getStrategy());
     }
 
-    public function testGetStrategies()
+    public function testGetStrategies(): void
     {
         $this->assertSame(
             [
@@ -71,7 +68,7 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
         array $fallbackTree,
         string $locale,
         array $expectedFallbackLocales
-    ) {
+    ): void {
         $defaultStrategy = $this->createMock(TranslationStrategyInterface::class);
 
         $provider = new TranslationStrategyProvider([$defaultStrategy]);
@@ -179,7 +176,7 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getAllFallbackLocalesDataProvider
      */
-    public function testGetAllFallbackLocales(array $fallbackTree, array $expectedFallbackLocales)
+    public function testGetAllFallbackLocales(array $fallbackTree, array $expectedFallbackLocales): void
     {
         $defaultStrategy = $this->createMock(TranslationStrategyInterface::class);
 

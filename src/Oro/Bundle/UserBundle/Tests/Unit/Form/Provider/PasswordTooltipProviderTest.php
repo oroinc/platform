@@ -5,12 +5,12 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Provider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
 use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PasswordTooltipProviderTest extends \PHPUnit\Framework\TestCase
+class PasswordTooltipProviderTest extends TestCase
 {
-    /** @var TranslatorInterface */
-    private $translator;
+    private TranslatorInterface $translator;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +27,7 @@ class PasswordTooltipProviderTest extends \PHPUnit\Framework\TestCase
      * @param array $configMap System config
      * @param string $expected Expected resulting tooltip
      */
-    public function testGetTooltip(array $configMap, $expected)
+    public function testGetTooltip(array $configMap, $expected): void
     {
         $configProvider = $this->getConfigProvider($configMap);
         $provider = new PasswordTooltipProvider($configProvider, $this->translator);

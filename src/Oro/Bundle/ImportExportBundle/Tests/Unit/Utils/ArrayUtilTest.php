@@ -3,13 +3,14 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\ImportExportBundle\Utils\ArrayUtil;
+use PHPUnit\Framework\TestCase;
 
-class ArrayUtilTest extends \PHPUnit\Framework\TestCase
+class ArrayUtilTest extends TestCase
 {
     /**
      * @dataProvider filterEmptyArraysDataProvider
      */
-    public function testFilterEmptyArrays(array $expected, array $data)
+    public function testFilterEmptyArrays(array $expected, array $data): void
     {
         $this->assertEquals($expected, ArrayUtil::filterEmptyArrays($data));
     }

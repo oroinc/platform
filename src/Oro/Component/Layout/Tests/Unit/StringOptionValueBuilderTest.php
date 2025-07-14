@@ -4,19 +4,20 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Exception\UnexpectedTypeException;
 use Oro\Component\Layout\StringOptionValueBuilder;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class StringOptionValueBuilderTest extends \PHPUnit\Framework\TestCase
+class StringOptionValueBuilderTest extends TestCase
 {
-    public function testConstructWithInvalidDelimiter()
+    public function testConstructWithInvalidDelimiter(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         new StringOptionValueBuilder(null);
     }
 
-    public function testBuildWithDefaultOptions()
+    public function testBuildWithDefaultOptions(): void
     {
         $builder = new StringOptionValueBuilder();
         $builder->add('val1');
@@ -27,7 +28,7 @@ class StringOptionValueBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('val1 replaced_val3 val4', $builder->get());
     }
 
-    public function testBuildWithoutTokenize()
+    public function testBuildWithoutTokenize(): void
     {
         $builder = new StringOptionValueBuilder(' ', false);
         $builder->add('val1');
@@ -38,7 +39,7 @@ class StringOptionValueBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('val1 val3 val4', $builder->get());
     }
 
-    public function testBuildWithCustomDelimiter()
+    public function testBuildWithCustomDelimiter(): void
     {
         $builder = new StringOptionValueBuilder(',');
         $builder->add('val1');
@@ -49,7 +50,7 @@ class StringOptionValueBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('val1,replaced_val3,val4', $builder->get());
     }
 
-    public function testBuildWithoutDelimiter()
+    public function testBuildWithoutDelimiter(): void
     {
         $builder = new StringOptionValueBuilder('');
         $builder->add('val1');
@@ -60,35 +61,35 @@ class StringOptionValueBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('val1replaced_val3', $builder->get());
     }
 
-    public function testAddThrowsExceptionIfInvalidValue()
+    public function testAddThrowsExceptionIfInvalidValue(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $builder = new StringOptionValueBuilder();
         $builder->add(123);
     }
 
-    public function testRemoveThrowsExceptionIfInvalidValue()
+    public function testRemoveThrowsExceptionIfInvalidValue(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $builder = new StringOptionValueBuilder();
         $builder->remove(123);
     }
 
-    public function testReplaceThrowsExceptionIfInvalidOldValue()
+    public function testReplaceThrowsExceptionIfInvalidOldValue(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $builder = new StringOptionValueBuilder();
         $builder->replace(123, 'new');
     }
 
-    public function testReplaceThrowsExceptionIfInvalidNewValue()
+    public function testReplaceThrowsExceptionIfInvalidNewValue(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $builder = new StringOptionValueBuilder();
         $builder->replace('old', 123);
     }
 
-    public function testReplaceWithNullNewValue()
+    public function testReplaceWithNullNewValue(): void
     {
         $builder = new StringOptionValueBuilder();
         $builder->add('val1');
@@ -97,14 +98,14 @@ class StringOptionValueBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('val2', $builder->get());
     }
 
-    public function testAddWithEmptyValue()
+    public function testAddWithEmptyValue(): void
     {
         $builder = new StringOptionValueBuilder();
         $builder->add('');
         $this->assertEquals('', $builder->get());
     }
 
-    public function testRemoveWithEmptyValue()
+    public function testRemoveWithEmptyValue(): void
     {
         $builder = new StringOptionValueBuilder();
         $builder->add('val1');
@@ -112,7 +113,7 @@ class StringOptionValueBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('val1', $builder->get());
     }
 
-    public function testReplaceWithEmptyOldValue()
+    public function testReplaceWithEmptyOldValue(): void
     {
         $builder = new StringOptionValueBuilder();
         $builder->add('val1');
@@ -120,7 +121,7 @@ class StringOptionValueBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('val1', $builder->get());
     }
 
-    public function testReplaceWithEmptyNewValue()
+    public function testReplaceWithEmptyNewValue(): void
     {
         $builder = new StringOptionValueBuilder();
         $builder->add('val1');

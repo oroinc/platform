@@ -7,17 +7,14 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
+class EntityNameProviderTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityNameResolver;
-
-    /** @var EntityNameProvider */
-    private $provider;
+    private ManagerRegistry&MockObject $doctrine;
+    private EntityNameResolver&MockObject $entityNameResolver;
+    private EntityNameProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +28,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider resolvedNameDataProvider
      */
-    public function testGetEntityNameFromEntityNameResolver(string $resolverName, string $expected)
+    public function testGetEntityNameFromEntityNameResolver(string $resolverName, string $expected): void
     {
         $entityClass = '\stdObject';
         $entityId = 1;

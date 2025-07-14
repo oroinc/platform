@@ -9,20 +9,15 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\EventListener\FileDeleteListener as BaseFileDeleteListener;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\EventListener\FileDeleteListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
+class FileDeleteListenerTest extends TestCase
 {
-    /** @var BaseFileDeleteListener|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerFileDeleteListener;
-
-    /** @var FileDeleteListener */
-    private $listener;
-
-    /** @var File|\PHPUnit\Framework\MockObject\MockObject */
-    private $file;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
+    private BaseFileDeleteListener&MockObject $innerFileDeleteListener;
+    private FileDeleteListener $listener;
+    private File&MockObject $file;
+    private EntityManagerInterface&MockObject $entityManager;
 
     #[\Override]
     protected function setUp(): void

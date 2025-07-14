@@ -9,24 +9,17 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Component\Routing\Resolver\EnhancedRouteCollection;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 
-class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
+class ActivityAssociationRouteOptionsResolverTest extends TestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $groupingConfigProvider;
-
-    /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityAliasResolver;
-
-    /** @var EnhancedRouteCollection */
-    private $routeCollection;
-
-    /** @var RouteCollectionAccessor */
-    private $routeCollectionAccessor;
-
-    /** @var ActivityAssociationRouteOptionsResolver */
-    private $routeOptionsResolver;
+    private ConfigProvider&MockObject $groupingConfigProvider;
+    private EntityAliasResolver&MockObject $entityAliasResolver;
+    private EnhancedRouteCollection $routeCollection;
+    private RouteCollectionAccessor $routeCollectionAccessor;
+    private ActivityAssociationRouteOptionsResolver $routeOptionsResolver;
 
     #[\Override]
     protected function setUp(): void
@@ -46,7 +39,7 @@ class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit\Framework\Tes
         $this->routeCollectionAccessor = new RouteCollectionAccessor($this->routeCollection);
     }
 
-    public function testResolveUnsupportedRoute()
+    public function testResolveUnsupportedRoute(): void
     {
         $route = new Route('/route');
 
@@ -55,7 +48,7 @@ class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit\Framework\Tes
         $this->assertEquals([], $route->getRequirements());
     }
 
-    public function testResolveActivityRelationRouteWithoutEntityPlaceholder()
+    public function testResolveActivityRelationRouteWithoutEntityPlaceholder(): void
     {
         $route = new Route('/route', [], [], ['group' => ActivityAssociationRouteOptionsResolver::ROUTE_GROUP]);
 
@@ -64,7 +57,7 @@ class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit\Framework\Tes
         $this->assertEquals([], $route->getRequirements());
     }
 
-    public function testResolve()
+    public function testResolve(): void
     {
         $route = new Route(
             '/{activity}/route',

@@ -7,21 +7,20 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\InMemoryUser as User;
 
-class AssignActiveUserTest extends \PHPUnit\Framework\TestCase
+class AssignActiveUserTest extends TestCase
 {
     private const ATTRIBUTE_NAME = 'some_attribute';
 
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var AssignActiveUser */
-    private $action;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private AssignActiveUser $action;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +34,7 @@ class AssignActiveUserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testInitialize(array $inputOptions, array $expectedOptions)
+    public function testInitialize(array $inputOptions, array $expectedOptions): void
     {
         $this->action->initialize($inputOptions);
         self::assertEquals($expectedOptions, ReflectionUtil::getPropertyValue($this->action, 'options'));
@@ -73,7 +72,7 @@ class AssignActiveUserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage): void
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
@@ -117,7 +116,7 @@ class AssignActiveUserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testExecute(array $inputOptions)
+    public function testExecute(array $inputOptions): void
     {
         $user = new User('testUser', 'qwerty');
 

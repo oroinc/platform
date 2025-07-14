@@ -4,14 +4,14 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\HierarchyCollection;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
+class HierarchyCollectionTest extends TestCase
 {
-    /** @var HierarchyCollection */
-    private $hierarchyCollection;
+    private HierarchyCollection $hierarchyCollection;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         $this->hierarchyCollection = new HierarchyCollection();
     }
 
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $this->assertTrue($this->hierarchyCollection->isEmpty());
 
@@ -30,7 +30,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->hierarchyCollection->isEmpty());
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $this->hierarchyCollection->add([], 'root');
 
@@ -38,7 +38,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->hierarchyCollection->isEmpty());
     }
 
-    public function testGetRootId()
+    public function testGetRootId(): void
     {
         $this->hierarchyCollection->add([], 'root');
         $this->hierarchyCollection->add(['root'], 'item');
@@ -46,7 +46,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('root', $this->hierarchyCollection->getRootId());
     }
 
-    public function testGetRootIdForEmptyHierarchy()
+    public function testGetRootIdForEmptyHierarchy(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The root item does not exist.');
@@ -54,7 +54,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         $this->hierarchyCollection->getRootId();
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $this->hierarchyCollection->add([], 'root');
         $this->hierarchyCollection->add(['root'], 'item1');
@@ -104,7 +104,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddToFirstHierarchyLevelWithoutRoot()
+    public function testAddToFirstHierarchyLevelWithoutRoot(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot add "item1" item to "root" because "root" root item does not exist.');
@@ -112,7 +112,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         $this->hierarchyCollection->add(['root'], 'item1');
     }
 
-    public function testAddWithoutRoot()
+    public function testAddWithoutRoot(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -122,7 +122,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         $this->hierarchyCollection->add(['root', 'item1', 'item2'], 'item3');
     }
 
-    public function testAddToUnknown()
+    public function testAddToUnknown(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -138,7 +138,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         $this->hierarchyCollection->add(['root', 'unknown', 'item2'], 'item3');
     }
 
-    public function testAddDuplicate()
+    public function testAddDuplicate(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot add "item1" item to "root" because such item already exists.');
@@ -152,7 +152,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         $this->hierarchyCollection->add(['root'], 'item1');
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         // prepare hierarchy
         $this->hierarchyCollection->add([], 'root');
@@ -173,7 +173,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddToTheBeginning()
+    public function testAddToTheBeginning(): void
     {
         // prepare hierarchy
         $this->hierarchyCollection->add([], 'root');
@@ -194,7 +194,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddToTheBeginningOfEmpty()
+    public function testAddToTheBeginningOfEmpty(): void
     {
         // prepare hierarchy
         $this->hierarchyCollection->add([], 'root');
@@ -211,7 +211,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddWithUnknownSibling()
+    public function testAddWithUnknownSibling(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -228,7 +228,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         $this->hierarchyCollection->add(['root', 'header'], 'item3', 'unknown');
     }
 
-    public function testAddAfterSibling()
+    public function testAddAfterSibling(): void
     {
         // prepare hierarchy
         $this->hierarchyCollection->add([], 'root');
@@ -251,7 +251,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddBeforeSibling()
+    public function testAddBeforeSibling(): void
     {
         // prepare hierarchy
         $this->hierarchyCollection->add([], 'root');
@@ -274,7 +274,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddLast()
+    public function testAddLast(): void
     {
         // prepare hierarchy
         $this->hierarchyCollection->add([], 'root');
@@ -297,7 +297,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddFirst()
+    public function testAddFirst(): void
     {
         // prepare hierarchy
         $this->hierarchyCollection->add([], 'root');
@@ -320,7 +320,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMove()
+    public function testMove(): void
     {
         // prepare hierarchy
         $this->hierarchyCollection->add([], 'root');
@@ -347,7 +347,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         // prepare hierarchy
         $this->hierarchyCollection->add([], 'root');
@@ -379,7 +379,7 @@ class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemoveUnknown()
+    public function testRemoveUnknown(): void
     {
         // prepare hierarchy
         $this->hierarchyCollection->add([], 'root');

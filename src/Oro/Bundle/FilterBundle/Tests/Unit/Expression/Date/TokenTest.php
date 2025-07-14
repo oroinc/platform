@@ -3,8 +3,9 @@
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Expression\Date;
 
 use Oro\Bundle\FilterBundle\Expression\Date\Token;
+use PHPUnit\Framework\TestCase;
 
-class TokenTest extends \PHPUnit\Framework\TestCase
+class TokenTest extends TestCase
 {
     private string $testType;
     private int $testValue;
@@ -19,7 +20,7 @@ class TokenTest extends \PHPUnit\Framework\TestCase
         $this->token = new Token($this->testType, $this->testValue);
     }
 
-    public function testTokenInterface()
+    public function testTokenInterface(): void
     {
         $this->assertSame($this->testType, $this->token->getType());
         $this->assertSame($this->testValue, $this->token->getValue());

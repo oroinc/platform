@@ -3,9 +3,10 @@
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyDoctrineOrmListenersPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class LazyDoctrineOrmListenersPassTest extends \PHPUnit\Framework\TestCase
+class LazyDoctrineOrmListenersPassTest extends TestCase
 {
     public function testShouldMarkDoctrineOrmEntityListenersAsLazyAndPublic(): void
     {

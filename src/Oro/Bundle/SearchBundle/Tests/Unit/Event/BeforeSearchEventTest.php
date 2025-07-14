@@ -4,10 +4,11 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Event;
 
 use Oro\Bundle\SearchBundle\Event\BeforeSearchEvent;
 use Oro\Bundle\SearchBundle\Query\Query;
+use PHPUnit\Framework\TestCase;
 
-class BeforeSearchEventTest extends \PHPUnit\Framework\TestCase
+class BeforeSearchEventTest extends TestCase
 {
-    public function testEvent()
+    public function testEvent(): void
     {
         $query = new Query();
         $event = new BeforeSearchEvent($query);

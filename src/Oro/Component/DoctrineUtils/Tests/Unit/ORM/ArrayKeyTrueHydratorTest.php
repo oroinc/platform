@@ -10,8 +10,9 @@ use Doctrine\DBAL\Result;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Oro\Component\DoctrineUtils\ORM\ArrayKeyTrueHydrator;
+use PHPUnit\Framework\TestCase;
 
-class ArrayKeyTrueHydratorTest extends \PHPUnit\Framework\TestCase
+class ArrayKeyTrueHydratorTest extends TestCase
 {
     public function testHydrateAllData(): void
     {

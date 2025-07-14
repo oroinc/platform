@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\DataGridBundle\DependencyInjection\Compiler\DataSourcesPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -10,7 +11,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class DataSourcesPassTest extends \PHPUnit\Framework\TestCase
+class DataSourcesPassTest extends TestCase
 {
     private ContainerBuilder $container;
     private Definition $builder;

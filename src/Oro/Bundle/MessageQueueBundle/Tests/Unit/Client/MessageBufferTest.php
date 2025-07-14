@@ -4,11 +4,11 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Client;
 
 use Oro\Bundle\MessageQueueBundle\Client\MessageBuffer;
 use Oro\Component\MessageQueue\Client\CallbackMessageBuilder;
+use PHPUnit\Framework\TestCase;
 
-class MessageBufferTest extends \PHPUnit\Framework\TestCase
+class MessageBufferTest extends TestCase
 {
-    /** @var MessageBuffer */
-    private $buffer;
+    private MessageBuffer $buffer;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class MessageBufferTest extends \PHPUnit\Framework\TestCase
         $this->buffer = new MessageBuffer();
     }
 
-    public function testEmpty()
+    public function testEmpty(): void
     {
         self::assertFalse($this->buffer->hasMessages());
         self::assertSame([], $this->buffer->getMessages());
@@ -31,7 +31,7 @@ class MessageBufferTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testBuffer()
+    public function testBuffer(): void
     {
         // test addMessage()
         $this->buffer->addMessage('topic1', ['msg1']);
@@ -166,7 +166,7 @@ class MessageBufferTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], iterator_to_array($this->buffer->getMessagesForTopics(['topic1', 'topic2'])));
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $this->buffer->addMessage('topic1', ['message1']);
         $this->buffer->clear();
@@ -181,7 +181,7 @@ class MessageBufferTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], iterator_to_array($this->buffer->getMessagesForTopics(['topic1'])));
     }
 
-    public function testGetMessagesWhenMessageRepresentsByMessageBuilder()
+    public function testGetMessagesWhenMessageRepresentsByMessageBuilder(): void
     {
         $this->buffer->addMessage(
             'topic1',
@@ -192,7 +192,7 @@ class MessageBufferTest extends \PHPUnit\Framework\TestCase
         self::assertSame([0 => ['topic1', ['message1']]], $this->buffer->getMessages());
     }
 
-    public function testGetMessageWhenMessageRepresentsByMessageBuilder()
+    public function testGetMessageWhenMessageRepresentsByMessageBuilder(): void
     {
         $this->buffer->addMessage(
             'topic1',
@@ -203,7 +203,7 @@ class MessageBufferTest extends \PHPUnit\Framework\TestCase
         self::assertSame(['message1'], $this->buffer->getMessage(0));
     }
 
-    public function testGetMessagesForTopicWhenMessageRepresentsByMessageBuilder()
+    public function testGetMessagesForTopicWhenMessageRepresentsByMessageBuilder(): void
     {
         $this->buffer->addMessage(
             'topic1',
@@ -217,7 +217,7 @@ class MessageBufferTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMessagesForTopicsWhenMessageRepresentsByMessageBuilder()
+    public function testGetMessagesForTopicsWhenMessageRepresentsByMessageBuilder(): void
     {
         $this->buffer->addMessage(
             'topic1',
@@ -231,7 +231,7 @@ class MessageBufferTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddMessageRepresentsByMessageBuilderWhenBufferIsAlreadyResolved()
+    public function testAddMessageRepresentsByMessageBuilderWhenBufferIsAlreadyResolved(): void
     {
         $this->buffer->addMessage('topic1', ['message1']);
         $this->buffer->addMessage(

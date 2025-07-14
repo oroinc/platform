@@ -5,18 +5,17 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Voter;
 use Oro\Bundle\SecurityBundle\Acl\Voter\CollectionAssociationAwareVoter;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-class CollectionAssociationAwareVoterTest extends \PHPUnit\Framework\TestCase
+class CollectionAssociationAwareVoterTest extends TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var CollectionAssociationAwareVoter */
-    private $voter;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private CollectionAssociationAwareVoter $voter;
 
     #[\Override]
     protected function setUp(): void

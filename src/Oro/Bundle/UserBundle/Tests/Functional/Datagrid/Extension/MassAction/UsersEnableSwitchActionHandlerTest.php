@@ -26,7 +26,7 @@ class UsersEnableSwitchActionHandlerTest extends WebTestCase
         $userReference = 'user.1';
         $this->updateUserSecurityToken($this->getReference($userReference)->getEmail());
         $userRepository = $this->getUserRepo();
-        $query          = $userRepository->createQueryBuilder('u')->getQuery();//select all
+        $query = $userRepository->createQueryBuilder('u')->getQuery();//select all
         $resultIterator = new IterableResult($query);
         $handler = self::getContainer()->get('oro_datagrid.mass_action.users_enable_switch.handler.disable');
         /** @var DatagridInterface $datagrid */
@@ -46,7 +46,7 @@ class UsersEnableSwitchActionHandlerTest extends WebTestCase
             }
         }
 
-        $all          = $userRepository->createQueryBuilder('u')
+        $all = $userRepository->createQueryBuilder('u')
             ->select('COUNT(u)')
             ->getQuery()
             ->getSingleScalarResult();

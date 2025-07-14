@@ -3,6 +3,8 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Csrf;
 
 use Oro\Bundle\SecurityBundle\Csrf\CookieTokenStorage;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -10,17 +12,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
+class CookieTokenStorageTest extends TestCase
 {
-    /**
-     * @var RequestStack|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $requestStack;
-
-    /**
-     * @var CookieTokenStorage
-     */
-    private $storage;
+    private RequestStack&MockObject $requestStack;
+    private CookieTokenStorage $storage;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +25,7 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
         $this->storage = new CookieTokenStorage('auto', $this->requestStack, Cookie::SAMESITE_STRICT);
     }
 
-    public function testGetTokenNoRequest()
+    public function testGetTokenNoRequest(): void
     {
         $tokenId = 'test';
         $this->requestStack->expects($this->any())
@@ -39,7 +34,7 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('', $this->storage->getToken($tokenId));
     }
 
-    public function testGetTokenNoCookie()
+    public function testGetTokenNoCookie(): void
     {
         $tokenId = 'test';
         $request = Request::create('/');
@@ -51,7 +46,7 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('', $this->storage->getToken($tokenId));
     }
 
-    public function testGetToken()
+    public function testGetToken(): void
     {
         $tokenId = 'test';
         $value = 'val';
@@ -65,7 +60,7 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($value, $this->storage->getToken($tokenId));
     }
 
-    public function testHasTokenNoRequest()
+    public function testHasTokenNoRequest(): void
     {
         $tokenId = 'test';
         $this->requestStack->expects($this->any())
@@ -74,7 +69,7 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->storage->hasToken($tokenId));
     }
 
-    public function testHasTokenNoCookie()
+    public function testHasTokenNoCookie(): void
     {
         $tokenId = 'test';
         $request = Request::create('/');
@@ -86,7 +81,7 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->storage->hasToken($tokenId));
     }
 
-    public function testHasToken()
+    public function testHasToken(): void
     {
         $tokenId = 'test';
         $value = 'val';
@@ -100,7 +95,7 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->storage->hasToken($tokenId));
     }
 
-    public function testSetToken()
+    public function testSetToken(): void
     {
         $tokenId = 'test';
         $value = 'val';
@@ -116,7 +111,7 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($cookie, $request->attributes->get(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE));
     }
 
-    public function testSetTokenWithSecureConfig()
+    public function testSetTokenWithSecureConfig(): void
     {
         $tokenId = 'test';
         $value = 'val';
@@ -133,7 +128,7 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($cookie, $request->attributes->get(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE));
     }
 
-    public function testSetTokenWithNotSecureConfig()
+    public function testSetTokenWithNotSecureConfig(): void
     {
         $tokenId = 'test';
         $value = 'val';
@@ -150,7 +145,7 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($cookie, $request->attributes->get(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE));
     }
 
-    public function testSetTokenWithoutRequest()
+    public function testSetTokenWithoutRequest(): void
     {
         $tokenId = 'test';
         $value = 'val';
@@ -163,7 +158,7 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
         $this->storage->setToken($tokenId, $value);
     }
 
-    public function testRemoveToken()
+    public function testRemoveToken(): void
     {
         $tokenId = 'test';
         $request = Request::create('/');

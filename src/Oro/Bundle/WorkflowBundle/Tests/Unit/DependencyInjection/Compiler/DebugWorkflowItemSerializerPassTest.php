@@ -4,11 +4,12 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\DebugWorkflowItemSerializerPass;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowItem\DebugWorkflowItemSerializer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class DebugWorkflowItemSerializerPassTest extends \PHPUnit\Framework\TestCase
+class DebugWorkflowItemSerializerPassTest extends TestCase
 {
     private DebugWorkflowItemSerializerPass $compiler;
 

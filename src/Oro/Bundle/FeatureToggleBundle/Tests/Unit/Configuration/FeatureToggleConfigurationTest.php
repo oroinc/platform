@@ -5,11 +5,12 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Configuration;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationExtension;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationExtensionInterface;
 use Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
-class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
+class FeatureToggleConfigurationTest extends TestCase
 {
     private FeatureToggleConfiguration $configuration;
 

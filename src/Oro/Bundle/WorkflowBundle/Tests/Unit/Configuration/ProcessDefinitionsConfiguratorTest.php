@@ -10,32 +10,21 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
+class ProcessDefinitionsConfiguratorTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var ProcessConfigurationBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurationBuilder;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
-
-    /** @var string|\PHPUnit\Framework\MockObject\MockObject */
-    private $definitionClass;
-
-    /** @var ObjectRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $objectManager;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var ProcessDefinitionsConfigurator */
-    private $processDefinitionsConfigurator;
+    private ProcessConfigurationBuilder&MockObject $configurationBuilder;
+    private ManagerRegistry&MockObject $managerRegistry;
+    private string $definitionClass;
+    private ObjectRepository&MockObject $repository;
+    private ObjectManager&MockObject $objectManager;
+    private LoggerInterface&MockObject $logger;
+    private ProcessDefinitionsConfigurator $processDefinitionsConfigurator;
 
     #[\Override]
     protected function setUp(): void
@@ -56,7 +45,7 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->processDefinitionsConfigurator->setLogger($this->logger);
     }
 
-    public function testConfigureDefinitions()
+    public function testConfigureDefinitions(): void
     {
         $definitionsConfiguration = ['...configuration'];
 
@@ -102,7 +91,7 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([$newDefinitionNonExistent], $this->getToPersistPropertyValue());
     }
 
-    public function testFlush()
+    public function testFlush(): void
     {
         $processDefinitionToPersist = new ProcessDefinition();
         $processDefinitionToRemove = new ProcessDefinition();
@@ -141,7 +130,7 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->getDirtyPropertyValue());
     }
 
-    public function testEmptyFlush()
+    public function testEmptyFlush(): void
     {
         $this->assertManagerRegistryCalled($this->definitionClass);
         $this->objectManager->expects($this->never())
@@ -170,7 +159,7 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->repository);
     }
 
-    public function testRemoveDefinitions()
+    public function testRemoveDefinitions(): void
     {
         $definitionName = 'definitionName';
         $definitionObject = (new ProcessDefinition())->setName($definitionName);

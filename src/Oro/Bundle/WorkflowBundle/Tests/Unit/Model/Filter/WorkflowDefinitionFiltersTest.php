@@ -6,13 +6,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilters;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Filter\Stub\DefaultDefinitionFilter;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Filter\Stub\SystemDefinitionFilter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class WorkflowDefinitionFiltersTest extends \PHPUnit\Framework\TestCase
+class WorkflowDefinitionFiltersTest extends TestCase
 {
-    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
-
+    private RequestStack&MockObject $requestStack;
     private WorkflowDefinitionFilters $filters;
 
     #[\Override]

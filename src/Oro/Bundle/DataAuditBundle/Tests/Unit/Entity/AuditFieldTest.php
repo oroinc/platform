@@ -5,8 +5,9 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Entity;
 use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 use Oro\Bundle\DataAuditBundle\Tests\Unit\Fixture\LoggableClass as TestEntity;
 use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\AuditField;
+use PHPUnit\Framework\TestCase;
 
-class AuditFieldTest extends \PHPUnit\Framework\TestCase
+class AuditFieldTest extends TestCase
 {
     #[\Override]
     protected function setUp(): void
@@ -29,7 +30,7 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
         mixed $newValue,
         mixed $oldValue,
         string $expectedDataType
-    ) {
+    ): void {
         $auditField = new AuditField($field, $dataType, $newValue, $oldValue);
         $auditField->setTranslationDomain('message');
         $this->assertEquals($expectedDataType, $auditField->getDataType());
@@ -64,7 +65,7 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testShouldAllowAddEntityRemovedFromCollection()
+    public function testShouldAllowAddEntityRemovedFromCollection(): void
     {
         $field = new AuditField('field', 'text', null, null);
         $field->addEntityRemovedFromCollection(TestEntity::class, 1, 'theName');
@@ -74,7 +75,7 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(null, $field->getNewValue());
     }
 
-    public function testShouldAllowAddSomeEntitiesRemovedFromCollection()
+    public function testShouldAllowAddSomeEntitiesRemovedFromCollection(): void
     {
         $field = new AuditField('field', 'text', null, null);
         $field->addEntityRemovedFromCollection(TestEntity::class, 1, 'theName');
@@ -85,7 +86,7 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(null, $field->getNewValue());
     }
 
-    public function testShouldAllowAddEntityAddedToCollection()
+    public function testShouldAllowAddEntityAddedToCollection(): void
     {
         $field = new AuditField('field', 'text', null, null);
         $field->addEntityAddedToCollection(TestEntity::class, 1, 'theName');
@@ -95,7 +96,7 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Added: theName', $field->getNewValue());
     }
 
-    public function testShouldAllowAddSomeEntitiesAddedToCollection()
+    public function testShouldAllowAddSomeEntitiesAddedToCollection(): void
     {
         $field = new AuditField('field', 'text', null, null);
         $field->addEntityAddedToCollection(TestEntity::class, 1, 'theName');
@@ -106,7 +107,7 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Added: theName, theAnotherName', $field->getNewValue());
     }
 
-    public function testShouldAllowAddSomeEntitiesAsChangedToCollection()
+    public function testShouldAllowAddSomeEntitiesAsChangedToCollection(): void
     {
         $field = new AuditField('field', 'text', null, null);
         $field->addEntityChangedInCollection(TestEntity::class, 1, 'theName');
@@ -117,7 +118,7 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals("\nChanged: theName, theAnotherName", $field->getNewValue());
     }
 
-    public function testShouldMergeEmptyCollectionFields()
+    public function testShouldMergeEmptyCollectionFields(): void
     {
         $field = new AuditField('field', 'text', null, null);
 
@@ -130,7 +131,7 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(null, $field->getNewValue());
     }
 
-    public function testShouldMergeEmptyCollectionFieldWithNotEmptyOne()
+    public function testShouldMergeEmptyCollectionFieldWithNotEmptyOne(): void
     {
         $field = new AuditField('field', 'text', null, null);
         $field->addEntityAddedToCollection(TestEntity::class, 1, 'theName');
@@ -145,7 +146,7 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Added: theName', $field->getNewValue());
     }
 
-    public function testShouldMergeNotEmptyCollectionFields()
+    public function testShouldMergeNotEmptyCollectionFields(): void
     {
         $field = new AuditField('field', 'text', null, null);
         $field->addEntityAddedToCollection(TestEntity::class, 1, 'theName');

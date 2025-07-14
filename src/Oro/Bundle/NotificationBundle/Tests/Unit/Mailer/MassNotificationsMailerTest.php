@@ -6,6 +6,8 @@ use Oro\Bundle\NotificationBundle\Event\NotificationSentEvent;
 use Oro\Bundle\NotificationBundle\Mailer\MassNotificationsMailer;
 use Oro\Bundle\NotificationBundle\Model\MassNotificationSender;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -19,14 +21,12 @@ use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\MessagePart;
 use Symfony\Component\Mime\RawMessage;
 
-class MassNotificationsMailerTest extends \PHPUnit\Framework\TestCase
+class MassNotificationsMailerTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private TransportInterface|\PHPUnit\Framework\MockObject\MockObject $transport;
-
-    private EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
-
+    private TransportInterface&MockObject $transport;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
     private MassNotificationsMailer $mailer;
 
     #[\Override]

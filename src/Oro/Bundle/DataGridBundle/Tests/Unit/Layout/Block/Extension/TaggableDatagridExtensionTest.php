@@ -7,11 +7,11 @@ use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use PHPUnit\Framework\TestCase;
 
-class TaggableDatagridExtensionTest extends \PHPUnit\Framework\TestCase
+class TaggableDatagridExtensionTest extends TestCase
 {
-    /** @var TaggableDatagridExtension */
-    private $extension;
+    private TaggableDatagridExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class TaggableDatagridExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new TaggableDatagridExtension();
     }
 
-    public function testGetExtendedType()
+    public function testGetExtendedType(): void
     {
         $this->assertEquals('datagrid', $this->extension->getExtendedType());
     }
@@ -27,7 +27,7 @@ class TaggableDatagridExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testConfigureOptions(array $options, array $expectedOptions)
+    public function testConfigureOptions(array $options, array $expectedOptions): void
     {
         $resolver = new OptionsResolver();
         $this->extension->configureOptions($resolver);
@@ -49,7 +49,7 @@ class TaggableDatagridExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testBuildView()
+    public function testBuildView(): void
     {
         $view = new BlockView();
         $block = $this->createMock(BlockInterface::class);
@@ -57,7 +57,7 @@ class TaggableDatagridExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($view->vars['enable_tagging']);
     }
 
-    public function testFinishView()
+    public function testFinishView(): void
     {
         $view = new BlockView();
         $view->vars['block_prefixes'] = [];

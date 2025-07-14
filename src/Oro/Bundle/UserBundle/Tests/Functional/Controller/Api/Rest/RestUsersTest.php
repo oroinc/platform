@@ -154,7 +154,7 @@ class RestUsersTest extends WebTestCase
         foreach ($result as $key => $object) {
             foreach ($request as $user) {
                 if ($user['username'] == $result[$key]['username']) {
-                    $flag   = 0;
+                    $flag = 0;
                     $userId = $result[$key]['id'];
                     break 2;
                 }

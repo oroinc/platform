@@ -3,10 +3,11 @@
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use PHPUnit\Framework\TestCase;
 
-class QueryBagTest extends \PHPUnit\Framework\TestCase
+class QueryBagTest extends TestCase
 {
-    public function testBag()
+    public function testBag(): void
     {
         $queries = new QueryBag();
         $queries->addPreQuery('query1');

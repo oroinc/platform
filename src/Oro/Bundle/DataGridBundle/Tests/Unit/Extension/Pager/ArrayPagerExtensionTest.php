@@ -11,20 +11,15 @@ use Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension;
 use Oro\Bundle\DataGridBundle\Extension\Pager\ArrayDatasource\ArrayPager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\ArrayPagerExtension;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ArrayPagerExtensionTest extends \PHPUnit\Framework\TestCase
+class ArrayPagerExtensionTest extends TestCase
 {
-    /** @var ArrayPager|\PHPUnit\Framework\MockObject\MockObject */
-    private $pager;
-
-    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    private $config;
-
-    /** @var ArrayDatasource */
-    private $arrayDatasource;
-
-    /** @var ArrayPagerExtension */
-    private $arrayPagerExtension;
+    private ArrayPager&MockObject $pager;
+    private DatagridConfiguration&MockObject $config;
+    private ArrayDatasource $arrayDatasource;
+    private ArrayPagerExtension $arrayPagerExtension;
 
     #[\Override]
     protected function setUp(): void
@@ -38,12 +33,12 @@ class ArrayPagerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->arrayPagerExtension->setParameters(new ParameterBag());
     }
 
-    public function testGetPriority()
+    public function testGetPriority(): void
     {
         $this->assertEquals(-270, $this->arrayPagerExtension->getPriority());
     }
 
-    public function testIsApplicableWithArrayDatasource()
+    public function testIsApplicableWithArrayDatasource(): void
     {
         $this->config->expects($this->once())
             ->method('getDatasourceType')
@@ -52,7 +47,7 @@ class ArrayPagerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->arrayPagerExtension->isApplicable($this->config));
     }
 
-    public function testIsApplicableWithWrongDatasource()
+    public function testIsApplicableWithWrongDatasource(): void
     {
         $this->config->expects($this->once())
             ->method('getDatasourceType')
@@ -70,7 +65,7 @@ class ArrayPagerExtensionTest extends \PHPUnit\Framework\TestCase
         int $perPageLimit,
         int $currentPage,
         int $maxPerPage
-    ) {
+    ): void {
         $this->config->expects($this->exactly(4))
             ->method('offsetGetByPath')
             ->willReturnMap([
@@ -93,7 +88,7 @@ class ArrayPagerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->arrayPagerExtension->visitDatasource($this->config, $this->arrayDatasource);
     }
 
-    public function testVisitDatasourceWithWrongSource()
+    public function testVisitDatasourceWithWrongSource(): void
     {
         $this->expectException(UnexpectedTypeException::class);
 

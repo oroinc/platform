@@ -6,19 +6,18 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class TokenAccessorTest extends \PHPUnit\Framework\TestCase
+class TokenAccessorTest extends TestCase
 {
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var TokenAccessor */
-    private $tokenAccessor;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private TokenAccessor $tokenAccessor;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         $this->tokenAccessor = new TokenAccessor($this->tokenStorage);
     }
 
-    public function testGetToken()
+    public function testGetToken(): void
     {
         $token = $this->createMock(TokenInterface::class);
 
@@ -39,7 +38,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($token, $this->tokenAccessor->getToken());
     }
 
-    public function testGetNullToken()
+    public function testGetNullToken(): void
     {
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
@@ -48,7 +47,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->tokenAccessor->getToken());
     }
 
-    public function testSetToken()
+    public function testSetToken(): void
     {
         $token = $this->createMock(TokenInterface::class);
 
@@ -59,7 +58,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         $this->tokenAccessor->setToken($token);
     }
 
-    public function testSetNullToken()
+    public function testSetNullToken(): void
     {
         $this->tokenStorage->expects(self::once())
             ->method('setToken')
@@ -68,7 +67,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         $this->tokenAccessor->setToken(null);
     }
 
-    public function testHasUser()
+    public function testHasUser(): void
     {
         $token = $this->createMock(TokenInterface::class);
 
@@ -82,7 +81,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->tokenAccessor->hasUser());
     }
 
-    public function testHasUserWhenTokenDoesNotContainUser()
+    public function testHasUserWhenTokenDoesNotContainUser(): void
     {
         $token = $this->createMock(TokenInterface::class);
 
@@ -96,7 +95,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->tokenAccessor->hasUser());
     }
 
-    public function testHasUserWhenTokenDoesNotExist()
+    public function testHasUserWhenTokenDoesNotExist(): void
     {
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
@@ -105,7 +104,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->tokenAccessor->hasUser());
     }
 
-    public function testGetUser()
+    public function testGetUser(): void
     {
         $token = $this->createMock(TokenInterface::class);
         $user = $this->createMock(AbstractUser::class);
@@ -120,7 +119,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($user, $this->tokenAccessor->getUser());
     }
 
-    public function testGetUserWhenTokenDoesNotContainUser()
+    public function testGetUserWhenTokenDoesNotContainUser(): void
     {
         $token = $this->createMock(TokenInterface::class);
 
@@ -134,7 +133,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->tokenAccessor->getUser());
     }
 
-    public function testGetUserWhenTokenDoesNotExist()
+    public function testGetUserWhenTokenDoesNotExist(): void
     {
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
@@ -143,7 +142,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->tokenAccessor->getUser());
     }
 
-    public function testGetUserId()
+    public function testGetUserId(): void
     {
         $token = $this->createMock(TokenInterface::class);
         $user = $this->createMock(AbstractUser::class);
@@ -162,7 +161,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($userId, $this->tokenAccessor->getUserId());
     }
 
-    public function testGetUserIdWhenTokenDoesNotContainUser()
+    public function testGetUserIdWhenTokenDoesNotContainUser(): void
     {
         $token = $this->createMock(TokenInterface::class);
 
@@ -176,7 +175,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->tokenAccessor->getUserId());
     }
 
-    public function testGetUserIdWhenTokenDoesNotExist()
+    public function testGetUserIdWhenTokenDoesNotExist(): void
     {
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
@@ -185,7 +184,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->tokenAccessor->getUserId());
     }
 
-    public function testGetOrganization()
+    public function testGetOrganization(): void
     {
         $token = $this->createMock(OrganizationAwareTokenInterface::class);
         $organization = $this->createMock(Organization::class);
@@ -200,7 +199,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($organization, $this->tokenAccessor->getOrganization());
     }
 
-    public function testGetOrganizationWhenTokenDoesNotContainOrganization()
+    public function testGetOrganizationWhenTokenDoesNotContainOrganization(): void
     {
         $token = $this->createMock(OrganizationAwareTokenInterface::class);
 
@@ -214,7 +213,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->tokenAccessor->getOrganization());
     }
 
-    public function testGetOrganizationWhenTokenDoesNotSupportOrganization()
+    public function testGetOrganizationWhenTokenDoesNotSupportOrganization(): void
     {
         $token = $this->createMock(TokenInterface::class);
 
@@ -225,7 +224,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->tokenAccessor->getOrganization());
     }
 
-    public function testGetOrganizationWhenTokenDoesNotExist()
+    public function testGetOrganizationWhenTokenDoesNotExist(): void
     {
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
@@ -234,7 +233,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->tokenAccessor->getOrganization());
     }
 
-    public function testGetOrganizationId()
+    public function testGetOrganizationId(): void
     {
         $token = $this->createMock(OrganizationAwareTokenInterface::class);
         $organization = $this->createMock(Organization::class);
@@ -253,7 +252,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($organizationId, $this->tokenAccessor->getOrganizationId());
     }
 
-    public function testGetOrganizationIdWhenTokenDoesNotContainOrganization()
+    public function testGetOrganizationIdWhenTokenDoesNotContainOrganization(): void
     {
         $token = $this->createMock(OrganizationAwareTokenInterface::class);
 
@@ -267,7 +266,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->tokenAccessor->getOrganizationId());
     }
 
-    public function testGetOrganizationIdWhenTokenDoesNotSupportOrganization()
+    public function testGetOrganizationIdWhenTokenDoesNotSupportOrganization(): void
     {
         $token = $this->createMock(TokenInterface::class);
 
@@ -278,7 +277,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->tokenAccessor->getOrganizationId());
     }
 
-    public function testGetOrganizationIdWhenTokenDoesNotExist()
+    public function testGetOrganizationIdWhenTokenDoesNotExist(): void
     {
         $this->tokenStorage->expects(self::once())
             ->method('getToken')

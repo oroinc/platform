@@ -13,37 +13,22 @@ use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\EventListener\PrepareResultItemListener;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
+class PrepareResultItemListenerTest extends TestCase
 {
-    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $urlGenerator;
-
-    /** @var ObjectMapper|\PHPUnit\Framework\MockObject\MockObject */
-    private $mapper;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var PrepareResultItemEvent|\PHPUnit\Framework\MockObject\MockObject */
-    private $event;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $item;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $entity;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var PrepareResultItemListener */
-    private $listener;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
+    private ObjectMapper&MockObject $mapper;
+    private EntityManagerInterface&MockObject $em;
+    private PrepareResultItemEvent&MockObject $event;
+    private Item&MockObject $item;
+    private User&MockObject $entity;
+    private ConfigManager&MockObject $configManager;
+    private TranslatorInterface&MockObject $translator;
+    private PrepareResultItemListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -74,7 +59,7 @@ class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * Check that process data doesn't execute any query if url and title already set
      */
-    public function testProcessSetData()
+    public function testProcessSetData(): void
     {
         $this->event->expects($this->once())
             ->method('getEntity');
@@ -103,7 +88,7 @@ class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * Generates url from existed entity
      */
-    public function testProcessUrlFromEntity()
+    public function testProcessUrlFromEntity(): void
     {
         $this->event->expects($this->once())
             ->method('getEntity')
@@ -156,7 +141,7 @@ class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * Process entity without URL params
      */
-    public function testProcessEmptyUrl()
+    public function testProcessEmptyUrl(): void
     {
         $this->event->expects($this->once())
             ->method('getEntity')
@@ -199,7 +184,7 @@ class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * Trying to find entity and generates parameters from result item
      */
-    public function testProcessUrl()
+    public function testProcessUrl(): void
     {
         $this->event->expects($this->once())
             ->method('getEntity')

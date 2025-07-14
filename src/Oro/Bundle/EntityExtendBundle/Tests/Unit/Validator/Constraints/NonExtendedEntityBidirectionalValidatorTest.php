@@ -9,17 +9,15 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NonExtendedEntityBidirectional;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NonExtendedEntityBidirectionalValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NonExtendedEntityBidirectionalValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var Form|\PHPUnit\Framework\MockObject\MockObject */
-    private $rootMock;
+    private ConfigManager&MockObject $configManager;
+    private Form&MockObject $rootMock;
 
     #[\Override]
     protected function setUp(): void

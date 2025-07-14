@@ -8,15 +8,14 @@ use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Transport\QueueCollection;
 use Oro\Component\MessageQueue\Transport\QueueInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class CreateQueueExtensionTest extends \PHPUnit\Framework\TestCase
+class CreateQueueExtensionTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DriverInterface */
-    private $driver;
-
-    /** @var CreateQueueExtension */
-    private $extension;
+    private DriverInterface&MockObject $driver;
+    private CreateQueueExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class CreateQueueExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new CreateQueueExtension($this->driver, new QueueCollection());
     }
 
-    public function testShouldCreateQueueUsingQueueNameFromContext()
+    public function testShouldCreateQueueUsingQueueNameFromContext(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())
@@ -45,7 +44,7 @@ class CreateQueueExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->onBeforeReceive($context);
     }
 
-    public function testShouldCreateSameQueueOnlyOnce()
+    public function testShouldCreateSameQueueOnlyOnce(): void
     {
         $this->driver->expects($this->exactly(2))
             ->method('createQueue')

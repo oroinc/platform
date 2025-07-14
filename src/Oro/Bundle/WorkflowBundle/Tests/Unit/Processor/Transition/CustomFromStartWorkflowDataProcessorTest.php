@@ -5,12 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\CustomFromStartWorkflowDataProcessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 
-class CustomFromStartWorkflowDataProcessorTest extends \PHPUnit\Framework\TestCase
+class CustomFromStartWorkflowDataProcessorTest extends TestCase
 {
-    /** @var CustomFromStartWorkflowDataProcessor */
-    private $processor;
+    private CustomFromStartWorkflowDataProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class CustomFromStartWorkflowDataProcessorTest extends \PHPUnit\Framework\TestCa
         $this->processor = new CustomFromStartWorkflowDataProcessor();
     }
 
-    public function testSetFormDataAttribute()
+    public function testSetFormDataAttribute(): void
     {
         $formData = (object)['id' => 42];
 
@@ -48,7 +48,7 @@ class CustomFromStartWorkflowDataProcessorTest extends \PHPUnit\Framework\TestCa
         );
     }
 
-    public function testCreatesArrayForInitDataIfNo()
+    public function testCreatesArrayForInitDataIfNo(): void
     {
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())
@@ -72,7 +72,7 @@ class CustomFromStartWorkflowDataProcessorTest extends \PHPUnit\Framework\TestCa
         $this->assertEquals(['attribute' => $formData], $context->get(TransitionContext::INIT_DATA));
     }
 
-    public function testNothingChangedIfAlreadyDefined()
+    public function testNothingChangedIfAlreadyDefined(): void
     {
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())

@@ -9,7 +9,7 @@ use stdClass;
 
 class LayoutCacheMetadataTest extends TestCase
 {
-    public function testAccessors()
+    public function testAccessors(): void
     {
         $metadata = new LayoutCacheMetadata();
 
@@ -27,7 +27,7 @@ class LayoutCacheMetadataTest extends TestCase
         $this->assertEquals(['foo_1', 'bar_2'], $metadata->getTags());
     }
 
-    public function testExceptionOnSetTags()
+    public function testExceptionOnSetTags(): void
     {
         $this->expectExceptionMessage(
             'The value of the "cache.tags.0" block option is expected to be a scalar but got "stdClass"'
@@ -38,7 +38,7 @@ class LayoutCacheMetadataTest extends TestCase
             ->setTags([new stdClass(), 'bar_2']);
     }
 
-    public function testExceptionOnSetVaryBy()
+    public function testExceptionOnSetVaryBy(): void
     {
         $this->expectExceptionMessage(
             'The value of the "cache.varyBy.bar" block option is expected to be a scalar but got "stdClass".'

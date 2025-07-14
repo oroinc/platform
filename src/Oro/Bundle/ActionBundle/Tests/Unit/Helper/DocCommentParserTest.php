@@ -5,11 +5,11 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 use Oro\Bundle\ActionBundle\Helper\DocCommentParser;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2;
+use PHPUnit\Framework\TestCase;
 
-class DocCommentParserTest extends \PHPUnit\Framework\TestCase
+class DocCommentParserTest extends TestCase
 {
-    /** @var DocCommentParser */
-    private $parser;
+    private DocCommentParser $parser;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class DocCommentParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFullCommentDataProvider
      */
-    public function testGetFullComment(string $className, string $expected)
+    public function testGetFullComment(string $className, string $expected): void
     {
         $this->assertSame($expected, $this->parser->getFullComment($className));
     }
@@ -42,7 +42,7 @@ class DocCommentParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getShortCommentDataProvider
      */
-    public function testGetShortComment(string $className, string $expected)
+    public function testGetShortComment(string $className, string $expected): void
     {
         $this->assertSame($expected, $this->parser->getShortComment($className));
     }

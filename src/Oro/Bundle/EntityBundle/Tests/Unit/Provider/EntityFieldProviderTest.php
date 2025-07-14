@@ -19,6 +19,8 @@ use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvide
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -26,46 +28,21 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
+class EntityFieldProviderTest extends TestCase
 {
-    /** @var ConfigProviderMock */
-    protected $entityConfigProvider;
-
-    /** @var ConfigProviderMock */
-    protected $extendConfigProvider;
-
-    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityClassResolver;
-
-    /** @var VirtualFieldProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $virtualFieldProvider;
-
-    /** @var VirtualRelationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $virtualRelationProvider;
-
-    /** @var VirtualFieldProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $enumVirtualFieldProvider;
-
-    /** @var FieldTypeHelper */
-    protected $fieldTypeHelper;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrine;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
-
-    /** @var EntityProvider */
-    protected $entityProvider;
-
-    /** @var EntityFieldProvider */
-    protected $provider;
-
-    /** @var ExclusionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $exclusionProvider;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    protected $featureChecker;
+    protected ConfigProviderMock $entityConfigProvider;
+    protected ConfigProviderMock $extendConfigProvider;
+    protected EntityClassResolver&MockObject $entityClassResolver;
+    protected VirtualFieldProviderInterface&MockObject $virtualFieldProvider;
+    protected VirtualRelationProviderInterface&MockObject $virtualRelationProvider;
+    protected VirtualFieldProviderInterface&MockObject $enumVirtualFieldProvider;
+    protected FieldTypeHelper $fieldTypeHelper;
+    protected ManagerRegistry&MockObject $doctrine;
+    protected TranslatorInterface&MockObject $translator;
+    protected EntityProvider $entityProvider;
+    protected EntityFieldProvider $provider;
+    protected ExclusionProviderInterface&MockObject $exclusionProvider;
+    protected FeatureChecker&MockObject $featureChecker;
 
     #[\Override]
     protected function setUp(): void
@@ -597,30 +574,28 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
             );
         $this->virtualFieldProvider->expects(self::exactly(2))
             ->method('getVirtualFieldQuery')
-            ->willReturnMap(
+            ->willReturnMap([
                 [
+                    $className,
+                    'rel1',
                     [
-                        $className,
-                        'rel1',
-                        [
-                            'select' => [
-                                'return_type' => 'enum',
-                                'filter_by_id' => true,
-                            ],
+                        'select' => [
+                            'return_type' => 'enum',
+                            'filter_by_id' => true,
                         ],
                     ],
+                ],
+                [
+                    $className,
+                    'rel2',
                     [
-                        $className,
-                        'rel2',
-                        [
-                            'select' => [
-                                'return_type' => 'multiEnum',
-                                'filter_by_id' => true,
-                            ],
+                        'select' => [
+                            'return_type' => 'multiEnum',
+                            'filter_by_id' => true,
                         ],
                     ],
-                ]
-            );
+                ],
+            ]);
 
         $result = $this->provider->getEntityFields(
             'Acme:Test',

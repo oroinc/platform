@@ -12,36 +12,29 @@ use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MenuExtensionTest extends \PHPUnit\Framework\TestCase
+class MenuExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $helper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $provider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $breadcrumbManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $configurationProvider;
-
-    /** @var MenuExtension */
-    private $extension;
+    private Helper&MockObject $helper;
+    private MenuProviderInterface&MockObject $provider;
+    private BreadcrumbManagerInterface&MockObject $breadcrumbManager;
+    private ConfigurationProvider&MockObject $configurationProvider;
+    private MenuExtension $extension;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->breadcrumbManager = $this->createMock(BreadcrumbManagerInterface::class);
         $this->helper = $this->createMock(Helper::class);
         $this->provider = $this->createMock(MenuProviderInterface::class);
+        $this->breadcrumbManager = $this->createMock(BreadcrumbManagerInterface::class);
         $this->configurationProvider = $this->createMock(ConfigurationProvider::class);
 
         $container = self::getContainerBuilder()
@@ -54,7 +47,7 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new MenuExtension($container);
     }
 
-    public function testRenderBreadCrumbs()
+    public function testRenderBreadCrumbs(): void
     {
         $environment = $this->createMock(Environment::class);
 
@@ -81,7 +74,7 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWrongBredcrumbs()
+    public function testWrongBredcrumbs(): void
     {
         $environment = $this->createMock(Environment::class);
 
@@ -94,7 +87,7 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMenuAsString()
+    public function testGetMenuAsString(): void
     {
         $options = [];
         $menu = 'test';
@@ -105,7 +98,7 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMenuException()
+    public function testGetMenuException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The menu has no child named "path"');
@@ -120,7 +113,7 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         self::callTwigFunction($this->extension, 'oro_menu_get', [$menuInstance, ['path'], $options]);
     }
 
-    public function testRenderException()
+    public function testRenderException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The array cannot be empty');
@@ -128,7 +121,7 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         self::callTwigFunction($this->extension, 'oro_menu_render', [[]]);
     }
 
-    public function testRenderMenuInstance()
+    public function testRenderMenuInstance(): void
     {
         $options = [];
         $renderer = 'test';
@@ -142,7 +135,7 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertRender($menuInstance, $menuInstance, $options, $renderer);
     }
 
-    public function testRenderMenuAsArray()
+    public function testRenderMenuAsArray(): void
     {
         $options = [];
         $renderer = 'test';
@@ -160,7 +153,7 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider typeOptionsDataProvider
      */
-    public function testRenderMenuInstanceWithExtra(array $options)
+    public function testRenderMenuInstanceWithExtra(array $options): void
     {
         $renderer = 'test';
         $menuInstance = $this->createMock(ItemInterface::class);
@@ -212,7 +205,7 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider menuItemsDataProvider
      */
-    public function testFilterNotAllowedItems(array $items, array $expected)
+    public function testFilterNotAllowedItems(array $items, array $expected): void
     {
         $menu = $this->createMock(ItemInterface::class);
 
@@ -501,8 +494,12 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         return $menu;
     }
 
-    private function assertRender($menu, $menuInstance, $options, $renderer)
-    {
+    private function assertRender(
+        ItemInterface|array $menu,
+        ItemInterface $menuInstance,
+        array $options,
+        string $renderer
+    ): void {
         $this->helper->expects($this->once())
             ->method('render')
             ->with($menuInstance, $options, $renderer)
@@ -514,10 +511,7 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return ItemInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function assertGetMenuString(string $menu, string $path, array $options)
+    private function assertGetMenuString(string $menu, string $path, array $options): ItemInterface&MockObject
     {
         $menuInstance = $this->createMock(ItemInterface::class);
         $menuInstance->expects($this->once())

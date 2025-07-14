@@ -4,16 +4,17 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Group;
 
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Group\ChainAclGroupProvider;
+use PHPUnit\Framework\TestCase;
 
-class ChainAclGroupProviderTest extends \PHPUnit\Framework\TestCase
+class ChainAclGroupProviderTest extends TestCase
 {
-    public function testSupports()
+    public function testSupports(): void
     {
         $chain = new ChainAclGroupProvider([]);
         $this->assertTrue($chain->supports());
     }
 
-    public function testGetGroup()
+    public function testGetGroup(): void
     {
         $group1 = 'group1';
         $group2 = 'group2';
@@ -26,7 +27,7 @@ class ChainAclGroupProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($group2, $chain->getGroup());
     }
 
-    public function testGetGroupForDefaultGroup()
+    public function testGetGroupForDefaultGroup(): void
     {
         $chain = new ChainAclGroupProvider([
             $this->getAclGroupProvider(false, 'group1'),

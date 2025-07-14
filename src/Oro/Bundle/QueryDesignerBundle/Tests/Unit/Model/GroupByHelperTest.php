@@ -3,13 +3,14 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Model;
 
 use Oro\Bundle\QueryDesignerBundle\Model\GroupByHelper;
+use PHPUnit\Framework\TestCase;
 
-class GroupByHelperTest extends \PHPUnit\Framework\TestCase
+class GroupByHelperTest extends TestCase
 {
     /**
      * @dataProvider groupByDataProvider
      */
-    public function testGetGroupByFields(array $selects, ?string $groupBy, array $expected)
+    public function testGetGroupByFields(array $selects, ?string $groupBy, array $expected): void
     {
         $helper = new GroupByHelper();
         $this->assertEquals($expected, $helper->getGroupByFields($groupBy, $selects));

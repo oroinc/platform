@@ -18,6 +18,7 @@ use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Stubs\BuilderAwareConfigurationPro
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Stubs\GridAwareQueryDesignerStub;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\Query;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -25,14 +26,9 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class QueryValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $configurationProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $gridBuilder;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
+    private ChainConfigurationProvider&MockObject $configurationProvider;
+    private Builder&MockObject $gridBuilder;
+    private DoctrineHelper&MockObject $doctrineHelper;
 
     #[\Override]
     protected function createValidator(): QueryValidator
@@ -78,7 +74,7 @@ class QueryValidatorTest extends ConstraintValidatorTestCase
      * @dataProvider validateDataProvider
      */
     public function testValidate(
-        \PHPUnit\Framework\MockObject\MockObject $datasource,
+        MockObject $datasource,
         bool $useOrmDatasource,
         ?\Exception $exception,
         ?\Exception $configurationException,

@@ -6,13 +6,13 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LoggerBundle\Provider\ErrorLogNotificationRecipientsProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ErrorLogNotificationRecipientsProviderTest extends \PHPUnit\Framework\TestCase
+class ErrorLogNotificationRecipientsProviderTest extends TestCase
 {
-    private ConfigManager&\PHPUnit\Framework\MockObject\MockObject $configManager;
-
-    private ApplicationState&\PHPUnit\Framework\MockObject\MockObject $applicationState;
-
+    private ConfigManager&MockObject $configManager;
+    private ApplicationState&MockObject $applicationState;
     private ErrorLogNotificationRecipientsProvider $provider;
 
     #[\Override]
@@ -24,7 +24,9 @@ class ErrorLogNotificationRecipientsProviderTest extends \PHPUnit\Framework\Test
             $this->configManager,
             $this->applicationState
         );
-        $this->applicationState->method('isInstalled')->willReturn(true);
+        $this->applicationState->expects(self::any())
+            ->method('isInstalled')
+            ->willReturn(true);
     }
 
     /**
@@ -35,8 +37,7 @@ class ErrorLogNotificationRecipientsProviderTest extends \PHPUnit\Framework\Test
      */
     public function testGetRecipientsEmailAddresses(string|null $recipients, array $expected): void
     {
-        $this->configManager
-            ->expects(self::once())
+        $this->configManager->expects(self::once())
             ->method('get')
             ->with(Configuration::getFullConfigKey(Configuration::EMAIL_NOTIFICATION_RECIPIENTS))
             ->willReturn($recipients);
@@ -44,9 +45,11 @@ class ErrorLogNotificationRecipientsProviderTest extends \PHPUnit\Framework\Test
         self::assertEquals($expected, $this->provider->getRecipientsEmailAddresses());
     }
 
-    public function testThatEmailListIsEmptyWhenApplicationIsNotInstalled()
+    public function testThatEmailListIsEmptyWhenApplicationIsNotInstalled(): void
     {
-        $this->applicationState->method('isInstalled')->willReturn(false);
+        $this->applicationState->expects(self::any())
+            ->method('isInstalled')
+            ->willReturn(false);
 
         self::assertEquals([], $this->provider->getRecipientsEmailAddresses());
     }

@@ -8,21 +8,16 @@ use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\UrlProvider;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MessageParamsProviderTest extends \PHPUnit\Framework\TestCase
+class MessageParamsProviderTest extends TestCase
 {
-    /** @var DateTimeFormatterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dateTimeFormatter;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var UrlProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $urlProvider;
-
-    /** @var MessageParamsProvider */
-    private $messageParamsProvider;
+    private DateTimeFormatterInterface&MockObject $dateTimeFormatter;
+    private ConfigProvider&MockObject $configProvider;
+    private UrlProvider&MockObject $urlProvider;
+    private MessageParamsProvider $messageParamsProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +34,7 @@ class MessageParamsProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMessageParamsSetupCorrectParams()
+    public function testGetMessageParamsSetupCorrectParams(): void
     {
         $expectedId = 42;
         $expectedSubject = 'testSubject';
@@ -102,7 +97,7 @@ class MessageParamsProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertIsString($result['uniqueId']);
     }
 
-    public function testGetMessageParamsForRemindersSetupCorrectParams()
+    public function testGetMessageParamsForRemindersSetupCorrectParams(): void
     {
         $expectedId = 42;
         $expectedSubject = 'testSubject';

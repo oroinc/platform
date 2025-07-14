@@ -5,16 +5,15 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultOwnerSubscriber;
 use Oro\Bundle\IntegrationBundle\Form\Type\ChannelType as IntegrationType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class IntegrationTypeTest extends \PHPUnit\Framework\TestCase
+class IntegrationTypeTest extends TestCase
 {
-    /** @var FormBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $builder;
-
-    /** @var IntegrationType */
-    private $type;
+    private FormBuilder&MockObject $builder;
+    private IntegrationType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class IntegrationTypeTest extends \PHPUnit\Framework\TestCase
         $this->type = new IntegrationType($defaultUserOwnerFS, $integrationFS);
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $this->builder->expects($this->exactly(2))
             ->method('addEventSubscriber')
@@ -38,7 +37,7 @@ class IntegrationTypeTest extends \PHPUnit\Framework\TestCase
         $this->type->buildForm($this->builder, []);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())

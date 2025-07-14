@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Container;
 
 class ImportConditionFilterTest extends TestCase
 {
-    public function testFilter()
+    public function testFilter(): void
     {
         $container = new Container();
         $container->setParameter('parameter1', true);

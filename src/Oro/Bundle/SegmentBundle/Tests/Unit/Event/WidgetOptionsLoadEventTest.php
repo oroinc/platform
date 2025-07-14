@@ -3,10 +3,11 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Event;
 
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
+use PHPUnit\Framework\TestCase;
 
-class WidgetOptionsLoadEventTest extends \PHPUnit\Framework\TestCase
+class WidgetOptionsLoadEventTest extends TestCase
 {
-    public function testGettersAndSetters()
+    public function testGettersAndSetters(): void
     {
         $originalOptions = [
             'oo' => 'ov',

@@ -15,9 +15,10 @@ use PHPUnit\Framework\TestCase;
 
 class ChannelOrganizationAwareAccessRuleTest extends TestCase
 {
+    private TokenAccessorInterface&MockObject $tokenAccessor;
     private ChannelOrganizationAwareAccessRule $rule;
-    private TokenAccessorInterface|MockObject $tokenAccessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
@@ -28,8 +29,7 @@ class ChannelOrganizationAwareAccessRuleTest extends TestCase
     public function testIsApplicable(): void
     {
         $criteria = $this->createMock(Criteria::class);
-        $criteria
-            ->expects(self::exactly(2))
+        $criteria->expects(self::exactly(2))
             ->method('getEntityClass')
             ->willReturnOnConsecutiveCalls(
                 Channel::class,
@@ -42,14 +42,12 @@ class ChannelOrganizationAwareAccessRuleTest extends TestCase
 
     public function testProcessWithOrganization(): void
     {
-        $this->tokenAccessor
-            ->expects(self::once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getOrganizationId')
             ->willReturn(1);
 
         $criteria = $this->createMock(Criteria::class);
-        $criteria
-            ->expects(self::once())
+        $criteria->expects(self::once())
             ->method('andExpression')
             ->with(new Comparison(
                 new Path('organization', $criteria->getAlias()),
@@ -62,14 +60,12 @@ class ChannelOrganizationAwareAccessRuleTest extends TestCase
 
     public function testProcessWithoutOrganizations(): void
     {
-        $this->tokenAccessor
-            ->expects(self::once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getOrganizationId')
             ->willReturn(null);
 
         $criteria = $this->createMock(Criteria::class);
-        $criteria
-            ->expects(self::once())
+        $criteria->expects(self::once())
             ->method('andExpression')
             ->with(new AccessDenied());
 

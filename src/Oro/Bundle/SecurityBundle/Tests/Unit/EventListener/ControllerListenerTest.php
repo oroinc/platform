@@ -5,28 +5,23 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
 use Oro\Bundle\SecurityBundle\EventListener\ControllerListener;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\TestDomainObject;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class ControllerListenerTest extends \PHPUnit\Framework\TestCase
+class ControllerListenerTest extends TestCase
 {
     private const CLASS_NAME = TestDomainObject::class;
     private const METHOD_NAME = 'getId';
 
-    /** @var ClassAuthorizationChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $classAuthorizationChecker;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var Request */
-    private $request;
-
-    /** @var ControllerListener */
-    private $listener;
+    private ClassAuthorizationChecker&MockObject $classAuthorizationChecker;
+    private LoggerInterface&MockObject $logger;
+    private Request $request;
+    private ControllerListener $listener;
 
     #[\Override]
     protected function setUp(): void

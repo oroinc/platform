@@ -9,8 +9,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ImportExportConfigurationRegistryCompilerPassTest extends TestCase
 {
-    /** @var ImportExportConfigurationRegistryCompilerPass */
-    private $compiler;
+    private ImportExportConfigurationRegistryCompilerPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -18,14 +17,14 @@ class ImportExportConfigurationRegistryCompilerPassTest extends TestCase
         $this->compiler = new ImportExportConfigurationRegistryCompilerPass();
     }
 
-    public function testProcessWithoutRegistryService()
+    public function testProcessWithoutRegistryService(): void
     {
         $container = new ContainerBuilder();
 
         $this->compiler->process($container);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $registryDef = $container->register('oro_importexport.configuration.registry');
@@ -48,7 +47,7 @@ class ImportExportConfigurationRegistryCompilerPassTest extends TestCase
         );
     }
 
-    public function testProcessWhenNoTaggedServices()
+    public function testProcessWhenNoTaggedServices(): void
     {
         $container = new ContainerBuilder();
         $registryDef = $container->register('oro_importexport.configuration.registry');

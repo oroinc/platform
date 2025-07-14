@@ -5,10 +5,11 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Event;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutorInterface;
+use PHPUnit\Framework\TestCase;
 
-class MigrationDataFixturesEventTest extends \PHPUnit\Framework\TestCase
+class MigrationDataFixturesEventTest extends TestCase
 {
-    public function testEventWithoutLogger()
+    public function testEventWithoutLogger(): void
     {
         $manager = $this->createMock(ObjectManager::class);
         $fixturesType = 'test';
@@ -21,7 +22,7 @@ class MigrationDataFixturesEventTest extends \PHPUnit\Framework\TestCase
         $event->log('some message');
     }
 
-    public function testEventWithLogger()
+    public function testEventWithLogger(): void
     {
         $manager = $this->createMock(ObjectManager::class);
         $fixturesType = 'test';
@@ -39,7 +40,7 @@ class MigrationDataFixturesEventTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['some message'], $logMessages);
     }
 
-    public function testFixturesType()
+    public function testFixturesType(): void
     {
         $fixturesType = 'test';
 
@@ -50,7 +51,7 @@ class MigrationDataFixturesEventTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($event->isDemoFixtures());
     }
 
-    public function testMainFixturesType()
+    public function testMainFixturesType(): void
     {
         $event = new MigrationDataFixturesEvent(
             $this->createMock(ObjectManager::class),
@@ -62,7 +63,7 @@ class MigrationDataFixturesEventTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($event->isDemoFixtures());
     }
 
-    public function testDemoFixturesType()
+    public function testDemoFixturesType(): void
     {
         $event = new MigrationDataFixturesEvent(
             $this->createMock(ObjectManager::class),

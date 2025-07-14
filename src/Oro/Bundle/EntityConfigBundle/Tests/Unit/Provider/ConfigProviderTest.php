@@ -11,23 +11,20 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity as TestEntity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ConfigProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigProviderTest extends TestCase
 {
     private const TEST_SCOPE = 'testScope';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var PropertyConfigBag|\PHPUnit\Framework\MockObject\MockObject */
-    private $configBag;
-
-    /** @var ConfigProvider */
-    private $configProvider;
+    private ConfigManager&MockObject $configManager;
+    private PropertyConfigBag&MockObject $configBag;
+    private ConfigProvider $configProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +35,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->configProvider = new ConfigProvider($this->configManager, self::TEST_SCOPE, $this->configBag);
     }
 
-    public function testGetPropertyConfig()
+    public function testGetPropertyConfig(): void
     {
         $propertyConfig = $this->createMock(PropertyConfigContainer::class);
 
@@ -50,12 +47,12 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($propertyConfig, $this->configProvider->getPropertyConfig());
     }
 
-    public function testGetConfigManager()
+    public function testGetConfigManager(): void
     {
         $this->assertSame($this->configManager, $this->configProvider->getConfigManager());
     }
 
-    public function testGetIdForNullClassName()
+    public function testGetIdForNullClassName(): void
     {
         $this->assertEquals(
             new EntityConfigId(self::TEST_SCOPE),
@@ -63,7 +60,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetIdForEntityConfig()
+    public function testGetIdForEntityConfig(): void
     {
         $this->assertEquals(
             new EntityConfigId(self::TEST_SCOPE, TestEntity::class),
@@ -71,7 +68,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetIdForFieldConfig()
+    public function testGetIdForFieldConfig(): void
     {
         $this->assertEquals(
             new FieldConfigId(self::TEST_SCOPE, TestEntity::class, 'testField', 'int'),
@@ -79,7 +76,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetIdForFieldConfigWithoutFieldType()
+    public function testGetIdForFieldConfigWithoutFieldType(): void
     {
         $fieldConfig = new FieldConfigId(self::TEST_SCOPE, TestEntity::class, 'testField', 'int');
 
@@ -94,7 +91,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasConfigForEntity()
+    public function testHasConfigForEntity(): void
     {
         $this->configManager->expects($this->once())
             ->method('hasConfig')
@@ -106,7 +103,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasConfigForField()
+    public function testHasConfigForField(): void
     {
         $this->configManager->expects($this->once())
             ->method('hasConfig')
@@ -118,7 +115,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasConfigByIdForEntity()
+    public function testHasConfigByIdForEntity(): void
     {
         $configId = new EntityConfigId(self::TEST_SCOPE, TestEntity::class);
 
@@ -132,7 +129,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasConfigByIdForField()
+    public function testHasConfigByIdForField(): void
     {
         $configId = new FieldConfigId(self::TEST_SCOPE, TestEntity::class, 'testField', 'string');
 
@@ -146,7 +143,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetConfigForNullClassName()
+    public function testGetConfigForNullClassName(): void
     {
         $entityConfig = new Config(
             new EntityConfigId(self::TEST_SCOPE)
@@ -163,7 +160,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetConfigForEntity()
+    public function testGetConfigForEntity(): void
     {
         $entityConfig = new Config(
             new EntityConfigId(self::TEST_SCOPE, TestEntity::class)
@@ -180,7 +177,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetConfigForField()
+    public function testGetConfigForField(): void
     {
         $fieldConfig = new Config(
             new FieldConfigId(self::TEST_SCOPE, TestEntity::class, 'testField', 'int')
@@ -197,7 +194,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetConfigByIdForNullClassName()
+    public function testGetConfigByIdForNullClassName(): void
     {
         $configId = new EntityConfigId(self::TEST_SCOPE);
         $entityConfig = new Config($configId);
@@ -213,7 +210,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetConfigByIdForEntity()
+    public function testGetConfigByIdForEntity(): void
     {
         $configId = new EntityConfigId(self::TEST_SCOPE, TestEntity::class);
         $entityConfig = new Config($configId);
@@ -229,7 +226,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetConfigByIdForField()
+    public function testGetConfigByIdForField(): void
     {
         $configId = new FieldConfigId(self::TEST_SCOPE, TestEntity::class, 'testField', 'int');
         $fieldConfig = new Config($configId);
@@ -245,7 +242,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetIdsForEntities()
+    public function testGetIdsForEntities(): void
     {
         $entityConfigId = new EntityConfigId(self::TEST_SCOPE, TestEntity::class);
 
@@ -260,7 +257,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetIdsForFields()
+    public function testGetIdsForFields(): void
     {
         $fieldConfigId = new FieldConfigId(self::TEST_SCOPE, TestEntity::class, 'testField', 'int');
 
@@ -275,7 +272,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetIdsForEntitiesIncludingHidden()
+    public function testGetIdsForEntitiesIncludingHidden(): void
     {
         $entityConfigId = new EntityConfigId(self::TEST_SCOPE, TestEntity::class);
 
@@ -290,7 +287,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetIdsForFieldsIncludingHidden()
+    public function testGetIdsForFieldsIncludingHidden(): void
     {
         $fieldConfigId = new FieldConfigId(self::TEST_SCOPE, TestEntity::class, 'testField', 'int');
 
@@ -305,7 +302,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetConfigsForEntities()
+    public function testGetConfigsForEntities(): void
     {
         $entityConfig = new Config(
             new EntityConfigId(self::TEST_SCOPE, TestEntity::class)
@@ -322,7 +319,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetConfigsForFields()
+    public function testGetConfigsForFields(): void
     {
         $fieldConfig = new Config(
             new FieldConfigId(self::TEST_SCOPE, TestEntity::class, 'testField', 'int')
@@ -339,7 +336,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetConfigsForEntitiesIncludingHidden()
+    public function testGetConfigsForEntitiesIncludingHidden(): void
     {
         $entityConfig = new Config(
             new EntityConfigId(self::TEST_SCOPE, TestEntity::class)
@@ -356,7 +353,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetConfigsForFieldsIncludingHidden()
+    public function testGetConfigsForFieldsIncludingHidden(): void
     {
         $fieldConfig = new Config(
             new FieldConfigId(self::TEST_SCOPE, TestEntity::class, 'testField', 'int')
@@ -373,7 +370,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMap()
+    public function testMap(): void
     {
         $entityConfig = new Config(new EntityConfigId(self::TEST_SCOPE, TestEntity::class));
 
@@ -394,7 +391,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$expectedEntityConfig], $result);
     }
 
-    public function testFilter()
+    public function testFilter(): void
     {
         $entityConfig = new Config(new EntityConfigId(self::TEST_SCOPE, TestEntity::class));
 
@@ -412,7 +409,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $result);
     }
 
-    public function testGetScope()
+    public function testGetScope(): void
     {
         $this->assertEquals(self::TEST_SCOPE, $this->configProvider->getScope());
     }

@@ -7,11 +7,11 @@ use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Manager\TagImportManager;
+use PHPUnit\Framework\TestCase;
 
-class TagImportManagerTest extends \PHPUnit\Framework\TestCase
+class TagImportManagerTest extends TestCase
 {
-    /** @var TagImportManager */
-    private $tagImportManager;
+    private TagImportManager $tagImportManager;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +36,7 @@ class TagImportManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeTagsProvider
      */
-    public function testNormalizeTags($tags, $expectedResult)
+    public function testNormalizeTags($tags, $expectedResult): void
     {
         $this->assertEquals($expectedResult, $this->tagImportManager->normalizeTags($tags));
     }
@@ -67,7 +67,7 @@ class TagImportManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider denormalizeTagsProvider
      */
-    public function testDenormalizeTags(array $data, $expectedResult)
+    public function testDenormalizeTags(array $data, $expectedResult): void
     {
         $this->assertEquals($expectedResult, $this->tagImportManager->denormalizeTags($data));
     }

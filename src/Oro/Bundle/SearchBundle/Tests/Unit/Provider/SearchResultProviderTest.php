@@ -12,25 +12,18 @@ use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Provider\SearchResultProvider;
 use Oro\Bundle\SearchBundle\Query\Result as SearchResult;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SearchResultProviderTest extends \PHPUnit\Framework\TestCase
+class SearchResultProviderTest extends TestCase
 {
-    /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
-    private $indexer;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dispatcher;
-
-    /** @var SearchResultProvider */
-    private $provider;
+    private Indexer&MockObject $indexer;
+    private FeatureChecker&MockObject $featureChecker;
+    private ConfigManager&MockObject $configManager;
+    private EventDispatcherInterface&MockObject $dispatcher;
+    private SearchResultProvider $provider;
 
     #[\Override]
     protected function setUp(): void

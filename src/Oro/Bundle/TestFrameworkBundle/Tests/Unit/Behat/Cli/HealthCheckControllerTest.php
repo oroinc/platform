@@ -11,16 +11,16 @@ use Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker\ResultPrinterSubscriber;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Cli\Stub\HealthCheckerStub;
 use Oro\Component\Testing\Unit\Command\Stub\InputStub;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class HealthCheckControllerTest extends \PHPUnit\Framework\TestCase
+class HealthCheckControllerTest extends TestCase
 {
-    /** @var array */
-    private $checkers = ['cs', 'fixtures'];
+    private array $checkers = ['cs', 'fixtures'];
 
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $eventDispatcher = new TestworkEventDispatcher();
         $controller = new HealthCheckController(
@@ -40,7 +40,7 @@ class HealthCheckControllerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider filterCheckersProvider
      */
-    public function testFilterCheckers($parameter, array $expectedCheckers)
+    public function testFilterCheckers($parameter, array $expectedCheckers): void
     {
         $eventDispatcher = new TestworkEventDispatcher();
 

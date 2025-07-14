@@ -6,10 +6,11 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\OrganizationBundle\Event\FormListener;
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormView;
 use Twig\Environment;
 
-class FormListenerTest extends \PHPUnit\Framework\TestCase
+class FormListenerTest extends TestCase
 {
     public function testAddOwnerField(): void
     {

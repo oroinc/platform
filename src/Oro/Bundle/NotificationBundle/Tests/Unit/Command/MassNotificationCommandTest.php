@@ -8,39 +8,32 @@ use Oro\Bundle\NotificationBundle\Command\MassNotificationCommand;
 use Oro\Bundle\NotificationBundle\Exception\NotificationSendException;
 use Oro\Bundle\NotificationBundle\Model\MassNotificationSender;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
+class MassNotificationCommandTest extends TestCase
 {
-    /** @var MassNotificationSender|\PHPUnit\Framework\MockObject\MockObject */
-    private $sender;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $in;
-
-    /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $out;
-
-    /** @var MassNotificationCommand */
-    private $command;
+    private MassNotificationSender&MockObject $sender;
+    private LoggerInterface&MockObject $logger;
+    private InputInterface&MockObject $in;
+    private OutputInterface&MockObject $out;
+    private MassNotificationCommand $command;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->sender = $this->createMock(MassNotificationSender::class);
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->in  = $this->createMock(InputInterface::class);
+        $this->in = $this->createMock(InputInterface::class);
         $this->out = $this->createMock(OutputInterface::class);
 
         $this->command = new MassNotificationCommand($this->sender, $this->logger);
     }
 
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $this->command->configure();
         $this->assertEquals('oro:maintenance-notification', $this->command->getName());
@@ -52,7 +45,7 @@ class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($definition->hasOption('sender_email'));
     }
 
-    public function testExecuteWithMessage()
+    public function testExecuteWithMessage(): void
     {
         $count = 2;
         $this->out->expects($this->once())
@@ -81,7 +74,7 @@ class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
         $this->command->execute($this->in, $this->out);
     }
 
-    public function testExecuteWithMessageWhenCouldNotSendNotification()
+    public function testExecuteWithMessageWhenCouldNotSendNotification(): void
     {
         $this->out->expects($this->once())
             ->method('writeln')
@@ -109,7 +102,7 @@ class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
         $this->command->execute($this->in, $this->out);
     }
 
-    public function testExecuteWithFile()
+    public function testExecuteWithFile(): void
     {
         $count = 2;
 
@@ -134,7 +127,7 @@ class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
         $this->command->execute($this->in, $this->out);
     }
 
-    public function testExecuteNoFileFound()
+    public function testExecuteNoFileFound(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Could not read notfoundpath file');

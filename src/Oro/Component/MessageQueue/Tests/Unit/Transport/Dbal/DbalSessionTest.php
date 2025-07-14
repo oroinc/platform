@@ -8,14 +8,13 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageProducer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 use Oro\Component\MessageQueue\Transport\Queue;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DbalSessionTest extends \PHPUnit\Framework\TestCase
+class DbalSessionTest extends TestCase
 {
-    /** @var DbalConnection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var DbalSession */
-    private $session;
+    private DbalConnection&MockObject $connection;
+    private DbalSession $session;
 
     #[\Override]
     protected function setUp(): void
@@ -51,8 +50,7 @@ class DbalSessionTest extends \PHPUnit\Framework\TestCase
     {
         $queue = new Queue('queue name');
 
-        $this->connection
-            ->expects($this->once())
+        $this->connection->expects($this->once())
             ->method('getOptions')
             ->willReturn([]);
 
@@ -68,8 +66,7 @@ class DbalSessionTest extends \PHPUnit\Framework\TestCase
     {
         $queue = new Queue('queue name');
 
-        $this->connection
-            ->expects($this->once())
+        $this->connection->expects($this->once())
             ->method('getOptions')
             ->willReturn([
                 'polling_interval' => 2000

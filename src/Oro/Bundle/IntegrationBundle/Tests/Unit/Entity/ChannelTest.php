@@ -10,8 +10,9 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Config\Common\ConfigObject;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class ChannelTest extends \PHPUnit\Framework\TestCase
+class ChannelTest extends TestCase
 {
     use EntityTestCaseTrait;
 

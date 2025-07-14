@@ -8,22 +8,19 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class WorkflowAwareCacheTest extends \PHPUnit\Framework\TestCase
+class WorkflowAwareCacheTest extends TestCase
 {
     private const ACTIVE_WORKFLOW_RELATED_CLASSES_KEY = 'active_workflow_related';
     private const WORKFLOW_RELATED_CLASSES_KEY = 'all_workflow_related';
 
-    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var WorkflowDefinitionRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var WorkflowAwareCache */
-    private $workflowAwareCache;
+    private CacheInterface&MockObject $cache;
+    private WorkflowDefinitionRepository&MockObject $repository;
+    private WorkflowAwareCache $workflowAwareCache;
 
     #[\Override]
     protected function setUp(): void

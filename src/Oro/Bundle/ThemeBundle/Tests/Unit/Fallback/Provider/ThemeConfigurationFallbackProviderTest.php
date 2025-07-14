@@ -13,9 +13,8 @@ use PHPUnit\Framework\TestCase;
 
 class ThemeConfigurationFallbackProviderTest extends TestCase
 {
-    private ThemeConfigurationProvider|MockObject $themeConfigurationProvider;
-    private ConfigProvider|MockObject $configProvider;
-
+    private ThemeConfigurationProvider&MockObject $themeConfigurationProvider;
+    private ConfigProvider&MockObject $configProvider;
     private ThemeConfigurationFallbackProvider $themeConfigurationFallbackProvider;
 
     #[\Override]

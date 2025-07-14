@@ -20,20 +20,11 @@ use PHPUnit\Framework\TestCase;
 
 class ChoiceTreeBusinessUnitProviderTest extends TestCase
 {
-    /** @var ChoiceTreeBusinessUnitProvider */
-    private $choiceTreeBUProvider;
-
-    /** @var TokenAccessorInterface|MockObject */
-    private $tokenAccessor;
-
-    /** @var ChainOwnerTreeProvider|MockObject */
-    private $treeProvider;
-
-    /** @var QueryBuilder|MockObject */
-    private $qb;
-
-    /** @var AbstractQuery|MockObject */
-    private $query;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private ChainOwnerTreeProvider&MockObject $treeProvider;
+    private QueryBuilder&MockObject $qb;
+    private AbstractQuery&MockObject $query;
+    private ChoiceTreeBusinessUnitProvider $choiceTreeBUProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -79,7 +70,7 @@ class ChoiceTreeBusinessUnitProviderTest extends TestCase
     /**
      * @dataProvider getListDataProvider
      */
-    public function testGetList(array $userBUIds, array $result)
+    public function testGetList(array $userBUIds, array $result): void
     {
         $ownerTree = $this->createMock(OwnerTreeInterface::class);
 

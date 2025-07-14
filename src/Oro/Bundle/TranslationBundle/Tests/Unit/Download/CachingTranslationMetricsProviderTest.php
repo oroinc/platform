@@ -6,11 +6,13 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Download;
 
 use Oro\Bundle\TranslationBundle\Download\CachingTranslationMetricsProvider;
 use Oro\Bundle\TranslationBundle\Download\TranslationServiceAdapterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
+class CachingTranslationMetricsProviderTest extends TestCase
 {
     private const METRICS = [
         'uk_UA' => [
@@ -38,17 +40,10 @@ class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var TranslationServiceAdapterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $adapter;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var CachingTranslationMetricsProvider */
-    private $provider;
+    private CacheInterface&MockObject $cache;
+    private TranslationServiceAdapterInterface&MockObject $adapter;
+    private LoggerInterface&MockObject $logger;
+    private CachingTranslationMetricsProvider $provider;
 
     #[\Override]
     protected function setUp(): void

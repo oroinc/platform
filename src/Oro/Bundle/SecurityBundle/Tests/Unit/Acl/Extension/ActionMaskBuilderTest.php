@@ -3,10 +3,11 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionMaskBuilder;
+use PHPUnit\Framework\TestCase;
 
-class ActionMaskBuilderTest extends \PHPUnit\Framework\TestCase
+class ActionMaskBuilderTest extends TestCase
 {
-    public function testAllGroup()
+    public function testAllGroup(): void
     {
         $this->assertEquals(
             ActionMaskBuilder::GROUP_ALL,
@@ -14,7 +15,7 @@ class ActionMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemoveServiceBits()
+    public function testRemoveServiceBits(): void
     {
         $this->assertEquals(
             ActionMaskBuilder::REMOVE_SERVICE_BITS,
@@ -22,7 +23,7 @@ class ActionMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testServiceBits()
+    public function testServiceBits(): void
     {
         $this->assertEquals(
             ActionMaskBuilder::SERVICE_BITS,
@@ -30,7 +31,7 @@ class ActionMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEmptyPattern()
+    public function testGetEmptyPattern(): void
     {
         $builder = new ActionMaskBuilder();
 
@@ -40,7 +41,7 @@ class ActionMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternExecute()
+    public function testGetPatternExecute(): void
     {
         $builder = new ActionMaskBuilder();
         $builder->add(ActionMaskBuilder::MASK_EXECUTE);

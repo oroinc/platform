@@ -3,10 +3,11 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Model;
 
 use Oro\Bundle\EntityExtendBundle\Model\EnumOption;
+use PHPUnit\Framework\TestCase;
 
-class EnumValueTest extends \PHPUnit\Framework\TestCase
+class EnumValueTest extends TestCase
 {
-    public function testIdGetterAndSetter()
+    public function testIdGetterAndSetter(): void
     {
         $enumValue = new EnumOption();
         self::assertNull($enumValue->getId());
@@ -14,7 +15,7 @@ class EnumValueTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('testId', $enumValue->getId());
     }
 
-    public function testLabelGetterAndSetter()
+    public function testLabelGetterAndSetter(): void
     {
         $enumValue = new EnumOption();
         self::assertNull($enumValue->getLabel());
@@ -22,7 +23,7 @@ class EnumValueTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test label', $enumValue->getLabel());
     }
 
-    public function testIsDefaultGetterAndSetter()
+    public function testIsDefaultGetterAndSetter(): void
     {
         $enumValue = new EnumOption();
         self::assertNull($enumValue->getIsDefault());
@@ -30,7 +31,7 @@ class EnumValueTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(true, $enumValue->getIsDefault());
     }
 
-    public function testPriorityGetterAndSetter()
+    public function testPriorityGetterAndSetter(): void
     {
         $enumValue = new EnumOption();
         self::assertNull($enumValue->getPriority());
@@ -38,7 +39,7 @@ class EnumValueTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(100, $enumValue->getPriority());
     }
 
-    public function testFromArrayAndToArray()
+    public function testFromArrayAndToArray(): void
     {
         $array = [
             'id' => 'testId',

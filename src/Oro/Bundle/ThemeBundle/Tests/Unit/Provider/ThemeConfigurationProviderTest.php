@@ -21,7 +21,6 @@ final class ThemeConfigurationProviderTest extends TestCase
     private ConfigManager&MockObject $configManager;
     private ThemeDefinitionBagInterface&MockObject $configurationProvider;
     private ThemeConfigurationRepository&MockObject $repository;
-
     private ThemeConfigurationProvider $provider;
 
     #[\Override]

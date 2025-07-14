@@ -5,10 +5,11 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Job\Context;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorInterface;
 use Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorRegistry;
+use PHPUnit\Framework\TestCase;
 
-class ContextAggregatorRegistryTest extends \PHPUnit\Framework\TestCase
+class ContextAggregatorRegistryTest extends TestCase
 {
-    public function testShouldNotInitializeAggregatorsInConstructor()
+    public function testShouldNotInitializeAggregatorsInConstructor(): void
     {
         $aggregator1 = $this->createMock(ContextAggregatorInterface::class);
         $aggregator1->expects(self::never())
@@ -17,7 +18,7 @@ class ContextAggregatorRegistryTest extends \PHPUnit\Framework\TestCase
         new ContextAggregatorRegistry([$aggregator1]);
     }
 
-    public function testGetAggregator()
+    public function testGetAggregator(): void
     {
         $aggregator1 = $this->createMock(ContextAggregatorInterface::class);
         $aggregator1->expects(self::once())
@@ -30,7 +31,7 @@ class ContextAggregatorRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($aggregator1, $contextAggregatorRegistry->getAggregator('aggregator1'));
     }
 
-    public function testGetAggregatorForNotExistingAggregator()
+    public function testGetAggregatorForNotExistingAggregator(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The context aggregator "aggregator2" does not exist.');
@@ -44,7 +45,7 @@ class ContextAggregatorRegistryTest extends \PHPUnit\Framework\TestCase
         $contextAggregatorRegistry->getAggregator('aggregator2');
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $aggregator1 = $this->createMock(ContextAggregatorInterface::class);
         $aggregator1->expects(self::exactly(2))

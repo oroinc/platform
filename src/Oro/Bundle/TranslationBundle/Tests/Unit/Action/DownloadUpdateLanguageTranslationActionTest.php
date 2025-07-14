@@ -10,19 +10,16 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Exception\TranslationDownloaderException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\Logger\BufferingLogger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class DownloadUpdateLanguageTranslationActionTest extends \PHPUnit\Framework\TestCase
+class DownloadUpdateLanguageTranslationActionTest extends TestCase
 {
-    /** @var TranslationDownloader|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationDownloader;
-
-    /** @var BufferingLogger */
-    private $logger;
-
-    /** @var DownloadUpdateLanguageTranslationAction */
-    private $action;
+    private TranslationDownloader&MockObject $translationDownloader;
+    private BufferingLogger $logger;
+    private DownloadUpdateLanguageTranslationAction $action;
 
     #[\Override]
     protected function setUp(): void

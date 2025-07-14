@@ -41,13 +41,13 @@ class OwnerFormSubscriberTest extends TestCase
         );
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $expectedEvents = [FormEvents::POST_SET_DATA => 'postSetData'];
         $this->assertEquals($expectedEvents, $this->subscriber->getSubscribedEvents());
     }
 
-    public function testPostSetDataNotRootForm()
+    public function testPostSetDataNotRootForm(): void
     {
         $form = $this->createMock(Form::class);
         $form->expects($this->once())
@@ -58,7 +58,7 @@ class OwnerFormSubscriberTest extends TestCase
         $this->subscriber->postSetData($event);
     }
 
-    public function testPostSetDataNoOwnerField()
+    public function testPostSetDataNoOwnerField(): void
     {
         $form = $this->createMock(Form::class);
         $form->expects($this->once())
@@ -75,7 +75,7 @@ class OwnerFormSubscriberTest extends TestCase
         $this->subscriber->postSetData($event);
     }
 
-    public function testPostSetDataNotAnObject()
+    public function testPostSetDataNotAnObject(): void
     {
         $form = $this->createMock(Form::class);
         $form->expects($this->once())
@@ -92,7 +92,7 @@ class OwnerFormSubscriberTest extends TestCase
         $this->subscriber->postSetData($event);
     }
 
-    public function testPostSetDataNotManagedObject()
+    public function testPostSetDataNotManagedObject(): void
     {
         $data = new \DateTime();
 
@@ -113,7 +113,7 @@ class OwnerFormSubscriberTest extends TestCase
         $this->subscriber->postSetData($event);
     }
 
-    public function testPostSetDataReplaceOwnerAssignGranted()
+    public function testPostSetDataReplaceOwnerAssignGranted(): void
     {
         $data = new Tag();
 
@@ -134,7 +134,7 @@ class OwnerFormSubscriberTest extends TestCase
         $this->subscriber->postSetData($event);
     }
 
-    public function testPostSetDataReplaceOwnerAssignNotGranted()
+    public function testPostSetDataReplaceOwnerAssignNotGranted(): void
     {
         $data = new Tag();
         $ownerName = 'user';
@@ -210,7 +210,7 @@ class OwnerFormSubscriberTest extends TestCase
             ->willReturn($entityManager);
     }
 
-    public function testPostSetDataSetPredefinedOwnerExists()
+    public function testPostSetDataSetPredefinedOwnerExists(): void
     {
         $ownerForm = $this->createMock(Form::class);
         $ownerForm->expects($this->once())
@@ -236,7 +236,7 @@ class OwnerFormSubscriberTest extends TestCase
         $this->subscriber->postSetData($event);
     }
 
-    public function testPostSetDataSetPredefinedOwnerNotExists()
+    public function testPostSetDataSetPredefinedOwnerNotExists(): void
     {
         $ownerForm = $this->createMock(Form::class);
         $ownerForm->expects($this->once())

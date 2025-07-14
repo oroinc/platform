@@ -4,8 +4,9 @@ namespace Oro\Bundle\CronBundle\Tests\Unit\Tools;
 
 use Cron\CronExpression;
 use Oro\Bundle\CronBundle\Tools\CronHelper;
+use PHPUnit\Framework\TestCase;
 
-class CronHelperTest extends \PHPUnit\Framework\TestCase
+class CronHelperTest extends TestCase
 {
     private CronHelper $cronHelper;
 

@@ -4,10 +4,11 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class RequestParameterBagFactoryTest extends \PHPUnit\Framework\TestCase
+class RequestParameterBagFactoryTest extends TestCase
 {
     private const TEST_NAME = 'testGrid';
     private const PARAMETERS_CLASS = ParameterBag::class;

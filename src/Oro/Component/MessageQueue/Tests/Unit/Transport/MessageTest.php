@@ -4,8 +4,9 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Transport;
 
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class MessageTest extends \PHPUnit\Framework\TestCase
+class MessageTest extends TestCase
 {
     use EntityTestCaseTrait;
 

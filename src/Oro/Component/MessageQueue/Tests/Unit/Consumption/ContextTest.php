@@ -4,28 +4,28 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Consumption;
 
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Exception\IllegalContextModificationException;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ContextTest extends \PHPUnit\Framework\TestCase
+class ContextTest extends TestCase
 {
     use ClassExtensionTrait;
 
     public function testCouldBeConstructedWithSessionAsFirstArgument(): void
     {
-        new Context($this->createSession());
+        new Context($this->createMock(SessionInterface::class));
     }
 
     public function testShouldAllowGetSessionSetInConstructor(): void
     {
-        $session = $this->createSession();
+        $session = $this->createMock(SessionInterface::class);
 
         $context = new Context($session);
 
@@ -34,9 +34,9 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldAllowGetMessageConsumerPreviouslySet(): void
     {
-        $messageConsumer = $this->createMessageConsumer();
+        $messageConsumer = $this->createMock(MessageConsumerInterface::class);
 
-        $context = new Context($this->createSession());
+        $context = new Context($this->createMock(SessionInterface::class));
         $context->setMessageConsumer($messageConsumer);
 
         self::assertSame($messageConsumer, $context->getMessageConsumer());
@@ -44,10 +44,10 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testThrowOnTryToChangeMessageConsumerIfAlreadySet(): void
     {
-        $messageConsumer = $this->createMessageConsumer();
-        $anotherMessageConsumer = $this->createMessageConsumer();
+        $messageConsumer = $this->createMock(MessageConsumerInterface::class);
+        $anotherMessageConsumer = $this->createMock(MessageConsumerInterface::class);
 
-        $context = new Context($this->createSession());
+        $context = new Context($this->createMock(SessionInterface::class));
 
         $context->setMessageConsumer($messageConsumer);
 
@@ -59,7 +59,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     {
         $messageProcessorName = 'sample_processor';
 
-        $context = new Context($this->createSession());
+        $context = new Context($this->createMock(SessionInterface::class));
         $context->setMessageProcessorName($messageProcessorName);
 
         self::assertSame($messageProcessorName, $context->getMessageProcessorName());
@@ -69,7 +69,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     {
         $logger = new NullLogger();
 
-        $context = new Context($this->createSession());
+        $context = new Context($this->createMock(SessionInterface::class));
         $context->setLogger($logger);
 
         self::assertSame($logger, $context->getLogger());
@@ -77,17 +77,16 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldSetExecutionInterruptedToFalseInConstructor(): void
     {
-        $context = new Context($this->createSession());
+        $context = new Context($this->createMock(SessionInterface::class));
 
         self::assertFalse($context->isExecutionInterrupted());
     }
 
     public function testShouldAllowGetPreviouslySetMessage(): void
     {
-        /** @var MessageInterface $message */
         $message = $this->createMock(MessageInterface::class);
 
-        $context = new Context($this->createSession());
+        $context = new Context($this->createMock(SessionInterface::class));
 
         $context->setMessage($message);
 
@@ -96,10 +95,9 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testThrowOnTryToChangeMessageIfAlreadySet(): void
     {
-        /** @var MessageInterface $message */
         $message = $this->createMock(MessageInterface::class);
 
-        $context = new Context($this->createSession());
+        $context = new Context($this->createMock(SessionInterface::class));
 
         $this->expectException(IllegalContextModificationException::class);
         $this->expectExceptionMessage('The message could be set once');
@@ -111,7 +109,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     {
         $exception = new \Exception();
 
-        $context = new Context($this->createSession());
+        $context = new Context($this->createMock(SessionInterface::class));
 
         $context->setException($exception);
 
@@ -122,7 +120,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     {
         $status = 'aStatus';
 
-        $context = new Context($this->createSession());
+        $context = new Context($this->createMock(SessionInterface::class));
 
         $context->setStatus($status);
 
@@ -133,7 +131,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     {
         $status = 'aStatus';
 
-        $context = new Context($this->createSession());
+        $context = new Context($this->createMock(SessionInterface::class));
         $this->expectException(IllegalContextModificationException::class);
         $this->expectExceptionMessage('The status modification is not allowed');
         $context->setStatus($status);
@@ -142,7 +140,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldAllowGetPreviouslySetExecutionInterrupted(): void
     {
-        $context = new Context($this->createSession());
+        $context = new Context($this->createMock(SessionInterface::class));
 
         // guard
         self::assertFalse($context->isExecutionInterrupted());
@@ -154,7 +152,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testThrowOnTryToRollbackExecutionInterruptedIfAlreadySetToTrue(): void
     {
-        $context = new Context($this->createSession());
+        $context = new Context($this->createMock(SessionInterface::class));
 
         $this->expectException(IllegalContextModificationException::class);
         $this->expectExceptionMessage('The execution once interrupted could not be roll backed');
@@ -164,7 +162,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testNotThrowOnSettingExecutionInterruptedToTrueIfAlreadySetToTrue(): void
     {
-        $context = new Context($this->createSession());
+        $context = new Context($this->createMock(SessionInterface::class));
 
         $context->setExecutionInterrupted(true);
         $context->setExecutionInterrupted(true);
@@ -174,7 +172,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     {
         $expectedLogger = new NullLogger();
 
-        $context = new Context($this->createSession());
+        $context = new Context($this->createMock(SessionInterface::class));
 
         $context->setLogger($expectedLogger);
 
@@ -183,7 +181,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testThrowOnSettingLoggerIfAlreadySet(): void
     {
-        $context = new Context($this->createSession());
+        $context = new Context($this->createMock(SessionInterface::class));
 
         $context->setLogger(new NullLogger());
         $this->expectException(IllegalContextModificationException::class);
@@ -193,7 +191,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldAllowGetPreviouslySetQueueName(): void
     {
-        $context = new Context($this->createSession());
+        $context = new Context($this->createMock(SessionInterface::class));
 
         $context->setQueueName('theQueueName');
 
@@ -202,35 +200,11 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testThrowOnSettingQueueNameIfAlreadySet(): void
     {
-        $context = new Context($this->createSession());
+        $context = new Context($this->createMock(SessionInterface::class));
 
         $context->setQueueName('theQueueName');
         $this->expectException(IllegalContextModificationException::class);
         $this->expectExceptionMessage('The queueName modification is not allowed');
         $context->setQueueName('theAnotherQueueName');
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    protected function createSession(): \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|MessageConsumerInterface
-     */
-    protected function createMessageConsumer(): \PHPUnit\Framework\MockObject\MockObject|MessageConsumerInterface
-    {
-        return $this->createMock(MessageConsumerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProcessorInterface
-     */
-    protected function createMessageProcessor(): \PHPUnit\Framework\MockObject\MockObject|MessageProcessorInterface
-    {
-        return $this->createMock(MessageProcessorInterface::class);
     }
 }

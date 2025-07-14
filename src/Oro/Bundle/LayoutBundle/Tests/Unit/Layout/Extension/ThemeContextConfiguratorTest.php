@@ -4,16 +4,14 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeContextConfigurator;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ThemeContextConfiguratorTest extends \PHPUnit\Framework\TestCase
+class ThemeContextConfiguratorTest extends TestCase
 {
-    /** @var RequestStack */
-    private $requestStack;
-
-    /** @var ThemeContextConfigurator */
-    private $contextConfigurator;
+    private RequestStack $requestStack;
+    private ThemeContextConfigurator $contextConfigurator;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +20,7 @@ class ThemeContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->contextConfigurator = new ThemeContextConfigurator($this->requestStack);
     }
 
-    public function testConfigureContextWithOutRequest()
+    public function testConfigureContextWithOutRequest(): void
     {
         $context = new LayoutContext();
 
@@ -32,7 +30,7 @@ class ThemeContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($context->get('theme'));
     }
 
-    public function testConfigureContextWithRequest()
+    public function testConfigureContextWithRequest(): void
     {
         $context = new LayoutContext();
 
@@ -46,7 +44,7 @@ class ThemeContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('testTheme', $context->get('theme'));
     }
 
-    public function testConfigureContextWithRequestAndDataSetInContext()
+    public function testConfigureContextWithRequestAndDataSetInContext(): void
     {
         $context = new LayoutContext();
         $context->set('theme', 'themeShouldNotBeOverridden');
@@ -61,7 +59,7 @@ class ThemeContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('themeShouldNotBeOverridden', $context->get('theme'));
     }
 
-    public function testConfigureContextWithRequestDefaultTheme()
+    public function testConfigureContextWithRequestDefaultTheme(): void
     {
         $context = new LayoutContext();
 

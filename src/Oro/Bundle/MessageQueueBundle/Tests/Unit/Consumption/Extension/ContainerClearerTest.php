@@ -4,16 +4,15 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerClearer;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
 
-class ContainerClearerTest extends \PHPUnit\Framework\TestCase
+class ContainerClearerTest extends TestCase
 {
-    /** @var Container|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var ContainerClearer */
-    private $clearer;
+    private Container&MockObject $container;
+    private ContainerClearer $clearer;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class ContainerClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer = new ContainerClearer($this->container);
     }
 
-    public function testSetPersistentServices()
+    public function testSetPersistentServices(): void
     {
         $service1 = new \stdClass();
         $serviceId1 = 'foo_service';
@@ -63,7 +62,7 @@ class ContainerClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer->clear($this->createMock(LoggerInterface::class));
     }
 
-    public function testClearShouldWriteToLogAppropriateMessage()
+    public function testClearShouldWriteToLogAppropriateMessage(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
 
@@ -74,7 +73,7 @@ class ContainerClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer->clear($logger);
     }
 
-    public function testClearShouldResetRootChainExtensionIfItImplementsResettableExtensionInterface()
+    public function testClearShouldResetRootChainExtensionIfItImplementsResettableExtensionInterface(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $rootChainExtension = $this->createMock(ResettableExtensionInterface::class);
@@ -86,7 +85,7 @@ class ContainerClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer->clear($logger);
     }
 
-    public function testClearShouldRemoveNonPersistentServices()
+    public function testClearShouldRemoveNonPersistentServices(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
 
@@ -102,7 +101,7 @@ class ContainerClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer->clear($logger);
     }
 
-    public function testClearShouldRestorePersistentServiceIfItWasInitialized()
+    public function testClearShouldRestorePersistentServiceIfItWasInitialized(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
 
@@ -129,7 +128,7 @@ class ContainerClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer->clear($logger);
     }
 
-    public function testClearShouldNotRestorePersistentServiceIfItWasInitializedButPresentInContainer()
+    public function testClearShouldNotRestorePersistentServiceIfItWasInitializedButPresentInContainer(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
 
@@ -157,7 +156,7 @@ class ContainerClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer->clear($logger);
     }
 
-    public function testClearShouldNotRestorePersistentServiceIfItWasNotInitialized()
+    public function testClearShouldNotRestorePersistentServiceIfItWasNotInitialized(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
 

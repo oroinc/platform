@@ -9,20 +9,19 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendExclusionProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
+class ExtendExclusionProviderTest extends TestCase
 {
     private const ENTITY_CLASS = 'Test\Entity';
     private const FIELD_NAME = 'testField';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ExtendExclusionProvider */
-    private $exclusionProvider;
+    private ConfigManager&MockObject $configManager;
+    private ExtendExclusionProvider $exclusionProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +31,7 @@ class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
         $this->exclusionProvider = new ExtendExclusionProvider($this->configManager);
     }
 
-    public function testIsIgnoredEntityForNonConfigurableEntity()
+    public function testIsIgnoredEntityForNonConfigurableEntity(): void
     {
         $this->configManager->expects($this->once())
             ->method('hasConfig')
@@ -44,7 +43,7 @@ class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsIgnoredEntityForNotAccessibleEntity()
+    public function testIsIgnoredEntityForNotAccessibleEntity(): void
     {
         $this->configManager->expects($this->once())
             ->method('hasConfig')
@@ -60,7 +59,7 @@ class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsIgnoredEntityForAccessibleEntity()
+    public function testIsIgnoredEntityForAccessibleEntity(): void
     {
         $this->configManager->expects($this->once())
             ->method('hasConfig')
@@ -76,7 +75,7 @@ class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsIgnoredFieldForNonConfigurableField()
+    public function testIsIgnoredFieldForNonConfigurableField(): void
     {
         $metadata = new ClassMetadata(self::ENTITY_CLASS);
 
@@ -90,7 +89,7 @@ class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsIgnoredFieldForNotAccessibleField()
+    public function testIsIgnoredFieldForNotAccessibleField(): void
     {
         $metadata = new ClassMetadata(self::ENTITY_CLASS);
 
@@ -114,7 +113,7 @@ class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsIgnoredFieldForAccessibleField()
+    public function testIsIgnoredFieldForAccessibleField(): void
     {
         $metadata = new ClassMetadata(self::ENTITY_CLASS);
 
@@ -132,7 +131,7 @@ class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsIgnoredRelationForNonConfigurableField()
+    public function testIsIgnoredRelationForNonConfigurableField(): void
     {
         $metadata = new ClassMetadata(self::ENTITY_CLASS);
 
@@ -146,7 +145,7 @@ class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsIgnoredRelationForNotAccessibleField()
+    public function testIsIgnoredRelationForNotAccessibleField(): void
     {
         $metadata = new ClassMetadata(self::ENTITY_CLASS);
 
@@ -170,7 +169,7 @@ class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsIgnoredRelationForAccessibleField()
+    public function testIsIgnoredRelationForAccessibleField(): void
     {
         $metadata = new ClassMetadata(self::ENTITY_CLASS);
 
@@ -188,7 +187,7 @@ class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsIgnoredRelationForNotAccessibleTargetEntity()
+    public function testIsIgnoredRelationForNotAccessibleTargetEntity(): void
     {
         $metadata = new ClassMetadata(self::ENTITY_CLASS);
 
@@ -218,7 +217,7 @@ class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsIgnoredRelationWithTargetEntity()
+    public function testIsIgnoredRelationWithTargetEntity(): void
     {
         $metadata = new ClassMetadata(self::ENTITY_CLASS);
 
@@ -248,7 +247,7 @@ class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsIgnoredRelationForDefaultFieldOfToManyRelation()
+    public function testIsIgnoredRelationForDefaultFieldOfToManyRelation(): void
     {
         $metadata = new ClassMetadata(self::ENTITY_CLASS);
         $fieldName = ExtendConfigDumper::DEFAULT_PREFIX . self::FIELD_NAME;
@@ -280,7 +279,7 @@ class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsIgnoredRelationForDefaultFieldOfToManyRelationForNotAccessibleRelation()
+    public function testIsIgnoredRelationForDefaultFieldOfToManyRelationForNotAccessibleRelation(): void
     {
         $metadata = new ClassMetadata(self::ENTITY_CLASS);
         $fieldName = ExtendConfigDumper::DEFAULT_PREFIX . self::FIELD_NAME;

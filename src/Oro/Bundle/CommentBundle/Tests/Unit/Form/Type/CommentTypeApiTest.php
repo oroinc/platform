@@ -10,13 +10,14 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\FormBundle\Validator\Constraints\HtmlNotBlank;
 use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CommentTypeApiTest extends \PHPUnit\Framework\TestCase
+class CommentTypeApiTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
+    private ConfigManager&MockObject $configManager;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +25,7 @@ class CommentTypeApiTest extends \PHPUnit\Framework\TestCase
         $this->configManager = $this->createMock(ConfigManager::class);
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->exactly(2))
@@ -62,7 +63,7 @@ class CommentTypeApiTest extends \PHPUnit\Framework\TestCase
         $formType->buildForm($builder, []);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
@@ -77,7 +78,7 @@ class CommentTypeApiTest extends \PHPUnit\Framework\TestCase
         $formType->configureOptions($resolver);
     }
 
-    public function testReturnFormName()
+    public function testReturnFormName(): void
     {
         $formType = new CommentTypeApi($this->configManager);
         $this->assertEquals('oro_comment_api', $formType->getName());

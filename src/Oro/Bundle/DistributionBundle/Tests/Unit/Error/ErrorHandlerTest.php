@@ -3,9 +3,10 @@
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Error;
 
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\ErrorHandler as SymfonyErrorHandler;
 
-class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
+class ErrorHandlerTest extends TestCase
 {
     private SymfonyErrorHandler $handler;
 
@@ -58,7 +59,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testHandleErrors()
+    public function testHandleErrors(): void
     {
         $this->expectException(\ErrorException::class);
         $this->expectExceptionMessage('Test error');

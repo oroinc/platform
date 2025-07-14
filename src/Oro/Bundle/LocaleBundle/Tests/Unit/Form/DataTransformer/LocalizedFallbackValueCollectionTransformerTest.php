@@ -13,6 +13,8 @@ use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\CustomLocalizedFallbackValueStub;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -20,10 +22,9 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework\TestCase
+class LocalizedFallbackValueCollectionTransformerTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
+    private ManagerRegistry&MockObject $doctrine;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +32,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
         $this->doctrine = $this->createMock(ManagerRegistry::class);
     }
 
-    public function testConstructWithInvalidValueClass()
+    public function testConstructWithInvalidValueClass(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Value class must extend AbstractLocalizedFallbackValue');
@@ -46,7 +47,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
     /**
      * @dataProvider transformDataProvider
      */
-    public function testTransform(string|array $field, array|ArrayCollection|null $source, ?array $expected)
+    public function testTransform(string|array $field, array|ArrayCollection|null $source, ?array $expected): void
     {
         $transformer = new LocalizedFallbackValueCollectionTransformer(
             $this->doctrine,
@@ -221,7 +222,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
         string|array $field,
         ?array $source,
         ?ArrayCollection $expected
-    ) {
+    ): void {
         $valueClass = CustomLocalizedFallbackValueStub::class;
         $transformer = new LocalizedFallbackValueCollectionTransformer($this->doctrine, $field, $valueClass);
         $this->addDoctrineExpectations($values, $localizations, $valueClass);
@@ -320,7 +321,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
         ];
     }
 
-    public function testTransformUnexpectedType()
+    public function testTransformUnexpectedType(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "array or Traversable", "DateTime" given');
@@ -333,7 +334,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
         $transformer->transform(new \DateTime());
     }
 
-    public function testTransformUnexpectedTypeMultiField()
+    public function testTransformUnexpectedTypeMultiField(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "array or Traversable", "DateTime" given');
@@ -346,7 +347,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
         $transformer->transform(new \DateTime());
     }
 
-    public function testReverseTransformUnexpectedType()
+    public function testReverseTransformUnexpectedType(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "array", "DateTime" given');
@@ -359,7 +360,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
         $transformer->reverseTransform(new \DateTime());
     }
 
-    public function testReverseTransformUnexpectedTypeMultiField()
+    public function testReverseTransformUnexpectedTypeMultiField(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "array", "DateTime" given');
@@ -372,7 +373,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
         $transformer->reverseTransform(new \DateTime());
     }
 
-    public function testReverseTransformNoLocalization()
+    public function testReverseTransformNoLocalization(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Undefined localization with ID=1');

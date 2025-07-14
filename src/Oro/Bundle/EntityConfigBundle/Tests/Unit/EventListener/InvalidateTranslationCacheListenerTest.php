@@ -8,18 +8,15 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\EventListener\InvalidateTranslationCacheListener;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\SecurityBundle\Cache\DoctrineAclCacheProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 
-class InvalidateTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
+class InvalidateTranslationCacheListenerTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineAclCacheProvider  */
-    protected $queryCacheProvider;
-
-    /** @var InvalidateTranslationCacheListener */
-    private $listener;
+    private ManagerRegistry&MockObject $doctrine;
+    protected DoctrineAclCacheProvider&MockObject $queryCacheProvider;
+    private InvalidateTranslationCacheListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -51,7 +48,7 @@ class InvalidateTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onInvalidateDynamicTranslationCache();
     }
 
-    public function testOnInvalidateDynamicTranslationCache()
+    public function testOnInvalidateDynamicTranslationCache(): void
     {
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $this->doctrine->expects($this->once())

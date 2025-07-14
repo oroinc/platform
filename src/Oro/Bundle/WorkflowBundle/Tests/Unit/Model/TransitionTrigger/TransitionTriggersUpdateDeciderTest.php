@@ -5,13 +5,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdateDecider;
+use PHPUnit\Framework\TestCase;
 
-class TransitionTriggersUpdateDeciderTest extends \PHPUnit\Framework\TestCase
+class TransitionTriggersUpdateDeciderTest extends TestCase
 {
     /**
      * @dataProvider decideData
      */
-    public function testDecide(array $expected, array $existing, array $new)
+    public function testDecide(array $expected, array $existing, array $new): void
     {
         $decider = new TransitionTriggersUpdateDecider();
 

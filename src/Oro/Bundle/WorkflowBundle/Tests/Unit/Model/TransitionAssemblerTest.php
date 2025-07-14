@@ -22,6 +22,7 @@ use Oro\Component\Action\Exception\AssemblerException;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -29,28 +30,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
+class TransitionAssemblerTest extends TestCase
 {
-    /** @var FormOptionsAssembler|MockObject */
-    private $formOptionsAssembler;
-
-    /** @var ExpressionFactory|MockObject */
-    private $conditionFactory;
-
-    /** @var ActionFactoryInterface|MockObject */
-    private $actionFactory;
-
-    /** @var EventDispatcher|MockObject */
-    private $eventDispatcher;
-
-    /** @var ServiceProviderInterface|MockObject */
-    private $serviceLocator;
-
-    /** @var TranslatorInterface|MockObject */
-    private $translator;
-
-    /** @var TransitionAssembler */
-    private $assembler;
+    private FormOptionsAssembler&MockObject $formOptionsAssembler;
+    private ExpressionFactory&MockObject $conditionFactory;
+    private ActionFactoryInterface&MockObject $actionFactory;
+    private EventDispatcher&MockObject $eventDispatcher;
+    private ServiceProviderInterface&MockObject $serviceLocator;
+    private TranslatorInterface&MockObject $translator;
+    private TransitionAssembler $assembler;
 
     private static $actions = [
         'preactions' => [['@assign_value' => ['parameters' => ['$attribute', 'preaction_value']]]],
@@ -108,7 +96,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider missedTransitionDefinitionDataProvider
      */
-    public function testAssembleNoRequiredTransitionDefinitionException(array $configuration)
+    public function testAssembleNoRequiredTransitionDefinitionException(array $configuration): void
     {
         $this->expectException(AssemblerException::class);
         $this->assembler->assemble($configuration, [], []);
@@ -143,7 +131,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider incorrectTransitionDefinitionDataProvider
      */
-    public function testUnknownTransitionDefinitionAssembler(array $configuration)
+    public function testUnknownTransitionDefinitionAssembler(array $configuration): void
     {
         $this->expectException(AssemblerException::class);
         $this->assembler->assemble($configuration, [], []);
@@ -176,7 +164,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider incorrectStepsDataProvider
      */
-    public function testUnknownStepException(array $steps)
+    public function testUnknownStepException(array $steps): void
     {
         $this->expectException(AssemblerException::class);
         $configuration = [
@@ -213,7 +201,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function testAssemble(array $configuration)
+    public function testAssemble(array $configuration): void
     {
         $steps = ['target_step' => $this->createMock(Step::class)];
         $attributes = ['attribute' => $this->createMock(Attribute::class)];
@@ -347,7 +335,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider assembleWithDestinationProvider
      */
-    public function testAssembleAndDestination(array $configuration, array $expectedActionConfig)
+    public function testAssembleAndDestination(array $configuration, array $expectedActionConfig): void
     {
         $steps = ['target_step' => $this->createMock(Step::class)];
 
@@ -531,7 +519,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testAssembleWithIsTrueCondition()
+    public function testAssembleWithIsTrueCondition(): void
     {
         $configuration = [
             'transition_definition' => 'with_condition',
@@ -606,7 +594,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testAssembleWithFullDefinition()
+    public function testAssembleWithFullDefinition(): void
     {
         $configuration = [
             'transition_definition' => 'full_definition',
@@ -702,7 +690,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedPostAction, $actualTransition->getAction(), 'Incorrect action');
     }
 
-    public function testAssembleWithFullDefinitionAndVariables()
+    public function testAssembleWithFullDefinitionAndVariables(): void
     {
         $configuration = [
             'transition_definition' => 'full_definition',
@@ -757,7 +745,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(ActionInterface::class, $actualTransition->getAction(), 'Incorrect action');
     }
 
-    public function testAssembleWithEmptyDefinition()
+    public function testAssembleWithEmptyDefinition(): void
     {
         $configuration = [
             'transition_definition' => 'empty_definition',
@@ -828,7 +816,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider assembleWithFrontendOptions
      */
-    public function testAssembleWithFrontendOptions(array $transitionDefinition, array $expectedFrontendOptions)
+    public function testAssembleWithFrontendOptions(array $transitionDefinition, array $expectedFrontendOptions): void
     {
         $this->formOptionsAssembler->expects($this->once())
             ->method('assemble')
@@ -913,7 +901,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testAssembleWithTransitionService()
+    public function testAssembleWithTransitionService(): void
     {
         $configuration = [
             'transition_service' => 'some_service_id',

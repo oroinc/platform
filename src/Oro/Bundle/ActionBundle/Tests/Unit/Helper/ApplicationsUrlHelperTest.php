@@ -4,18 +4,15 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 
-class ApplicationsUrlHelperTest extends \PHPUnit\Framework\TestCase
+class ApplicationsUrlHelperTest extends TestCase
 {
-    /** @var RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $routerProvider;
-
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var ApplicationsUrlHelper */
-    private $instance;
+    private RouteProviderInterface&MockObject $routerProvider;
+    private RouterInterface&MockObject $router;
+    private ApplicationsUrlHelper $instance;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +23,7 @@ class ApplicationsUrlHelperTest extends \PHPUnit\Framework\TestCase
         $this->instance = new ApplicationsUrlHelper($this->routerProvider, $this->router);
     }
 
-    public function testGetExecutionUrl()
+    public function testGetExecutionUrl(): void
     {
         $parameters = ['param1' => 'val1'];
 
@@ -42,7 +39,7 @@ class ApplicationsUrlHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('ok_extension', $this->instance->getExecutionUrl($parameters));
     }
 
-    public function testGetDialogUrl()
+    public function testGetDialogUrl(): void
     {
         $parameters = ['param1' => 'val1'];
 
@@ -58,7 +55,7 @@ class ApplicationsUrlHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('ok_dialog', $this->instance->getDialogUrl($parameters));
     }
 
-    public function testGetPageUrl()
+    public function testGetPageUrl(): void
     {
         $parameters = ['param1' => 'val1'];
 

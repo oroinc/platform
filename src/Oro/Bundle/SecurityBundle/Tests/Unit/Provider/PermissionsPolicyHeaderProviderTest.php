@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class PermissionsPolicyHeaderProviderTest extends TestCase
 {
-    public function testProvider()
+    public function testProvider(): void
     {
         $provider = new PermissionsPolicyHeaderProvider(
             true,

@@ -4,8 +4,9 @@ namespace Oro\Bundle\ChartBundle\Tests\Unit\Model\Data\Transformer;
 
 use Oro\Bundle\ChartBundle\Model\Data\ArrayData;
 use Oro\Bundle\ChartBundle\Model\Data\Transformer\OverlaidMultiSetDataTransformer;
+use PHPUnit\Framework\TestCase;
 
-class OverlaidMultiSetDataTransformerTest extends \PHPUnit\Framework\TestCase
+class OverlaidMultiSetDataTransformerTest extends TestCase
 {
     /**
      * @dataProvider getTransformDataProvider

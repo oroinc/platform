@@ -3,13 +3,13 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\AddNormalizerCompilerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class AddNormalizerCompilerPassTest extends \PHPUnit\Framework\TestCase
+class AddNormalizerCompilerPassTest extends TestCase
 {
-    /** @var AddNormalizerCompilerPass */
-    private $compiler;
+    private AddNormalizerCompilerPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +17,7 @@ class AddNormalizerCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new AddNormalizerCompilerPass();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $serializerDef = $container->register('oro_importexport.serializer')
@@ -57,7 +57,7 @@ class AddNormalizerCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWhenEncodersInjectedInConstructor()
+    public function testProcessWhenEncodersInjectedInConstructor(): void
     {
         $container = new ContainerBuilder();
         $serializerDef = $container->register('oro_importexport.serializer')
@@ -91,7 +91,7 @@ class AddNormalizerCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessFailsWhenNoNormalizers()
+    public function testProcessFailsWhenNoNormalizers(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
@@ -109,7 +109,7 @@ class AddNormalizerCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    public function testProcessFailsWhenNoEncoders()
+    public function testProcessFailsWhenNoEncoders(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(

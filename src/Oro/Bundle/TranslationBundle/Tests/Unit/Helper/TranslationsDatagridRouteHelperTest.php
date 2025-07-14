@@ -4,15 +4,14 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class TranslationsDatagridRouteHelperTest extends \PHPUnit\Framework\TestCase
+class TranslationsDatagridRouteHelperTest extends TestCase
 {
-    /** @var DatagridRouteHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagridRouteHelper;
-
-    /** @var TranslationsDatagridRouteHelper */
-    private $helper;
+    private DatagridRouteHelper&MockObject $datagridRouteHelper;
+    private TranslationsDatagridRouteHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class TranslationsDatagridRouteHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper = new TranslationsDatagridRouteHelper($this->datagridRouteHelper);
     }
 
-    public function testGenerate()
+    public function testGenerate(): void
     {
         $this->datagridRouteHelper->expects($this->once())
             ->method('generate')

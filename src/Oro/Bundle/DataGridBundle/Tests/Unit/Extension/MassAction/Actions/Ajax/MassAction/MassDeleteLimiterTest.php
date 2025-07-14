@@ -8,14 +8,13 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassD
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimitResult;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MassDeleteLimiterTest extends \PHPUnit\Framework\TestCase
+class MassDeleteLimiterTest extends TestCase
 {
-    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $helper;
-
-    /** @var MassDeleteLimiter */
-    private $limiter;
+    private AclHelper&MockObject $helper;
+    private MassDeleteLimiter $limiter;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class MassDeleteLimiterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getLimitationCodeDataProvider
      */
-    public function testGetLimitationCode(MassDeleteLimitResult $limitResult, int $result)
+    public function testGetLimitationCode(MassDeleteLimitResult $limitResult, int $result): void
     {
         $this->assertEquals($result, $this->limiter->getLimitationCode($limitResult));
     }
@@ -40,7 +39,7 @@ class MassDeleteLimiterTest extends \PHPUnit\Framework\TestCase
         MassDeleteLimitResult $limitResult,
         bool $accessRestriction = false,
         bool $maxLimitRestriction = false
-    ) {
+    ): void {
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
         $args = $this->createMock(MassActionHandlerArgs::class);

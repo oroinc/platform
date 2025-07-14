@@ -16,6 +16,8 @@ use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 use Oro\Bundle\ScopeBundle\Tests\Unit\Stub\StubContext;
 use Oro\Bundle\ScopeBundle\Tests\Unit\Stub\StubScope;
 use Oro\Bundle\ScopeBundle\Tests\Unit\Stub\StubScopeCriteriaProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
@@ -26,25 +28,14 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ScopeManagerTest extends \PHPUnit\Framework\TestCase
+class ScopeManagerTest extends TestCase
 {
-    /** @var ScopeDataAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $scopeDataAccessor;
-
-    /** @var ScopeCollection|\PHPUnit\Framework\MockObject\MockObject */
-    private $scheduledForInsertScopes;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var ClassMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $classMetadataFactory;
-
-    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $scopeClassMetadata;
+    private ScopeDataAccessor&MockObject $scopeDataAccessor;
+    private ScopeCollection&MockObject $scheduledForInsertScopes;
+    private ManagerRegistry&MockObject $doctrine;
+    private EntityManagerInterface&MockObject $em;
+    private ClassMetadataFactory&MockObject $classMetadataFactory;
+    private ClassMetadata&MockObject $scopeClassMetadata;
 
     #[\Override]
     protected function setUp(): void
@@ -104,7 +95,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFindDefaultScope()
+    public function testFindDefaultScope(): void
     {
         $expectedCriteria = new ScopeCriteria(['relation' => null], $this->classMetadataFactory);
         $scope = new Scope();
@@ -122,7 +113,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($scope, $manager->findDefaultScope());
     }
 
-    public function testGetCriteriaByScope()
+    public function testGetCriteriaByScope(): void
     {
         $scope = new StubScope();
         $scope->setScopeField('expected_value');
@@ -140,7 +131,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetCriteriaByScopeWithContext()
+    public function testGetCriteriaByScopeWithContext(): void
     {
         $scope = new StubScope();
         $scope->setScopeField('scope_value');
@@ -163,7 +154,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($contextFieldValue, $criteriaProperties[$provider->getCriteriaField()]);
     }
 
-    public function testFind()
+    public function testFind(): void
     {
         $scope = new Scope();
         $fieldValue = new \stdClass();
@@ -187,7 +178,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($scope, $manager->find('testScope'));
     }
 
-    public function testFindWithArrayContext()
+    public function testFindWithArrayContext(): void
     {
         $scope = new Scope();
         $fieldValue = new \stdClass();
@@ -212,7 +203,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($scope, $manager->find('testScope', $context));
     }
 
-    public function testFindWithObjectContext()
+    public function testFindWithObjectContext(): void
     {
         $scope = new Scope();
         $fieldValue = new \stdClass();
@@ -238,7 +229,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($scope, $manager->find('testScope', $context));
     }
 
-    public function testFindWithIsNotNullValueInContext()
+    public function testFindWithIsNotNullValueInContext(): void
     {
         $scope = new Scope();
         $fieldValue = ScopeCriteria::IS_NOT_NULL;
@@ -263,7 +254,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($scope, $manager->find('testScope', $context));
     }
 
-    public function testFindWithArrayValueInContext()
+    public function testFindWithArrayValueInContext(): void
     {
         $scope = new Scope();
         $fieldValue = [1, 2, 3];
@@ -288,7 +279,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($scope, $manager->find('testScope', $context));
     }
 
-    public function testFindWithInvalidScalarValueInContext()
+    public function testFindWithInvalidScalarValueInContext(): void
     {
         $this->expectException(NotSupportedCriteriaValueException::class);
         $this->expectExceptionMessage(
@@ -306,7 +297,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $manager->find('testScope', $context);
     }
 
-    public function testFindWithInvalidObjectValueInContext()
+    public function testFindWithInvalidObjectValueInContext(): void
     {
         $this->expectException(NotSupportedCriteriaValueException::class);
         $this->expectExceptionMessage(sprintf(
@@ -325,7 +316,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $manager->find('testScope', $context);
     }
 
-    public function testFindScheduled()
+    public function testFindScheduled(): void
     {
         $scope = new Scope();
         $fieldValue = new \stdClass();
@@ -353,7 +344,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($scope, $manager->find('testScope'));
     }
 
-    public function testFindId()
+    public function testFindId(): void
     {
         $scopeId = 123;
         $fieldValue = new \stdClass();
@@ -377,7 +368,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($scopeId, $manager->findId('testScope', ['field' => $fieldValue]));
     }
 
-    public function testFindIdWhenScopeIdWasNotFound()
+    public function testFindIdWhenScopeIdWasNotFound(): void
     {
         $this->scopeClassMetadata->expects($this->once())
             ->method('getAssociationNames')
@@ -392,7 +383,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($manager->findId('testScope'));
     }
 
-    public function testCreateScopeByCriteriaWithFlush()
+    public function testCreateScopeByCriteriaWithFlush(): void
     {
         $scopeCriteria = new ScopeCriteria([], $this->classMetadataFactory);
 
@@ -410,7 +401,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(Scope::class, $manager->createScopeByCriteria($scopeCriteria));
     }
 
-    public function testCreateScopeByCriteriaWithoutFlush()
+    public function testCreateScopeByCriteriaWithoutFlush(): void
     {
         $scopeCriteria = new ScopeCriteria([], $this->classMetadataFactory);
 
@@ -428,7 +419,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(Scope::class, $manager->createScopeByCriteria($scopeCriteria, false));
     }
 
-    public function testCreateScopeByCriteriaScheduled()
+    public function testCreateScopeByCriteriaScheduled(): void
     {
         $scope = new Scope();
         $scopeCriteria = new ScopeCriteria([], $this->classMetadataFactory);
@@ -446,7 +437,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($scope, $manager->createScopeByCriteria($scopeCriteria));
     }
 
-    public function testFindBy()
+    public function testFindBy(): void
     {
         $scope = new Scope();
         $criteriaField = 'scopeField';
@@ -468,7 +459,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$scope], $manager->findBy('testScope'));
     }
 
-    public function testFindRelatedScopes()
+    public function testFindRelatedScopes(): void
     {
         $scopes = [new Scope()];
         $scopeCriteria = new ScopeCriteria(
@@ -491,7 +482,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($scopes, $manager->findRelatedScopes('testScope'));
     }
 
-    public function testFindRelatedScopeIds()
+    public function testFindRelatedScopeIds(): void
     {
         $scopeIds = [1, 4];
         $scopeCriteria = new ScopeCriteria(
@@ -514,7 +505,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($scopeIds, $manager->findRelatedScopeIds('testScope'));
     }
 
-    public function testFindRelatedScopeIdsWithPriority()
+    public function testFindRelatedScopeIdsWithPriority(): void
     {
         $scopes = [new Scope()];
         $fieldValue = new \stdClass();
@@ -538,7 +529,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($scopes, $manager->findRelatedScopeIdsWithPriority('testScope'));
     }
 
-    public function testFindOrCreate()
+    public function testFindOrCreate(): void
     {
         $this->scopeClassMetadata->expects($this->once())
             ->method('getAssociationNames')
@@ -564,7 +555,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(Scope::class, $manager->findOrCreate('testScope'));
     }
 
-    public function testFindOrCreateWithoutFlush()
+    public function testFindOrCreateWithoutFlush(): void
     {
         $this->scopeClassMetadata->expects($this->once())
             ->method('getAssociationNames')
@@ -590,7 +581,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(Scope::class, $manager->findOrCreate('testScope', null, false));
     }
 
-    public function testFindOrCreateUsingContext()
+    public function testFindOrCreateUsingContext(): void
     {
         $context = ['scopeAttribute' => new \stdClass()];
 
@@ -618,7 +609,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(Scope::class, $manager->findOrCreate('testScope', $context));
     }
 
-    public function testGetScopeEntities()
+    public function testGetScopeEntities(): void
     {
         $provider = new StubScopeCriteriaProvider('scopeField', null, \stdClass::class);
 
@@ -631,7 +622,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFindMostSuitable()
+    public function testFindMostSuitable(): void
     {
         $scope = new Scope();
         $fieldValue = new \stdClass();
@@ -662,7 +653,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
         bool $expectedResult,
         array $criteriaContext,
         string|object|null $scopeFieldValue
-    ) {
+    ): void {
         $scope = new StubScope();
         $scope->setScopeField($scopeFieldValue);
         $scopeCriteria = new ScopeCriteria($criteriaContext, $this->classMetadataFactory);

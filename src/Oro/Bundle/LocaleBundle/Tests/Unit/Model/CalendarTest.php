@@ -30,7 +30,7 @@ class CalendarTest extends TestCase
     /**
      * @dataProvider getFirstDayOfWeekDataProvider
      */
-    public function testGetFirstDayOfWeek(?string $locale, int $expected, ?string $defaultLocale = null)
+    public function testGetFirstDayOfWeek(?string $locale, int $expected, ?string $defaultLocale = null): void
     {
         $this->calendar->setLocale($locale);
         if (null !== $defaultLocale) {
@@ -67,7 +67,7 @@ class CalendarTest extends TestCase
     /**
      * @dataProvider getMonthNamesDataProvider
      */
-    public function testGetMonthNames(?string $width, ?string $locale, $defaultLocale = null)
+    public function testGetMonthNames(?string $width, ?string $locale, $defaultLocale = null): void
     {
         $this->calendar->setLocale($locale);
         if (null !== $defaultLocale) {
@@ -114,7 +114,7 @@ class CalendarTest extends TestCase
     /**
      * @dataProvider getDayOfWeekNamesDataProvider
      */
-    public function testGetDayOfWeekNames(?string $width, ?string $locale, ?string $defaultLocale = null)
+    public function testGetDayOfWeekNames(?string $width, ?string $locale, ?string $defaultLocale = null): void
     {
         $this->calendar->setLocale($locale);
         if (null !== $defaultLocale) {
@@ -194,7 +194,7 @@ class CalendarTest extends TestCase
         ];
     }
 
-    public function testLocale()
+    public function testLocale(): void
     {
         $this->assertEquals(\Locale::getDefault(), $this->calendar->getLocale());
         $this->calendar->setLocale('ru_RU');

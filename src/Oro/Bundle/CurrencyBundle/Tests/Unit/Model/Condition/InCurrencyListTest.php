@@ -7,11 +7,11 @@ use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
 use Oro\Bundle\CurrencyBundle\Model\Condition\InCurrencyList;
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Provider\CurrencyListProviderStub;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
-class InCurrencyListTest extends \PHPUnit\Framework\TestCase
+class InCurrencyListTest extends TestCase
 {
-    /** @var InCurrencyList */
-    private $condition;
+    private InCurrencyList $condition;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class InCurrencyListTest extends \PHPUnit\Framework\TestCase
         $this->condition = new InCurrencyList(new CurrencyListProviderStub());
     }
 
-    public function testEvaluateSuccess()
+    public function testEvaluateSuccess(): void
     {
         $this->condition->initialize([
             'entity' => MultiCurrency::create(100, 'USD')
@@ -27,7 +27,7 @@ class InCurrencyListTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->condition->evaluate(new \stdClass(), new ArrayCollection()));
     }
 
-    public function testEvaluateIncorrectCurrency()
+    public function testEvaluateIncorrectCurrency(): void
     {
         $this->condition->initialize([MultiCurrency::create(100, 'GBP')]);
         $this->assertFalse(
@@ -36,7 +36,7 @@ class InCurrencyListTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEvoluteWithIncorrectData()
+    public function testEvoluteWithIncorrectData(): void
     {
         try {
             $this->condition->initialize([
@@ -50,7 +50,7 @@ class InCurrencyListTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testInitializeWithIncorrectData()
+    public function testInitializeWithIncorrectData(): void
     {
         try {
             $this->condition->initialize(['test' => 'foo']);
@@ -67,7 +67,7 @@ class InCurrencyListTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals(
             'in_currency_list',

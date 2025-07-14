@@ -11,8 +11,10 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Placeholder\AttributesImportFilter;
 use Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
+class AttributesImportFilterTest extends TestCase
 {
     use EntityTrait;
 
@@ -21,17 +23,10 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
     private const ENTITY_ID = 712;
     private const TOPIC = 'Topic';
 
-    /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityAliasResolver;
-
-    /** @var AttributesImportTopicSender|\PHPUnit\Framework\MockObject\MockObject */
-    private $topicSender;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var AttributesImportFilter */
-    private $attributesImportFilter;
+    private EntityAliasResolver&MockObject $entityAliasResolver;
+    private AttributesImportTopicSender&MockObject $topicSender;
+    private ConfigManager&MockObject $configManager;
+    private AttributesImportFilter $attributesImportFilter;
 
     #[\Override]
     protected function setUp(): void
@@ -50,7 +45,7 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider applicableAliasDataProvider
      */
-    public function testIsApplicableAlias(bool $hasAttributes, bool $isApplicable)
+    public function testIsApplicableAlias(bool $hasAttributes, bool $isApplicable): void
     {
         $this->entityAliasResolver->expects($this->once())
             ->method('getClassByAlias')
@@ -83,7 +78,7 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testIsApplicableEntityWhenNotEntityConfigModel()
+    public function testIsApplicableEntityWhenNotEntityConfigModel(): void
     {
         $entity = new \stdClass();
 
@@ -93,7 +88,7 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider applicableEntityDataProvider
      */
-    public function testIsApplicableEntity(bool $hasAttributes, bool $isApplicable)
+    public function testIsApplicableEntity(bool $hasAttributes, bool $isApplicable): void
     {
         $entity = (new EntityConfigModel())->setClassName(self::ENTITY_CLASS);
 
@@ -123,7 +118,7 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetTopicByAliasWhenNoEntityConfigModel()
+    public function testGetTopicByAliasWhenNoEntityConfigModel(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('No entity config model found for class ' . self::ENTITY_CLASS);
@@ -144,7 +139,7 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
         $this->attributesImportFilter->getTopicByAlias(self::ENTITY_ALIAS);
     }
 
-    public function testGetTopicByAlias()
+    public function testGetTopicByAlias(): void
     {
         $this->entityAliasResolver->expects($this->once())
             ->method('getClassByAlias')
@@ -168,14 +163,13 @@ class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTopicByEntity()
+    public function testGetTopicByEntity(): void
     {
         $this->topicSender->expects($this->once())
             ->method('getTopic')
             ->with(self::ENTITY_ID)
             ->willReturn(self::TOPIC);
 
-        /** @var EntityConfigModel $entity */
         $entity = $this->getEntity(EntityConfigModel::class, ['id' => self::ENTITY_ID]);
 
         $this->assertEquals(['topic' => self::TOPIC], $this->attributesImportFilter->getTopicByEntity($entity));

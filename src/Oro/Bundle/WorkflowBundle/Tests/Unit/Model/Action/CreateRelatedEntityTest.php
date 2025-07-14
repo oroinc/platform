@@ -12,15 +12,14 @@ use Oro\Component\Action\Exception\ActionException;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class CreateRelatedEntityTest extends \PHPUnit\Framework\TestCase
+class CreateRelatedEntityTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var CreateRelatedEntity */
-    private $action;
+    private ManagerRegistry&MockObject $registry;
+    private CreateRelatedEntity $action;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +30,7 @@ class CreateRelatedEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
-    public function testInitializeException()
+    public function testInitializeException(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Object data must be an array.');
@@ -45,7 +44,7 @@ class CreateRelatedEntityTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testInitialize(array $options)
+    public function testInitialize(array $options): void
     {
         self::assertSame($this->action, $this->action->initialize($options));
         self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
@@ -60,7 +59,7 @@ class CreateRelatedEntityTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testExecuteExceptionInterface()
+    public function testExecuteExceptionInterface(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Context must be instance of WorkflowItem');
@@ -69,7 +68,7 @@ class CreateRelatedEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    public function testExecuteExceptionNotManaged()
+    public function testExecuteExceptionNotManaged(): void
     {
         $this->expectException(NotManageableEntityException::class);
         $definition = $this->createMock(WorkflowDefinition::class);
@@ -88,7 +87,7 @@ class CreateRelatedEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($workflowItem);
     }
 
-    public function testExecuteSaveException()
+    public function testExecuteSaveException(): void
     {
         $this->expectException(ActionException::class);
         $this->expectExceptionMessage(sprintf("Can't create related entity %s.", \stdClass::class));
@@ -126,7 +125,7 @@ class CreateRelatedEntityTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testExecute(array $options)
+    public function testExecute(array $options): void
     {
         $entity = new \stdClass();
         $entity->test = null;

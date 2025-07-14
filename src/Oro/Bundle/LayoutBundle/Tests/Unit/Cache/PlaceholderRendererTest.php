@@ -7,31 +7,28 @@ use Oro\Bundle\LayoutBundle\Layout\LayoutManager;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutContextStack;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 class PlaceholderRendererTest extends TestCase
 {
-    private LayoutContext|\PHPUnit\Framework\MockObject\MockObject $context;
-
-    private LayoutManager|\PHPUnit\Framework\MockObject\MockObject $layoutManager;
-
-    private LayoutContextStack|\PHPUnit\Framework\MockObject\MockObject $layoutContextStack;
-
+    private LayoutContext $context;
+    private LayoutManager&MockObject $layoutManager;
+    private LayoutContextStack&MockObject $layoutContextStack;
     private PlaceholderRenderer $placeholderRenderer;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->layoutManager = $this->createMock(LayoutManager::class);
         $this->context = new LayoutContext();
+        $this->layoutManager = $this->createMock(LayoutManager::class);
         $this->layoutContextStack = $this->createMock(LayoutContextStack::class);
-        $logger = $this->createMock(LoggerInterface::class);
 
         $this->placeholderRenderer = new PlaceholderRenderer(
             $this->layoutManager,
             $this->layoutContextStack,
-            $logger
+            $this->createMock(LoggerInterface::class)
         );
     }
 
@@ -173,8 +170,7 @@ HTML,
 <html>
 HTML;
 
-        $this->layoutManager
-            ->expects(self::never())
+        $this->layoutManager->expects(self::never())
             ->method(self::anything());
 
         self::assertEquals(

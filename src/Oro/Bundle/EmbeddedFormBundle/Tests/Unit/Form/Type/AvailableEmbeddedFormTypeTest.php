@@ -4,16 +4,15 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class AvailableEmbeddedFormTypeTest extends \PHPUnit\Framework\TestCase
+class AvailableEmbeddedFormTypeTest extends TestCase
 {
-    /** @var EmbeddedFormManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var AvailableEmbeddedFormType */
-    private $formType;
+    private EmbeddedFormManager&MockObject $manager;
+    private AvailableEmbeddedFormType $formType;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class AvailableEmbeddedFormTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType = new AvailableEmbeddedFormType($this->manager);
     }
 
-    public function testShouldConfigureOptions()
+    public function testShouldConfigureOptions(): void
     {
         $availableForms = ['myForm' => 'Label'];
         $this->manager->expects($this->once())
@@ -38,12 +37,12 @@ class AvailableEmbeddedFormTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType->configureOptions($resolver);
     }
 
-    public function testShouldReturnFormName()
+    public function testShouldReturnFormName(): void
     {
         $this->assertEquals('oro_available_embedded_forms', $this->formType->getName());
     }
 
-    public function testShouldReturnChoiceAsParent()
+    public function testShouldReturnChoiceAsParent(): void
     {
         $this->assertEquals(ChoiceType::class, $this->formType->getParent());
     }

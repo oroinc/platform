@@ -137,23 +137,17 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(
-                [
-                    'id',
-                    'field1',
-                    'field2',
-                    'field3',
-                    'field4',
-                    'field5',
-                    'realField6',
-                    'realField7'
-                ]
-            );
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id'         => ['type' => 'integer'],
+            'field1'     => ['type' => 'string'],
+            'field2'     => ['type' => 'string'],
+            'field3'     => ['type' => 'string'],
+            'field4'     => ['type' => 'string'],
+            'field5'     => ['type' => 'string'],
+            'realField6' => ['type' => 'string'],
+            'realField7' => ['type' => 'string']
+        ];
+        $rootEntityMetadata->associationMappings = [];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -194,6 +188,76 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
+    public function testCompleteDefinitionForEnumFields(): void
+    {
+        $config = $this->createConfigObject([
+            'fields' => [
+                'field1' => null,
+                'field2' => [
+                    'property_path' => 'realField2'
+                ]
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::exactly(3))
+            ->method('isIgnoredField')
+            ->willReturnMap([
+                [$rootEntityMetadata, 'id', false],
+                [$rootEntityMetadata, 'field1', false],
+                [$rootEntityMetadata, 'realField6', false]
+            ]);
+
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->fieldMappings = [
+            'id'         => ['type' => 'integer'],
+            'field1'     => ['type' => 'string', 'enumType' => 'Test\Enum1'],
+            'realField2' => ['type' => 'string', 'enumType' => 'Test\Enum2']
+        ];
+        $rootEntityMetadata->associationMappings = [];
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->dictionaryProvider->expects(self::once())
+            ->method('isSupportedEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'     => null,
+                    'field1' => [
+                        'data_type' => 'enum:Test\Enum1'
+                    ],
+                    'field2' => [
+                        'property_path' => 'realField2',
+                        'data_type' => 'enum:Test\Enum2'
+                    ]
+                ]
+            ],
+            $config
+        );
+    }
+
     public function testCompleteDefinitionForFieldReplacedWithComputedField(): void
     {
         $config = $this->createConfigObject([
@@ -213,12 +277,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id', 'field1']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id'     => ['type' => 'integer'],
+            'field1' => ['type' => 'string']
+        ];
+        $rootEntityMetadata->associationMappings = [];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -277,19 +340,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'association1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_ONE
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['type' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::exactly(2))
@@ -365,19 +424,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'association1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_ONE
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::exactly(2))
@@ -437,19 +492,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'association1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_ONE
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::exactly(2))
@@ -527,19 +578,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'association1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_ONE
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::exactly(2))
@@ -623,19 +670,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'realAssociation1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_ONE
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'realAssociation1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::exactly(2))
@@ -720,19 +763,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'association1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_ONE
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::exactly(2))
@@ -815,19 +854,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'association1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_ONE
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::exactly(2))
@@ -907,19 +942,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'association1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_ONE
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::exactly(2))
@@ -1005,19 +1036,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'association1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_ONE
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -1074,19 +1101,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'association1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_ONE
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::exactly(2))
@@ -1169,19 +1192,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'association1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_ONE
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::exactly(2))
@@ -1272,12 +1291,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [];
         $rootEntityMetadata->expects(self::once())
             ->method('hasAssociation')
             ->with('association1')
@@ -1354,12 +1371,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [];
         $rootEntityMetadata->expects(self::never())
             ->method('hasAssociation');
 
@@ -1438,19 +1453,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'association1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_ONE
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::exactly(2))
@@ -1539,12 +1550,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id', 'field1']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id'     => ['type' => 'integer'],
+            'field1' => ['type' => 'string']
+        ];
+        $rootEntityMetadata->associationMappings = [];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -1604,12 +1614,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id', 'field1']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id'     => ['type' => 'integer'],
+            'field1' => ['type' => 'string']
+        ];
+        $rootEntityMetadata->associationMappings = [];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -1670,12 +1679,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id', 'field1']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id'     => ['type' => 'integer'],
+            'field1' => ['type' => 'string']
+        ];
+        $rootEntityMetadata->associationMappings = [];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -2123,12 +2131,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -2177,12 +2183,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -2230,12 +2234,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -2282,19 +2284,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'association1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_MANY
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_MANY
+            ]
+        ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::exactly(2))
@@ -2371,12 +2369,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id', 'field']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id'    => ['type' => 'integer'],
+            'field' => ['type' => 'string']
+        ];
+        $rootEntityMetadata->associationMappings = [];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -2533,12 +2530,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id', 'field']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id'    => ['type' => 'integer'],
+            'field' => ['type' => 'string']
+        ];
+        $rootEntityMetadata->associationMappings = [];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -2577,12 +2573,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id', 'field']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id'    => ['type' => 'integer'],
+            'field' => ['type' => 'string']
+        ];
+        $rootEntityMetadata->associationMappings = [];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -2615,12 +2610,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -2666,12 +2659,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -2721,12 +2712,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -2797,16 +2786,12 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn([
-                'id',
-                'field1',
-                'field2'
-            ]);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id'     => ['type' => 'integer'],
+            'field1' => ['type' => 'string'],
+            'field2' => ['type' => 'string']
+        ];
+        $rootEntityMetadata->associationMappings = [];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -2878,16 +2863,12 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn([
-                'id',
-                'field1',
-                'field2'
-            ]);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id'     => ['type' => 'integer'],
+            'field1' => ['type' => 'string'],
+            'field2' => ['type' => 'string']
+        ];
+        $rootEntityMetadata->associationMappings = [];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -2988,18 +2969,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn([
-                'id',
-                'field1',
-                'field2',
-                'field3',
-                'field4'
-            ]);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn([]);
+        $rootEntityMetadata->fieldMappings = [
+            'id'     => ['type' => 'integer'],
+            'field1' => ['type' => 'string'],
+            'field2' => ['type' => 'string'],
+            'field3' => ['type' => 'string'],
+            'field4' => ['type' => 'string']
+        ];
+        $rootEntityMetadata->associationMappings = [];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -3057,19 +3034,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'association1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_ONE
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::exactly(2))
@@ -3169,19 +3142,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'association1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_ONE
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::exactly(2))
@@ -3287,19 +3256,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'association1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_ONE
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::exactly(2))
@@ -3414,19 +3379,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'association1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_ONE
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::exactly(2))
@@ -3538,19 +3499,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'association1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_ONE
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
@@ -3614,19 +3571,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getFieldNames')
-            ->willReturn(['id']);
-        $rootEntityMetadata->expects(self::once())
-            ->method('getAssociationMappings')
-            ->willReturn(
-                [
-                    'association1' => [
-                        'targetEntity' => 'Test\Association1Target',
-                        'type'         => ClassMetadata::MANY_TO_ONE
-                    ]
-                ]
-            );
+        $rootEntityMetadata->fieldMappings = [
+            'id' => ['ty[e' => 'integer']
+        ];
+        $rootEntityMetadata->associationMappings = [
+            'association1' => [
+                'targetEntity' => 'Test\Association1Target',
+                'type'         => ClassMetadata::MANY_TO_ONE
+            ]
+        ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
 
         $this->doctrineHelper->expects(self::exactly(2))

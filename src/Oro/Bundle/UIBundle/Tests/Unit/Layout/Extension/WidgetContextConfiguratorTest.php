@@ -4,16 +4,14 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Bundle\UIBundle\Layout\Extension\WidgetContextConfigurator;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class WidgetContextConfiguratorTest extends \PHPUnit\Framework\TestCase
+class WidgetContextConfiguratorTest extends TestCase
 {
-    /** @var WidgetContextConfigurator */
-    private $contextConfigurator;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
+    private RequestStack $requestStack;
+    private WidgetContextConfigurator $contextConfigurator;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +20,7 @@ class WidgetContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->contextConfigurator = new WidgetContextConfigurator($this->requestStack);
     }
 
-    public function testConfigureContextByQueryString()
+    public function testConfigureContextByQueryString(): void
     {
         $request = new Request();
         $request->query->set('_wid', 'test_widget_id');
@@ -39,7 +37,7 @@ class WidgetContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test_widget_id', $context->data()->get('widget_id'));
     }
 
-    public function testConfigureContextByPostData()
+    public function testConfigureContextByPostData(): void
     {
         $request = new Request();
         $request->request->set('_wid', 'test_widget_id');
@@ -55,7 +53,7 @@ class WidgetContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test_widget_id', $context->data()->get('widget_id'));
     }
 
-    public function testConfigureContextNoWidget()
+    public function testConfigureContextNoWidget(): void
     {
         $request = new Request();
         $this->requestStack->push($request);
@@ -69,14 +67,14 @@ class WidgetContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($context->data()->get('widget_id'));
     }
 
-    public function testConfigureContextOverride()
+    public function testConfigureContextOverride(): void
     {
         $request = new Request();
         $request->query->set('_wid', 'test_widget_id');
         $request->query->set('_widgetContainer', 'dialog');
         $this->requestStack->push($request);
 
-        $context                     = new LayoutContext();
+        $context = new LayoutContext();
         $context['widget_container'] = 'updated_widget';
         $context->data()->set('widget_id', 'updated_widget_id');
 
@@ -87,7 +85,7 @@ class WidgetContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('updated_widget_id', $context->data()->get('widget_id'));
     }
 
-    public function testConfigureContextWithoutRequest()
+    public function testConfigureContextWithoutRequest(): void
     {
         $context = new LayoutContext();
 

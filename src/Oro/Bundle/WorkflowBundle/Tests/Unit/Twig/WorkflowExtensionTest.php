@@ -8,16 +8,15 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Twig\WorkflowExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowExtensionTest extends \PHPUnit\Framework\TestCase
+class WorkflowExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var WorkflowExtension */
-    private $extension;
+    private WorkflowManager&MockObject $workflowManager;
+    private WorkflowExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -42,7 +41,7 @@ class WorkflowExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new WorkflowExtension($container);
     }
 
-    public function testHasApplicableWorkflows()
+    public function testHasApplicableWorkflows(): void
     {
         $entity = new \stdClass();
         $this->workflowManager->expects($this->once())
@@ -51,7 +50,7 @@ class WorkflowExtensionTest extends \PHPUnit\Framework\TestCase
         $this->callTwigFunction($this->extension, 'has_workflows', [$entity]);
     }
 
-    public function testHasWorkflowItemsByEntity()
+    public function testHasWorkflowItemsByEntity(): void
     {
         $entity = new \stdClass();
         $this->workflowManager->expects($this->once())
@@ -60,7 +59,7 @@ class WorkflowExtensionTest extends \PHPUnit\Framework\TestCase
         $this->callTwigFunction($this->extension, 'has_workflow_items', [$entity]);
     }
 
-    public function testFormatWorkflowVariableValue()
+    public function testFormatWorkflowVariableValue(): void
     {
         $entity = $this->createMock(Variable::class);
         $this->callTwigFilter($this->extension, 'oro_format_workflow_variable_value', [$entity]);

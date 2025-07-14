@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer;
 
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ScalarFieldDenormalizer;
+use PHPUnit\Framework\TestCase;
 
-class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
+class ScalarFieldDenormalizerTest extends TestCase
 {
-    /** @var ScalarFieldDenormalizer */
-    private $denormalizer;
+    private ScalarFieldDenormalizer $denormalizer;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +24,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
         string $type,
         array $context = [],
         ?string $format = null
-    ) {
+    ): void {
         $this->assertEquals(
             $isSupported,
             $this->denormalizer->supportsDenormalization($data, $type, $format, $context)
@@ -139,7 +139,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSupportsDenormalizationOnIgnoredField()
+    public function testSupportsDenormalizationOnIgnoredField(): void
     {
         $this->denormalizer->addFieldToIgnore(\stdClass::class, 'test');
 
@@ -166,7 +166,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
         string $type,
         array $context = [],
         ?string $format = null
-    ) {
+    ): void {
         $this->assertEquals(
             $expectedValue,
             $this->denormalizer->denormalize($data, $type, $format, $context)

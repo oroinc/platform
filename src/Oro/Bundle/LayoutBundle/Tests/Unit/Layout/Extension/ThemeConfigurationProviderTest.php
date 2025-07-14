@@ -18,14 +18,13 @@ class ThemeConfigurationProviderTest extends TestCase
     use TempDirExtension;
 
     private ThemeConfigurationProvider $configurationProvider;
-
     private ConfigurationBuildersProvider $configurationBuildersProvider;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->configurationBuildersProvider = $this->createStub(ConfigurationBuildersProvider::class);
-        $this->configurationBuildersProvider
+        $this->configurationBuildersProvider->expects(self::any())
             ->method('getConfigurationTypes')
             ->willReturn(['type']);
 
@@ -47,21 +46,21 @@ class ThemeConfigurationProviderTest extends TestCase
         );
     }
 
-    public function testGetThemeNames()
+    public function testGetThemeNames(): void
     {
         $result = $this->configurationProvider->getThemeNames();
         sort($result);
         $this->assertEquals(['base', 'oro-app-root-based', 'oro-black'], $result);
     }
 
-    public function testGetThemeDefinitionForUnknownTheme()
+    public function testGetThemeDefinitionForUnknownTheme(): void
     {
         $this->assertNull(
             $this->configurationProvider->getThemeDefinition('unknown')
         );
     }
 
-    public function testGetThemeDefinitionForEmptyTheme()
+    public function testGetThemeDefinitionForEmptyTheme(): void
     {
         $this->assertEquals(
             [
@@ -76,7 +75,7 @@ class ThemeConfigurationProviderTest extends TestCase
         );
     }
 
-    public function testGetThemeDefinition()
+    public function testGetThemeDefinition(): void
     {
         $expected = [
             'label'              => 'Oro Black theme',

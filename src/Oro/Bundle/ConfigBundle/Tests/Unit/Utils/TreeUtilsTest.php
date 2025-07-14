@@ -4,8 +4,9 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
+use PHPUnit\Framework\TestCase;
 
-class TreeUtilsTest extends \PHPUnit\Framework\TestCase
+class TreeUtilsTest extends TestCase
 {
     protected static function getTestGroup(): GroupNodeDefinition
     {
@@ -24,7 +25,7 @@ class TreeUtilsTest extends \PHPUnit\Framework\TestCase
         return $root;
     }
 
-    public function testFindNodeByName()
+    public function testFindNodeByName(): void
     {
         // existing node
         $result = TreeUtils::findNodeByName(self::getTestGroup(), 'node2');
@@ -35,7 +36,7 @@ class TreeUtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($result);
     }
 
-    public function testGetByNestingLevel()
+    public function testGetByNestingLevel(): void
     {
         // existed nested node
         $result = TreeUtils::getByNestingLevel(self::getTestGroup(), 2);
@@ -47,7 +48,7 @@ class TreeUtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($result);
     }
 
-    public function testGetFirstNodeName()
+    public function testGetFirstNodeName(): void
     {
         // not empty node
         $result = TreeUtils::getFirstNodeName(self::getTestGroup());
@@ -58,7 +59,7 @@ class TreeUtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($result);
     }
 
-    public function testGetConfigKey()
+    public function testGetConfigKey(): void
     {
         $this->assertEquals('root.name', TreeUtils::getConfigKey('root', 'name'));
         $this->assertEquals('root__name', TreeUtils::getConfigKey('root', 'name', '__'));

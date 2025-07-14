@@ -11,12 +11,14 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\ImportEntity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FieldHelperTest extends \PHPUnit\Framework\TestCase
+class FieldHelperTest extends TestCase
 {
     private array $config = [
         'TestEntity' => [
@@ -41,11 +43,8 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /** @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldProvider;
-
-    /** @var FieldHelper */
-    private $helper;
+    private EntityFieldProvider&MockObject $fieldProvider;
+    private FieldHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -53,27 +52,29 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->fieldProvider = $this->createMock(EntityFieldProvider::class);
 
         $configProvider = $this->createMock(ConfigProvider::class);
-        $configProvider->expects(self::any())->method('hasConfig')
+        $configProvider->expects(self::any())
+            ->method('hasConfig')
             ->with(self::isType('string'), self::isType('string'))
             ->willReturnCallback(function ($entityName, $fieldName) {
                 return isset($this->config[$entityName][$fieldName]);
             });
-        $configProvider->expects(self::any())->method('getConfig')
+        $configProvider->expects(self::any())
+            ->method('getConfig')
             ->with(self::isType('string'), self::isType('string'))
             ->willReturnCallback(function ($entityName, $fieldName) {
                 $entityConfig = $this->createMock(ConfigInterface::class);
-                $entityConfig->expects($this->any())->method('has')->with($this->isType('string'))
-                    ->willReturnCallback(
-                        function ($parameter) use ($entityName, $fieldName) {
-                            return isset($this->config[$entityName][$fieldName][$parameter]);
-                        }
-                    );
-                $entityConfig->expects($this->any())->method('get')->with($this->isType('string'))
-                    ->willReturnCallback(
-                        function ($parameter, $isStrict, $default) use ($entityName, $fieldName) {
-                            return $this->config[$entityName][$fieldName][$parameter] ?? $default;
-                        }
-                    );
+                $entityConfig->expects($this->any())
+                    ->method('has')
+                    ->with($this->isType('string'))
+                    ->willReturnCallback(function ($parameter) use ($entityName, $fieldName) {
+                        return isset($this->config[$entityName][$fieldName][$parameter]);
+                    });
+                $entityConfig->expects($this->any())
+                    ->method('get')
+                    ->with($this->isType('string'))
+                    ->willReturnCallback(function ($parameter, $isStrict, $default) use ($entityName, $fieldName) {
+                        return $this->config[$entityName][$fieldName][$parameter] ?? $default;
+                    });
 
                 return $entityConfig;
             });
@@ -498,7 +499,9 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
         $entityName = 'TestEntity';
         $expectedRelations = [['name' => 'field']];
 
-        $this->fieldProvider->expects(self::once())->method('getRelations')->with($entityName)
+        $this->fieldProvider->expects(self::once())
+            ->method('getRelations')
+            ->with($entityName)
             ->willReturn($expectedRelations);
 
         self::assertEquals($expectedRelations, $this->helper->getRelations($entityName));

@@ -6,17 +6,14 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ScopeBundle\Manager\ContextNormalizer;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ContextNormalizerTest extends \PHPUnit\Framework\TestCase
+class ContextNormalizerTest extends TestCase
 {
-    /** @var ContextNormalizer */
-    private $contextNormalizer;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $scopeManager;
+    private ContextNormalizer $contextNormalizer;
+    private ManagerRegistry&MockObject $registry;
+    private ScopeManager&MockObject $scopeManager;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +23,7 @@ class ContextNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->contextNormalizer = new ContextNormalizer($this->scopeManager, $this->registry);
     }
 
-    public function testNormalizeContext()
+    public function testNormalizeContext(): void
     {
         $entity1 = $this->getMockBuilder(\stdClass::class)
             ->addMethods(['getId'])
@@ -49,7 +46,7 @@ class ContextNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDenormalizeContext()
+    public function testDenormalizeContext(): void
     {
         $entity = $this->createMock(\stdClass::class);
 
@@ -80,7 +77,7 @@ class ContextNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDenormalizeContextWithNonExistentEntity()
+    public function testDenormalizeContextWithNonExistentEntity(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Entity foo_entity with identifier 100 does not exist.');

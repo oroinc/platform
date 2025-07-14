@@ -4,17 +4,18 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Form;
 
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\DependencyInjectionFormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormInterface;
 
-class DependencyInjectionFormAccessorTest extends \PHPUnit\Framework\TestCase
+class DependencyInjectionFormAccessorTest extends TestCase
 {
     private const FORM_SERVICE_ID = 'test_service_id';
 
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
+    private ContainerInterface&MockObject $container;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +23,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit\Framework\TestCase
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    public function testGetForm()
+    public function testGetForm(): void
     {
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())
@@ -39,13 +40,13 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('form_name', $formAccessor->getName());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $formAccessor = new DependencyInjectionFormAccessor($this->container, self::FORM_SERVICE_ID);
         $this->assertEquals('form_service_id:'.self::FORM_SERVICE_ID, $formAccessor->toString());
     }
 
-    public function testGetHash()
+    public function testGetHash(): void
     {
         $formAccessor = new DependencyInjectionFormAccessor(
             $this->container,
@@ -60,7 +61,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParamsInitializer()
+    public function testParamsInitializer(): void
     {
         $formAccessor = new DependencyInjectionFormAccessor($this->container, self::FORM_SERVICE_ID);
 
@@ -96,7 +97,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('form_service_id:'.self::FORM_SERVICE_ID, $formAccessor->toString());
     }
 
-    public function testParamsInitializerForMultipartForm()
+    public function testParamsInitializerForMultipartForm(): void
     {
         $formAccessor = new DependencyInjectionFormAccessor($this->container, self::FORM_SERVICE_ID);
 
@@ -132,7 +133,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('form_service_id:'.self::FORM_SERVICE_ID, $formAccessor->toString());
     }
 
-    public function testGetView()
+    public function testGetView(): void
     {
         // form
         //   field1
@@ -160,7 +161,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($formView->vars['id'], $formAccessor->getId());
     }
 
-    public function testProcessedFields()
+    public function testProcessedFields(): void
     {
         $formAccessor = new DependencyInjectionFormAccessor($this->container, self::FORM_SERVICE_ID);
 
@@ -171,7 +172,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($processedFields, $formAccessor->getProcessedFields());
     }
 
-    public function testSetFormData()
+    public function testSetFormData(): void
     {
         $data = ['test'];
 
@@ -194,7 +195,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($data, $formAccessor->getForm()->getData());
     }
 
-    public function testSetters()
+    public function testSetters(): void
     {
         $formConfig = $this->createMock(FormConfigInterface::class);
         $formView = new FormView();

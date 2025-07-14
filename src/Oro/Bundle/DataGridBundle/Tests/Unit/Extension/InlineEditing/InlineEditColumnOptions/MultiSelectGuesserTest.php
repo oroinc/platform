@@ -7,17 +7,14 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\MultiSelectGuesser;
 use Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MultiSelectGuesserTest extends \PHPUnit\Framework\TestCase
+class MultiSelectGuesserTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ChoiceFieldHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $choiceHelper;
-
-    /** @var MultiSelectGuesser */
-    private $guesser;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ChoiceFieldHelper&MockObject $choiceHelper;
+    private MultiSelectGuesser $guesser;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +25,7 @@ class MultiSelectGuesserTest extends \PHPUnit\Framework\TestCase
         $this->guesser = new MultiSelectGuesser($this->doctrineHelper, $this->choiceHelper);
     }
 
-    public function testRelationGuessHasNotAssociation()
+    public function testRelationGuessHasNotAssociation(): void
     {
         $metadata = $this->createMock(ClassMetadata::class);
 
@@ -57,7 +54,7 @@ class MultiSelectGuesserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setParametersDataProvider
      */
-    public function testRelationGuess(array $column, array $expected, bool $invokes)
+    public function testRelationGuess(array $column, array $expected, bool $invokes): void
     {
         $metadata = $this->createMock(ClassMetadata::class);
 
@@ -160,7 +157,7 @@ class MultiSelectGuesserTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGuessTranslatableColumnOptions()
+    public function testGuessTranslatableColumnOptions(): void
     {
         $metadata = new ClassMetadata('\oro\test');
         $metadata->associationMappings = [
@@ -218,7 +215,7 @@ class MultiSelectGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessNonTranslatableColumnOptions()
+    public function testGuessNonTranslatableColumnOptions(): void
     {
         $metadata = new ClassMetadata('\oro\test');
         $metadata->associationMappings = [

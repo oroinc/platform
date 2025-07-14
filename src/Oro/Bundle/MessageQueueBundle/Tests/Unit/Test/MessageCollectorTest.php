@@ -4,14 +4,13 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Test;
 
 use Oro\Bundle\MessageQueueBundle\Test\MessageCollector;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MessageCollectorTest extends \PHPUnit\Framework\TestCase
+class MessageCollectorTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $messageProducer;
-
-    /** @var MessageCollector */
-    private $messageCollector;
+    private MessageProducerInterface&MockObject $messageProducer;
+    private MessageCollector $messageCollector;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class MessageCollectorTest extends \PHPUnit\Framework\TestCase
         $this->messageCollector = new MessageCollector($this->messageProducer);
     }
 
-    public function testShouldCallInternalMessageProducerSendMethod()
+    public function testShouldCallInternalMessageProducerSendMethod(): void
     {
         $topic = 'test topic';
         $message = 'test message';
@@ -33,7 +32,7 @@ class MessageCollectorTest extends \PHPUnit\Framework\TestCase
         $this->messageCollector->send($topic, $message);
     }
 
-    public function testShouldCollectMessages()
+    public function testShouldCollectMessages(): void
     {
         $topic = 'test topic';
         $message = 'test message';
@@ -48,7 +47,7 @@ class MessageCollectorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldAllowClearCollectedMessages()
+    public function testShouldAllowClearCollectedMessages(): void
     {
         $this->messageCollector->send('test topic', 'test message');
         $this->messageCollector->clear();
@@ -56,7 +55,7 @@ class MessageCollectorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $this->messageCollector->getSentMessages());
     }
 
-    public function testShouldAllowClearCollectedTopicMessages()
+    public function testShouldAllowClearCollectedTopicMessages(): void
     {
         $this->messageCollector->send('test topic 1', 'test message 1');
         $this->messageCollector->send('test topic 2', 'test message 2');
@@ -68,7 +67,7 @@ class MessageCollectorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldNotCatchExceptionFromInternalMessageProducer()
+    public function testShouldNotCatchExceptionFromInternalMessageProducer(): void
     {
         $exception = new \Exception('some error');
 
@@ -81,7 +80,7 @@ class MessageCollectorTest extends \PHPUnit\Framework\TestCase
         $this->messageCollector->send('test topic', 'test message');
     }
 
-    public function testShouldNotStoreMessageIfInternalMessageProducerThrowsException()
+    public function testShouldNotStoreMessageIfInternalMessageProducerThrowsException(): void
     {
         $this->messageProducer->expects($this->once())
             ->method('send')
@@ -94,7 +93,7 @@ class MessageCollectorTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testShouldBePossibleToUseWithoutInternalMessageProducer()
+    public function testShouldBePossibleToUseWithoutInternalMessageProducer(): void
     {
         $topic = 'test topic';
         $message = 'test message';

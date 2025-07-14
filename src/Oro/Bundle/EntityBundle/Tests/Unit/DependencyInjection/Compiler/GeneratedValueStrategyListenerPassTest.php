@@ -3,12 +3,12 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\GeneratedValueStrategyListenerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class GeneratedValueStrategyListenerPassTest extends \PHPUnit\Framework\TestCase
+class GeneratedValueStrategyListenerPassTest extends TestCase
 {
-    /** @var GeneratedValueStrategyListenerPass */
-    private $compiler;
+    private GeneratedValueStrategyListenerPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class GeneratedValueStrategyListenerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new GeneratedValueStrategyListenerPass();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $listenerDef = $container->register('oro_entity.listener.orm.generated_value_strategy_listener')
@@ -42,7 +42,7 @@ class GeneratedValueStrategyListenerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithoutDefinition()
+    public function testProcessWithoutDefinition(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter(
@@ -56,7 +56,7 @@ class GeneratedValueStrategyListenerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    public function testProcessWithoutDoctrineConnectionsParameter()
+    public function testProcessWithoutDoctrineConnectionsParameter(): void
     {
         $container = new ContainerBuilder();
         $listenerDef = $container->register('oro_entity.listener.orm.generated_value_strategy_listener')

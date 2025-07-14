@@ -5,11 +5,11 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension\Generator;
 use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ThemesRelativePathGeneratorExtension;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
+use PHPUnit\Framework\TestCase;
 
-class ThemesRelativePathGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
+class ThemesRelativePathGeneratorExtensionTest extends TestCase
 {
-    /** @var ThemesRelativePathGeneratorExtension */
-    private $extension;
+    private ThemesRelativePathGeneratorExtension $extension;
 
     #[\Override]
     protected function setUp(): void

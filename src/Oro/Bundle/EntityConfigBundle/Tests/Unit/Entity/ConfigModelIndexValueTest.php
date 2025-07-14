@@ -7,10 +7,11 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class ConfigModelIndexValueTest extends \PHPUnit\Framework\TestCase
+class ConfigModelIndexValueTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $obj = new ConfigModelIndexValue('testScope', 'testCode', 'testValue');
         $this->assertEquals('testScope', $obj->getScope());
@@ -18,7 +19,7 @@ class ConfigModelIndexValueTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('testValue', $obj->getValue());
     }
 
-    public function testIdGetter()
+    public function testIdGetter(): void
     {
         $obj = new ConfigModelIndexValue();
         ReflectionUtil::setId($obj, 1);
@@ -28,7 +29,7 @@ class ConfigModelIndexValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider propertiesDataProvider
      */
-    public function testSettersAndGetters(string $property, mixed $value)
+    public function testSettersAndGetters(string $property, mixed $value): void
     {
         $obj = new ConfigModelIndexValue();
 

@@ -6,11 +6,12 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SqlMigrationQueryTest extends \PHPUnit\Framework\TestCase
+class SqlMigrationQueryTest extends TestCase
 {
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
+    private Connection&MockObject $connection;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +22,7 @@ class SqlMigrationQueryTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new MySqlPlatform());
     }
 
-    public function testConstructorWithString()
+    public function testConstructorWithString(): void
     {
         $query = new SqlMigrationQuery(
             'INSERT INTO test_table (name) VALUES (:name)'
@@ -34,7 +35,7 @@ class SqlMigrationQueryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConstructorWithArray()
+    public function testConstructorWithArray(): void
     {
         $query = new SqlMigrationQuery(
             [
@@ -53,7 +54,7 @@ class SqlMigrationQueryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDescriptionWithoutSql()
+    public function testGetDescriptionWithoutSql(): void
     {
         $query = new SqlMigrationQuery();
         $query->setConnection($this->connection);
@@ -61,7 +62,7 @@ class SqlMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('', $query->getDescription());
     }
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $query = new SqlMigrationQuery();
         $query->setConnection($this->connection);
@@ -85,7 +86,7 @@ class SqlMigrationQueryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $query = new SqlMigrationQuery();
         $query->setConnection($this->connection);

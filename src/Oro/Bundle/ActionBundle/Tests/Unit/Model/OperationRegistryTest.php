@@ -18,7 +18,6 @@ use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -27,15 +26,15 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 
 class OperationRegistryTest extends TestCase
 {
-    private ConfigurationProviderInterface|MockObject $configurationProvider;
-    private CurrentApplicationProviderInterface|MockObject $applicationProvider;
-    private DoctrineHelper|MockObject $doctrineHelper;
-    private ActionFactory|MockObject $actionFactory;
-    private ConditionFactory|MockObject $conditionFactory;
-    private AttributeAssembler|MockObject $attributeAssembler;
-    private FormOptionsAssembler|MockObject $formOptionsAssembler;
+    private ConfigurationProviderInterface&MockObject $configurationProvider;
+    private CurrentApplicationProviderInterface&MockObject $applicationProvider;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ActionFactoryInterface&MockObject $actionFactory;
+    private ConditionFactory&MockObject $conditionFactory;
+    private AttributeAssembler&MockObject $attributeAssembler;
+    private FormOptionsAssembler&MockObject $formOptionsAssembler;
     private OptionsResolver $optionsResolver;
-    private OperationEventDispatcher|MockObject $eventDispatcher;
+    private OperationEventDispatcher&MockObject $eventDispatcher;
     private OperationAssembler $assembler;
 
     #[\Override]
@@ -88,7 +87,7 @@ class OperationRegistryTest extends TestCase
         ?string $datagrid,
         ?string $group,
         array $expected
-    ) {
+    ): void {
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
             ->willReturn($this->getConfiguration());
@@ -265,7 +264,7 @@ class OperationRegistryTest extends TestCase
         ?string $expected,
         ?OperationFindCriteria $criteria = null,
         array $filterResult = []
-    ) {
+    ): void {
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
             ->willReturn(
@@ -480,7 +479,7 @@ class OperationRegistryTest extends TestCase
         );
     }
 
-    public function testOuterFilterArguments()
+    public function testOuterFilterArguments(): void
     {
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
@@ -511,7 +510,7 @@ class OperationRegistryTest extends TestCase
         $registry->find($criteria3);
     }
 
-    public function testOuterFiltering()
+    public function testOuterFiltering(): void
     {
         $this->configurationProvider->expects($this->any())
             ->method('getConfiguration')

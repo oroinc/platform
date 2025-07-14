@@ -6,11 +6,12 @@ use Oro\Bundle\WorkflowBundle\Configuration\ConfigImportProcessorInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowImportProcessor;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowImportProcessorSupervisor;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Import\Stub\StubWorkflowImportCallbackProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowImportProcessorSupervisorTest extends \PHPUnit\Framework\TestCase
+class WorkflowImportProcessorSupervisorTest extends TestCase
 {
-    /** @var WorkflowImportProcessorSupervisor */
-    private $processor;
+    private WorkflowImportProcessorSupervisor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +19,7 @@ class WorkflowImportProcessorSupervisorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new WorkflowImportProcessorSupervisor();
     }
 
-    public function testProcessProxyParent()
+    public function testProcessProxyParent(): void
     {
         $parent = $this->createMock(ConfigImportProcessorInterface::class);
 
@@ -50,7 +51,7 @@ class WorkflowImportProcessorSupervisorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($content, $file);
     }
 
-    public function testSkipProcessed()
+    public function testSkipProcessed(): void
     {
         $once = $this->getImportProcessor('targetA', 'resourceA', ['setParent', 'process']);
 
@@ -70,7 +71,7 @@ class WorkflowImportProcessorSupervisorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($content, $file);
     }
 
-    public function testRecursionPreventionStack()
+    public function testRecursionPreventionStack(): void
     {
         $fromA = $this->createCallbackProcessor(
             function ($content) {
@@ -108,7 +109,7 @@ class WorkflowImportProcessorSupervisorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['data' => '[B->A][A->B]'], $processed);
     }
 
-    public function testRecursionPreventionStackComplex()
+    public function testRecursionPreventionStackComplex(): void
     {
         $fromA = $this->createCallbackProcessor(
             function ($content) {
@@ -157,7 +158,7 @@ class WorkflowImportProcessorSupervisorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['data' => '[B->C][C->A][A->B]'], $processed);
     }
 
-    public function testOuterProcessingLoopCircularReferenceException()
+    public function testOuterProcessingLoopCircularReferenceException(): void
     {
         $fromA = $this->createCallbackProcessor(
             function ($content) {
@@ -204,11 +205,11 @@ class WorkflowImportProcessorSupervisorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['data' => 'cas'], $result);
     }
 
-    /**
-     * @return WorkflowImportProcessor|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getImportProcessor(string $target, string $resource, array $methods = [])
-    {
+    private function getImportProcessor(
+        string $target,
+        string $resource,
+        array $methods = []
+    ): WorkflowImportProcessor&MockObject {
         $builder = $this->getMockBuilder(WorkflowImportProcessor::class);
         $builder->disableOriginalConstructor();
 
@@ -235,7 +236,7 @@ class WorkflowImportProcessorSupervisorTest extends \PHPUnit\Framework\TestCase
         callable $processCallback,
         string $target,
         string $resource
-    ): Stub\StubWorkflowImportCallbackProcessor {
+    ): StubWorkflowImportCallbackProcessor {
         $processor = new StubWorkflowImportCallbackProcessor($processCallback);
         $processor->setTarget($target);
         $processor->setResource($resource);

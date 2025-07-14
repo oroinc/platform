@@ -5,14 +5,14 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Suite;
 use Behat\Testwork\Suite\Exception\ParameterNotFoundException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SymfonyBundleSuite;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
-class SymfonyBundleSuiteTest extends \PHPUnit\Framework\TestCase
+class SymfonyBundleSuiteTest extends TestCase
 {
     use EntityTestCaseTrait;
 
     private array $settings;
-
     private SymfonyBundleSuite $suite;
 
     #[\Override]

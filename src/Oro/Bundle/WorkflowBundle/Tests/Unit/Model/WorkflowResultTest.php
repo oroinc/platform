@@ -3,11 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowResultTest extends \PHPUnit\Framework\TestCase
+class WorkflowResultTest extends TestCase
 {
-    /** @var WorkflowResult */
-    private $result;
+    private WorkflowResult $result;
 
     #[\Override]
     protected function setUp(): void
@@ -15,7 +15,7 @@ class WorkflowResultTest extends \PHPUnit\Framework\TestCase
         $this->result = new WorkflowResult();
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $this->assertEquals([], $this->result->getValues());
         $values = [
@@ -25,7 +25,7 @@ class WorkflowResultTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($values, $this->result->getValues());
     }
 
-    public function testHasGetSetRemove()
+    public function testHasGetSetRemove(): void
     {
         $this->assertFalse($this->result->has('foo'));
         $this->assertNull($this->result->get('foo'));
@@ -39,7 +39,7 @@ class WorkflowResultTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->result->get('foo'));
     }
 
-    public function testIssetGetSetUnset()
+    public function testIssetGetSetUnset(): void
     {
         $this->assertTrue(isset($this->result->foo));
         $this->assertNull($this->result->foo);
@@ -53,7 +53,7 @@ class WorkflowResultTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->result->foo);
     }
 
-    public function testArrayAccess()
+    public function testArrayAccess(): void
     {
         $this->assertInstanceOf('ArrayAccess', $this->result);
 
@@ -69,7 +69,7 @@ class WorkflowResultTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->result['foo']);
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         $this->assertCount(0, $this->result);
 
@@ -86,7 +86,7 @@ class WorkflowResultTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $this->result);
     }
 
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $this->assertTrue($this->result->isEmpty());
 
@@ -94,7 +94,7 @@ class WorkflowResultTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->result->isEmpty());
     }
 
-    public function testIterable()
+    public function testIterable(): void
     {
         $this->result->set('foo', 'bar');
         $this->result->set('baz', 'qux');
@@ -107,7 +107,7 @@ class WorkflowResultTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $data);
     }
 
-    public function testGetValuesAll()
+    public function testGetValuesAll(): void
     {
         $this->result->set('foo', 'foo_value');
         $this->result->set('bar', 'bar_value');
@@ -125,7 +125,7 @@ class WorkflowResultTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetValuesWithNames()
+    public function testGetValuesWithNames(): void
     {
         $this->result->set('foo', 'foo_value');
         $this->result->set('bar', 'bar_value');
@@ -143,7 +143,7 @@ class WorkflowResultTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $this->result->set('foo', 'foo_value');
         $this->result->set('bar', 'bar_value');

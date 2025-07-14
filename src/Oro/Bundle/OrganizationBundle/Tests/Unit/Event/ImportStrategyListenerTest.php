@@ -15,20 +15,15 @@ use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
+class ImportStrategyListenerTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadataProvider;
-
-    /** @var ImportStrategyListener */
-    private $listener;
+    private ManagerRegistry&MockObject $doctrine;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private OwnershipMetadataProviderInterface&MockObject $metadataProvider;
+    private ImportStrategyListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -44,7 +39,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnProcessAfterWithNonSupportedEntity()
+    public function testOnProcessAfterWithNonSupportedEntity(): void
     {
         $entity = new Entity();
         $event = new StrategyEvent(
@@ -64,7 +59,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($entity->getOrganization());
     }
 
-    public function testOnProcessAfterWithOrganizationInEntityButWithoutOrganizationInData()
+    public function testOnProcessAfterWithOrganizationInEntityButWithoutOrganizationInData(): void
     {
         $entity = new Entity();
         $organization = new Organization();
@@ -91,7 +86,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($organization, $entity->getOrganization());
     }
 
-    public function testOnProcessAfterWithEntityOrgAndDataOrgWithoutOrgInToken()
+    public function testOnProcessAfterWithEntityOrgAndDataOrgWithoutOrgInToken(): void
     {
         $entity = new Entity();
         $organization = new Organization();
@@ -122,7 +117,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($organization, $entity->getOrganization());
     }
 
-    public function testOnProcessAfterWithEntityOrgAndDataOrgWithSameOrgInToken()
+    public function testOnProcessAfterWithEntityOrgAndDataOrgWithSameOrgInToken(): void
     {
         $entity = new Entity();
         $organization = new Organization();
@@ -157,7 +152,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($organization, $entity->getOrganization());
     }
 
-    public function testOnProcessAfterWithoutEntityOrgWithoutOrgInToken()
+    public function testOnProcessAfterWithoutEntityOrgWithoutOrgInToken(): void
     {
         $entity = new Entity();
 
@@ -205,7 +200,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($organization, $entity->getOrganization());
     }
 
-    public function testOnProcessAfterWithoutEntityOrgWithOrgInToken()
+    public function testOnProcessAfterWithoutEntityOrgWithOrgInToken(): void
     {
         $entity = new Entity();
 
@@ -234,7 +229,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($organization, $entity->getOrganization());
     }
 
-    public function testOnProcessAfterWithSameOrgInEntityAndToken()
+    public function testOnProcessAfterWithSameOrgInEntityAndToken(): void
     {
         $entity = new Entity();
 
@@ -267,7 +262,7 @@ class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($organization, $entity->getOrganization());
     }
 
-    public function testOnProcessAfterWithDifferentOrgInEntityAndToken()
+    public function testOnProcessAfterWithDifferentOrgInEntityAndToken(): void
     {
         $entity = new Entity();
 

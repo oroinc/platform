@@ -11,6 +11,7 @@ use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
@@ -21,14 +22,9 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
 {
     use EntityTrait;
 
-    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationManager;
-
-    /** @var LocalizationChoicesProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationChoicesProvider;
-
-    /** @var LocalizationSelectionType */
-    private $formType;
+    private LocalizationManager&MockObject $localizationManager;
+    private LocalizationChoicesProvider&MockObject $localizationChoicesProvider;
+    private LocalizationSelectionType $formType;
 
     #[\Override]
     protected function setUp(): void
@@ -36,17 +32,15 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
         $this->localizationManager = $this->createMock(LocalizationManager::class);
         $this->localizationManager->expects($this->any())
             ->method('getLocalizations')
-            ->willReturnCallback(
-                function (array $ids) {
-                    $result = [];
+            ->willReturnCallback(function (array $ids) {
+                $result = [];
 
-                    foreach ($ids as $id) {
-                        $result[$id] = $this->getEntity(Localization::class, ['id' => $id]);
-                    }
-
-                    return $result;
+                foreach ($ids as $id) {
+                    $result[$id] = $this->getEntity(Localization::class, ['id' => $id]);
                 }
-            );
+
+                return $result;
+            });
 
         $this->localizationChoicesProvider = $this->createMock(LocalizationChoicesProvider::class);
         $this->localizationChoicesProvider->expects($this->any())
@@ -77,7 +71,6 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions(): void
     {
-        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
@@ -140,7 +133,6 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
             new ChoiceView(4004, 4004, 'Localization 4'),
         ];
 
-        /** @var FormInterface $form */
         $form = $this->createMock(FormInterface::class);
 
         $this->formType->finishView(

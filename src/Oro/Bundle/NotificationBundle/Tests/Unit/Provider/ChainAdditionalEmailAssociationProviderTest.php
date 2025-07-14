@@ -4,17 +4,14 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\NotificationBundle\Provider\AdditionalEmailAssociationProviderInterface;
 use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChainAdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\TestCase
+class ChainAdditionalEmailAssociationProviderTest extends TestCase
 {
-    /** @var AdditionalEmailAssociationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $provider1;
-
-    /** @var AdditionalEmailAssociationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $provider2;
-
-    /** @var ChainAdditionalEmailAssociationProvider */
-    private $chainProvider;
+    private AdditionalEmailAssociationProviderInterface&MockObject $provider1;
+    private AdditionalEmailAssociationProviderInterface&MockObject $provider2;
+    private ChainAdditionalEmailAssociationProvider $chainProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +24,7 @@ class ChainAdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\Tes
         );
     }
 
-    public function testGetAssociations()
+    public function testGetAssociations(): void
     {
         $this->provider1->expects(self::once())
             ->method('getAssociations')
@@ -56,7 +53,7 @@ class ChainAdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\Tes
         );
     }
 
-    public function testGetAssociationValueWithSupportedProvider()
+    public function testGetAssociationValueWithSupportedProvider(): void
     {
         $entity = new \stdClass();
         $entity->testField = 'test';
@@ -80,7 +77,7 @@ class ChainAdditionalEmailAssociationProviderTest extends \PHPUnit\Framework\Tes
         self::assertEquals('test', $this->chainProvider->getAssociationValue($entity, 'testField'));
     }
 
-    public function testGetAssociationValueWithoutSupportedProvider()
+    public function testGetAssociationValueWithoutSupportedProvider(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('There is no provider to get the value.');

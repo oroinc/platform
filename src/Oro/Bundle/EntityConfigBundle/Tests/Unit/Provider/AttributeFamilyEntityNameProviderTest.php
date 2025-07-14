@@ -9,8 +9,9 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class AttributeFamilyEntityNameProviderTest extends \PHPUnit\Framework\TestCase
+class AttributeFamilyEntityNameProviderTest extends TestCase
 {
     private AttributeFamilyEntityNameProvider $provider;
 

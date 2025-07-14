@@ -7,16 +7,15 @@ use Nelmio\Alice\Parser\Chainable\YamlParser;
 use Nelmio\Alice\Parser\IncludeProcessor\DefaultIncludeProcessor;
 use Nelmio\Alice\Parser\RuntimeCacheParser;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\IncludeProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Parser;
 
-class IncludeProcessorTest extends \PHPUnit\Framework\TestCase
+class IncludeProcessorTest extends TestCase
 {
-    /** @var KernelInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $kernel;
-
-    /** @var RuntimeCacheParser */
-    private $parser;
+    private KernelInterface&MockObject $kernel;
+    private RuntimeCacheParser $parser;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +34,7 @@ class IncludeProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider includeFilesDataProvider
      */
-    public function testIncludeFiles(string $path, ?string $expectsKernelCallWith)
+    public function testIncludeFiles(string $path, ?string $expectsKernelCallWith): void
     {
         if ($expectsKernelCallWith) {
             $this->kernel->expects($this->once())
@@ -43,7 +42,8 @@ class IncludeProcessorTest extends \PHPUnit\Framework\TestCase
                 ->with($expectsKernelCallWith)
                 ->willReturn(__DIR__ . '/OroStubBundle/Tests/Behat/Features/Fixtures/test_include.yml');
         } else {
-            $this->kernel->expects($this->never())->method('locateResource');
+            $this->kernel->expects($this->never())
+                ->method('locateResource');
         }
 
         $data = $this->parser->parse($path);

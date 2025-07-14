@@ -7,11 +7,12 @@ use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RejectMessageOnExcepti
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit\Framework\TestCase
+class RejectMessageOnExceptionDbalExtensionTest extends TestCase
 {
-    public function testShouldDoNothingIfExceptionIsMissing()
+    public function testShouldDoNothingIfExceptionIsMissing(): void
     {
         $consumer = $this->createMock(MessageConsumerInterface::class);
         $consumer->expects($this->never())
@@ -24,7 +25,7 @@ class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit\Framework\TestC
         $extension->onInterrupted($context);
     }
 
-    public function testShouldDoNothingIfMessageIsMissing()
+    public function testShouldDoNothingIfMessageIsMissing(): void
     {
         $consumer = $this->createMock(MessageConsumerInterface::class);
         $consumer->expects($this->never())
@@ -38,7 +39,7 @@ class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit\Framework\TestC
         $extension->onInterrupted($context);
     }
 
-    public function testShouldRejectMessage()
+    public function testShouldRejectMessage(): void
     {
         $message = new Message();
         $message->setMessageId(123);

@@ -5,14 +5,13 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Provider;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Provider\ConfigDefaultLocalizationProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigDefaultLocalizationProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigDefaultLocalizationProviderTest extends TestCase
 {
-    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationManager;
-
-    /** @var ConfigDefaultLocalizationProvider */
-    private $provider;
+    private LocalizationManager&MockObject $localizationManager;
+    private ConfigDefaultLocalizationProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class ConfigDefaultLocalizationProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new ConfigDefaultLocalizationProvider($this->localizationManager);
     }
 
-    public function testGetCurrentLocalization()
+    public function testGetCurrentLocalization(): void
     {
         $localization = new Localization();
 

@@ -5,18 +5,15 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Configuration;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationExtension;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationExtensionInterface;
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\ConfigurationExtensionStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
-class ConfigurationExtensionTest extends \PHPUnit\Framework\TestCase
+class ConfigurationExtensionTest extends TestCase
 {
-    /** @var ConfigurationExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $extension1;
-
-    /** @var ConfigurationExtensionStub|\PHPUnit\Framework\MockObject\MockObject */
-    private $extension2;
-
-    /** @var ConfigurationExtension */
-    private $configurationExtension;
+    private ConfigurationExtensionInterface&MockObject $extension1;
+    private ConfigurationExtensionStub&MockObject $extension2;
+    private ConfigurationExtension $configurationExtension;
 
     #[\Override]
     protected function setUp(): void

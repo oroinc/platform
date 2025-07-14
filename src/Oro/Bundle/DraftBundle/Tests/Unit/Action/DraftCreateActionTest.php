@@ -9,32 +9,27 @@ use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class DraftCreateActionTest extends \PHPUnit\Framework\TestCase
+class DraftCreateActionTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var DraftCreateAction */
-    private $action;
-
-    /** @var ContextAccessor */
-    private $contextAccessor;
-
-    /** @var DraftManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $draftMananager;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
+    private DraftCreateAction $action;
+    private ContextAccessor $contextAccessor;
+    private DraftManager&MockObject $draftManager;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
-        $this->draftMananager = $this->createMock(DraftManager::class);
+        $this->draftManager = $this->createMock(DraftManager::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->action = new DraftCreateAction($this->contextAccessor, $this->draftMananager);
+        $this->action = new DraftCreateAction($this->contextAccessor, $this->draftManager);
         $this->action->setDispatcher($this->eventDispatcher);
     }
 
@@ -59,8 +54,7 @@ class DraftCreateActionTest extends \PHPUnit\Framework\TestCase
         $this->contextAccessor->setValue($context, $sourceProperty, $source);
         $this->contextAccessor->setValue($context, $targetProperty, null);
 
-        $this->draftMananager
-            ->expects($this->once())
+        $this->draftManager->expects($this->once())
             ->method('createDraft')
             ->willReturn($source);
 

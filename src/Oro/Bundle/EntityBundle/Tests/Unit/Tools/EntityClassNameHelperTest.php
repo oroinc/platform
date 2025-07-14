@@ -5,8 +5,9 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Tools;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
+use PHPUnit\Framework\TestCase;
 
-class EntityClassNameHelperTest extends \PHPUnit\Framework\TestCase
+class EntityClassNameHelperTest extends TestCase
 {
     private const TEST_ENTITY_ALIAS = 'alias';
     private const TEST_ENTITY_PLURAL_ALIAS = 'plural_alias';
@@ -15,8 +16,7 @@ class EntityClassNameHelperTest extends \PHPUnit\Framework\TestCase
     private const TEST_CUSTOM_ENTITY_CLASS = 'Extend\Entity\test_entity';
     private const TEST_CUSTOM_ENTITY_URL_SAFE_CLASS = 'Extend_Entity_test_entity';
 
-    /** @var EntityClassNameHelper */
-    private $entityClassNameHelper;
+    private EntityClassNameHelper $entityClassNameHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -47,7 +47,7 @@ class EntityClassNameHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider resolveEntityClassProvider
      */
-    public function testResolveEntityClass(?string $className, bool $isPluralAlias, ?string $expected)
+    public function testResolveEntityClass(?string $className, bool $isPluralAlias, ?string $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -76,7 +76,7 @@ class EntityClassNameHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getUrlSafeClassNameProvider
      */
-    public function testGetUrlSafeClassName(string $className, string $expected)
+    public function testGetUrlSafeClassName(string $className, string $expected): void
     {
         $this->assertEquals(
             $expected,

@@ -12,19 +12,16 @@ use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\ActionBundle\Provider\Event\OnButtonsMatched;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
 use Oro\Bundle\TestFrameworkBundle\Test\Stub\CallableStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ButtonProviderTest extends \PHPUnit\Framework\TestCase
+class ButtonProviderTest extends TestCase
 {
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var ButtonSearchContext */
-    private $searchContext;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private LoggerInterface&MockObject $logger;
+    private ButtonSearchContext $searchContext;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,7 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
         $this->searchContext = new ButtonSearchContext();
     }
 
-    public function testMatch()
+    public function testMatch(): void
     {
         $button1 = $this->getButton(1);
         $button2 = $this->getButton(1);
@@ -71,7 +68,7 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
         $collection->map($callable);
     }
 
-    public function testMatchEvent()
+    public function testMatchEvent(): void
     {
         $extension1 = $this->createMock(ButtonProviderExtensionInterface::class);
         $extension1->expects($this->once())
@@ -90,7 +87,7 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
         $buttonProvider->match($this->searchContext);
     }
 
-    public function testFindAvailableWithErrors()
+    public function testFindAvailableWithErrors(): void
     {
         $extension = $this->createMock(ButtonProviderExtensionInterface::class);
         $extension->expects($this->once())
@@ -113,7 +110,7 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider findAllDataProvider
      */
-    public function testFindAll(array $input, array $output)
+    public function testFindAll(array $input, array $output): void
     {
         $extension = $this->createMock(ButtonProviderExtensionInterface::class);
         $extension->expects($this->once())
@@ -151,7 +148,7 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testFindAllWithErrors()
+    public function testFindAllWithErrors(): void
     {
         $extension = $this->createMock(ButtonProviderExtensionInterface::class);
         $extension->expects($this->once())
@@ -171,7 +168,7 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
         $buttonProvider->findAll($this->searchContext);
     }
 
-    public function testHasButtons()
+    public function testHasButtons(): void
     {
         $extension = $this->createMock(ButtonProviderExtensionInterface::class);
         $extension->expects($this->once())
@@ -183,7 +180,7 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($buttonProvider->hasButtons($this->searchContext));
     }
 
-    public function testHasButtonsWithoutButtons()
+    public function testHasButtonsWithoutButtons(): void
     {
         $extension = $this->createMock(ButtonProviderExtensionInterface::class);
         $extension->expects($this->once())

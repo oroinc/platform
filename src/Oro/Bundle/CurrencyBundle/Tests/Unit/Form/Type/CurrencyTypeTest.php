@@ -3,13 +3,13 @@
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\CurrencyBundle\Form\Type\CurrencyType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\CurrencyType as BaseCurrencyType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CurrencyTypeTest extends \PHPUnit\Framework\TestCase
+class CurrencyTypeTest extends TestCase
 {
-    /** @var CurrencyType */
-    private $formType;
+    private CurrencyType $formType;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +17,7 @@ class CurrencyTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType = new CurrencyType();
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
@@ -29,12 +29,12 @@ class CurrencyTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType->configureOptions($resolver);
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(BaseCurrencyType::class, $this->formType->getParent());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals('oro_currency', $this->formType->getName());
     }

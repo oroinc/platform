@@ -6,24 +6,25 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Oro\Component\ConfigExpression\Func;
+use Oro\Component\ConfigExpression\Func\Trim;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class TrimTest extends \PHPUnit\Framework\TestCase
+class TrimTest extends TestCase
 {
-    /** @var Func\Trim */
-    private $function;
+    private Func\Trim $function;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->function = new Func\Trim();
+        $this->function = new Trim();
         $this->function->setContextAccessor(new ContextAccessor());
     }
 
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, array $context, string $expectedResult)
+    public function testEvaluate(array $options, array $context, string $expectedResult): void
     {
         $this->assertSame($this->function, $this->function->initialize($options));
         $this->assertEquals($expectedResult, $this->function->evaluate($context));
@@ -55,7 +56,7 @@ class TrimTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testEvaluateNullValue()
+    public function testEvaluateNullValue(): void
     {
         $context = ['foo' => null];
         $options = [new PropertyPath('foo')];
@@ -67,7 +68,7 @@ class TrimTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $errors, 'An error should not be added');
     }
 
-    public function testAddError()
+    public function testAddError(): void
     {
         $context = ['foo' => 123, 'charlist' => '_'];
         $options = [new PropertyPath('foo'), new PropertyPath('charlist')];
@@ -94,7 +95,7 @@ class TrimTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInitializeFailsWhenEmptyOptions()
+    public function testInitializeFailsWhenEmptyOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 or 2 elements, but 0 given.');
@@ -102,7 +103,7 @@ class TrimTest extends \PHPUnit\Framework\TestCase
         $this->function->initialize([]);
     }
 
-    public function testInitializeFailsWhenMoreThanTwoOptions()
+    public function testInitializeFailsWhenMoreThanTwoOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 or 2 elements, but 3 given.');
@@ -113,7 +114,7 @@ class TrimTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray(array $options, ?string $message, array $expected)
+    public function testToArray(array $options, ?string $message, array $expected): void
     {
         $this->function->initialize($options);
         if ($message !== null) {
@@ -151,7 +152,7 @@ class TrimTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile(array $options, ?string $message, string $expected)
+    public function testCompile(array $options, ?string $message, string $expected): void
     {
         $this->function->initialize($options);
         if ($message !== null) {

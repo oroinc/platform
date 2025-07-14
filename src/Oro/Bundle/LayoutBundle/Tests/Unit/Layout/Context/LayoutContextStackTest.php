@@ -7,12 +7,13 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Context;
 use Oro\Bundle\LayoutBundle\Event\LayoutContextChangedEvent;
 use Oro\Bundle\LayoutBundle\Layout\Context\LayoutContextStack;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class LayoutContextStackTest extends \PHPUnit\Framework\TestCase
+class LayoutContextStackTest extends TestCase
 {
-    private EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
-
+    private EventDispatcherInterface&MockObject $eventDispatcher;
     private LayoutContextStack $layoutContextStack;
 
     #[\Override]
@@ -25,8 +26,7 @@ class LayoutContextStackTest extends \PHPUnit\Framework\TestCase
     public function testPushPop(): void
     {
         $context = new LayoutContext();
-        $this->eventDispatcher
-            ->expects(self::exactly(2))
+        $this->eventDispatcher->expects(self::exactly(2))
             ->method('dispatch')
             ->withConsecutive(
                 [new LayoutContextChangedEvent(null, $context)],
@@ -44,8 +44,7 @@ class LayoutContextStackTest extends \PHPUnit\Framework\TestCase
     {
         $context = new LayoutContext();
         $context2 = new LayoutContext();
-        $this->eventDispatcher
-            ->expects(self::exactly(3))
+        $this->eventDispatcher->expects(self::exactly(3))
             ->method('dispatch')
             ->withConsecutive(
                 [new LayoutContextChangedEvent(null, $context)],

@@ -9,20 +9,17 @@ use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormView;
 
-class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
+class LayoutExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var TwigRendererInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $renderer;
-
-    /** @var TextHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $textHelper;
-
-    /** @var LayoutExtension */
-    private $extension;
+    private TwigRendererInterface&MockObject $renderer;
+    private TextHelper&MockObject $textHelper;
+    private LayoutExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +35,7 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new LayoutExtension($container, (new InflectorFactory())->build());
     }
 
-    public function testGetTokenParsers()
+    public function testGetTokenParsers(): void
     {
         $tokenParsers = $this->extension->getTokenParsers();
 
@@ -47,7 +44,7 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(BlockThemeTokenParser::class, $tokenParsers[0]);
     }
 
-    public function testMergeContext()
+    public function testMergeContext(): void
     {
         $parent = new BlockView();
         $firstChild = new BlockView();
@@ -73,7 +70,7 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider attributeProvider
      */
-    public function testDefaultAttributes(array $attr, array $defaultAttr, array $expected)
+    public function testDefaultAttributes(array $attr, array $defaultAttr, array $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -171,7 +168,7 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSetClassPrefixToForm()
+    public function testSetClassPrefixToForm(): void
     {
         $prototypeView = $this->createMock(FormView::class);
 
@@ -191,7 +188,7 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider convertValueToStringDataProvider
      */
-    public function testConvertValueToString(mixed $value, string $expectedConvertedValue)
+    public function testConvertValueToString(mixed $value, string $expectedConvertedValue): void
     {
         $this->assertSame($expectedConvertedValue, $this->extension->convertValueToString($value));
     }

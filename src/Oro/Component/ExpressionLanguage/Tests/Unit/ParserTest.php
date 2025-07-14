@@ -5,10 +5,18 @@ namespace Oro\Component\ExpressionLanguage\Tests\Unit;
 use Oro\Component\ExpressionLanguage\Lexer;
 use Oro\Component\ExpressionLanguage\Node as CustomNode;
 use Oro\Component\ExpressionLanguage\Parser;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Node;
+use Symfony\Component\ExpressionLanguage\Node\ArgumentsNode;
+use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
+use Symfony\Component\ExpressionLanguage\Node\ConditionalNode;
+use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
+use Symfony\Component\ExpressionLanguage\Node\GetAttrNode;
+use Symfony\Component\ExpressionLanguage\Node\NameNode;
+use Symfony\Component\ExpressionLanguage\Node\UnaryNode;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
 
-class ParserTest extends \PHPUnit\Framework\TestCase
+class ParserTest extends TestCase
 {
     public function testParseWhenMethodNotSupported(): void
     {
@@ -75,119 +83,119 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                new Node\NameNode('a'),
+                new NameNode('a'),
                 'a',
                 ['a'],
             ],
             [
-                new Node\ConstantNode('a'),
+                new ConstantNode('a'),
                 '"a"',
             ],
             [
-                new Node\ConstantNode(3),
+                new ConstantNode(3),
                 '3',
             ],
             [
-                new Node\ConstantNode(false),
+                new ConstantNode(false),
                 'false',
             ],
             [
-                new Node\ConstantNode(true),
+                new ConstantNode(true),
                 'true',
             ],
             [
-                new Node\ConstantNode(null),
+                new ConstantNode(null),
                 'null',
             ],
             [
-                new Node\UnaryNode('-', new Node\ConstantNode(3)),
+                new UnaryNode('-', new ConstantNode(3)),
                 '-3',
             ],
             [
-                new CustomNode\BinaryNode('-', new Node\ConstantNode(3), new Node\ConstantNode(3)),
+                new CustomNode\BinaryNode('-', new ConstantNode(3), new ConstantNode(3)),
                 '3 - 3',
             ],
             [
                 new CustomNode\BinaryNode(
                     '*',
-                    new CustomNode\BinaryNode('-', new Node\ConstantNode(3), new Node\ConstantNode(3)),
-                    new Node\ConstantNode(2)
+                    new CustomNode\BinaryNode('-', new ConstantNode(3), new ConstantNode(3)),
+                    new ConstantNode(2)
                 ),
                 '(3 - 3) * 2',
             ],
             [
                 new CustomNode\GetPropertyNode(
-                    new Node\NameNode('foo'),
-                    new Node\ConstantNode('bar', true),
-                    new Node\ArgumentsNode()
+                    new NameNode('foo'),
+                    new ConstantNode('bar', true),
+                    new ArgumentsNode()
                 ),
                 'foo.bar',
                 ['foo'],
             ],
             [
                 new CustomNode\CollectionMethodAllNode(
-                    new Node\NameNode('foo'),
-                    new Node\ConstantNode('all', true),
-                    $this->getArgumentsNode(new Node\ConstantNode(true))
+                    new NameNode('foo'),
+                    new ConstantNode('all', true),
+                    $this->getArgumentsNode(new ConstantNode(true))
                 ),
                 'foo.all(true)',
                 ['foo'],
             ],
             [
                 new CustomNode\CollectionMethodAnyNode(
-                    new Node\NameNode('foo'),
-                    new Node\ConstantNode('any', true),
-                    $this->getArgumentsNode(new Node\ConstantNode(true))
+                    new NameNode('foo'),
+                    new ConstantNode('any', true),
+                    $this->getArgumentsNode(new ConstantNode(true))
                 ),
                 'foo.any(true)',
                 ['foo'],
             ],
             [
                 new CustomNode\CollectionMethodSumNode(
-                    new Node\NameNode('foo'),
-                    new Node\ConstantNode('sum', true),
-                    $this->getArgumentsNode(new Node\ConstantNode(true))
+                    new NameNode('foo'),
+                    new ConstantNode('sum', true),
+                    $this->getArgumentsNode(new ConstantNode(true))
                 ),
                 'foo.sum(1)',
                 ['foo'],
             ],
             [
-                new Node\GetAttrNode(
-                    new Node\NameNode('foo'),
-                    new Node\ConstantNode(3),
-                    new Node\ArgumentsNode(),
-                    Node\GetAttrNode::ARRAY_CALL
+                new GetAttrNode(
+                    new NameNode('foo'),
+                    new ConstantNode(3),
+                    new ArgumentsNode(),
+                    GetAttrNode::ARRAY_CALL
                 ),
                 'foo[3]',
                 ['foo'],
             ],
             [
-                new Node\ConditionalNode(
-                    new Node\ConstantNode(true),
-                    new Node\ConstantNode(true),
-                    new Node\ConstantNode(false)
+                new ConditionalNode(
+                    new ConstantNode(true),
+                    new ConstantNode(true),
+                    new ConstantNode(false)
                 ),
                 'true ? true : false',
             ],
             [
-                new CustomNode\BinaryNode('matches', new Node\ConstantNode('foo'), new Node\ConstantNode('/foo/')),
+                new CustomNode\BinaryNode('matches', new ConstantNode('foo'), new ConstantNode('/foo/')),
                 '"foo" matches "/foo/"',
             ],
             [
                 new CustomNode\CollectionMethodAllNode(
                     new CustomNode\CollectionMethodAnyNode(
-                        new Node\NameNode('foo'),
-                        new Node\ConstantNode('any', true),
-                        $this->getArgumentsNode(new Node\ConstantNode(true))
+                        new NameNode('foo'),
+                        new ConstantNode('any', true),
+                        $this->getArgumentsNode(new ConstantNode(true))
                     ),
-                    new Node\ConstantNode('all', true),
-                    $this->getArgumentsNode(new Node\ConstantNode(true))
+                    new ConstantNode('all', true),
+                    $this->getArgumentsNode(new ConstantNode(true))
                 ),
                 'foo.any(true).all(true)',
                 ['foo'],
             ],
             [
-                new Node\NameNode('foo'),
+                new NameNode('foo'),
                 'bar',
                 ['foo' => 'bar'],
             ],
@@ -196,55 +204,55 @@ class ParserTest extends \PHPUnit\Framework\TestCase
 
     public function testParseNestedCondition(): void
     {
-        $arrayNode = new Node\ArrayNode();
-        $arrayNode->addElement(new Node\ConstantNode('bar'));
+        $arrayNode = new ArrayNode();
+        $arrayNode->addElement(new ConstantNode('bar'));
 
         $left = new CustomNode\BinaryNode(
             'in',
             new CustomNode\GetPropertyNode(
-                new Node\NameNode('item'),
-                new Node\ConstantNode('foo', true),
-                new Node\ArgumentsNode()
+                new NameNode('item'),
+                new ConstantNode('foo', true),
+                new ArgumentsNode()
             ),
             $arrayNode
         );
 
-        $allArguments = new Node\ArgumentsNode();
+        $allArguments = new ArgumentsNode();
         $allArguments->addElement(
             new CustomNode\BinaryNode(
                 '>',
                 new CustomNode\GetPropertyNode(
-                    new Node\NameNode('item'),
-                    new Node\ConstantNode('index', true),
-                    new Node\ArgumentsNode()
+                    new NameNode('item'),
+                    new ConstantNode('index', true),
+                    new ArgumentsNode()
                 ),
-                new Node\ConstantNode(10)
+                new ConstantNode(10)
             )
         );
 
         $arguments = new CustomNode\BinaryNode(
             '>',
             new CustomNode\GetPropertyNode(
-                new Node\NameNode('value'),
-                new Node\ConstantNode('index', true),
-                new Node\ArgumentsNode()
+                new NameNode('value'),
+                new ConstantNode('index', true),
+                new ArgumentsNode()
             ),
-            new Node\ConstantNode(10)
+            new ConstantNode(10)
         );
 
         $right = new CustomNode\CollectionMethodAllNode(
             new CustomNode\GetPropertyNode(
-                new Node\NameNode('item'),
-                new Node\ConstantNode('values', true),
-                new Node\ArgumentsNode()
+                new NameNode('item'),
+                new ConstantNode('values', true),
+                new ArgumentsNode()
             ),
-            new Node\ConstantNode('all', true),
+            new ConstantNode('all', true),
             $this->getArgumentsNode($arguments)
         );
 
         $node = new CustomNode\CollectionMethodAnyNode(
-            new Node\NameNode('items'),
-            new Node\ConstantNode('any', true),
+            new NameNode('items'),
+            new ConstantNode('any', true),
             $this->getArgumentsNode(new CustomNode\BinaryNode('and', $left, $right))
         );
 
@@ -256,9 +264,9 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($node, $parser->parse($lexer->tokenize($expression), $names));
     }
 
-    private function getArgumentsNode(...$args): Node\ArgumentsNode
+    private function getArgumentsNode(...$args): ArgumentsNode
     {
-        $arguments = new Node\ArgumentsNode();
+        $arguments = new ArgumentsNode();
         foreach ($args as $arg) {
             $arguments->addElement($arg);
         }

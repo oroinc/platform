@@ -7,8 +7,9 @@ use Oro\Bundle\HelpBundle\Tests\Unit\Fixtures\Bundles\BarBundle\BarBundle;
 use Oro\Bundle\HelpBundle\Tests\Unit\Fixtures\Bundles\FooBundle\FooBundle;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigurationProviderTest extends TestCase
 {
     use TempDirExtension;
 
@@ -22,7 +23,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->configurationProvider = new ConfigurationProvider($cacheFile, false);
     }
 
-    public function testGetConfiguration()
+    public function testGetConfiguration(): void
     {
         $bundle1 = new BarBundle();
         $bundle2 = new FooBundle();

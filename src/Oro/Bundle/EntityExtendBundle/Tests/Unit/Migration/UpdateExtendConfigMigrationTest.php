@@ -11,10 +11,11 @@ use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigration;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use PHPUnit\Framework\TestCase;
 
-class UpdateExtendConfigMigrationTest extends \PHPUnit\Framework\TestCase
+class UpdateExtendConfigMigrationTest extends TestCase
 {
-    public function testUp()
+    public function testUp(): void
     {
         $extendOptions = ['test'];
 

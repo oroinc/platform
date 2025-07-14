@@ -5,20 +5,15 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\Extension\JsValidation;
 use Oro\Bundle\AddressBundle\Extension\JsValidation\ConstraintsProviderDecorator;
 use Oro\Bundle\AddressBundle\Validator\Constraints\NameOrOrganization;
 use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class ConstraintsProviderDecoratorTest extends \PHPUnit\Framework\TestCase
+class ConstraintsProviderDecoratorTest extends TestCase
 {
-    /**
-     * @var ConstraintsProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $provider;
-
-    /**
-     * @var ConstraintsProviderDecorator
-     */
-    private $providerDecorator;
+    private ConstraintsProviderInterface&MockObject $provider;
+    private ConstraintsProviderDecorator $providerDecorator;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +23,7 @@ class ConstraintsProviderDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->providerDecorator = new ConstraintsProviderDecorator($this->provider);
     }
 
-    public function testGetFormConstraintsNoParentForm()
+    public function testGetFormConstraintsNoParentForm(): void
     {
         $constraints = [new NameOrOrganization()];
 
@@ -44,7 +39,7 @@ class ConstraintsProviderDecoratorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($constraints, $this->providerDecorator->getFormConstraints($form));
     }
 
-    public function testGetFormConstraintsHasParentNoNameOrOrganization()
+    public function testGetFormConstraintsHasParentNoNameOrOrganization(): void
     {
         $constraints = [new NotBlank()];
 
@@ -60,7 +55,7 @@ class ConstraintsProviderDecoratorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($constraints, $this->providerDecorator->getFormConstraints($form));
     }
 
-    public function testGetFormConstraintsHasParentNoNameOrOrganizationAndNameOrOrganizationConstraint()
+    public function testGetFormConstraintsHasParentNoNameOrOrganizationAndNameOrOrganizationConstraint(): void
     {
         $constraints = [new NotBlank(), new NameOrOrganization()];
 

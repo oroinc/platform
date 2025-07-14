@@ -4,10 +4,11 @@ namespace Oro\Bundle\LoggerBundle\Tests\Unit\Monolog\Processor;
 
 use Monolog\Logger;
 use Oro\Bundle\LoggerBundle\Monolog\Processor\StacktraceProcessor;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\InvalidArgumentException;
 use Symfony\Component\HttpKernel\Kernel;
 
-class StacktraceProcessorTest extends \PHPUnit\Framework\TestCase
+class StacktraceProcessorTest extends TestCase
 {
     private function getStacktraceProcessor(?string $level): StacktraceProcessor
     {

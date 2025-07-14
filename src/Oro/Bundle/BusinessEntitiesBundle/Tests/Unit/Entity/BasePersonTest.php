@@ -5,8 +5,9 @@ namespace Oro\Bundle\BusinessEntitiesBundle\Tests\Unit\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
 use Oro\Bundle\BusinessEntitiesBundle\Entity\BasePerson;
+use PHPUnit\Framework\TestCase;
 
-class BasePersonTest extends \PHPUnit\Framework\TestCase
+class BasePersonTest extends TestCase
 {
     private const TEST_STRING = 'testString';
     private const TEST_ID = 123;
@@ -22,7 +23,7 @@ class BasePersonTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getSetDataProvider
      */
-    public function testSetGet(string $property, mixed $value = null, mixed $expected = null)
+    public function testSetGet(string $property, mixed $value = null, mixed $expected = null): void
     {
         if ($value !== null) {
             call_user_func([$this->entity, 'set' . ucfirst($property)], $value);
@@ -52,14 +53,14 @@ class BasePersonTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testHasAddress()
+    public function testHasAddress(): void
     {
         $address = $this->getMockForAbstractClass(AbstractAddress::class);
         $this->entity->addAddress($address);
         $this->assertTrue($this->entity->hasAddress($address));
     }
 
-    public function testResetGetAddresses()
+    public function testResetGetAddresses(): void
     {
         $addresses = new ArrayCollection([
             $this->getMockForAbstractClass(AbstractAddress::class),
@@ -69,7 +70,7 @@ class BasePersonTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($addresses, $this->entity->getAddresses());
     }
 
-    public function testRemoveAddresses()
+    public function testRemoveAddresses(): void
     {
         $addresses = new ArrayCollection([
             $this->getMockForAbstractClass(AbstractAddress::class),
@@ -81,7 +82,7 @@ class BasePersonTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, $this->entity->getAddresses()->count());
     }
 
-    public function testCloneAddresses()
+    public function testCloneAddresses(): void
     {
         $addresses = new ArrayCollection([
             $this->getMockForAbstractClass(AbstractAddress::class),

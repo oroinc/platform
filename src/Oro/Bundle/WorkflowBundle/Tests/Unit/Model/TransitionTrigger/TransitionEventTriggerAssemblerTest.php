@@ -7,14 +7,14 @@ use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionEventTriggerAssembler;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerVerifierInterface;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger\Stub\AbstractTransitionTriggerAssemblerStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TransitionEventTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
+class TransitionEventTriggerAssemblerTest extends TestCase
 {
-    /** @var TransitionEventTriggerVerifierInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $verifier;
-
-    /** @var TransitionEventTriggerAssembler */
-    private $assembler;
+    private TransitionEventTriggerVerifierInterface&MockObject $verifier;
+    private TransitionEventTriggerAssembler $assembler;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +26,7 @@ class TransitionEventTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider canAssembleData
      */
-    public function testCanAssemble(bool $expected, array $options)
+    public function testCanAssemble(bool $expected, array $options): void
     {
         $this->assertEquals($expected, $this->assembler->canAssemble($options));
     }
@@ -55,7 +55,7 @@ class TransitionEventTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testAssemble()
+    public function testAssemble(): void
     {
         $eventOpt = 'update';
         $entityClassOpt = '\EntityClass';
@@ -102,7 +102,7 @@ class TransitionEventTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($workflowDefinitionOpt, $trigger->getWorkflowDefinition());
     }
 
-    public function testAssembleDefaults()
+    public function testAssembleDefaults(): void
     {
         $eventOpt = 'create';
         $entityClassOpt = '\WorkflowRelatedEntity';
@@ -145,7 +145,7 @@ class TransitionEventTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($workflowDefinitionOpt, $trigger->getWorkflowDefinition());
     }
 
-    public function testVerifyTriggerException()
+    public function testVerifyTriggerException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -153,7 +153,7 @@ class TransitionEventTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
             'got Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger'
         );
 
-        $stub = new Stub\AbstractTransitionTriggerAssemblerStub();
+        $stub = new AbstractTransitionTriggerAssemblerStub();
 
         $stub->verifyProxy($this->assembler, new TransitionCronTrigger());
     }

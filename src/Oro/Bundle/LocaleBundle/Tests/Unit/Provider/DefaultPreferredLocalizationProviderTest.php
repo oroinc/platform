@@ -6,14 +6,13 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Provider\DefaultPreferredLocalizationProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DefaultPreferredLocalizationProviderTest extends \PHPUnit\Framework\TestCase
+class DefaultPreferredLocalizationProviderTest extends TestCase
 {
-    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationManager;
-
-    /** @var DefaultPreferredLocalizationProvider */
-    private $provider;
+    private LocalizationManager&MockObject $localizationManager;
+    private DefaultPreferredLocalizationProvider $provider;
 
     #[\Override]
     protected function setUp(): void

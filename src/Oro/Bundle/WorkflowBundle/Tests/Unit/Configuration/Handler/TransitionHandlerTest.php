@@ -5,11 +5,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Handler;
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\TransitionHandler;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+use PHPUnit\Framework\TestCase;
 
-class TransitionHandlerTest extends \PHPUnit\Framework\TestCase
+class TransitionHandlerTest extends TestCase
 {
-    /** @var TransitionHandler */
-    private $handler;
+    private TransitionHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class TransitionHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider handleDataProvider
      */
-    public function testHandle(array $expected, array $input)
+    public function testHandle(array $expected, array $input): void
     {
         $this->assertEquals($expected, $this->handler->handle($input));
     }
@@ -159,7 +159,7 @@ class TransitionHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testHandleEmptyConfiguration()
+    public function testHandleEmptyConfiguration(): void
     {
         $configuration = [
             WorkflowConfiguration::NODE_STEPS => [

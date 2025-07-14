@@ -5,12 +5,13 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\OptionalListenersCompilerPass;
 use Oro\Bundle\PlatformBundle\Tests\Unit\Fixtures\NonInterfaceListener;
 use Oro\Bundle\PlatformBundle\Tests\Unit\Fixtures\TestListener;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class OptionalListenersCompilerPassTest extends \PHPUnit\Framework\TestCase
+class OptionalListenersCompilerPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
 

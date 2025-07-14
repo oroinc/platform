@@ -19,8 +19,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class OperationTypeTest extends FormIntegrationTestCase
 {
-    /** @var OperationType */
-    private $formType;
+    private OperationType $formType;
 
     #[\Override]
     protected function setUp(): void

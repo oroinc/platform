@@ -10,20 +10,15 @@ use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MenuUpdateProviderTest extends \PHPUnit\Framework\TestCase
+class MenuUpdateProviderTest extends TestCase
 {
-    /** @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $scopeManager;
-
-    /** @var MenuUpdateManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $menuUpdateManager;
-
-    /** @var ItemInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $menuItem;
-
-    /** @var MenuUpdateProvider */
-    private $menuUpdateProvider;
+    private ScopeManager&MockObject $scopeManager;
+    private MenuUpdateManager&MockObject $menuUpdateManager;
+    private ItemInterface&MockObject $menuItem;
+    private MenuUpdateProvider $menuUpdateProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +33,7 @@ class MenuUpdateProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEmptyMenuUpdates()
+    public function testEmptyMenuUpdates(): void
     {
         $this->menuItem->expects(self::exactly(2))
             ->method('getExtra')
@@ -51,7 +46,7 @@ class MenuUpdateProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($this->menuUpdateProvider->getMenuUpdatesForMenuItem($this->menuItem));
     }
 
-    public function testGetMenuUpdatesCalledMoreThanOnce()
+    public function testGetMenuUpdatesCalledMoreThanOnce(): void
     {
         $options = [MenuUpdateProvider::SCOPE_CONTEXT_OPTION => ['scopeAttribute' => new \stdClass()]];
         $this->menuItem->expects(self::exactly(2))
@@ -91,7 +86,7 @@ class MenuUpdateProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($updates, $this->menuUpdateProvider->getMenuUpdatesForMenuItem($this->menuItem, $options));
     }
 
-    public function testGetMenuUpdatesWithDifferentScopeOptions()
+    public function testGetMenuUpdatesWithDifferentScopeOptions(): void
     {
         $user = $this->createMock(User::class);
         $options1 = [MenuUpdateProvider::SCOPE_CONTEXT_OPTION => ['scopeAttribute' => new \stdClass()]];
@@ -143,7 +138,7 @@ class MenuUpdateProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($updates, $this->menuUpdateProvider->getMenuUpdatesForMenuItem($this->menuItem, $options2));
     }
 
-    public function testGetMenuUpdatesForMenuWithLimitedScopes()
+    public function testGetMenuUpdatesForMenuWithLimitedScopes(): void
     {
         $options = [MenuUpdateProvider::SCOPE_CONTEXT_OPTION => ['scopeAttribute' => new \stdClass()]];
         $this->menuItem->expects(self::any())

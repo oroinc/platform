@@ -15,6 +15,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -31,14 +32,9 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
 {
     use EntityTrait;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var SegmentFilterBuilderType */
-    private $formType;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private SegmentFilterBuilderType $formType;
 
     #[\Override]
     protected function setUp(): void

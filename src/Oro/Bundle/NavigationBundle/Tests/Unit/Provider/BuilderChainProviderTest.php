@@ -13,21 +13,21 @@ use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuItemStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
+class BuilderChainProviderTest extends TestCase
 {
     use MenuItemTestTrait;
 
-    private FactoryInterface|\PHPUnit\Framework\MockObject\MockObject $factory;
-
-    private ArrayLoader|\PHPUnit\Framework\MockObject\MockObject $loader;
-
-    private MenuManipulator|\PHPUnit\Framework\MockObject\MockObject $manipulator;
+    private FactoryInterface&MockObject $factory;
+    private ArrayLoader&MockObject $loader;
+    private MenuManipulator&MockObject $manipulator;
 
     #[\Override]
     protected function setUp(): void

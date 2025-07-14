@@ -11,22 +11,17 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AttributeTypeRegistryTest extends \PHPUnit\Framework\TestCase
+class AttributeTypeRegistryTest extends TestCase
 {
     private const CLASS_NAME = \stdClass::class;
 
-    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadata;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var AttributeTypeRegistry */
-    private $registry;
-
-    /** @var array */
-    private $attributeTypes;
+    private ClassMetadata&MockObject $metadata;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private AttributeTypeRegistry $registry;
+    private array $attributeTypes;
 
     #[\Override]
     protected function setUp(): void
@@ -54,9 +49,10 @@ class AttributeTypeRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAttributeTypeKnownType()
+    public function testGetAttributeTypeKnownType(): void
     {
-        $this->doctrineHelper->expects($this->never())->method($this->anything());
+        $this->doctrineHelper->expects($this->never())
+            ->method($this->anything());
 
         $this->assertSame(
             $this->attributeTypes['test_type'],
@@ -64,7 +60,7 @@ class AttributeTypeRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAttributeTypeFieldFromMetadata()
+    public function testGetAttributeTypeFieldFromMetadata(): void
     {
         $metadataType = 'metadata_type';
         $fieldName = 'test_field';
@@ -89,7 +85,7 @@ class AttributeTypeRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAttributeTypeRelationFromMetadataForOneToOne()
+    public function testGetAttributeTypeRelationFromMetadataForOneToOne(): void
     {
         $this->doTestGetAttributeTypeRelationFromMetadata(
             ClassMetadataInfo::ONE_TO_ONE,
@@ -97,7 +93,7 @@ class AttributeTypeRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAttributeTypeRelationFromMetadataForOneToMany()
+    public function testGetAttributeTypeRelationFromMetadataForOneToMany(): void
     {
         $this->doTestGetAttributeTypeRelationFromMetadata(
             ClassMetadataInfo::ONE_TO_MANY,
@@ -105,7 +101,7 @@ class AttributeTypeRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAttributeTypeRelationFromMetadataForManyToOne()
+    public function testGetAttributeTypeRelationFromMetadataForManyToOne(): void
     {
         $this->doTestGetAttributeTypeRelationFromMetadata(
             ClassMetadataInfo::MANY_TO_ONE,
@@ -113,7 +109,7 @@ class AttributeTypeRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAttributeTypeRelationFromMetadataForManyToMany()
+    public function testGetAttributeTypeRelationFromMetadataForManyToMany(): void
     {
         $this->doTestGetAttributeTypeRelationFromMetadata(
             ClassMetadataInfo::MANY_TO_MANY,
@@ -121,7 +117,7 @@ class AttributeTypeRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAttributeTypeRelationFromMetadataForUnknown()
+    public function testGetAttributeTypeRelationFromMetadataForUnknown(): void
     {
         $this->doTestGetAttributeTypeRelationFromMetadata(
             100,
@@ -129,7 +125,7 @@ class AttributeTypeRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAttributeTypeUnknown()
+    public function testGetAttributeTypeUnknown(): void
     {
         $fieldName = 'test_field';
 
@@ -146,7 +142,8 @@ class AttributeTypeRegistryTest extends \PHPUnit\Framework\TestCase
             ->method('hasAssociation')
             ->with($fieldName)
             ->willReturn(false);
-        $this->metadata->expects($this->never())->method('getAssociationMapping');
+        $this->metadata->expects($this->never())
+            ->method('getAssociationMapping');
 
         $this->assertNull($this->registry->getAttributeType($this->getAttribute($fieldName, 'some_type')));
     }

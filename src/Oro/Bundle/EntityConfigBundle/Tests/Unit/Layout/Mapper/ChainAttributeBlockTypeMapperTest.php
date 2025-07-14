@@ -6,11 +6,12 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Layout\Mapper\AttributeBlockTypeMapperInterface;
 use Oro\Bundle\EntityConfigBundle\Layout\Mapper\ChainAttributeBlockTypeMapper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChainAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
+class ChainAttributeBlockTypeMapperTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private ManagerRegistry&MockObject $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +27,7 @@ class ChainAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
         return $chainMapper;
     }
 
-    public function testGetBlockTypeFromProvider()
+    public function testGetBlockTypeFromProvider(): void
     {
         $attribute = new FieldConfigModel();
         $attribute->setType('string');
@@ -43,7 +44,7 @@ class ChainAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('attribute_string', $chainMapper->getBlockType($attribute));
     }
 
-    public function testGetBlockTypeDefault()
+    public function testGetBlockTypeDefault(): void
     {
         $attribute = new FieldConfigModel();
         $attribute->setType('percent');

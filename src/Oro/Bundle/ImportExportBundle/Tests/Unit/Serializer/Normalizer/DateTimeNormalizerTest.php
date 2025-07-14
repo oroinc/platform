@@ -5,16 +5,15 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer;
 use Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DateTimeNormalizerTest extends \PHPUnit\Framework\TestCase
+class DateTimeNormalizerTest extends TestCase
 {
-    /** @var DateTimeNormalizer */
-    private $normalizer;
-
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
+    private DateTimeNormalizer $normalizer;
+    private LocaleSettings&MockObject $localeSettings;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class DateTimeNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->normalizer->setFormatter(new ExcelDateTimeTypeFormatter($this->localeSettings, $translator));
     }
 
-    public function testSupportsDenormalization()
+    public function testSupportsDenormalization(): void
     {
         $this->assertFalse($this->normalizer->supportsDenormalization([], 'stdClass'));
         $this->assertFalse($this->normalizer->supportsDenormalization([], 'DateTime'));
@@ -37,7 +36,7 @@ class DateTimeNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider testSupportsNormalizationProvider
      */
-    public function testSupportsNormalization(mixed $data, bool $result)
+    public function testSupportsNormalization(mixed $data, bool $result): void
     {
         $this->assertEquals($result, $this->normalizer->supportsNormalization($data, null, []));
     }
@@ -83,7 +82,7 @@ class DateTimeNormalizerTest extends \PHPUnit\Framework\TestCase
         ?string $locale,
         ?string $timezone,
         array $context
-    ) {
+    ): void {
         if (null !== $locale) {
             $this->localeSettings->expects($this->any())
                 ->method('getLocale')
@@ -102,7 +101,7 @@ class DateTimeNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNormalizeWithoutFormatter()
+    public function testNormalizeWithoutFormatter(): void
     {
         $normalizer = new DateTimeNormalizer();
 
@@ -239,7 +238,7 @@ class DateTimeNormalizerTest extends \PHPUnit\Framework\TestCase
         ?string $locale,
         ?string $timezone,
         array $context
-    ) {
+    ): void {
         if (null !== $locale) {
             $this->localeSettings->expects($this->any())
                 ->method('getLocale')
@@ -258,7 +257,7 @@ class DateTimeNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDenormalizeWithoutFormatter()
+    public function testDenormalizeWithoutFormatter(): void
     {
         $data = '2013-12-31T23:59:59+0200';
         $expected = new \DateTime('2013-12-31 23:59:59+0200');
@@ -375,7 +374,7 @@ class DateTimeNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testDenormalizeException()
+    public function testDenormalizeException(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Invalid datetime "qwerty", expected format Y-m-d\TH:i:sO.');

@@ -12,23 +12,18 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
-class DatagridTest extends \PHPUnit\Framework\TestCase
+class DatagridTest extends TestCase
 {
     private const TEST_NAME = 'testName';
 
-    /** @var Acceptor|\PHPUnit\Framework\MockObject\MockObject */
-    private $acceptor;
-
-    /** @var ParameterBag */
-    private $parameters;
-
-    /** @var MemoryCacheProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $memoryCacheProvider;
-
-    /** @var Datagrid */
-    private $grid;
+    private Acceptor&MockObject $acceptor;
+    private ParameterBag $parameters;
+    private MemoryCacheProviderInterface&MockObject $memoryCacheProvider;
+    private Datagrid $grid;
 
     #[\Override]
     protected function setUp(): void
@@ -42,12 +37,12 @@ class DatagridTest extends \PHPUnit\Framework\TestCase
         $this->grid->setAcceptor($this->acceptor);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals(self::TEST_NAME, $this->grid->getName());
     }
 
-    public function testSetAndGetDatasource()
+    public function testSetAndGetDatasource(): void
     {
         $this->memoryCacheProvider->expects($this->once())
             ->method('reset');
@@ -59,7 +54,7 @@ class DatagridTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($dataSource, $this->grid->getDatasource());
     }
 
-    public function testSetAndGetAcceptor()
+    public function testSetAndGetAcceptor(): void
     {
         $anotherOneAcceptor = clone $this->acceptor;
 
@@ -72,7 +67,7 @@ class DatagridTest extends \PHPUnit\Framework\TestCase
         $this->assertNotSame($this->acceptor, $this->grid->getAcceptor());
     }
 
-    public function testGetData()
+    public function testGetData(): void
     {
         $dataSource = $this->createMock(DatasourceInterface::class);
 
@@ -135,7 +130,7 @@ class DatagridTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(3, $cacheCallCounter);
     }
 
-    public function testGetAcceptedDataSource()
+    public function testGetAcceptedDataSource(): void
     {
         $dataSource = $this->createMock(DatasourceInterface::class);
         $this->grid->setDatasource($dataSource);
@@ -148,7 +143,7 @@ class DatagridTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($dataSource, $result);
     }
 
-    public function testGetMetaData()
+    public function testGetMetaData(): void
     {
         $this->acceptor->expects($this->once())
             ->method('acceptMetadata')
@@ -159,7 +154,7 @@ class DatagridTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(MetadataObject::class, $this->grid->getMetadata());
     }
 
-    public function testGetParameters()
+    public function testGetParameters(): void
     {
         $this->assertSame($this->parameters, $this->grid->getParameters());
     }

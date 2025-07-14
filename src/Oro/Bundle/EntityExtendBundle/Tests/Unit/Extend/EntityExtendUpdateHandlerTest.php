@@ -6,23 +6,14 @@ use Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateHandler;
 use Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateProcessor;
 use Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateProcessorResult;
 use Oro\Bundle\MaintenanceBundle\Maintenance\Mode as MaintenanceMode;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityExtendUpdateHandlerTest extends \PHPUnit\Framework\TestCase
+class EntityExtendUpdateHandlerTest extends TestCase
 {
-    /**
-     * @var EntityExtendUpdateProcessor|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $entityExtendUpdateProcessor;
-
-    /**
-     * @var MaintenanceMode|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $maintenance;
-
-    /**
-     * @var EntityExtendUpdateHandler
-     */
-    private $handler;
+    private EntityExtendUpdateProcessor&MockObject $entityExtendUpdateProcessor;
+    private MaintenanceMode&MockObject $maintenance;
+    private EntityExtendUpdateHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +24,7 @@ class EntityExtendUpdateHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new EntityExtendUpdateHandler($this->entityExtendUpdateProcessor, $this->maintenance);
     }
 
-    public function testUpdate()
+    public function testUpdate(): void
     {
         $this->maintenance->expects(self::once())
             ->method('activate');
@@ -47,7 +38,7 @@ class EntityExtendUpdateHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($result->getFailureMessage());
     }
 
-    public function testUpdateWhenUpdateFailed()
+    public function testUpdateWhenUpdateFailed(): void
     {
         $this->maintenance->expects(self::once())
             ->method('activate');

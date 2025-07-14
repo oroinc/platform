@@ -4,11 +4,11 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
 use Oro\Bundle\AddressBundle\Entity\AddressType;
+use PHPUnit\Framework\TestCase;
 
-class AbstractTypedAddressTest extends \PHPUnit\Framework\TestCase
+class AbstractTypedAddressTest extends TestCase
 {
-    /** @var AbstractTypedAddress */
-    private $address;
+    private AbstractTypedAddress $address;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class AbstractTypedAddressTest extends \PHPUnit\Framework\TestCase
         $this->address = $this->getMockForAbstractClass(AbstractTypedAddress::class);
     }
 
-    public function testAddType()
+    public function testAddType(): void
     {
         $this->assertEmpty($this->address->getTypes()->toArray());
 
@@ -35,7 +35,7 @@ class AbstractTypedAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertContains($type, $types);
     }
 
-    public function testGetTypeNames()
+    public function testGetTypeNames(): void
     {
         $this->assertSame([], $this->address->getTypeNames());
 
@@ -45,7 +45,7 @@ class AbstractTypedAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['billing', 'shipping'], $this->address->getTypeNames());
     }
 
-    public function testGetTypeLabels()
+    public function testGetTypeLabels(): void
     {
         $this->assertSame([], $this->address->getTypeLabels());
 
@@ -60,7 +60,7 @@ class AbstractTypedAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['Billing', 'Shipping'], $this->address->getTypeLabels());
     }
 
-    public function testGetTypeByName()
+    public function testGetTypeByName(): void
     {
         $addressType = new AddressType('billing');
         $this->address->addType($addressType);
@@ -69,7 +69,7 @@ class AbstractTypedAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->address->getTypeByName('shipping'));
     }
 
-    public function testHasTypeWithName()
+    public function testHasTypeWithName(): void
     {
         $this->address->addType(new AddressType('billing'));
 
@@ -77,7 +77,7 @@ class AbstractTypedAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->address->hasTypeWithName('shipping'));
     }
 
-    public function testPrimary()
+    public function testPrimary(): void
     {
         $this->assertFalse($this->address->isPrimary());
 
@@ -86,7 +86,7 @@ class AbstractTypedAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->address->isPrimary());
     }
 
-    public function testRemoveType()
+    public function testRemoveType(): void
     {
         $type = new AddressType('testAddressType');
         $this->address->addType($type);
@@ -96,7 +96,7 @@ class AbstractTypedAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($this->address->getTypes()->toArray());
     }
 
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $this->assertTrue($this->address->isEmpty());
         $this->address->setPrimary(true);

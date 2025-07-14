@@ -10,6 +10,8 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Model\AclProviderInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityRetrievalStrategyInterface;
@@ -25,25 +27,14 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class AclVoterTest extends \PHPUnit\Framework\TestCase
+class AclVoterTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|PermissionMapInterface */
-    private $permissionMap;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AclExtensionSelector */
-    private $extensionSelector;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface */
-    private $groupProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenInterface */
-    private $securityToken;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|PermissionMapInterface */
-    private $extension;
-
-    /** @var AclVoter */
-    private $voter;
+    private PermissionMapInterface&MockObject $permissionMap;
+    private AclExtensionSelector&MockObject $extensionSelector;
+    private AclGroupProviderInterface&MockObject $groupProvider;
+    private TokenInterface&MockObject $securityToken;
+    private AclExtensionInterface&MockObject $extension;
+    private AclVoter $voter;
 
     #[\Override]
     protected function setUp(): void
@@ -65,7 +56,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         $this->extension = $this->createMock(AclExtensionInterface::class);
     }
 
-    public function testOneShotIsGrantedObserver()
+    public function testOneShotIsGrantedObserver(): void
     {
         $object = new \stdClass();
 
@@ -97,14 +88,14 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         $this->voter->vote($this->securityToken, $object, ['test']);
     }
 
-    public function testInitialState()
+    public function testInitialState(): void
     {
         self::assertNull($this->voter->getSecurityToken());
         self::assertNull($this->voter->getObject());
         self::assertNull($this->voter->getAclExtension());
     }
 
-    public function testClearStateAfterVote()
+    public function testClearStateAfterVote(): void
     {
         $object = new \stdClass();
 
@@ -127,7 +118,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->voter->getAclExtension());
     }
 
-    public function testClearStateAfterVoteEvenIfExceptionOccurred()
+    public function testClearStateAfterVoteEvenIfExceptionOccurred(): void
     {
         $object = new \stdClass();
         $exception = new \Exception('some error');
@@ -156,7 +147,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->voter->getAclExtension());
     }
 
-    public function testStateOfVote()
+    public function testStateOfVote(): void
     {
         $object = new \stdClass();
 
@@ -174,15 +165,13 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $this->permissionMap->expects(self::once())
             ->method('getMasks')
-            ->willReturnCallback(
-                function () use (&$inVoteToken, &$inVoteObject, &$inVoteExtension) {
-                    $inVoteToken = $this->voter->getSecurityToken();
-                    $inVoteObject = $this->voter->getObject();
-                    $inVoteExtension = $this->voter->getAclExtension();
+            ->willReturnCallback(function () use (&$inVoteToken, &$inVoteObject, &$inVoteExtension) {
+                $inVoteToken = $this->voter->getSecurityToken();
+                $inVoteObject = $this->voter->getObject();
+                $inVoteExtension = $this->voter->getAclExtension();
 
-                    return null;
-                }
-            );
+                return null;
+            });
 
         $this->voter->vote($this->securityToken, $object, ['test']);
 
@@ -191,7 +180,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->extension, $inVoteExtension);
     }
 
-    public function testAclExtensionNotFound()
+    public function testAclExtensionNotFound(): void
     {
         $object = new \stdClass();
 
@@ -208,7 +197,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVoteAccessAbstain()
+    public function testVoteAccessAbstain(): void
     {
         $object = new \stdClass();
 
@@ -230,7 +219,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVoteAccessGranted()
+    public function testVoteAccessGranted(): void
     {
         $object = new \stdClass();
 
@@ -252,7 +241,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVoteForObjectIdentityObject()
+    public function testVoteForObjectIdentityObject(): void
     {
         $object = new ObjectIdentity('stdClass', 'entity');
 
@@ -283,7 +272,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVoteForObjectIdentityObjectWhenObjectGroupIsNotEqualCurrentGroup()
+    public function testVoteForObjectIdentityObjectWhenObjectGroupIsNotEqualCurrentGroup(): void
     {
         $object = new ObjectIdentity('stdClass', 'test_group@entity');
 
@@ -309,7 +298,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVoteForObjectIdentityObjectWhenObjectGroupIsEqualCurrentGroup()
+    public function testVoteForObjectIdentityObjectWhenObjectGroupIsEqualCurrentGroup(): void
     {
         $object = new ObjectIdentity('stdClass', 'test_group@entity');
 
@@ -340,7 +329,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVoteForObjectIdentityObjectWhenExtensionDoesNotSupportGivenPermission()
+    public function testVoteForObjectIdentityObjectWhenExtensionDoesNotSupportGivenPermission(): void
     {
         $object = new ObjectIdentity('stdClass', 'entity');
 
@@ -370,7 +359,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVoteForDomainObjectWrapperObject()
+    public function testVoteForDomainObjectWrapperObject(): void
     {
         $object = new DomainObjectWrapper(new CmsAddress(), new ObjectIdentity('stdClass', 'entity'));
 
@@ -401,7 +390,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVoteForDomainObjectWrapperObjectWhenObjectGroupIsNotEqualCurrentGroup()
+    public function testVoteForDomainObjectWrapperObjectWhenObjectGroupIsNotEqualCurrentGroup(): void
     {
         $object = new DomainObjectWrapper(new CmsAddress(), new ObjectIdentity('stdClass', 'test_group@entity'));
 
@@ -427,7 +416,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVoteForDomainObjectWrapperObjectWhenObjectGroupIsEqualCurrentGroup()
+    public function testVoteForDomainObjectWrapperObjectWhenObjectGroupIsEqualCurrentGroup(): void
     {
         $object = new DomainObjectWrapper(new CmsAddress(), new ObjectIdentity('stdClass', 'test_group@entity'));
 
@@ -458,7 +447,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVoteForDomainObjectWrapperObjectWhenExtensionDoesNotSupportGivenPermission()
+    public function testVoteForDomainObjectWrapperObjectWhenExtensionDoesNotSupportGivenPermission(): void
     {
         $object = new DomainObjectWrapper(new CmsAddress(), new ObjectIdentity('stdClass', 'entity'));
 
@@ -488,7 +477,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVoteForFieldVoteWithObjectAsDomainObject()
+    public function testVoteForFieldVoteWithObjectAsDomainObject(): void
     {
         $domainObject = new CmsAddress();
         $object = new FieldVote($domainObject, 'testField');
@@ -511,7 +500,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVoteForFieldVoteWithDomainObjectWrapperAsDomainObject()
+    public function testVoteForFieldVoteWithDomainObjectWrapperAsDomainObject(): void
     {
         $address = new CmsAddress();
         $domainObject = new DomainObjectWrapper($address, new ObjectIdentity('stdClass', 'test_group@entity'));

@@ -3,11 +3,12 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\SearchBundle\Utils\SearchAllText;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SearchAllTextTest extends \PHPUnit\Framework\TestCase
+class SearchAllTextTest extends TestCase
 {
-    public function testGetOperatorChoices()
+    public function testGetOperatorChoices(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
 

@@ -7,11 +7,11 @@ use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Oro\Component\ConfigExpression\Exception\UnexpectedTypeException;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
+class AbstractCompositeTest extends TestCase
 {
-    /** @var AbstractComposite */
-    private $condition;
+    private AbstractComposite $condition;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +27,7 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
         };
     }
 
-    public function testInitializeSuccess()
+    public function testInitializeSuccess(): void
     {
         $operands = [$this->createMock(ExpressionInterface::class)];
 
@@ -35,7 +35,7 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($operands, ReflectionUtil::getPropertyValue($this->condition, 'operands'));
     }
 
-    public function testInitializeFailsWithEmptyElements()
+    public function testInitializeFailsWithEmptyElements(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have at least one element');
@@ -43,7 +43,7 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize([]);
     }
 
-    public function testInitializeFailsWithScalarElement()
+    public function testInitializeFailsWithScalarElement(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(sprintf(
@@ -54,7 +54,7 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize(['anything']);
     }
 
-    public function testInitializeFailsWithWrongInstanceElement()
+    public function testInitializeFailsWithWrongInstanceElement(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(sprintf(

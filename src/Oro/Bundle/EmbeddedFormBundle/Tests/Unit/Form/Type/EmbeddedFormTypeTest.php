@@ -5,14 +5,15 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class EmbeddedFormTypeTest extends \PHPUnit\Framework\TestCase
+class EmbeddedFormTypeTest extends TestCase
 {
-    public function testShouldBuildForm()
+    public function testShouldBuildForm(): void
     {
         $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->exactly(5))
@@ -30,7 +31,7 @@ class EmbeddedFormTypeTest extends \PHPUnit\Framework\TestCase
         $formType->buildForm($builder, []);
     }
 
-    public function testShouldConfigureOptions()
+    public function testShouldConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
@@ -41,7 +42,7 @@ class EmbeddedFormTypeTest extends \PHPUnit\Framework\TestCase
         $formType->configureOptions($resolver);
     }
 
-    public function testShouldReturnFormName()
+    public function testShouldReturnFormName(): void
     {
         $formType = new EmbeddedFormType();
 

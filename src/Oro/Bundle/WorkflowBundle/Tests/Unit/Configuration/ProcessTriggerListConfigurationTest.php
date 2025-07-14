@@ -6,11 +6,11 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerConfiguration;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerListConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+use PHPUnit\Framework\TestCase;
 
-class ProcessTriggerListConfigurationTest extends \PHPUnit\Framework\TestCase
+class ProcessTriggerListConfigurationTest extends TestCase
 {
-    /** @var ProcessTriggerListConfiguration */
-    private $configuration;
+    private ProcessTriggerListConfiguration $configuration;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +21,7 @@ class ProcessTriggerListConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processDataProvider
      */
-    public function testProcess(array $input, array $expected)
+    public function testProcess(array $input, array $expected): void
     {
         $this->assertEquals($expected, $this->configuration->processConfiguration($input));
     }

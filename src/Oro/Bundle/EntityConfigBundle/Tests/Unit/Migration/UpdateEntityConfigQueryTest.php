@@ -10,20 +10,17 @@ use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity2;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
+class UpdateEntityConfigQueryTest extends TestCase
 {
     private const FIELD_NAME = 'fieldName';
 
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var UpdateEntityConfigQuery */
-    private $query;
-
-    /** @var string */
-    private $relationFullName;
+    private Connection&MockObject $connection;
+    private UpdateEntityConfigQuery $query;
+    private string $relationFullName;
 
     #[\Override]
     protected function setUp(): void
@@ -46,7 +43,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getConfiguration
      */
-    public function testGetDescription(string $key, mixed $value)
+    public function testGetDescription(string $key, mixed $value): void
     {
         $this->initializeQuery($key, $value);
         $statement = $this->setUpConnection($key, $value);
@@ -83,7 +80,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getConfiguration
      */
-    public function testUpdateCascadeValue(string $key, mixed $value)
+    public function testUpdateCascadeValue(string $key, mixed $value): void
     {
         $this->initializeQuery($key, $value);
         $statement = $this->setUpConnection($key, $value);
@@ -113,7 +110,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getConfiguration
      */
-    public function testNoRelationAlert(string $key, mixed $value)
+    public function testNoRelationAlert(string $key, mixed $value): void
     {
         $this->initializeQuery($key, $value);
         $this->connection->expects($this->once())
@@ -151,7 +148,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
         $this->query->execute($logger);
     }
 
-    private function setUpConnection(string $key, mixed $value): Statement|\PHPUnit\Framework\MockObject\MockObject
+    private function setUpConnection(string $key, mixed $value): Statement&MockObject
     {
         $this->connection->expects($this->once())
             ->method('convertToPHPValue')

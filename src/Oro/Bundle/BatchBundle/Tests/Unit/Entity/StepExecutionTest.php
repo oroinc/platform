@@ -7,11 +7,12 @@ use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\BatchBundle\Item\ExecutionContext;
 use Oro\Bundle\BatchBundle\Job\BatchStatus;
 use Oro\Bundle\BatchBundle\Job\ExitStatus;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class StepExecutionTest extends \PHPUnit\Framework\TestCase
+class StepExecutionTest extends TestCase
 {
     private JobExecution $jobExecution;
     private StepExecution $stepExecution;

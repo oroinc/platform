@@ -11,6 +11,8 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -18,25 +20,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class OperationFormHandlerTest extends \PHPUnit\Framework\TestCase
+class OperationFormHandlerTest extends TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var ContextHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextHelper;
-
-    /** @var OperationRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $operationRegistry;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var OperationFormHandler */
-    private $handler;
-
-    /** @var FlashBagInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $flashBag;
+    private FormFactoryInterface&MockObject $formFactory;
+    private ContextHelper&MockObject $contextHelper;
+    private OperationRegistry&MockObject $operationRegistry;
+    private TranslatorInterface&MockObject $translator;
+    private OperationFormHandler $handler;
+    private FlashBagInterface&MockObject $flashBag;
 
     #[\Override]
     protected function setUp(): void
@@ -62,7 +53,7 @@ class OperationFormHandlerTest extends \PHPUnit\Framework\TestCase
         $this->flashBag = $this->createMock(FlashBagInterface::class);
     }
 
-    public function testProcessSimple()
+    public function testProcessSimple(): void
     {
         $actionData = $this->contextHelper->getActionData();
         $errors = new ArrayCollection();
@@ -106,7 +97,7 @@ class OperationFormHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessRedirect()
+    public function testProcessRedirect(): void
     {
         $actionData = $this->contextHelper->getActionData();
 
@@ -129,7 +120,7 @@ class OperationFormHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(302, $response->getStatusCode());
     }
 
-    public function testProcessRefreshDatagrid()
+    public function testProcessRefreshDatagrid(): void
     {
         $actionData = $this->contextHelper->getActionData();
         $errors = new ArrayCollection();
@@ -179,7 +170,7 @@ class OperationFormHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessOperationNotFoundException()
+    public function testProcessOperationNotFoundException(): void
     {
         $this->operationRegistry->expects($this->once())
             ->method('findByName')
@@ -192,7 +183,7 @@ class OperationFormHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->process('operation', new Request(), $this->flashBag);
     }
 
-    public function testProcessForbiddenOperationException()
+    public function testProcessForbiddenOperationException(): void
     {
         $operation = $this->createMock(Operation::class);
         $operation->expects($this->once())
@@ -209,7 +200,7 @@ class OperationFormHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->process('operation', new Request(), $this->flashBag);
     }
 
-    public function testProcessErrorHandlingForWidget()
+    public function testProcessErrorHandlingForWidget(): void
     {
         $actionData = $this->contextHelper->getActionData();
 
@@ -247,7 +238,7 @@ class OperationFormHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessErrorHandlingForWidgetWithManyErrors()
+    public function testProcessErrorHandlingForWidgetWithManyErrors(): void
     {
         $actionData = $this->contextHelper->getActionData();
 
@@ -305,7 +296,7 @@ class OperationFormHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->handler->process('operation', $request, $this->flashBag));
     }
 
-    public function testProcessErrorHandlingForNotWidget()
+    public function testProcessErrorHandlingForNotWidget(): void
     {
         $actionData = $this->contextHelper->getActionData();
 
@@ -347,15 +338,12 @@ class OperationFormHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return Operation|\PHPUnit\Framework\MockObject\MockObject
-     */
     private function operationRetrieval(
         string $formType,
         ActionData $actionData,
         array $formOptions,
         bool $pageReload = true
-    ) {
+    ): Operation&MockObject {
         $definition = $this->createMock(OperationDefinition::class);
         $definition->expects($this->once())
             ->method('getFormType')
@@ -385,11 +373,11 @@ class OperationFormHandlerTest extends \PHPUnit\Framework\TestCase
         return $operation;
     }
 
-    /**
-     * @return FormInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function expectsFormProcessing(Request $request, ActionData $actionData, Operation $operation)
-    {
+    private function expectsFormProcessing(
+        Request $request,
+        ActionData $actionData,
+        Operation $operation
+    ): FormInterface&MockObject {
         $form = $this->createMock(FormInterface::class);
 
         $this->formFactory->expects($this->once())

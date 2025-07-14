@@ -3,12 +3,13 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\LayoutBundle\EventListener\ThemeListener;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class ThemeListenerTest extends \PHPUnit\Framework\TestCase
+class ThemeListenerTest extends TestCase
 {
     private ThemeListener $listener;
 

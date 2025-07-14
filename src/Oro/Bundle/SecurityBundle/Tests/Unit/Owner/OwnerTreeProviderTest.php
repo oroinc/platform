@@ -17,6 +17,7 @@ use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\ORM\Mocks\ConnectionMock;
 use Oro\Component\Testing\Unit\ORM\Mocks\DriverMock;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -44,26 +45,13 @@ class OwnerTreeProviderTest extends OrmTestCase
     private const USER_3 = 300;
     private const USER_4 = 400;
 
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var DatabaseChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $databaseChecker;
-
-    /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipMetadataProvider;
-
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var OwnerTreeProvider */
-    private $treeProvider;
+    private EntityManagerInterface $em;
+    private DatabaseChecker&MockObject $databaseChecker;
+    private AbstractAdapter&MockObject $cache;
+    private OwnershipMetadataProviderInterface&MockObject $ownershipMetadataProvider;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private LoggerInterface&MockObject $logger;
+    private OwnerTreeProvider $treeProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -103,7 +91,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         $this->treeProvider->setLogger($this->logger);
     }
 
-    public function testSupportsForSupportedUser()
+    public function testSupportsForSupportedUser(): void
     {
         $token = $this->createMock(TokenInterface::class);
         $this->tokenStorage->expects(self::once())
@@ -116,7 +104,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         $this->assertTrue($this->treeProvider->supports());
     }
 
-    public function testSupportsForNotSupportedUser()
+    public function testSupportsForNotSupportedUser(): void
     {
         $token = $this->createMock(TokenInterface::class);
         $this->tokenStorage->expects(self::once())
@@ -129,7 +117,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         $this->assertFalse($this->treeProvider->supports());
     }
 
-    public function testSupportsWhenNoSecurityToken()
+    public function testSupportsWhenNoSecurityToken(): void
     {
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
@@ -230,7 +218,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         );
     }
 
-    public function testBusinessUnitsWithoutOrganization()
+    public function testBusinessUnitsWithoutOrganization(): void
     {
         $this->databaseChecker->expects(self::once())
             ->method('checkDatabase')
@@ -325,7 +313,7 @@ class OwnerTreeProviderTest extends OrmTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testBusinessUnitTree()
+    public function testBusinessUnitTree(): void
     {
         $this->databaseChecker->expects(self::once())
             ->method('checkDatabase')
@@ -422,7 +410,7 @@ class OwnerTreeProviderTest extends OrmTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testBusinessUnitTreeWhenChildBusinessUnitAreLoadedBeforeParentBusinessUnit()
+    public function testBusinessUnitTreeWhenChildBusinessUnitAreLoadedBeforeParentBusinessUnit(): void
     {
         $this->databaseChecker->expects(self::once())
             ->method('checkDatabase')
@@ -519,7 +507,7 @@ class OwnerTreeProviderTest extends OrmTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testUserDoesNotHaveAssignedBusinessUnit()
+    public function testUserDoesNotHaveAssignedBusinessUnit(): void
     {
         $this->databaseChecker->expects(self::once())
             ->method('checkDatabase')
@@ -590,7 +578,7 @@ class OwnerTreeProviderTest extends OrmTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSeveralOrganizations()
+    public function testSeveralOrganizations(): void
     {
         $this->databaseChecker->expects(self::once())
             ->method('checkDatabase')
@@ -700,7 +688,7 @@ class OwnerTreeProviderTest extends OrmTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testUsersAssignedToBusinessUnitsFromSeveralOrganizations()
+    public function testUsersAssignedToBusinessUnitsFromSeveralOrganizations(): void
     {
         $this->databaseChecker->expects(self::once())
             ->method('checkDatabase')
@@ -870,7 +858,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         array $src,
         array $expected,
         array $criticalMessageArguments
-    ) {
+    ): void {
         $this->logger->expects($this->once())
             ->method('critical')
             ->with(
@@ -907,7 +895,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         array $src,
         array $expected,
         array $criticalMessageArguments
-    ) {
+    ): void {
         $this->logger->expects($this->exactly(count($criticalMessageArguments)))
             ->method('critical')
             ->withConsecutive(

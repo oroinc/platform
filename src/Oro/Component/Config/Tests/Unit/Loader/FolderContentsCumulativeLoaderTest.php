@@ -9,9 +9,10 @@ use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
 use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
+class FolderContentsCumulativeLoaderTest extends TestCase
 {
     use TempDirExtension;
 
@@ -69,14 +70,14 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
         return $lastChangeTime;
     }
 
-    public function testResourceName()
+    public function testResourceName(): void
     {
         $loader = $this->getLoader('Resources/folder_to_track/', []);
 
         $this->assertSame('Folder content: Resources/folder_to_track/', $loader->getResource());
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $fileMatcher = new ByFileNameMatcher(['/\.yml$/', '/\.xml$/']);
         $loader = new FolderContentCumulativeLoader(
@@ -99,7 +100,7 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
         string $path,
         int $nestingLevel = -1,
         array $fileNamePatterns = ['/\.yml$/', '/\.xml$/']
-    ) {
+    ): void {
         $loader = $this->getLoader($path, $fileNamePatterns, $nestingLevel);
 
         $bundleClass = TestBundle1::class;
@@ -208,7 +209,7 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
         string $path,
         int $nestingLevel = -1,
         array $fileNamePatterns = ['/\.yml$/', '/\.xml$/']
-    ) {
+    ): void {
         $loader = $this->getLoader($path, $fileNamePatterns, $nestingLevel);
 
         $bundle = new TestBundle1();
@@ -315,7 +316,7 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testLoadInHierarchicalModeWithAppRootDirectory()
+    public function testLoadInHierarchicalModeWithAppRootDirectory(): void
     {
         $loader = $this->getLoader('Resources/folder_to_track/', ['/\.yml$/', '/\.xml$/'], -1, false);
 
@@ -356,7 +357,7 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadInHierarchicalMode()
+    public function testLoadInHierarchicalMode(): void
     {
         $loader = $this->getLoader('Resources/folder_to_track/', ['/\.yml$/', '/\.xml$/'], -1, false);
 
@@ -399,7 +400,7 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isResourceFreshDataProvider
      */
-    public function testIsResourceFresh(callable $assertion)
+    public function testIsResourceFresh(callable $assertion): void
     {
         $loader = $this->getLoader('Resources/folder_to_track/', ['/\.yml$/', '/\.xml$/']);
 

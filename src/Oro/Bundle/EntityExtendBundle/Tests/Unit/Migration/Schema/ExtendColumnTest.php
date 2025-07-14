@@ -7,17 +7,16 @@ use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ExtendColumnTest extends \PHPUnit\Framework\TestCase
+class ExtendColumnTest extends TestCase
 {
     private const TABLE_NAME = 'test_table';
     private const COLUMN_NAME = 'test_name';
 
-    /** @var ExtendOptionsManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendOptionsManager;
-
-    /** @var ExtendColumn */
-    private $column;
+    private ExtendOptionsManager&MockObject $extendOptionsManager;
+    private ExtendColumn $column;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +30,7 @@ class ExtendColumnTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testSetOptions()
+    public function testSetOptions(): void
     {
         $options = [
             OroOptions::KEY => ['key1' => 'value1'],
@@ -51,7 +50,7 @@ class ExtendColumnTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(Type::getType('integer'), $this->column->getType());
     }
 
-    public function testSetType()
+    public function testSetType(): void
     {
         $this->extendOptionsManager->expects(self::once())
             ->method('setColumnOptions')
@@ -63,7 +62,7 @@ class ExtendColumnTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(Type::getType('integer'), $this->column->getType());
     }
 
-    public function testSetLength()
+    public function testSetLength(): void
     {
         $this->extendOptionsManager->expects(self::once())
             ->method('setColumnOptions')
@@ -76,7 +75,7 @@ class ExtendColumnTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(100, $this->column->getLength());
     }
 
-    public function testSetPrecision()
+    public function testSetPrecision(): void
     {
         $this->extendOptionsManager->expects(self::once())
             ->method('setColumnOptions')
@@ -89,7 +88,7 @@ class ExtendColumnTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(8, $this->column->getPrecision());
     }
 
-    public function testSetScale()
+    public function testSetScale(): void
     {
         $this->extendOptionsManager->expects(self::once())
             ->method('setColumnOptions')
@@ -102,7 +101,7 @@ class ExtendColumnTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(5, $this->column->getScale());
     }
 
-    public function testSetDefault()
+    public function testSetDefault(): void
     {
         $this->extendOptionsManager->expects(self::once())
             ->method('setColumnOptions')
@@ -115,7 +114,7 @@ class ExtendColumnTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->column->getDefault());
     }
 
-    public function testSetNotNull()
+    public function testSetNotNull(): void
     {
         $this->extendOptionsManager->expects(self::once())
             ->method('setColumnOptions')

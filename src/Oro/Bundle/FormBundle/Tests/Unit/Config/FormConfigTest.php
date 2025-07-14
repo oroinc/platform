@@ -49,7 +49,7 @@ class FormConfigTest extends TestCase
             ->setClass(User::class)
             ->setPriority(1);
 
-        $subBlocks      = [];
+        $subBlocks = [];
         $subBlocksArray = [];
         foreach ($this->testSubBlocksConfig as $code => $data) {
             $subBlock = new SubBlockConfig($code);

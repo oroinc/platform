@@ -3,20 +3,21 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\SecurityBundle\Form\Type\PermissionCollectionType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormInterface;
 
-class PermissionCollectionTypeTest extends \PHPUnit\Framework\TestCase
+class PermissionCollectionTypeTest extends TestCase
 {
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $formType = new PermissionCollectionType();
 
         $this->assertEquals(CollectionType::class, $formType->getParent());
     }
 
-    public function testBuildView()
+    public function testBuildView(): void
     {
         $view = $this->createMock(FormView::class);
         $form = $this->createMock(FormInterface::class);

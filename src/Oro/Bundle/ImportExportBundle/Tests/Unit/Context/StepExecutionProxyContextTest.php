@@ -9,17 +9,16 @@ use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\BatchBundle\Entity\Warning;
 use Oro\Bundle\BatchBundle\Item\ExecutionContext;
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
+class StepExecutionProxyContextTest extends TestCase
 {
-    /** @var StepExecution|\PHPUnit\Framework\MockObject\MockObject */
-    private $stepExecution;
-
-    /** @var StepExecutionProxyContext */
-    private $context;
+    private StepExecution&MockObject $stepExecution;
+    private StepExecutionProxyContext $context;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +28,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new StepExecutionProxyContext($this->stepExecution);
     }
 
-    public function testAddError()
+    public function testAddError(): void
     {
         $message = 'Error message';
 
@@ -40,7 +39,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
         $this->context->addError($message);
     }
 
-    public function testGetErrors()
+    public function testGetErrors(): void
     {
         $expected = ['Error message'];
 
@@ -51,7 +50,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->context->getErrors());
     }
 
-    public function testIncrementReadCount()
+    public function testIncrementReadCount(): void
     {
         $this->stepExecution->expects($this->once())
             ->method('setReadCount')
@@ -81,7 +80,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(1, $this->context->getReadCount());
     }
 
-    public function testGetReadCount()
+    public function testGetReadCount(): void
     {
         $expected = 10;
 
@@ -95,7 +94,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider incrementCountDataProvider
      */
-    public function testIncrement(string $propertyName)
+    public function testIncrement(string $propertyName): void
     {
         $expectedCount = 1;
 
@@ -133,7 +132,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getCountDataProvider
      */
-    public function testGetCount(string $propertyName)
+    public function testGetCount(string $propertyName): void
     {
         $expectedCount = 1;
 
@@ -164,14 +163,14 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetConfiguration()
+    public function testGetConfiguration(): void
     {
         $expectedConfiguration = ['foo' => 'value'];
         $this->expectGetRawConfiguration($expectedConfiguration);
         $this->assertSame($expectedConfiguration, $this->context->getConfiguration());
     }
 
-    public function testHasConfigurationOption()
+    public function testHasConfigurationOption(): void
     {
         $expectedConfiguration = ['foo' => 'value'];
         $this->expectGetRawConfiguration($expectedConfiguration);
@@ -179,7 +178,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->context->hasOption('foo'));
     }
 
-    public function testHasConfigurationOptionUnknown()
+    public function testHasConfigurationOptionUnknown(): void
     {
         $expectedConfiguration = ['foo' => 'value'];
         $this->expectGetRawConfiguration($expectedConfiguration);
@@ -187,7 +186,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->context->hasOption('unknown'));
     }
 
-    public function testGetConfigurationOption()
+    public function testGetConfigurationOption(): void
     {
         $expectedConfiguration = ['foo' => 'value'];
         $this->expectGetRawConfiguration($expectedConfiguration);
@@ -195,7 +194,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('value', $this->context->getOption('foo'));
     }
 
-    public function testGetConfigurationOptionDefault()
+    public function testGetConfigurationOptionDefault(): void
     {
         $expectedConfiguration = ['foo' => 'value'];
         $this->expectGetRawConfiguration($expectedConfiguration);
@@ -222,7 +221,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
             ->willReturn($jobExecution);
     }
 
-    public function testAddErrors()
+    public function testAddErrors(): void
     {
         $messages = ['Error 1', 'Error 2'];
 
@@ -233,7 +232,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
         $this->context->addErrors($messages);
     }
 
-    public function testGetFailureExceptions()
+    public function testGetFailureExceptions(): void
     {
         $exceptions = [['message' => 'Error 1'], ['message' => 'Error 2']];
         $expected = ['Error 1', 'Error 2'];
@@ -243,7 +242,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->context->getFailureExceptions());
     }
 
-    public function testGetWarnings()
+    public function testGetWarnings(): void
     {
         $warning = $this->createMock(Warning::class);
         $expected = new ArrayCollection();

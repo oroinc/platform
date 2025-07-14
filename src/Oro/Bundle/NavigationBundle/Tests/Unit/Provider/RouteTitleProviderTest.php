@@ -13,12 +13,9 @@ use PHPUnit\Framework\TestCase;
 
 class RouteTitleProviderTest extends TestCase
 {
-    private TitleReaderRegistry|MockObject $readerRegistry;
-
-    private TitleTranslator|MockObject $titleTranslator;
-
-    private TitleService|MockObject $titleService;
-
+    private TitleReaderRegistry&MockObject $readerRegistry;
+    private TitleTranslator&MockObject $titleTranslator;
+    private TitleService&MockObject $titleService;
     private RouteTitleProvider $provider;
 
     #[\Override]
@@ -34,18 +31,15 @@ class RouteTitleProviderTest extends TestCase
     public function testWhenNoTitle(): void
     {
         $routeName = 'sample_route';
-        $this->readerRegistry
-            ->expects(self::once())
+        $this->readerRegistry->expects(self::once())
             ->method('getTitleByRoute')
             ->with($routeName)
             ->willReturn(null);
 
-        $this->titleService
-            ->expects(self::never())
+        $this->titleService->expects(self::never())
             ->method('createTitle');
 
-        $this->titleTranslator
-            ->expects(self::never())
+        $this->titleTranslator->expects(self::never())
             ->method('trans');
 
         self::assertSame('', $this->provider->getTitle($routeName, 'frontend_menu'));
@@ -57,22 +51,19 @@ class RouteTitleProviderTest extends TestCase
         $titleKey = 'sample_title';
         $menuName = 'frontend_menu';
 
-        $this->readerRegistry
-            ->expects(self::once())
+        $this->readerRegistry->expects(self::once())
             ->method('getTitleByRoute')
             ->with($routeName)
             ->willReturn($titleKey);
 
         $title = 'oro.sample_title';
-        $this->titleService
-            ->expects(self::once())
+        $this->titleService->expects(self::once())
             ->method('createTitle')
             ->with($routeName, $titleKey, $menuName)
             ->willReturn($title);
 
         $translatedTitle = 'translated title';
-        $this->titleTranslator
-            ->expects(self::once())
+        $this->titleTranslator->expects(self::once())
             ->method('trans')
             ->with($title)
             ->willReturn($translatedTitle);

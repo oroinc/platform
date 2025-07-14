@@ -6,13 +6,14 @@ use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SidebarBundle\Entity\Widget;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use PHPUnit\Framework\TestCase;
 
-class WidgetTest extends \PHPUnit\Framework\TestCase
+class WidgetTest extends TestCase
 {
     /**
      * @dataProvider propertiesDataProvider
      */
-    public function testSettersAndGetters(string $property, mixed $value)
+    public function testSettersAndGetters(string $property, mixed $value): void
     {
         $obj = new Widget();
 

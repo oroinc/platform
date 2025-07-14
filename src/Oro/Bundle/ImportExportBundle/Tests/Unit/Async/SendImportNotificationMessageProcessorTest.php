@@ -20,9 +20,10 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class SendImportNotificationMessageProcessorTest extends TestCase
 {
     public function testSendImportNotificationProcessCanBeConstructedWithRequiredAttributes(): void
     {

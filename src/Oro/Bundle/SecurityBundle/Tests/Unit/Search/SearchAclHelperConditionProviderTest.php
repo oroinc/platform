@@ -6,10 +6,11 @@ use Oro\Bundle\SearchBundle\Query\Criteria\ExpressionBuilder;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SecurityBundle\Search\SearchAclHelperConditionProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Search\TestSearchAclHelperCondition;
+use PHPUnit\Framework\TestCase;
 
-class SearchAclHelperConditionProviderTest extends \PHPUnit\Framework\TestCase
+class SearchAclHelperConditionProviderTest extends TestCase
 {
-    public function testIsApplicable()
+    public function testIsApplicable(): void
     {
         $conditionProvider = new SearchAclHelperConditionProvider([
             new TestSearchAclHelperCondition(

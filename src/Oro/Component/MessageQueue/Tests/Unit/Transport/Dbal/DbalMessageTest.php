@@ -4,8 +4,9 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Dbal;
 
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class DbalMessageTest extends \PHPUnit\Framework\TestCase
+class DbalMessageTest extends TestCase
 {
     use EntityTestCaseTrait;
 

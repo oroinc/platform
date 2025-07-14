@@ -11,7 +11,7 @@ use Oro\Bundle\SegmentBundle\Query\FilterProcessor;
 
 class FilterProcessorTest extends OrmQueryConverterTestCase
 {
-    public function testConvertQueryDesignerFilters()
+    public function testConvertQueryDesignerFilters(): void
     {
         $restrictionBuilder = $this->createMock(RestrictionBuilderInterface::class);
         $processor = new FilterProcessor(

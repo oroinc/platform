@@ -10,8 +10,9 @@ use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
 use Oro\Component\Layout\Loader\Visitor\ElementDependentVisitor;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class YamlDriverTest extends \PHPUnit\Framework\TestCase
+class YamlDriverTest extends TestCase
 {
     use TempDirExtension;
 
@@ -20,8 +21,6 @@ class YamlDriverTest extends \PHPUnit\Framework\TestCase
     #[\Override]
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->cacheDir = $this->getTempDir('layouts', false);
     }
 
@@ -30,14 +29,14 @@ class YamlDriverTest extends \PHPUnit\Framework\TestCase
         return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
 
-    public function testEmptyCacheDirException()
+    public function testEmptyCacheDirException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $generator = $this->createMock(LayoutUpdateGeneratorInterface::class);
         $this->getLoader($generator);
     }
 
-    public function testLoadInDebugMode()
+    public function testLoadInDebugMode(): void
     {
         $generator = $this->createMock(LayoutUpdateGeneratorInterface::class);
         $loader = $this->getLoader($generator, false, $this->cacheDir);
@@ -53,7 +52,7 @@ class YamlDriverTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(LayoutUpdateInterface::class, $update);
     }
 
-    public function testLoadInProductionMode()
+    public function testLoadInProductionMode(): void
     {
         $generator = $this->createMock(LayoutUpdateGeneratorInterface::class);
         $loader = $this->getLoader($generator, false, $this->cacheDir);
@@ -70,7 +69,7 @@ class YamlDriverTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(1, $files = iterator_to_array(new \FilesystemIterator($this->cacheDir)));
     }
 
-    public function testPassElementVisitor()
+    public function testPassElementVisitor(): void
     {
         $generator = $this->createMock(LayoutUpdateGeneratorInterface::class);
         $loader = $this->getLoader($generator, false, $this->cacheDir);
@@ -87,13 +86,13 @@ class YamlDriverTest extends \PHPUnit\Framework\TestCase
                     $collection
                 );
 
-                return $this->buildClass($className, $data);
+                return $this->buildClass($className);
             });
 
         $loader->load($resource);
     }
 
-    public function testPassesParsedYamlContentToGenerator()
+    public function testPassesParsedYamlContentToGenerator(): void
     {
         $generator = $this->createMock(LayoutUpdateGeneratorInterface::class);
         $loader = $this->getLoader($generator, false, $this->cacheDir);
@@ -117,7 +116,7 @@ class YamlDriverTest extends \PHPUnit\Framework\TestCase
         $loader->load($path);
     }
 
-    public function testProcessSyntaxExceptions()
+    public function testProcessSyntaxExceptions(): void
     {
         $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update5.yml';
         $path = $this->getPath($path);
@@ -150,7 +149,7 @@ MESSAGE;
         $this->assertInstanceOf(LayoutUpdateInterface::class, $update);
     }
 
-    public function testGetUpdateFilenamePattern()
+    public function testGetUpdateFilenamePattern(): void
     {
         $loader = $this->getLoader(null, false, $this->cacheDir);
         $this->assertEquals('/\.yml$/', $loader->getUpdateFilenamePattern('yml'));

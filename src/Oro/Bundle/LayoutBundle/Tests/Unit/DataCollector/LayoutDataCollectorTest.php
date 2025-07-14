@@ -13,16 +13,16 @@ use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutBuilderInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\Tests\Unit\Stubs\ContextItemStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\VarDumper\Cloner\Data;
 
-class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
+class LayoutDataCollectorTest extends TestCase
 {
-    private DataCollectorLayoutNameProviderInterface|\PHPUnit\Framework\MockObject\MockObject $layoutNameProvider;
-
-    private PathProviderInterface|\PHPUnit\Framework\MockObject\MockObject $pathProvider;
-
+    private DataCollectorLayoutNameProviderInterface&MockObject $layoutNameProvider;
+    private PathProviderInterface&MockObject $pathProvider;
     private LayoutDataCollector $dataCollector;
 
     #[\Override]
@@ -36,8 +36,7 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
         ];
 
         $configManager = $this->createMock(ConfigManager::class);
-        $configManager
-            ->expects(self::any())
+        $configManager->expects(self::any())
             ->method('get')
             ->willReturnCallback(static fn ($code) => $configs[$code]);
 
@@ -57,8 +56,7 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
     public function testCollect(): void
     {
         $paths = ['default/', 'default/sample_route'];
-        $this->pathProvider
-            ->expects(self::once())
+        $this->pathProvider->expects(self::once())
             ->method('getPaths')
             ->willReturn($paths);
 
@@ -87,8 +85,7 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
         $context->resolve();
 
         $name = 'Sample Name';
-        $this->layoutNameProvider
-            ->expects(self::once())
+        $this->layoutNameProvider->expects(self::once())
             ->method('getNameByContext')
             ->with($context)
             ->willReturn($name);
@@ -116,13 +113,11 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $layout = $this->createMock(Layout::class);
-        $layout
-            ->expects(self::once())
+        $layout->expects(self::once())
             ->method('getContext')
             ->willReturn($context);
         $layoutBuilder = $this->createMock(LayoutBuilderInterface::class);
-        $layoutBuilder
-            ->expects(self::once())
+        $layoutBuilder->expects(self::once())
             ->method('getNotAppliedActions')
             ->willReturn($notAppliedActions);
         $this->dataCollector->onBuildAfter(new LayoutBuildAfterEvent($layout, $layoutBuilder));
@@ -146,8 +141,7 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
     public function testCollectBuildViews(): void
     {
         $paths = ['default/', 'default/sample_route'];
-        $this->pathProvider
-            ->expects(self::once())
+        $this->pathProvider->expects(self::once())
             ->method('getPaths')
             ->willReturn($paths);
 
@@ -194,8 +188,7 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
         $context->resolve();
 
         $name = 'Sample Name';
-        $this->layoutNameProvider
-            ->expects(self::once())
+        $this->layoutNameProvider->expects(self::once())
             ->method('getNameByContext')
             ->with($context)
             ->willReturn($name);
@@ -219,13 +212,11 @@ class LayoutDataCollectorTest extends \PHPUnit\Framework\TestCase
         }
 
         $layout = $this->createMock(Layout::class);
-        $layout
-            ->expects(self::once())
+        $layout->expects(self::once())
             ->method('getContext')
             ->willReturn($context);
         $layoutBuilder = $this->createMock(LayoutBuilderInterface::class);
-        $layoutBuilder
-            ->expects(self::once())
+        $layoutBuilder->expects(self::once())
             ->method('getNotAppliedActions')
             ->willReturn([]);
         $this->dataCollector->onBuildAfter(new LayoutBuildAfterEvent($layout, $layoutBuilder));

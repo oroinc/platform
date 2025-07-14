@@ -6,14 +6,13 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\IntegrationBundle\Datagrid\ActionConfiguration;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ActionConfigurationTest extends \PHPUnit\Framework\TestCase
+class ActionConfigurationTest extends TestCase
 {
-    /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $typesRegistry;
-
-    /** @var ActionConfiguration */
-    private $actionConfiguration;
+    private TypesRegistry&MockObject $typesRegistry;
+    private ActionConfiguration $actionConfiguration;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class ActionConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->actionConfiguration = new ActionConfiguration($this->typesRegistry);
     }
 
-    public function testShouldReturnConfigForEnabledChannel()
+    public function testShouldReturnConfigForEnabledChannel(): void
     {
         $record = new ResultRecord([
             'enabled' => 'enabled',
@@ -39,7 +38,7 @@ class ActionConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testShouldReturnConfigForDisabledChannel()
+    public function testShouldReturnConfigForDisabledChannel(): void
     {
         $record = new ResultRecord([
             'enabled' => 'disabled',
@@ -56,7 +55,7 @@ class ActionConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testShouldReturnConfigForEditModeDisallow()
+    public function testShouldReturnConfigForEditModeDisallow(): void
     {
         $record = new ResultRecord([
             'enabled' => 'enabled',
@@ -72,7 +71,7 @@ class ActionConfigurationTest extends \PHPUnit\Framework\TestCase
         ], $result);
     }
 
-    public function testDoesNotSupportSync()
+    public function testDoesNotSupportSync(): void
     {
         $record = new ResultRecord([
             'enabled' => 'enabled',

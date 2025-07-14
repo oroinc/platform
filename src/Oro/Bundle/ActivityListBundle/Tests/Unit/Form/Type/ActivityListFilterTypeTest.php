@@ -24,15 +24,13 @@ class ActivityListFilterTypeTest extends TypeTestCase
         parent::setUp();
 
         $validator = $this->createMock(ValidatorInterface::class);
-        $validator->method('validate')->willReturn(new ConstraintViolationList());
+        $validator->expects(self::any())
+            ->method('validate')
+            ->willReturn(new ConstraintViolationList());
 
         $this->factory = Forms::createFormFactoryBuilder()
             ->addExtensions($this->getExtensions())
-            ->addTypeExtension(
-                new FormTypeValidatorExtension(
-                    $validator
-                )
-            )
+            ->addTypeExtension(new FormTypeValidatorExtension($validator))
             ->addTypeGuesser($this->createMock(ValidatorTypeGuesser::class))
             ->getFormFactory();
 

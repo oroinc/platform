@@ -5,17 +5,15 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Form;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererEngine;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormView;
 use Twig\Environment;
 use Twig\Template;
 
 class TwigRendererEngineTest extends RendererEngineTest
 {
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $environment;
-
-    /** @var TwigRendererEngine */
-    private $twigRendererEngine;
+    private Environment&MockObject $environment;
+    private TwigRendererEngine $twigRendererEngine;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +23,7 @@ class TwigRendererEngineTest extends RendererEngineTest
         $this->twigRendererEngine = $this->createRendererEngine();
     }
 
-    public function testRenderBlock()
+    public function testRenderBlock(): void
     {
         $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects(self::once())

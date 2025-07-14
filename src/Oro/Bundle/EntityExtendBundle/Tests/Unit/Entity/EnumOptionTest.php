@@ -3,10 +3,11 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
+use PHPUnit\Framework\TestCase;
 
-class EnumOptionTest extends \PHPUnit\Framework\TestCase
+class EnumOptionTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $testName = 'test';
         $enumValue = new TestEnumValue('test_enum_code', $testName, $testName, 1);
@@ -19,7 +20,7 @@ class EnumOptionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($enumValue->isDefault());
     }
 
-    public function testConstructorWithAllParams()
+    public function testConstructorWithAllParams(): void
     {
         $testName = 'test';
         $enumValue = new TestEnumValue(
@@ -38,7 +39,7 @@ class EnumOptionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($enumValue->isDefault());
     }
 
-    public function testNameGetterAndSetter()
+    public function testNameGetterAndSetter(): void
     {
         $testName = 'test';
         $enumValue = new TestEnumValue('test_enum_code', $testName, $testName, 1);
@@ -47,7 +48,7 @@ class EnumOptionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Test1', $enumValue->getName());
     }
 
-    public function testPriorityGetterAndSetter()
+    public function testPriorityGetterAndSetter(): void
     {
         $testName = 'test';
         $enumValue = new TestEnumValue('test_enum_code', $testName, $testName, 1);
@@ -56,7 +57,7 @@ class EnumOptionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(123, $enumValue->getPriority());
     }
 
-    public function testDefaultGetterAndSetter()
+    public function testDefaultGetterAndSetter(): void
     {
         $testName = 'test';
         $enumValue = new TestEnumValue('test_enum_code', $testName, $testName, 1);
@@ -65,7 +66,7 @@ class EnumOptionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($enumValue->isDefault());
     }
 
-    public function testLocaleGetterAndSetter()
+    public function testLocaleGetterAndSetter(): void
     {
         $testName = 'test';
         $enumValue = new TestEnumValue('test_enum_code', $testName, $testName, 1);

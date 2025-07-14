@@ -12,15 +12,14 @@ use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
-class ActionGroupRegistryTest extends \PHPUnit\Framework\TestCase
+class ActionGroupRegistryTest extends TestCase
 {
-    private ConfigurationProviderInterface|MockObject $configurationProvider;
-    private ServiceProviderInterface|MockObject $actionGroupServiceLocator;
-
-    /** @var ActionGroupRegistry */
-    private $registry;
+    private ConfigurationProviderInterface&MockObject $configurationProvider;
+    private ServiceProviderInterface&MockObject $actionGroupServiceLocator;
+    private ActionGroupRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -46,7 +45,7 @@ class ActionGroupRegistryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider findByNameDataProvider
      */
-    public function testFindByName(string $actionGroupName, ?string $expected)
+    public function testFindByName(string $actionGroupName, ?string $expected): void
     {
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
@@ -77,7 +76,7 @@ class ActionGroupRegistryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
@@ -94,7 +93,7 @@ class ActionGroupRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('action_group1', $group->getDefinition()->getName());
     }
 
-    public function testGetException()
+    public function testGetException(): void
     {
         $this->expectException(ActionGroupNotFoundException::class);
         $this->expectExceptionMessage('ActionGroup with name "not exists" not found');

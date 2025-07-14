@@ -24,10 +24,11 @@ class CryptedStringGuesserTest extends TestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->md5ProcessorMock = self::createMock(Md5Processor::class);
-        $this->classMetadataMock = self::createMock(ClassMetadata::class);
-        $this->configManagerMock = self::createMock(ConfigManager::class);
-        $this->extendEntityMetadataProvider = self::createMock(ExtendEntityMetadataProvider::class);
+        $this->md5ProcessorMock = $this->createMock(Md5Processor::class);
+        $this->classMetadataMock = $this->createMock(ClassMetadata::class);
+        $this->configManagerMock = $this->createMock(ConfigManager::class);
+        $this->extendEntityMetadataProvider = $this->createMock(ExtendEntityMetadataProvider::class);
+
         $this->processorHelper = new ProcessorHelper($this->configManagerMock, $this->extendEntityMetadataProvider);
     }
 
@@ -35,17 +36,14 @@ class CryptedStringGuesserTest extends TestCase
     {
         $cryptedStringGuesser = new CryptedStringGuesser($this->md5ProcessorMock, $this->processorHelper);
 
-        $this->classMetadataMock
-            ->expects(self::once())
+        $this->classMetadataMock->expects(self::once())
             ->method('getName')
             ->willReturn(self::DUMMY_CLASS_NAME);
-        $this->extendEntityMetadataProvider
-            ->expects(self::once())
+        $this->extendEntityMetadataProvider->expects(self::once())
             ->method('getExtendEntityFieldsMetadata')
             ->with(self::DUMMY_CLASS_NAME)
             ->willReturn([self::DUMMY_FIELD_NAME => [ExtendEntityMetadataProvider::IS_SERIALIZED => false]]);
-        $this->classMetadataMock
-            ->expects(self::once())
+        $this->classMetadataMock->expects(self::once())
             ->method('getFieldMapping')
             ->with(self::DUMMY_FIELD_NAME)
             ->willReturn(['type' => 'crypted_string']);
@@ -60,17 +58,14 @@ class CryptedStringGuesserTest extends TestCase
     {
         $cryptedStringGuesser = new CryptedStringGuesser($this->md5ProcessorMock, $this->processorHelper);
 
-        $this->classMetadataMock
-            ->expects(self::once())
+        $this->classMetadataMock->expects(self::once())
             ->method('getName')
             ->willReturn(self::DUMMY_CLASS_NAME);
-        $this->extendEntityMetadataProvider
-            ->expects(self::once())
+        $this->extendEntityMetadataProvider->expects(self::once())
             ->method('getExtendEntityFieldsMetadata')
             ->with(self::DUMMY_CLASS_NAME)
             ->willReturn([self::DUMMY_FIELD_NAME => [ExtendEntityMetadataProvider::IS_SERIALIZED => false]]);
-        $this->classMetadataMock
-            ->expects(self::once())
+        $this->classMetadataMock->expects(self::once())
             ->method('getFieldMapping')
             ->with(self::DUMMY_FIELD_NAME)
             ->willReturn(['type' => 'not_crypted_string']);

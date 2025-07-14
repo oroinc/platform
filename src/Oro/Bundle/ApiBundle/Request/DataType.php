@@ -26,6 +26,7 @@ final class DataType
     public const PERCENT_100 = 'percent_100'; // a percentage value multiplied by 100, 100% equals to 100
     public const MONEY = 'money';
     public const DURATION = 'duration';
+    public const ENUM = 'enum';
     public const GUID = 'guid';
     public const ARRAY = 'array';
     public const OBJECT = 'object';
@@ -37,6 +38,9 @@ final class DataType
 
     public const NESTED_OBJECT = 'nestedObject';
     public const NESTED_ASSOCIATION = 'nestedAssociation';
+
+    /** a symbol that is used to delimit the data-type and its detail, if any */
+    public const DETAIL_DELIMITER = ':';
 
     private const EXTENDED_ASSOCIATION_PREFIX = 'association';
     private const EXTENDED_ASSOCIATION_MARKER = 'association:';
@@ -104,7 +108,7 @@ final class DataType
      */
     public static function isExtendedAssociation(?string $dataType): bool
     {
-        return $dataType && 0 === strncmp($dataType, self::EXTENDED_ASSOCIATION_MARKER, 12);
+        return $dataType && str_starts_with($dataType, self::EXTENDED_ASSOCIATION_MARKER);
     }
 
     /**
@@ -121,7 +125,7 @@ final class DataType
     {
         [$prefix, $type, $kind] = array_pad(explode(':', $dataType, 3), 3, null);
         if (self::EXTENDED_ASSOCIATION_PREFIX !== $prefix || !$type || '' === $kind) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new \InvalidArgumentException(\sprintf(
                 'Expected a string like "association:type[:kind]", "%s" given.',
                 $dataType
             ));

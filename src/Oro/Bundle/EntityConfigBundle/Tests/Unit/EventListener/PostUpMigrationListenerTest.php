@@ -9,10 +9,11 @@ use Oro\Bundle\EntityConfigBundle\Migration\WarmUpEntityConfigCacheMigration;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestMigration;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
+use PHPUnit\Framework\TestCase;
 
-class PostUpMigrationListenerTest extends \PHPUnit\Framework\TestCase
+class PostUpMigrationListenerTest extends TestCase
 {
-    public function testUpdateConfigs()
+    public function testUpdateConfigs(): void
     {
         $commandExecutor = $this->createMock(CommandExecutor::class);
 
@@ -48,7 +49,7 @@ class PostUpMigrationListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWarmUpCache()
+    public function testWarmUpCache(): void
     {
         $commandExecutor = $this->createMock(CommandExecutor::class);
 

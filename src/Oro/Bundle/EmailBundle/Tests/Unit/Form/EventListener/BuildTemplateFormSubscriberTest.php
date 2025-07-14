@@ -144,7 +144,7 @@ class BuildTemplateFormSubscriberTest extends TestCase
             ->method('getOptions')
             ->willReturn(['auto_initialize' => true]);
 
-        $formType   = $this->createMock(ResolvedFormTypeInterface::class);
+        $formType = $this->createMock(ResolvedFormTypeInterface::class);
         $configMock->expects($this->once())
             ->method('getType')
             ->willReturn($formType);

@@ -9,17 +9,16 @@ use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
 use Oro\Component\Action\Tests\Unit\Action\Stub\TestService;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
+class CallServiceMethodTest extends TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var CallServiceMethod */
-    private $action;
+    private ContainerInterface&MockObject $container;
+    private CallServiceMethod $action;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $options = [
             'service' => 'test_service',
@@ -43,7 +42,7 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
-    public function testInitializeNoServiceException()
+    public function testInitializeNoServiceException(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Service name parameter is required');
@@ -51,7 +50,7 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize([]);
     }
 
-    public function testInitializeNoMethodException()
+    public function testInitializeNoMethodException(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Method name parameter is required');
@@ -61,7 +60,7 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testExecuteActionUndefinedServiceException()
+    public function testExecuteActionUndefinedServiceException(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Undefined service with name "test_service"');
@@ -81,7 +80,7 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
         $this->action->execute('');
     }
 
-    public function testExecuteActionMethodNotExists()
+    public function testExecuteActionMethodNotExists(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Could not found public method "noMethod" in service "test_service"');
@@ -98,7 +97,7 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
         $this->action->execute('');
     }
 
-    public function testExecuteActionWithAttribute()
+    public function testExecuteActionWithAttribute(): void
     {
         $service = 'test_service';
         $options = [
@@ -121,7 +120,7 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testExecuteActionWithoutAttribute()
+    public function testExecuteActionWithoutAttribute(): void
     {
         $service = 'test_service';
         $options = [
@@ -140,7 +139,7 @@ class CallServiceMethodTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['param' => 'value'], $context->getValues());
     }
 
-    public function testExecuteActionPropertyPathService()
+    public function testExecuteActionPropertyPathService(): void
     {
         $service = 'test_service';
         $options = [

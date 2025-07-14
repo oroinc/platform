@@ -12,8 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 class EntityFormatExtensionFactoryTest extends TestCase
 {
-    private TemplateRendererConfigProviderInterface|MockObject $templateRendererConfigProvider;
-
+    private TemplateRendererConfigProviderInterface&MockObject $templateRendererConfigProvider;
     private EntityFormatExtensionFactory $factory;
 
     #[\Override]
@@ -26,8 +25,7 @@ class EntityFormatExtensionFactoryTest extends TestCase
     public function testCreateWhenEmptyConfig(): void
     {
         $configuration = [];
-        $this->templateRendererConfigProvider
-            ->expects(self::once())
+        $this->templateRendererConfigProvider->expects(self::once())
             ->method('getConfiguration')
             ->willReturn($configuration);
 
@@ -44,8 +42,7 @@ class EntityFormatExtensionFactoryTest extends TestCase
                 'Acme\Entity\SampleEntity' => ['sampleFieldName' => 'sample_formatter_name'],
             ],
         ];
-        $this->templateRendererConfigProvider
-            ->expects(self::once())
+        $this->templateRendererConfigProvider->expects(self::once())
             ->method('getConfiguration')
             ->willReturn($configuration);
 

@@ -13,10 +13,12 @@ use Oro\Bundle\TagBundle\Entity\Tagging;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable as TaggableStub;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class TagManagerTest extends \PHPUnit\Framework\TestCase
+class TagManagerTest extends TestCase
 {
     private const TEST_TAG_NAME = 'testName';
     private const TEST_NEW_TAG_NAME = 'testAnotherName';
@@ -26,26 +28,13 @@ class TagManagerTest extends \PHPUnit\Framework\TestCase
     private const TEST_CREATED_ID = 22;
     private const TEST_USER_ID = 'someID';
 
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var TagRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $urlGenerator;
-
-    /** @var User|\PHPUnit\Framework\MockObject\MockObject */
-    private $user;
-
-    /** @var TagManager */
-    private $manager;
+    private EntityManagerInterface&MockObject $em;
+    private TagRepository&MockObject $repository;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
+    private User&MockObject $user;
+    private TagManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -89,7 +78,7 @@ class TagManagerTest extends \PHPUnit\Framework\TestCase
         return $user;
     }
 
-    public function testAddTags()
+    public function testAddTags(): void
     {
         $this->tokenAccessor->expects($this->any())
             ->method('getUser')
@@ -111,8 +100,12 @@ class TagManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getTagNames
      */
-    public function testLoadOrCreateTags(array $names, bool $shouldWorkWithDB, int $resultCount, array $tagsFromDB)
-    {
+    public function testLoadOrCreateTags(
+        array $names,
+        bool $shouldWorkWithDB,
+        int $resultCount,
+        array $tagsFromDB
+    ): void {
         $this->tokenAccessor->expects($this->any())
             ->method('getUser')
             ->willReturn($this->user);
@@ -180,7 +173,7 @@ class TagManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testLoadTagging()
+    public function testLoadTagging(): void
     {
         $this->tokenAccessor->expects($this->any())
             ->method('getUser')
@@ -193,7 +186,7 @@ class TagManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->loadTagging($resource);
     }
 
-    public function testGetPreparedArrayFromDb()
+    public function testGetPreparedArrayFromDb(): void
     {
         $this->tokenAccessor->expects($this->any())
             ->method('getUser')
@@ -260,7 +253,7 @@ class TagManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result[0]['owner']);
     }
 
-    public function testGetPreparedArrayFromArray()
+    public function testGetPreparedArrayFromArray(): void
     {
         $this->tokenAccessor->expects($this->any())
             ->method('getUser')
@@ -277,7 +270,7 @@ class TagManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getPreparedArray($resource, $this->tagForPreparing());
     }
 
-    public function testGetTagsByEntityIdsWhenNoUser()
+    public function testGetTagsByEntityIdsWhenNoUser(): void
     {
         $entityClass = \stdClass::class;
         $ids = [42];

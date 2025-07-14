@@ -5,14 +5,13 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Condition;
 use Oro\Bundle\ConfigBundle\Condition\IsSystemConfigEqual;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class IsSystemConfigEqualTest extends \PHPUnit\Framework\TestCase
+class IsSystemConfigEqualTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var IsSystemConfigEqual */
-    private $condition;
+    private ConfigManager&MockObject $configManager;
+    private IsSystemConfigEqual $condition;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class IsSystemConfigEqualTest extends \PHPUnit\Framework\TestCase
         $this->condition = new IsSystemConfigEqual($this->configManager);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals(IsSystemConfigEqual::NAME, $this->condition->getName());
     }
@@ -30,7 +29,7 @@ class IsSystemConfigEqualTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeDataProvider
      */
-    public function testInitializeExceptions(array $options, string $message)
+    public function testInitializeExceptions(array $options, string $message): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($message);
@@ -62,9 +61,12 @@ class IsSystemConfigEqualTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(mixed $configValue, mixed $value, bool $expected)
+    public function testEvaluate(mixed $configValue, mixed $value, bool $expected): void
     {
-        $this->configManager->expects($this->once())->method('get')->with('test_key')->willReturn($configValue);
+        $this->configManager->expects($this->once())
+            ->method('get')
+            ->with('test_key')
+            ->willReturn($configValue);
         $this->condition->initialize(['key' => 'test_key', 'value' => $value]);
         $this->assertEquals($expected, $this->condition->evaluate([]));
     }

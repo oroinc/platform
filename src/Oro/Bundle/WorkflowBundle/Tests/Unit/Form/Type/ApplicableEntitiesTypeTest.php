@@ -6,15 +6,14 @@ use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\StubEntity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ApplicableEntitiesTypeTest extends \PHPUnit\Framework\TestCase
+class ApplicableEntitiesTypeTest extends TestCase
 {
-    /** @var WorkflowEntityConnector|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConnector;
-
-    /** @var ApplicableEntitiesType */
-    private $type;
+    private WorkflowEntityConnector&MockObject $entityConnector;
+    private ApplicableEntitiesType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class ApplicableEntitiesTypeTest extends \PHPUnit\Framework\TestCase
         $this->type = new ApplicableEntitiesType($this->entityConnector);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = new OptionsResolver();
         $inflector = (new InflectorFactory())->build();

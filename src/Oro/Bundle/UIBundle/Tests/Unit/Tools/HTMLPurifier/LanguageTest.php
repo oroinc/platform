@@ -3,18 +3,15 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Tools\HTMLPurifier;
 
 use Oro\Bundle\UIBundle\Tools\HTMLPurifier\Language;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LanguageTest extends \PHPUnit\Framework\TestCase
+class LanguageTest extends TestCase
 {
-    /** @var \HTMLPurifier_Config|\PHPUnit\Framework\MockObject\MockObject */
-    private $config;
-
-    /** @var \HTMLPurifier_Context|\PHPUnit\Framework\MockObject\MockObject */
-    private $context;
-
-    /** @var Language */
-    private $language;
+    private \HTMLPurifier_Config&MockObject $config;
+    private \HTMLPurifier_Context&MockObject $context;
+    private Language $language;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,6 @@ class LanguageTest extends \PHPUnit\Framework\TestCase
 
     public function testLoad(): void
     {
-        /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator */
         $translator = $this->createMock(TranslatorInterface::class);
         $this->language->setTranslator($translator);
 

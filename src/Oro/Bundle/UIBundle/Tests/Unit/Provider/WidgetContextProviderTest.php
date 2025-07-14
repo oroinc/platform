@@ -3,16 +3,14 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\UIBundle\Provider\WidgetContextProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class WidgetContextProviderTest extends \PHPUnit\Framework\TestCase
+class WidgetContextProviderTest extends TestCase
 {
-    /** @var RequestStack */
-    private $requestStack;
-
-    /** @var WidgetContextProvider */
-    private $provider;
+    private RequestStack $requestStack;
+    private WidgetContextProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +23,7 @@ class WidgetContextProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isActiveProvider
      */
-    public function testIsActive(bool $expectedValue, ?Request $request = null)
+    public function testIsActive(bool $expectedValue, ?Request $request = null): void
     {
         if ($request) {
             $this->requestStack->push($request);
@@ -55,7 +53,7 @@ class WidgetContextProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider widgetIdentifierProvider
      */
-    public function testGetWid(string|bool $expectedValue, ?Request $request = null)
+    public function testGetWid(string|bool $expectedValue, ?Request $request = null): void
     {
         if ($request) {
             $this->requestStack->push($request);

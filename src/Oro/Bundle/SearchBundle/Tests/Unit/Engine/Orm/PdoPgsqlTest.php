@@ -9,7 +9,6 @@ class PdoPgsqlTest extends AbstractPdoTest
     #[\Override]
     protected function setUp(): void
     {
-        parent::setUp();
         $this->driver = new PdoPgsql();
     }
 }
