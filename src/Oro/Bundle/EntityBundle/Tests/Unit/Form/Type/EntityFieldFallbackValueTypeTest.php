@@ -10,6 +10,7 @@ use Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\FallbackParentStub;
 use Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\FallbackParentStubType;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -17,7 +18,7 @@ use Symfony\Component\Form\FormInterface;
 
 class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
 {
-    private EntityFallbackResolver|\PHPUnit\Framework\MockObject\MockObject $fallbackResolver;
+    private EntityFallbackResolver&MockObject $fallbackResolver;
 
     public function testOptionsCanBeOverridden(): void
     {

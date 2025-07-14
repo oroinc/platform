@@ -9,16 +9,15 @@ use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
+class PopulateIntegrationOwnerTest extends TestCase
 {
-    /** @var DefaultOwnerHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $defaultOwnerHelper;
-
-    /** @var ActionInterface */
-    private $action;
+    private DefaultOwnerHelper&MockObject $defaultOwnerHelper;
+    private ActionInterface $action;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +31,7 @@ class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidOptionsDataProvider
      */
-    public function testInitializeExceptions(array $options)
+    public function testInitializeExceptions(array $options): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->action->initialize($options);
@@ -48,7 +47,7 @@ class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $attribute = 'a';
         $integration = 'b';
@@ -60,7 +59,7 @@ class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($integration, ReflectionUtil::getPropertyValue($this->action, 'integration'));
     }
 
-    public function testExecuteIncorrectEntity()
+    public function testExecuteIncorrectEntity(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage(
@@ -79,7 +78,7 @@ class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    public function testExecuteIncorrectIntegration()
+    public function testExecuteIncorrectIntegration(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage(sprintf(
@@ -99,7 +98,7 @@ class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $context = new \stdClass();
         $context->attr = new \stdClass();

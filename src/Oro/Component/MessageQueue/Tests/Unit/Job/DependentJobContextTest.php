@@ -4,15 +4,16 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
 use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\Job;
+use PHPUnit\Framework\TestCase;
 
-class DependentJobContextTest extends \PHPUnit\Framework\TestCase
+class DependentJobContextTest extends TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
+    public function testCouldBeConstructedWithRequiredArguments(): void
     {
         new DependentJobContext(new Job());
     }
 
-    public function testShouldReturnJob()
+    public function testShouldReturnJob(): void
     {
         $job = new Job();
 
@@ -21,7 +22,7 @@ class DependentJobContextTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($job, $context->getJob());
     }
 
-    public function testCouldAddAndGetDependentJobs()
+    public function testCouldAddAndGetDependentJobs(): void
     {
         $context = new DependentJobContext(new Job());
 

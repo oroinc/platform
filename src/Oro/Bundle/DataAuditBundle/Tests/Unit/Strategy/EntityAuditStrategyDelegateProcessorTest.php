@@ -10,12 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class EntityAuditStrategyDelegateProcessorTest extends TestCase
 {
-    private EntityAuditStrategyProcessorRegistry|MockObject $registry;
-
-    private EntityAuditStrategyProcessorInterface|MockObject $processor1;
-
-    private EntityAuditStrategyProcessorInterface|MockObject $defaultProcessor;
-
+    private EntityAuditStrategyProcessorRegistry&MockObject $registry;
     private EntityAuditStrategyDelegateProcessor $processor;
 
     #[\Override]
@@ -26,10 +21,10 @@ class EntityAuditStrategyDelegateProcessorTest extends TestCase
         $this->processor = new EntityAuditStrategyDelegateProcessor($this->registry);
     }
 
-    public function testProcessWithKnownEntity()
+    public function testProcessWithKnownEntity(): void
     {
         $sourceEntityData['entity_class'] = 'Test\Entity';
-        $this->processor1 = $this->createMock(EntityAuditStrategyProcessorInterface::class);
+        $processor1 = $this->createMock(EntityAuditStrategyProcessorInterface::class);
 
         $this->registry->expects($this->once())
             ->method('hasProcessor')
@@ -37,8 +32,8 @@ class EntityAuditStrategyDelegateProcessorTest extends TestCase
         $this->registry->expects($this->once())
             ->method('getProcessor')
             ->with('Test\Entity')
-            ->willReturn($this->processor1);
-        $this->processor1->expects($this->once())
+            ->willReturn($processor1);
+        $processor1->expects($this->once())
             ->method('processInverseCollections')
             ->willReturn([]);
 
@@ -50,7 +45,7 @@ class EntityAuditStrategyDelegateProcessorTest extends TestCase
     public function testProcessWithUnKnownEntity(): void
     {
         $sourceEntityData['entity_class'] = 'Test\UnknownEntity';
-        $this->defaultProcessor = $this->createMock(EntityAuditStrategyProcessorInterface::class);
+        $defaultProcessor = $this->createMock(EntityAuditStrategyProcessorInterface::class);
 
         $this->registry->expects($this->once())
             ->method('hasProcessor')
@@ -59,8 +54,8 @@ class EntityAuditStrategyDelegateProcessorTest extends TestCase
             ->method('getProcessor');
         $this->registry->expects($this->atLeastOnce())
             ->method('getDefaultProcessor')
-            ->willReturn($this->defaultProcessor);
-        $this->defaultProcessor->expects($this->once())
+            ->willReturn($defaultProcessor);
+        $defaultProcessor->expects($this->once())
             ->method('processInverseCollections')
             ->willReturn([]);
 

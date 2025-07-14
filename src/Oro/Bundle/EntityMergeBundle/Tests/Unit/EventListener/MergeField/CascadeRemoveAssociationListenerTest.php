@@ -12,17 +12,14 @@ use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CascadeRemoveAssociationListenerTest extends \PHPUnit\Framework\TestCase
+class CascadeRemoveAssociationListenerTest extends TestCase
 {
-    /** @var AccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $accessor;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var CascadeRemoveAssociationListener */
-    private $listener;
+    private AccessorInterface&MockObject $accessor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private CascadeRemoveAssociationListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +33,7 @@ class CascadeRemoveAssociationListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testAfterMergeField()
+    public function testAfterMergeField(): void
     {
         $fooEntity = new EntityStub(1);
         $barEntity = new EntityStub(2);

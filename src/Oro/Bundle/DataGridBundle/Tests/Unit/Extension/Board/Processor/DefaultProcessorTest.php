@@ -17,17 +17,10 @@ use PHPUnit\Framework\TestCase;
 
 class DefaultProcessorTest extends TestCase
 {
-    /** @var EntityManagerInterface&MockObject */
-    private $em;
-
-    /** @var EntityClassResolver&MockObject */
-    private $entityClassResolver;
-
-    /** @var ChoiceFieldHelper&MockObject */
-    private $choiceHelper;
-
-    /** @var DefaultProcessor */
-    private $processor;
+    private EntityManagerInterface&MockObject $em;
+    private EntityClassResolver&MockObject $entityClassResolver;
+    private ChoiceFieldHelper&MockObject $choiceHelper;
+    private DefaultProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -49,7 +42,7 @@ class DefaultProcessorTest extends TestCase
         );
     }
 
-    public function testGetBoardOptions()
+    public function testGetBoardOptions(): void
     {
         $config = DatagridConfiguration::create([
             'source' => [
@@ -118,7 +111,7 @@ class DefaultProcessorTest extends TestCase
         $this->assertEquals($expected, $this->processor->getBoardOptions($boardConfig, $config));
     }
 
-    public function testProcessDatasourceNotORM()
+    public function testProcessDatasourceNotORM(): void
     {
         $config = DatagridConfiguration::create([]);
         $dataSource = $this->createMock(DatasourceInterface::class);

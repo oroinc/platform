@@ -9,64 +9,47 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\ImportExport\Strategy\AttributeImportStrategy;
-use Oro\Bundle\EntityConfigBundle\ImportExport\Strategy\EntityFieldImportStrategy;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AttributeImportStrategyTest extends \PHPUnit\Framework\TestCase
+class AttributeImportStrategyTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    private $translator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DatabaseHelper */
-    private $databaseHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FieldTypeProvider */
-    private $fieldTypeProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityFieldImportStrategy */
-    private $strategy;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FieldHelper */
-    private $fieldHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ImportStrategyHelper */
-    private $strategyHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FieldNameValidationHelper */
-    private $validationHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigHelper */
-    private $configHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContextInterface */
-    private $context;
+    private TranslatorInterface&MockObject $translator;
+    private DatabaseHelper&MockObject $databaseHelper;
+    private FieldTypeProvider&MockObject $fieldTypeProvider;
+    private FieldHelper&MockObject $fieldHelper;
+    private ImportStrategyHelper&MockObject $strategyHelper;
+    private FieldNameValidationHelper&MockObject $validationHelper;
+    private ConfigHelper&MockObject $configHelper;
+    private ContextInterface&MockObject $context;
+    private AttributeImportStrategy $strategy;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->fieldTypeProvider = $this->createMock(FieldTypeProvider::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
-
         $this->fieldHelper = $this->createMock(FieldHelper::class);
         $this->strategyHelper = $this->createMock(ImportStrategyHelper::class);
         $this->databaseHelper = $this->createMock(DatabaseHelper::class);
         $this->validationHelper = $this->createMock(FieldNameValidationHelper::class);
         $this->configHelper = $this->createMock(ConfigHelper::class);
+        $this->context = $this->createMock(ContextInterface::class);
+
         $this->strategy = new AttributeImportStrategy(
             new EventDispatcher(),
             $this->strategyHelper,
             $this->fieldHelper,
             $this->databaseHelper
         );
-        $this->context = $this->createMock(ContextInterface::class);
-
         $this->strategy->setImportExportContext($this->context);
         $this->strategy->setEntityName(FieldConfigModel::class);
         $this->strategy->setFieldTypeProvider($this->fieldTypeProvider);
@@ -78,7 +61,7 @@ class AttributeImportStrategyTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validationGroupsDataProvider
      */
-    public function testProcessValidationErrorsWithAttributesGroup(bool $isNew, array $validationGroups)
+    public function testProcessValidationErrorsWithAttributesGroup(bool $isNew, array $validationGroups): void
     {
         $this->fieldTypeProvider->expects($this->any())
             ->method('getFieldProperties')

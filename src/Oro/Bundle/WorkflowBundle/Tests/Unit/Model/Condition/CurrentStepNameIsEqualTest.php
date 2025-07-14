@@ -11,19 +11,18 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Component\ConfigExpression\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
+class CurrentStepNameIsEqualTest extends TestCase
 {
     use EntityTrait;
 
     private const STEP_NAME = 'TestStep';
     private const WORKFLOW_NAME = 'TestWorkflow';
 
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var CurrentStepNameIsEqual */
-    private $condition;
+    private WorkflowManager&MockObject $workflowManager;
+    private CurrentStepNameIsEqual $condition;
 
     #[\Override]
     protected function setUp(): void
@@ -33,12 +32,12 @@ class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
         $this->condition = new CurrentStepNameIsEqual($this->workflowManager);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals(CurrentStepNameIsEqual::NAME, $this->condition->getName());
     }
 
-    public function testInitializeInvalid()
+    public function testInitializeInvalid(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Missing "step_name" option');
@@ -49,7 +48,7 @@ class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $this->assertInstanceOf(
             AbstractCondition::class,
@@ -64,7 +63,7 @@ class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider evaluateProvider
      */
-    public function testEvaluate(string $stepName, bool $expected)
+    public function testEvaluate(string $stepName, bool $expected): void
     {
         $context = $this->createMock(TransitionContext::class);
         $user = $this->getEntity(User::class);
@@ -103,7 +102,7 @@ class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $stdClass = new \stdClass();
         $this->condition->initialize([
@@ -124,7 +123,7 @@ class CurrentStepNameIsEqualTest extends \PHPUnit\Framework\TestCase
         $this->assertContains($stdClass, $resultSection['parameters']);
     }
 
-    public function testCompile()
+    public function testCompile(): void
     {
         $toStringStub = new User();
         $toStringStub->setUserIdentifier('testUser');

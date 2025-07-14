@@ -7,8 +7,9 @@ use Oro\Component\MessageQueue\Exception\MessageProcessorNotFoundException;
 use Oro\Component\MessageQueue\Exception\MessageProcessorNotSpecifiedException;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 
-class NullMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class NullMessageProcessorTest extends TestCase
 {
     public function testProcessWhenNoMessageProcessorName(): void
     {

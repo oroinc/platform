@@ -5,14 +5,13 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ActionHandler;
 use Oro\Bundle\IntegrationBundle\ActionHandler\ChannelDeleteActionHandler;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Manager\DeleteManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChannelDeleteActionHandlerTest extends \PHPUnit\Framework\TestCase
+class ChannelDeleteActionHandlerTest extends TestCase
 {
-    /** @var DeleteManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $deleteManager;
-
-    /** @var ChannelDeleteActionHandler */
-    private $handler;
+    private DeleteManager&MockObject $deleteManager;
+    private ChannelDeleteActionHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class ChannelDeleteActionHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new ChannelDeleteActionHandler($this->deleteManager);
     }
 
-    public function testHandleAction()
+    public function testHandleAction(): void
     {
         $this->deleteManager->expects(self::once())
             ->method('delete')

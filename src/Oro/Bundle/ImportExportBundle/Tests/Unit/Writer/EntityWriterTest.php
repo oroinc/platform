@@ -10,23 +10,16 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer;
 use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityWriterTest extends \PHPUnit\Framework\TestCase
+class EntityWriterTest extends TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityManager;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
-
-    /** @var EntityDetachFixer|\PHPUnit\Framework\MockObject\MockObject */
-    protected $detachFixer;
-
-    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $contextRegistry;
-
-    /** @var EntityWriter */
-    protected $writer;
+    protected EntityManager&MockObject $entityManager;
+    protected DoctrineHelper&MockObject $doctrineHelper;
+    protected EntityDetachFixer&MockObject $detachFixer;
+    protected ContextRegistry&MockObject $contextRegistry;
+    protected EntityWriter $writer;
 
     #[\Override]
     protected function setUp(): void
@@ -50,7 +43,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider configurationProvider
      */
-    public function testWrite(array $configuration)
+    public function testWrite(array $configuration): void
     {
         $fooItem = $this->createMock(\stdClass::class);
         $barItem = $this->createMock(\ArrayObject::class);
@@ -87,7 +80,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer->write([$fooItem, $barItem]);
     }
 
-    public function testWriteException()
+    public function testWriteException(): void
     {
         $item = $this->createMock(\stdClass::class);
 
@@ -122,7 +115,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer->write([$item]);
     }
 
-    public function testWriteDatabaseExceptionDeadlock()
+    public function testWriteDatabaseExceptionDeadlock(): void
     {
         $exception = $this->createMock(DeadlockException::class);
         $item = $this->createMock(\stdClass::class);
@@ -160,7 +153,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer->write([$item]);
     }
 
-    public function testMissingClassName()
+    public function testMissingClassName(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('entityName not resolved');
@@ -181,7 +174,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer->write([]);
     }
 
-    public function testClassResolvedOnce()
+    public function testClassResolvedOnce(): void
     {
         $stepExecution = $this->createMock(StepExecution::class);
 

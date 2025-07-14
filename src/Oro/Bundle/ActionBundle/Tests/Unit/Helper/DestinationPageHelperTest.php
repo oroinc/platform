@@ -5,23 +5,18 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 use Oro\Bundle\ActionBundle\Helper\DestinationPageHelper;
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
-class DestinationPageHelperTest extends \PHPUnit\Framework\TestCase
+class DestinationPageHelperTest extends TestCase
 {
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var EntityConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigHelper;
-
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var DestinationPageHelper */
-    private $helper;
+    private RequestStack&MockObject $requestStack;
+    private EntityConfigHelper&MockObject $entityConfigHelper;
+    private RouterInterface&MockObject $router;
+    private DestinationPageHelper $helper;
 
     #[\Override]
     protected function setUp(): void

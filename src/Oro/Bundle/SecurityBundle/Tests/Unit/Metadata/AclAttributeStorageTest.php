@@ -5,13 +5,14 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 use Oro\Bundle\SecurityBundle\Attribute\Acl as AclAttribute;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor as AclAttributeAncestor;
 use Oro\Bundle\SecurityBundle\Metadata\AclAttributeStorage;
+use PHPUnit\Framework\TestCase;
 
-class AclAttributeStorageTest extends \PHPUnit\Framework\TestCase
+class AclAttributeStorageTest extends TestCase
 {
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testStorage()
+    public function testStorage(): void
     {
         $storage = new AclAttributeStorage();
 
@@ -122,7 +123,7 @@ class AclAttributeStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $storage = new AclAttributeStorage();
         $storage->add(

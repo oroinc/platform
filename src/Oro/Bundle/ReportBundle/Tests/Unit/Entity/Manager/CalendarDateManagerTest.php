@@ -8,17 +8,14 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Bundle\ReportBundle\Entity\Manager\CalendarDateManager;
 use Oro\Bundle\ReportBundle\Entity\Repository\CalendarDateRepository;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
+class CalendarDateManagerTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
-
-    /** @var CalendarDateManager */
-    private $calendarDateManager;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private LocaleSettings&MockObject $localeSettings;
+    private CalendarDateManager $calendarDateManager;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +32,7 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleCalendarDatesWithoutAppending()
+    public function testHandleCalendarDatesWithoutAppending(): void
     {
         $timezone = new \DateTimeZone('UTC');
         $entityManager = $this->createMock(EntityManagerInterface::class);
@@ -54,7 +51,7 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
         $this->calendarDateManager->handleCalendarDates();
     }
 
-    public function testHandleCalendarDatesWithAppending()
+    public function testHandleCalendarDatesWithAppending(): void
     {
         $timezone = new \DateTimeZone('UTC');
         $startDate = new \DateTime('tomorrow midnight - 10 days', $timezone);
@@ -83,7 +80,7 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
         $this->calendarDateManager->handleCalendarDates(true);
     }
 
-    public function testHandleCalendarDatesWithEmptyTable()
+    public function testHandleCalendarDatesWithEmptyTable(): void
     {
         $timezone = new \DateTimeZone('UTC');
         $repository = $this->createMock(CalendarDateRepository::class);

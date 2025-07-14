@@ -7,23 +7,16 @@ use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\TranslationBundle\EventListener\JsTranslationDumpDemoDataListener;
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class JsTranslationDumpDemoDataListenerTest extends \PHPUnit\Framework\TestCase
+class JsTranslationDumpDemoDataListenerTest extends TestCase
 {
-    /** @var JsTranslationDumper|\PHPUnit\Framework\MockObject\MockObject */
-    private $jsTranslationDumper;
-
-    /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $languageProvider;
-
-    /** @var ApplicationState|\PHPUnit\Framework\MockObject\MockObject */
-    private $applicationState;
-
-    /** @var MigrationDataFixturesEvent|\PHPUnit\Framework\MockObject\MockObject */
-    private $event;
-
-    /** @var JsTranslationDumpDemoDataListener */
-    private $listener;
+    private JsTranslationDumper&MockObject $jsTranslationDumper;
+    private LanguageProvider&MockObject $languageProvider;
+    private ApplicationState&MockObject $applicationState;
+    private MigrationDataFixturesEvent&MockObject $event;
+    private JsTranslationDumpDemoDataListener $listener;
 
     #[\Override]
     protected function setUp(): void

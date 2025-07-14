@@ -8,20 +8,15 @@ use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\ImportExport\Reader\TranslationReader;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TranslationReaderTest extends \PHPUnit\Framework\TestCase
+class TranslationReaderTest extends TestCase
 {
-    /** @var LanguageRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $languageRepository;
-
-    /** @var StepExecution|\PHPUnit\Framework\MockObject\MockObject */
-    private $stepExecution;
-
-    /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $context;
-
-    /** @var TranslationReader */
-    private $reader;
+    private LanguageRepository&MockObject $languageRepository;
+    private StepExecution&MockObject $stepExecution;
+    private ContextInterface&MockObject $context;
+    private TranslationReader $reader;
 
     #[\Override]
     protected function setUp(): void
@@ -43,7 +38,7 @@ class TranslationReaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider readProvider
      */
-    public function testRead(int $offset, string $locale, ?array $expectedData = null)
+    public function testRead(int $offset, string $locale, ?array $expectedData = null): void
     {
         $this->languageRepository->expects($this->exactly(2))
             ->method('getTranslationsForExport')

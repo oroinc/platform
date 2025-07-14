@@ -12,20 +12,19 @@ use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
+class WorkflowEntityConnectorTest extends TestCase
 {
     use EntityTrait;
 
     private const WORKFLOW_APPLICABLE_ENTITIES_CACHE_KEY_PREFIX = 'workflow_applicable_entity:';
 
-    /** @var WorkflowEntityConnector */
-    private $entityConnector;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private WorkflowEntityConnector $entityConnector;
+    private ManagerRegistry&MockObject $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -46,7 +45,7 @@ class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsApplicableEntityConvertsObjectToClassName()
+    public function testIsApplicableEntityConvertsObjectToClassName(): void
     {
         $this->registry->expects($this->never())
             ->method('getManagerForClass');
@@ -65,7 +64,7 @@ class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->entityConnector->isApplicableEntity(new EntityStub(42)));
     }
 
-    public function testCacheStores()
+    public function testCacheStores(): void
     {
         $cache = $this->createMock(CacheInterface::class);
 
@@ -99,7 +98,7 @@ class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->entityConnector->isApplicableEntity(new EntityStub(42)));
     }
 
-    public function testIsApplicableEntityNonManageable()
+    public function testIsApplicableEntityNonManageable(): void
     {
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
@@ -111,7 +110,7 @@ class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->entityConnector->isApplicableEntity(new EntityStub(42)));
     }
 
-    public function testIsApplicableEntityNotSupportCompositePrimaryKeys()
+    public function testIsApplicableEntityNotSupportCompositePrimaryKeys(): void
     {
         $manager = $this->createMock(ObjectManager::class);
         $this->registry->expects($this->once())
@@ -134,7 +133,7 @@ class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
      * @param bool $expected
      * @dataProvider typeSupportingProvider
      */
-    public function testIsApplicableEntitySupportedTypes($type, $expected)
+    public function testIsApplicableEntitySupportedTypes($type, $expected): void
     {
         $manager = $this->createMock(ObjectManager::class);
         $this->registry->expects($this->once())

@@ -140,8 +140,7 @@ final class OperationButtonProviderExtensionTest extends TestCase
         $actionData = $this->createMock(ActionData::class);
         $definition = $this->createMock(OperationDefinition::class);
 
-        $this->contextHelper
-            ->expects($this->once())
+        $this->contextHelper->expects($this->once())
             ->method('getActionData')
             ->with($this->equalTo([
                 ContextHelper::ENTITY_ID_PARAM => 42,
@@ -152,39 +151,29 @@ final class OperationButtonProviderExtensionTest extends TestCase
             ]))
             ->willReturn($actionData);
 
-        $button
-            ->expects($this->exactly(2))
+        $button->expects($this->exactly(2))
             ->method('getOperation')
             ->willReturn($operation);
-
-        $button
-            ->expects($this->once())
+        $button->expects($this->once())
             ->method('getButtonContext')
             ->willReturn($buttonContext);
-
-        $button
-            ->expects($this->once())
+        $button->expects($this->once())
             ->method('setData')
             ->with($this->equalTo($actionData));
 
-        $operation
-            ->expects($this->once())
+        $operation->expects($this->once())
             ->method('isAvailable')
             ->with($actionData)
             ->willReturn($expected);
-
-        $operation
-            ->expects($this->once())
+        $operation->expects($this->once())
             ->method('getDefinition')
             ->willReturn($definition);
 
-        $definition
-            ->expects($this->once())
+        $definition->expects($this->once())
             ->method('getEnabled')
             ->willReturn($expected);
 
-        $buttonContext
-            ->expects($this->once())
+        $buttonContext->expects($this->once())
             ->method('setEnabled')
             ->with($this->equalTo($expected));
 
@@ -228,8 +217,7 @@ final class OperationButtonProviderExtensionTest extends TestCase
         $definition = $this->createMock(OperationDefinition::class);
         $exception = new \Exception('Exception text');
 
-        $this->contextHelper
-            ->expects($this->once())
+        $this->contextHelper->expects($this->once())
             ->method('getActionData')
             ->with($this->equalTo([
                 ContextHelper::ENTITY_ID_PARAM => 42,
@@ -240,46 +228,34 @@ final class OperationButtonProviderExtensionTest extends TestCase
             ]))
             ->willReturn($actionData);
 
-        $button
-            ->expects($this->atMost(3))
+        $button->expects($this->atMost(3))
             ->method('getOperation')
             ->willReturn($operation);
-
-        $button
-            ->expects($this->once())
+        $button->expects($this->once())
             ->method('getButtonContext')
             ->willReturn($buttonContext);
-
-        $button
-            ->expects($this->once())
+        $button->expects($this->once())
             ->method('setData')
             ->with($this->equalTo($actionData));
 
-        $operation
-            ->expects($this->once())
+        $operation->expects($this->once())
             ->method('isAvailable')
             ->with($actionData)
             ->willThrowException($exception);
-
         if ($errors) {
-            $operation
-                ->expects($this->once())
+            $operation->expects($this->once())
                 ->method('getName')
                 ->willReturn('Operation name');
         }
-
-        $operation
-            ->expects($this->once())
+        $operation->expects($this->once())
             ->method('getDefinition')
             ->willReturn($definition);
 
-        $definition
-            ->expects($this->once())
+        $definition->expects($this->once())
             ->method('getEnabled')
             ->willReturn(true);
 
-        $buttonContext
-            ->expects($this->once())
+        $buttonContext->expects($this->once())
             ->method('setEnabled')
             ->with($this->equalTo(true));
 

@@ -3,26 +3,27 @@
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Condition\EqualTo;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class EqualToTest extends \PHPUnit\Framework\TestCase
+class EqualToTest extends TestCase
 {
-    /** @var Condition\EqualTo */
-    protected $condition;
+    private Condition\EqualTo $condition;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->condition = new Condition\EqualTo();
+        $this->condition = new EqualTo();
         $this->condition->setContextAccessor(new ContextAccessor());
     }
 
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, $context, $expectedResult)
+    public function testEvaluate(array $options, $context, $expectedResult): void
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -78,7 +79,7 @@ class EqualToTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray($options, $message, $expected)
+    public function testToArray($options, $message, $expected): void
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -122,7 +123,7 @@ class EqualToTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile($options, $message, $expected)
+    public function testCompile($options, $message, $expected): void
     {
         $this->condition->initialize($options);
         if ($message !== null) {

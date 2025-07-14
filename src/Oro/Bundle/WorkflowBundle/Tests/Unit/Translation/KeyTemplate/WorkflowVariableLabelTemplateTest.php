@@ -12,24 +12,24 @@ class WorkflowVariableLabelTemplateTest extends TemplateTestCase
         return new WorkflowVariableLabelTemplate();
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals(WorkflowVariableLabelTemplate::NAME, $this->getTemplateInstance()->getName());
     }
 
     #[\Override]
-    public function testGetTemplate()
+    public function testGetTemplate(): void
     {
         $this->assertTemplate('oro.workflow.{{ workflow_name }}.variable.{{ variable_name }}.label');
     }
 
     #[\Override]
-    public function testGetRequiredKeys()
+    public function testGetRequiredKeys(): void
     {
         $this->assertRequiredKeys(['workflow_name', 'variable_name']);
     }
 
-    public function testGetKeyTemplates()
+    public function testGetKeyTemplates(): void
     {
         $this->assertKeyTemplates([
             'workflow_name' => '{{ workflow_name }}',

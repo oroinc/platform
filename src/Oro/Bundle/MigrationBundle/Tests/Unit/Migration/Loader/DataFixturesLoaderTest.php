@@ -40,8 +40,11 @@ class DataFixturesLoaderTest extends TestCase
     /**
      * @dataProvider getFixturesProvider
      */
-    public function testGetFixtures(array $bundles, array $loadedDataFixtureClasses, array $expectedFixtureClasses)
-    {
+    public function testGetFixtures(
+        array $bundles,
+        array $loadedDataFixtureClasses,
+        array $expectedFixtureClasses
+    ): void {
         /** @var BundleInterface $bundle */
         foreach ($bundles as $bundle) {
             $this->loader->loadFromDirectory(

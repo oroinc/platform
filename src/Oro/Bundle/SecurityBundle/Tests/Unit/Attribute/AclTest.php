@@ -3,10 +3,11 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Attribute;
 
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
+use PHPUnit\Framework\TestCase;
 
-class AclTest extends \PHPUnit\Framework\TestCase
+class AclTest extends TestCase
 {
-    public function testAttribute()
+    public function testAttribute(): void
     {
         $attribute = new Acl(
             id: 'test_acl',
@@ -30,25 +31,25 @@ class AclTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($attribute->getIgnoreClassAcl());
     }
 
-    public function testAttributeWithEmptyId()
+    public function testAttributeWithEmptyId(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new Acl(id: '');
     }
 
-    public function testAttributeWithInvalidId()
+    public function testAttributeWithInvalidId(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new Acl(id: 'test acl');
     }
 
-    public function testAttributeWithMissingId()
+    public function testAttributeWithMissingId(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         Acl::fromArray([]);
     }
 
-    public function testAttributeWithNull()
+    public function testAttributeWithNull(): void
     {
         $attribute = Acl::fromArray();
 
@@ -62,13 +63,13 @@ class AclTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($attribute->getCategory());
     }
 
-    public function testAttributeWithEmptyType()
+    public function testAttributeWithEmptyType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new Acl(id: 'test', type: '');
     }
 
-    public function testAttributeWithMissingType()
+    public function testAttributeWithMissingType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new Acl(id: 'test');

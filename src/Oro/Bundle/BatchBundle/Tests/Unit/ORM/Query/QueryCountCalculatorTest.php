@@ -15,6 +15,7 @@ use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Component\Testing\Unit\ORM\Mocks\DriverMock;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -23,14 +24,9 @@ class QueryCountCalculatorTest extends OrmTestCase
 {
     private const TEST_COUNT = 42;
 
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var Statement|\PHPUnit\Framework\MockObject\MockObject */
-    private $statement;
+    private EntityManagerInterface $em;
+    private Connection&MockObject $connection;
+    private Statement&MockObject $statement;
 
     #[\Override]
     protected function setUp(): void
@@ -62,7 +58,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         return $query;
     }
 
-    public function testCalculateCountForQueryWithoutParameters()
+    public function testCalculateCountForQueryWithoutParameters(): void
     {
         $query = $this->getQuery('SELECT e FROM ' . Entity::class . ' e');
         $expectedSql = 'SELECT count(e0_.a) AS sclr_0 FROM Entity e0_';
@@ -78,7 +74,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query));
     }
 
-    public function testCalculateCountForQueryWithGroupBy()
+    public function testCalculateCountForQueryWithGroupBy(): void
     {
         $query = $this->getQuery('SELECT e FROM ' . Entity::class . ' e GROUP BY e.b');
         $expectedSql = 'SELECT COUNT(*)'
@@ -96,7 +92,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query));
     }
 
-    public function testCalculateCountForQueryWithParameters()
+    public function testCalculateCountForQueryWithParameters(): void
     {
         $query = $this->getQuery(
             'SELECT e FROM ' . Entity::class . ' e WHERE e.a = :a AND e.b = :b',
@@ -117,7 +113,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query));
     }
 
-    public function testCalculateCountForQueryWithParametersAndDisabledCountWalker()
+    public function testCalculateCountForQueryWithParametersAndDisabledCountWalker(): void
     {
         $query = $this->getQuery(
             'SELECT e FROM ' . Entity::class . ' e WHERE e.a = :a AND e.b = :b',
@@ -140,7 +136,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query, false));
     }
 
-    public function testCalculateCountForQueryWithParameterUsedSeveralTimes()
+    public function testCalculateCountForQueryWithParameterUsedSeveralTimes(): void
     {
         $query = $this->getQuery(
             'SELECT DISTINCT e.a FROM ' . Entity::class . ' e WHERE e.a = :value AND e.b = :value',
@@ -162,7 +158,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query));
     }
 
-    public function testCalculateCountForQueryWithParameterUsedSeveralTimesAndDisabledCountWalker()
+    public function testCalculateCountForQueryWithParameterUsedSeveralTimesAndDisabledCountWalker(): void
     {
         $query = $this->getQuery(
             'SELECT DISTINCT e.a FROM ' . Entity::class . ' e WHERE e.a = :value AND e.b = :value',
@@ -185,7 +181,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query, false));
     }
 
-    public function testCalculateCountForQueryWithPositionalParameters()
+    public function testCalculateCountForQueryWithPositionalParameters(): void
     {
         $query = $this->getQuery(
             'SELECT e.a FROM ' . Entity::class . ' e WHERE e.a = ?1 AND e.b = ?0',
@@ -206,7 +202,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query));
     }
 
-    public function testCalculateCountForQueryWithPositionalParametersAndDisabledCountWalker()
+    public function testCalculateCountForQueryWithPositionalParametersAndDisabledCountWalker(): void
     {
         $query = $this->getQuery(
             'SELECT e.a FROM ' . Entity::class . ' e WHERE e.a = ?1 AND e.b = ?0',
@@ -229,7 +225,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query, false));
     }
 
-    public function testCalculateCountDistinct()
+    public function testCalculateCountDistinct(): void
     {
         $query = $this->getQuery(
             'SELECT e FROM ' . Entity::class . ' e WHERE e.a = :a AND e.b = :b',
@@ -250,7 +246,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCountDistinct($query));
     }
 
-    public function testCalculateCountDistinctWhenCountWalkerIsNotUsed()
+    public function testCalculateCountDistinctWhenCountWalkerIsNotUsed(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -261,7 +257,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         QueryCountCalculator::calculateCountDistinct($query);
     }
 
-    public function testCalculateCountWhenResultSetMappingIsAlreadyBuilt()
+    public function testCalculateCountWhenResultSetMappingIsAlreadyBuilt(): void
     {
         $query = $this->getQuery(
             'SELECT e FROM ' . Entity::class . ' e WHERE e.a = :a',
@@ -310,7 +306,7 @@ class QueryCountCalculatorTest extends OrmTestCase
     /**
      * @dataProvider getSqlCountDataProvider
      */
-    public function testCalculateCountForSqlQuery(string $sql, ?bool $useWalker = null)
+    public function testCalculateCountForSqlQuery(string $sql, ?bool $useWalker = null): void
     {
         $qb = $this->createMock(SqlQueryBuilder::class);
 
@@ -359,7 +355,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         ];
     }
 
-    public function testCalculateCountForInvalidQueryType()
+    public function testCalculateCountForInvalidQueryType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -369,7 +365,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         QueryCountCalculator::calculateCount(123);
     }
 
-    public function testCalculateCountForInvalidQueryTypeAndUseWalker()
+    public function testCalculateCountForInvalidQueryTypeAndUseWalker(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(

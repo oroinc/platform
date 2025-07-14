@@ -12,30 +12,21 @@ use Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\ThemeBundle\Model\Theme;
 use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
+class LocaleSettingsTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var CalendarFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $calendarFactory;
-
-    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationManager;
-
-    /** @var LocaleConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeConfigProvider;
-
-    /** @var ThemeRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $themeRegistry;
-
-    /** @var LocaleSettings */
-    private $localeSettings;
+    private ConfigManager&MockObject $configManager;
+    private CalendarFactoryInterface&MockObject $calendarFactory;
+    private LocalizationManager&MockObject $localizationManager;
+    private LocaleConfigurationProvider&MockObject $localeConfigProvider;
+    private ThemeRegistry&MockObject $themeRegistry;
+    private LocaleSettings $localeSettings;
 
     #[\Override]
     protected function setUp(): void
@@ -55,7 +46,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameFormats()
+    public function testGetNameFormats(): void
     {
         $enFormat = '%first_name% %middle_name% %last_name%';
 
@@ -69,7 +60,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNameFormats()
+    public function testAddNameFormats(): void
     {
         $enFormat = '%first_name% %middle_name% %last_name%';
         $enFormatModified = '%prefix% %%first_name% %middle_name% %last_name% %suffix%';
@@ -86,7 +77,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAddressFormats()
+    public function testGetAddressFormats(): void
     {
         $usFormat = [
             LocaleSettings::ADDRESS_FORMAT_KEY
@@ -103,7 +94,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddAddressFormats()
+    public function testAddAddressFormats(): void
     {
         $usFormat = [
             LocaleSettings::ADDRESS_FORMAT_KEY
@@ -129,7 +120,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLocaleData()
+    public function testGetLocaleData(): void
     {
         $usData = [LocaleSettings::DEFAULT_LOCALE_KEY => 'en_US'];
 
@@ -143,7 +134,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddLocaleData()
+    public function testAddLocaleData(): void
     {
         $usData = [LocaleSettings::DEFAULT_LOCALE_KEY => 'en_US'];
         $usDataModified = [LocaleSettings::DEFAULT_LOCALE_KEY => 'en'];
@@ -207,7 +198,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         string $countryCode,
         string $expectedLocale,
         ?string $defaultLocale = null
-    ) {
+    ): void {
         $this->localeSettings->addLocaleData($localeData);
 
         if (null !== $defaultLocale) {
@@ -221,7 +212,8 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
                 ->with(42)
                 ->willReturn(['id' => 42, 'formattingCode' => $defaultLocale]);
         } else {
-            $this->configManager->expects($this->never())->method($this->anything());
+            $this->configManager->expects($this->never())
+                ->method($this->anything());
         }
 
         $this->assertEquals($expectedLocale, $this->localeSettings->getLocaleByCountry($countryCode));
@@ -247,7 +239,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getLocaleDataProvider
      */
-    public function testGetLocale(string $expectedValue, ?string $configurationValue)
+    public function testGetLocale(string $expectedValue, ?string $configurationValue): void
     {
         // We cannot cache localization because it depends on ConfigManager, which can work in different scopes
         // and there is already a cache that takes into account the scope.
@@ -279,7 +271,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetCountry()
+    public function testGetCountry(): void
     {
         $expectedCountry = 'CA';
 
@@ -292,18 +284,16 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedCountry, $this->localeSettings->getCountry());
     }
 
-    public function testGetCountryDefault()
+    public function testGetCountryDefault(): void
     {
         $expectedCountry = 'US';
 
         $this->configManager->expects($this->any())
             ->method('get')
-            ->willReturnMap(
-                [
-                    ['oro_locale.country', false, false, null, null],
-                    ['oro_locale.default_localization', false, false, null, 42],
-                ]
-            );
+            ->willReturnMap([
+                ['oro_locale.country', false, false, null, null],
+                ['oro_locale.default_localization', false, false, null, 42],
+            ]);
 
         $this->localizationManager->expects($this->once())
             ->method('getLocalizationData')
@@ -317,7 +307,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getTimeZoneDataProvider
      */
-    public function testGetTimeZone(string $expectedValue, ?string $configurationValue)
+    public function testGetTimeZone(string $expectedValue, ?string $configurationValue): void
     {
         $this->configManager->expects($this->once())
             ->method('get')
@@ -342,7 +332,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetCurrency()
+    public function testGetCurrency(): void
     {
         $expectedCurrency = 'GBP';
 
@@ -355,7 +345,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedCurrency, $this->localeSettings->getCurrency());
     }
 
-    public function testGetCurrencyDefault()
+    public function testGetCurrencyDefault(): void
     {
         $expectedCurrency = CurrencyConfiguration::DEFAULT_CURRENCY;
 
@@ -368,7 +358,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedCurrency, $this->localeSettings->getCurrency());
     }
 
-    public function testGetCalendarDefaultLocaleAndLanguage()
+    public function testGetCalendarDefaultLocaleAndLanguage(): void
     {
         $expectedLocale = 'ru_RU';
         $expectedLanguage = 'fr_CA';
@@ -385,30 +375,33 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
 
         $calendar = $this->createMock(Calendar::class);
 
-        $this->calendarFactory->expects($this->once())->method('getCalendar')
+        $this->calendarFactory->expects($this->once())
+            ->method('getCalendar')
             ->with($expectedLocale, $expectedLanguage)
             ->willReturn($calendar);
 
         $this->assertSame($calendar, $this->localeSettings->getCalendar());
     }
 
-    public function testGetCalendarSpecificLocale()
+    public function testGetCalendarSpecificLocale(): void
     {
         $locale = 'ru_RU';
         $language = 'fr_CA';
 
-        $this->configManager->expects($this->never())->method($this->anything());
+        $this->configManager->expects($this->never())
+            ->method($this->anything());
 
         $calendar = $this->createMock(Calendar::class);
 
-        $this->calendarFactory->expects($this->once())->method('getCalendar')
+        $this->calendarFactory->expects($this->once())
+            ->method('getCalendar')
             ->with($locale, $language)
             ->willReturn($calendar);
 
         $this->assertSame($calendar, $this->localeSettings->getCalendar($locale, $language));
     }
 
-    public function testIsFormatAddressByAddressCountry()
+    public function testIsFormatAddressByAddressCountry(): void
     {
         $this->configManager->expects($this->exactly(2))
             ->method('get')
@@ -425,7 +418,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getLanguageDataProvider
      */
-    public function testGetLanguage(string $expectedValue, ?string $configurationValue)
+    public function testGetLanguage(string $expectedValue, ?string $configurationValue): void
     {
         // We cannot cache localization because it depends on ConfigManager, which can work in different scopes
         // and there is already a cache that takes into account the scope.
@@ -566,7 +559,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->localeSettings->isRtlMode());
     }
 
-    public function testGetActualLanguage()
+    public function testGetActualLanguage(): void
     {
         $en = 'en';
         $fr = 'fr';
@@ -588,7 +581,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($fr, $this->localeSettings->getActualLanguage());
     }
 
-    public function testGetCurrencySymbolByCurrency()
+    public function testGetCurrencySymbolByCurrency(): void
     {
         $existingCurrencyCode = 'USD';
         $existingCurrencySymbol = '$';
@@ -608,7 +601,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLocaleByCode()
+    public function testGetLocaleByCode(): void
     {
         $locales = $this->localeSettings->getLocalesByCodes(['en', 'fr']);
         $this->assertCount(2, $locales);
@@ -622,7 +615,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider localeProvider
      */
-    public function testGetCountryByLocal(string $locale, string $expectedCurrency)
+    public function testGetCountryByLocal(string $locale, string $expectedCurrency): void
     {
         $currency = LocaleSettings::getCurrencyByLocale($locale);
 

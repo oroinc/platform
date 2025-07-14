@@ -6,28 +6,21 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterState;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
+class SegmentQueryConverterStateTest extends TestCase
 {
-    /** @var CacheItemPoolInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var CacheItemInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cacheItem;
-
-    /** @var AbstractQueryDesigner|\PHPUnit\Framework\MockObject\MockObject */
-    private $segment;
-
-    /** @var string */
-    private $segmentHash;
-
-    /** @var SegmentQueryConverterState */
-    private $state;
+    private CacheItemPoolInterface&MockObject $cache;
+    private CacheItemInterface&MockObject $cacheItem;
+    private AbstractQueryDesigner&MockObject $segment;
+    private string $segmentHash;
+    private SegmentQueryConverterState $state;
 
     #[\Override]
     protected function setUp(): void
@@ -46,7 +39,7 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
         $this->segmentHash = md5($this->segment->getEntity() . '::' . $this->segment->getDefinition());
     }
 
-    public function testRegisterQuery()
+    public function testRegisterQuery(): void
     {
         $segmentId = 123;
         $segment1Id = 234;
@@ -68,7 +61,7 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($this->segmentHash . '_4', $this->state->buildQueryAlias($segmentId, $this->segment));
     }
 
-    public function testUnregisterQuery()
+    public function testUnregisterQuery(): void
     {
         $segmentId = 123;
         $segment1Id = 234;
@@ -87,7 +80,7 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
         $this->state->unregisterQuery($segmentId);
     }
 
-    public function testUnregisterQueryWhenNoRegisteredQueries()
+    public function testUnregisterQueryWhenNoRegisteredQueries(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -97,7 +90,7 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
         $this->state->unregisterQuery(123);
     }
 
-    public function testUnregisterQueryWhenAllQueriesForSegmentAlreadyUnregistered()
+    public function testUnregisterQueryWhenAllQueriesForSegmentAlreadyUnregistered(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -110,18 +103,18 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
         $this->state->unregisterQuery(123);
     }
 
-    public function testIsRootQueryWhenNoRegisteredQueries()
+    public function testIsRootQueryWhenNoRegisteredQueries(): void
     {
         self::assertFalse($this->state->isRootQuery(123));
     }
 
-    public function testIsRootQueryForNotRegisteredQuery()
+    public function testIsRootQueryForNotRegisteredQuery(): void
     {
         $this->state->registerQuery(123);
         self::assertFalse($this->state->isRootQuery(234));
     }
 
-    public function testIsRootQueryWhenAllQueriesAreUnregistered()
+    public function testIsRootQueryWhenAllQueriesAreUnregistered(): void
     {
         $segmentId = 123;
 
@@ -131,7 +124,7 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->state->isRootQuery($segmentId));
     }
 
-    public function testIsRootQueryWhenAllQueriesAreUnregisteredAndThenNewQueryIsRegistered()
+    public function testIsRootQueryWhenAllQueriesAreUnregisteredAndThenNewQueryIsRegistered(): void
     {
         $segmentId = 123;
 
@@ -142,7 +135,7 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->state->isRootQuery($segmentId));
     }
 
-    public function testIsRootQuery()
+    public function testIsRootQuery(): void
     {
         $segmentId = 123;
         $segment1Id = 234;
@@ -179,7 +172,7 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->state->isRootQuery($segment1Id));
     }
 
-    public function testBuildQueryAliasWhenNoRegisteredQueries()
+    public function testBuildQueryAliasWhenNoRegisteredQueries(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('A query for the segment 123 was not registered yet.');
@@ -187,7 +180,7 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
         $this->state->buildQueryAlias(123, $this->segment);
     }
 
-    public function testBuildQueryAliasForNotRegisteredQuery()
+    public function testBuildQueryAliasForNotRegisteredQuery(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('A query for the segment 234 was not registered yet.');
@@ -196,7 +189,7 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
         $this->state->buildQueryAlias(234, $this->segment);
     }
 
-    public function testBuildQueryAliasWhenAllQueriesAreUnregistered()
+    public function testBuildQueryAliasWhenAllQueriesAreUnregistered(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('A query for the segment 123 was not registered yet.');
@@ -209,7 +202,7 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
         $this->state->buildQueryAlias($segmentId, $this->segment);
     }
 
-    public function testBuildQueryAliasWhenAllQueriesAreUnregisteredAndThenNewQueryIsRegistered()
+    public function testBuildQueryAliasWhenAllQueriesAreUnregisteredAndThenNewQueryIsRegistered(): void
     {
         $segmentId = 123;
 
@@ -220,7 +213,7 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($this->segmentHash . '_1', $this->state->buildQueryAlias($segmentId, $this->segment));
     }
 
-    public function testBuildQueryAlias()
+    public function testBuildQueryAlias(): void
     {
         $segmentId = 123;
         $segment1Id = 234;
@@ -254,7 +247,7 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
         $this->state->unregisterQuery($segmentId);
     }
 
-    public function testGetQueryFromCacheWhenNoCachedQuery()
+    public function testGetQueryFromCacheWhenNoCachedQuery(): void
     {
         $this->cache->expects(self::once())
             ->method('getItem')
@@ -267,7 +260,7 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->state->getQueryFromCache(123));
     }
 
-    public function testGetQueryFromCacheWhenHasCachedQuery()
+    public function testGetQueryFromCacheWhenHasCachedQuery(): void
     {
         $cachedQuery = (new QueryBuilder($this->createMock(EntityManagerInterface::class)))
             ->from('Test\Entity', 'e')
@@ -289,7 +282,7 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($cachedQuery, $query);
     }
 
-    public function testSaveQueryToCache()
+    public function testSaveQueryToCache(): void
     {
         $query = (new QueryBuilder($this->createMock(EntityManagerInterface::class)))
             ->from('Test\Entity', 'e')

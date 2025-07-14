@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Context;
 
 use Oro\Bundle\ImportExportBundle\Context\Context;
+use PHPUnit\Framework\TestCase;
 
-class ContextTest extends \PHPUnit\Framework\TestCase
+class ContextTest extends TestCase
 {
-    public function testErrors()
+    public function testErrors(): void
     {
         $context = new Context([]);
 
@@ -18,7 +19,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['error_1', 'error_2', 'error_3'], $context->getErrors());
     }
 
-    public function testPostponedRows()
+    public function testPostponedRows(): void
     {
         $context = new Context([]);
 
@@ -32,7 +33,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         ], $context->getPostponedRows());
     }
 
-    public function testIncrementRead()
+    public function testIncrementRead(): void
     {
         $context = new Context(['incremented_read' => false]);
         $context->incrementReadCount(1);
@@ -43,7 +44,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(1, $context->getReadCount());
     }
 
-    public function testExceptions()
+    public function testExceptions(): void
     {
         $context = new Context([]);
 
@@ -58,7 +59,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['exception_1', 'exception_2'], $context->getFailureExceptions());
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         $context = new Context([]);
 
@@ -98,7 +99,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(4, (int)$context->getErrorEntriesCount());
     }
 
-    public function testOffset()
+    public function testOffset(): void
     {
         $context = new Context([]);
 
@@ -117,7 +118,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         array $getOptionArguments,
         bool $hasOption,
         ?int $value
-    ) {
+    ): void {
         $context = new Context($configuration);
 
         $this->assertEquals($hasOption, $context->hasOption($getOptionArguments[0]));

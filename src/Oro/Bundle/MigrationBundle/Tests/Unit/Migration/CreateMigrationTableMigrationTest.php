@@ -5,13 +5,14 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\CreateMigrationTableMigration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use PHPUnit\Framework\TestCase;
 
-class CreateMigrationTableMigrationTest extends \PHPUnit\Framework\TestCase
+class CreateMigrationTableMigrationTest extends TestCase
 {
-    public function testUp()
+    public function testUp(): void
     {
-        $schema          = new Schema();
-        $queryBag        = new QueryBag();
+        $schema = new Schema();
+        $queryBag = new QueryBag();
         $createMigration = new CreateMigrationTableMigration();
         $createMigration->up($schema, $queryBag);
 

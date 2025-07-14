@@ -3,17 +3,16 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Csrf;
 
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
-class CsrfRequestManagerTest extends \PHPUnit\Framework\TestCase
+class CsrfRequestManagerTest extends TestCase
 {
-    /** @var CsrfTokenManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $csrfTokenManager;
-
-    /** @var CsrfRequestManager */
-    private $manager;
+    private CsrfTokenManagerInterface&MockObject $csrfTokenManager;
+    private CsrfRequestManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class CsrfRequestManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager = new CsrfRequestManager($this->csrfTokenManager);
     }
 
-    public function testRefreshRequestToken()
+    public function testRefreshRequestToken(): void
     {
         $this->csrfTokenManager->expects($this->once())
             ->method('refreshToken')
@@ -32,7 +31,7 @@ class CsrfRequestManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->refreshRequestToken();
     }
 
-    public function testIsRequestTokenValidForRequestValue()
+    public function testIsRequestTokenValidForRequestValue(): void
     {
         $request = Request::create('/');
         $value = 'test';
@@ -46,7 +45,7 @@ class CsrfRequestManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->manager->isRequestTokenValid($request, true));
     }
 
-    public function testIsRequestTokenValidForHeader()
+    public function testIsRequestTokenValidForHeader(): void
     {
         $request = Request::create('/');
         $value = 'test';
@@ -60,7 +59,7 @@ class CsrfRequestManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->manager->isRequestTokenValid($request));
     }
 
-    public function testIsRequestTokenValidForEmptyRequestValue()
+    public function testIsRequestTokenValidForEmptyRequestValue(): void
     {
         $request = Request::create('/');
 
@@ -70,7 +69,7 @@ class CsrfRequestManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->manager->isRequestTokenValid($request, true));
     }
 
-    public function testIsRequestTokenValidForEmptyHeader()
+    public function testIsRequestTokenValidForEmptyHeader(): void
     {
         $request = Request::create('/');
 

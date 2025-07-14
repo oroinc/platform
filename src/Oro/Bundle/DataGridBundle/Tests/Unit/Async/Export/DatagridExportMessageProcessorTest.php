@@ -16,23 +16,19 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DatagridExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class DatagridExportMessageProcessorTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private JobRunner|\PHPUnit\Framework\MockObject\MockObject $jobRunner;
-
-    private ExportHandler|\PHPUnit\Framework\MockObject\MockObject $exportHandler;
-
-    private ExportProcessor|\PHPUnit\Framework\MockObject\MockObject $exportProcessor;
-
-    private ItemReaderInterface|\PHPUnit\Framework\MockObject\MockObject $exportItemReader;
-
-    private WriterChain|\PHPUnit\Framework\MockObject\MockObject $writerChain;
-
-    private FileManager|\PHPUnit\Framework\MockObject\MockObject $fileManager;
-
+    private JobRunner&MockObject $jobRunner;
+    private ExportHandler&MockObject $exportHandler;
+    private ExportProcessor&MockObject $exportProcessor;
+    private ItemReaderInterface&MockObject $exportItemReader;
+    private WriterChain&MockObject $writerChain;
+    private FileManager&MockObject $fileManager;
     private DatagridExportMessageProcessor $processor;
 
     #[\Override]
@@ -76,14 +72,12 @@ class DatagridExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         ];
         $message->setBody($messageBody);
 
-        $this->writerChain
-            ->expects(self::once())
+        $this->writerChain->expects(self::once())
             ->method('getWriter')
             ->with($messageBody['outputFormat'])
             ->willReturn(null);
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('error')
             ->with(
                 'Export writer for output format {outputFormat} was expected to be {expectedClass}, got {actualClass}',
@@ -112,31 +106,26 @@ class DatagridExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $message->setBody($messageBody);
 
         $exportWriter = $this->createMock(FileStreamWriter::class);
-        $this->writerChain
-            ->expects(self::once())
+        $this->writerChain->expects(self::once())
             ->method('getWriter')
             ->with($messageBody['outputFormat'])
             ->willReturn($exportWriter);
 
         $delayedJobRunner = $this->createMock(JobRunner::class);
         $delayedJob = new Job();
-        $this->jobRunner
-            ->expects(self::once())
+        $this->jobRunner->expects(self::once())
             ->method('runDelayed')
             ->with($messageBody['jobId'], self::isType('callable'))
-            ->willReturnCallback(
-                function (int $jobId, callable $callback) use ($delayedJobRunner, $delayedJob) {
-                    return $callback($delayedJobRunner, $delayedJob);
-                }
-            );
+            ->willReturnCallback(function (int $jobId, callable $callback) use ($delayedJobRunner, $delayedJob) {
+                return $callback($delayedJobRunner, $delayedJob);
+            });
 
         $exportResult = [
             'success' => true,
             'readsCount' => 142,
             'errorsCount' => 0,
         ];
-        $this->exportHandler
-            ->expects(self::once())
+        $this->exportHandler->expects(self::once())
             ->method('handle')
             ->with(
                 $this->exportItemReader,
@@ -148,8 +137,7 @@ class DatagridExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($exportResult);
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('info')
             ->with(
                 'Export of the batch with offset {rowsStart}, limit {rowsLimit} is finished. Success: {success}. '
@@ -163,8 +151,7 @@ class DatagridExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->fileManager
-            ->expects(self::never())
+        $this->fileManager->expects(self::never())
             ->method('writeToStorage');
 
         self::assertEquals(
@@ -187,23 +174,19 @@ class DatagridExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $message->setBody($messageBody);
 
         $exportWriter = $this->createMock(FileStreamWriter::class);
-        $this->writerChain
-            ->expects(self::once())
+        $this->writerChain->expects(self::once())
             ->method('getWriter')
             ->with($messageBody['outputFormat'])
             ->willReturn($exportWriter);
 
         $delayedJobRunner = $this->createMock(JobRunner::class);
         $delayedJob = new Job();
-        $this->jobRunner
-            ->expects(self::once())
+        $this->jobRunner->expects(self::once())
             ->method('runDelayed')
             ->with($messageBody['jobId'], self::isType('callable'))
-            ->willReturnCallback(
-                function (int $jobId, callable $callback) use ($delayedJobRunner, $delayedJob) {
-                    return $callback($delayedJobRunner, $delayedJob);
-                }
-            );
+            ->willReturnCallback(function (int $jobId, callable $callback) use ($delayedJobRunner, $delayedJob) {
+                return $callback($delayedJobRunner, $delayedJob);
+            });
 
         $exportResult = [
             'success' => false,
@@ -211,8 +194,7 @@ class DatagridExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'errorsCount' => 1,
             'errors' => ['Sample error 1'],
         ];
-        $this->exportHandler
-            ->expects(self::once())
+        $this->exportHandler->expects(self::once())
             ->method('handle')
             ->with(
                 $this->exportItemReader,
@@ -224,8 +206,7 @@ class DatagridExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($exportResult);
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('info')
             ->with(
                 'Export of the batch with offset {rowsStart}, limit {rowsLimit} is finished. Success: {success}. '
@@ -239,8 +220,7 @@ class DatagridExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->fileManager
-            ->expects(self::once())
+        $this->fileManager->expects(self::once())
             ->method('writeToStorage')
             ->with(
                 json_encode($exportResult['errors'], JSON_THROW_ON_ERROR),

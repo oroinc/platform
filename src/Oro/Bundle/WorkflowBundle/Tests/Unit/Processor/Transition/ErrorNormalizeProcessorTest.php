@@ -10,6 +10,8 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\ErrorNormalizeProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -17,13 +19,10 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class ErrorNormalizeProcessorTest extends \PHPUnit\Framework\TestCase
+class ErrorNormalizeProcessorTest extends TestCase
 {
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var ErrorNormalizeProcessor */
-    private $processor;
+    private LoggerInterface&MockObject $logger;
+    private ErrorNormalizeProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +35,7 @@ class ErrorNormalizeProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider errorsProvider
      */
-    public function testMessagesAndCodesCatch(\Throwable $error, int $code, string $message)
+    public function testMessagesAndCodesCatch(\Throwable $error, int $code, string $message): void
     {
         $context = $this->createContextAndLoggingAssertions($error);
 
@@ -115,7 +114,7 @@ class ErrorNormalizeProcessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSkipHasNoError()
+    public function testSkipHasNoError(): void
     {
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
@@ -127,7 +126,7 @@ class ErrorNormalizeProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testSkipAsResponseCodeAndMessageAlreadyDefined()
+    public function testSkipAsResponseCodeAndMessageAlreadyDefined(): void
     {
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())

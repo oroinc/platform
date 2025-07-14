@@ -9,20 +9,15 @@ use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AuditGridOrganizationListenerTest extends \PHPUnit\Framework\TestCase
+class AuditGridOrganizationListenerTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var AuditGridOrganizationListener */
-    private $listener;
-
-    /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagrid;
-
-    /** @var OrganizationRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private AuditGridOrganizationListener $listener;
+    private DatagridInterface&MockObject $datagrid;
+    private OrganizationRepository&MockObject $repository;
 
     #[\Override]
     protected function setUp(): void
@@ -38,13 +33,13 @@ class AuditGridOrganizationListenerTest extends \PHPUnit\Framework\TestCase
         $this->datagrid = $this->createMock(DatagridInterface::class);
     }
 
-    public function testAddDataSupportNoData()
+    public function testAddDataSupportNoData(): void
     {
         $event = new OrmResultAfter($this->datagrid, []);
         $this->listener->addOrganizationSupport($event);
     }
 
-    public function testAddDataSupportNoIds()
+    public function testAddDataSupportNoIds(): void
     {
         $record = new ResultRecord([]);
         $event = new OrmResultAfter($this->datagrid, [$record]);
@@ -54,7 +49,7 @@ class AuditGridOrganizationListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($record->getValue('organization'));
     }
 
-    public function testAddDataSupportNoOrganization()
+    public function testAddDataSupportNoOrganization(): void
     {
         $record = new ResultRecord(['organization' => 1]);
         $event = new OrmResultAfter($this->datagrid, [$record]);
@@ -65,7 +60,7 @@ class AuditGridOrganizationListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($record->getValue('organization'));
     }
 
-    public function testAddDataSupportSetOrganizationName()
+    public function testAddDataSupportSetOrganizationName(): void
     {
         $organization = new Organization();
         $organization->setName('Org Name');
@@ -78,7 +73,7 @@ class AuditGridOrganizationListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($organization->getName(), $record->getValue('organization'));
     }
 
-    public function testAddDataSupportMultipleOrganizations()
+    public function testAddDataSupportMultipleOrganizations(): void
     {
         $organization = new Organization();
         $organization->setName('Org Name');

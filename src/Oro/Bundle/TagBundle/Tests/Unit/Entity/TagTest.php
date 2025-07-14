@@ -6,11 +6,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class TagTest extends \PHPUnit\Framework\TestCase
+class TagTest extends TestCase
 {
-    /** @var Tag */
-    private $tag;
+    private Tag $tag;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class TagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(null, $this->tag->getId());
     }
 
-    public function testSetGetNameMethods()
+    public function testSetGetNameMethods(): void
     {
         $this->tag->setName('test');
         $this->assertEquals('test', $this->tag->getName());
@@ -30,7 +30,7 @@ class TagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test 2', $tag->__toString());
     }
 
-    public function testDateTimeMethods()
+    public function testDateTimeMethods(): void
     {
         $timeCreated = new \DateTime('now');
         $timeUpdated = new \DateTime('now');
@@ -42,7 +42,7 @@ class TagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($timeUpdated, $this->tag->getUpdated());
     }
 
-    public function testAuthorAndUpdaterStoring()
+    public function testAuthorAndUpdaterStoring(): void
     {
         $user = $this->createMock(User::class);
 
@@ -50,7 +50,7 @@ class TagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($user, $this->tag->getOwner());
     }
 
-    public function testUpdatedTime()
+    public function testUpdatedTime(): void
     {
         $this->tag->doUpdate();
         $oldUpdatedTime = $this->tag->getUpdated();
@@ -60,12 +60,12 @@ class TagTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEquals($oldUpdatedTime, $this->tag->getUpdated());
     }
 
-    public function testGetTagging()
+    public function testGetTagging(): void
     {
         $this->assertInstanceOf(ArrayCollection::class, $this->tag->getTagging());
     }
 
-    public function testOwners()
+    public function testOwners(): void
     {
         $entity = $this->tag;
         $user = new User();
@@ -77,7 +77,7 @@ class TagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($user, $entity->getOwner());
     }
 
-    public function testOrganization()
+    public function testOrganization(): void
     {
         $entity = $this->tag;
         $organization = new Organization();

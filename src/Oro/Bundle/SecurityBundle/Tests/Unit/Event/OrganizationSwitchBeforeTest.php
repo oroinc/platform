@@ -5,10 +5,11 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Event;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Event\OrganizationSwitchBefore;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class OrganizationSwitchBeforeTest extends \PHPUnit\Framework\TestCase
+class OrganizationSwitchBeforeTest extends TestCase
 {
-    public function testEventInterface()
+    public function testEventInterface(): void
     {
         $user = $this->createMock(User::class);
         $organization = $this->createMock(Organization::class);

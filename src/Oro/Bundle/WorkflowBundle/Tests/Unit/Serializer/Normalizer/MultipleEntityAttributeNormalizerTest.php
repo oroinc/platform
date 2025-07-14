@@ -260,7 +260,7 @@ class MultipleEntityAttributeNormalizerTest extends TestCase
     /**
      * @dataProvider normalizeDirectionDataProvider
      */
-    public function testSupportsNormalizationForSingle(string $direction)
+    public function testSupportsNormalizationForSingle(string $direction): void
     {
         $attributeValue = 'bar';
 
@@ -278,7 +278,7 @@ class MultipleEntityAttributeNormalizerTest extends TestCase
     /**
      * @dataProvider normalizeDirectionDataProvider
      */
-    public function testNotSupportsNormalizationWhenNotEntityType(string $direction)
+    public function testNotSupportsNormalizationWhenNotEntityType(string $direction): void
     {
         $attributeValue = 'bar';
 

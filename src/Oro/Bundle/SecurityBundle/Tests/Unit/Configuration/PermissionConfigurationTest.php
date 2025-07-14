@@ -3,9 +3,10 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Processor;
 
-class PermissionConfigurationTest extends \PHPUnit\Framework\TestCase
+class PermissionConfigurationTest extends TestCase
 {
     private function processConfiguration(array $configs): array
     {

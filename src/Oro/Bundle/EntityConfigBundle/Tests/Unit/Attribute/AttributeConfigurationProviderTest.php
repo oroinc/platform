@@ -9,26 +9,19 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Layout\DataProvider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AttributeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
+class AttributeConfigurationProviderTest extends TestCase
 {
     private const CLASS_NAME = \stdClass::class;
     private const FIELD_NAME = 'test_field';
 
-    /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfig;
-
-    /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendConfig;
-
-    /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeConfig;
-
-    /** @var AttributeConfigurationProvider */
-    private $provider;
-
-    /** @var FieldConfigModel */
-    private $attribute;
+    private ConfigInterface&MockObject $entityConfig;
+    private ConfigInterface&MockObject $extendConfig;
+    private ConfigInterface&MockObject $attributeConfig;
+    private AttributeConfigurationProvider $provider;
+    private FieldConfigModel $attribute;
 
     #[\Override]
     protected function setUp(): void
@@ -40,13 +33,11 @@ class AttributeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->once())
             ->method('getProvider')
-            ->willReturnMap(
-                [
-                    ['entity', $this->getConfigProvider($this->entityConfig)],
-                    ['extend', $this->getConfigProvider($this->extendConfig)],
-                    ['attribute', $this->getConfigProvider($this->attributeConfig)],
-                ]
-            );
+            ->willReturnMap([
+                ['entity', $this->getConfigProvider($this->entityConfig)],
+                ['extend', $this->getConfigProvider($this->extendConfig)],
+                ['attribute', $this->getConfigProvider($this->attributeConfig)],
+            ]);
 
         $this->provider = new AttributeConfigurationProvider($configManager);
 
@@ -54,7 +45,7 @@ class AttributeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->attribute->setEntity(new EntityConfigModel(self::CLASS_NAME));
     }
 
-    public function testGetAttributeLabel()
+    public function testGetAttributeLabel(): void
     {
         $this->entityConfig->expects($this->once())
             ->method('get')
@@ -64,7 +55,7 @@ class AttributeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test label', $this->provider->getAttributeLabel($this->attribute));
     }
 
-    public function testIsAttributeActive()
+    public function testIsAttributeActive(): void
     {
         $this->extendConfig->expects($this->once())
             ->method('in')
@@ -74,7 +65,7 @@ class AttributeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->provider->isAttributeActive($this->attribute));
     }
 
-    public function testIsAttributeSearchable()
+    public function testIsAttributeSearchable(): void
     {
         $this->attributeConfig->expects($this->once())
             ->method('is')
@@ -84,7 +75,7 @@ class AttributeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->provider->isAttributeSearchable($this->attribute));
     }
 
-    public function testIsAttributeFilterable()
+    public function testIsAttributeFilterable(): void
     {
         $this->attributeConfig->expects($this->once())
             ->method('is')
@@ -94,7 +85,7 @@ class AttributeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->provider->isAttributeFilterable($this->attribute));
     }
 
-    public function testIsAttributeFilterByExactValue()
+    public function testIsAttributeFilterByExactValue(): void
     {
         $this->attributeConfig->expects($this->once())
             ->method('is')
@@ -104,7 +95,7 @@ class AttributeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->provider->isAttributeFilterByExactValue($this->attribute));
     }
 
-    public function testIsAttributeSortable()
+    public function testIsAttributeSortable(): void
     {
         $this->attributeConfig->expects($this->once())
             ->method('is')

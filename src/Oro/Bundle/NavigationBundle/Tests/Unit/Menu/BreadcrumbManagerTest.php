@@ -7,20 +7,15 @@ use Knp\Menu\MenuFactory;
 use Knp\Menu\MenuItem;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
+class BreadcrumbManagerTest extends TestCase
 {
-    /** @var Matcher|\PHPUnit\Framework\MockObject\MockObject */
-    private $matcher;
-
-    /** @var BuilderChainProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $provider;
-
-    /** @var MenuFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $factory;
-
-    /** @var BreadcrumbManager */
-    private $manager;
+    private Matcher&MockObject $matcher;
+    private BuilderChainProvider&MockObject $provider;
+    private MenuFactory&MockObject $factory;
+    private BreadcrumbManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +27,7 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager = new BreadcrumbManager($this->provider, $this->matcher);
     }
 
-    public function testGetBreadcrumbs()
+    public function testGetBreadcrumbs(): void
     {
         $item = new MenuItem('test', $this->factory);
         $subItem = new MenuItem('sub_item_test', $this->factory);
@@ -53,7 +48,7 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('sub_item_test', $breadcrumbs[0]['label']);
     }
 
-    public function testGetBreadcrumbsWithoutItem()
+    public function testGetBreadcrumbsWithoutItem(): void
     {
         $item = new MenuItem('test', $this->factory);
 
@@ -64,7 +59,7 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->manager->getBreadcrumbs('nullable'));
     }
 
-    public function testGetBreadcrumbsWithRoute()
+    public function testGetBreadcrumbsWithRoute(): void
     {
         $item = new MenuItem('test', $this->factory);
         $item->setExtra('routes', [
@@ -102,7 +97,7 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetBreadcrumbLabels()
+    public function testGetBreadcrumbLabels(): void
     {
         $item = new MenuItem('test', $this->factory);
         $item->setExtra('routes', [
@@ -127,7 +122,7 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMenu()
+    public function testGetMenu(): void
     {
         $item = new MenuItem('testItem', $this->factory);
         $subItem = new MenuItem('subItem', $this->factory);
@@ -143,7 +138,7 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getMenu('test', ['bad_item']);
     }
 
-    public function testGetCurrentMenuItem()
+    public function testGetCurrentMenuItem(): void
     {
         $item = new MenuItem('testItem', $this->factory);
         $goodItem = new MenuItem('goodItem', $this->factory);

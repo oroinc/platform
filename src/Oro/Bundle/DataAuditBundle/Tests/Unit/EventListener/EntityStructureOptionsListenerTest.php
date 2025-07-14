@@ -8,14 +8,13 @@ use Oro\Bundle\EntityBundle\Event\EntityStructureOptionsEvent;
 use Oro\Bundle\EntityBundle\Helper\UnidirectionalFieldHelper;
 use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
+class EntityStructureOptionsListenerTest extends TestCase
 {
-    /** @var AuditConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $auditConfigProvider;
-
-    /** @var EntityStructureOptionsListener */
-    private $listener;
+    private AuditConfigProvider&MockObject $auditConfigProvider;
+    private EntityStructureOptionsListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class EntityStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onOptionsRequestDataProvider
      */
-    public function testOnOptionsRequest(bool $isEntityAuditable, bool $isFieldAuditable)
+    public function testOnOptionsRequest(bool $isEntityAuditable, bool $isFieldAuditable): void
     {
         $field = $this->createMock(EntityFieldStructure::class);
         $field->expects($this->once())
@@ -89,7 +88,7 @@ class EntityStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testOnOptionsRequestUnidirectional()
+    public function testOnOptionsRequestUnidirectional(): void
     {
         $fieldName = sprintf('class%sfield', UnidirectionalFieldHelper::DELIMITER);
         $field = $this->createMock(EntityFieldStructure::class);

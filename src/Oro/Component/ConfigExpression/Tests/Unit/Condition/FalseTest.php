@@ -2,30 +2,31 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
-use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Condition\FalseCondition;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
-class FalseTest extends \PHPUnit\Framework\TestCase
+class FalseTest extends TestCase
 {
-    private Condition\FalseCondition $condition;
+    private FalseCondition $condition;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->condition = new Condition\FalseCondition();
+        $this->condition = new FalseCondition();
     }
 
-    public function testEvaluate()
+    public function testEvaluate(): void
     {
         $this->assertFalse($this->condition->evaluate('anything'));
     }
 
-    public function testInitializeSuccess()
+    public function testInitializeSuccess(): void
     {
         $this->assertSame($this->condition, $this->condition->initialize([]));
     }
 
-    public function testInitializeFails()
+    public function testInitializeFails(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options are prohibited');
@@ -36,7 +37,7 @@ class FalseTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray(?string $message, array $expected)
+    public function testToArray(?string $message, array $expected): void
     {
         if ($message !== null) {
             $this->condition->setMessage($message);
@@ -68,7 +69,7 @@ class FalseTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile(?string $message, string $expected)
+    public function testCompile(?string $message, string $expected): void
     {
         if ($message !== null) {
             $this->condition->setMessage($message);

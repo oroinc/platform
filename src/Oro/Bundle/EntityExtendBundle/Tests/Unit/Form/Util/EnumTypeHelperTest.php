@@ -10,17 +10,16 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
+class EnumTypeHelperTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var EnumTypeHelper */
-    private $typeHelper;
+    private ConfigManager&MockObject $configManager;
+    private EnumTypeHelper $typeHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         $this->typeHelper = new EnumTypeHelper($this->configManager);
     }
 
-    public function testGetEnumCodeForEntityNoConfig()
+    public function testGetEnumCodeForEntityNoConfig(): void
     {
         $className = 'Test\Entity';
 
@@ -49,7 +48,7 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEnumCodeForFieldNoConfig()
+    public function testGetEnumCodeForFieldNoConfig(): void
     {
         $className = 'Test\Entity';
         $fieldName = 'testField';
@@ -69,9 +68,9 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEnumCodeForEntity()
+    public function testGetEnumCodeForEntity(): void
     {
-        $enumCode  = 'test_enum';
+        $enumCode = 'test_enum';
         $className = 'Test\Entity';
 
         $config = $this->createMock(Config::class);
@@ -100,9 +99,9 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEnumCodeForField()
+    public function testGetEnumCodeForField(): void
     {
-        $enumCode  = 'test_enum';
+        $enumCode = 'test_enum';
         $className = 'Test\Entity';
         $fieldName = 'testField';
 
@@ -132,7 +131,7 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasEnumCodeForEntityNoConfig()
+    public function testHasEnumCodeForEntityNoConfig(): void
     {
         $className = 'Test\Entity';
 
@@ -151,7 +150,7 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasEnumCodeForFieldNoConfig()
+    public function testHasEnumCodeForFieldNoConfig(): void
     {
         $className = 'Test\Entity';
         $fieldName = 'testField';
@@ -171,7 +170,7 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasEnumCodeForEntity()
+    public function testHasEnumCodeForEntity(): void
     {
         $enumCode = 'test_enum';
         $className = 'Test\Entity';
@@ -201,7 +200,7 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasEnumCodeForField()
+    public function testHasEnumCodeForField(): void
     {
         $enumCode = 'test_enum';
         $className = 'Test\Entity';
@@ -232,7 +231,7 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasEnumCodeForEmptyEnumCode()
+    public function testHasEnumCodeForEmptyEnumCode(): void
     {
         $enumCode = '';
         $className = 'Test\Entity';
@@ -266,7 +265,7 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider hasOtherReferencesProvider
      */
-    public function testHasOtherReferences(string $enumType)
+    public function testHasOtherReferences(string $enumType): void
     {
         $enumCode = 'test_enum';
 
@@ -280,7 +279,7 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         $config1Field2->set('enum_code', $enumCode);
         $config1Field3 = new Config(new FieldConfigId('enum', 'Test\Entity1', 'field3', 'string'));
 
-        $configs      = [$config1, $config2];
+        $configs = [$config1, $config2];
         $fieldConfigs = [$config1Field1, $config1Field2, $config1Field3];
 
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
@@ -307,7 +306,7 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider hasOtherReferencesProvider
      */
-    public function testHasOtherReferencesWithNoRefs(string $enumType)
+    public function testHasOtherReferencesWithNoRefs(string $enumType): void
     {
         $enumCode = 'test_enum';
 
@@ -320,7 +319,7 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         $config1Field2 = new Config(new FieldConfigId('enum', 'Test\Entity1', 'field2', $enumType));
         $config1Field2->set('enum_code', 'another_enum');
 
-        $configs      = [$config1, $config2];
+        $configs = [$config1, $config2];
         $fieldConfigs = [$config1Field1, $config1Field2];
 
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
@@ -352,7 +351,7 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testIsSystemNoConfig()
+    public function testIsSystemNoConfig(): void
     {
         $className = 'Test\Entity';
 
@@ -376,7 +375,7 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isSystemProvider
      */
-    public function testIsSystem($owner, $expected, $fieldName = null)
+    public function testIsSystem($owner, $expected, $fieldName = null): void
     {
         $className = 'Test\Entity';
 
@@ -413,7 +412,7 @@ class EnumTypeHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetUndefinedEnumFieldType()
+    public function testGetUndefinedEnumFieldType(): void
     {
         $enumConfig1 = new Config(new EntityConfigId('enum', 'Test\EnumValue1'));
         $enumConfig1->set('public', true);

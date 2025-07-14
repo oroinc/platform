@@ -7,31 +7,21 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\View\ScrollData;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class AbstractFallbackFieldsFormViewTest extends \PHPUnit\Framework\TestCase
+class AbstractFallbackFieldsFormViewTest extends TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrine;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    protected $requestStack;
-
-    /** @var BeforeListRenderEvent|\PHPUnit\Framework\MockObject\MockObject */
-    protected $event;
-
-    /** @var FieldAclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $fieldAclHelper;
-
-    /** @var ScrollData|\PHPUnit\Framework\MockObject\MockObject */
-    protected $scrollData;
-
+    protected TranslatorInterface&MockObject $translator;
+    protected ManagerRegistry&MockObject $doctrine;
+    protected RequestStack&MockObject $requestStack;
+    protected BeforeListRenderEvent&MockObject $event;
+    protected FieldAclHelper&MockObject $fieldAclHelper;
+    protected ScrollData&MockObject $scrollData;
     /** @var FallbackFieldsFormViewStub */
     protected $fallbackFieldsFormView;
 
@@ -63,7 +53,7 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddBlockToEntityView()
+    public function testAddBlockToEntityView(): void
     {
         $env = $this->createMock(Environment::class);
         $env->expects($this->once())
@@ -85,7 +75,7 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddBlockToEntityViewWithSectionTitle()
+    public function testAddBlockToEntityViewWithSectionTitle(): void
     {
         $env = $this->createMock(Environment::class);
         $env->expects($this->once())
@@ -113,7 +103,7 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddBlockToEntityEdit()
+    public function testAddBlockToEntityEdit(): void
     {
         $env = $this->createMock(Environment::class);
         $env->expects($this->once())
@@ -145,7 +135,7 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityFromRequest()
+    public function testGetEntityFromRequest(): void
     {
         $currentRequest = $this->createMock(Request::class);
         $currentRequest->expects($this->once())

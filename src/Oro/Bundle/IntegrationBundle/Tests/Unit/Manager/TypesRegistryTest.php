@@ -9,22 +9,19 @@ use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
 use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\IntegrationTypeWithIcon;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\IntegrationTypeWithoutIcon;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TypesRegistryTest extends \PHPUnit\Framework\TestCase
+class TypesRegistryTest extends TestCase
 {
     private const CHANNEL_TYPE_ONE = 'type1';
     private const CHANNEL_TYPE_TWO = 'type2';
     private const TRANSPORT_TYPE_ONE = 'transport1';
     private const TRANSPORT_TYPE_TWO = 'transport2';
 
-    /** @var TransportInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $transport1;
-
-    /** @var TransportInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $transport2;
-
-    /** @var TypesRegistry */
-    private $typesRegistry;
+    private TransportInterface&MockObject $transport1;
+    private TransportInterface&MockObject $transport2;
+    private TypesRegistry $typesRegistry;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +37,7 @@ class TypesRegistryTest extends \PHPUnit\Framework\TestCase
         $this->typesRegistry->addTransportType(self::TRANSPORT_TYPE_TWO, self::CHANNEL_TYPE_TWO, $this->transport2);
     }
 
-    public function testGetRegisteredChannelTypes()
+    public function testGetRegisteredChannelTypes(): void
     {
         $this->assertInstanceOf(
             Collection::class,
@@ -53,7 +50,7 @@ class TypesRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAvailableChannelTypesChoiceList()
+    public function testGetAvailableChannelTypesChoiceList(): void
     {
         $this->assertEquals(
             ['oro.type1.label' => self::CHANNEL_TYPE_ONE, 'oro.type2.label' => self::CHANNEL_TYPE_TWO],
@@ -61,7 +58,7 @@ class TypesRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAvailableIntegrationTypesChoiceListWithIcon()
+    public function testGetAvailableIntegrationTypesChoiceListWithIcon(): void
     {
         $this->assertEquals(
             [
@@ -72,7 +69,7 @@ class TypesRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTransportType()
+    public function testGetTransportType(): void
     {
         $this->assertEquals(
             $this->transport1,
@@ -80,7 +77,7 @@ class TypesRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTransportType1()
+    public function testGetTransportType1(): void
     {
         $this->expectException(\LogicException::class);
         $this->assertEquals(
@@ -89,7 +86,7 @@ class TypesRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetRegisteredTransportTypes()
+    public function testGetRegisteredTransportTypes(): void
     {
         $this->assertInstanceOf(
             Collection::class,
@@ -97,7 +94,7 @@ class TypesRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSupportsSyncWithConnectors()
+    public function testSupportsSyncWithConnectors(): void
     {
         $expectedIntegrationType = 'someType';
 
@@ -110,7 +107,7 @@ class TypesRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->typesRegistry->supportsSync($expectedIntegrationType));
     }
 
-    public function testSupportsSyncWithoutConnectors()
+    public function testSupportsSyncWithoutConnectors(): void
     {
         $this->assertFalse($this->typesRegistry->supportsSync('someIntegrationType'));
     }

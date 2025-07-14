@@ -15,6 +15,9 @@ use Oro\Component\MessageQueue\Client\MessageProcessorRegistryInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Test\Async\Extension\ConsumedMessagesCollectorExtension;
 use Oro\Component\MessageQueue\Transport\Queue;
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -23,13 +26,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
+class MessageQueueExtensionTest extends TestCase
 {
     use MessageQueueExtension;
 
     private static ?ContainerInterface $container = null;
     private static ?MessageCollector $messageCollector = null;
-    private static BufferedMessageProducer|\PHPUnit\Framework\MockObject\MockObject|null $bufferedProducer = null;
+    private static BufferedMessageProducer|MockObject|null $bufferedProducer = null;
 
     #[\Override]
     protected function setUp(): void
@@ -60,8 +63,7 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
                 new SentMessagesStorage()
             );
             $messageProducer = $this->createMock(MessageProducerInterface::class);
-            $messageProducer
-                ->expects(self::any())
+            $messageProducer->expects(self::any())
                 ->method('send')
                 ->willReturnCallback(function (string $topic, array|string $messageBody) use ($driverMessageCollector) {
                     $message = new Message($messageBody);
@@ -200,7 +202,7 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         $exception = false;
         try {
             self::assertMessageSent('test topic', 'test message');
-        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $exception = $e;
             self::assertStringContainsString('Failed asserting that the message', $exception->getMessage());
             self::assertStringContainsString('All sent messages', $exception->getMessage());
@@ -225,7 +227,7 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         $exception = false;
         try {
             self::assertMessageSent('test topic');
-        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $exception = $e;
             self::assertStringContainsString('Failed asserting that the message', $exception->getMessage());
             self::assertStringContainsString('All sent messages', $exception->getMessage());
@@ -256,7 +258,7 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         $exception = false;
         try {
             self::assertMessagesSent($topic, [$message1, 'another message']);
-        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $exception = $e;
             self::assertStringContainsString('Failed asserting that the message', $exception->getMessage());
             self::assertStringContainsString('All sent messages', $exception->getMessage());
@@ -278,7 +280,7 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         $exception = false;
         try {
             self::assertMessagesSent($topic, [$message2]);
-        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $exception = $e;
             self::assertStringContainsString(
                 'Failed asserting that exactly given messages were sent to "test topic" topic',
@@ -324,7 +326,7 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         $exception = false;
         try {
             self::assertMessagesCount($topic, 1);
-        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $exception = $e;
             self::assertStringContainsString(
                 'Failed asserting that the given number of messages were sent to "test topic" topic',
@@ -369,7 +371,7 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         $exception = false;
         try {
             self::assertCountMessages($topic, 1);
-        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $exception = $e;
             self::assertStringContainsString(
                 'Failed asserting that the given number of messages were sent to "test topic" topic',
@@ -413,7 +415,7 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         $exception = false;
         try {
             self::assertMessagesEmpty($topic);
-        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $exception = $e;
             self::assertStringContainsString(
                 'Failed asserting that exactly given messages were sent to "test topic" topic',
@@ -443,7 +445,7 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         $exception = false;
         try {
             self::assertEmptyMessages($topic);
-        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $exception = $e;
             self::assertStringContainsString(
                 'Failed asserting that exactly given messages were sent to "test topic" topic',
@@ -469,7 +471,7 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         $exception = false;
         try {
             self::assertAllMessagesSent([['topic' => 'test topic', 'message' => 'test message']]);
-        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $exception = $e;
             self::assertStringContainsString(
                 'Failed asserting that exactly all messages were sent',

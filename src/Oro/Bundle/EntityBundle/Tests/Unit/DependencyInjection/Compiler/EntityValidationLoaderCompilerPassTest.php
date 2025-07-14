@@ -4,11 +4,12 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityValidationLoaderCompilerPass;
 use Oro\Bundle\EntityBundle\Validator\EntityValidationLoader;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class EntityValidationLoaderCompilerPassTest extends \PHPUnit\Framework\TestCase
+class EntityValidationLoaderCompilerPassTest extends TestCase
 {
     public function testProcess(): void
     {

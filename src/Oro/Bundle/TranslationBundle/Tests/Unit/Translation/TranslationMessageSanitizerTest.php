@@ -4,14 +4,13 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
 use Oro\Bundle\TranslationBundle\Translation\TranslationMessageSanitizer;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TranslationMessageSanitizerTest extends \PHPUnit\Framework\TestCase
+class TranslationMessageSanitizerTest extends TestCase
 {
-    /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $htmlTagHelper;
-
-    /** @var TranslationMessageSanitizer */
-    private $sanitizer;
+    private HtmlTagHelper&MockObject $htmlTagHelper;
+    private TranslationMessageSanitizer $sanitizer;
 
     #[\Override]
     protected function setUp(): void

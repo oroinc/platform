@@ -13,11 +13,13 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ConfigHelperTest extends \PHPUnit\Framework\TestCase
+class ConfigHelperTest extends TestCase
 {
     private const FIELD_NAME = 'someExtendFieldName';
     private const ENTITY_CLASS_NAME = 'Oro\Bundle\SomeBundle\Entity\SomeEntity';
@@ -28,14 +30,9 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         'state' => ExtendScope::STATE_NEW
     ];
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var FieldConfigModel|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldConfigModel;
-
-    /** @var ConfigHelper */
-    private $configHelper;
+    private ConfigManager&MockObject $configManager;
+    private FieldConfigModel&MockObject $fieldConfigModel;
+    private ConfigHelper $configHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -54,7 +51,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         return $config;
     }
 
-    public function testGetExtendJsModules()
+    public function testGetExtendJsModules(): void
     {
         $modules = ['module1'];
 
@@ -76,7 +73,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($modules, $this->configHelper->getExtendJsModules());
     }
 
-    public function testGetEntityConfigByField()
+    public function testGetEntityConfigByField(): void
     {
         $scope = 'scope';
         $className = 'className';
@@ -107,7 +104,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($entityConfig, $this->configHelper->getEntityConfigByField($fieldConfigModel, $scope));
     }
 
-    public function testGetFieldConfig()
+    public function testGetFieldConfig(): void
     {
         $scope = 'scope';
         $className = 'className';
@@ -142,7 +139,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($fieldConfig, $this->configHelper->getFieldConfig($this->fieldConfigModel, $scope));
     }
 
-    public function testFilterEntityConfigByField()
+    public function testFilterEntityConfigByField(): void
     {
         $scope = 'scope';
         $className = 'className';
@@ -176,7 +173,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateFieldOptionsForSimpleFieldType()
+    public function testCreateFieldOptionsForSimpleFieldType(): void
     {
         $extendEntityConfig = $this->getEntityConfig('Test\Entity', []);
         $fieldType = 'string';
@@ -196,7 +193,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateFieldOptionsForSimpleFieldTypeWithAdditionalFieldOptions()
+    public function testCreateFieldOptionsForSimpleFieldTypeWithAdditionalFieldOptions(): void
     {
         $extendEntityConfig = $this->getEntityConfig('Test\Entity', []);
         $fieldType = 'string';
@@ -223,7 +220,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateFieldOptionsForPublicEnumFieldType()
+    public function testCreateFieldOptionsForPublicEnumFieldType(): void
     {
         $extendEntityConfig = $this->getEntityConfig('Test\Entity', []);
         $fieldType = 'enum||some_enum_code';
@@ -246,7 +243,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateFieldOptionsForPublicMultiEnumFieldType()
+    public function testCreateFieldOptionsForPublicMultiEnumFieldType(): void
     {
         $extendEntityConfig = $this->getEntityConfig('Test\Entity', []);
         $fieldType = 'multiEnum||some_enum_code';
@@ -269,7 +266,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateFieldOptionsForOneToManyReverseRelationFieldType()
+    public function testCreateFieldOptionsForOneToManyReverseRelationFieldType(): void
     {
         $extendEntityConfig = $this->getEntityConfig(
             'Test\Entity',
@@ -304,7 +301,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateFieldOptionsForManyToOneReverseRelationFieldType()
+    public function testCreateFieldOptionsForManyToOneReverseRelationFieldType(): void
     {
         $extendEntityConfig = $this->getEntityConfig(
             'Test\Entity',
@@ -339,7 +336,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateFieldOptionsForNotSupportedFieldType()
+    public function testCreateFieldOptionsForNotSupportedFieldType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The field type "item1||item2" is not supported.');
@@ -351,7 +348,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->configHelper->createFieldOptions($extendEntityConfig, $fieldType, $additionalFieldOptions);
     }
 
-    public function testGetEntityConfig()
+    public function testGetEntityConfig(): void
     {
         $className = 'Oro\Bundle\SomeBundle\Entity\SomeEntity';
         $scope = 'scope';
@@ -377,7 +374,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($entityConfig, $this->configHelper->getEntityConfig($entityConfigModel, $scope));
     }
 
-    public function testGetNonExtendedEntitiesClasses()
+    public function testGetNonExtendedEntitiesClasses(): void
     {
         $entitiesConfig = [
             $this->getEntityConfig('extended_1', ['is_extend' => true]),
@@ -409,11 +406,10 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($entityConfigModel);
     }
 
-    /**
-     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function expectsGetProviderByScope(string $scope, ConfigInterface $returnedConfig)
-    {
+    private function expectsGetProviderByScope(
+        string $scope,
+        ConfigInterface $returnedConfig
+    ): ConfigProvider&MockObject {
         $configProvider = $this->createMock(ConfigProvider::class);
         $configProvider->expects($this->once())
             ->method('getConfig')
@@ -428,7 +424,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         return $configProvider;
     }
 
-    public function testUpdateFieldConfigsWhenNothingHasChanged()
+    public function testUpdateFieldConfigsWhenNothingHasChanged(): void
     {
         $options = [
             'extend' => [
@@ -457,7 +453,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->configHelper->updateFieldConfigs($this->fieldConfigModel, $options);
     }
 
-    public function testUpdateFieldConfigsWhenOptionValueHasChanged()
+    public function testUpdateFieldConfigsWhenOptionValueHasChanged(): void
     {
         $options = [
             'extend' => [
@@ -517,7 +513,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->configHelper->updateFieldConfigs($this->fieldConfigModel, $options);
     }
 
-    public function testAddToFieldConfigModel()
+    public function testAddToFieldConfigModel(): void
     {
         $model = new FieldConfigModel();
         $model->fromArray('someScope', ['someKey' => 'someValue']);

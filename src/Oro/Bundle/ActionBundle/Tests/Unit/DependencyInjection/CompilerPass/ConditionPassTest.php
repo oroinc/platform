@@ -3,16 +3,16 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ConditionPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class ConditionPassTest extends \PHPUnit\Framework\TestCase
+class ConditionPassTest extends TestCase
 {
     private const EXTENSION_SERVICE_ID = 'oro_action.expression.extension';
     private const EXPRESSION_TAG = 'oro_action.condition';
 
-    /** @var ConditionPass */
-    private $compiler;
+    private ConditionPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -26,12 +26,12 @@ class ConditionPassTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($definition->isPublic());
     }
 
-    public function testProcessWithoutExtensionService()
+    public function testProcessWithoutExtensionService(): void
     {
         $this->compiler->process(new ContainerBuilder());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->register(self::EXTENSION_SERVICE_ID)

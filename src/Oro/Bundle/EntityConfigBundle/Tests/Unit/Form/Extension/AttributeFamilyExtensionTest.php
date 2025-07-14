@@ -9,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeFamilyExtension;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
@@ -21,14 +22,9 @@ class AttributeFamilyExtensionTest extends TypeTestCase
 {
     private const DATA_CLASS = TestActivityTarget::class;
 
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeConfigProvider;
-
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityNameResolver;
-
-    /** @var AttributeFamilyExtension */
-    private $extension;
+    private ConfigProvider&MockObject $attributeConfigProvider;
+    private EntityNameResolver&MockObject $entityNameResolver;
+    private AttributeFamilyExtension $extension;
 
     #[\Override]
     protected function setUp(): void

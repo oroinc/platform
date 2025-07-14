@@ -6,19 +6,16 @@ use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 use Oro\Bundle\SyncBundle\Twig\OroSyncExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
+class OroSyncExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $connectionChecker;
-
-    /** @var TagGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tagGenerator;
-
-    /** @var OroSyncExtension */
-    private $extension;
+    private ConnectionChecker&MockObject $connectionChecker;
+    private TagGeneratorInterface&MockObject $tagGenerator;
+    private OroSyncExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,7 @@ class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new OroSyncExtension($container);
     }
 
-    public function testGenerate()
+    public function testGenerate(): void
     {
         $data = 'string';
         $tags = ['string_tag'];
@@ -50,7 +47,7 @@ class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCheckWsConnected()
+    public function testCheckWsConnected(): void
     {
         $this->connectionChecker->expects($this->once())
             ->method('checkConnection')
@@ -59,7 +56,7 @@ class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(self::callTwigFunction($this->extension, 'check_ws', []));
     }
 
-    public function testWsConnectedFail()
+    public function testWsConnectedFail(): void
     {
         $this->connectionChecker->expects($this->once())
             ->method('checkConnection')

@@ -8,19 +8,16 @@ use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Filter\SchedulesByArgumentsFilterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
+class ScheduleManagerTest extends TestCase
 {
     private const CLASS_NAME = Schedule::class;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
-    private $registry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SchedulesByArgumentsFilterInterface */
-    private $schedulesByArgumentsFilter;
-
-    /** @var ScheduleManager */
-    private $manager;
+    private ManagerRegistry&MockObject $registry;
+    private SchedulesByArgumentsFilterInterface&MockObject $schedulesByArgumentsFilter;
+    private ScheduleManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +32,7 @@ class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasSchedule()
+    public function testHasSchedule(): void
     {
         $command = 'oro:test';
         $definition = '* * * * *';
@@ -55,7 +52,7 @@ class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->manager->hasSchedule($command, $arguments, $definition));
     }
 
-    public function testCreateSchedule()
+    public function testCreateSchedule(): void
     {
         $command = 'oro:test';
         $arguments = ['arg1', 'arg2'];
@@ -81,7 +78,7 @@ class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
         array $schedules,
         string $exception,
         string $message
-    ) {
+    ): void {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
 
@@ -124,7 +121,7 @@ class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetSchedulesByCommandAndArguments()
+    public function testGetSchedulesByCommandAndArguments(): void
     {
         $command = 'oro:test';
         $arguments = ['arg1', 'arg2'];

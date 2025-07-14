@@ -12,21 +12,16 @@ use Oro\Component\MessageQueue\Job\JobRepositoryInterface;
 use Oro\Component\MessageQueue\Job\Topic\RootJobStoppedTopic;
 use Oro\Component\MessageQueue\Transport\Message as TransportMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class DependentJobMessageProcessorTest extends TestCase
 {
-    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $producer;
-
-    /** @var JobRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRepository;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var DependentJobMessageProcessor */
-    private $processor;
+    private MessageProducerInterface&MockObject $producer;
+    private JobRepositoryInterface&MockObject $jobRepository;
+    private LoggerInterface&MockObject $logger;
+    private DependentJobMessageProcessor $processor;
 
     #[\Override]
     protected function setUp(): void

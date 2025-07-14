@@ -17,14 +17,14 @@ class EntityAuditStrategyPassTest extends TestCase
         $this->compiler = new EntityAuditStrategyPass();
     }
 
-    public function testProcessRegistryDoesNotExist()
+    public function testProcessRegistryDoesNotExist(): void
     {
         $container = new ContainerBuilder();
 
         $this->compiler->process($container);
     }
 
-    public function testProcessNoTaggedServicesFound()
+    public function testProcessNoTaggedServicesFound(): void
     {
         $container = new ContainerBuilder();
         $registryDef = $container->register('oro_dataaudit.strategy_processor.entity_audit_strategy_registry');
@@ -34,7 +34,7 @@ class EntityAuditStrategyPassTest extends TestCase
         self::assertSame([], $registryDef->getMethodCalls());
     }
 
-    public function testProcessWithTaggedServices()
+    public function testProcessWithTaggedServices(): void
     {
         $container = new ContainerBuilder();
         $registryDef = $container->register('oro_dataaudit.strategy_processor.entity_audit_strategy_registry');
@@ -55,7 +55,7 @@ class EntityAuditStrategyPassTest extends TestCase
         );
     }
 
-    public function testProcessWithTaggedServicesWithoutEntityName()
+    public function testProcessWithTaggedServicesWithoutEntityName(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf(

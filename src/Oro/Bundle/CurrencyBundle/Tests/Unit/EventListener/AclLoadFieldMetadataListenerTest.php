@@ -9,10 +9,11 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Event\LoadFieldsMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
+use PHPUnit\Framework\TestCase;
 
-class AclLoadFieldMetadataListenerTest extends \PHPUnit\Framework\TestCase
+class AclLoadFieldMetadataListenerTest extends TestCase
 {
-    public function testOnLoad()
+    public function testOnLoad(): void
     {
         $className = 'Acme\Test';
         $fields = [

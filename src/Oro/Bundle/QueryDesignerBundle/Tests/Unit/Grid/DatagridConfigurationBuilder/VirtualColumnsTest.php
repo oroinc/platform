@@ -10,7 +10,7 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testVirtualColumns()
+    public function testVirtualColumns(): void
     {
         $en = 'Acme\Entity\TestEntity';
         $en1 = 'Acme\Entity\TestEntity1';
@@ -228,7 +228,7 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testVirtualColumnsForEnum()
+    public function testVirtualColumnsForEnum(): void
     {
         $en = 'Acme\Entity\TestEntity';
         $definition = [
@@ -364,7 +364,7 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testVirtualColumnsForDictionary()
+    public function testVirtualColumnsForDictionary(): void
     {
         $en = 'Acme\Entity\TestEntity';
         $definition = [

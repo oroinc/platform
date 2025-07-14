@@ -7,17 +7,14 @@ use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Model\Factory;
 use Oro\Bundle\DashboardBundle\Model\WidgetCollection;
 use Oro\Bundle\DashboardBundle\Model\WidgetModel;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WidgetCollectionTest extends \PHPUnit\Framework\TestCase
+class WidgetCollectionTest extends TestCase
 {
-    /** @var Dashboard|\PHPUnit\Framework\MockObject\MockObject */
-    private $dashboard;
-
-    /** @var Factory|\PHPUnit\Framework\MockObject\MockObject */
-    private $factory;
-
-    /** @var WidgetCollection */
-    private $collection;
+    private Dashboard&MockObject $dashboard;
+    private Factory&MockObject $factory;
+    private WidgetCollection $collection;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +25,7 @@ class WidgetCollectionTest extends \PHPUnit\Framework\TestCase
         $this->collection = new WidgetCollection($this->dashboard, $this->factory);
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $fooWidget = $this->createMock(Widget::class);
         $fooWidgetModel = $this->createMock(WidgetModel::class);

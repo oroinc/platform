@@ -8,13 +8,14 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ConfigFilter\ByInitialStateFilter;
+use PHPUnit\Framework\TestCase;
 
-class ByInitialStateFilterTest extends \PHPUnit\Framework\TestCase
+class ByInitialStateFilterTest extends TestCase
 {
     /**
      * @dataProvider applyDataProvider
      */
-    public function testApply(ConfigInterface $config, $expectedResult)
+    public function testApply(ConfigInterface $config, $expectedResult): void
     {
         $filter = new ByInitialStateFilter(
             [

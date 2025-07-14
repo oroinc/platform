@@ -4,10 +4,11 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation\KeySource;
 
 use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
+use PHPUnit\Framework\TestCase;
 
-class TranslationKeySourceTest extends \PHPUnit\Framework\TestCase
+class TranslationKeySourceTest extends TestCase
 {
-    public function testConstructorDataValidation()
+    public function testConstructorDataValidation(): void
     {
         $data = ['some_key' => 'someValue'];
         $templateMock = $this->createMock(TranslationKeyTemplateInterface::class);
@@ -19,7 +20,7 @@ class TranslationKeySourceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($data, $source->getData());
     }
 
-    public function testConstructorDataValidationFailure()
+    public function testConstructorDataValidationFailure(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -34,7 +35,7 @@ class TranslationKeySourceTest extends \PHPUnit\Framework\TestCase
         new TranslationKeySource($templateMock, ['some_other_key' => 'someValue']);
     }
 
-    public function testGetTemplate()
+    public function testGetTemplate(): void
     {
         $templateMock = $this->createMock(TranslationKeyTemplateInterface::class);
         $templateMock->expects($this->once())
@@ -49,7 +50,7 @@ class TranslationKeySourceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('templateString', $source->getTemplate());
     }
 
-    public function testGetData()
+    public function testGetData(): void
     {
         $data = ['some_key' => 'someValue'];
         $templateMock = $this->createMock(TranslationKeyTemplateInterface::class);

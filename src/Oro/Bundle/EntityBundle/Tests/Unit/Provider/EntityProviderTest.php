@@ -12,30 +12,19 @@ use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EntityProviderTest extends \PHPUnit\Framework\TestCase
+class EntityProviderTest extends TestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendConfigProvider;
-
-    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassResolver;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var ExclusionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $exclusionProvider;
-
-    /** @var Config */
-    private $extendConfig;
-
-    /** @var EntityProvider */
-    private $provider;
+    private ConfigProvider&MockObject $entityConfigProvider;
+    private ConfigProvider&MockObject $extendConfigProvider;
+    private EntityClassResolver&MockObject $entityClassResolver;
+    private FeatureChecker&MockObject $featureChecker;
+    private ExclusionProviderInterface&MockObject $exclusionProvider;
+    private Config $extendConfig;
+    private EntityProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -78,7 +67,7 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
         return $entityConfig;
     }
 
-    public function testGetEntity()
+    public function testGetEntity(): void
     {
         $entityName = 'Acme:Test';
         $entityClassName = 'Acme\Entity\Test';
@@ -107,7 +96,7 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testGetEnabledEntity()
+    public function testGetEnabledEntity(): void
     {
         $entityName = 'Acme:Test';
         $entityClassName = 'Acme\Entity\Test';
@@ -152,7 +141,7 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testGetEnabledEntityWhenEntityIsNotAccessibleYet()
+    public function testGetEnabledEntityWhenEntityIsNotAccessibleYet(): void
     {
         $this->expectException(RuntimeException::class);
 
@@ -191,7 +180,7 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testGetEntities()
+    public function testGetEntities(): void
     {
         $entityClassName1 = 'Acme\Entity\Test1';
         $entityClassName2 = 'Acme\Entity\Test2';
@@ -296,7 +285,7 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
 
         // sort by plural label
-        $result   = $this->provider->getEntities();
+        $result = $this->provider->getEntities();
         $expected = [
             [
                 'name'         => $entityClassName2,
@@ -321,7 +310,7 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
 
         // sort by label
-        $result   = $this->provider->getEntities(false);
+        $result = $this->provider->getEntities(false);
         $expected = [
             [
                 'name'         => $entityClassName3,
@@ -348,7 +337,7 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testGetEntitiesWhenEntitiesAreDisabled()
+    public function testGetEntitiesWhenEntitiesAreDisabled(): void
     {
         $entityClassName1 = 'Acme\Entity\Test1';
         $entityClassName2 = 'Acme\Entity\Test2';
@@ -438,7 +427,7 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testIsIgnoredEntity()
+    public function testIsIgnoredEntity(): void
     {
         $this->exclusionProvider->expects($this->once())
             ->method('isIgnoredEntity')

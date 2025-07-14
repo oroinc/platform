@@ -10,17 +10,14 @@ use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 use Oro\Bundle\SearchBundle\Entity\IndexText;
 use Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FulltextIndexListenerTest extends \PHPUnit\Framework\TestCase
+class FulltextIndexListenerTest extends TestCase
 {
-    /** @var LoadClassMetadataEventArgs|\PHPUnit\Framework\MockObject\MockObject */
-    private $event;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ClassMetadataInfo */
-    private $metadata;
-
-    /** @var FulltextIndexListener */
-    private $listener;
+    private LoadClassMetadataEventArgs&MockObject $event;
+    private ClassMetadataInfo&MockObject $metadata;
+    private FulltextIndexListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -52,7 +49,7 @@ class FulltextIndexListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new FulltextIndexListener($textIndexTableName, $connection);
     }
 
-    public function testPlatformNotMatch()
+    public function testPlatformNotMatch(): void
     {
         $this->initListener('not_mysql', 'expectedTextIndexTableName');
 
@@ -63,7 +60,7 @@ class FulltextIndexListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->metadata->table);
     }
 
-    public function testTableNotMatch()
+    public function testTableNotMatch(): void
     {
         $this->initListener(DatabaseDriverInterface::DRIVER_MYSQL, 'expectedTextIndexTableName');
 
@@ -82,7 +79,7 @@ class FulltextIndexListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getMysqlVersionsProvider
      */
-    public function testTableEngineDependsOnMysqlVersionOptions(string $mysqlVersion, string $tableEngine)
+    public function testTableEngineDependsOnMysqlVersionOptions(string $mysqlVersion, string $tableEngine): void
     {
         $this->initListener(DatabaseDriverInterface::DRIVER_MYSQL, IndexText::TABLE_NAME, $mysqlVersion);
 

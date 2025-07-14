@@ -8,16 +8,15 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
+class EntityPaginationManagerTest extends TestCase
 {
     private const WRONG_SCOPE = 'wrong_scope';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var EntityPaginationManager */
-    private $entityPaginationManager;
+    private ConfigManager&MockObject $configManager;
+    private EntityPaginationManager $entityPaginationManager;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isEnabledDataProvider
      */
-    public function testIsEnabled(string|bool|null $source, bool $expected)
+    public function testIsEnabled(string|bool|null $source, bool $expected): void
     {
         $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->once())
@@ -68,7 +67,7 @@ class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetLimit()
+    public function testGetLimit(): void
     {
         $limit = 200;
 
@@ -83,7 +82,7 @@ class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPermissionProvider
      */
-    public function testGetPermission(string $scope, string $expected)
+    public function testGetPermission(string $scope, string $expected): void
     {
         $result = EntityPaginationManager::getPermission($scope);
         $this->assertSame($expected, $result);
@@ -103,7 +102,7 @@ class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetPermissionException()
+    public function testGetPermissionException(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Scope "wrong_scope" is not available.');
@@ -114,7 +113,7 @@ class EntityPaginationManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isDatagridApplicableDataProvider
      */
-    public function testIsDatagridApplicable(bool $expected, bool $isOrmDatasource, ?bool $entityPagination)
+    public function testIsDatagridApplicable(bool $expected, bool $isOrmDatasource, ?bool $entityPagination): void
     {
         if ($isOrmDatasource) {
             $dataSource = $this->createMock(OrmDatasource::class);

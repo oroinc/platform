@@ -6,15 +6,16 @@ use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclManagerException;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AbstractAclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\BaseAclManager;
 use Oro\Bundle\SecurityBundle\Model\Role;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class AbstractAclManagerTest extends \PHPUnit\Framework\TestCase
+class AbstractAclManagerTest extends TestCase
 {
-    /** @var AbstractAclManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $abstract;
+    private AbstractAclManager&MockObject $abstract;
 
     #[\Override]
     protected function setUp(): void

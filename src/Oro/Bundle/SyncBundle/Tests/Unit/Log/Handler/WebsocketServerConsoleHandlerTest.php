@@ -4,6 +4,8 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Log\Handler;
 
 use Gos\Bundle\WebSocketBundle\Command\WebsocketServerCommand;
 use Oro\Bundle\SyncBundle\Log\Handler\WebsocketServerConsoleHandler;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler as SymfonyConsoleHandler;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -11,13 +13,10 @@ use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class WebsocketServerConsoleHandlerTest extends \PHPUnit\Framework\TestCase
+class WebsocketServerConsoleHandlerTest extends TestCase
 {
-    /** @var SymfonyConsoleHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $consoleHandler;
-
-    /** @var WebsocketServerConsoleHandler */
-    private $handler;
+    private SymfonyConsoleHandler&MockObject $consoleHandler;
+    private WebsocketServerConsoleHandler $handler;
 
     #[\Override]
     protected function setUp(): void

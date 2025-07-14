@@ -8,14 +8,13 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityMetadataHelperTest extends \PHPUnit\Framework\TestCase
+class EntityMetadataHelperTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var EntityMetadataHelper */
-    private $helper;
+    private ManagerRegistry&MockObject $doctrine;
+    private EntityMetadataHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class EntityMetadataHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper = new EntityMetadataHelper($this->doctrine);
     }
 
-    public function testGetEntityClassesByTableName()
+    public function testGetEntityClassesByTableName(): void
     {
         $testEntityMetadata = new ClassMetadataInfo(TestEntity::class);
         $testEntityMetadata->table['name'] = 'acme_test';
@@ -59,7 +58,7 @@ class EntityMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTableNameByEntityClass()
+    public function testGetTableNameByEntityClass(): void
     {
         $metadata = new ClassMetadataInfo(TestEntity::class);
         $metadata->table['name'] = 'acme_test';
@@ -88,7 +87,7 @@ class EntityMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldNameByColumnName()
+    public function testGetFieldNameByColumnName(): void
     {
         $metadata = new ClassMetadataInfo(TestEntity::class);
         $metadata->table['name'] = 'acme_test';

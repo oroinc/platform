@@ -6,26 +6,19 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Attribute\Acl as AclAttribute;
 use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
 use Oro\Bundle\SecurityBundle\Metadata\AclAttributeProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class ClassAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
+class ClassAuthorizationCheckerTest extends TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var ObjectIdentityFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $objectIdentityFactory;
-
-    /** @var AclAttributeProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeProvider;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var ClassAuthorizationChecker */
-    private $classAuthorizationChecker;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private ObjectIdentityFactory&MockObject $objectIdentityFactory;
+    private AclAttributeProvider&MockObject $attributeProvider;
+    private LoggerInterface&MockObject $logger;
+    private ClassAuthorizationChecker $classAuthorizationChecker;
 
     #[\Override]
     protected function setUp(): void
@@ -43,7 +36,7 @@ class ClassAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsClassMethodGrantedDenyingByMethodAcl()
+    public function testIsClassMethodGrantedDenyingByMethodAcl(): void
     {
         $oid = new ObjectIdentity('1', 'TestType');
         $attribute = $this->createMock(AclAttribute::class);
@@ -73,7 +66,7 @@ class ClassAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function testIsClassMethodGrantedGrantingByMethodAclNoClassAcl()
+    public function testIsClassMethodGrantedGrantingByMethodAclNoClassAcl(): void
     {
         $oid = new ObjectIdentity('1', 'TestType');
         $attribute = $this->createMock(AclAttribute::class);
@@ -108,7 +101,7 @@ class ClassAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function testIsClassMethodGrantedGrantingByMethodAclWithIgnoreClassAcl()
+    public function testIsClassMethodGrantedGrantingByMethodAclWithIgnoreClassAcl(): void
     {
         $oid = new ObjectIdentity('1', 'TestType');
         $attribute = $this->createMock(AclAttribute::class);
@@ -141,7 +134,7 @@ class ClassAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function testIsClassMethodGrantedDenyingByClassAcl()
+    public function testIsClassMethodGrantedDenyingByClassAcl(): void
     {
         $oid = new ObjectIdentity('1', 'TestType');
         $attribute = $this->createMock(AclAttribute::class);
@@ -197,7 +190,7 @@ class ClassAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function testIsClassMethodGrantedGrantingByMethodAndClassAcls()
+    public function testIsClassMethodGrantedGrantingByMethodAndClassAcls(): void
     {
         $oid = new ObjectIdentity('1', 'TestType');
         $attribute = $this->createMock(AclAttribute::class);
@@ -250,7 +243,7 @@ class ClassAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function testGetClassMethodAttribute()
+    public function testGetClassMethodAttribute(): void
     {
         $class = 'TestClass';
         $method = 'TestMethod';
@@ -267,7 +260,7 @@ class ClassAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetClassMethodAttributeWhenAttributeWasNotFound()
+    public function testGetClassMethodAttributeWhenAttributeWasNotFound(): void
     {
         $class = 'TestClass';
         $method = 'TestMethod';

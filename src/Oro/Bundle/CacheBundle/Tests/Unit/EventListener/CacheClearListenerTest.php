@@ -3,15 +3,14 @@
 namespace Oro\Bundle\CacheBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\CacheBundle\EventListener\CacheClearListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 
-class CacheClearListenerTest extends \PHPUnit\Framework\TestCase
+class CacheClearListenerTest extends TestCase
 {
-    /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var CacheClearListener */
-    private $listener;
+    private AbstractAdapter&MockObject $cache;
+    private CacheClearListener $listener;
 
     #[\Override]
     protected function setUp(): void

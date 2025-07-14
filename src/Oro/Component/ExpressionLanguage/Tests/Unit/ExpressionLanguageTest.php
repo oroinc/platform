@@ -3,6 +3,7 @@
 namespace Oro\Component\ExpressionLanguage\Tests\Unit;
 
 use Oro\Component\ExpressionLanguage\ExpressionLanguage;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -13,7 +14,7 @@ use Symfony\Component\ExpressionLanguage\ParsedExpression;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ExpressionLanguageTest extends \PHPUnit\Framework\TestCase
+class ExpressionLanguageTest extends TestCase
 {
     private ExpressionLanguage $expressionLanguage;
 

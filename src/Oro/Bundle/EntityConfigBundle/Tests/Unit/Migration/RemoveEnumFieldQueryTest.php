@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Connection;
-
 use Doctrine\DBAL\Statement;
 use Oro\Bundle\EntityConfigBundle\Migration\RemoveOutdatedEnumFieldQuery;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -12,9 +11,8 @@ use Psr\Log\LoggerInterface;
 
 class RemoveEnumFieldQueryTest extends TestCase
 {
-    private LoggerInterface|MockObject $logger;
-
-    private Connection|MockObject $connector;
+    private LoggerInterface&MockObject $logger;
+    private Connection&MockObject $connector;
 
     #[\Override]
     protected function setUp(): void

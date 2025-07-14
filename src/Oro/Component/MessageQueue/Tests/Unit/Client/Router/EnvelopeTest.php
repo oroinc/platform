@@ -5,8 +5,9 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Client\Router;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\Router\Envelope;
 use Oro\Component\MessageQueue\Transport\Queue;
+use PHPUnit\Framework\TestCase;
 
-class EnvelopeTest extends \PHPUnit\Framework\TestCase
+class EnvelopeTest extends TestCase
 {
     public function testGetQueue(): void
     {

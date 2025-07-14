@@ -6,6 +6,7 @@ use Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\ConfigBundle\Form\Type\FormType;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\FormType as SymfonyFormType;
@@ -15,14 +16,9 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class FormTypeTest extends TypeTestCase
 {
-    /** @var ConfigSubscriber|\PHPUnit\Framework\MockObject\MockObject */
-    private $subscriber;
-
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var FormType */
-    private $form;
+    private ConfigSubscriber&MockObject $subscriber;
+    private ContainerInterface&MockObject $container;
+    private FormType $form;
 
     #[\Override]
     protected function setUp(): void
@@ -69,7 +65,7 @@ class FormTypeTest extends TypeTestCase
             null,
             [
                 'block_config' => [
-                    ['configurator' => __CLASS__ . '::staticConfigurator']
+                    ['configurator' => self::class . '::staticConfigurator']
                 ]
             ]
         );
@@ -90,7 +86,7 @@ class FormTypeTest extends TypeTestCase
             null,
             [
                 'block_config' => [
-                    ['configurator' => __CLASS__ . '::undefinedMethod']
+                    ['configurator' => self::class . '::undefinedMethod']
                 ]
             ]
         );

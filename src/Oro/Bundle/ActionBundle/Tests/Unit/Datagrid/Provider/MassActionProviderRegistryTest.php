@@ -5,10 +5,11 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\Provider;
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface;
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\TestCase;
 
-class MassActionProviderRegistryTest extends \PHPUnit\Framework\TestCase
+class MassActionProviderRegistryTest extends TestCase
 {
-    public function testGetProvider()
+    public function testGetProvider(): void
     {
         $provider = $this->createMock(MassActionProviderInterface::class);
 

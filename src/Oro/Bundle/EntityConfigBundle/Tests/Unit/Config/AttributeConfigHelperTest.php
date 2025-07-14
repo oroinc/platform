@@ -5,14 +5,13 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 use Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AttributeConfigHelperTest extends \PHPUnit\Framework\TestCase
+class AttributeConfigHelperTest extends TestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeConfigProvider;
-
-    /** @var AttributeConfigHelper */
-    private $helper;
+    private ConfigProvider&MockObject $attributeConfigProvider;
+    private AttributeConfigHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -46,7 +45,7 @@ class AttributeConfigHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isFieldAttributeDataProvider
      */
-    public function testIsFieldAttribute(bool $hasConfig, ?bool $isAttribute, bool $willReturn)
+    public function testIsFieldAttribute(bool $hasConfig, ?bool $isAttribute, bool $willReturn): void
     {
         $entityClass = 'EntityClass';
         $fieldName = 'fieldName';
@@ -93,7 +92,7 @@ class AttributeConfigHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isEntityWithAttributesDataProvider
      */
-    public function testIsEntityWithAttributes(bool $hasConfig, ?bool $isWithAttributes, bool $willReturn)
+    public function testIsEntityWithAttributes(bool $hasConfig, ?bool $isWithAttributes, bool $willReturn): void
     {
         $entityClass = 'EntityClass';
 

@@ -18,10 +18,9 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 
 class ActionGroupAssemblerTest extends TestCase
 {
-    private ServiceProviderInterface|MockObject $actionGroupServiceLocator;
-    private ParametersResolver|MockObject $parametersResolver;
-    private ActionGroupEventDispatcher|MockObject $eventDispatcher;
-
+    private ServiceProviderInterface&MockObject $actionGroupServiceLocator;
+    private ParametersResolver&MockObject $parametersResolver;
+    private ActionGroupEventDispatcher&MockObject $eventDispatcher;
     private ActionGroupAssembler $assembler;
 
     #[\Override]
@@ -41,7 +40,7 @@ class ActionGroupAssemblerTest extends TestCase
         );
     }
 
-    public function testAssembleWithServiceMinimal()
+    public function testAssembleWithServiceMinimal(): void
     {
         $service = new \stdClass();
         $this->actionGroupServiceLocator->expects($this->once())
@@ -71,7 +70,7 @@ class ActionGroupAssemblerTest extends TestCase
         $this->assertEquals($expected, $definitions);
     }
 
-    public function testAssembleWithServiceAllParameters()
+    public function testAssembleWithServiceAllParameters(): void
     {
         $service = new \stdClass();
         $this->actionGroupServiceLocator->expects($this->once())
@@ -107,7 +106,7 @@ class ActionGroupAssemblerTest extends TestCase
     /**
      * @dataProvider assembleProvider
      */
-    public function testAssemble(array $configuration, array $expected)
+    public function testAssemble(array $configuration, array $expected): void
     {
         $definitions = $this->assembler->assemble($configuration);
 

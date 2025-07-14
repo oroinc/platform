@@ -5,12 +5,12 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction\Actions;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\FrontendMassAction;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class FrontendMassActionTest extends \PHPUnit\Framework\TestCase
+class FrontendMassActionTest extends TestCase
 {
-    /** @var FrontendMassAction */
-    private $action;
+    private FrontendMassAction $action;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class FrontendMassActionTest extends \PHPUnit\Framework\TestCase
         $this->action = new FrontendMassAction();
     }
 
-    public function testSetOptions()
+    public function testSetOptions(): void
     {
         $options = [
             'frontend_type' => 'frontend-mass',

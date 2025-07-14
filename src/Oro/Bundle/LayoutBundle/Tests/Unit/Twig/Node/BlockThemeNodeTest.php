@@ -5,19 +5,20 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig\Node;
 use Oro\Bundle\LayoutBundle\Twig\LayoutExtension;
 use Oro\Bundle\LayoutBundle\Twig\Node\BlockThemeNode;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 use Twig\Compiler;
 use Twig\Environment;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\NameExpression;
 use Twig\Node\Node;
 
-class BlockThemeNodeTest extends \PHPUnit\Framework\TestCase
+class BlockThemeNodeTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     private const SET_THEME_CALL = '$this->env->getExtension("' . LayoutExtension::class . '")->renderer->setTheme';
 
-    public function testCompile()
+    public function testCompile(): void
     {
         $block = new Node(
             [

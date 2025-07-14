@@ -4,17 +4,14 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Serializer;
 
 use Oro\Bundle\LayoutBundle\Layout\Serializer\TypeNameConverter;
 use Oro\Bundle\LayoutBundle\Layout\Serializer\TypeNameConverterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TypeNameConverterTest extends \PHPUnit\Framework\TestCase
+class TypeNameConverterTest extends TestCase
 {
-    /** @var TypeNameConverterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $converter1;
-
-    /** @var TypeNameConverterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $converter2;
-
-    /** @var TypeNameConverter */
-    private $typeNameConverter;
+    private TypeNameConverterInterface&MockObject $converter1;
+    private TypeNameConverterInterface&MockObject $converter2;
+    private TypeNameConverter $typeNameConverter;
 
     #[\Override]
     protected function setUp(): void

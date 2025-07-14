@@ -6,14 +6,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class BusinessUnitTest extends \PHPUnit\Framework\TestCase
+class BusinessUnitTest extends TestCase
 {
-    /** @var BusinessUnit */
-    private $unit;
+    private BusinessUnit $unit;
 
     #[\Override]
     protected function setUp(): void
@@ -21,12 +21,12 @@ class BusinessUnitTest extends \PHPUnit\Framework\TestCase
         $this->unit = new BusinessUnit();
     }
 
-    public function testId()
+    public function testId(): void
     {
         $this->assertNull($this->unit->getId());
     }
 
-    public function testName()
+    public function testName(): void
     {
         $name = 'test';
         $this->assertNull($this->unit->getName());
@@ -35,7 +35,7 @@ class BusinessUnitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($name, (string)$this->unit);
     }
 
-    public function testOrganization()
+    public function testOrganization(): void
     {
         $organization = new Organization();
         $this->assertNull($this->unit->getOrganization());
@@ -43,7 +43,7 @@ class BusinessUnitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($organization, $this->unit->getOrganization());
     }
 
-    public function testPhone()
+    public function testPhone(): void
     {
         $phone = 911;
         $this->assertNull($this->unit->getPhone());
@@ -51,7 +51,7 @@ class BusinessUnitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($phone, $this->unit->getPhone());
     }
 
-    public function testWebsite()
+    public function testWebsite(): void
     {
         $site = 'http://test.com';
         $this->assertNull($this->unit->getWebsite());
@@ -59,7 +59,7 @@ class BusinessUnitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($site, $this->unit->getWebsite());
     }
 
-    public function testEmail()
+    public function testEmail(): void
     {
         $mail = 'test@test.com';
         $this->assertNull($this->unit->getEmail());
@@ -67,7 +67,7 @@ class BusinessUnitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($mail, $this->unit->getEmail());
     }
 
-    public function testFax()
+    public function testFax(): void
     {
         $fax = '321';
         $this->assertNull($this->unit->getFax());
@@ -75,7 +75,7 @@ class BusinessUnitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($fax, $this->unit->getFax());
     }
 
-    public function testPrePersist()
+    public function testPrePersist(): void
     {
         $dateCreated = new \DateTime();
         $dateCreated = $dateCreated->format('yy');
@@ -86,7 +86,7 @@ class BusinessUnitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($dateCreated, $this->unit->getUpdatedAt()->format('yy'));
     }
 
-    public function testUpdated()
+    public function testUpdated(): void
     {
         $dateCreated = new \DateTime();
         $dateCreated = $dateCreated->format('yy');
@@ -95,10 +95,10 @@ class BusinessUnitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($dateCreated, $this->unit->getUpdatedAt()->format('yy'));
     }
 
-    public function testUser()
+    public function testUser(): void
     {
         $businessUnit = new BusinessUnit();
-        $user  = new User();
+        $user = new User();
 
         $businessUnit->setUsers(new ArrayCollection([$user]));
 
@@ -113,7 +113,7 @@ class BusinessUnitTest extends \PHPUnit\Framework\TestCase
         $this->assertContains($user, $businessUnit->getUsers());
     }
 
-    public function testOwners()
+    public function testOwners(): void
     {
         $entity = $this->unit;
         $businessUnit = new BusinessUnit();

@@ -7,14 +7,13 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAwareManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowAwareManagerTest extends \PHPUnit\Framework\TestCase
+class WorkflowAwareManagerTest extends TestCase
 {
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var WorkflowAwareManager */
-    private $manger;
+    private WorkflowManager&MockObject $workflowManager;
+    private WorkflowAwareManager $manger;
 
     private string $testWorkflowName = 'test_workflow';
 
@@ -26,7 +25,7 @@ class WorkflowAwareManagerTest extends \PHPUnit\Framework\TestCase
         $this->manger->setWorkflowName($this->testWorkflowName);
     }
 
-    public function testInterface()
+    public function testInterface(): void
     {
         $workflowName = 'test_workflow1';
 
@@ -35,7 +34,7 @@ class WorkflowAwareManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($workflowName, $this->manger->getWorkflowName());
     }
 
-    public function testGetWorkflowItem()
+    public function testGetWorkflowItem(): void
     {
         $expectedItem = new WorkflowItem();
         $entity = new EntityStub(42);
@@ -48,7 +47,7 @@ class WorkflowAwareManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedItem, $this->manger->getWorkflowItem($entity));
     }
 
-    public function testGetWorkflow()
+    public function testGetWorkflow(): void
     {
         $workflow = $this->createMock(Workflow::class);
 
@@ -60,7 +59,7 @@ class WorkflowAwareManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($workflow, $this->manger->getWorkflow());
     }
 
-    public function testStartWorkflow()
+    public function testStartWorkflow(): void
     {
         $startedItem = new WorkflowItem();
         $entity = new EntityStub(42);

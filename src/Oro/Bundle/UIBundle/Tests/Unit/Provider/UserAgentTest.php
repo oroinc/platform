@@ -3,10 +3,11 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\UIBundle\Provider\UserAgent;
+use PHPUnit\Framework\TestCase;
 
-class UserAgentTest extends \PHPUnit\Framework\TestCase
+class UserAgentTest extends TestCase
 {
-    public function testWithoutUserAgentString()
+    public function testWithoutUserAgentString(): void
     {
         $agent = new UserAgent(null);
 
@@ -15,7 +16,7 @@ class UserAgentTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($agent->isMobile());
     }
 
-    public function testWithEmptyUserAgentString()
+    public function testWithEmptyUserAgentString(): void
     {
         $agent = new UserAgent('');
 
@@ -24,10 +25,10 @@ class UserAgentTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($agent->isMobile());
     }
 
-    public function testMobileAgent()
+    public function testMobileAgent(): void
     {
         $userAgent = 'Mozilla/5.0 (Linux; U; Android 2.3; en-us) AppleWebKit/999+ (KHTML, like Gecko) Safari/999.9';
-        $agent     = new UserAgent($userAgent);
+        $agent = new UserAgent($userAgent);
 
         $this->assertTrue(isset($agent[UserAgent::USER_AGENT]));
         $this->assertTrue(isset($agent[UserAgent::MOBILE]));
@@ -41,10 +42,10 @@ class UserAgentTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($agent[UserAgent::DESKTOP]);
     }
 
-    public function testDesktopAgent()
+    public function testDesktopAgent(): void
     {
         $userAgent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; DigExt)';
-        $agent     = new UserAgent($userAgent);
+        $agent = new UserAgent($userAgent);
 
         $this->assertTrue(isset($agent[UserAgent::USER_AGENT]));
         $this->assertTrue(isset($agent[UserAgent::MOBILE]));
@@ -58,24 +59,24 @@ class UserAgentTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($agent[UserAgent::DESKTOP]);
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $userAgent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; DigExt)';
-        $agent     = new UserAgent($userAgent);
+        $agent = new UserAgent($userAgent);
 
         $this->assertEquals($userAgent, $agent->toString());
     }
 
-    public function testArrayAccessSetThrowsException()
+    public function testArrayAccessSetThrowsException(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Not supported');
 
-        $agent                        = new UserAgent('');
+        $agent = new UserAgent('');
         $agent[UserAgent::USER_AGENT] = 'val';
     }
 
-    public function testArrayAccessUnsetThrowsException()
+    public function testArrayAccessUnsetThrowsException(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Not supported');

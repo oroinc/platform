@@ -4,14 +4,14 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\SearchBundle\Twig\OroSearchExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 
-class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
+class OroSearchExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var OroSearchExtension */
-    private $extension;
+    private OroSearchExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -20,13 +20,13 @@ class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new OroSearchExtension($twigService, 'testLayout.html.twig');
     }
 
-    public function testHighlight()
+    public function testHighlight(): void
     {
         $result = self::callTwigFilter($this->extension, 'highlight', ['test search string', 'search']);
         $this->assertEquals(5, strpos($result, '<strong>search</strong>'));
     }
 
-    public function testTrimByString()
+    public function testTrimByString(): void
     {
         $this->assertEquals(
             '...Writing Tests search string...',
@@ -38,7 +38,7 @@ class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHighlightTrim()
+    public function testHighlightTrim(): void
     {
         $this->assertEquals(
             '...Writing Tests <strong>search</strong> string...',

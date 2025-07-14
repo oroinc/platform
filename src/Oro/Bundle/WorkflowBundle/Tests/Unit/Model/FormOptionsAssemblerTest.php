@@ -10,18 +10,15 @@ use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\Configurable;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class FormOptionsAssemblerTest extends \PHPUnit\Framework\TestCase
+class FormOptionsAssemblerTest extends TestCase
 {
-    /** @var ActionFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $actionFactory;
-
-    /** @var ConfigurationPassInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurationPass;
-
-    /** @var FormOptionsAssembler */
-    private $assembler;
+    private ActionFactoryInterface&MockObject $actionFactory;
+    private ConfigurationPassInterface&MockObject $configurationPass;
+    private FormOptionsAssembler $assembler;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +30,7 @@ class FormOptionsAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assembler->addConfigurationPass($this->configurationPass);
     }
 
-    public function testAssemble()
+    public function testAssemble(): void
     {
         $options = [
             'attribute_fields' => [
@@ -103,7 +100,7 @@ class FormOptionsAssemblerTest extends \PHPUnit\Framework\TestCase
         string $ownerName,
         string $expectedException,
         string $expectedExceptionMessage
-    ) {
+    ): void {
         $this->expectException($expectedException);
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->assembler->assemble($options, $attributes, $owner, $ownerName);

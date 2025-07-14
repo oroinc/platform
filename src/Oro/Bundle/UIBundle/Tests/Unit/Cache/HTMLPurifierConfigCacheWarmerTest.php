@@ -5,10 +5,11 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Cache;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Bundle\UIBundle\Cache\HTMLPurifierConfigCacheWarmer;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use PHPUnit\Framework\TestCase;
 
-class HTMLPurifierConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
+class HTMLPurifierConfigCacheWarmerTest extends TestCase
 {
-    public function testWarmUp()
+    public function testWarmUp(): void
     {
         $htmlTagHelper = $this->createMock(HtmlTagHelper::class);
         $htmlTagProvider = $this->createMock(HtmlTagProvider::class);

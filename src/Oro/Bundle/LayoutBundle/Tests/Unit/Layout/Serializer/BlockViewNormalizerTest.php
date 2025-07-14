@@ -8,23 +8,20 @@ use Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewVarsNormalizer;
 use Oro\Bundle\LayoutBundle\Layout\Serializer\TypeNameConverter;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\BlockViewCollection;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Serializer;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
+class BlockViewNormalizerTest extends TestCase
 {
     private const CONTEXT_HASH_VALUE = 'context_hash_value';
 
-    /** @var TypeNameConverter|\PHPUnit\Framework\MockObject\MockObject */
-    private $typeNameConverter;
-
-    /** @var Serializer|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializer;
-
-    /** @var BlockViewNormalizer */
-    private $normalizer;
+    private TypeNameConverter&MockObject $typeNameConverter;
+    private Serializer&MockObject $serializer;
+    private BlockViewNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +33,7 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->normalizer->setSerializer($this->serializer);
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $this->assertFalse($this->normalizer->supportsNormalization((object)[]));
         $this->assertTrue($this->normalizer->supportsNormalization(
@@ -47,7 +44,7 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeWithoutObjectsInVarsProvider
      */
-    public function testNormalizeWithoutObjectsInVars(array $expectedResult, BlockView $actualView)
+    public function testNormalizeWithoutObjectsInVars(array $expectedResult, BlockView $actualView): void
     {
         $this->assertEquals($expectedResult, $this->normalizer->normalize($actualView));
     }
@@ -112,7 +109,7 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testNormalizeWithObjectsInVarsWhenNoShortTypeName()
+    public function testNormalizeWithObjectsInVarsWhenNoShortTypeName(): void
     {
         $bar = (object)[];
 
@@ -151,7 +148,7 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->normalizer->normalize($view));
     }
 
-    public function testNormalizeWithObjectsInVarsWhenHasShortTypeName()
+    public function testNormalizeWithObjectsInVarsWhenHasShortTypeName(): void
     {
         $bar = (object)[];
 
@@ -190,7 +187,7 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->normalizer->normalize($view));
     }
 
-    public function testNormalizeShouldNotChangeBlockViewToBeNormalized()
+    public function testNormalizeShouldNotChangeBlockViewToBeNormalized(): void
     {
         $view = new BlockView();
         $view->vars = [
@@ -221,7 +218,7 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNormalizeShouldFailOnBlockViewInVars()
+    public function testNormalizeShouldFailOnBlockViewInVars(): void
     {
         $this->expectException(UnexpectedBlockViewVarTypeException::class);
         $this->expectExceptionMessage('BlockView vars cannot contain link to another BlockView');
@@ -240,7 +237,7 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->normalizer->normalize($view);
     }
 
-    public function testSupportsDenormalization()
+    public function testSupportsDenormalization(): void
     {
         $this->assertFalse($this->normalizer->supportsDenormalization([], 'Object'));
         $this->assertTrue($this->normalizer->supportsDenormalization([], BlockView::class));
@@ -249,7 +246,7 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider denormalizeWithoutObjectsInVarsProvider
      */
-    public function testDenormalizeWithoutObjectsInVars(BlockView $expectedView, array $actualData)
+    public function testDenormalizeWithoutObjectsInVars(BlockView $expectedView, array $actualData): void
     {
         $this->assertEquals(
             $expectedView,
@@ -332,7 +329,7 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testDenormalizeWithObjectsInVarsWithFullTypeName()
+    public function testDenormalizeWithObjectsInVarsWithFullTypeName(): void
     {
         $bar = (object)[];
 
@@ -388,7 +385,7 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDenormalizeWithObjectsInVarsWithShortTypeName()
+    public function testDenormalizeWithObjectsInVarsWithShortTypeName(): void
     {
         $bar = (object)[];
 

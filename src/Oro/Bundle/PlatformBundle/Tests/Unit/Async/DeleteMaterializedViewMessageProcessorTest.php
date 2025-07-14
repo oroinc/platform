@@ -8,14 +8,13 @@ use Oro\Bundle\PlatformBundle\MaterializedView\MaterializedViewManager;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DeleteMaterializedViewMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class DeleteMaterializedViewMessageProcessorTest extends TestCase
 {
-    /** @var MaterializedViewManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $materializedViewManager;
-
-    /** @var DeleteMaterializedViewMessageProcessor */
-    private $processor;
+    private MaterializedViewManager&MockObject $materializedViewManager;
+    private DeleteMaterializedViewMessageProcessor $processor;
 
     #[\Override]
     protected function setUp(): void

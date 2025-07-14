@@ -5,19 +5,16 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\FormFactoryProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
-class FormFactoryProcessorTest extends \PHPUnit\Framework\TestCase
+class FormFactoryProcessorTest extends TestCase
 {
-    /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject */
-    private $context;
-
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var FormFactoryProcessor */
-    private $processor;
+    private TransitionContext&MockObject $context;
+    private FormFactoryInterface&MockObject $formFactory;
+    private FormFactoryProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +25,7 @@ class FormFactoryProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new FormFactoryProcessor($this->formFactory);
     }
 
-    public function testCreateForm()
+    public function testCreateForm(): void
     {
         $formData = (object)['id' => 42];
 
@@ -60,7 +57,7 @@ class FormFactoryProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($this->context);
     }
 
-    public function testNoFormDataException()
+    public function testNoFormDataException(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Data for transition form is not defined');

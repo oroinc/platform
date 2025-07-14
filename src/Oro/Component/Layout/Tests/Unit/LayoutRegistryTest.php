@@ -20,17 +20,16 @@ use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\LayoutRegistry;
 use Oro\Component\Layout\LayoutUpdateInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
+class LayoutRegistryTest extends TestCase
 {
-    /** @var ExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $extension;
-
-    /** @var LayoutRegistry */
-    private $registry;
+    private ExtensionInterface&MockObject $extension;
+    private LayoutRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -42,7 +41,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->addExtension($this->extension);
     }
 
-    public function testGetTypeNames()
+    public function testGetTypeNames(): void
     {
         $this->extension->expects($this->once())
             ->method('getTypeNames')
@@ -54,7 +53,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTypeFromCoreExtension()
+    public function testGetTypeFromCoreExtension(): void
     {
         $this->extension->expects($this->never())
             ->method('hasType')
@@ -67,7 +66,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(BaseType::class, $type);
     }
 
-    public function testGetType()
+    public function testGetType(): void
     {
         $name = 'test';
         $type = $this->createMock(BlockTypeInterface::class);
@@ -86,7 +85,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($type, $this->registry->getType($name));
     }
 
-    public function testGetTypeWithNullName()
+    public function testGetTypeWithNullName(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "string", "NULL" given.');
@@ -94,7 +93,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->getType(null);
     }
 
-    public function testGetTypeWithEmptyName()
+    public function testGetTypeWithEmptyName(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Could not load a block type "".');
@@ -102,7 +101,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->getType('');
     }
 
-    public function testGetTypeWithNotStringName()
+    public function testGetTypeWithNotStringName(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "string", "integer" given.');
@@ -110,7 +109,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->getType(1);
     }
 
-    public function testGetUndefinedType()
+    public function testGetUndefinedType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Could not load a block type "widget".');
@@ -125,7 +124,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->getType('widget');
     }
 
-    public function testGetTypeExtensions()
+    public function testGetTypeExtensions(): void
     {
         $name = 'test';
         $typeExtension = $this->createMock(BlockTypeExtensionInterface::class);
@@ -144,7 +143,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($typeExtension, $result[0]);
     }
 
-    public function testGetContextConfigurators()
+    public function testGetContextConfigurators(): void
     {
         $configurator = $this->createMock(ContextConfiguratorInterface::class);
 
@@ -160,7 +159,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($configurator, $result[0]);
     }
 
-    public function testFindDataProvider()
+    public function testFindDataProvider(): void
     {
         $name = 'test';
         $dataProvider = $this->createMock(\stdClass::class);
@@ -179,7 +178,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($dataProvider, $this->registry->findDataProvider($name));
     }
 
-    public function testFindDataProviderWithNullName()
+    public function testFindDataProviderWithNullName(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "string", "NULL" given.');
@@ -187,12 +186,12 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->findDataProvider(null);
     }
 
-    public function testFindDataProviderWithEmptyName()
+    public function testFindDataProviderWithEmptyName(): void
     {
         $this->assertNull($this->registry->findDataProvider(''));
     }
 
-    public function testFindDataProviderWithNotStringName()
+    public function testFindDataProviderWithNotStringName(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "string", "integer" given.');
@@ -200,7 +199,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->findDataProvider(1);
     }
 
-    public function testFindUndefinedDataProvider()
+    public function testFindUndefinedDataProvider(): void
     {
         $this->extension->expects($this->once())
             ->method('hasDataProvider')
@@ -212,7 +211,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->registry->findDataProvider('foo'));
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $name = 'test';
         $resolver = $this->createMock(OptionsResolver::class);
@@ -234,7 +233,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->configureOptions($name, $resolver);
     }
 
-    public function testBuildBlock()
+    public function testBuildBlock(): void
     {
         $name = 'test';
         $builder = $this->createMock(BlockBuilderInterface::class);
@@ -257,7 +256,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->buildBlock($name, $builder, $options);
     }
 
-    public function testBuildView()
+    public function testBuildView(): void
     {
         $name = 'test';
         $view = new BlockView();
@@ -280,7 +279,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->buildView($name, $view, $block, $options);
     }
 
-    public function testFinishView()
+    public function testFinishView(): void
     {
         $name = 'test';
         $view = new BlockView();
@@ -303,7 +302,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->finishView($name, $view, $block);
     }
 
-    public function testUpdateLayout()
+    public function testUpdateLayout(): void
     {
         $id = 'test';
         $layoutManipulator = $this->createMock(LayoutManipulatorInterface::class);
@@ -329,7 +328,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->updateLayout($id, $layoutManipulator, $item);
     }
 
-    public function testConfigureContext()
+    public function testConfigureContext(): void
     {
         $context = $this->createMock(ContextInterface::class);
 

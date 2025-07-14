@@ -5,6 +5,7 @@ namespace Oro\Bundle\CacheBundle\Tests\Unit\Command;
 use Oro\Bundle\CacheBundle\Action\DataStorage\InvalidateCacheDataStorage;
 use Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheActionHandlerInterface;
 use Oro\Bundle\CacheBundle\Command\InvalidateCacheScheduleCommand;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -13,7 +14,7 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class InvalidateCacheScheduleCommandTest extends \PHPUnit\Framework\TestCase
+class InvalidateCacheScheduleCommandTest extends TestCase
 {
     public function testConfigure(): void
     {

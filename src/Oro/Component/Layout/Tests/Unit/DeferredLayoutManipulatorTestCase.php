@@ -12,25 +12,19 @@ use Oro\Component\Layout\Extension\PreloadedExtension;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutRegistry;
 use Oro\Component\Layout\RawLayoutBuilder;
-use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type;
+use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\HeaderType;
+use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\LogoType;
+use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\RootType;
+use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\TestSelfBuildingContainerType;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class DeferredLayoutManipulatorTestCase extends LayoutTestCase
 {
-    /** @var LayoutContext */
-    protected $context;
-
-    /** @var RawLayoutBuilder */
-    protected $rawLayoutBuilder;
-
-    /** @var DeferredLayoutManipulator */
-    protected $layoutManipulator;
-
-    /** @var BlockFactory */
-    protected $blockFactory;
-
-    /** @var LayoutRegistry */
-    protected $registry;
+    protected LayoutContext $context;
+    protected RawLayoutBuilder $rawLayoutBuilder;
+    protected DeferredLayoutManipulator $layoutManipulator;
+    protected BlockFactory $blockFactory;
+    protected LayoutRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -43,10 +37,10 @@ class DeferredLayoutManipulatorTestCase extends LayoutTestCase
         $this->registry->addExtension(
             new PreloadedExtension(
                 [
-                    'root'                         => new Type\RootType(),
-                    'header'                       => new Type\HeaderType(),
-                    'logo'                         => new Type\LogoType(),
-                    'test_self_building_container' => new Type\TestSelfBuildingContainerType()
+                    'root'                         => new RootType(),
+                    'header'                       => new HeaderType(),
+                    'logo'                         => new LogoType(),
+                    'test_self_building_container' => new TestSelfBuildingContainerType()
                 ]
             )
         );

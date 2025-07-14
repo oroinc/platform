@@ -4,14 +4,13 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Menu;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Menu\FeatureAwareMenuFactoryExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FeatureAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
+class FeatureAwareMenuFactoryExtensionTest extends TestCase
 {
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var FeatureAwareMenuFactoryExtension */
-    private $extension;
+    private FeatureChecker&MockObject $featureChecker;
+    private FeatureAwareMenuFactoryExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class FeatureAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new FeatureAwareMenuFactoryExtension($this->featureChecker);
     }
 
-    public function testBuildOptionsChangeToNotAllowed()
+    public function testBuildOptionsChangeToNotAllowed(): void
     {
         $this->featureChecker->expects($this->once())
             ->method('isResourceEnabled')
@@ -43,7 +42,7 @@ class FeatureAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testBuildOptionsNoChanges(array $options)
+    public function testBuildOptionsNoChanges(array $options): void
     {
         $this->featureChecker->expects($this->never())
             ->method('isResourceEnabled');

@@ -5,19 +5,18 @@ namespace Oro\Bundle\ScopeBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\ScopeBundle\Form\DataTransformer\ScopeTransformer;
 use Oro\Bundle\ScopeBundle\Form\Type\ScopeType;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ScopeTypeTest extends \PHPUnit\Framework\TestCase
+class ScopeTypeTest extends TestCase
 {
-    /** @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $scopeManager;
-
-    /** @var ScopeType */
-    private $scopeType;
+    private ScopeManager&MockObject $scopeManager;
+    private ScopeType $scopeType;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class ScopeTypeTest extends \PHPUnit\Framework\TestCase
         $this->scopeType = new ScopeType($this->scopeManager);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
 
@@ -63,7 +62,7 @@ class ScopeTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider finishViewDataProvider
      */
-    public function testFinishView(array $options, array $children, array $expected)
+    public function testFinishView(array $options, array $children, array $expected): void
     {
         $view = new FormView();
         $view->children = $children;
@@ -100,7 +99,7 @@ class ScopeTypeTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $scopeType = 'test_scope_type';
         $scopeTransformer = new ScopeTransformer($this->scopeManager, $scopeType);
@@ -113,7 +112,7 @@ class ScopeTypeTest extends \PHPUnit\Framework\TestCase
         $this->scopeType->buildForm($builder, [ScopeType::SCOPE_TYPE_OPTION => $scopeType]);
     }
 
-    public function testGetBlockPrefix()
+    public function testGetBlockPrefix(): void
     {
         $this->assertEquals(ScopeType::NAME, $this->scopeType->getBlockPrefix());
     }

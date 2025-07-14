@@ -10,7 +10,6 @@ use Oro\Bundle\InstallerBundle\Command\InstallCommand;
 use Oro\Bundle\InstallerBundle\ScriptManager;
 use Oro\Component\Testing\Command\CommandTestingTrait;
 use Oro\Component\Testing\TempDirExtension;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -42,11 +41,12 @@ class InstallCommandTest extends TestCase
         $container = $this->createMock(ContainerInterface::class);
 
         $applicationState = $this->createMock(ApplicationState::class);
-        $applicationState->method('isInstalled')->willReturn(true);
+        $applicationState->expects(self::any())
+            ->method('isInstalled')
+            ->willReturn(true);
 
         $container->set('oro_distribution.handler.application_status', $applicationState);
 
-        /** @noinspection PhpParamsInspection */
         $this->command = new InstallCommand(
             $container,
             $this->createMock(ManagerRegistry::class),
@@ -57,9 +57,9 @@ class InstallCommandTest extends TestCase
         );
 
         $questionHelper = $this->createMock(QuestionHelper::class);
-        /** @var HelperSet|MockObject $helperSet */
         $helperSet = $this->createMock(HelperSet::class);
-        $helperSet->method('get')
+        $helperSet->expects(self::any())
+            ->method('get')
             ->willReturn($questionHelper);
         $this->command->setHelperSet($helperSet);
     }

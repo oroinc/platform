@@ -4,10 +4,11 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Model\AdditionalEntityChangesToAuditStorage;
+use PHPUnit\Framework\TestCase;
 
-class AdditionalEntityChangesToAuditStorageTest extends \PHPUnit\Framework\TestCase
+class AdditionalEntityChangesToAuditStorageTest extends TestCase
 {
-    public function testWhenNoEntityManagerInStorage()
+    public function testWhenNoEntityManagerInStorage(): void
     {
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $storage = new AdditionalEntityChangesToAuditStorage();
@@ -16,7 +17,7 @@ class AdditionalEntityChangesToAuditStorageTest extends \PHPUnit\Framework\TestC
         $this->assertEquals(new \SplObjectStorage(), $storage->getEntityUpdates($entityManager));
     }
 
-    public function testWhenAddNewEntityManagerAndEntity()
+    public function testWhenAddNewEntityManagerAndEntity(): void
     {
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entity = new \stdClass();
@@ -29,7 +30,7 @@ class AdditionalEntityChangesToAuditStorageTest extends \PHPUnit\Framework\TestC
         $this->assertEquals($expectedUpdates, $storage->getEntityUpdates($entityManager));
     }
 
-    public function testWhenAddNewEntity()
+    public function testWhenAddNewEntity(): void
     {
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entity = new \stdClass();
@@ -45,7 +46,7 @@ class AdditionalEntityChangesToAuditStorageTest extends \PHPUnit\Framework\TestC
         $this->assertEquals($expectedUpdates, $storage->getEntityUpdates($entityManager));
     }
 
-    public function testWhenAddNewChangesToOldEntity()
+    public function testWhenAddNewChangesToOldEntity(): void
     {
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entity = new \stdClass();

@@ -6,10 +6,11 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Event\PreBuild;
 use Oro\Bundle\NavigationBundle\EventListener\MenuGridListener;
+use PHPUnit\Framework\TestCase;
 
-class MenuGridListenerTest extends \PHPUnit\Framework\TestCase
+class MenuGridListenerTest extends TestCase
 {
-    public function testOnPreBuild()
+    public function testOnPreBuild(): void
     {
         $config = DatagridConfiguration::create([]);
         $routeParams = ['first_param' => 'foo', 'second_param' => 'bar'];

@@ -4,18 +4,15 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Security;
 
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class SecurityProviderTest extends \PHPUnit\Framework\TestCase
+class SecurityProviderTest extends TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var EntitySecurityMetadataProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entitySecurityMetadataProvider;
-
-    /** @var SecurityProvider */
-    private $provider;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private EntitySecurityMetadataProvider&MockObject $entitySecurityMetadataProvider;
+    private SecurityProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +26,7 @@ class SecurityProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIisProtectedEntity()
+    public function testIisProtectedEntity(): void
     {
         $this->entitySecurityMetadataProvider->expects($this->once())
             ->method('isProtectedEntity')
@@ -38,7 +35,7 @@ class SecurityProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->isProtectedEntity('someClass');
     }
 
-    public function testIsGranted()
+    public function testIsGranted(): void
     {
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')

@@ -6,12 +6,13 @@ use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class CommentTest extends \PHPUnit\Framework\TestCase
+class CommentTest extends TestCase
 {
     use EntityTestCaseTrait;
 
-    public function testProperties()
+    public function testProperties(): void
     {
         $properties = [
             'id'           => ['id', 1],
@@ -27,7 +28,7 @@ class CommentTest extends \PHPUnit\Framework\TestCase
         self::assertPropertyAccessors($entity, $properties);
     }
 
-    public function testPrePersist()
+    public function testPrePersist(): void
     {
         $entity = new Comment();
         $entity->prePersist();
@@ -44,7 +45,7 @@ class CommentTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($existingUpdatedAt, $entity->getUpdatedAt());
     }
 
-    public function testPreUpdate()
+    public function testPreUpdate(): void
     {
         $entity = new Comment();
         $entity->preUpdate();

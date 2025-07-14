@@ -9,26 +9,24 @@ use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\WidgetModel;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DashboardModelTest extends \PHPUnit\Framework\TestCase
+class DashboardModelTest extends TestCase
 {
-    /** @var Dashboard|\PHPUnit\Framework\MockObject\MockObject */
-    private $dashboardEntity;
-
-    /** @var ArrayCollection */
-    private $widgets;
+    private Dashboard&MockObject $dashboardEntity;
+    private ArrayCollection $widgets;
 
     private array $config = [
         'label' => 'Dashboard label'
     ];
 
-    /** @var DashboardModel */
-    private $dashboardModel;
+    private DashboardModel $dashboardModel;
 
     #[\Override]
     protected function setUp(): void
@@ -43,22 +41,22 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $this->dashboardModel = new DashboardModel($this->dashboardEntity, $this->widgets, $this->config);
     }
 
-    public function testGetConfig()
+    public function testGetConfig(): void
     {
         $this->assertEquals($this->config, $this->dashboardModel->getConfig());
     }
 
-    public function testGetEntity()
+    public function testGetEntity(): void
     {
         $this->assertEquals($this->dashboardEntity, $this->dashboardModel->getEntity());
     }
 
-    public function testGetWidgets()
+    public function testGetWidgets(): void
     {
         $this->assertEquals($this->widgets, $this->dashboardModel->getWidgets());
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $id = 100;
         $this->dashboardEntity->expects($this->once())
@@ -68,7 +66,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($id, $this->dashboardModel->getId());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $name = 'Name';
         $this->dashboardEntity->expects($this->once())
@@ -78,7 +76,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($name, $this->dashboardModel->getName());
     }
 
-    public function testSetName()
+    public function testSetName(): void
     {
         $name = 'Name';
         $this->dashboardEntity->expects($this->once())
@@ -88,7 +86,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->dashboardModel, $this->dashboardModel->setName($name));
     }
 
-    public function testGetStartDashboard()
+    public function testGetStartDashboard(): void
     {
         $dashboard = $this->createMock(Dashboard::class);
         $this->dashboardEntity->expects($this->once())
@@ -98,7 +96,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($dashboard, $this->dashboardModel->getStartDashboard());
     }
 
-    public function testSetStartDashboard()
+    public function testSetStartDashboard(): void
     {
         $dashboard = $this->createMock(Dashboard::class);
         $this->dashboardEntity->expects($this->once())
@@ -108,7 +106,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->dashboardModel, $this->dashboardModel->setStartDashboard($dashboard));
     }
 
-    public function testAddWidget()
+    public function testAddWidget(): void
     {
         $widgetEntity = $this->createMock(Widget::class);
         $widgetModel = $this->createMock(WidgetModel::class);
@@ -128,7 +126,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider addWidgetRecalculatePositionDataProvider
      */
-    public function testAddWidgetMinColumnPosition(array $layoutPositions, $column, array $expectedLayoutPosition)
+    public function testAddWidgetMinColumnPosition(array $layoutPositions, $column, array $expectedLayoutPosition): void
     {
         $widgetEntity = $this->createMock(Widget::class);
         $widgetModel = $this->createMock(WidgetModel::class);
@@ -193,7 +191,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetWidgetById()
+    public function testGetWidgetById(): void
     {
         $firstWidgetId = 100;
         $secondWidgetId = 101;
@@ -217,7 +215,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $appendLesser,
         $layoutPositions,
         $expectedLayoutPositions
-    ) {
+    ): void {
         $this->widgets->clear();
         foreach ($layoutPositions as $layoutPosition) {
             $widget = $this->createMock(WidgetModel::class);
@@ -270,7 +268,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testHasWidget()
+    public function testHasWidget(): void
     {
         $widgetModel = $this->createMock(WidgetModel::class);
         $widgetEntity = $this->createMock(Widget::class);
@@ -287,7 +285,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->dashboardModel->hasWidget($widgetModel));
     }
 
-    public function testIsDefault()
+    public function testIsDefault(): void
     {
         $isDefault = true;
         $this->dashboardEntity->expects($this->once())
@@ -297,7 +295,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($isDefault, $this->dashboardModel->isDefault());
     }
 
-    public function testSetIsDefault()
+    public function testSetIsDefault(): void
     {
         $isDefault = true;
         $this->dashboardEntity->expects($this->once())
@@ -307,7 +305,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->dashboardModel, $this->dashboardModel->setIsDefault($isDefault));
     }
 
-    public function testGetOwner()
+    public function testGetOwner(): void
     {
         $owner = $this->createMock(User::class);
         $this->dashboardEntity->expects($this->once())
@@ -317,7 +315,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($owner, $this->dashboardModel->getOwner());
     }
 
-    public function testSetOwner()
+    public function testSetOwner(): void
     {
         $owner = $this->createMock(User::class);
         $this->dashboardEntity->expects($this->once())
@@ -327,7 +325,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->dashboardModel, $this->dashboardModel->setOwner($owner));
     }
 
-    public function testGetOrganization()
+    public function testGetOrganization(): void
     {
         $organization = $this->createMock(Organization::class);
         $this->dashboardEntity->expects($this->once())
@@ -337,7 +335,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($organization, $this->dashboardModel->getOrganization());
     }
 
-    public function testSetOrganization()
+    public function testSetOrganization(): void
     {
         $organization = $this->createMock(Organization::class);
         $this->dashboardEntity->expects($this->once())
@@ -347,7 +345,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->dashboardModel, $this->dashboardModel->setOrganization($organization));
     }
 
-    public function testGetLabelFromEntity()
+    public function testGetLabelFromEntity(): void
     {
         $label = 'Label';
         $this->dashboardEntity->expects($this->once())
@@ -357,7 +355,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($label, $this->dashboardModel->getLabel());
     }
 
-    public function testSetLabel()
+    public function testSetLabel(): void
     {
         $label = 'Label';
         $this->dashboardEntity->expects($this->once())
@@ -367,7 +365,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->dashboardModel, $this->dashboardModel->setLabel($label));
     }
 
-    public function testGetLabelFromConfig()
+    public function testGetLabelFromConfig(): void
     {
         $this->dashboardEntity->expects($this->once())
             ->method('getLabel')
@@ -376,7 +374,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->config['label'], $this->dashboardModel->getLabel());
     }
 
-    public function testGetTemplate()
+    public function testGetTemplate(): void
     {
         $this->assertEquals(DashboardModel::DEFAULT_TEMPLATE, $this->dashboardModel->getTemplate());
     }

@@ -10,8 +10,9 @@ use Oro\Component\PhpUtils\Attribute\Reader\AttributeReader;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TitleAttributeReaderTest extends \PHPUnit\Framework\TestCase
+class TitleAttributeReaderTest extends TestCase
 {
     use TempDirExtension;
 
@@ -32,7 +33,7 @@ class TitleAttributeReaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTitle()
+    public function testGetTitle(): void
     {
         $this->controllerClassProvider->expects(self::once())
             ->method('getControllers')

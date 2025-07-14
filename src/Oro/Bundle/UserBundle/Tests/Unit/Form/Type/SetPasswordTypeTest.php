@@ -5,19 +5,18 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Oro\Bundle\UserBundle\Form\Type\SetPasswordType;
 use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class SetPasswordTypeTest extends \PHPUnit\Framework\TestCase
+class SetPasswordTypeTest extends TestCase
 {
-    /** @var PasswordFieldOptionsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $optionsProvider;
-
-    /** @var SetPasswordType */
-    private $formType;
+    private PasswordFieldOptionsProvider&MockObject $optionsProvider;
+    private SetPasswordType $formType;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +37,7 @@ class SetPasswordTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType = new SetPasswordType($this->optionsProvider);
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilder::class);
 
@@ -64,12 +63,12 @@ class SetPasswordTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType->buildForm($builder, []);
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(TextType::class, $this->formType->getParent());
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())

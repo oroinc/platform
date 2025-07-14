@@ -9,20 +9,15 @@ use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQueryExecutor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-abstract class MigrationExecutorTestCase extends \PHPUnit\Framework\TestCase
+abstract class MigrationExecutorTestCase extends TestCase
 {
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    protected $connection;
-
-    /** @var ArrayLogger */
-    protected $logger;
-
-    /** @var MigrationQueryExecutor */
-    protected $queryExecutor;
-
-    /** @var OroDataCacheManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $cacheManager;
+    protected Connection&MockObject $connection;
+    protected ArrayLogger $logger;
+    protected MigrationQueryExecutor $queryExecutor;
+    protected OroDataCacheManager&MockObject $cacheManager;
 
     #[\Override]
     protected function setUp(): void

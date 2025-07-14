@@ -15,8 +15,7 @@ class DbPingPeriodicTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private ManagerRegistry|MockObject $doctrine;
-
+    private ManagerRegistry&MockObject $doctrine;
     private DbPingPeriodic $dbPing;
 
     #[\Override]

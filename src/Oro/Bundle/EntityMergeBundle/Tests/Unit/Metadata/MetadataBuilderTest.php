@@ -12,29 +12,20 @@ use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataBuilder;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class MetadataBuilderTest extends \PHPUnit\Framework\TestCase
+class MetadataBuilderTest extends TestCase
 {
     private const CLASS_NAME = 'Namespace\EntityName';
 
-    /** @var MetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadataFactory;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityExtendConfigProvider;
-
-    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $classMetadata;
-
-    /** @var MetadataBuilder */
-    private $metadataBuilder;
+    private MetadataFactory&MockObject $metadataFactory;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private ConfigProvider&MockObject $entityExtendConfigProvider;
+    private ClassMetadata&MockObject $classMetadata;
+    private MetadataBuilder $metadataBuilder;
 
     #[\Override]
     protected function setUp(): void
@@ -56,7 +47,7 @@ class MetadataBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testCreateEntityMetadataByClass()
+    public function testCreateEntityMetadataByClass(): void
     {
         $this->doctrineHelper->expects($this->once())
             ->method('getMetadataFor')

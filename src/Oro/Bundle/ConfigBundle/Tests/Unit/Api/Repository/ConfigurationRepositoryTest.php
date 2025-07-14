@@ -6,14 +6,13 @@ use Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption;
 use Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection;
 use Oro\Bundle\ConfigBundle\Api\Repository\ConfigurationRepository;
 use Oro\Bundle\ConfigBundle\Config\ConfigApiManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigurationRepositoryTest extends \PHPUnit\Framework\TestCase
+class ConfigurationRepositoryTest extends TestCase
 {
-    /** @var ConfigApiManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ConfigurationRepository */
-    private $configRepository;
+    private ConfigApiManager&MockObject $configManager;
+    private ConfigurationRepository $configRepository;
 
     #[\Override]
     protected function setUp(): void

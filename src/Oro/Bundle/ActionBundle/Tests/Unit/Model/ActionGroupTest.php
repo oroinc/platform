@@ -14,7 +14,6 @@ use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 use Oro\Bundle\ActionBundle\Model\Parameter;
-use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
@@ -26,11 +25,10 @@ use PHPUnit\Framework\TestCase;
 
 class ActionGroupTest extends TestCase
 {
-    private ActionFactory|MockObject $actionFactory;
-    private ExpressionFactory|MockObject $conditionFactory;
-    private ActionGroupEventDispatcher|MockObject $eventDispatcher;
+    private ActionFactoryInterface&MockObject $actionFactory;
+    private ExpressionFactory&MockObject $conditionFactory;
+    private ActionGroupEventDispatcher&MockObject $eventDispatcher;
     private ActionGroupDefinition $definition;
-
     private ActionGroup $actionGroup;
 
     #[\Override]
@@ -51,7 +49,7 @@ class ActionGroupTest extends TestCase
         );
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $data = new ActionData(['data' => new \stdClass()]);
         $action = $this->createActionGroup($this->once(), $data);
@@ -77,7 +75,7 @@ class ActionGroupTest extends TestCase
         $this->actionGroup->execute($data, $errors);
     }
 
-    public function testExecuteNotAllowedByCondition()
+    public function testExecuteNotAllowedByCondition(): void
     {
         $data = new ActionData(['data' => new \stdClass()]);
         $action = $this->createActionGroup($this->never(), $data);
@@ -112,7 +110,7 @@ class ActionGroupTest extends TestCase
         $this->assertEmpty($errors->toArray());
     }
 
-    public function testExecuteNotAllowedByEvent()
+    public function testExecuteNotAllowedByEvent(): void
     {
         $data = new ActionData(['data' => new \stdClass()]);
 
@@ -145,7 +143,7 @@ class ActionGroupTest extends TestCase
     /**
      * @dataProvider isAllowedProvider
      */
-    public function testIsAllowed(ActionData $data, ?ConfigurableCondition $condition, bool $allowed)
+    public function testIsAllowed(ActionData $data, ?ConfigurableCondition $condition, bool $allowed): void
     {
         if ($condition) {
             $this->definition->setConditions(['condition1']);
@@ -210,7 +208,7 @@ class ActionGroupTest extends TestCase
     /**
      * @dataProvider getParametersProvider
      */
-    public function testGetParameters(array $config, array $expected)
+    public function testGetParameters(array $config, array $expected): void
     {
         if ($config) {
             $this->definition->setParameters($config);

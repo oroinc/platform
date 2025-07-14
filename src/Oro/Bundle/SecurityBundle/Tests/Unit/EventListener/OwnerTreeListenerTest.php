@@ -9,6 +9,7 @@ use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestBusinessUnit;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestUser;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -17,14 +18,9 @@ class OwnerTreeListenerTest extends OrmTestCase
 {
     private const ENTITY_NAMESPACE = 'Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity';
 
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var OwnerTreeProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownerTreeProvider;
-
-    /** @var OwnerTreeListener */
-    private $listener;
+    private EntityManagerInterface $em;
+    private OwnerTreeProviderInterface&MockObject $ownerTreeProvider;
+    private OwnerTreeListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -149,7 +145,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         return $this->em->getReference(self::ENTITY_NAMESPACE . '\TestBusinessUnit', $businessUnitId);
     }
 
-    public function testMonitoredEntityIsCreated()
+    public function testMonitoredEntityIsCreated(): void
     {
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
@@ -164,7 +160,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->em->flush();
     }
 
-    public function testNotMonitoredEntityIsCreated()
+    public function testNotMonitoredEntityIsCreated(): void
     {
         $this->ownerTreeProvider->expects($this->never())
             ->method('clearCache');
@@ -177,7 +173,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->em->flush();
     }
 
-    public function testMonitoredEntityIsDeleted()
+    public function testMonitoredEntityIsDeleted(): void
     {
         $userId = 1;
 
@@ -195,7 +191,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->em->flush();
     }
 
-    public function testNotMonitoredEntityIsDeleted()
+    public function testNotMonitoredEntityIsDeleted(): void
     {
         $userId = 1;
 
@@ -211,7 +207,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->em->flush();
     }
 
-    public function testMonitoredToOneAssociationIsChanged()
+    public function testMonitoredToOneAssociationIsChanged(): void
     {
         $userId = 1;
         $businessUnitId = 20;
@@ -230,7 +226,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->em->flush();
     }
 
-    public function testNotMonitoredToOneAssociationIsChanged()
+    public function testNotMonitoredToOneAssociationIsChanged(): void
     {
         $userId = 1;
         $businessUnitId = 20;
@@ -247,7 +243,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->em->flush();
     }
 
-    public function testNotMonitoredToOneAssociationIsChangedForMonitoredEntity()
+    public function testNotMonitoredToOneAssociationIsChangedForMonitoredEntity(): void
     {
         $userId = 1;
         $businessUnitId = 20;
@@ -266,7 +262,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->em->flush();
     }
 
-    public function testMonitoredToOneAssociationIsSet()
+    public function testMonitoredToOneAssociationIsSet(): void
     {
         $userId = 1;
         $businessUnitId = 10;
@@ -285,7 +281,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->em->flush();
     }
 
-    public function testNotMonitoredToOneAssociationIsSet()
+    public function testNotMonitoredToOneAssociationIsSet(): void
     {
         $userId = 1;
 
@@ -300,7 +296,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->em->flush();
     }
 
-    public function testMonitoredToOneAssociationIsUnset()
+    public function testMonitoredToOneAssociationIsUnset(): void
     {
         $userId = 1;
 
@@ -318,7 +314,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->em->flush();
     }
 
-    public function testNotMonitoredToOneAssociationIsUnset()
+    public function testNotMonitoredToOneAssociationIsUnset(): void
     {
         $userId = 1;
 
@@ -334,7 +330,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->em->flush();
     }
 
-    public function testNewItemIsAddedToMonitoredToManyAssociation()
+    public function testNewItemIsAddedToMonitoredToManyAssociation(): void
     {
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
@@ -351,7 +347,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->em->flush();
     }
 
-    public function testNewItemIsAddedToNotMonitoredToManyAssociation()
+    public function testNewItemIsAddedToNotMonitoredToManyAssociation(): void
     {
         $this->ownerTreeProvider->expects($this->never())
             ->method('clearCache');
@@ -366,7 +362,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->em->flush();
     }
 
-    public function testNewItemIsAddedToNotMonitoredToManyAssociationForMonitoredEntity()
+    public function testNewItemIsAddedToNotMonitoredToManyAssociationForMonitoredEntity(): void
     {
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['organizations']);
 
@@ -383,7 +379,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->em->flush();
     }
 
-    public function testItemRemovedFromMonitoredToManyAssociation()
+    public function testItemRemovedFromMonitoredToManyAssociation(): void
     {
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
@@ -400,7 +396,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->em->flush();
     }
 
-    public function testItemRemovedFromNotMonitoredToManyAssociation()
+    public function testItemRemovedFromNotMonitoredToManyAssociation(): void
     {
         $this->ownerTreeProvider->expects($this->never())
             ->method('clearCache');
@@ -415,7 +411,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->em->flush();
     }
 
-    public function testNotMonitoredFieldIsChanged()
+    public function testNotMonitoredFieldIsChanged(): void
     {
         $userId = 1;
         $newUserName = 'new';

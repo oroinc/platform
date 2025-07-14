@@ -6,14 +6,14 @@ use Oro\Bundle\LayoutBundle\Event\LayoutContextChangedEvent;
 use Oro\Bundle\LayoutBundle\EventListener\LayoutContextChangedListener;
 use Oro\Bundle\LayoutBundle\Layout\TwigEnvironmentAwareLayoutRendererInterface;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 
-class LayoutContextChangedListenerTest extends \PHPUnit\Framework\TestCase
+class LayoutContextChangedListenerTest extends TestCase
 {
-    private TwigEnvironmentAwareLayoutRendererInterface|\PHPUnit\Framework\MockObject\MockObject $twigLayoutRenderer;
-
-    private Environment|\PHPUnit\Framework\MockObject\MockObject $environment;
-
+    private TwigEnvironmentAwareLayoutRendererInterface&MockObject $twigLayoutRenderer;
+    private Environment&MockObject $environment;
     private LayoutContextChangedListener $listener;
 
     #[\Override]
@@ -22,8 +22,7 @@ class LayoutContextChangedListenerTest extends \PHPUnit\Framework\TestCase
         $this->twigLayoutRenderer = $this->createMock(TwigEnvironmentAwareLayoutRendererInterface::class);
         $this->environment = $this->createMock(Environment::class);
 
-        $this->twigLayoutRenderer
-            ->expects(self::once())
+        $this->twigLayoutRenderer->expects(self::once())
             ->method('getEnvironment')
             ->willReturn($this->environment);
 
@@ -34,8 +33,7 @@ class LayoutContextChangedListenerTest extends \PHPUnit\Framework\TestCase
     {
         $event = new LayoutContextChangedEvent(null, null);
 
-        $this->twigLayoutRenderer
-            ->expects(self::once())
+        $this->twigLayoutRenderer->expects(self::once())
             ->method('setEnvironment')
             ->with(
                 self::callback(function (Environment $environment) {
@@ -54,8 +52,7 @@ class LayoutContextChangedListenerTest extends \PHPUnit\Framework\TestCase
         $context->resolve();
         $event = new LayoutContextChangedEvent(null, $context);
 
-        $this->twigLayoutRenderer
-            ->expects(self::once())
+        $this->twigLayoutRenderer->expects(self::once())
             ->method('setEnvironment')
             ->with(
                 self::callback(function (Environment $environment) {

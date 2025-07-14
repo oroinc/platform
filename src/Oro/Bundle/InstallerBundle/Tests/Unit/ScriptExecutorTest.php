@@ -4,12 +4,13 @@ namespace Oro\Bundle\InstallerBundle\Tests\Unit;
 
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ScriptExecutorTest extends \PHPUnit\Framework\TestCase
+class ScriptExecutorTest extends TestCase
 {
-    public function testRunScript()
+    public function testRunScript(): void
     {
         $testScriptFile = realpath(__DIR__ . '/Fixture/src/TestPackage/install.php');
 

@@ -8,17 +8,15 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
+class ChainVirtualRelationProviderTest extends TestCase
 {
-    /** @var ChainVirtualRelationProvider */
-    private $chainProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject[] */
-    private $providers = [];
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
+    /** @var VirtualRelationProviderInterface[]&MockObject[] */
+    private array $providers = [];
+    private ConfigProvider&MockObject $configProvider;
+    private ChainVirtualRelationProvider $chainProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +30,7 @@ class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         $this->chainProvider = new ChainVirtualRelationProvider($this->providers, $this->configProvider);
     }
 
-    public function testIsVirtualRelationByLowPriorityProvider()
+    public function testIsVirtualRelationByLowPriorityProvider(): void
     {
         $this->providers[0]->expects($this->once())
             ->method('isVirtualRelation')
@@ -44,7 +42,7 @@ class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->chainProvider->isVirtualRelation('testClass', 'testField'));
     }
 
-    public function testIsVirtualRelationByHighPriorityProvider()
+    public function testIsVirtualRelationByHighPriorityProvider(): void
     {
         $this->providers[0]->expects($this->once())
             ->method('isVirtualRelation')
@@ -58,7 +56,7 @@ class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->chainProvider->isVirtualRelation('testClass', 'testField'));
     }
 
-    public function testIsVirtualRelationNone()
+    public function testIsVirtualRelationNone(): void
     {
         $this->providers[0]->expects($this->once())
             ->method('isVirtualRelation')
@@ -72,13 +70,13 @@ class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->chainProvider->isVirtualRelation('testClass', 'testField'));
     }
 
-    public function testIsVirtualRelationWithoutChildProviders()
+    public function testIsVirtualRelationWithoutChildProviders(): void
     {
         $chainProvider = new ChainVirtualRelationProvider([], $this->configProvider);
         $this->assertFalse($chainProvider->isVirtualRelation('testClass', 'testField'));
     }
 
-    public function testGetVirtualRelations()
+    public function testGetVirtualRelations(): void
     {
         $entityClass = 'testClass';
 
@@ -140,7 +138,7 @@ class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVirtualRelationsForNotAccessibleEntity()
+    public function testGetVirtualRelationsForNotAccessibleEntity(): void
     {
         $entityClass = 'testClass';
 
@@ -168,13 +166,13 @@ class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVirtualRelationsWithoutChildProviders()
+    public function testGetVirtualRelationsWithoutChildProviders(): void
     {
         $chainProvider = new ChainVirtualRelationProvider([], $this->configProvider);
         $this->assertSame([], $chainProvider->getVirtualRelations('testClass'));
     }
 
-    public function testGetVirtualRelationQuery()
+    public function testGetVirtualRelationQuery(): void
     {
         $className = 'stdClass';
         $fieldName = 'testField1';
@@ -207,7 +205,7 @@ class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($query, $this->chainProvider->getVirtualRelationQuery($className, $fieldName));
     }
 
-    public function testGetVirtualRelationQueryException()
+    public function testGetVirtualRelationQueryException(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('A query for relation "testField" in class "stdClass" was not found.');
@@ -215,7 +213,7 @@ class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         $this->chainProvider->getVirtualRelationQuery('stdClass', 'testField');
     }
 
-    public function testGetVirtualRelationQueryWithoutChildProviders()
+    public function testGetVirtualRelationQueryWithoutChildProviders(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('A query for relation "testField" in class "stdClass" was not found.');

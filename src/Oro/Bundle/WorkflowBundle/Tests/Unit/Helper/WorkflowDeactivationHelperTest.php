@@ -8,17 +8,14 @@ use Oro\Bundle\WorkflowBundle\Helper\WorkflowDeactivationHelper;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowDeactivationHelperTest extends \PHPUnit\Framework\TestCase
+class WorkflowDeactivationHelperTest extends TestCase
 {
-    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowRegistry;
-
-    /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationHelper;
-
-    /** @var WorkflowDeactivationHelper */
-    private $helper;
+    private WorkflowRegistry&MockObject $workflowRegistry;
+    private WorkflowTranslationHelper&MockObject $translationHelper;
+    private WorkflowDeactivationHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +26,7 @@ class WorkflowDeactivationHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper = new WorkflowDeactivationHelper($this->workflowRegistry, $this->translationHelper);
     }
 
-    public function testGetWorkflowsForManualDeactivation()
+    public function testGetWorkflowsForManualDeactivation(): void
     {
         $workflow1 = $this->getWorkflow('workflow1', ['exclusiveGroup1']);
         $workflow2 = $this->getWorkflow('workflow2', ['exclusiveGroup1']);
@@ -69,7 +66,7 @@ class WorkflowDeactivationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetWorkflowsToDeactivation()
+    public function testGetWorkflowsToDeactivation(): void
     {
         $workflow1 = $this->getWorkflow('workflow1', ['exclusiveGroup1']);
         $workflow2 = $this->getWorkflow('workflow2', ['exclusiveGroup1']);
@@ -98,12 +95,7 @@ class WorkflowDeactivationHelperTest extends \PHPUnit\Framework\TestCase
         return $definition;
     }
 
-    /**
-     * @param string $name
-     * @param array $exclusiveActiveGroups
-     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getWorkflow($name, array $exclusiveActiveGroups = [])
+    private function getWorkflow(string $name, array $exclusiveActiveGroups = []): Workflow&MockObject
     {
         $workflow = $this->createMock(Workflow::class);
         $workflow->expects($this->any())

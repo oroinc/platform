@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\EventListener;
 
 use Gos\Bundle\WebSocketBundle\Client\Auth\WebsocketAuthenticationProviderInterface;
-use Gos\Bundle\WebSocketBundle\Client\ClientStorage;
 use Gos\Bundle\WebSocketBundle\Client\ClientStorageInterface;
 use Gos\Bundle\WebSocketBundle\Client\Exception\StorageException;
 use Gos\Bundle\WebSocketBundle\Event\ClientConnectedEvent;
@@ -14,6 +13,7 @@ use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
 use Oro\Bundle\SyncBundle\Security\Token\TicketToken;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Ratchet\ConnectionInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -24,13 +24,9 @@ class ClientEventListenerTest extends TestCase
 
     private const CONNECTION_RESOURCE_ID = 45654;
 
-    private WebsocketAuthenticationProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-        $websocketAuthenticationProvider;
-
-    private ClientStorage|\PHPUnit\Framework\MockObject\MockObject $clientStorage;
-
-    private ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject $connection;
-
+    private WebsocketAuthenticationProviderInterface&MockObject $websocketAuthenticationProvider;
+    private ClientStorageInterface&MockObject $clientStorage;
+    private ConnectionInterface&MockObject $connection;
     private ClientEventListener $clientEventListener;
 
     #[\Override]

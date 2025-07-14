@@ -6,20 +6,18 @@ use Monolog\Logger;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\LoggerBundle\Monolog\LogLevelConfig;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
+class LogLevelConfigTest extends TestCase
 {
-    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
-
-    private ArrayAdapter|\PHPUnit\Framework\MockObject\MockObject $loggerCache;
-
-    private LogLevelConfig $config;
-
+    private ConfigManager&MockObject $configManager;
+    private ArrayAdapter&MockObject $loggerCache;
+    private ItemInterface&MockObject $cacheItemMock;
     private ApplicationState $applicationState;
-
-    private ItemInterface|\PHPUnit\Framework\MockObject\MockObject  $cacheItemMock;
+    private LogLevelConfig $config;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +27,9 @@ class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
         $this->cacheItemMock = $this->createMock(ItemInterface::class);
         $this->applicationState = $this->createMock(ApplicationState::class);
 
-        $this->applicationState->method('isInstalled')->willReturn(true);
+        $this->applicationState->expects(self::any())
+            ->method('isInstalled')
+            ->willReturn(true);
 
         $this->config = new LogLevelConfig(
             $this->loggerCache,
@@ -59,7 +59,8 @@ class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
                 return $callable($this->cacheItemMock);
             });
 
-        $this->configManager->expects($this->never())->method('get');
+        $this->configManager->expects($this->never())
+            ->method('get');
 
         $this->assertEquals(Logger::WARNING, $config->getMinLevel());
     }
@@ -71,7 +72,8 @@ class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
             ->with(LogLevelConfig::CACHE_KEY)
             ->willReturn(Logger::WARNING);
 
-        $this->configManager->expects($this->never())->method('get');
+        $this->configManager->expects($this->never())
+            ->method('get');
 
         $this->assertEquals(Logger::WARNING, $this->config->getMinLevel());
     }
@@ -107,7 +109,8 @@ class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
             ->with(LogLevelConfig::CACHE_KEY)
             ->willReturn(Logger::INFO);
 
-        $this->configManager->expects($this->never())->method('get');
+        $this->configManager->expects($this->never())
+            ->method('get');
 
         $this->assertTrue($this->config->isActive());
     }
@@ -119,7 +122,8 @@ class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
             ->with(LogLevelConfig::CACHE_KEY)
             ->willReturn(Logger::WARNING);
 
-        $this->configManager->expects($this->never())->method('get');
+        $this->configManager->expects($this->never())
+            ->method('get');
 
         $this->assertFalse($this->config->isActive());
     }
@@ -131,7 +135,8 @@ class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
             ->with(LogLevelConfig::CACHE_KEY)
             ->willReturn(Logger::WARNING);
 
-        $this->configManager->expects($this->never())->method('get');
+        $this->configManager->expects($this->never())
+            ->method('get');
 
         $this->assertEquals(Logger::WARNING, $this->config->getMinLevel());
         $this->config->reset();

@@ -5,17 +5,14 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Mailer;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Mailer\Processor;
 use Oro\Bundle\UserBundle\Mailer\UserTemplateEmailSender;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ProcessorTest extends \PHPUnit\Framework\TestCase
+class ProcessorTest extends TestCase
 {
-    /** @var User */
-    private $user;
-
-    /** @var UserTemplateEmailSender|\PHPUnit\Framework\MockObject\MockObject */
-    private $userTemplateEmailSender;
-
-    /** @var Processor */
-    private $mailProcessor;
+    private User $user;
+    private UserTemplateEmailSender&MockObject $userTemplateEmailSender;
+    private Processor $mailProcessor;
 
     #[\Override]
     protected function setUp(): void

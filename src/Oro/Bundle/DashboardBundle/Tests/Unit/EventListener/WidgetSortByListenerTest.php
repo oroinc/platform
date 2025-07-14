@@ -18,7 +18,7 @@ class WidgetSortByListenerTest extends OrmTestCase
     /**
      * @dataProvider onResultBeforeQueryShouldNotUpdateQueryProvider
      */
-    public function testOnResultBeforeQueryShouldNotUpdateQuery(WidgetOptionBag $widgetOptionBag)
+    public function testOnResultBeforeQueryShouldNotUpdateQuery(WidgetOptionBag $widgetOptionBag): void
     {
         $widgetConfigs = $this->createMock(WidgetConfigs::class);
         $widgetConfigs->expects(self::any())
@@ -63,8 +63,10 @@ class WidgetSortByListenerTest extends OrmTestCase
     /**
      * @dataProvider onResultBeforeQueryShouldUpdateQueryProvider
      */
-    public function testOnResultBeforeQueryShouldUpdateQuery(WidgetOptionBag $widgetOptionBag, string $expectedDQL)
-    {
+    public function testOnResultBeforeQueryShouldUpdateQuery(
+        WidgetOptionBag $widgetOptionBag,
+        string $expectedDQL
+    ): void {
         $widgetConfigs = $this->createMock(WidgetConfigs::class);
         $widgetConfigs->expects(self::any())
             ->method('getWidgetOptions')

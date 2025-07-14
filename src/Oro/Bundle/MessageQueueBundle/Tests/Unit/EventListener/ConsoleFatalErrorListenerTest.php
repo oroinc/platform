@@ -6,6 +6,8 @@ use Oro\Bundle\MessageQueueBundle\Command\CleanupCommand;
 use Oro\Bundle\MessageQueueBundle\EventListener\ConsoleFatalErrorListener;
 use Oro\Component\MessageQueue\Client\ConsumeMessagesCommand;
 use Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand as TransportConsumeMessagesCommand;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -13,22 +15,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\ErrorHandler\ErrorHandler;
 
-class ConsoleFatalErrorListenerTest extends \PHPUnit\Framework\TestCase
+class ConsoleFatalErrorListenerTest extends TestCase
 {
-    /** @var ConsoleFatalErrorListener */
-    private $listener;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var ErrorHandler */
-    private $handler;
-
-    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $input;
-
-    /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $output;
+    private ConsoleFatalErrorListener $listener;
+    private LoggerInterface&MockObject $logger;
+    private ErrorHandler $handler;
+    private InputInterface&MockObject $input;
+    private OutputInterface&MockObject $output;
 
     private static array $defaultLoggers = [
         E_DEPRECATED => [null, LogLevel::INFO],

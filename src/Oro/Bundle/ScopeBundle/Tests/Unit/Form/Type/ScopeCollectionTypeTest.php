@@ -10,8 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ScopeCollectionTypeTest extends FormIntegrationTestCase
 {
-    /** @var ScopeCollectionType */
-    private $formType;
+    private ScopeCollectionType $formType;
 
     #[\Override]
     protected function setUp(): void

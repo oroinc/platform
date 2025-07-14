@@ -4,10 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Event;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Event\TransitionsAttributeEvent;
+use PHPUnit\Framework\TestCase;
 
-class TransitionsAttributeEventTest extends \PHPUnit\Framework\TestCase
+class TransitionsAttributeEventTest extends TestCase
 {
-    public function testAttributeEvent()
+    public function testAttributeEvent(): void
     {
         $attribute = new Attribute();
         $attribute

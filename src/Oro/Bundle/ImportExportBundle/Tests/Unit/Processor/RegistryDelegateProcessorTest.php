@@ -15,20 +15,17 @@ use Oro\Bundle\ImportExportBundle\Processor\RegistryDelegateProcessor;
 use Oro\Bundle\ImportExportBundle\Processor\StepExecutionAwareProcessor;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Processor\Mocks\ClassWithCloseMethod;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
+class RegistryDelegateProcessorTest extends TestCase
 {
-    /** @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $processorRegistry;
+    private ProcessorRegistry&MockObject $processorRegistry;
+    private ContextRegistry&MockObject $contextRegistry;
 
-    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextRegistry;
+    private string $delegateType = 'import';
 
-    /** @var string */
-    private $delegateType = 'import';
-
-    /** @var RegistryDelegateProcessor */
-    private $processor;
+    private RegistryDelegateProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -43,7 +40,7 @@ class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetStepExecution()
+    public function testSetStepExecution(): void
     {
         $stepExecution = $this->createMock(StepExecution::class);
 
@@ -52,7 +49,7 @@ class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($stepExecution, ReflectionUtil::getPropertyValue($this->processor, 'stepExecution'));
     }
 
-    public function testProcessContextAwareProcessor()
+    public function testProcessContextAwareProcessor(): void
     {
         $entityName = 'entity_name';
         $processorAlias = 'processor_alias';
@@ -90,7 +87,7 @@ class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($item);
     }
 
-    public function testProcessStepExecutionAwareProcessor()
+    public function testProcessStepExecutionAwareProcessor(): void
     {
         $entityName = 'entity_name';
         $processorAlias = 'processor_alias';
@@ -128,7 +125,7 @@ class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($item);
     }
 
-    public function testProcessSimpleProcessor()
+    public function testProcessSimpleProcessor(): void
     {
         $entityName = 'entity_name';
         $processorAlias = 'processor_alias';
@@ -167,7 +164,7 @@ class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($item);
     }
 
-    public function testProcessFailsWhenNoConfigurationProvided()
+    public function testProcessFailsWhenNoConfigurationProvided(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Configuration of processor must contain "processorAlias" options.');
@@ -192,7 +189,7 @@ class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($this->createMock(\stdClass::class));
     }
 
-    public function testProcessFailsWhenNoStepExecution()
+    public function testProcessFailsWhenNoStepExecution(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Step execution entity must be injected to processor.');
@@ -200,7 +197,7 @@ class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($this->createMock(\stdClass::class));
     }
 
-    public function testClose()
+    public function testClose(): void
     {
         $entityName = 'entity_name';
         $processorAlias = 'processor_alias';
@@ -232,7 +229,7 @@ class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->close();
     }
 
-    public function testCloseNoClosableInterface()
+    public function testCloseNoClosableInterface(): void
     {
         $entityName = 'entity_name';
         $processorAlias = 'processor_alias';

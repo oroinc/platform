@@ -5,14 +5,13 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Formatter\Property;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\CallbackProperty;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyConfiguration;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CallbackPropertyTest extends \PHPUnit\Framework\TestCase
+class CallbackPropertyTest extends TestCase
 {
-    /** @var \stdClass|\PHPUnit\Framework\MockObject\MockObject */
-    private $callable;
-
-    /** @var CallbackProperty */
-    private $property;
+    private \stdClass&MockObject $callable;
+    private CallbackProperty $property;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class CallbackPropertyTest extends \PHPUnit\Framework\TestCase
         $this->property = new CallbackProperty();
     }
 
-    public function testGetRawValue()
+    public function testGetRawValue(): void
     {
         $record = new ResultRecord([]);
 
@@ -40,7 +39,7 @@ class CallbackPropertyTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('returnValue', $this->property->getRawValue($record));
     }
 
-    public function testGetRawValueAndParams()
+    public function testGetRawValueAndParams(): void
     {
         $record = new ResultRecord(['param1' => 'value1', 'param2' => 'value2']);
 

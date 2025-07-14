@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Expr\Orx;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
@@ -665,7 +666,7 @@ class AbstractEmailSynchronizerTest extends TestCase
             ->method('andWhere')
             ->withConsecutive(
                 ['(o.isSyncEnabled is NULL or o.isSyncEnabled = :isSyncEnabled)'],
-                [self::isInstanceOf(Expr\Orx::class)],
+                [self::isInstanceOf(Orx::class)],
             )
             ->willReturn($qb);
         $qb->expects(self::once())

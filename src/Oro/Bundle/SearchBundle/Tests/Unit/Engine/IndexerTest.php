@@ -19,23 +19,20 @@ use Oro\Bundle\SearchBundle\Security\SecurityProvider;
 use Oro\Bundle\SearchBundle\Test\Unit\SearchMappingTypeCastingHandlersTestTrait;
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class IndexerTest extends \PHPUnit\Framework\TestCase
+class IndexerTest extends TestCase
 {
     use SearchMappingTypeCastingHandlersTestTrait;
 
-    /** @var EngineInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $engine;
-
-    /** @var array */
-    private $config;
-
-    /** @var Indexer */
-    private $indexService;
+    private EngineInterface&MockObject $engine;
+    private array $config;
+    private Indexer $indexService;
 
     #[\Override]
     protected function setUp(): void
@@ -102,14 +99,14 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSelect()
+    public function testSelect(): void
     {
         $query = $this->indexService->select();
 
         $this->assertEquals($this->config, $query->getMappingConfig());
     }
 
-    public function testQuery()
+    public function testQuery(): void
     {
         $select = $this->indexService->select();
 
@@ -213,7 +210,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         ?int $maxResults = 0,
         ?string $from = null,
         int $page = 0
-    ) {
+    ): void {
         $searchResults = ['one', 'two', 'three'];
 
         $this->engine->expects($this->any())
@@ -236,7 +233,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($actualQuery, $expectedQuery);
     }
 
-    public function testAdvancedSearch()
+    public function testAdvancedSearch(): void
     {
         $searchResults = ['one', 'two', 'three'];
 

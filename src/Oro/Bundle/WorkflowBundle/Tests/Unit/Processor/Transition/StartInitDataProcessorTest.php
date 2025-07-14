@@ -7,14 +7,13 @@ use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\StartInitDataProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class StartInitDataProcessorTest extends \PHPUnit\Framework\TestCase
+class StartInitDataProcessorTest extends TestCase
 {
-    /** @var ButtonSearchContextProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $buttonContextProvider;
-
-    /** @var StartInitDataProcessor */
-    private $processor;
+    private ButtonSearchContextProvider&MockObject $buttonContextProvider;
+    private StartInitDataProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class StartInitDataProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new StartInitDataProcessor($this->buttonContextProvider);
     }
 
-    public function testSkipContextWithoutInitOptions()
+    public function testSkipContextWithoutInitOptions(): void
     {
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())

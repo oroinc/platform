@@ -5,11 +5,11 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Attribute\Type;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface;
 use Oro\Bundle\EntityConfigBundle\Attribute\Type\ManyToOneAttributeType;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ManyToOneAttributeTypeTest extends AttributeTypeTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
+    private DoctrineHelper&MockObject $doctrineHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +33,7 @@ class ManyToOneAttributeTypeTest extends AttributeTypeTestCase
         ];
     }
 
-    public function testGetSearchableValue()
+    public function testGetSearchableValue(): void
     {
         $value = new \stdClass();
 
@@ -43,7 +43,7 @@ class ManyToOneAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetFilterableValue()
+    public function testGetFilterableValue(): void
     {
         $value = new \stdClass();
         $filterableValue = 'filterable_value';
@@ -59,7 +59,7 @@ class ManyToOneAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetFilterableValueNotObject()
+    public function testGetFilterableValueNotObject(): void
     {
         $value = 'test_value';
 
@@ -69,7 +69,7 @@ class ManyToOneAttributeTypeTest extends AttributeTypeTestCase
         $this->assertNull($this->getAttributeType()->getFilterableValue($this->attribute, $value, $this->localization));
     }
 
-    public function testGetSortableValue()
+    public function testGetSortableValue(): void
     {
         $value = new \stdClass();
 

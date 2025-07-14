@@ -14,10 +14,7 @@ use Symfony\Component\Form\FormInterface;
 
 class CheckboxTypeTest extends TestCase
 {
-    /**
-     * @var CheckboxType
-     */
-    private $type;
+    private CheckboxType $type;
 
     #[\Override]
     protected function setUp(): void

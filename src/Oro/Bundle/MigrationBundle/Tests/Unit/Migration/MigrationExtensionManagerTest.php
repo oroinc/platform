@@ -13,9 +13,10 @@ use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\TestExten
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\MigrationWithTestExtension;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\MigrationWithTestExtensionDepended;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class MigrationExtensionManagerTest extends \PHPUnit\Framework\TestCase
+class MigrationExtensionManagerTest extends TestCase
 {
     public function testValidExtension(): void
     {

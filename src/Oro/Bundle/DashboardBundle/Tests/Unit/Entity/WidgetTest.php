@@ -4,11 +4,11 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
+use PHPUnit\Framework\TestCase;
 
-class WidgetTest extends \PHPUnit\Framework\TestCase
+class WidgetTest extends TestCase
 {
-    /** @var Widget */
-    private $widget;
+    private Widget $widget;
 
     #[\Override]
     protected function setUp(): void
@@ -16,12 +16,12 @@ class WidgetTest extends \PHPUnit\Framework\TestCase
         $this->widget = new Widget();
     }
 
-    public function testId()
+    public function testId(): void
     {
         $this->assertNull($this->widget->getId());
     }
 
-    public function testName()
+    public function testName(): void
     {
         $this->assertNull($this->widget->getName());
         $value = 'test';
@@ -29,7 +29,7 @@ class WidgetTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->widget->getName());
     }
 
-    public function testLayoutPosition()
+    public function testLayoutPosition(): void
     {
         $this->assertNull($this->widget->getLayoutPosition());
         $value = [1, 100];
@@ -37,7 +37,7 @@ class WidgetTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->widget->getLayoutPosition());
     }
 
-    public function testDashboard()
+    public function testDashboard(): void
     {
         $dashboard = $this->createMock(Dashboard::class);
         $this->assertNull($this->widget->getDashboard());
@@ -45,7 +45,7 @@ class WidgetTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($dashboard, $this->widget->getDashboard());
     }
 
-    public function testOptions()
+    public function testOptions(): void
     {
         $this->assertEquals([], $this->widget->getOptions());
         $options['foo'] = 'bar';

@@ -11,17 +11,14 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository;
 use Oro\Bundle\SegmentBundle\EventListener\DoctrinePreRemoveListener;
 use Oro\Bundle\SegmentBundle\Tests\Unit\Fixtures\StubEntity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DoctrinePreRemoveListenerTest extends \PHPUnit\Framework\TestCase
+class DoctrinePreRemoveListenerTest extends TestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var DoctrinePreRemoveListener */
-    private $listener;
+    private EntityManagerInterface&MockObject $entityManager;
+    private ConfigManager&MockObject $configManager;
+    private DoctrinePreRemoveListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +32,7 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider preRemoveProvider
      */
-    public function testPreRemove(bool $entityIsConfigurable = false)
+    public function testPreRemove(bool $entityIsConfigurable = false): void
     {
         $entity = new StubEntity();
         $args = new LifecycleEventArgs($entity, $this->entityManager);
@@ -59,7 +56,7 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider postFlushProvider
      */
-    public function testPostFlushSegmentBundlePresent(array $entities)
+    public function testPostFlushSegmentBundlePresent(array $entities): void
     {
         $this->mockMetadata(count($entities));
         $this->configManager->expects($this->exactly(count($entities)))
@@ -93,7 +90,7 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider postFlushProvider
      */
-    public function testPostFlushSegmentBundleNotPresent(array $entities)
+    public function testPostFlushSegmentBundleNotPresent(array $entities): void
     {
         $this->mockMetadata(count($entities));
         $this->configManager->expects($this->exactly(count($entities)))

@@ -31,7 +31,7 @@ class UserMultiSelectTypeTest extends TestCase
         $this->type = new UserMultiSelectType($doctrine);
     }
 
-    public function testBuildView()
+    public function testBuildView(): void
     {
         $builder = $this->createMock(FormBuilder::class);
 
@@ -42,7 +42,7 @@ class UserMultiSelectTypeTest extends TestCase
         $this->type->buildForm($builder, ['entity_class' => User::class]);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
@@ -51,7 +51,7 @@ class UserMultiSelectTypeTest extends TestCase
         $this->type->configureOptions($resolver);
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(OroJquerySelect2HiddenType::class, $this->type->getParent());
     }

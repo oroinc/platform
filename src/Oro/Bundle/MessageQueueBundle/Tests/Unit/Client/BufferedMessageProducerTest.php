@@ -7,24 +7,19 @@ use Oro\Bundle\MessageQueueBundle\Client\MessageBuffer;
 use Oro\Bundle\MessageQueueBundle\Client\MessageFilterInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Transport\Exception\Exception;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
+class BufferedMessageProducerTest extends TestCase
 {
-    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $inner;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var MessageFilterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $messageFilter;
-
-    /** @var BufferedMessageProducer */
-    private $producer;
+    private MessageProducerInterface&MockObject $inner;
+    private LoggerInterface&MockObject $logger;
+    private MessageFilterInterface&MockObject $messageFilter;
+    private BufferedMessageProducer $producer;
 
     #[\Override]
     protected function setUp(): void
@@ -36,25 +31,25 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
         $this->producer = new BufferedMessageProducer($this->inner, $this->logger, $this->messageFilter);
     }
 
-    public function testBufferDisabledByDefault()
+    public function testBufferDisabledByDefault(): void
     {
         self::assertFalse($this->producer->isBufferingEnabled());
     }
 
-    public function testEnableBuffering()
+    public function testEnableBuffering(): void
     {
         $this->producer->enableBuffering();
         self::assertTrue($this->producer->isBufferingEnabled());
     }
 
-    public function testDisableBuffering()
+    public function testDisableBuffering(): void
     {
         $this->producer->enableBuffering();
         $this->producer->disableBuffering();
         self::assertFalse($this->producer->isBufferingEnabled());
     }
 
-    public function testDisableBufferingWhenItIsAlreadyDisabled()
+    public function testDisableBufferingWhenItIsAlreadyDisabled(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The buffering of messages is already disabled.');
@@ -66,7 +61,7 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
         $this->producer->disableBuffering();
     }
 
-    public function testEnableBufferingNestingLevel()
+    public function testEnableBufferingNestingLevel(): void
     {
         self::assertFalse($this->producer->isBufferingEnabled());
 
@@ -83,7 +78,7 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->producer->isBufferingEnabled());
     }
 
-    public function testSendWhenBufferingIsDisabled()
+    public function testSendWhenBufferingIsDisabled(): void
     {
         $topic = 'test1';
         $message = ['test_data'];
@@ -100,7 +95,7 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
         $this->producer->send($topic, $message);
     }
 
-    public function testHasBufferedMessages()
+    public function testHasBufferedMessages(): void
     {
         $this->producer->enableBuffering();
 
@@ -119,7 +114,7 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->producer->hasBufferedMessages());
     }
 
-    public function testClearBuffer()
+    public function testClearBuffer(): void
     {
         // send several messages to fill the buffer
         $messages = [
@@ -140,7 +135,7 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
         $this->producer->flushBuffer();
     }
 
-    public function testFlushBuffer()
+    public function testFlushBuffer(): void
     {
         // send several messages to fill the buffer
         $messages = [
@@ -171,7 +166,7 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
         $this->producer->flushBuffer();
     }
 
-    public function testFlushBufferWhenInnerProducerThrowsException()
+    public function testFlushBufferWhenInnerProducerThrowsException(): void
     {
         $exception = new Exception('some error');
 
@@ -198,7 +193,7 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
         $this->producer->flushBuffer();
     }
 
-    public function testDisableBufferingThrowExceptionOnFlush()
+    public function testDisableBufferingThrowExceptionOnFlush(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The buffering of messages is disabled.');
@@ -210,7 +205,7 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
         $this->producer->flushBuffer();
     }
 
-    public function testDisableBufferingThrowExceptionOnClear()
+    public function testDisableBufferingThrowExceptionOnClear(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The buffering of messages is disabled.');

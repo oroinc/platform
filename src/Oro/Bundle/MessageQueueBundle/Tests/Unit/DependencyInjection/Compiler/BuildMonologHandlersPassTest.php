@@ -5,13 +5,14 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler;
 use Monolog\Logger;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMonologHandlersPass;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\MonologBundle\DependencyInjection\MonologExtension;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
+class BuildMonologHandlersPassTest extends TestCase
 {
     private BuildMonologHandlersPass $compiler;
 
@@ -24,7 +25,7 @@ class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processVerbosityFilterProvider
      */
-    public function testProcessVerbosityFilter(array $handler, array $verbosityLevels)
+    public function testProcessVerbosityFilter(array $handler, array $verbosityLevels): void
     {
         $container = new ExtendedContainerBuilder();
         $container->registerExtension(new MonologExtension());
@@ -44,7 +45,7 @@ class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithEmptyConfigs()
+    public function testProcessWithEmptyConfigs(): void
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new MonologExtension());
@@ -52,7 +53,7 @@ class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    public function testProcessWithoutHandlers()
+    public function testProcessWithoutHandlers(): void
     {
         $container = new ExtendedContainerBuilder();
         $container->registerExtension(new MonologExtension());
@@ -61,7 +62,7 @@ class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    public function testProcessWithInvalidHandler()
+    public function testProcessWithInvalidHandler(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The attribute "name" must be set for path "monolog.handlers".');

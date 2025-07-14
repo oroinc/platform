@@ -5,19 +5,18 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Topic;
 use Gos\Bundle\WebSocketBundle\Topic\TopicPeriodicTimer;
 use Oro\Bundle\SyncBundle\Topic\WebsocketPingTopic;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Ratchet\Wamp\Topic;
 
-class WebsocketPingTopicTest extends \PHPUnit\Framework\TestCase
+class WebsocketPingTopicTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
     private const TIMEOUT = 333;
 
-    /** @var TopicPeriodicTimer|\PHPUnit\Framework\MockObject\MockObject */
-    private $periodicTimer;
-
-    /** @var WebsocketPingTopic */
-    private $websocketPing;
+    private TopicPeriodicTimer&MockObject $periodicTimer;
+    private WebsocketPingTopic $websocketPing;
 
     #[\Override]
     protected function setUp(): void
@@ -48,15 +47,15 @@ class WebsocketPingTopicTest extends \PHPUnit\Framework\TestCase
                 $this->websocketPing,
                 'oro_sync.ping',
                 self::TIMEOUT,
-                $this->callback(
-                    function ($callable) {
-                        if (!is_callable($callable)) {
-                            return false;
-                        }
-                        $callable();
-                        return true;
+                $this->callback(function ($callable) {
+                    if (!is_callable($callable)) {
+                        return false;
                     }
-                )
+
+                    $callable();
+
+                    return true;
+                })
             );
 
         $this->websocketPing->registerPeriodicTimer($topic);
@@ -77,15 +76,15 @@ class WebsocketPingTopicTest extends \PHPUnit\Framework\TestCase
                 $this->websocketPing,
                 'oro_sync.ping',
                 self::TIMEOUT,
-                $this->callback(
-                    function ($callable) {
-                        if (!\is_callable($callable)) {
-                            return false;
-                        }
-                        $callable();
-                        return true;
+                $this->callback(function ($callable) {
+                    if (!\is_callable($callable)) {
+                        return false;
                     }
-                )
+
+                    $callable();
+
+                    return true;
+                })
             );
 
         $this->websocketPing->registerPeriodicTimer($topic);

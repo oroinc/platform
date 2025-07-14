@@ -8,15 +8,14 @@ use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\WorkflowBundle\Datagrid\EmailNotificationDatagridListener;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailNotificationDatagridListenerTest extends \PHPUnit\Framework\TestCase
+class EmailNotificationDatagridListenerTest extends TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var EmailNotificationDatagridListener */
-    private $listener;
+    private TranslatorInterface&MockObject $translator;
+    private EmailNotificationDatagridListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +33,7 @@ class EmailNotificationDatagridListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new EmailNotificationDatagridListener($this->translator);
     }
 
-    public function testOnBuildBefore()
+    public function testOnBuildBefore(): void
     {
         $event = $this->getBuildBeforeEvent();
 
@@ -54,7 +53,7 @@ class EmailNotificationDatagridListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnResultAfter()
+    public function testOnResultAfter(): void
     {
         $record1 = $this->getResultRecord();
         $record2 = $this->getResultRecord('test_workflow');
@@ -77,10 +76,7 @@ class EmailNotificationDatagridListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->getResultRecord(null, 'test_transition'), $record4);
     }
 
-    /**
-     * @return BuildBefore|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getBuildBeforeEvent()
+    private function getBuildBeforeEvent(): BuildBefore&MockObject
     {
         $event = $this->createMock(BuildBefore::class);
         $event->expects($this->any())
@@ -90,11 +86,7 @@ class EmailNotificationDatagridListenerTest extends \PHPUnit\Framework\TestCase
         return $event;
     }
 
-    /**
-     * @param array $records
-     * @return OrmResultAfter|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getOrmResultAfterEvent(array $records = [])
+    private function getOrmResultAfterEvent(array $records = []): OrmResultAfter&MockObject
     {
         $event = $this->createMock(OrmResultAfter::class);
         $event->expects($this->any())

@@ -4,15 +4,14 @@ namespace Oro\Bundle\DraftBundle\Tests\Unit\Placeholder;
 
 use Oro\Bundle\DraftBundle\Placeholder\PlaceholderFilter;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
+class PlaceholderFilterTest extends TestCase
 {
-    /** @var PlaceholderFilter */
-    private $placeholder;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
-    private $authorizationChecker;
+    private PlaceholderFilter $placeholder;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
 
     #[\Override]
     protected function setUp(): void
@@ -27,8 +26,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
     public function testIsApplicable(bool $isGranted): void
     {
         $source = new DraftableEntityStub();
-        $this->authorizationChecker
-            ->expects($this->once())
+        $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('CREATE_DRAFT', $source)
             ->willReturn($isGranted);

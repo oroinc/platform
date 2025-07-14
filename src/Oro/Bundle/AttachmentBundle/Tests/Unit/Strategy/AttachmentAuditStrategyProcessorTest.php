@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 
 class AttachmentAuditStrategyProcessorTest extends TestCase
 {
-    private ManagerRegistry|MockObject $doctrine;
+    private ManagerRegistry&MockObject $doctrine;
     private EntityAuditStrategyProcessorInterface $strategyProcessor;
 
     #[\Override]

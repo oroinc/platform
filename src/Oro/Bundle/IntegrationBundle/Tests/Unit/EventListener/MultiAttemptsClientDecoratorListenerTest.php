@@ -7,15 +7,14 @@ use Oro\Bundle\IntegrationBundle\EventListener\MultiAttemptsClientDecoratorListe
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator\MultiAttemptsClientDecorator;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\RestTransportSettingsInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class MultiAttemptsClientDecoratorListenerTest extends \PHPUnit\Framework\TestCase
+class MultiAttemptsClientDecoratorListenerTest extends TestCase
 {
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var MultiAttemptsClientDecoratorListener */
-    private $listener;
+    private LoggerInterface&MockObject $logger;
+    private MultiAttemptsClientDecoratorListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class MultiAttemptsClientDecoratorListenerTest extends \PHPUnit\Framework\TestCa
         $this->listener->setLogger($this->logger);
     }
 
-    public function testDecoratorAttached()
+    public function testDecoratorAttached(): void
     {
         $client = $this->createMock(RestClientInterface::class);
         $transport = $this->createMock(RestTransportSettingsInterface::class);
@@ -44,7 +43,7 @@ class MultiAttemptsClientDecoratorListenerTest extends \PHPUnit\Framework\TestCa
         );
     }
 
-    public function testDecoratorNotAttached()
+    public function testDecoratorNotAttached(): void
     {
         $configuration = MultiAttemptsClientDecoratorListener::getMultiAttemptsDisabledConfig();
 

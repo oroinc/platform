@@ -18,27 +18,18 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class RolePermissionDatasourceTest extends \PHPUnit\Framework\TestCase
+class RolePermissionDatasourceTest extends TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var PermissionManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $permissionManager;
-
-    /** @var AclRoleHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclRoleHandler;
-
-    /** @var RolePrivilegeCategoryProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $categoryProvider;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configEntityManager;
-
-    /** @var RolePermissionDatasource */
-    private $datasource;
+    private TranslatorInterface&MockObject $translator;
+    private PermissionManager&MockObject $permissionManager;
+    private AclRoleHandler&MockObject $aclRoleHandler;
+    private RolePrivilegeCategoryProvider&MockObject $categoryProvider;
+    private ConfigManager&MockObject $configEntityManager;
+    private RolePermissionDatasource $datasource;
 
     #[\Override]
     protected function setUp(): void
@@ -58,7 +49,7 @@ class RolePermissionDatasourceTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResults()
+    public function testGetResults(): void
     {
         $role = new Role();
         $parameters = new ParameterBag();

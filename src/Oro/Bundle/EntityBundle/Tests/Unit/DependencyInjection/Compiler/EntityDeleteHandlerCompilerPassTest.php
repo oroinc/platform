@@ -5,16 +5,16 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityDeleteHandlerCompilerPass;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerExtensionRegistry;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class EntityDeleteHandlerCompilerPassTest extends \PHPUnit\Framework\TestCase
+class EntityDeleteHandlerCompilerPassTest extends TestCase
 {
-    /** @var EntityDeleteHandlerCompilerPass */
-    private $compiler;
+    private EntityDeleteHandlerCompilerPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +22,7 @@ class EntityDeleteHandlerCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new EntityDeleteHandlerCompilerPass();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $handlerRegistryDef = $container->register(
@@ -71,7 +71,7 @@ class EntityDeleteHandlerCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWhenHandlerDoesNotHaveEntityTagAttribute()
+    public function testProcessWhenHandlerDoesNotHaveEntityTagAttribute(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -96,7 +96,7 @@ class EntityDeleteHandlerCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    public function testProcessWhenExtensionDoesNotHaveEntityTagAttribute()
+    public function testProcessWhenExtensionDoesNotHaveEntityTagAttribute(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -121,7 +121,7 @@ class EntityDeleteHandlerCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    public function testProcessWhenHandlerIsDuplicated()
+    public function testProcessWhenHandlerIsDuplicated(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -149,7 +149,7 @@ class EntityDeleteHandlerCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    public function testProcessWhenExtensionIsDuplicated()
+    public function testProcessWhenExtensionIsDuplicated(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(

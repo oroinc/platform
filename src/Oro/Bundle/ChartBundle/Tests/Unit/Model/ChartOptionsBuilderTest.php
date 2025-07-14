@@ -11,12 +11,13 @@ use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChartOptionsBuilderTest extends \PHPUnit\Framework\TestCase
+class ChartOptionsBuilderTest extends TestCase
 {
-    private EntityFieldProvider|MockObject $entityFieldProvider;
-    private DateHelper|MockObject $dateHelper;
-    private DatagridInterface|MockObject $datagrid;
+    private EntityFieldProvider&MockObject $entityFieldProvider;
+    private DateHelper&MockObject $dateHelper;
+    private DatagridInterface&MockObject $datagrid;
 
     #[\Override]
     protected function setUp(): void
@@ -50,25 +51,21 @@ class ChartOptionsBuilderTest extends \PHPUnit\Framework\TestCase
         array $fields,
         array $expected
     ): void {
-        $report = self::assertReport($chartOptions);
-        $builder = self::assertBuilder($report);
+        $report = $this->assertReport($chartOptions);
+        $builder = $this->assertBuilder($report);
 
-        $this->datagrid
-            ->expects($this->any())
+        $this->datagrid->expects($this->any())
             ->method('getConfig')
             ->willReturn(DatagridConfiguration::create($gridConfig));
-        $this->datagrid
-            ->expects($this->any())
+        $this->datagrid->expects($this->any())
             ->method('getData')
             ->willReturn(ResultsObject::create($gridData));
 
-        $this->dateHelper
-            ->expects($this->once())
+        $this->dateHelper->expects($this->once())
             ->method('getFormatStrings')
             ->willReturn(['viewType' => 'year']);
 
-        $this->entityFieldProvider
-            ->expects($this->once())
+        $this->entityFieldProvider->expects($this->once())
             ->method('getEntityFields')
             ->with(User::class, EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS)
             ->willReturn($fields);

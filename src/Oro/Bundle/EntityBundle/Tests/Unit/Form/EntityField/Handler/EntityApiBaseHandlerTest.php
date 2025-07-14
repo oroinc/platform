@@ -8,19 +8,15 @@ use Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 
 class EntityApiBaseHandlerTest extends TestCase
 {
-    /** @var EntityApiHandlerProcessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $processor;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var EntityApiBaseHandler */
-    private $handler;
+    private EntityApiHandlerProcessor&MockObject $processor;
+    private ManagerRegistry&MockObject $doctrine;
+    private EntityApiBaseHandler $handler;
 
     public function methodsDataProvider(): array
     {
@@ -44,7 +40,7 @@ class EntityApiBaseHandlerTest extends TestCase
         );
     }
 
-    public function testProcessUnsupportedMethod()
+    public function testProcessUnsupportedMethod(): void
     {
         $entity = new SomeEntity();
         $form = $this->createMock(FormInterface::class);
@@ -67,7 +63,7 @@ class EntityApiBaseHandlerTest extends TestCase
     /**
      * @dataProvider methodsDataProvider
      */
-    public function testProcessDataEmpty(string $method, bool $clearMissing)
+    public function testProcessDataEmpty(string $method, bool $clearMissing): void
     {
         $entity = new SomeEntity();
         $form = $this->createMock(FormInterface::class);
@@ -89,7 +85,7 @@ class EntityApiBaseHandlerTest extends TestCase
     /**
      * @dataProvider methodsDataProvider
      */
-    public function testProcessInvalid(string $method, bool $clearMissing)
+    public function testProcessInvalid(string $method, bool $clearMissing): void
     {
         $entity = new SomeEntity();
         $form = $this->createMock(FormInterface::class);
@@ -123,7 +119,7 @@ class EntityApiBaseHandlerTest extends TestCase
     /**
      * @dataProvider methodsDataProvider
      */
-    public function testProcessValid(string $method, bool $clearMissing)
+    public function testProcessValid(string $method, bool $clearMissing): void
     {
         $entity = new SomeEntity();
         $form = $this->createMock(FormInterface::class);

@@ -4,15 +4,15 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\MigrationBundle\Container\MigrationContainer;
 use Oro\Bundle\MigrationBundle\DependencyInjection\Compiler\ServiceContainerRealRefPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class ServiceContainerRealRefPassTest extends \PHPUnit\Framework\TestCase
+class ServiceContainerRealRefPassTest extends TestCase
 {
-    /** @var ServiceContainerRealRefPass */
-    private $compiler;
+    private ServiceContainerRealRefPass $compiler;
 
     #[\Override]
     protected function setUp(): void

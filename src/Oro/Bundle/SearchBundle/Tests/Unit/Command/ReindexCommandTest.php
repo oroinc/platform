@@ -5,21 +5,16 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Command;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Command\ReindexCommand;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class ReindexCommandTest extends \PHPUnit\Framework\TestCase
+class ReindexCommandTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var IndexerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $asyncIndexer;
-
-    /** @var IndexerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $syncIndexer;
-
-    /** @var ReindexCommand */
-    private $command;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private IndexerInterface&MockObject $asyncIndexer;
+    private IndexerInterface&MockObject $syncIndexer;
+    private ReindexCommand $command;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +26,7 @@ class ReindexCommandTest extends \PHPUnit\Framework\TestCase
         $this->command = new ReindexCommand($this->doctrineHelper, $this->asyncIndexer, $this->syncIndexer);
     }
 
-    public function testShouldReindexAllIfClassArgumentWasNotProvided()
+    public function testShouldReindexAllIfClassArgumentWasNotProvided(): void
     {
         $this->syncIndexer->expects($this->once())
             ->method('reindex')
@@ -44,7 +39,7 @@ class ReindexCommandTest extends \PHPUnit\Framework\TestCase
         self::assertStringContainsString('Reindex finished successfully', $tester->getDisplay());
     }
 
-    public function testShouldReindexOnlySingleClassIfClassArgumentExists()
+    public function testShouldReindexOnlySingleClassIfClassArgumentExists(): void
     {
         $shortClassName = 'Class:Name';
         $fullClassName = 'Class\Entity\Name';
@@ -69,7 +64,7 @@ class ReindexCommandTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldReindexAsynchronouslyIfParameterSpecified()
+    public function testShouldReindexAsynchronouslyIfParameterSpecified(): void
     {
         $this->asyncIndexer->expects($this->once())
             ->method('reindex')

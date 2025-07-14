@@ -5,12 +5,12 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Formatter\Property;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\TranslatableProperty;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TranslatablePropertyTest extends \PHPUnit\Framework\TestCase
+class TranslatablePropertyTest extends TestCase
 {
-    /** @var TranslatableProperty */
-    private $property;
+    private TranslatableProperty $property;
 
     #[\Override]
     protected function setUp(): void

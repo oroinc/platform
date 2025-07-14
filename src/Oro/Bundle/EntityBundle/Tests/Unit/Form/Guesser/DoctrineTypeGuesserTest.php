@@ -8,20 +8,17 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Form\Guesser\DoctrineTypeGuesser;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Guess\TypeGuess;
 
-class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
+class DoctrineTypeGuesserTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigProvider;
-
-    /** @var DoctrineTypeGuesser */
-    private $guesser;
+    private ManagerRegistry&MockObject $managerRegistry;
+    private ConfigProvider&MockObject $entityConfigProvider;
+    private DoctrineTypeGuesser $guesser;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +32,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddDoctrineTypeMapping()
+    public function testAddDoctrineTypeMapping(): void
     {
         $doctrineType = 'doctrine_type';
         $formType = 'test_form_type';
@@ -50,7 +47,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessNoMetadata()
+    public function testGuessNoMetadata(): void
     {
         $class = 'Test\Entity';
         $property = 'testProperty';
@@ -60,7 +57,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertDefaultGuess($this->guesser->guessType($class, $property));
     }
 
-    public function testGuessFieldWithoutAssociation()
+    public function testGuessFieldWithoutAssociation(): void
     {
         $class = 'Test\Entity';
         $firstField = 'firstField';
@@ -88,7 +85,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertDefaultGuess($this->guesser->guessType($class, $secondField));
     }
 
-    public function testGuessFieldSingleAssociation()
+    public function testGuessFieldSingleAssociation(): void
     {
         $class = 'Test\Entity';
         $property = 'testProperty';
@@ -117,7 +114,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessFieldCollectionAssociation()
+    public function testGuessFieldCollectionAssociation(): void
     {
         $class = 'Test\Entity';
         $property = 'testProperty';

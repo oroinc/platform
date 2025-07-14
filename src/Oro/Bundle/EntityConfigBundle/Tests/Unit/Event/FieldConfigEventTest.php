@@ -4,10 +4,11 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
+use PHPUnit\Framework\TestCase;
 
-class FieldConfigEventTest extends \PHPUnit\Framework\TestCase
+class FieldConfigEventTest extends TestCase
 {
-    public function testEvent()
+    public function testEvent(): void
     {
         $configManager = $this->createMock(ConfigManager::class);
 

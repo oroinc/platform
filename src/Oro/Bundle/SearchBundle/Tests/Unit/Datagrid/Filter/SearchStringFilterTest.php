@@ -10,12 +10,12 @@ use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapte
 use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchStringFilter;
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
 use Oro\Component\Exception\UnexpectedTypeException;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 
-class SearchStringFilterTest extends \PHPUnit\Framework\TestCase
+class SearchStringFilterTest extends TestCase
 {
-    /** @var SearchStringFilter */
-    private $filter;
+    private SearchStringFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +25,7 @@ class SearchStringFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter = new SearchStringFilter($formFactory, new FilterUtility());
     }
 
-    public function testThrowsExceptionForWrongFilterDatasourceAdapter()
+    public function testThrowsExceptionForWrongFilterDatasourceAdapter(): void
     {
         $this->expectException(UnexpectedTypeException::class);
 
@@ -38,7 +38,7 @@ class SearchStringFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider applyDataProvider
      */
-    public function testApply(int $filterType, string $comparisonOperator, array $filterParams = [])
+    public function testApply(int $filterType, string $comparisonOperator, array $filterParams = []): void
     {
         $fieldName = 'field';
         $fieldValue = 'value';
@@ -67,7 +67,7 @@ class SearchStringFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider applyWithMinAndMaxLengthViolatedDataProvider
      */
-    public function testApplyWithMinAndMaxLengthViolated(string $fieldValue, array $filterParams = [])
+    public function testApplyWithMinAndMaxLengthViolated(string $fieldValue, array $filterParams = []): void
     {
         $filterType = 'anyCustomFilterType';
         $fieldName = 'field';
@@ -147,7 +147,7 @@ class SearchStringFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testPrepareData()
+    public function testPrepareData(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->filter->prepareData([]);

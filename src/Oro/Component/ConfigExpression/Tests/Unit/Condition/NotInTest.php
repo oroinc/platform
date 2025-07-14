@@ -2,25 +2,26 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
-use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Condition\NotIn;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\Testcase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class NotInTest extends \PHPUnit\Framework\Testcase
+class NotInTest extends Testcase
 {
     protected $condition;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->condition = new Condition\NotIn();
+        $this->condition = new NotIn();
         $this->condition->setContextAccessor(new ContextAccessor());
     }
 
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, $context, $expectedResult)
+    public function testEvaluate(array $options, $context, $expectedResult): void
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));

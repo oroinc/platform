@@ -4,8 +4,9 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Content;
 
 use Oro\Bundle\SyncBundle\Content\ChainTagGenerator;
 use Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\SimpleGeneratorStub;
+use PHPUnit\Framework\TestCase;
 
-class ChainTagGeneratorTest extends \PHPUnit\Framework\TestCase
+class ChainTagGeneratorTest extends TestCase
 {
     /**
      * @dataProvider generateDataProvider
@@ -15,7 +16,7 @@ class ChainTagGeneratorTest extends \PHPUnit\Framework\TestCase
         mixed $data,
         bool $includeCollection,
         array $expectedTags
-    ) {
+    ): void {
         $result = $generator->generate($data, $includeCollection);
         $this->assertSame($expectedTags, $result);
     }
@@ -63,7 +64,7 @@ class ChainTagGeneratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDataProvider
      */
-    public function testSupports(array $generators, ?string $data, bool $result)
+    public function testSupports(array $generators, ?string $data, bool $result): void
     {
         $chain = new ChainTagGenerator($generators);
         $this->assertEquals($result, $chain->supports($data));

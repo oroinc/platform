@@ -5,16 +5,15 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Twig;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Twig\FeatureExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FeatureExtensionTest extends \PHPUnit\Framework\TestCase
+class FeatureExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var FeatureExtension */
-    private $extension;
+    private FeatureChecker&MockObject $featureChecker;
+    private FeatureExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class FeatureExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new FeatureExtension($container);
     }
 
-    public function testIsFeatureEnabled()
+    public function testIsFeatureEnabled(): void
     {
         $feature = 'test';
         $scopeIdentifier = 1;
@@ -43,7 +42,7 @@ class FeatureExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsResourceEnabled()
+    public function testIsResourceEnabled(): void
     {
         $resource = 'resource';
         $resourceType = 'type';

@@ -5,17 +5,14 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Resolver;
 use Oro\Bundle\ActionBundle\Model\OptionsAssembler;
 use Oro\Bundle\ActionBundle\Resolver\OptionsResolver;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class OptionsResolverTest extends \PHPUnit\Framework\TestCase
+class OptionsResolverTest extends TestCase
 {
-    /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextAccessor;
-
-    /** @var OptionsAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    private $optionsAssembler;
-
-    /** @var OptionsResolver */
-    private $optionsResolver;
+    private ContextAccessor&MockObject $contextAccessor;
+    private OptionsAssembler&MockObject $optionsAssembler;
+    private OptionsResolver $optionsResolver;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +26,7 @@ class OptionsResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider resolveOptionsDataProvider
      */
-    public function testResolveOptions(array $options, array $expected)
+    public function testResolveOptions(array $options, array $expected): void
     {
         $data = ['some' => 'data'];
         $this->optionsAssembler->expects($this->once())

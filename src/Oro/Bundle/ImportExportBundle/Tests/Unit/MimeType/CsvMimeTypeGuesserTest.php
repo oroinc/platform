@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\MimeType;
 
 use Oro\Bundle\ImportExportBundle\MimeType\CsvMimeTypeGuesser;
+use PHPUnit\Framework\TestCase;
 
-class CsvMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
+class CsvMimeTypeGuesserTest extends TestCase
 {
-    /** @var CsvMimeTypeGuesser */
-    private $guesser;
+    private CsvMimeTypeGuesser $guesser;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class CsvMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider filesDataProvider
      */
-    public function testGuess(string $path, ?string $expectedMimeType)
+    public function testGuess(string $path, ?string $expectedMimeType): void
     {
         $this->assertEquals($expectedMimeType, $this->guesser->guessMimeType($path));
     }
@@ -58,7 +58,7 @@ class CsvMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGuessNonDefaultSettings()
+    public function testGuessNonDefaultSettings(): void
     {
         $this->guesser->setDelimiter('|');
         $this->guesser->setEnclosure("'");

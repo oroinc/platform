@@ -4,11 +4,11 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Pager\ArrayDatasource;
 
 use Oro\Bundle\DataGridBundle\Datasource\ArrayDatasource\ArrayDatasource;
 use Oro\Bundle\DataGridBundle\Extension\Pager\ArrayDatasource\ArrayPager;
+use PHPUnit\Framework\TestCase;
 
-class ArrayPagerTest extends \PHPUnit\Framework\TestCase
+class ArrayPagerTest extends TestCase
 {
-    /** @var ArrayPager */
-    private $arrayPager;
+    private ArrayPager $arrayPager;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class ArrayPagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider pageDataProvider
      */
-    public function testApply(int $currentPage, int $maxPerPage, int $arrayLength, int $expectedLength)
+    public function testApply(int $currentPage, int $maxPerPage, int $arrayLength, int $expectedLength): void
     {
         $this->arrayPager->setPage($currentPage);
         $this->arrayPager->setMaxPerPage($maxPerPage);
@@ -44,7 +44,7 @@ class ArrayPagerTest extends \PHPUnit\Framework\TestCase
 
     private function prepareResults(int $rowsCount = 50): array
     {
-        $arraySource  = [];
+        $arraySource = [];
 
         $rowData =  [
             'priceListId' => 256,

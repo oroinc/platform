@@ -7,17 +7,15 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeConfigurationInterface
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\ImportExport\TemplateFixture\EntityFieldFixture;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityFieldFixtureTest extends \PHPUnit\Framework\TestCase
+class EntityFieldFixtureTest extends TestCase
 {
     private const CLASS_NAME = FieldConfigModel::class;
 
-    /** @var FieldTypeProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldTypeProvider;
-
-    /** @var AttributeTypeRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $typeRegistry;
-
+    private FieldTypeProvider&MockObject $fieldTypeProvider;
+    private AttributeTypeRegistry&MockObject $typeRegistry;
     private EntityFieldFixture $fixture;
 
     #[\Override]

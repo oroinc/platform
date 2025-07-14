@@ -4,8 +4,9 @@ namespace Oro\Bundle\BatchBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\BatchBundle\Entity\JobInstance;
 use Oro\Bundle\BatchBundle\Job\Job;
+use PHPUnit\Framework\TestCase;
 
-class JobInstanceTest extends \PHPUnit\Framework\TestCase
+class JobInstanceTest extends TestCase
 {
     private const CONNECTOR = 'acme_connector';
     private const TYPE = 'export';
@@ -87,8 +88,7 @@ class JobInstanceTest extends \PHPUnit\Framework\TestCase
         $expectedConfiguration = ['key1' => 'value1', 'key2' => 'value2', 'key3' => 'value3'];
 
         $job = $this->createMock(Job::class);
-        $job
-            ->expects(self::any())
+        $job->expects(self::any())
             ->method('getConfiguration')
             ->willReturn($expectedConfiguration);
 

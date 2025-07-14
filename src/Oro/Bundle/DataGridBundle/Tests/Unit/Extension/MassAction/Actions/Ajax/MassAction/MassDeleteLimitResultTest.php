@@ -3,10 +3,11 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction\Actions\Ajax\MassAction;
 
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimitResult;
+use PHPUnit\Framework\TestCase;
 
-class MassDeleteLimitResultTest extends \PHPUnit\Framework\TestCase
+class MassDeleteLimitResultTest extends TestCase
 {
-    public function testLimitResultGetters()
+    public function testLimitResultGetters(): void
     {
         $result = new MassDeleteLimitResult(10, 5, 200);
 
@@ -15,7 +16,7 @@ class MassDeleteLimitResultTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(200, $result->getMaxLimit());
     }
 
-    public function testDefaultValueOfMaxLimit()
+    public function testDefaultValueOfMaxLimit(): void
     {
         $result = new MassDeleteLimitResult(10, 5);
 

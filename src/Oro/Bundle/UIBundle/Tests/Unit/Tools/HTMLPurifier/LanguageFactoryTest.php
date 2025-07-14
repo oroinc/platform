@@ -4,9 +4,10 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Tools\HTMLPurifier;
 
 use Oro\Bundle\UIBundle\Tools\HTMLPurifier\Language;
 use Oro\Bundle\UIBundle\Tools\HTMLPurifier\LanguageFactory;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LanguageFactoryTest extends \PHPUnit\Framework\TestCase
+class LanguageFactoryTest extends TestCase
 {
     public function testInstance(): void
     {

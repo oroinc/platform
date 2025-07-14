@@ -8,17 +8,16 @@ use Oro\Bundle\BatchBundle\Job\BatchStatus;
 use Oro\Bundle\BatchBundle\Job\ExitStatus;
 use Oro\Bundle\BatchBundle\Job\JobRepositoryInterface;
 use Oro\Bundle\BatchBundle\Step\AbstractStep;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class AbstractStepTest extends \PHPUnit\Framework\TestCase
+class AbstractStepTest extends TestCase
 {
     private const STEP_NAME = 'test_step_name';
 
-    /** @var JobRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRepository;
-
-    /** @var AbstractStep|\PHPUnit\Framework\MockObject\MockObject */
-    private $step;
+    private JobRepositoryInterface&MockObject $jobRepository;
+    private AbstractStep&MockObject $step;
 
     #[\Override]
     protected function setUp(): void

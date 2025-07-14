@@ -6,20 +6,18 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Security\DisabledLoginSubscriber;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class DisabledLoginSubscriberTest extends \PHPUnit\Framework\TestCase
+class DisabledLoginSubscriberTest extends TestCase
 {
-    /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $token;
-
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
+    private TokenInterface&MockObject $token;
+    private TokenStorageInterface&MockObject $tokenStorage;
     private User $user;
 
     #[\Override]

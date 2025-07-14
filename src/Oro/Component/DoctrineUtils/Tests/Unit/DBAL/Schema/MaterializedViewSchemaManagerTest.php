@@ -6,14 +6,13 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\PostgreSQL100Platform;
 use Oro\Component\DoctrineUtils\DBAL\Schema\MaterializedView;
 use Oro\Component\DoctrineUtils\DBAL\Schema\MaterializedViewSchemaManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MaterializedViewSchemaManagerTest extends \PHPUnit\Framework\TestCase
+class MaterializedViewSchemaManagerTest extends TestCase
 {
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var MaterializedViewSchemaManager */
-    private $manager;
+    private Connection&MockObject $connection;
+    private MaterializedViewSchemaManager $manager;
 
     #[\Override]
     protected function setUp(): void

@@ -3,14 +3,14 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\SecurityBundle\Form\Type\PrivilegeCollectionType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormInterface;
 
-class PrivilegeCollectionTypeTest extends \PHPUnit\Framework\TestCase
+class PrivilegeCollectionTypeTest extends TestCase
 {
-    /** @var PrivilegeCollectionType */
-    private $formType;
+    private PrivilegeCollectionType $formType;
 
     #[\Override]
     protected function setUp(): void
@@ -18,12 +18,12 @@ class PrivilegeCollectionTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType = new PrivilegeCollectionType();
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(CollectionType::class, $this->formType->getParent());
     }
 
-    public function testBuildView()
+    public function testBuildView(): void
     {
         $view = new FormView();
         $form = $this->createMock(FormInterface::class);

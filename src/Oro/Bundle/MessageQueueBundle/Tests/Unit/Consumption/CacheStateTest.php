@@ -4,14 +4,13 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption;
 
 use Oro\Bundle\MessageQueueBundle\Consumption\CacheState;
 use Oro\Bundle\MessageQueueBundle\Consumption\StateDriverInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CacheStateTest extends \PHPUnit\Framework\TestCase
+class CacheStateTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|StateDriverInterface */
-    private $driver;
-
-    /** @var CacheState */
-    private $cacheState;
+    private StateDriverInterface&MockObject $driver;
+    private CacheState $cacheState;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class CacheStateTest extends \PHPUnit\Framework\TestCase
         $this->cacheState = new CacheState($this->driver);
     }
 
-    public function testRenewChangeDate()
+    public function testRenewChangeDate(): void
     {
         $this->driver->expects(self::once())
             ->method('setChangeStateDate')
@@ -30,7 +29,7 @@ class CacheStateTest extends \PHPUnit\Framework\TestCase
         $this->cacheState->renewChangeDate();
     }
 
-    public function testGetChangeDate()
+    public function testGetChangeDate(): void
     {
         $date = new \DateTime('now', new \DateTimeZone('UTC'));
 

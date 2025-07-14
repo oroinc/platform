@@ -6,14 +6,14 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SSOBundle\Security\OAuthToken;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\TestCase;
 
-class OAuthTokenTest extends \PHPUnit\Framework\TestCase
+class OAuthTokenTest extends TestCase
 {
     use EntityTrait;
 
-    public function testGetOrganization()
+    public function testGetOrganization(): void
     {
-        /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 3]);
 
         $token = new OAuthToken('access_token');
@@ -22,12 +22,10 @@ class OAuthTokenTest extends \PHPUnit\Framework\TestCase
         self::assertSame($organization, $token->getOrganization());
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $accessToken = 'access_token';
-        /** @var Role $role */
         $role = $this->getEntity(Role::class, ['id' => 2]);
-        /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 3]);
 
         $token = new OAuthToken($accessToken, [$role]);

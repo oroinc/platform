@@ -4,14 +4,14 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\SecurityBundle\Form\Type\AclPermissionType;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class AclPermissionTypeTest extends \PHPUnit\Framework\TestCase
+class AclPermissionTypeTest extends TestCase
 {
-    /** @var AclPermissionType */
-    private $formType;
+    private AclPermissionType $formType;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class AclPermissionTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType = new AclPermissionType();
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilder::class);
         $options = [
@@ -36,7 +36,7 @@ class AclPermissionTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType->buildForm($builder, $options);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())

@@ -5,12 +5,13 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Entity;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class AuditTest extends \PHPUnit\Framework\TestCase
+class AuditTest extends TestCase
 {
-    public function testUser()
+    public function testUser(): void
     {
-        $user  = new User();
+        $user = new User();
         $audit = new Audit();
 
         $this->assertEmpty($audit->getUser());
@@ -20,7 +21,7 @@ class AuditTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($audit->getUser());
     }
 
-    public function testObjectId()
+    public function testObjectId(): void
     {
         $audit = new Audit();
 
@@ -35,10 +36,10 @@ class AuditTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('string_id', $audit->getObjectId());
     }
 
-    public function testObjectName()
+    public function testObjectName(): void
     {
         $audit = new Audit();
-        $name  = 'LoggedObject';
+        $name = 'LoggedObject';
 
         $this->assertEmpty($audit->getObjectName());
 
@@ -47,13 +48,13 @@ class AuditTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($name, $audit->getObjectName());
     }
 
-    public function testFieldsShouldBeEmptyWhenNewInstanceIsCreated()
+    public function testFieldsShouldBeEmptyWhenNewInstanceIsCreated(): void
     {
         $audit = new Audit();
         $this->assertEmpty($audit->getFields());
     }
 
-    public function testCreateFieldShouldAddNewFieldToAudit()
+    public function testCreateFieldShouldAddNewFieldToAudit(): void
     {
         $audit = new Audit();
         $audit->addField(new AuditField('field', 'integer', 1, 0));
@@ -65,7 +66,7 @@ class AuditTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $field->getOldValue());
     }
 
-    public function testShouldSetNowAsLoggedAtIfNotPassed()
+    public function testShouldSetNowAsLoggedAtIfNotPassed(): void
     {
         $audit = new Audit();
         $audit->setLoggedAt();
@@ -74,7 +75,7 @@ class AuditTest extends \PHPUnit\Framework\TestCase
         $this->assertLessThan(new \DateTime('now + 10 seconds'), $audit->getLoggedAt());
     }
 
-    public function testShouldSetPassedLoggedAtDate()
+    public function testShouldSetPassedLoggedAtDate(): void
     {
         $loggedAt = new \DateTime('2012-11-10 01:02:03+0000');
 
@@ -84,7 +85,7 @@ class AuditTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($loggedAt, $audit->getLoggedAt());
     }
 
-    public function testLimitOwnerDescription()
+    public function testLimitOwnerDescription(): void
     {
         $descr = str_pad('a', 300);
         $audit = new Audit();

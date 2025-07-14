@@ -4,8 +4,9 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Tools;
 
 use NumberFormatter as IntlNumberFormatter;
 use Oro\Bundle\LocaleBundle\Tools\NumberFormatterHelper;
+use PHPUnit\Framework\TestCase;
 
-class NumberFormatterHelperTest extends \PHPUnit\Framework\TestCase
+class NumberFormatterHelperTest extends TestCase
 {
     /**
      * @dataProvider parseConstantValueDataProvider

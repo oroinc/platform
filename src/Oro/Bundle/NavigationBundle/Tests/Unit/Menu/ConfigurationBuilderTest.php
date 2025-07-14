@@ -12,14 +12,15 @@ use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Component\Config\Resolver\SystemAwareResolver;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
+class ConfigurationBuilderTest extends TestCase
 {
     private MenuFactory $factory;
-    private FactoryInterface|MockObject $menuFactory;
-    private EventDispatcherInterface|MockObject $eventDispatcher;
-    private ConfigurationProvider|MockObject $configurationProvider;
+    private FactoryInterface&MockObject $menuFactory;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private ConfigurationProvider&MockObject $configurationProvider;
     private ConfigurationBuilder $configurationBuilder;
 
     #[\Override]
@@ -41,7 +42,7 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider menuStructureProvider
      */
-    public function testBuild(array $options)
+    public function testBuild(array $options): void
     {
         $this->configurationProvider->expects(self::once())
             ->method('getMenuTree')
@@ -70,7 +71,7 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setAreaToExtraProvider
      */
-    public function testSetAreaToExtra(array $options, string $expectedArea)
+    public function testSetAreaToExtra(array $options, string $expectedArea): void
     {
         $this->configurationProvider->expects(self::once())
             ->method('getMenuTree')
@@ -212,7 +213,7 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testBuildDuplicatedItemTreeCallException()
+    public function testBuildDuplicatedItemTreeCallException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Item key "user_user_show" duplicated in tree menu "navbar".');
@@ -260,7 +261,7 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->configurationBuilder->build($menu, [], 'navbar');
     }
 
-    public function testWarningOption()
+    public function testWarningOption(): void
     {
         $warningText = 'Test Warning';
         $tree = [
@@ -273,8 +274,12 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $this->configurationProvider->method('getMenuTree')->willReturn($tree);
-        $this->configurationProvider->method('getMenuItems')->willReturn([]);
+        $this->configurationProvider->expects(self::any())
+            ->method('getMenuTree')
+            ->willReturn($tree);
+        $this->configurationProvider->expects(self::any())
+            ->method('getMenuItems')
+            ->willReturn([]);
 
         $menu1 = new MenuItem('test', $this->factory);
         $this->configurationBuilder->build($menu1, [], 'navbarWithWarning');

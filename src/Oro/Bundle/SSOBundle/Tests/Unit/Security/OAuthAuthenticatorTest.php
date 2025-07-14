@@ -66,23 +66,27 @@ class OAuthAuthenticatorTest extends TestCase
         $this->authenticator->setTokenFactory($this->tokenFactory);
     }
 
-    public function testSupportsReturnsTrueForValidRequestPath()
+    public function testSupportsReturnsTrueForValidRequestPath(): void
     {
         $request = $this->createMock(Request::class);
-        $this->httpUtils->expects($this->once())->method('checkRequestPath')->willReturn(true);
+        $this->httpUtils->expects($this->once())
+            ->method('checkRequestPath')
+            ->willReturn(true);
 
         $this->assertTrue($this->authenticator->supports($request));
     }
 
-    public function testSupportsReturnsFalseForInvalidRequestPath()
+    public function testSupportsReturnsFalseForInvalidRequestPath(): void
     {
         $request = $this->createMock(Request::class);
-        $this->httpUtils->expects($this->once())->method('checkRequestPath')->willReturn(false);
+        $this->httpUtils->expects($this->once())
+            ->method('checkRequestPath')
+            ->willReturn(false);
 
         $this->assertFalse($this->authenticator->supports($request));
     }
 
-    public function testAuthenticateThrowsExceptionForInvalidResourceOwner()
+    public function testAuthenticateThrowsExceptionForInvalidResourceOwner(): void
     {
         $request = $this->createMock(Request::class);
         $this->resourceOwnerMap->expects($this->once())

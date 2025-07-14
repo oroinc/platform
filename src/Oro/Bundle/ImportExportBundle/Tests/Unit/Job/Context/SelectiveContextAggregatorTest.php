@@ -10,14 +10,13 @@ use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Job\Context\SelectiveContextAggregator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SelectiveContextAggregatorTest extends \PHPUnit\Framework\TestCase
+class SelectiveContextAggregatorTest extends TestCase
 {
-    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextRegistry;
-
-    /** @var SelectiveContextAggregator */
-    private $aggregator;
+    private ContextRegistry&MockObject $contextRegistry;
+    private SelectiveContextAggregator $aggregator;
 
     #[\Override]
     protected function setUp(): void
@@ -27,12 +26,12 @@ class SelectiveContextAggregatorTest extends \PHPUnit\Framework\TestCase
         $this->aggregator = new SelectiveContextAggregator($this->contextRegistry);
     }
 
-    public function testGetType()
+    public function testGetType(): void
     {
         self::assertEquals(SelectiveContextAggregator::TYPE, $this->aggregator->getType());
     }
 
-    public function testGetAggregatedContext()
+    public function testGetAggregatedContext(): void
     {
         $execution1Context = new ExecutionContext();
         $execution2Context = new ExecutionContext();
@@ -95,7 +94,7 @@ class SelectiveContextAggregatorTest extends \PHPUnit\Framework\TestCase
         self::assertSame(2, $result->getReadCount());
     }
 
-    public function testGetAggregatedContextWhenStepExecutionsAreEmpty()
+    public function testGetAggregatedContextWhenStepExecutionsAreEmpty(): void
     {
         $stepExecutions = new ArrayCollection();
 

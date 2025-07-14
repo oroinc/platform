@@ -3,8 +3,9 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Model;
 
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
+use PHPUnit\Framework\TestCase;
 
-class ThemeImageTypeDimensionTest extends \PHPUnit\Framework\TestCase
+class ThemeImageTypeDimensionTest extends TestCase
 {
     private const NAME = 'dim';
     private const WIDTH = 100;

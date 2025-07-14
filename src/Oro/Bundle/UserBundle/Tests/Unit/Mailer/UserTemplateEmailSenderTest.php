@@ -16,10 +16,8 @@ class UserTemplateEmailSenderTest extends TestCase
     private const TEMPLATE_NAME = 'templateName';
     private const TEMPLATE_PARAMS = ['some' => 'params'];
 
-    private NotificationSettings|MockObject $notificationSettingsModel;
-
-    private EmailTemplateSender|MockObject $emailTemplateSender;
-
+    private NotificationSettings&MockObject $notificationSettingsModel;
+    private EmailTemplateSender&MockObject $emailTemplateSender;
     private UserTemplateEmailSender $sender;
 
     #[\Override]

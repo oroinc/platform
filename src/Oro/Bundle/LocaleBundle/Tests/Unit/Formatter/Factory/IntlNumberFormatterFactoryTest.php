@@ -5,17 +5,16 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter\Factory;
 use NumberFormatter as IntlNumberFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class IntlNumberFormatterFactoryTest extends \PHPUnit\Framework\TestCase
+class IntlNumberFormatterFactoryTest extends TestCase
 {
     private const LOCALE = 'en_US';
 
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
-
-    /** @var IntlNumberFormatterFactory */
-    private $factory;
+    private LocaleSettings&MockObject $localeSettings;
+    private IntlNumberFormatterFactory $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -173,8 +172,7 @@ class IntlNumberFormatterFactoryTest extends \PHPUnit\Framework\TestCase
         array $expectedTextAttribute,
         array $expectedSymbol
     ): void {
-        $this->localeSettings
-            ->expects($this->once())
+        $this->localeSettings->expects($this->once())
             ->method('getLocale')
             ->willReturn(self::LOCALE);
 

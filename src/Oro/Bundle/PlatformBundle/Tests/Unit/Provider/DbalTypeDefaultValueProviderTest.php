@@ -3,8 +3,9 @@
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\PlatformBundle\Provider\DbalTypeDefaultValueProvider;
+use PHPUnit\Framework\TestCase;
 
-class DbalTypeDefaultValueProviderTest extends \PHPUnit\Framework\TestCase
+class DbalTypeDefaultValueProviderTest extends TestCase
 {
     private DbalTypeDefaultValueProvider $provider;
 

@@ -8,9 +8,10 @@ use Oro\Bundle\NavigationBundle\MenuUpdate\Factory\MenuUpdateFactory;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class MenuUpdateFactoryTest extends \PHPUnit\Framework\TestCase
+class MenuUpdateFactoryTest extends TestCase
 {
     use MenuItemTestTrait;
 

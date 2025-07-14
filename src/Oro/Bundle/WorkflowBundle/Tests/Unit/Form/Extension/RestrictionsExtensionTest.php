@@ -7,6 +7,7 @@ use Oro\Bundle\WorkflowBundle\Form\Extension\RestrictionsExtension;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -15,17 +16,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RestrictionsExtensionTest extends FormIntegrationTestCase
 {
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var RestrictionManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $restrictionsManager;
-
-    /** @var RestrictionsExtension */
-    private $extension;
+    private WorkflowManager&MockObject $workflowManager;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private RestrictionManager&MockObject $restrictionsManager;
+    private RestrictionsExtension $extension;
 
     #[\Override]
     protected function setUp(): void

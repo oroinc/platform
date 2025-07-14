@@ -8,19 +8,16 @@ use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\XlsxFileReader;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
+class XlsxFileReaderTest extends TestCase
 {
     private const MOCK_FILE_NAME = 'mock_file_for_initialize.xlsx';
 
-    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextRegistry;
-
-    /** @var ImportStrategyHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $importHelper;
-
-    /** @var XlsxFileReader */
-    private $reader;
+    private ContextRegistry&MockObject $contextRegistry;
+    private ImportStrategyHelper&MockObject $importHelper;
+    private XlsxFileReader $reader;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +29,7 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
         $this->reader->setImportHelper($this->importHelper);
     }
 
-    public function testSetStepExecution()
+    public function testSetStepExecution(): void
     {
         $options = [
             'filePath' => __DIR__ . '/fixtures/' . self::MOCK_FILE_NAME,
@@ -64,7 +61,7 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider excelDataProvider
      */
-    public function testRead(array $options, ?array $exceptedHeader, array $expected)
+    public function testRead(array $options, ?array $exceptedHeader, array $expected): void
     {
         $context = new Context($options);
         $stepExecution = $this->createMock(StepExecution::class);

@@ -24,26 +24,13 @@ class IntegrationHandlerTest extends TestCase
     private const FORM_NAME = 'form_name';
     private const FORM_DATA = ['field' => 'data'];
 
-    /** @var Request */
-    private $request;
-
-    /** @var FormInterface|MockObject */
-    private $form;
-
-    /** @var EntityManager|MockObject */
-    private $em;
-
-    /** @var EventDispatcherInterface|MockObject */
-    private $eventDispatcher;
-
-    /** @var FormFactoryInterface|MockObject */
-    private $formFactory;
-
-    /** @var IntegrationHandler */
-    private $handler;
-
-    /** @var Integration */
-    private $entity;
+    private Request $request;
+    private FormInterface&MockObject $form;
+    private EntityManager&MockObject $em;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private FormFactoryInterface&MockObject $formFactory;
+    private IntegrationHandler $handler;
+    private Integration $entity;
 
     #[\Override]
     protected function setUp(): void

@@ -5,11 +5,11 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Action\Actions;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ImportAction;
+use PHPUnit\Framework\TestCase;
 
-class ImportActionTest extends \PHPUnit\Framework\TestCase
+class ImportActionTest extends TestCase
 {
-    /** @var ImportAction */
-    private $action;
+    private ImportAction $action;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +17,7 @@ class ImportActionTest extends \PHPUnit\Framework\TestCase
         $this->action = new ImportAction();
     }
 
-    public function testGetOptions()
+    public function testGetOptions(): void
     {
         $this->assertEquals(
             ActionConfiguration::create([
@@ -28,7 +28,7 @@ class ImportActionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetOptions()
+    public function testSetOptions(): void
     {
         $this->assertSame(
             $this->action,
@@ -39,7 +39,7 @@ class ImportActionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetOptionsWithoutExportProcessor()
+    public function testSetOptionsWithoutExportProcessor(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('There is no option "importProcessor" for action "test_name"');

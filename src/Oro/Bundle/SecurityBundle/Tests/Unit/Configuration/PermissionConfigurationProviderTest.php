@@ -84,7 +84,7 @@ class PermissionConfigurationProviderTest extends TestCase
         $this->provider = new PermissionConfigurationProvider($cacheFile, false);
     }
 
-    public function testCorrectConfiguration()
+    public function testCorrectConfiguration(): void
     {
         $expectedPermissions = [
             self::PERMISSION1 => $this->permissions[self::PERMISSION1],
@@ -96,7 +96,7 @@ class PermissionConfigurationProviderTest extends TestCase
         $this->assertEquals($expectedPermissions, $permissions);
     }
 
-    public function testFilterPermissionsConfiguration()
+    public function testFilterPermissionsConfiguration(): void
     {
         $expectedPermissions = [
             self::PERMISSION1 => $this->permissions[self::PERMISSION1],

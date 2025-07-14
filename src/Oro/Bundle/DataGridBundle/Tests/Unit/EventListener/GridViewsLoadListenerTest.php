@@ -25,23 +25,12 @@ class GridViewsLoadListenerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var MockObject */
-    private $gridViewRepository;
-
-    /** @var MockObject */
-    private $registry;
-
-    /** @var MockObject */
-    private $authorizationChecker;
-
-    /** @var MockObject */
-    private $tokenAccessor;
-
-    /** @var MockObject */
-    private $appearanceTypeManager;
-
-    /** @var GridViewsLoadListener */
-    private $gridViewsLoadListener;
+    private MockObject $gridViewRepository;
+    private MockObject $registry;
+    private MockObject $authorizationChecker;
+    private MockObject $tokenAccessor;
+    private MockObject $appearanceTypeManager;
+    private GridViewsLoadListener $gridViewsLoadListener;
 
     #[\Override]
     protected function setUp(): void
@@ -75,9 +64,8 @@ class GridViewsLoadListenerTest extends TestCase
         );
     }
 
-    public function testListenerShouldAddViewsIntoEvent()
+    public function testListenerShouldAddViewsIntoEvent(): void
     {
-        /** @var User $currentUser */
         $currentUser = $this->getEntity(User::class, ['id' => 42]);
 
         $this->tokenAccessor->expects($this->once())
@@ -156,7 +144,7 @@ class GridViewsLoadListenerTest extends TestCase
         $this->assertEquals($expectedViews, $event->getGridViews());
     }
 
-    public function testListenerShouldNotAddViewsIntoIfUserIsNotLoggedIn()
+    public function testListenerShouldNotAddViewsIntoIfUserIsNotLoggedIn(): void
     {
         $originalView = new View('view');
         $event = new GridViewsLoadEvent('grid', $this->createMock(DatagridConfiguration::class), [$originalView]);

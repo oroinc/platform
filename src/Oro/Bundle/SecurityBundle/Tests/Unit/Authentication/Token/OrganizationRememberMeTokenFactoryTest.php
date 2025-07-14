@@ -6,10 +6,11 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeToken;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactory;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class OrganizationRememberMeTokenFactoryTest extends \PHPUnit\Framework\TestCase
+class OrganizationRememberMeTokenFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $user = new User();
         $organization = new Organization();

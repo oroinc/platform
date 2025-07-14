@@ -17,21 +17,18 @@ use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\SomeClass;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
+class OrmDatasourceTest extends TestCase
 {
-    private YamlProcessor|\PHPUnit\Framework\MockObject\MockObject $processor;
-
-    private EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
-
-    private ParameterBinder|\PHPUnit\Framework\MockObject\MockObject $parameterBinder;
-
-    private QueryHintResolver|\PHPUnit\Framework\MockObject\MockObject $queryHintResolver;
-
-    private QueryExecutorInterface|\PHPUnit\Framework\MockObject\MockObject $queryExecutor;
-
+    private YamlProcessor&MockObject $processor;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private ParameterBinder&MockObject $parameterBinder;
+    private QueryHintResolver&MockObject $queryHintResolver;
+    private QueryExecutorInterface&MockObject $queryExecutor;
     private OrmDatasource $datasource;
 
     #[\Override]
@@ -337,8 +334,7 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
             ->willReturn($queryBuilder);
 
         $entityAliases = [\stdClass::class, 'AcmeEntity'];
-        $queryBuilder
-            ->expects(self::once())
+        $queryBuilder->expects(self::once())
             ->method('getRootEntities')
             ->willReturn($entityAliases);
 

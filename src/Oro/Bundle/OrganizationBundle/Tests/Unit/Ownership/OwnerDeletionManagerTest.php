@@ -14,24 +14,17 @@ use Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership\Fixture\Entity\TestOwnerE
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class OwnerDeletionManagerTest extends \PHPUnit\Framework\TestCase
+class OwnerDeletionManagerTest extends TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $checkerContainer;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipProvider;
-
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipMetadata;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var OwnerDeletionManager */
-    private $ownerDeletionManager;
+    private ContainerInterface&MockObject $checkerContainer;
+    private ConfigProvider&MockObject $ownershipProvider;
+    private OwnershipMetadataProviderInterface&MockObject $ownershipMetadata;
+    private EntityManagerInterface&MockObject $em;
+    private OwnerDeletionManager $ownerDeletionManager;
 
     #[\Override]
     protected function setUp(): void
@@ -68,13 +61,13 @@ class OwnerDeletionManagerTest extends \PHPUnit\Framework\TestCase
         return $entityConfig;
     }
 
-    public function testIsOwner()
+    public function testIsOwner(): void
     {
         $this->assertTrue($this->ownerDeletionManager->isOwner(new TestOwnerEntity()));
         $this->assertFalse($this->ownerDeletionManager->isOwner(new TestEntity()));
     }
 
-    public function testHasAssignmentsForNotOwnerEntity()
+    public function testHasAssignmentsForNotOwnerEntity(): void
     {
         $owner = new TestEntity();
 
@@ -84,7 +77,7 @@ class OwnerDeletionManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->ownerDeletionManager->hasAssignments($owner));
     }
 
-    public function testHasAssignmentsForNonOwnerTypeEntity()
+    public function testHasAssignmentsForNonOwnerTypeEntity(): void
     {
         $owner = new TestOwnerEntity();
 
@@ -107,7 +100,7 @@ class OwnerDeletionManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->ownerDeletionManager->hasAssignments($owner));
     }
 
-    public function testHasAssignmentsWithDefaultChecker()
+    public function testHasAssignmentsWithDefaultChecker(): void
     {
         $owner = new TestOwnerEntity();
         $ownerId = 123;
@@ -149,7 +142,7 @@ class OwnerDeletionManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->ownerDeletionManager->hasAssignments($owner));
     }
 
-    public function testHasAssignmentsWithCustomChecker()
+    public function testHasAssignmentsWithCustomChecker(): void
     {
         $owner = new TestOwnerEntity();
         $ownerId = 123;

@@ -4,13 +4,13 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\ActionBundle\Form\EventListener\RequiredAttributesListener;
 use Oro\Bundle\ActionBundle\Model\ActionData;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
+class RequiredAttributesListenerTest extends TestCase
 {
-    /** @var RequiredAttributesListener */
-    private $listener;
+    private RequiredAttributesListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new RequiredAttributesListener();
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $events = $this->listener->getSubscribedEvents();
 
@@ -29,7 +29,7 @@ class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('onSubmit', $events[FormEvents::SUBMIT]);
     }
 
-    public function testEvents()
+    public function testEvents(): void
     {
         $attributeNames = ['test'];
         $values = ['test' => 'value'];
@@ -62,7 +62,7 @@ class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onSubmit($submitEvent);
     }
 
-    public function testOnSubmitNoActionData()
+    public function testOnSubmitNoActionData(): void
     {
         $data = $this->createMock(ActionData::class);
         $data->expects($this->never())
@@ -78,7 +78,7 @@ class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onSubmit($event);
     }
 
-    public function testOnPreSetDataNoActionData()
+    public function testOnPreSetDataNoActionData(): void
     {
         $event = $this->createMock(FormEvent::class);
         $event->expects($this->once())

@@ -6,11 +6,11 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowDataSerializer;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowDataSerializerTest extends \PHPUnit\Framework\TestCase
+class WorkflowDataSerializerTest extends TestCase
 {
-    /** @var WorkflowDataSerializer */
-    private $serializer;
+    private WorkflowDataSerializer $serializer;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class WorkflowDataSerializerTest extends \PHPUnit\Framework\TestCase
         $this->serializer = new WorkflowDataSerializer();
     }
 
-    public function testSetWorkflowRegistry()
+    public function testSetWorkflowRegistry(): void
     {
         $workflowRegistry = $this->createMock(WorkflowRegistry::class);
         $this->serializer->setWorkflowRegistry($workflowRegistry);
@@ -28,7 +28,7 @@ class WorkflowDataSerializerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetWorkflowName()
+    public function testSetWorkflowName(): void
     {
         self::assertEmpty($this->serializer->getWorkflowName());
         $workflowName = 'test_workflow';
@@ -36,7 +36,7 @@ class WorkflowDataSerializerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($workflowName, $this->serializer->getWorkflowName());
     }
 
-    public function testGetWorkflowName()
+    public function testGetWorkflowName(): void
     {
         self::assertNull($this->serializer->getWorkflowName());
         $workflowName = 'test_workflow';
@@ -44,7 +44,7 @@ class WorkflowDataSerializerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($workflowName, $this->serializer->getWorkflowName());
     }
 
-    public function testGetWorkflow()
+    public function testGetWorkflow(): void
     {
         $workflowName = 'test_workflow';
         $workflow = $this->createMock(Workflow::class);

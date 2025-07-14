@@ -3,8 +3,9 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\IntegrationBundle\Utils\SecureErrorMessageHelper;
+use PHPUnit\Framework\TestCase;
 
-class SecureErrorMessageHelperTest extends \PHPUnit\Framework\TestCase
+class SecureErrorMessageHelperTest extends TestCase
 {
     /**
      * @dataProvider messageProvider
@@ -12,7 +13,7 @@ class SecureErrorMessageHelperTest extends \PHPUnit\Framework\TestCase
      * @param string $exceptionMessage
      * @param string $expectedMessage
      */
-    public function testSanitizeSecureInfo($exceptionMessage, $expectedMessage)
+    public function testSanitizeSecureInfo($exceptionMessage, $expectedMessage): void
     {
         $sanitisedMessage = SecureErrorMessageHelper::sanitizeSecureInfo($exceptionMessage);
         $this->assertEquals($expectedMessage, $sanitisedMessage);

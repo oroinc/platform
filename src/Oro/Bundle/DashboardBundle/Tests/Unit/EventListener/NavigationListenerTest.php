@@ -7,17 +7,14 @@ use Oro\Bundle\DashboardBundle\EventListener\NavigationListener;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class NavigationListenerTest extends \PHPUnit\Framework\TestCase
+class NavigationListenerTest extends TestCase
 {
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var Manager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var NavigationListener */
-    private $navigationListener;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private Manager&MockObject $manager;
+    private NavigationListener $navigationListener;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +28,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnNavigationConfigureWithoutUser()
+    public function testOnNavigationConfigureWithoutUser(): void
     {
         $event = $this->createMock(ConfigureMenuEvent::class);
         $this->tokenAccessor->expects($this->atLeastOnce())
@@ -43,7 +40,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
         $this->navigationListener->onNavigationConfigure($event);
     }
 
-    public function testOnNavigationConfigureWithDisabledDisplaying()
+    public function testOnNavigationConfigureWithDisabledDisplaying(): void
     {
         $event = $this->createMock(ConfigureMenuEvent::class);
 
@@ -71,7 +68,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
         $this->navigationListener->onNavigationConfigure($event);
     }
 
-    public function testOnNavigationConfigureAddCorrectItems()
+    public function testOnNavigationConfigureAddCorrectItems(): void
     {
         $event = $this->createMock(ConfigureMenuEvent::class);
 

@@ -10,17 +10,14 @@ use Doctrine\ORM\Id\IdentityGenerator;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityBundle\EventListener\ORM\GeneratedValueStrategyListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class GeneratedValueStrategyListenerTest extends \PHPUnit\Framework\TestCase
+class GeneratedValueStrategyListenerTest extends TestCase
 {
-    /** @var LoadClassMetadataEventArgs|\PHPUnit\Framework\MockObject\MockObject */
-    private $event;
-
-    /** @var ClassMetadataInfo|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadata;
-
-    /** @var GeneratedValueStrategyListener */
-    private $listener;
+    private LoadClassMetadataEventArgs&MockObject $event;
+    private ClassMetadataInfo&MockObject $metadata;
+    private GeneratedValueStrategyListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +28,7 @@ class GeneratedValueStrategyListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new GeneratedValueStrategyListener();
     }
 
-    public function testNotIdGeneratorSequence()
+    public function testNotIdGeneratorSequence(): void
     {
         $this->event->expects($this->once())
             ->method('getClassMetadata')
@@ -52,7 +49,7 @@ class GeneratedValueStrategyListenerTest extends \PHPUnit\Framework\TestCase
         string $sequence,
         string $type,
         AbstractIdGenerator $generator
-    ) {
+    ): void {
         $this->event->expects($this->once())
             ->method('getClassMetadata')
             ->willReturn($this->metadata);

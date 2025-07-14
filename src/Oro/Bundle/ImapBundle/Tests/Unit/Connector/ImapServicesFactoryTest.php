@@ -36,7 +36,7 @@ class ImapServicesFactoryTest extends TestCase
         $factory = new ImapServicesFactory($config);
         $services = $factory->createImapServices(new ImapConfig());
 
-        $expected = new ImapServices(new TestFixtures\Imap1([]), new TestFixtures\SearchStringManager1());
+        $expected = new ImapServices(new Imap1([]), new SearchStringManager1());
         $this->assertEquals($expected, $services);
     }
 
@@ -57,7 +57,7 @@ class ImapServicesFactoryTest extends TestCase
 
         $services = $factory->createImapServices(new ImapConfig());
 
-        $expected = new ImapServices(new TestFixtures\Imap1([]), new TestFixtures\SearchStringManager1());
+        $expected = new ImapServices(new Imap1([]), new SearchStringManager1());
 
         $this->assertEquals($expected, $services);
     }

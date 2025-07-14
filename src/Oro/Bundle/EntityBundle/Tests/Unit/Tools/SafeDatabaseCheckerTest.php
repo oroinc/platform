@@ -12,16 +12,17 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
+class SafeDatabaseCheckerTest extends TestCase
 {
     /**
      * @dataProvider tablesExistProvider
      */
-    public function testTablesExist($tables, bool $tablesExistResult = true, bool $expectedResult = true)
+    public function testTablesExist($tables, bool $tablesExistResult = true, bool $expectedResult = true): void
     {
         $connection = $this->createMock(Connection::class);
         $schemaManager = $this->createMock(AbstractSchemaManager::class);
@@ -55,7 +56,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider tablesExistWithEmptyTablesParamProvider
      */
-    public function testTablesExistWithEmptyTablesParam($tables)
+    public function testTablesExistWithEmptyTablesParam($tables): void
     {
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->never())
@@ -78,7 +79,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider expectedExceptionsForTablesExist
      */
-    public function testTablesExistShouldHandleExpectedExceptions(\Exception $exception)
+    public function testTablesExistShouldHandleExpectedExceptions(\Throwable $exception): void
     {
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())
@@ -98,7 +99,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testTablesExistShouldRethrowUnexpectedException()
+    public function testTablesExistShouldRethrowUnexpectedException(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('unexpected');
@@ -111,14 +112,14 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         SafeDatabaseChecker::tablesExist($connection, 'table');
     }
 
-    public function testGetTableName()
+    public function testGetTableName(): void
     {
         $doctrine = $this->createMock(ManagerRegistry::class);
         $em = $this->createMock(EntityManagerInterface::class);
         $classMetadata = $this->createMock(\Doctrine\ORM\Mapping\ClassMetadata::class);
 
         $entityName = 'Test\Entity';
-        $tableName  = 'test_table';
+        $tableName = 'test_table';
 
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
@@ -138,10 +139,10 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTableNameForNotOrmEntity()
+    public function testGetTableNameForNotOrmEntity(): void
     {
         $doctrine = $this->createMock(ManagerRegistry::class);
-        $om       = $this->createMock(ObjectManager::class);
+        $om = $this->createMock(ObjectManager::class);
 
         $entityName = 'Test\Entity';
 
@@ -160,7 +161,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getTableNameWithEmptyEntityNameParamProvider
      */
-    public function testGetTableNameWithEmptyEntityNameParam(?string $entityName)
+    public function testGetTableNameWithEmptyEntityNameParam(?string $entityName): void
     {
         $doctrine = $this->createMock(ManagerRegistry::class);
 
@@ -183,7 +184,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider expectedExceptionsForGetTableName
      */
-    public function testGetTableNameShouldHandleExpectedExceptions(\Exception $exception)
+    public function testGetTableNameShouldHandleExpectedExceptions(\Throwable $exception): void
     {
         $doctrine = $this->createMock(ManagerRegistry::class);
 
@@ -206,7 +207,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetTableNameShouldRethrowUnexpectedException()
+    public function testGetTableNameShouldRethrowUnexpectedException(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('unexpected');
@@ -220,9 +221,9 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         SafeDatabaseChecker::getTableName($doctrine, 'Test\Entity');
     }
 
-    public function testGetAllMetadata()
+    public function testGetAllMetadata(): void
     {
-        $om              = $this->createMock(ObjectManager::class);
+        $om = $this->createMock(ObjectManager::class);
         $metadataFactory = $this->createMock(ClassMetadataFactory::class);
 
         $classMetadata = $this->createMock(ClassMetadata::class);
@@ -245,7 +246,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider expectedExceptionsForGetAllMetadata
      */
-    public function testGetAllMetadataShouldHandleExpectedExceptions(\Exception $exception)
+    public function testGetAllMetadataShouldHandleExpectedExceptions(\Throwable $exception): void
     {
         $om = $this->createMock(ObjectManager::class);
 
@@ -269,7 +270,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetAllMetadataShouldRethrowUnexpectedException()
+    public function testGetAllMetadataShouldRethrowUnexpectedException(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('unexpected');

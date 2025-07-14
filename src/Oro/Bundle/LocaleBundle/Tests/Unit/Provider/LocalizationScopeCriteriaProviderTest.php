@@ -5,14 +5,13 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Provider;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationScopeCriteriaProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LocalizationScopeCriteriaProviderTest extends \PHPUnit\Framework\TestCase
+class LocalizationScopeCriteriaProviderTest extends TestCase
 {
-    /** @var CurrentLocalizationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $currentLocalizationProvider;
-
-    /** @var LocalizationScopeCriteriaProvider */
-    private $provider;
+    private CurrentLocalizationProvider&MockObject $currentLocalizationProvider;
+    private LocalizationScopeCriteriaProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -22,12 +21,12 @@ class LocalizationScopeCriteriaProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new LocalizationScopeCriteriaProvider($this->currentLocalizationProvider);
     }
 
-    public function testGetCriteriaField()
+    public function testGetCriteriaField(): void
     {
         $this->assertEquals(LocalizationScopeCriteriaProvider::LOCALIZATION, $this->provider->getCriteriaField());
     }
 
-    public function testGetCriteriaValue()
+    public function testGetCriteriaValue(): void
     {
         $localization = new Localization();
 
@@ -38,7 +37,7 @@ class LocalizationScopeCriteriaProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($localization, $this->provider->getCriteriaValue());
     }
 
-    public function testGetCriteriaValueType()
+    public function testGetCriteriaValueType(): void
     {
         $this->assertEquals(Localization::class, $this->provider->getCriteriaValueType());
     }

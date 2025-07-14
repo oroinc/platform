@@ -55,7 +55,7 @@ class QueryBuilderUtilTest extends OrmTestCase
     /**
      * @dataProvider getPageOffsetProvider
      */
-    public function testGetPageOffset(int $expectedOffset, int|string|null $page, int|string|null $limit)
+    public function testGetPageOffset(int $expectedOffset, int|string|null $page, int|string|null $limit): void
     {
         $this->assertSame($expectedOffset, QueryBuilderUtil::getPageOffset($page, $limit));
     }
@@ -74,7 +74,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         ];
     }
 
-    public function testNormalizeNullCriteria()
+    public function testNormalizeNullCriteria(): void
     {
         $this->assertEquals(
             new Criteria(),
@@ -82,7 +82,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeEmptyCriteria()
+    public function testNormalizeEmptyCriteria(): void
     {
         $this->assertEquals(
             new Criteria(),
@@ -90,7 +90,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeCriteriaObject()
+    public function testNormalizeCriteriaObject(): void
     {
         $criteria = new Criteria();
         $this->assertSame(
@@ -99,7 +99,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeCriteriaArray()
+    public function testNormalizeCriteriaArray(): void
     {
         $expectedCriteria = new Criteria();
         $expectedCriteria->andWhere(Criteria::expr()->eq('field', 'value'));
@@ -110,7 +110,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeCriteriaArrayValue()
+    public function testNormalizeCriteriaArrayValue(): void
     {
         $expectedCriteria = new Criteria();
         $expectedCriteria->andWhere(Criteria::expr()->in('field', ['value']));
@@ -124,7 +124,7 @@ class QueryBuilderUtilTest extends OrmTestCase
     /**
      * @dataProvider getSelectExprProvider
      */
-    public function testGetSelectExpr(QueryBuilder $qb, string $expectedExpr)
+    public function testGetSelectExpr(QueryBuilder $qb, string $expectedExpr): void
     {
         $this->assertEquals($expectedExpr, QueryBuilderUtil::getSelectExpr($qb));
     }
@@ -170,7 +170,7 @@ class QueryBuilderUtilTest extends OrmTestCase
     /**
      * @dataProvider getSelectExprByAliasProvider
      */
-    public function testGetSelectExprByAlias(QueryBuilder $qb, string $alias, ?string $expectedExpr)
+    public function testGetSelectExprByAlias(QueryBuilder $qb, string $alias, ?string $expectedExpr): void
     {
         $this->assertEquals($expectedExpr, QueryBuilderUtil::getSelectExprByAlias($qb, $alias));
     }
@@ -211,7 +211,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         ];
     }
 
-    public function testGetSingleRootAlias()
+    public function testGetSingleRootAlias(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
 
@@ -225,7 +225,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         );
     }
 
-    public function testGetSingleRootAliasWhenQueryHasSeveralRootAliases()
+    public function testGetSingleRootAliasWhenQueryHasSeveralRootAliases(): void
     {
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage(
@@ -242,7 +242,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         QueryBuilderUtil::getSingleRootAlias($qb);
     }
 
-    public function testGetSingleRootAliasWhenQueryHasNoRootAlias()
+    public function testGetSingleRootAliasWhenQueryHasNoRootAlias(): void
     {
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage(
@@ -258,7 +258,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         QueryBuilderUtil::getSingleRootAlias($qb);
     }
 
-    public function testGetSingleRootAliasWhenQueryHasNoRootAliasAndNoExceptionRequested()
+    public function testGetSingleRootAliasWhenQueryHasNoRootAliasAndNoExceptionRequested(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
 
@@ -269,7 +269,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         $this->assertNull(QueryBuilderUtil::getSingleRootAlias($qb, false));
     }
 
-    public function testGetSingleRootEntity()
+    public function testGetSingleRootEntity(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
 
@@ -283,7 +283,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         );
     }
 
-    public function testGetSingleRootEntityWhenQueryHasSeveralRootEntities()
+    public function testGetSingleRootEntityWhenQueryHasSeveralRootEntities(): void
     {
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage(
@@ -300,7 +300,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         QueryBuilderUtil::getSingleRootEntity($qb);
     }
 
-    public function testGetSingleRootEntityWhenQueryHasNoRootEntity()
+    public function testGetSingleRootEntityWhenQueryHasNoRootEntity(): void
     {
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage(
@@ -316,7 +316,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         QueryBuilderUtil::getSingleRootEntity($qb);
     }
 
-    public function testGetSingleRootEntityWhenQueryHasNoRootEntityAndNoExceptionRequested()
+    public function testGetSingleRootEntityWhenQueryHasNoRootEntityAndNoExceptionRequested(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
 
@@ -327,7 +327,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         $this->assertNull(QueryBuilderUtil::getSingleRootEntity($qb, false));
     }
 
-    public function testApplyEmptyJoins()
+    public function testApplyEmptyJoins(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
 
@@ -339,7 +339,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         QueryBuilderUtil::applyJoins($qb, []);
     }
 
-    public function testApplyJoins()
+    public function testApplyJoins(): void
     {
         $joins = [
             'emails'   => null,
@@ -416,7 +416,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         self::assertEquals('param3', QueryBuilderUtil::generateParameterName('param', $qb));
     }
 
-    public function testRemoveUnusedParameters()
+    public function testRemoveUnusedParameters(): void
     {
         $dql = 'SELECT a.name FROM Some:Other as a WHERE a.name = :param1
                 AND a.name != :param2 AND a.status = ?1';
@@ -447,7 +447,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         QueryBuilderUtil::removeUnusedParameters($qb);
     }
 
-    public function testFindClassForRootAlias()
+    public function testFindClassForRootAlias(): void
     {
         $qb = $this->em->createQueryBuilder()
             ->select('p')
@@ -460,7 +460,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         );
     }
 
-    public function testFindClassForRootAliasFowQueryWithSeveralRootEntities()
+    public function testFindClassForRootAliasFowQueryWithSeveralRootEntities(): void
     {
         $qb = $this->em->createQueryBuilder()
             ->select('p')
@@ -474,7 +474,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         );
     }
 
-    public function testFindClassWhenAliasNotFound()
+    public function testFindClassWhenAliasNotFound(): void
     {
         $qb = $this->em->createQueryBuilder()
             ->select('p')
@@ -489,7 +489,7 @@ class QueryBuilderUtilTest extends OrmTestCase
     /**
      * @dataProvider getJoinClassDataProvider
      */
-    public function testFindClassByAliasForJoinAlias(callable $qbFactory, array $joinPath, string $expectedClass)
+    public function testFindClassByAliasForJoinAlias(callable $qbFactory, array $joinPath, string $expectedClass): void
     {
         $qb = $qbFactory($this->em);
 
@@ -502,7 +502,7 @@ class QueryBuilderUtilTest extends OrmTestCase
     /**
      * @dataProvider getJoinClassDataProvider
      */
-    public function testGetJoinClass(callable $qbFactory, array $joinPath, string $expectedClass)
+    public function testGetJoinClass(callable $qbFactory, array $joinPath, string $expectedClass): void
     {
         $qb = $qbFactory($this->em);
 
@@ -580,7 +580,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         ];
     }
 
-    public function testFindJoinByAlias()
+    public function testFindJoinByAlias(): void
     {
         $qb = $this->em->createQueryBuilder()
             ->select('p')
@@ -594,7 +594,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         $this->assertNull(QueryBuilderUtil::findJoinByAlias($qb, 'w'));
     }
 
-    public function testAddJoin()
+    public function testAddJoin(): void
     {
         $srcQb = $this->em->createQueryBuilder()
             ->select('p')
@@ -618,7 +618,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         );
     }
 
-    public function testIsToOne()
+    public function testIsToOne(): void
     {
         $qb = $this->em->createQueryBuilder()
             ->select('p')
@@ -635,7 +635,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         $this->assertFalse(QueryBuilderUtil::isToOne($qb, 'nonExistingAlias'));
     }
 
-    public function testSprintfValid()
+    public function testSprintfValid(): void
     {
         $this->assertEquals('tesT.One_1 > :param', QueryBuilderUtil::sprintf('%s.%s > :param', 'tesT', 'One_1'));
     }
@@ -643,13 +643,13 @@ class QueryBuilderUtilTest extends OrmTestCase
     /**
      * @dataProvider invalidDataProvider
      */
-    public function testSprintfInvalid(string $invalid)
+    public function testSprintfInvalid(string $invalid): void
     {
         $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::sprintf('%s.%s > 0', $invalid, 'id');
     }
 
-    public function testCheckIdentifierValid()
+    public function testCheckIdentifierValid(): void
     {
         QueryBuilderUtil::checkIdentifier('tEs_T_01a');
     }
@@ -657,80 +657,80 @@ class QueryBuilderUtilTest extends OrmTestCase
     /**
      * @dataProvider invalidDataProvider
      */
-    public function testCheckStringInvalid(string $invalid)
+    public function testCheckStringInvalid(string $invalid): void
     {
         $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkIdentifier($invalid);
     }
 
-    public function testCheckFieldForValidFieldWithoutAlias()
+    public function testCheckFieldForValidFieldWithoutAlias(): void
     {
         QueryBuilderUtil::checkField('tEs_T_01a');
     }
 
-    public function testCheckFieldForValidFieldWithAlias()
+    public function testCheckFieldForValidFieldWithAlias(): void
     {
         QueryBuilderUtil::checkField('tEs_T_01a.tEs_T_01a');
     }
 
-    public function testCheckFieldForInvalidFieldWithoutAlias()
+    public function testCheckFieldForInvalidFieldWithoutAlias(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkField('0_some//');
     }
 
-    public function testCheckFieldForInvalidAliasPart()
+    public function testCheckFieldForInvalidAliasPart(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkField('0_some//.field');
     }
 
-    public function testCheckFieldForInvalidFieldPart()
+    public function testCheckFieldForInvalidFieldPart(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkField('alias.0_some//');
     }
 
-    public function testCheckPathForValidFieldWithoutAlias()
+    public function testCheckPathForValidFieldWithoutAlias(): void
     {
         QueryBuilderUtil::checkPath('tEs_T_01a');
     }
 
-    public function testCheckPathForValidFieldWithAlias()
+    public function testCheckPathForValidFieldWithAlias(): void
     {
         QueryBuilderUtil::checkPath('tEs_T_01a.tEs_T_01a');
     }
 
-    public function testCheckPathForValidNestedField()
+    public function testCheckPathForValidNestedField(): void
     {
         QueryBuilderUtil::checkPath('tEs_T_01a.tEs_T_01a.tEs_T_01a');
     }
 
-    public function testCheckPathForInvalidFieldWithoutAlias()
+    public function testCheckPathForInvalidFieldWithoutAlias(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkPath('0_some//');
     }
 
-    public function testCheckPathForInvalidAliasPart()
+    public function testCheckPathForInvalidAliasPart(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkPath('0_some//.field');
     }
 
-    public function testCheckPathForInvalidFieldPart()
+    public function testCheckPathForInvalidFieldPart(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkPath('alias.0_some//');
     }
 
-    public function testCheckPathForInvalidNestedFieldPart()
+    public function testCheckPathForInvalidNestedFieldPart(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkPath('alias.field.0_some//');
     }
 
-    public function testGetFieldValid()
+    public function testGetFieldValid(): void
     {
         $this->assertEquals('a0_.Field0', QueryBuilderUtil::getField('a0_', 'Field0'));
     }
@@ -738,7 +738,7 @@ class QueryBuilderUtilTest extends OrmTestCase
     /**
      * @dataProvider invalidDataProvider
      */
-    public function testGetFieldInvalid(string $invalid)
+    public function testGetFieldInvalid(string $invalid): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->assertEquals('a0_.Field0', QueryBuilderUtil::getField('a0_', $invalid));

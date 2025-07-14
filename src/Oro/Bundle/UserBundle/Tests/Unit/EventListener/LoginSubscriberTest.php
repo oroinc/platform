@@ -8,17 +8,16 @@ use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\UserBundle\EventListener\LoginSubscriber;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\LoginInfoInterfaceStub;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\PasswordRecoveryInterfaceStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
-class LoginSubscriberTest extends \PHPUnit\Framework\TestCase
+class LoginSubscriberTest extends TestCase
 {
-    /** @var BaseUserManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $userManager;
-
-    /** @var LoginSubscriber */
-    private $subscriber;
+    private BaseUserManager&MockObject $userManager;
+    private LoginSubscriber $subscriber;
 
     #[\Override]
     protected function setUp(): void

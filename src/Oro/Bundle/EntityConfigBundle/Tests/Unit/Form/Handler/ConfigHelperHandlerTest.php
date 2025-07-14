@@ -11,6 +11,8 @@ use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormInterface;
@@ -20,24 +22,16 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
+class ConfigHelperHandlerTest extends TestCase
 {
     use EntityTrait;
 
-    private FormFactory|\PHPUnit\Framework\MockObject\MockObject $formFactory;
-
-    private Session|\PHPUnit\Framework\MockObject\MockObject $session;
-
-    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
-
-    private Router|\PHPUnit\Framework\MockObject\MockObject $router;
-
-    private ConfigHelper|\PHPUnit\Framework\MockObject\MockObject $configHelper;
-
-    private FormInterface|\PHPUnit\Framework\MockObject\MockObject $form;
-
-    private Request|\PHPUnit\Framework\MockObject\MockObject $request;
-
+    private FormFactory&MockObject $formFactory;
+    private Session&MockObject $session;
+    private Router&MockObject $router;
+    private ConfigHelper&MockObject $configHelper;
+    private FormInterface&MockObject $form;
+    private Request $request;
     private ConfigHelperHandler $handler;
 
     #[\Override]
@@ -49,14 +43,15 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
         $this->configHelper = $this->createMock(ConfigHelper::class);
         $this->form = $this->createMock(FormInterface::class);
         $this->request = $this->createMock(Request::class);
-        $this->requestStack = $this->createMock(RequestStack::class);
-        $this->requestStack
+
+        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack->expects(self::any())
             ->method('getSession')
             ->willReturn($this->session);
 
         $this->handler = new ConfigHelperHandler(
             $this->formFactory,
-            $this->requestStack,
+            $requestStack,
             $this->router,
             $this->configHelper,
         );
@@ -66,7 +61,6 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $entityClassName = 'someClassName';
         $entityConfigModel = $this->getEntity(EntityConfigModel::class, ['className' => $entityClassName]);
-        /** @var FieldConfigModel $fieldConfigModel */
         $fieldConfigModel = $this->getEntity(FieldConfigModel::class, ['entity' => $entityConfigModel]);
 
         $this->formFactory->expects(self::once())
@@ -83,7 +77,6 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateSecondStepFieldForm(): void
     {
-        /** @var FieldConfigModel $fieldConfigModel */
         $fieldConfigModel = $this->getEntity(FieldConfigModel::class);
 
         $this->formFactory->expects(self::once())
@@ -190,7 +183,6 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('getFlashBag')
             ->willReturn($flashBag);
 
-        /** @var FieldConfigModel $fieldConfigModel */
         $fieldConfigModel = $this->getEntity(FieldConfigModel::class);
         $this->router->expects(self::once())
             ->method('redirect')
@@ -201,7 +193,6 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testConstructConfigResponse(): void
     {
-        /** @var FieldConfigModel $fieldConfigModel */
         $fieldConfigModel = $this->getEntity(FieldConfigModel::class);
 
         $formView = new FormView();
@@ -252,7 +243,6 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testRedirect(): void
     {
-        /** @var FieldConfigModel $fieldConfigModel */
         $fieldConfigModel = $this->getEntity(FieldConfigModel::class);
 
         $redirectResponse = new RedirectResponse('some_url');

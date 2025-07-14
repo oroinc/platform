@@ -7,14 +7,13 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AssociationTypeHelperTest extends \PHPUnit\Framework\TestCase
+class AssociationTypeHelperTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var AssociationTypeHelper */
-    private $typeHelper;
+    private ConfigManager&MockObject $configManager;
+    private AssociationTypeHelper $typeHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class AssociationTypeHelperTest extends \PHPUnit\Framework\TestCase
         $this->typeHelper = new AssociationTypeHelper($this->configManager);
     }
 
-    public function testIsDictionaryNoConfig()
+    public function testIsDictionaryNoConfig(): void
     {
         $className = 'Test\Entity';
 
@@ -48,7 +47,7 @@ class AssociationTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isDictionaryProvider
      */
-    public function testIsDictionary(?array $groups, bool $expected)
+    public function testIsDictionary(?array $groups, bool $expected): void
     {
         $className = 'Test\Entity';
 
@@ -89,7 +88,7 @@ class AssociationTypeHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetOwningSideEntities()
+    public function testGetOwningSideEntities(): void
     {
         $config1 = new Config(new EntityConfigId('grouping', 'Test\Entity1'));
         $config1->set('groups', ['some_group', 'another_group']);

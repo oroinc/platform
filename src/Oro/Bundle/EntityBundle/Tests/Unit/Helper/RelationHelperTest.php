@@ -5,14 +5,19 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Helper;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Helper\RelationHelper;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
+use Oro\Bundle\EntityBundle\Tests\Unit\Helper\Stub\Entity1;
+use Oro\Bundle\EntityBundle\Tests\Unit\Helper\Stub\Entity2;
+use Oro\Bundle\EntityBundle\Tests\Unit\Helper\Stub\Entity3;
+use Oro\Bundle\EntityBundle\Tests\Unit\Helper\Stub\Entity4;
+use Oro\Bundle\EntityBundle\Tests\Unit\Helper\Stub\Entity5;
+use Oro\Bundle\EntityBundle\Tests\Unit\Helper\Stub\Entity6;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class RelationHelperTest extends \PHPUnit\Framework\TestCase
+class RelationHelperTest extends TestCase
 {
-    /** @var VirtualRelationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $relationProvider;
-
-    /** @var RelationHelper */
-    private $helper;
+    private VirtualRelationProviderInterface&MockObject $relationProvider;
+    private RelationHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -22,32 +27,32 @@ class RelationHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper = new RelationHelper($this->relationProvider);
     }
 
-    public function testHasVirtualRelations()
+    public function testHasVirtualRelations(): void
     {
         $this->relationProvider->expects($this->any())
             ->method('getVirtualRelations')
             ->willReturnMap([
-                [Stub\Entity1::class, $this->getRelations()],
-                [Stub\Entity2::class, []],
+                [Entity1::class, $this->getRelations()],
+                [Entity2::class, []],
             ]);
 
-        $this->assertTrue($this->helper->hasVirtualRelations(Stub\Entity1::class));
-        $this->assertFalse($this->helper->hasVirtualRelations(Stub\Entity2::class));
+        $this->assertTrue($this->helper->hasVirtualRelations(Entity1::class));
+        $this->assertFalse($this->helper->hasVirtualRelations(Entity2::class));
     }
 
     /**
      * @dataProvider getMetadataTypeForVirtualJoin
      */
-    public function testGetMetadataTypeForVirtualJoin(string $targetEntityClass, int $expectedResult)
+    public function testGetMetadataTypeForVirtualJoin(string $targetEntityClass, int $expectedResult): void
     {
         $this->relationProvider->expects($this->once())
             ->method('getVirtualRelations')
-            ->with(Stub\Entity1::class)
+            ->with(Entity1::class)
             ->willReturn($this->getRelations());
 
         $this->assertEquals(
             $expectedResult,
-            $this->helper->getMetadataTypeForVirtualJoin(Stub\Entity1::class, $targetEntityClass)
+            $this->helper->getMetadataTypeForVirtualJoin(Entity1::class, $targetEntityClass)
         );
     }
 
@@ -55,27 +60,27 @@ class RelationHelperTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'unknown target class' => [
-                'target' => Stub\Entity1::class,
+                'target' => Entity1::class,
                 'result' => 0,
             ],
             'unknown type' => [
-                'target' => Stub\Entity2::class,
+                'target' => Entity2::class,
                 'result' => 0,
             ],
             'one-to-one' => [
-                'target' => Stub\Entity3::class,
+                'target' => Entity3::class,
                 'result' => ClassMetadata::ONE_TO_ONE,
             ],
             'many-to-one' => [
-                'target' => Stub\Entity4::class,
+                'target' => Entity4::class,
                 'result' => ClassMetadata::MANY_TO_ONE,
             ],
             'one-to-many' => [
-                'target' => Stub\Entity5::class,
+                'target' => Entity5::class,
                 'result' => ClassMetadata::ONE_TO_MANY,
             ],
             'many-to-many' => [
-                'target' => Stub\Entity6::class,
+                'target' => Entity6::class,
                 'result' => ClassMetadata::MANY_TO_MANY,
             ],
         ];
@@ -90,7 +95,7 @@ class RelationHelperTest extends \PHPUnit\Framework\TestCase
                 'query' => [
                     'join' => [
                         'left' => [
-                            ['join' => Stub\Entity2::class],
+                            ['join' => Entity2::class],
                         ],
                     ],
                 ],
@@ -100,7 +105,7 @@ class RelationHelperTest extends \PHPUnit\Framework\TestCase
                 'query' => [
                     'join' => [
                         'left' => [
-                            ['join' => Stub\Entity3::class],
+                            ['join' => Entity3::class],
                         ],
                     ],
                 ],
@@ -110,7 +115,7 @@ class RelationHelperTest extends \PHPUnit\Framework\TestCase
                 'query' => [
                     'join' => [
                         'left' => [
-                            ['join' => Stub\Entity4::class],
+                            ['join' => Entity4::class],
                         ],
                     ],
                 ],
@@ -120,7 +125,7 @@ class RelationHelperTest extends \PHPUnit\Framework\TestCase
                 'query' => [
                     'join' => [
                         'left' => [
-                            ['join' => Stub\Entity5::class],
+                            ['join' => Entity5::class],
                         ],
                     ],
                 ],
@@ -130,7 +135,7 @@ class RelationHelperTest extends \PHPUnit\Framework\TestCase
                 'query' => [
                     'join' => [
                         'left' => [
-                            ['join' => Stub\Entity6::class],
+                            ['join' => Entity6::class],
                         ],
                     ],
                 ],

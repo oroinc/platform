@@ -4,13 +4,14 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Formatter;
 
 use Oro\Bundle\MessageQueueBundle\Log\Formatter\ConsoleFormatter;
 use Oro\Component\MessageQueue\Client\Config;
+use PHPUnit\Framework\TestCase;
 
-class ConsoleFormatterTest extends \PHPUnit\Framework\TestCase
+class ConsoleFormatterTest extends TestCase
 {
     /**
      * @dataProvider recordsProvider
      */
-    public function testFormat(array $record, string $expectedResult)
+    public function testFormat(array $record, string $expectedResult): void
     {
         $formatter = new ConsoleFormatter();
 

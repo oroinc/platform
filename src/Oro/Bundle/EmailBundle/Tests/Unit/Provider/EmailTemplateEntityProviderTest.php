@@ -124,7 +124,7 @@ class EmailTemplateEntityProviderTest extends TestCase
             ->method('isResourceEnabled')
             ->willReturn(true);
 
-        $result   = $this->provider->getEntities();
+        $result = $this->provider->getEntities();
         $expected = [
             [
                 'name'         => $entityClassName2,

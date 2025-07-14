@@ -7,11 +7,11 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\TransitionTriggerVerifierException;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerRelationVerifier;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
+use PHPUnit\Framework\TestCase;
 
-class TransitionEventTriggerRelationVerifierTest extends \PHPUnit\Framework\TestCase
+class TransitionEventTriggerRelationVerifierTest extends TestCase
 {
-    /** @var TransitionEventTriggerRelationVerifier */
-    private $verifier;
+    private TransitionEventTriggerRelationVerifier $verifier;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class TransitionEventTriggerRelationVerifierTest extends \PHPUnit\Framework\Test
         $this->verifier = new TransitionEventTriggerRelationVerifier();
     }
 
-    public function testRelationExpectedException()
+    public function testRelationExpectedException(): void
     {
         $definition = (new WorkflowDefinition())->setName('test_workflow');
         $definition->setRelatedEntity(EntityStub::class);
@@ -40,7 +40,7 @@ class TransitionEventTriggerRelationVerifierTest extends \PHPUnit\Framework\Test
         $this->verifier->verifyTrigger($trigger);
     }
 
-    public function testRelationOk()
+    public function testRelationOk(): void
     {
         $definition = new WorkflowDefinition();
         $definition->setRelatedEntity(EntityStub::class);
@@ -53,7 +53,7 @@ class TransitionEventTriggerRelationVerifierTest extends \PHPUnit\Framework\Test
         $this->verifier->verifyTrigger($trigger);
     }
 
-    public function testRelationIsNotNeeded()
+    public function testRelationIsNotNeeded(): void
     {
         $definition = new WorkflowDefinition();
         $definition->setRelatedEntity(EntityStub::class);

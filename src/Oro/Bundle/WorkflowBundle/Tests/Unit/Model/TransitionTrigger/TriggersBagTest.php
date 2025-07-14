@@ -6,10 +6,11 @@ use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TriggersBag;
+use PHPUnit\Framework\TestCase;
 
-class TriggersBagTest extends \PHPUnit\Framework\TestCase
+class TriggersBagTest extends TestCase
 {
-    public function testBag()
+    public function testBag(): void
     {
         $definition = new WorkflowDefinition();
         $triggers = [new TransitionEventTrigger(), new TransitionCronTrigger()];

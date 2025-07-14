@@ -15,30 +15,21 @@ use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\NotificationBundle\Model\TemplateMassNotification;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MassNotificationSenderTest extends \PHPUnit\Framework\TestCase
+class MassNotificationSenderTest extends TestCase
 {
     private const TEST_SENDER_EMAIL = 'admin@example.com';
     private const TEST_SENDER_NAME = 'sender name';
     private const TEMPLATE_NAME = 'test template';
 
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var UserRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $userRepository;
-
-    /** @var EntityPool|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityPool;
-
-    /** @var NotificationSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $notificationSettings;
-
-    /** @var EmailNotificationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var MassNotificationSender */
-    private $sender;
+    private EntityManagerInterface&MockObject $entityManager;
+    private UserRepository&MockObject $userRepository;
+    private EntityPool&MockObject $entityPool;
+    private NotificationSettings&MockObject $notificationSettings;
+    private EmailNotificationManager&MockObject $manager;
+    private MassNotificationSender $sender;
 
     #[\Override]
     protected function setUp(): void
@@ -62,7 +53,7 @@ class MassNotificationSenderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSendToActiveUsersWithEmptySender()
+    public function testSendToActiveUsersWithEmptySender(): void
     {
         $body = 'Test Body';
         $subject = 'Test Subject';
@@ -111,7 +102,7 @@ class MassNotificationSenderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(2, $this->sender->send($body, $subject));
     }
 
-    public function testSendToConfigEmailsWithEmptyTemplate()
+    public function testSendToConfigEmailsWithEmptyTemplate(): void
     {
         $body = 'Test Body';
         $subject = null;

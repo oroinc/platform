@@ -5,20 +5,21 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
+use PHPUnit\Framework\TestCase;
 
-class CountryTest extends \PHPUnit\Framework\TestCase
+class CountryTest extends TestCase
 {
     /**
      * @dataProvider provider
      */
-    public function testSettersAndGetters(string $property, mixed $value)
+    public function testSettersAndGetters(string $property, mixed $value): void
     {
         $obj = new Country('iso2code');
         $obj->{'set' . ucfirst($property)}($value);
         $this->assertEquals($value, call_user_func_array([$obj, 'get' . ucfirst($property)], []));
     }
 
-    public function testConstructorData()
+    public function testConstructorData(): void
     {
         $obj = new Country('iso2Code');
 
@@ -35,14 +36,14 @@ class CountryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $obj = new Country('iso2Code');
         $obj->setName('name');
         $this->assertEquals('name', $obj->__toString());
     }
 
-    public function testAddRegion()
+    public function testAddRegion(): void
     {
         $country = new Country('iso2Code');
         $region = new Region('combinedCode');
@@ -55,7 +56,7 @@ class CountryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($country, $region->getCountry());
     }
 
-    public function testRemoveRegion()
+    public function testRemoveRegion(): void
     {
         $country = new Country('iso2Code');
         $region = new Region('combinedCode');
@@ -69,7 +70,7 @@ class CountryTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($region->getCountry());
     }
 
-    public function testHasRegions()
+    public function testHasRegions(): void
     {
         $country = new Country('iso2Code');
         $region = new Region('combinedCode');

@@ -4,11 +4,13 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Cache;
 
 use Oro\Bundle\LayoutBundle\Cache\TwigTemplateCacheWarmer;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 use Twig\Error\Error;
 use Twig\Template;
+use Twig\TemplateWrapper;
 
-class TwigTemplateCacheWarmerTest extends \PHPUnit\Framework\TestCase
+class TwigTemplateCacheWarmerTest extends TestCase
 {
     private function getCacheWarmer(Environment $twig, iterable $iterator): TwigTemplateCacheWarmer
     {
@@ -54,7 +56,7 @@ class TwigTemplateCacheWarmerTest extends \PHPUnit\Framework\TestCase
                 if ('invalid_template.html.twig' === $templateName) {
                     throw new Error('some error');
                 }
-                return new \Twig\TemplateWrapper($twig, $template);
+                return new TemplateWrapper($twig, $template);
             });
 
         $cacheWarmer = $this->getCacheWarmer($twig, $iterator);

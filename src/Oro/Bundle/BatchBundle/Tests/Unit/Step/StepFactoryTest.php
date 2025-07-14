@@ -10,9 +10,10 @@ use Oro\Bundle\BatchBundle\Job\JobRepositoryInterface;
 use Oro\Bundle\BatchBundle\Step\ItemStep;
 use Oro\Bundle\BatchBundle\Step\StepFactory;
 use Oro\Bundle\BatchBundle\Step\StepInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class StepFactoryTest extends \PHPUnit\Framework\TestCase
+class StepFactoryTest extends TestCase
 {
     public function testCreateStep(): void
     {

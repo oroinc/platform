@@ -8,15 +8,14 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Condition\IsWorkflowConfigurationClean;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class IsWorkflowConfigurationCleanTest extends \PHPUnit\Framework\TestCase
+class IsWorkflowConfigurationCleanTest extends TestCase
 {
-    /** @var ConfigurationChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $checker;
-
-    /** @var IsWorkflowConfigurationClean */
-    private $condition;
+    private ConfigurationChecker&MockObject $checker;
+    private IsWorkflowConfigurationClean $condition;
 
     #[\Override]
     protected function setUp(): void
@@ -27,12 +26,12 @@ class IsWorkflowConfigurationCleanTest extends \PHPUnit\Framework\TestCase
         $this->condition->setContextAccessor(new ContextAccessor());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals(IsWorkflowConfigurationClean::NAME, $this->condition->getName());
     }
 
-    public function testInitializeFailsWhenEmptyOptions()
+    public function testInitializeFailsWhenEmptyOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 element, but 0 given.');
@@ -40,7 +39,7 @@ class IsWorkflowConfigurationCleanTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize([]);
     }
 
-    public function testInitializeFailsWhenOptionNotExpressionInterface()
+    public function testInitializeFailsWhenOptionNotExpressionInterface(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Option "workflow" is required.');
@@ -48,7 +47,7 @@ class IsWorkflowConfigurationCleanTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize([1 => 'anything']);
     }
 
-    public function testEvaluateNotSupported()
+    public function testEvaluateNotSupported(): void
     {
         $this->checker->expects($this->never())
             ->method($this->anything());
@@ -60,7 +59,7 @@ class IsWorkflowConfigurationCleanTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(bool $expected)
+    public function testEvaluate(bool $expected): void
     {
         $configuration = [
             WorkflowConfiguration::NODE_TRANSITIONS => [],

@@ -7,14 +7,13 @@ use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionValidateListener;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Component\Action\Exception\AssemblerException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowDefinitionValidateListenerTest extends \PHPUnit\Framework\TestCase
+class WorkflowDefinitionValidateListenerTest extends TestCase
 {
-    /** @var WorkflowAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowAssembler;
-
-    /** @var WorkflowDefinitionValidateListener */
-    private $listener;
+    private WorkflowAssembler&MockObject $workflowAssembler;
+    private WorkflowDefinitionValidateListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class WorkflowDefinitionValidateListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new WorkflowDefinitionValidateListener($this->workflowAssembler);
     }
 
-    public function testOnUpdateWorkflowDefinition()
+    public function testOnUpdateWorkflowDefinition(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('test message');
@@ -34,7 +33,7 @@ class WorkflowDefinitionValidateListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onCreateWorkflowDefinition($this->getEvent());
     }
 
-    public function testOnCreateWorkflowDefinition()
+    public function testOnCreateWorkflowDefinition(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('test message');
@@ -45,10 +44,7 @@ class WorkflowDefinitionValidateListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onUpdateWorkflowDefinition($this->getEvent());
     }
 
-    /**
-     * @return WorkflowChangesEvent|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getEvent()
+    private function getEvent(): WorkflowChangesEvent&MockObject
     {
         $event = $this->createMock(WorkflowChangesEvent::class);
         $event->expects($this->any())

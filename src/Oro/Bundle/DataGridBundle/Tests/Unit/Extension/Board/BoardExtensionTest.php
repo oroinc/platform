@@ -16,29 +16,20 @@ use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BoardExtensionTest extends \PHPUnit\Framework\TestCase
+class BoardExtensionTest extends TestCase
 {
-    /** @var BoardProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $processor;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var RestrictionManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $restrictionManager;
-
-    /** @var BoardExtension */
-    private $extension;
+    private BoardProcessorInterface&MockObject $processor;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private RequestStack&MockObject $requestStack;
+    private TranslatorInterface&MockObject $translator;
+    private RestrictionManager&MockObject $restrictionManager;
+    private BoardExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -78,7 +69,7 @@ class BoardExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->setParameters($parameters);
     }
 
-    public function testIsApplicableWithRestriction()
+    public function testIsApplicableWithRestriction(): void
     {
         $config = DatagridConfiguration::createNamed('grid', [
             AppearanceExtension::APPEARANCE_CONFIG_PATH => [
@@ -98,7 +89,7 @@ class BoardExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayNotHasKey('board', $config->offsetGet(AppearanceExtension::APPEARANCE_CONFIG_PATH));
     }
 
-    public function testIsNotApplicableInImportExportMode()
+    public function testIsNotApplicableInImportExportMode(): void
     {
         $params = new ParameterBag();
         $params->set(
@@ -110,7 +101,7 @@ class BoardExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->extension->isApplicable($config));
     }
 
-    public function testVisitMetadata()
+    public function testVisitMetadata(): void
     {
         $config = DatagridConfiguration::createNamed('grid', [
             AppearanceExtension::APPEARANCE_CONFIG_PATH => [
@@ -186,7 +177,7 @@ class BoardExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitMetadataWithWrongProcessor()
+    public function testVisitMetadataWithWrongProcessor(): void
     {
         $config = DatagridConfiguration::createNamed('grid', [
             AppearanceExtension::APPEARANCE_CONFIG_PATH => [
@@ -209,7 +200,7 @@ class BoardExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitMetadata($config, $data);
     }
 
-    public function testVisitDataSource()
+    public function testVisitDataSource(): void
     {
         $config = DatagridConfiguration::createNamed('grid', [
             AppearanceExtension::APPEARANCE_CONFIG_PATH => [

@@ -4,6 +4,8 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Route;
 
 use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -14,22 +16,13 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RouterTest extends \PHPUnit\Framework\TestCase
+class RouterTest extends TestCase
 {
-    /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
-    private $request;
-
-    /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestQuery;
-
-    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $urlGenerator;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var Router */
-    private $router;
+    private Request&MockObject $request;
+    private ParameterBag&MockObject $requestQuery;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private Router $router;
 
     #[\Override]
     protected function setUp(): void
@@ -264,8 +257,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Request parameter "input_action" must be string, array is given.');
 
-        $this->request
-            ->expects(self::once())
+        $this->request->expects(self::once())
             ->method('get')
             ->with(Router::ACTION_PARAMETER)
             ->willReturn(['invalid_value']);
@@ -276,8 +268,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
     public function testGetInputActionData(): void
     {
         $inputAction = ['route' => 'test_route', 'parameters' => ['id' => 42]];
-        $this->request
-            ->expects(self::once())
+        $this->request->expects(self::once())
             ->method('get')
             ->with(Router::ACTION_PARAMETER)
             ->willReturn(json_encode($inputAction));
@@ -288,8 +279,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
     public function testGetInputActionDataWithoutRequest(): void
     {
         $inputAction = ['route' => 'test_route', 'parameters' => ['id' => 42]];
-        $this->request
-            ->expects(self::once())
+        $this->request->expects(self::once())
             ->method('get')
             ->with(Router::ACTION_PARAMETER)
             ->willReturn(json_encode($inputAction));

@@ -5,8 +5,9 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\EntityParameterInterface;
 use Oro\Bundle\ActionBundle\Model\ParameterInterface;
+use PHPUnit\Framework\TestCase;
 
-class AttributeTest extends \PHPUnit\Framework\TestCase
+class AttributeTest extends TestCase
 {
     /**
      * @dataProvider propertiesDataProvider

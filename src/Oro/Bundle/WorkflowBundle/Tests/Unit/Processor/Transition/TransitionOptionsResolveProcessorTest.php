@@ -7,10 +7,11 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\TransitionOptionsResolveProcessor;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
+use PHPUnit\Framework\TestCase;
 
-class TransitionOptionsResolveProcessorTest extends \PHPUnit\Framework\TestCase
+class TransitionOptionsResolveProcessorTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $resolver = $this->createMock(TransitionOptionsResolver::class);
 

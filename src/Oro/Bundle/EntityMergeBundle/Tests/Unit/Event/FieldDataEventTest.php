@@ -4,14 +4,13 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Event\FieldDataEvent;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FieldDataEventTest extends \PHPUnit\Framework\TestCase
+class FieldDataEventTest extends TestCase
 {
-    /** @var FieldData|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldData;
-
-    /** @var FieldDataEvent */
-    private $event;
+    private FieldData&MockObject $fieldData;
+    private FieldDataEvent $event;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class FieldDataEventTest extends \PHPUnit\Framework\TestCase
         $this->event = new FieldDataEvent($this->fieldData);
     }
 
-    public function testGetEntityData()
+    public function testGetEntityData(): void
     {
         $this->assertEquals($this->fieldData, $this->event->getFieldData());
     }

@@ -9,17 +9,16 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\MultipleAssociationEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
+class MultipleAssociationEntityConfigDumperExtensionTest extends TestCase
 {
     private const ASSOCIATION_SCOPE = 'test_scope';
     private const ATTR_NAME = 'items';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $associationBuilder;
+    private ConfigManager&MockObject $configManager;
+    private AssociationBuilder&MockObject $associationBuilder;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit\Framew
         $this->associationBuilder = $this->createMock(AssociationBuilder::class);
     }
 
-    public function testSupportsPostUpdate()
+    public function testSupportsPostUpdate(): void
     {
         $extension = $this->getExtensionMock();
 
@@ -40,7 +39,7 @@ class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit\Framew
         );
     }
 
-    public function testSupportsPreUpdate()
+    public function testSupportsPreUpdate(): void
     {
         $extension = $this->getExtensionMock(
             ['getAssociationScope', 'getAssociationAttributeName']
@@ -64,7 +63,7 @@ class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit\Framew
         );
     }
 
-    public function testSupportsPreUpdateNoApplicableTargetEntities()
+    public function testSupportsPreUpdateNoApplicableTargetEntities(): void
     {
         $extension = $this->getExtensionMock(
             ['getAssociationScope', 'getAssociationAttributeName']
@@ -86,7 +85,7 @@ class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit\Framew
         );
     }
 
-    public function testPreUpdate()
+    public function testPreUpdate(): void
     {
         $extension = $this->getExtensionMock(
             ['getAssociationScope', 'getAssociationAttributeName', 'getAssociationKind']
@@ -115,7 +114,7 @@ class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit\Framew
         $extension->preUpdate();
     }
 
-    public function testPreUpdateForManyToOne()
+    public function testPreUpdateForManyToOne(): void
     {
         $extension = $this->getExtensionMock(
             ['getAssociationScope', 'getAssociationAttributeName', 'getAssociationKind', 'getAssociationType']
@@ -147,12 +146,7 @@ class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit\Framew
         $extension->preUpdate();
     }
 
-    /**
-     * @param string[] $methods
-     *
-     * @return MultipleAssociationEntityConfigDumperExtension|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getExtensionMock(array $methods = [])
+    private function getExtensionMock(array $methods = []): MultipleAssociationEntityConfigDumperExtension&MockObject
     {
         return $this->getMockForAbstractClass(
             MultipleAssociationEntityConfigDumperExtension::class,
@@ -165,7 +159,7 @@ class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit\Framew
         );
     }
 
-    private function setTargetEntityConfigsExpectations(array $configs = [])
+    private function setTargetEntityConfigsExpectations(array $configs = []): void
     {
         $configProvider = $this->createMock(ConfigProvider::class);
         $configProvider->expects($this->once())

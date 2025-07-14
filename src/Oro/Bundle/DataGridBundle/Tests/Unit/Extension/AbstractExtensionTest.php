@@ -11,11 +11,11 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\Extension\Configuration;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
+class AbstractExtensionTest extends TestCase
 {
-    /** @var AbstractExtension */
-    private $extension;
+    private AbstractExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +24,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->setParameters(new ParameterBag());
     }
 
-    public function testParameters()
+    public function testParameters(): void
     {
         $parameters = $this->createMock(ParameterBag::class);
 
@@ -32,7 +32,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($parameters, $this->extension->getParameters());
     }
 
-    public function testGetPriority()
+    public function testGetPriority(): void
     {
         $this->assertSame(0, $this->extension->getPriority(), 'Should be zero by default');
     }
@@ -40,7 +40,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * Empty implementation should be callable
      */
-    public function testVisitDatasource()
+    public function testVisitDatasource(): void
     {
         $datasourceMock = $this->createMock(DatasourceInterface::class);
         $config = DatagridConfiguration::create([]);
@@ -48,7 +48,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitDatasource($config, $datasourceMock);
     }
 
-    public function testIsApplicable()
+    public function testIsApplicable(): void
     {
         $config = DatagridConfiguration::create(
             [ParameterBag::DATAGRID_MODES_PARAMETER => [DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE]]
@@ -59,7 +59,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * Empty implementation should be callable
      */
-    public function testVisitResult()
+    public function testVisitResult(): void
     {
         $result = ResultsObject::create([]);
         $config = DatagridConfiguration::create([]);
@@ -70,7 +70,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * Empty implementation should be callable
      */
-    public function testVisitMetadata()
+    public function testVisitMetadata(): void
     {
         $data = MetadataObject::create([]);
         $config = DatagridConfiguration::create([]);
@@ -78,7 +78,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitMetadata($config, $data);
     }
 
-    public function testValidateConfiguration()
+    public function testValidateConfiguration(): void
     {
         $configBody = [Configuration::NODE => 'test'];
         $config = [Configuration::ROOT => $configBody];

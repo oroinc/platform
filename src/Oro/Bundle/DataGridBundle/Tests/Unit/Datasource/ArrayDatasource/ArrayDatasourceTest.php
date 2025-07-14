@@ -5,8 +5,9 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datasource\ArrayDatasource;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ArrayDatasource\ArrayDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use PHPUnit\Framework\TestCase;
 
-class ArrayDatasourceTest extends \PHPUnit\Framework\TestCase
+class ArrayDatasourceTest extends TestCase
 {
     private $arraySource = [
         [
@@ -43,8 +44,7 @@ class ArrayDatasourceTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /** @var ArrayDatasource */
-    private $arrayDatasource;
+    private ArrayDatasource $arrayDatasource;
 
     #[\Override]
     protected function setUp(): void
@@ -52,7 +52,7 @@ class ArrayDatasourceTest extends \PHPUnit\Framework\TestCase
         $this->arrayDatasource = new ArrayDatasource();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $grid = $this->createMock(DatagridInterface::class);
         $grid->expects($this->once())
@@ -61,14 +61,14 @@ class ArrayDatasourceTest extends \PHPUnit\Framework\TestCase
         $this->arrayDatasource->process($grid, []);
     }
 
-    public function testGetResultsByQuantity()
+    public function testGetResultsByQuantity(): void
     {
         $this->arrayDatasource->setArraySource($this->arraySource);
 
         $this->assertSameSize($this->arraySource, $this->arrayDatasource->getResults());
     }
 
-    public function testResultsByType()
+    public function testResultsByType(): void
     {
         $this->arrayDatasource->setArraySource(reset($this->arraySource));
         $result = $this->arrayDatasource->getResults();
@@ -76,7 +76,7 @@ class ArrayDatasourceTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(ResultRecordInterface::class, $result[0]);
     }
 
-    public function testSetArraySource()
+    public function testSetArraySource(): void
     {
         $this->arrayDatasource->setArraySource($this->arraySource);
 

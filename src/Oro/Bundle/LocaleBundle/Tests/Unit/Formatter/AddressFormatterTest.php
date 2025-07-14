@@ -8,17 +8,14 @@ use Oro\Bundle\LocaleBundle\Formatter\AddressFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Formatter\Stubs\AddressStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AddressFormatterTest extends \PHPUnit\Framework\TestCase
+class AddressFormatterTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LocaleSettings */
-    private $localeSettings;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|NameFormatter */
-    private $nameFormatter;
-
-    /** @var AddressFormatter */
-    private $addressFormatter;
+    private LocaleSettings&MockObject $localeSettings;
+    private NameFormatter&MockObject $nameFormatter;
+    private AddressFormatter $addressFormatter;
 
     #[\Override]
     protected function setUp(): void
@@ -43,7 +40,7 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
         bool $formatByCountry = false,
         string $street2 = 'apartment 10',
         string $separator = "\n"
-    ) {
+    ): void {
         $address = new AddressStub($street2);
         $address->setRegionCode($regionCode);
         $locale = 'en';
@@ -292,7 +289,7 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetAddressFormatFails()
+    public function testGetAddressFormatFails(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot get address format for "CA"');
@@ -312,7 +309,7 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
         $localeOrRegion,
         string $expectedFormat,
         ?string $defaultCountry = null
-    ) {
+    ): void {
         $this->localeSettings->expects($this->once())
             ->method('getAddressFormats')
             ->willReturn($addressFormats);

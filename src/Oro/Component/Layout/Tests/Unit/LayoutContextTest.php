@@ -6,11 +6,12 @@ use Oro\Component\Layout\ContextDataCollection;
 use Oro\Component\Layout\ContextItemInterface;
 use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class LayoutContextTest extends \PHPUnit\Framework\TestCase
+class LayoutContextTest extends TestCase
 {
     private LayoutContext $context;
 
@@ -23,7 +24,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider valueDataProvider
      */
-    public function testGetSetHasRemove(mixed $value)
+    public function testGetSetHasRemove(mixed $value): void
     {
         $this->assertFalse(
             $this->context->has('test'),
@@ -89,7 +90,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testResolveShouldThrowExceptionIfInvalidObjectTypeAdded()
+    public function testResolveShouldThrowExceptionIfInvalidObjectTypeAdded(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(sprintf(
@@ -103,12 +104,12 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->context->resolve();
     }
 
-    public function testHasForUnknownItem()
+    public function testHasForUnknownItem(): void
     {
         $this->assertFalse($this->context->has('test'));
     }
 
-    public function testGetUnknownItem()
+    public function testGetUnknownItem(): void
     {
         $this->expectException(\OutOfBoundsException::class);
         $this->expectExceptionMessage('Undefined index: test.');
@@ -116,7 +117,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->context->get('test');
     }
 
-    public function testGetOr()
+    public function testGetOr(): void
     {
         $this->assertNull($this->context->getOr('test'));
         $this->assertEquals(123, $this->context->getOr('test', 123));
@@ -124,7 +125,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('val', $this->context->getOr('test'));
     }
 
-    public function testResolve()
+    public function testResolve(): void
     {
         $this->context->set('test', 'val');
 
@@ -142,7 +143,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('val_normalized', $this->context['test']);
     }
 
-    public function testResolveThrowsExceptionWhenInvalidData()
+    public function testResolveThrowsExceptionWhenInvalidData(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Failed to resolve the context variables.');
@@ -151,7 +152,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->context->resolve();
     }
 
-    public function testResolveThrowsExceptionWhenDataAlreadyResolved()
+    public function testResolveThrowsExceptionWhenDataAlreadyResolved(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The context variables are already resolved.');
@@ -160,14 +161,14 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->context->resolve();
     }
 
-    public function testIsResolved()
+    public function testIsResolved(): void
     {
         $this->assertFalse($this->context->isResolved());
         $this->context->resolve();
         $this->assertTrue($this->context->isResolved());
     }
 
-    public function testChangeValueAllowedForResolvedData()
+    public function testChangeValueAllowedForResolvedData(): void
     {
         $this->context->getResolver()->setDefaults(['test' => 'default']);
         $this->context->resolve();
@@ -177,7 +178,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Updated', $this->context['test']);
     }
 
-    public function testAddNewValueThrowsExceptionWhenDataAlreadyResolved()
+    public function testAddNewValueThrowsExceptionWhenDataAlreadyResolved(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -188,7 +189,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->context->set('test', 'Updated');
     }
 
-    public function testRemoveNotExistingValueNotThrowsExceptionForResolvedData()
+    public function testRemoveNotExistingValueNotThrowsExceptionForResolvedData(): void
     {
         $this->context->getResolver()->setDefaults(['test' => 'default']);
         $this->context->resolve();
@@ -196,7 +197,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->context->remove('unknown');
     }
 
-    public function testRemoveExistingValueThrowsExceptionWhenDataAlreadyResolved()
+    public function testRemoveExistingValueThrowsExceptionWhenDataAlreadyResolved(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -210,12 +211,12 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->context->remove('test');
     }
 
-    public function testGetData()
+    public function testGetData(): void
     {
         $this->assertInstanceOf(ContextDataCollection::class, $this->context->data());
     }
 
-    public function testGetHash()
+    public function testGetHash(): void
     {
         $this->context->resolve();
         $hash = $this->context->getHash();
@@ -223,7 +224,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(md5(serialize([]) . serialize([])), $hash);
     }
 
-    public function testGetHashWithContextItemInterfaceDescendantItems()
+    public function testGetHashWithContextItemInterfaceDescendantItems(): void
     {
         $item = $this->createMock(ContextItemInterface::class);
         $item->expects($this->once())
@@ -237,7 +238,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(md5(serialize(['item' => 'value']) . serialize([])), $this->context->getHash());
     }
 
-    public function testGetHashThrowAnException()
+    public function testGetHashThrowAnException(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The context is not resolved.');

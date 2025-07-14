@@ -8,14 +8,13 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\Layout\Mapper\AttributeBlockTypeMapperStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AbstractAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
+class AbstractAttributeBlockTypeMapperTest extends TestCase
 {
-    /** @var AttributeBlockTypeMapperStub */
-    private $mapper;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private AttributeBlockTypeMapperStub $mapper;
+    private ManagerRegistry&MockObject $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class AbstractAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
         $this->mapper = new AttributeBlockTypeMapperStub($this->registry);
     }
 
-    public function testGetBlockTypeFromAttributeTypesRegistry()
+    public function testGetBlockTypeFromAttributeTypesRegistry(): void
     {
         $this->mapper->addBlockType('string', 'attribute_string');
 
@@ -35,7 +34,7 @@ class AbstractAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('attribute_string', $this->mapper->getBlockType($attribute));
     }
 
-    public function testGetBlockTypeFromTargetClassesRegistry()
+    public function testGetBlockTypeFromTargetClassesRegistry(): void
     {
         $this->mapper->addBlockTypeUsingMetadata(\stdClass::class, 'attribute_std_class');
 
@@ -70,7 +69,7 @@ class AbstractAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('attribute_std_class', $this->mapper->getBlockType($attribute));
     }
 
-    public function testGetBlockTypeNull()
+    public function testGetBlockTypeNull(): void
     {
         $attribute = new FieldConfigModel();
         $attribute->setType('attribute_string');

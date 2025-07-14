@@ -9,18 +9,17 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager\Stub\Entity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
+class ApiEntityManagerTest extends TestCase
 {
-    /**
-     * @param  string                                   $class
-     * @param  \PHPUnit\Framework\MockObject\MockObject $metadata
-     * @param  \PHPUnit\Framework\MockObject\MockObject $objectManager
-     * @return ApiEntityManager
-     */
-    private function createApiEntityManager($class, $metadata = null, $objectManager = null)
-    {
+    private function createApiEntityManager(
+        string $class,
+        ClassMetadata|MockObject|null $metadata = null,
+        EntityManagerInterface|MockObject|null $objectManager = null
+    ): ApiEntityManager {
         if (!$metadata) {
             $metadata = $this->createMock(ClassMetadata::class);
         }
@@ -39,7 +38,7 @@ class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
         return new ApiEntityManager($class, $objectManager);
     }
 
-    public function testGetEntityId()
+    public function testGetEntityId(): void
     {
         $className = Entity::class;
 
@@ -63,7 +62,7 @@ class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * Test getListQueryBuilder with criteria as an array
      */
-    public function testGetSimpleFilteredList()
+    public function testGetSimpleFilteredList(): void
     {
         $className = Entity::class;
 
@@ -105,7 +104,7 @@ class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * Test getListQueryBuilder with criteria as Criteria instance
      */
-    public function testGetCriteriaFilteredList()
+    public function testGetCriteriaFilteredList(): void
     {
         $className = Entity::class;
 
@@ -144,7 +143,7 @@ class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($result, $queryBuilder);
     }
 
-    public function testGetEntityIdIncorrectInstance()
+    public function testGetEntityIdIncorrectInstance(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected instance of DateTime');

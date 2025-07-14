@@ -3,11 +3,11 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\SecurityBundle\Metadata\ActionSecurityMetadata;
+use PHPUnit\Framework\TestCase;
 
-class ActionSecurityMetadataTest extends \PHPUnit\Framework\TestCase
+class ActionSecurityMetadataTest extends TestCase
 {
-    /** @var ActionSecurityMetadata */
-    private $metadata;
+    private ActionSecurityMetadata $metadata;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +21,7 @@ class ActionSecurityMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetters()
+    public function testGetters(): void
     {
         $this->assertEquals('SomeName', $this->metadata->getClassName());
         $this->assertEquals('SomeGroup', $this->metadata->getGroup());
@@ -30,7 +30,7 @@ class ActionSecurityMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('SomeCategory', $this->metadata->getCategory());
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $data = serialize($this->metadata);
         $emptyMetadata = unserialize($data);

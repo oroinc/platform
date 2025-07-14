@@ -6,11 +6,12 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 use Oro\Bundle\IntegrationBundle\ImportExport\DataConverter\AbstractTreeDataConverter;
 use Oro\Bundle\IntegrationBundle\ImportExport\DataConverter\IntegrationAwareDataConverter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AbstractTreeDataConverterTest extends \PHPUnit\Framework\TestCase
+class AbstractTreeDataConverterTest extends TestCase
 {
-    /** @var AbstractTreeDataConverter|\PHPUnit\Framework\MockObject\MockObject */
-    private $dataConverter;
+    private AbstractTreeDataConverter&MockObject $dataConverter;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +19,7 @@ class AbstractTreeDataConverterTest extends \PHPUnit\Framework\TestCase
         $this->dataConverter = $this->getMockForAbstractClass(AbstractTreeDataConverter::class);
     }
 
-    public function testSetImportExportContext()
+    public function testSetImportExportContext(): void
     {
         $context = $this->createMock(ContextInterface::class);
 
@@ -41,7 +42,7 @@ class AbstractTreeDataConverterTest extends \PHPUnit\Framework\TestCase
      * @param array $input
      * @param array $expected
      */
-    public function testConvertToImportFormat($isMany, array $input, array $expected)
+    public function testConvertToImportFormat($isMany, array $input, array $expected): void
     {
         $nodeKey = 'test_key';
         $converted = [
@@ -132,7 +133,7 @@ class AbstractTreeDataConverterTest extends \PHPUnit\Framework\TestCase
      * @param array $input
      * @param array $expected
      */
-    public function testConvertToExportFormat($isMany, array $input, array $expected)
+    public function testConvertToExportFormat($isMany, array $input, array $expected): void
     {
         $nodeKey = 'test_key';
         $converted = [

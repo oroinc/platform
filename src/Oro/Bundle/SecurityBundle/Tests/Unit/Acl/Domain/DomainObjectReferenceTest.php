@@ -3,10 +3,11 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
+use PHPUnit\Framework\TestCase;
 
-class DomainObjectReferenceTest extends \PHPUnit\Framework\TestCase
+class DomainObjectReferenceTest extends TestCase
 {
-    public function testGetObjectData()
+    public function testGetObjectData(): void
     {
         $className = 'testClass';
         $objectId = 1;
@@ -21,7 +22,7 @@ class DomainObjectReferenceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($organizationId, $objectReference->getOrganizationId());
     }
 
-    public function testGetObjectDataNoOrganization()
+    public function testGetObjectDataNoOrganization(): void
     {
         $className = 'testClass';
         $objectId = 1;

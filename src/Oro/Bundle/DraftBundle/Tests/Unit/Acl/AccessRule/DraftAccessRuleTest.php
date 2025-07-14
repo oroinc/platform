@@ -12,20 +12,14 @@ use Oro\Bundle\SecurityBundle\AccessRule\Expr\Path;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionDataBuilderInterface;
+use PHPUnit\Framework\TestCase;
 
-class DraftAccessRuleTest extends \PHPUnit\Framework\TestCase
+class DraftAccessRuleTest extends TestCase
 {
-    /** @var AclConditionDataBuilderInterface */
-    private $builder;
-
-    /** @var DraftPermissionHelper */
-    private $draftPermissionHelper;
-
-    /** @var TokenAccessorInterface */
-    private $tokenAccessor;
-
-    /** @var DraftAccessRule */
-    private $rule;
+    private AclConditionDataBuilderInterface $builder;
+    private DraftPermissionHelper $draftPermissionHelper;
+    private TokenAccessorInterface $tokenAccessor;
+    private DraftAccessRule $rule;
 
     #[\Override]
     protected function setUp(): void
@@ -50,7 +44,6 @@ class DraftAccessRuleTest extends \PHPUnit\Framework\TestCase
         string $permission,
         bool $expectedValue
     ): void {
-        /** @var Criteria|\PHPUnit\Framework\MockObject\MockObject $criteria */
         $criteria = $this->createMock(Criteria::class);
         $criteria->expects($this->once())
             ->method('getEntityClass')

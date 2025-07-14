@@ -11,59 +11,35 @@ use Oro\Bundle\TranslationBundle\Provider\JsTranslationGenerator;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\Constraint\IsEqual;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Exception\IOException;
 
-class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
+class JsTranslationDumperTest extends TestCase
 {
     use TempDirExtension;
 
-    /** @var JsTranslationGenerator|\PHPUnit\Framework\MockObject\MockObject */
-    private $generator;
-
-    /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $languageProvider;
-
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private static $fileManager;
-
-    /** @var JsTranslationDumper */
-    private $dumper;
+    private JsTranslationGenerator&MockObject $generator;
+    private LanguageProvider&MockObject $languageProvider;
+    private FileManager $fileManager;
+    private JsTranslationDumper $dumper;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->generator = $this->createMock(JsTranslationGenerator::class);
         $this->languageProvider = $this->createMock(LanguageProvider::class);
-        self::$fileManager = new FileManager('js_trans_dumper');
-        self::$fileManager->setProtocol('gaufrette');
-        self::$fileManager->setFilesystemMap(new FilesystemMap([
+        $this->fileManager = new FileManager('js_trans_dumper');
+        $this->fileManager->setProtocol('gaufrette');
+        $this->fileManager->setFilesystemMap(new FilesystemMap([
             'js_trans_dumper' => new Filesystem(new LocalAdapter($this->getTempDir('js_trans_dumper'))),
         ]));
 
         $this->dumper = new JsTranslationDumper(
             $this->generator,
             $this->languageProvider,
-            self::$fileManager
+            $this->fileManager
         );
-    }
-
-    #[\Override]
-    public static function assertFileExists(string $filename, string $message = ''): void
-    {
-        self::assertTrue(self::$fileManager->hasFile($filename), $message);
-    }
-
-    #[\Override]
-    public static function assertStringEqualsFile(
-        string $expectedFile,
-        string $actualString,
-        string $message = ''
-    ): void {
-        self::assertFileExists($expectedFile, $message);
-
-        $constraint = new IsEqual(self::$fileManager->getFile($expectedFile)->getContent());
-
-        self::assertThat($actualString, $constraint, $message);
     }
 
     public function testGetAllLocales(): void
@@ -93,8 +69,11 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
 
         $this->dumper->dumpTranslations();
 
-        self::assertFileExists($translationFileName);
-        self::assertStringEqualsFile($translationFileName, $translationFileContent);
+        self::assertTrue($this->fileManager->hasFile($translationFileName));
+        self::assertThat(
+            $translationFileContent,
+            new IsEqual($this->fileManager->getFile($translationFileName)->getContent())
+        );
     }
 
     public function testDumpTranslationsWithLocales(): void
@@ -112,8 +91,11 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
 
         $this->dumper->dumpTranslations(['en_US']);
 
-        self::assertFileExists($translationFileName);
-        self::assertStringEqualsFile($translationFileName, $translationFileContent);
+        self::assertTrue($this->fileManager->hasFile($translationFileName));
+        self::assertThat(
+            $translationFileContent,
+            new IsEqual($this->fileManager->getFile($translationFileName)->getContent()),
+        );
     }
 
     public function testDumpTranslationFile(): void
@@ -128,8 +110,11 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
 
         $this->dumper->dumpTranslationFile('en_US');
 
-        self::assertFileExists($translationFileName);
-        self::assertStringEqualsFile($translationFileName, $translationFileContent);
+        self::assertTrue($this->fileManager->hasFile($translationFileName));
+        self::assertThat(
+            $translationFileContent,
+            new IsEqual($this->fileManager->getFile($translationFileName)->getContent())
+        );
     }
 
     public function testDumpTranslationFileWhenItIsFailed(): void
@@ -175,7 +160,7 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
         $translationFileName = 'translation/en_GB.json';
         $translationFileContent = 'test';
 
-        self::$fileManager->writeToStorage($translationFileContent, $translationFileName);
+        $this->fileManager->writeToStorage($translationFileContent, $translationFileName);
 
         self::assertTrue($this->dumper->isTranslationFileExist('en_GB'));
     }

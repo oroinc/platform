@@ -3,8 +3,9 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormTypeProvider;
+use PHPUnit\Framework\TestCase;
 
-class ExtendFieldFormTypeProviderTest extends \PHPUnit\Framework\TestCase
+class ExtendFieldFormTypeProviderTest extends TestCase
 {
     private ExtendFieldFormTypeProvider $provider;
 

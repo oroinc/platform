@@ -7,14 +7,13 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor;
 use Oro\Bundle\ImportExportBundle\Writer\AbstractNativeQueryWriter;
 use Oro\Bundle\ImportExportBundle\Writer\InsertFromSelectWriter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class InsertFromSelectWriterTest extends \PHPUnit\Framework\TestCase
+class InsertFromSelectWriterTest extends TestCase
 {
-    /** @var InsertFromSelectQueryExecutor|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryExecutor;
-
-    /** @var InsertFromSelectWriter */
-    private $writer;
+    private InsertFromSelectQueryExecutor&MockObject $queryExecutor;
+    private InsertFromSelectWriter $writer;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class InsertFromSelectWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer = new InsertFromSelectWriter($this->queryExecutor);
     }
 
-    public function testWrite()
+    public function testWrite(): void
     {
         $firstQueryBuilder = $this->createMock(QueryBuilder::class);
 

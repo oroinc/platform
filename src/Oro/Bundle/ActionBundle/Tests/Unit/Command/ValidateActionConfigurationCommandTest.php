@@ -7,24 +7,17 @@ use Oro\Bundle\ActionBundle\Command\ValidateActionConfigurationCommand;
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationValidatorInterface;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 
-class ValidateActionConfigurationCommandTest extends \PHPUnit\Framework\TestCase
+class ValidateActionConfigurationCommandTest extends TestCase
 {
-    /** @var ConfigurationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $provider;
-
-    /** @var ConfigurationValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $validator;
-
-    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $input;
-
-    /** @var OutputStub */
-    private $output;
-
-    /** @var ValidateActionConfigurationCommand */
-    private $command;
+    private ConfigurationProviderInterface&MockObject $provider;
+    private ConfigurationValidatorInterface&MockObject $validator;
+    private InputInterface&MockObject $input;
+    private OutputStub $output;
+    private ValidateActionConfigurationCommand $command;
 
     #[\Override]
     protected function setUp(): void
@@ -37,7 +30,7 @@ class ValidateActionConfigurationCommandTest extends \PHPUnit\Framework\TestCase
         $this->command = new ValidateActionConfigurationCommand($this->provider, $this->validator);
     }
 
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $this->assertNotEmpty($this->command->getDescription());
         $this->assertNotEmpty($this->command->getName());
@@ -46,7 +39,7 @@ class ValidateActionConfigurationCommandTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeProvider
      */
-    public function testExecute(array $inputData, array $expectedData)
+    public function testExecute(array $inputData, array $expectedData): void
     {
         $this->provider->expects($this->once())
             ->method('getConfiguration')

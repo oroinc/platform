@@ -1,5 +1,7 @@
 <?php
 
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+
 return [
     'with_parts_from_file' => [
         'entity' => 'Some\\Entity',
@@ -23,7 +25,7 @@ return [
                 'is_unavailable_hidden' => false,
                 'acl_message' => null,
                 'frontend_options' => [],
-                'form_type' => 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType',
+                'form_type' => WorkflowTransitionType::class,
                 'display_type' => 'dialog',
                 'destination_page' => '',
                 'form_options' => [],

@@ -13,6 +13,7 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
@@ -21,7 +22,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class TranslatorTest extends \PHPUnit\Framework\TestCase
+class TranslatorTest extends TestCase
 {
     use TempDirExtension;
 
@@ -69,11 +70,8 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /** @var TranslationMessageSanitizationErrorCollection */
-    private $sanitizationErrorCollection;
-
-    /** @var MessageCatalogueSanitizer|MockObject */
-    private $messageCatalogueSanitizer;
+    private MessageCatalogueSanitizer&MockObject $messageCatalogueSanitizer;
+    private TranslationMessageSanitizationErrorCollection $sanitizationErrorCollection;
 
     #[\Override]
     protected function setUp(): void
@@ -601,8 +599,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
 
         $translator->rebuildCache();
 
-        $this->messageCatalogueSanitizer
-            ->expects($this->never())
+        $this->messageCatalogueSanitizer->expects($this->never())
             ->method('sanitizeCatalogue');
 
         self::assertTrue($translator->hasTrans('baz', $domain));

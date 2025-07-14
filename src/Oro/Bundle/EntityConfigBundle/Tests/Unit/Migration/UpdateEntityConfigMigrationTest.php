@@ -7,10 +7,11 @@ use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigration;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigrationQuery;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use PHPUnit\Framework\TestCase;
 
-class UpdateEntityConfigMigrationTest extends \PHPUnit\Framework\TestCase
+class UpdateEntityConfigMigrationTest extends TestCase
 {
-    public function testUp()
+    public function testUp(): void
     {
         $commandExecutor = $this->createMock(CommandExecutor::class);
         $schema = $this->createMock(Schema::class);

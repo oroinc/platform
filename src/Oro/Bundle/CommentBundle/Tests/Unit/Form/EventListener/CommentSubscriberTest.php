@@ -3,14 +3,14 @@
 namespace Oro\Bundle\CommentBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\CommentBundle\Form\EventListener\CommentSubscriber;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class CommentSubscriberTest extends \PHPUnit\Framework\TestCase
+class CommentSubscriberTest extends TestCase
 {
-    /** @var CommentSubscriber */
-    private $subscriber;
+    private CommentSubscriber $subscriber;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class CommentSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber = new CommentSubscriber();
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $result = $this->subscriber->getSubscribedEvents();
 
@@ -29,7 +29,7 @@ class CommentSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getTestData
      */
-    public function testPreSetData(bool $has, int $removeCount)
+    public function testPreSetData(bool $has, int $removeCount): void
     {
         $form = $this->createMock(Form::class);
         $form->expects($this->once())

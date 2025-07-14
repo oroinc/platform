@@ -7,14 +7,13 @@ use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ProcessTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
+class ProcessTriggerCronSchedulerTest extends TestCase
 {
-    /** @var DeferredScheduler|\PHPUnit\Framework\MockObject\MockObject */
-    private $deferredScheduler;
-
-    /** @var ProcessTriggerCronScheduler */
-    private $processCronScheduler;
+    private DeferredScheduler&MockObject $deferredScheduler;
+    private ProcessTriggerCronScheduler $processCronScheduler;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->processCronScheduler = new ProcessTriggerCronScheduler($this->deferredScheduler);
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $cronExpression = '* * * * *';
 
@@ -55,7 +54,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->processCronScheduler->add($trigger);
     }
 
-    public function testRemoveSchedule()
+    public function testRemoveSchedule(): void
     {
         $processDefinition = $this->createMock(ProcessDefinition::class);
         $processDefinition->expects($this->once())
@@ -80,7 +79,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->processCronScheduler->removeSchedule($trigger);
     }
 
-    public function testRemoveException()
+    public function testRemoveException(): void
     {
         $trigger = $this->createMock(ProcessTrigger::class);
         $trigger->expects($this->once())
@@ -95,7 +94,7 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->processCronScheduler->removeSchedule($trigger);
     }
 
-    public function testAddException()
+    public function testAddException(): void
     {
         $trigger = $this->createMock(ProcessTrigger::class);
         $trigger->expects($this->once())

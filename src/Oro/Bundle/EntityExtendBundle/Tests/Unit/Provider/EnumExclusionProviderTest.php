@@ -6,16 +6,15 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumExclusionProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EnumExclusionProviderTest extends \PHPUnit\Framework\TestCase
+class EnumExclusionProviderTest extends TestCase
 {
     private const ENTITY_CLASS = 'Test\Entity';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var EnumExclusionProvider */
-    private $exclusionProvider;
+    private ConfigManager&MockObject $configManager;
+    private EnumExclusionProvider $exclusionProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -25,14 +24,14 @@ class EnumExclusionProviderTest extends \PHPUnit\Framework\TestCase
         $this->exclusionProvider = new EnumExclusionProvider($this->configManager);
     }
 
-    public function testIsIgnoredEntity()
+    public function testIsIgnoredEntity(): void
     {
         $this->assertFalse(
             $this->exclusionProvider->isIgnoredEntity(self::ENTITY_CLASS)
         );
     }
 
-    public function testIsIgnoredFieldWithoutMultiEnumSnapshotSuffix()
+    public function testIsIgnoredFieldWithoutMultiEnumSnapshotSuffix(): void
     {
         $metadata = new ClassMetadata(self::ENTITY_CLASS);
 
@@ -41,7 +40,7 @@ class EnumExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsIgnoredFieldForSnapshotFieldName()
+    public function testIsIgnoredFieldForSnapshotFieldName(): void
     {
         $metadata = new ClassMetadata(self::ENTITY_CLASS);
 
@@ -50,7 +49,7 @@ class EnumExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsIgnoredFieldForNonConfigurableGuessedField()
+    public function testIsIgnoredFieldForNonConfigurableGuessedField(): void
     {
         $metadata = new ClassMetadata(self::ENTITY_CLASS);
 
@@ -64,7 +63,7 @@ class EnumExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsIgnoredFieldForNotMultiEnumSnapshot()
+    public function testIsIgnoredFieldForNotMultiEnumSnapshot(): void
     {
         $metadata = new ClassMetadata(self::ENTITY_CLASS);
 
@@ -82,7 +81,7 @@ class EnumExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsIgnoredFieldForMultiEnumSnapshot()
+    public function testIsIgnoredFieldForMultiEnumSnapshot(): void
     {
         $metadata = new ClassMetadata(self::ENTITY_CLASS);
 
@@ -100,7 +99,7 @@ class EnumExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsIgnoredRelation()
+    public function testIsIgnoredRelation(): void
     {
         $metadata = new ClassMetadata(self::ENTITY_CLASS);
 

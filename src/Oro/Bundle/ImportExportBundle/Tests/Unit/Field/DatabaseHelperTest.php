@@ -16,37 +16,24 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
+class DatabaseHelperTest extends TestCase
 {
     private const TEST_CLASS = 'stdClass';
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldHelper;
-
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipMetadataProvider;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadata;
-
-    /** @var DatabaseHelper */
-    private $helper;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private FieldHelper&MockObject $fieldHelper;
+    private OwnershipMetadataProviderInterface&MockObject $ownershipMetadataProvider;
+    private EntityManagerInterface&MockObject $entityManager;
+    private EntityRepository&MockObject $repository;
+    private ClassMetadata&MockObject $metadata;
+    private DatabaseHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -84,7 +71,7 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFind()
+    public function testFind(): void
     {
         $entity = new \stdClass();
         $identifier = 1;
@@ -100,7 +87,7 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($found, $this->helper->find(self::TEST_CLASS, $identifier));
     }
 
-    public function testFindObjectFromAnotherOrganization()
+    public function testFindObjectFromAnotherOrganization(): void
     {
         $entityOrganization = new TestOrganization();
         $entityOrganization->setId(2);
@@ -173,7 +160,7 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($entity, $this->helper->find(self::TEST_CLASS, $identifier, false));
     }
 
-    public function testGetIdentifier()
+    public function testGetIdentifier(): void
     {
         $entity = new \stdClass();
         $identifier = 1;
@@ -186,7 +173,7 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($identifier, $this->helper->getIdentifier($entity));
     }
 
-    public function testGetIdentifierFieldName()
+    public function testGetIdentifierFieldName(): void
     {
         $fieldName = 'id';
 
@@ -201,7 +188,7 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isCascadePersistDataProvider
      */
-    public function testIsCascadePersist(array $mapping, bool $isCascade)
+    public function testIsCascadePersist(array $mapping, bool $isCascade): void
     {
         $fieldName = 'relation';
 
@@ -231,7 +218,7 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testResetIdentifier()
+    public function testResetIdentifier(): void
     {
         $entity = new \stdClass();
         $fieldName = 'id';
@@ -281,7 +268,7 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getInversedRelationFieldNameDataProvider
      */
-    public function testGetInversedRelationFieldName(array $association, ?string $expectedField)
+    public function testGetInversedRelationFieldName(array $association, ?string $expectedField): void
     {
         $fieldName = 'relation';
 
@@ -314,7 +301,7 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isSingleInversedRelationDataProvider
      */
-    public function testIsSingleInversedRelation(int $type, bool $expected)
+    public function testIsSingleInversedRelation(int $type, bool $expected): void
     {
         $fieldName = 'relation';
 
@@ -336,7 +323,7 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetEntityReference()
+    public function testGetEntityReference(): void
     {
         $entity = new \stdClass();
         $reference = new \stdClass();
@@ -355,7 +342,7 @@ class DatabaseHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($reference, $this->helper->getEntityReference($entity));
     }
 
-    public function testFindOneByCacheWithoutEntity()
+    public function testFindOneByCacheWithoutEntity(): void
     {
         $query = $this->createMock(AbstractQuery::class);
         $query->expects($this->once())

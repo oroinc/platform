@@ -3,12 +3,12 @@
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineEventHandlersPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class UpdateDoctrineEventHandlersPassTest extends \PHPUnit\Framework\TestCase
+class UpdateDoctrineEventHandlersPassTest extends TestCase
 {
-    /** @var UpdateDoctrineEventHandlersPass */
-    private $compiler;
+    private UpdateDoctrineEventHandlersPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +31,7 @@ class UpdateDoctrineEventHandlersPassTest extends \PHPUnit\Framework\TestCase
         return $container;
     }
 
-    public function testSetDefaultConnectionWhenEmpty()
+    public function testSetDefaultConnectionWhenEmpty(): void
     {
         $container = $this->createContainer();
 
@@ -65,7 +65,7 @@ class UpdateDoctrineEventHandlersPassTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($listenerDef->isDeprecated());
     }
 
-    public function testSetSpecificConnectionWhenNotEmpty()
+    public function testSetSpecificConnectionWhenNotEmpty(): void
     {
         $container = $this->createContainer();
 
@@ -99,7 +99,7 @@ class UpdateDoctrineEventHandlersPassTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($listenerDef->isDeprecated());
     }
 
-    public function testMarkDeprecatedWhenDefaultConnectionIsSet()
+    public function testMarkDeprecatedWhenDefaultConnectionIsSet(): void
     {
         $container = $this->createContainer();
 

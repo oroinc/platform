@@ -10,28 +10,19 @@ use Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Filter\SchedulesByArgumentsFilterInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
+class DeferredSchedulerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var ScheduleManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $scheduleManager;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var string */
-    private $scheduleClass;
-
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $objectManager;
-
-    /** @var SchedulesByArgumentsFilterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $schedulesByArgumentsFilter;
-
-    /** @var DeferredScheduler */
-    private $deferredScheduler;
+    private ScheduleManager&MockObject $scheduleManager;
+    private ManagerRegistry&MockObject $registry;
+    private string $scheduleClass;
+    private ObjectManager&MockObject $objectManager;
+    private SchedulesByArgumentsFilterInterface&MockObject $schedulesByArgumentsFilter;
+    private DeferredScheduler $deferredScheduler;
 
     #[\Override]
     protected function setUp(): void
@@ -50,7 +41,7 @@ class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddAndFlush()
+    public function testAddAndFlush(): void
     {
         $command = 'oro:test:command';
         $cronExpression = '* * * * *';
@@ -85,7 +76,7 @@ class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->deferredScheduler->flush();
     }
 
-    public function testAddLateArgumentsResolvingAndFlush()
+    public function testAddLateArgumentsResolvingAndFlush(): void
     {
         $command = 'oro:test:command';
         $cronExpression = '* * * * *';
@@ -125,7 +116,7 @@ class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->deferredScheduler->flush();
     }
 
-    public function testRemoveScheduleAndFlush()
+    public function testRemoveScheduleAndFlush(): void
     {
         $foundMatchedSchedule = (new Schedule())->setArguments(['--arg1=string', '--arg2=42']);
         $foundNonMatchedSchedule = (new Schedule())->setArguments(['--arg2=string', '--arg2=41']);
@@ -163,7 +154,7 @@ class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->deferredScheduler->flush();
     }
 
-    public function testUnmanageableEntityException()
+    public function testUnmanageableEntityException(): void
     {
         $this->setValue($this->deferredScheduler, 'dirty', true);
 
@@ -178,7 +169,7 @@ class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->deferredScheduler->flush();
     }
 
-    public function testRemoveScheduleForCommand()
+    public function testRemoveScheduleForCommand(): void
     {
         $matchedArguments = ['--arg1=str', '--arg2=3'];
         $matchedSchedule = (new Schedule())->setArguments($matchedArguments);

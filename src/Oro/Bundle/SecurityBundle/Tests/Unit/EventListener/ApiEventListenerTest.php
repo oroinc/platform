@@ -6,26 +6,19 @@ use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
 use Oro\Bundle\SecurityBundle\EventListener\ApiEventListener;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SoapBundle\Event\FindAfter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class ApiEventListenerTest extends \PHPUnit\Framework\TestCase
+class ApiEventListenerTest extends TestCase
 {
-    /** @var RequestAuthorizationChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestAuthorizationChecker;
-
-    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclHelper;
-
-    /** @var Request */
-    private $request;
-
-    /** @var RequestStack */
-    private $requestStack;
-
-    /** @var ApiEventListener */
-    private $listener;
+    private RequestAuthorizationChecker&MockObject $requestAuthorizationChecker;
+    private AclHelper&MockObject $aclHelper;
+    private Request $request;
+    private RequestStack $requestStack;
+    private ApiEventListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -45,7 +38,7 @@ class ApiEventListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onFindAfterProvider
      */
-    public function testOnFindAfter(int $isGranted, bool $throwException)
+    public function testOnFindAfter(int $isGranted, bool $throwException): void
     {
         $this->requestStack->push($this->request);
         $object = new \stdClass();
@@ -70,7 +63,7 @@ class ApiEventListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testOnFindAfterNoRequest()
+    public function testOnFindAfterNoRequest(): void
     {
         $this->requestAuthorizationChecker->expects($this->never())
             ->method($this->anything());

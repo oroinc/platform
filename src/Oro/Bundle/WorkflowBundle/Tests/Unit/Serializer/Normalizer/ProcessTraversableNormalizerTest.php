@@ -4,15 +4,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessTraversableNormalizer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Serializer;
 
-class ProcessTraversableNormalizerTest extends \PHPUnit\Framework\TestCase
+class ProcessTraversableNormalizerTest extends TestCase
 {
-    /** @var Serializer|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializer;
-
-    /** @var ProcessTraversableNormalizer */
-    private $normalizer;
+    private Serializer&MockObject $serializer;
+    private ProcessTraversableNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void

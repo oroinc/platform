@@ -9,33 +9,24 @@ use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
 use Oro\Bundle\WindowsBundle\Twig\WindowsExtension;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Twig\Environment;
 
-class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
+class WindowsExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
     use EntityTrait;
 
-    /** @var WindowsExtension */
-    private $extension;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Environment */
-    private $environment;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WindowsStateManager */
-    private $stateManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WindowsStateManagerRegistry */
-    private $stateManagerRegistry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WindowsStateRequestManager */
-    private $requestStateManager;
-
-    /** @var FragmentHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $fragmentHandler;
+    private WindowsExtension $extension;
+    private Environment&MockObject $environment;
+    private WindowsStateManager&MockObject $stateManager;
+    private WindowsStateManagerRegistry&MockObject $stateManagerRegistry;
+    private WindowsStateRequestManager $requestStateManager;
+    private FragmentHandler&MockObject $fragmentHandler;
 
     #[\Override]
     protected function setUp(): void
@@ -57,14 +48,13 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
 
     private function createWindowState(array $data = [], ?int $id = 123): WindowsState
     {
-        /** @var WindowsState $state */
         $state = $this->getEntity(WindowsState::class, ['id' => $id]);
         $state->setData($data);
 
         return $state;
     }
 
-    public function testRenderNoUser()
+    public function testRenderNoUser(): void
     {
         $this->stateManagerRegistry->expects($this->once())
             ->method('getManager')
@@ -77,7 +67,7 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRender()
+    public function testRender(): void
     {
         $windowStateFoo = $this->createWindowState(['cleanUrl' => 'foo']);
         $windowStateBar = $this->createWindowState(['cleanUrl' => 'foo']);
@@ -115,7 +105,7 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider renderFragmentDataProvider
      */
-    public function testRenderFragment(string $cleanUrl, string $type, string $expectedUrl)
+    public function testRenderFragment(string $cleanUrl, string $type, string $expectedUrl): void
     {
         $windowState = $this->createWindowState(['cleanUrl' => $cleanUrl, 'type' => $type]);
 
@@ -161,7 +151,7 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testRenderFragmentWithNotFoundHttpException()
+    public function testRenderFragmentWithNotFoundHttpException(): void
     {
         $cleanUrl = '/foo/bar';
         $windowState = $this->createWindowState(['cleanUrl' => $cleanUrl]);
@@ -185,7 +175,7 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($windowState->isRenderedSuccessfully());
     }
 
-    public function testRenderFragmentWithGenericException()
+    public function testRenderFragmentWithGenericException(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Not caught exception.');
@@ -209,7 +199,7 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testRenderFragmentWithEmptyCleanUrl()
+    public function testRenderFragmentWithEmptyCleanUrl(): void
     {
         $windowState = $this->createWindowState();
 
@@ -230,7 +220,7 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($windowState->isRenderedSuccessfully());
     }
 
-    public function testRenderFragmentWithEmptyCleanUrlAndWithoutUser()
+    public function testRenderFragmentWithEmptyCleanUrlAndWithoutUser(): void
     {
         $windowState = $this->createWindowState();
 

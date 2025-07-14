@@ -10,20 +10,16 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class OwnershipQueryHelperTest extends OrmTestCase
 {
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipMetadataProvider;
-
-    /** @var OwnershipQueryHelper */
-    private $ownershipQueryHelper;
+    private EntityManagerInterface $em;
+    private OwnershipMetadataProviderInterface&MockObject $ownershipMetadataProvider;
+    private OwnershipQueryHelper $ownershipQueryHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -66,7 +62,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         return $metadata;
     }
 
-    public function testNoIdFieldInSelect()
+    public function testNoIdFieldInSelect(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 
@@ -89,7 +85,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         );
     }
 
-    public function testIdFieldWithExprInSelect()
+    public function testIdFieldWithExprInSelect(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 
@@ -112,7 +108,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         );
     }
 
-    public function testIdFieldWithFunctionInSelect()
+    public function testIdFieldWithFunctionInSelect(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 
@@ -135,7 +131,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         );
     }
 
-    public function testIdWithoutAliasInSelect()
+    public function testIdWithoutAliasInSelect(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 
@@ -164,7 +160,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         );
     }
 
-    public function testIdWithAliasInSelect()
+    public function testIdWithAliasInSelect(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 
@@ -193,7 +189,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         );
     }
 
-    public function testIdWithoutAliasAsFirstFieldInSelect()
+    public function testIdWithoutAliasAsFirstFieldInSelect(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 
@@ -222,7 +218,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         );
     }
 
-    public function testIdWithAliasAsFirstFieldInSelect()
+    public function testIdWithAliasAsFirstFieldInSelect(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 
@@ -251,7 +247,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         );
     }
 
-    public function testIdWithoutAliasAsLastFieldInSelect()
+    public function testIdWithoutAliasAsLastFieldInSelect(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 
@@ -280,7 +276,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         );
     }
 
-    public function testIdWithAliasAsLastFieldInSelect()
+    public function testIdWithAliasAsLastFieldInSelect(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 
@@ -309,7 +305,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         );
     }
 
-    public function testIdWithoutAliasAsMiddleFieldInSelect()
+    public function testIdWithoutAliasAsMiddleFieldInSelect(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 
@@ -338,7 +334,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         );
     }
 
-    public function testIdWithAliasAsMiddleFieldInSelect()
+    public function testIdWithAliasAsMiddleFieldInSelect(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 
@@ -367,7 +363,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         );
     }
 
-    public function testFieldStartsWithIdStringAsFirstFieldInSelect()
+    public function testFieldStartsWithIdStringAsFirstFieldInSelect(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 
@@ -396,7 +392,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         );
     }
 
-    public function testFieldStartsWithIdStringAsLastFieldInSelect()
+    public function testFieldStartsWithIdStringAsLastFieldInSelect(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 
@@ -419,7 +415,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         );
     }
 
-    public function testFieldStartsWithIdStringAsMiddleFieldInSelect()
+    public function testFieldStartsWithIdStringAsMiddleFieldInSelect(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 
@@ -448,7 +444,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         );
     }
 
-    public function testIdWithAliasInSelectWhenAsIsLowercase()
+    public function testIdWithAliasInSelectWhenAsIsLowercase(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 
@@ -477,7 +473,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         );
     }
 
-    public function testNoOwnerField()
+    public function testNoOwnerField(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 
@@ -505,7 +501,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         );
     }
 
-    public function testNoOrganizationField()
+    public function testNoOrganizationField(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 
@@ -533,7 +529,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         );
     }
 
-    public function testEntityWithoutOwnership()
+    public function testEntityWithoutOwnership(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 
@@ -557,7 +553,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         );
     }
 
-    public function testOwnershipFieldsAlreadyExistInSelect()
+    public function testOwnershipFieldsAlreadyExistInSelect(): void
     {
         $entityClass = Entity\TestOwnershipEntity::class;
 

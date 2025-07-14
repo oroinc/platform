@@ -12,20 +12,17 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityAliasProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
+class ExtendEntityAliasProviderTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var DuplicateEntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $duplicateResolver;
-
-    /** @var ExtendEntityAliasProvider */
-    private $entityAliasProvider;
+    private ConfigManager&MockObject $configManager;
+    private DuplicateEntityAliasResolver&MockObject $duplicateResolver;
+    private ExtendEntityAliasProvider $entityAliasProvider;
 
     #[\Override]
     protected function setUp(): void

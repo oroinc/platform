@@ -7,10 +7,11 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
+use PHPUnit\Framework\TestCase;
 
-class PreFlushConfigEventTest extends \PHPUnit\Framework\TestCase
+class PreFlushConfigEventTest extends TestCase
 {
-    public function testEvent()
+    public function testEvent(): void
     {
         $config1 = $this->createMock(ConfigInterface::class);
         $config2 = $this->createMock(ConfigInterface::class);
@@ -27,7 +28,7 @@ class PreFlushConfigEventTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($event->getConfig('another_scope'));
     }
 
-    public function testGetClass()
+    public function testGetClass(): void
     {
         $config1 = $this->createMock(ConfigInterface::class);
         $config2 = $this->createMock(ConfigInterface::class);
@@ -53,7 +54,7 @@ class PreFlushConfigEventTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isFieldConfigDataProvider
      */
-    public function testIsFieldConfig(EntityConfigId|FieldConfigId $configId, bool $expectedResult)
+    public function testIsFieldConfig(EntityConfigId|FieldConfigId $configId, bool $expectedResult): void
     {
         $config1 = $this->createMock(ConfigInterface::class);
         $config2 = $this->createMock(ConfigInterface::class);
@@ -85,7 +86,7 @@ class PreFlushConfigEventTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isEntityConfigDataProvider
      */
-    public function testIsEntityConfig(EntityConfigId|FieldConfigId $configId, bool $expectedResult)
+    public function testIsEntityConfig(EntityConfigId|FieldConfigId $configId, bool $expectedResult): void
     {
         $config1 = $this->createMock(ConfigInterface::class);
         $config2 = $this->createMock(ConfigInterface::class);

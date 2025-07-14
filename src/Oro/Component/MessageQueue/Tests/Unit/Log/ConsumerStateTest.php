@@ -6,8 +6,9 @@ use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
+use PHPUnit\Framework\TestCase;
 
-class ConsumerStateTest extends \PHPUnit\Framework\TestCase
+class ConsumerStateTest extends TestCase
 {
     public function testInitialState(): void
     {

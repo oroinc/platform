@@ -6,16 +6,15 @@ use Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler;
 use Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TransitionTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
+class TransitionTriggerCronSchedulerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var TransitionTriggerCronScheduler */
-    private $scheduler;
-
-    /** @var DeferredScheduler|\PHPUnit\Framework\MockObject\MockObject */
-    private $deferredScheduler;
+    private TransitionTriggerCronScheduler $scheduler;
+    private DeferredScheduler&MockObject $deferredScheduler;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class TransitionTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->scheduler = new TransitionTriggerCronScheduler($this->deferredScheduler);
     }
 
-    public function testAddSchedule()
+    public function testAddSchedule(): void
     {
         $cronTrigger = $this->createTrigger(['cron' => '* * * * *', 'id' => 42]);
 
@@ -60,7 +59,7 @@ class TransitionTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
         return $trigger;
     }
 
-    public function testRemoveSchedule()
+    public function testRemoveSchedule(): void
     {
         $cronTrigger = $this->createTrigger(['cron' => '* * * * *', 'id' => 42]);
 
@@ -74,7 +73,7 @@ class TransitionTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->scheduler->removeSchedule($cronTrigger);
     }
 
-    public function testFlush()
+    public function testFlush(): void
     {
         $this->deferredScheduler->expects($this->once())
             ->method('flush');

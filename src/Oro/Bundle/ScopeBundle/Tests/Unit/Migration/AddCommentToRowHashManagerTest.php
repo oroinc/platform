@@ -12,8 +12,9 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ScopeBundle\Migration\AddCommentToRowHashManager;
+use PHPUnit\Framework\TestCase;
 
-class AddCommentToRowHashManagerTest extends \PHPUnit\Framework\TestCase
+class AddCommentToRowHashManagerTest extends TestCase
 {
     private function getManager(EntityManagerInterface $em): AddCommentToRowHashManager
     {

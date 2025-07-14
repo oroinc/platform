@@ -12,12 +12,9 @@ use PHPUnit\Framework\TestCase;
 
 class TemplateDataFactoryTest extends TestCase
 {
-    private TemplateRendererConfigProviderInterface|MockObject $templateRendererConfigProvider;
-
-    private EntityVariableComputer|MockObject $entityVariableComputer;
-
-    private EntityDataAccessor|MockObject $entityDataAccessor;
-
+    private TemplateRendererConfigProviderInterface&MockObject $templateRendererConfigProvider;
+    private EntityVariableComputer&MockObject $entityVariableComputer;
+    private EntityDataAccessor&MockObject $entityDataAccessor;
     private TemplateDataFactory $factory;
 
     #[\Override]
@@ -38,8 +35,7 @@ class TemplateDataFactoryTest extends TestCase
     {
         $systemVars = ['system_key' => 'system_value'];
         $templateParams = ['sample_key' => 'sample_value', 'system' => $systemVars];
-        $this->templateRendererConfigProvider
-            ->expects(self::once())
+        $this->templateRendererConfigProvider->expects(self::once())
             ->method('getSystemVariableValues')
             ->willReturn($systemVars);
 

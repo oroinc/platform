@@ -9,16 +9,15 @@ use Oro\Component\Action\Exception\ActionException;
 use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class CreateEntityTest extends \PHPUnit\Framework\TestCase
+class CreateEntityTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var CreateEntity */
-    private $action;
+    private ManagerRegistry&MockObject $registry;
+    private CreateEntity $action;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +31,7 @@ class CreateEntityTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeDataProvider
      */
-    public function testExecute(array $options)
+    public function testExecute(array $options): void
     {
         $em = $this->createMock(ObjectManager::class);
         $em->expects($this->once())
@@ -96,7 +95,7 @@ class CreateEntityTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testExecuteEntityNotManageable()
+    public function testExecuteEntityNotManageable(): void
     {
         $this->expectException(NotManageableEntityException::class);
         $this->expectExceptionMessage(sprintf('Entity class "%s" is not manageable.', \stdClass::class));
@@ -110,7 +109,7 @@ class CreateEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    public function testExecuteCantCreateEntity()
+    public function testExecuteCantCreateEntity(): void
     {
         $this->expectException(ActionException::class);
         $this->expectExceptionMessage(sprintf("Can't create entity %s. Test exception.", \stdClass::class));

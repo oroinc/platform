@@ -11,9 +11,9 @@ use PHPUnit\Framework\TestCase;
 
 class OrmTranslationLoaderTest extends TestCase
 {
+    private Registry&MockObject $registry;
+    private TranslationRepository&MockObject $repository;
     private OrmTranslationLoader $loader;
-    private Registry|MockObject $registry;
-    private TranslationRepository|MockObject $repository;
 
     #[\Override]
     protected function setUp(): void
@@ -30,14 +30,12 @@ class OrmTranslationLoaderTest extends TestCase
         ?string $domain,
         array $expectedResult
     ): void {
-        $this->registry
-            ->expects(self::once())
+        $this->registry->expects(self::once())
             ->method('getRepository')
             ->with(Translation::class)
             ->willReturn($this->repository);
 
-        $this->repository
-            ->expects(self::once())
+        $this->repository->expects(self::once())
             ->method('findDomainTranslations')
             ->willReturn($translationsData);
 

@@ -6,20 +6,15 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\SyncBundle\EventListener\MaintenanceListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
+class MaintenanceListenerTest extends TestCase
 {
-    /** @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $websocketClient;
-
-    /** @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $connectionChecker;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var MaintenanceListener */
-    private $publisher;
+    private WebsocketClientInterface&MockObject $websocketClient;
+    private ConnectionChecker&MockObject $connectionChecker;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private MaintenanceListener $publisher;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +30,7 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnModeOn()
+    public function testOnModeOn(): void
     {
         $expectedUserId = 0;
 
@@ -53,7 +48,7 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
         $this->publisher->onModeOn();
     }
 
-    public function testOnModeOnNoConnection()
+    public function testOnModeOnNoConnection(): void
     {
         $this->connectionChecker->expects(self::once())
             ->method('checkConnection')
@@ -68,7 +63,7 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
         $this->publisher->onModeOn();
     }
 
-    public function testOnModeOff()
+    public function testOnModeOff(): void
     {
         $expectedUserId = 42;
 
@@ -86,7 +81,7 @@ class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
         $this->publisher->onModeOff();
     }
 
-    public function testOnModeOffNoConnection()
+    public function testOnModeOffNoConnection(): void
     {
         $this->connectionChecker->expects(self::once())
             ->method('checkConnection')

@@ -3,19 +3,14 @@
 namespace Oro\Bundle\CacheBundle\Tests\Unit\Generator;
 
 use Oro\Bundle\CacheBundle\Generator\ObjectCacheDataSerializer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class ObjectCacheDataSerializerTest extends \PHPUnit\Framework\TestCase
+class ObjectCacheDataSerializerTest extends TestCase
 {
-    /**
-     * @var SerializerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $serializer;
-
-    /**
-     * @var ObjectCacheDataSerializer
-     */
-    private $dataSerializer;
+    private SerializerInterface&MockObject $serializer;
+    private ObjectCacheDataSerializer $dataSerializer;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +19,7 @@ class ObjectCacheDataSerializerTest extends \PHPUnit\Framework\TestCase
         $this->dataSerializer = new ObjectCacheDataSerializer($this->serializer);
     }
 
-    public function testConvertToString()
+    public function testConvertToString(): void
     {
         $object = new \stdClass();
         $scope = 'someScope';

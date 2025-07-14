@@ -11,20 +11,15 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ActivityListEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
+class ActivityListEntityConfigDumperExtensionTest extends TestCase
 {
-    /** @var ActivityListChainProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $listProvider;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var AssociationBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $associationBuilder;
-
-    /** @var ActivityListEntityConfigDumperExtension */
-    private $extension;
+    private ActivityListChainProvider&MockObject $listProvider;
+    private ConfigManager&MockObject $configManager;
+    private AssociationBuilder&MockObject $associationBuilder;
+    private ActivityListEntityConfigDumperExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -40,12 +35,12 @@ class ActivityListEntityConfigDumperExtensionTest extends \PHPUnit\Framework\Tes
         );
     }
 
-    public function testBadActionSupports()
+    public function testBadActionSupports(): void
     {
         $this->assertFalse($this->extension->supports(ExtendConfigDumper::ACTION_POST_UPDATE));
     }
 
-    public function testEmptyTargetsSupports()
+    public function testEmptyTargetsSupports(): void
     {
         $provider = $this->createMock(ConfigProvider::class);
         $provider->expects($this->once())
@@ -59,7 +54,7 @@ class ActivityListEntityConfigDumperExtensionTest extends \PHPUnit\Framework\Tes
         $this->assertFalse($this->extension->supports(ExtendConfigDumper::ACTION_PRE_UPDATE));
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $configId = new EntityConfigId('extend', 'Acme\TestBundle\Entity\TestEntity');
         $config = new Config($configId);
@@ -86,7 +81,7 @@ class ActivityListEntityConfigDumperExtensionTest extends \PHPUnit\Framework\Tes
         $this->assertTrue($this->extension->supports(ExtendConfigDumper::ACTION_PRE_UPDATE));
     }
 
-    public function testPreUpdate()
+    public function testPreUpdate(): void
     {
         $configId = new EntityConfigId('extend', 'Acme\TestBundle\Entity\TestEntity');
         $config = new Config($configId);

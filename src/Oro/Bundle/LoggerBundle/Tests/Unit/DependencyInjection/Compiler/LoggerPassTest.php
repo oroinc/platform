@@ -3,9 +3,10 @@
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\LoggerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class LoggerPassTest extends \PHPUnit\Framework\TestCase
+class LoggerPassTest extends TestCase
 {
     public function testAlwaysSetPublicAlias(): void
     {

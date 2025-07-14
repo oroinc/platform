@@ -13,13 +13,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ThemeConfigurationHandlerTest extends TestCase
 {
+    private FormInterface&MockObject $form;
+    private ManagerRegistry&MockObject $registry;
+    private ObjectManager&MockObject $manager;
     private ThemeConfigurationHandler $handler;
-
-    private FormInterface|MockObject $form;
-
-    private ManagerRegistry|MockObject $registry;
-
-    private ObjectManager|MockObject $manager;
 
     #[\Override]
     public function setUp(): void
@@ -70,8 +67,7 @@ class ThemeConfigurationHandlerTest extends TestCase
             ->method('isValid')
             ->willReturn(true);
 
-        $this->registry
-            ->expects(self::once())
+        $this->registry->expects(self::once())
             ->method('getManagerForClass')
             ->with(ThemeConfiguration::class)
             ->willReturn($this->manager);

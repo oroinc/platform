@@ -4,11 +4,13 @@ namespace Oro\Component\Config\Tests\Unit\Resource;
 
 use Oro\Component\Config\Resource\SelfCheckingResourceChecker;
 use Oro\Component\Config\Tests\Unit\Fixtures\ResourceStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\SelfCheckingResourceChecker as SymfonySelfCheckingResourceChecker;
 
-class SelfCheckingResourceCheckerTest extends \PHPUnit\Framework\TestCase
+class SelfCheckingResourceCheckerTest extends TestCase
 {
-    private SymfonySelfCheckingResourceChecker|\PHPUnit\Framework\MockObject\MockObject $innerResourceChecker;
+    private SymfonySelfCheckingResourceChecker&MockObject $innerResourceChecker;
 
     #[\Override]
     protected function setUp(): void

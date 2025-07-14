@@ -11,26 +11,17 @@ use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\TagBundle\EventListener\TagSearchResultsGridListener;
 use Oro\Bundle\TagBundle\Security\SecurityProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TagSearchResultsGridListenerTest extends \PHPUnit\Framework\TestCase
+class TagSearchResultsGridListenerTest extends TestCase
 {
-    /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
-    private $parameters;
-
-    /** @var SecurityProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $securityProvider;
-
-    /** @var BuildAfter|\PHPUnit\Framework\MockObject\MockObject */
-    private $event;
-
-    /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagrid;
-
-    /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityAliasResolver;
-
-    /** @var TagSearchResultsGridListener */
-    private $listener;
+    private ParameterBag&MockObject $parameters;
+    private SecurityProvider&MockObject $securityProvider;
+    private BuildAfter&MockObject $event;
+    private DatagridInterface&MockObject $datagrid;
+    private EntityAliasResolver&MockObject $entityAliasResolver;
+    private TagSearchResultsGridListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -55,7 +46,7 @@ class TagSearchResultsGridListenerTest extends \PHPUnit\Framework\TestCase
         string $alias,
         ?string $entityClass = null,
         ?EntityAliasNotFoundException $exception = null
-    ) {
+    ): void {
         $this->event->expects($this->once())
             ->method('getDatagrid')
             ->willReturn($this->datagrid);

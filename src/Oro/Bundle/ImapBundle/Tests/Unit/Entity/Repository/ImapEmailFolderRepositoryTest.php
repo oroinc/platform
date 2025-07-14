@@ -20,7 +20,7 @@ class ImapEmailFolderRepositoryTest extends OrmTestCase
         $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
     }
 
-    public function testGetFoldersByOriginQueryBuilder()
+    public function testGetFoldersByOriginQueryBuilder(): void
     {
         $origin = new UserEmailOrigin();
 
@@ -39,7 +39,7 @@ class ImapEmailFolderRepositoryTest extends OrmTestCase
         $this->assertSame($origin, $query->getParameter('origin')->getValue());
     }
 
-    public function testGetFoldersByOriginQueryBuilderWithOutdated()
+    public function testGetFoldersByOriginQueryBuilderWithOutdated(): void
     {
         $origin = new UserEmailOrigin();
 
@@ -58,7 +58,7 @@ class ImapEmailFolderRepositoryTest extends OrmTestCase
         $this->assertSame($origin, $query->getParameter('origin')->getValue());
     }
 
-    public function testGetEmptyOutdatedFoldersByOriginQueryBuilder()
+    public function testGetEmptyOutdatedFoldersByOriginQueryBuilder(): void
     {
         $origin = new UserEmailOrigin();
 

@@ -3,25 +3,26 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
 use Oro\Component\MessageQueue\Client\Message;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MessageTest extends \PHPUnit\Framework\TestCase
+class MessageTest extends TestCase
 {
-    public function testCouldBeConstructedWithoutAnyArguments()
+    public function testCouldBeConstructedWithoutAnyArguments(): void
     {
         new Message();
     }
 
-    public function testCouldBeSetBodyAndPriorityViaConstructor()
+    public function testCouldBeSetBodyAndPriorityViaConstructor(): void
     {
         $message = new Message('theBody', 'thePriority');
         self::assertEquals('theBody', $message->getBody());
         self::assertEquals('thePriority', $message->getPriority());
     }
 
-    public function testShouldAllowGetPreviouslySetBody()
+    public function testShouldAllowGetPreviouslySetBody(): void
     {
         $message = new Message();
 
@@ -30,7 +31,7 @@ class MessageTest extends \PHPUnit\Framework\TestCase
         self::assertSame('theBody', $message->getBody());
     }
 
-    public function testShouldAllowGetPreviouslySetContentType()
+    public function testShouldAllowGetPreviouslySetContentType(): void
     {
         $message = new Message();
 
@@ -39,7 +40,7 @@ class MessageTest extends \PHPUnit\Framework\TestCase
         self::assertSame('theContentType', $message->getContentType());
     }
 
-    public function testShouldAllowGetPreviouslySetDelay()
+    public function testShouldAllowGetPreviouslySetDelay(): void
     {
         $message = new Message();
 
@@ -48,7 +49,7 @@ class MessageTest extends \PHPUnit\Framework\TestCase
         self::assertSame('theDelay', $message->getDelay());
     }
 
-    public function testShouldAllowGetPreviouslySetExpire()
+    public function testShouldAllowGetPreviouslySetExpire(): void
     {
         $message = new Message();
 
@@ -57,7 +58,7 @@ class MessageTest extends \PHPUnit\Framework\TestCase
         self::assertSame('theExpire', $message->getExpire());
     }
 
-    public function testShouldAllowGetPreviouslySetPriority()
+    public function testShouldAllowGetPreviouslySetPriority(): void
     {
         $message = new Message();
 
@@ -66,7 +67,7 @@ class MessageTest extends \PHPUnit\Framework\TestCase
         self::assertSame('thePriority', $message->getPriority());
     }
 
-    public function testShouldAllowGetPreviouslySetMessageId()
+    public function testShouldAllowGetPreviouslySetMessageId(): void
     {
         $message = new Message();
 
@@ -75,7 +76,7 @@ class MessageTest extends \PHPUnit\Framework\TestCase
         self::assertSame('theMessageId', $message->getMessageId());
     }
 
-    public function testShouldAllowGetPreviouslySetTimestamp()
+    public function testShouldAllowGetPreviouslySetTimestamp(): void
     {
         $message = new Message();
 
@@ -84,14 +85,14 @@ class MessageTest extends \PHPUnit\Framework\TestCase
         self::assertSame('theTimestamp', $message->getTimestamp());
     }
 
-    public function testShouldSetEmptyArrayAsDefaultHeadersInConstructor()
+    public function testShouldSetEmptyArrayAsDefaultHeadersInConstructor(): void
     {
         $message = new Message();
 
         self::assertSame([], $message->getHeaders());
     }
 
-    public function testShouldAllowGetPreviouslySetHeaders()
+    public function testShouldAllowGetPreviouslySetHeaders(): void
     {
         $message = new Message();
 
@@ -100,7 +101,7 @@ class MessageTest extends \PHPUnit\Framework\TestCase
         self::assertSame(['foo' => 'fooVal'], $message->getHeaders());
     }
 
-    public function testShouldAllowGetPreviouslySetHeader()
+    public function testShouldAllowGetPreviouslySetHeader(): void
     {
         $message = new Message();
 
@@ -109,21 +110,21 @@ class MessageTest extends \PHPUnit\Framework\TestCase
         self::assertSame('fooVal', $message->getHeader('foo'));
     }
 
-    public function testShouldReturnDefaultIfHeaderNotSet()
+    public function testShouldReturnDefaultIfHeaderNotSet(): void
     {
         $message = new Message();
 
         self::assertSame('theDefault', $message->getHeader('foo', 'theDefault'));
     }
 
-    public function testShouldSetEmptyArrayAsDefaultPropertiesInConstructor()
+    public function testShouldSetEmptyArrayAsDefaultPropertiesInConstructor(): void
     {
         $message = new Message();
 
         self::assertSame([], $message->getProperties());
     }
 
-    public function testShouldAllowGetPreviouslySetProperties()
+    public function testShouldAllowGetPreviouslySetProperties(): void
     {
         $message = new Message();
 
@@ -132,7 +133,7 @@ class MessageTest extends \PHPUnit\Framework\TestCase
         self::assertSame(['foo' => 'fooVal'], $message->getProperties());
     }
 
-    public function testShouldAllowGetPreviouslySetProperty()
+    public function testShouldAllowGetPreviouslySetProperty(): void
     {
         $message = new Message();
 
@@ -141,7 +142,7 @@ class MessageTest extends \PHPUnit\Framework\TestCase
         self::assertSame('fooVal', $message->getProperty('foo'));
     }
 
-    public function testShouldReturnDefaultIfPropertyNotSet()
+    public function testShouldReturnDefaultIfPropertyNotSet(): void
     {
         $message = new Message();
 

@@ -5,13 +5,14 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Entity;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\GridViewUser;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class GridViewUserTest extends \PHPUnit\Framework\TestCase
+class GridViewUserTest extends TestCase
 {
     /**
      * @dataProvider provider
      */
-    public function testSettersAndGetters(string $property, mixed $value)
+    public function testSettersAndGetters(string $property, mixed $value): void
     {
         $gridView = new GridViewUser();
 

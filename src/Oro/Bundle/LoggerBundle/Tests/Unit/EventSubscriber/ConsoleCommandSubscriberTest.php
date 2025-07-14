@@ -6,6 +6,8 @@ use Monolog\Logger;
 use Oro\Bundle\LoggerBundle\EventSubscriber\ConsoleCommandSubscriber;
 use Oro\Component\Testing\Unit\Command\Stub\InputStub;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -13,11 +15,10 @@ use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ConsoleCommandSubscriberTest extends \PHPUnit\Framework\TestCase
+class ConsoleCommandSubscriberTest extends TestCase
 {
+    private Logger&MockObject $logger;
     private ConsoleCommandSubscriber $subscriber;
-
-    private Logger|\PHPUnit\Framework\MockObject\MockObject $logger;
 
     #[\Override]
     protected function setUp(): void
@@ -92,7 +93,7 @@ class ConsoleCommandSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $exception = new \Exception('exception message', 3);
 
-        $event  = new ConsoleErrorEvent($input, new OutputStub(), $exception, new Command('test:command'));
+        $event = new ConsoleErrorEvent($input, new OutputStub(), $exception, new Command('test:command'));
 
         $context = ['exit_code' => 3, 'exception' => $exception];
 

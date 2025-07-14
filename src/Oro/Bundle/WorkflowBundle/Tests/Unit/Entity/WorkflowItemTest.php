@@ -15,15 +15,15 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class WorkflowItemTest extends \PHPUnit\Framework\TestCase
+class WorkflowItemTest extends TestCase
 {
-    /** @var WorkflowItem */
-    private $workflowItem;
+    private WorkflowItem $workflowItem;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +31,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->workflowItem = new WorkflowItem();
     }
 
-    public function testId()
+    public function testId(): void
     {
         self::assertNull($this->workflowItem->getId());
         $value = 1;
@@ -39,7 +39,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($value, $this->workflowItem->getId());
     }
 
-    public function testMerge()
+    public function testMerge(): void
     {
         $object = (object)['prop1' => 'val1'];
 
@@ -60,7 +60,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($object, $dest->getResult()->get('obj'));
     }
 
-    public function testWorkflowName()
+    public function testWorkflowName(): void
     {
         self::assertNull($this->workflowItem->getWorkflowName());
         $value = 'example_workflow';
@@ -68,7 +68,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($value, $this->workflowItem->getWorkflowName());
     }
 
-    public function testCurrentStepName()
+    public function testCurrentStepName(): void
     {
         self::assertNull($this->workflowItem->getCurrentStep());
         $value = $this->createMock(WorkflowStep::class);
@@ -76,7 +76,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($value, $this->workflowItem->getCurrentStep());
     }
 
-    public function testSetCurrentStepForLockedWorkflowItem()
+    public function testSetCurrentStepForLockedWorkflowItem(): void
     {
         $this->workflowItem->lock();
         $value = $this->createMock(WorkflowStep::class);
@@ -87,7 +87,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->workflowItem->setCurrentStep($value);
     }
 
-    public function testData()
+    public function testData(): void
     {
         $this->assertInstanceOf(WorkflowData::class, $this->workflowItem->getData());
 
@@ -98,7 +98,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($data, $this->workflowItem->getData());
     }
 
-    public function testGetDataWithSerialization()
+    public function testGetDataWithSerialization(): void
     {
         $definition = $this->createMock(WorkflowDefinition::class);
         $definition->expects(self::once())
@@ -129,7 +129,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($data, $workflowItem->getData());
     }
 
-    public function testGetDataWithSerializationFails()
+    public function testGetDataWithSerializationFails(): void
     {
         $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage('Cannot deserialize data of workflow item. Serializer is not available.');
@@ -142,7 +142,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $workflowItem->getData();
     }
 
-    public function testGetDataWithWithEmptySerializedData()
+    public function testGetDataWithWithEmptySerializedData(): void
     {
         $workflowItem = $this->getMockBuilder(WorkflowItem::class)
             ->disableOriginalConstructor()
@@ -154,7 +154,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($data->isEmpty());
     }
 
-    public function testSetSerializedData()
+    public function testSetSerializedData(): void
     {
         self::assertEmpty($this->workflowItem->getSerializedData());
         $data = 'serialized_data';
@@ -162,7 +162,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($data, $this->workflowItem->getSerializedData());
     }
 
-    public function testGetSerializedData()
+    public function testGetSerializedData(): void
     {
         self::assertNull($this->workflowItem->getSerializedData());
         $data = 'serialized_data';
@@ -170,7 +170,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($data, $this->workflowItem->getSerializedData());
     }
 
-    public function testGetResult()
+    public function testGetResult(): void
     {
         self::assertInstanceOf(WorkflowResult::class, $this->workflowItem->getResult());
         self::assertTrue($this->workflowItem->getResult()->isEmpty());
@@ -179,14 +179,14 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
     /**
      * @depends testGetResult
      */
-    public function testGetResultUnserialized()
+    public function testGetResultUnserialized(): void
     {
         ReflectionUtil::setPropertyValue($this->workflowItem, 'result', null);
         $this->assertInstanceOf(WorkflowResult::class, $this->workflowItem->getResult());
         $this->assertTrue($this->workflowItem->getResult()->isEmpty());
     }
 
-    public function testDefinition()
+    public function testDefinition(): void
     {
         $this->assertNull($this->workflowItem->getDefinition());
         $value = new WorkflowDefinition();
@@ -194,7 +194,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->workflowItem->getDefinition());
     }
 
-    public function testCreatedAtAndPrePersist()
+    public function testCreatedAtAndPrePersist(): void
     {
         $this->assertNull($this->workflowItem->getCreated());
         $this->workflowItem->prePersist();
@@ -203,7 +203,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsWithDelta(time(), $this->workflowItem->getCreated()->getTimestamp(), 5);
     }
 
-    public function testUpdatedAndPreUpdate()
+    public function testUpdatedAndPreUpdate(): void
     {
         $this->assertNull($this->workflowItem->getUpdated());
         $this->workflowItem->preUpdate();
@@ -212,7 +212,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsWithDelta(time(), $this->workflowItem->getUpdated()->getTimestamp(), 5);
     }
 
-    public function testGetAddTransitionRecords()
+    public function testGetAddTransitionRecords(): void
     {
         $this->assertEmpty($this->workflowItem->getTransitionRecords()->getValues());
 
@@ -224,14 +224,14 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->workflowItem, $transitionRecord->getWorkflowItem());
     }
 
-    public function testEntity()
+    public function testEntity(): void
     {
         $entity = new \stdClass();
         $this->assertSame($this->workflowItem, $this->workflowItem->setEntity($entity));
         $this->assertEquals($entity, $this->workflowItem->getEntity());
     }
 
-    public function testSetEntityException()
+    public function testSetEntityException(): void
     {
         $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage('Workflow item entity can not be changed');
@@ -240,14 +240,14 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->workflowItem->setEntity(new \stdClass());
     }
 
-    public function testEntityId()
+    public function testEntityId(): void
     {
         $entityId = 1;
         $this->assertSame($this->workflowItem, $this->workflowItem->setEntityId($entityId));
         $this->assertEquals($entityId, $this->workflowItem->getEntityId());
     }
 
-    public function testSetEntityIdException()
+    public function testSetEntityIdException(): void
     {
         $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage('Workflow item entity ID can not be changed');
@@ -256,7 +256,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->workflowItem->setEntityId(2);
     }
 
-    public function testSetGetAclIdentities()
+    public function testSetGetAclIdentities(): void
     {
         $firstStep = new WorkflowStep();
         $firstStep->setName('first_step');
@@ -300,7 +300,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($this->workflowItem->getAclIdentities()->toArray());
     }
 
-    public function testSetGetRestrictionIdentities()
+    public function testSetGetRestrictionIdentities(): void
     {
         $firstStep = new WorkflowStep();
         $firstStep->setName('first_step');
@@ -344,14 +344,14 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($this->workflowItem->getRestrictionIdentities()->toArray());
     }
 
-    public function testEntityClass()
+    public function testEntityClass(): void
     {
         $entityClass = new \stdClass();
         $this->assertSame($this->workflowItem, $this->workflowItem->setEntityClass($entityClass));
         $this->assertEquals(get_class($entityClass), $this->workflowItem->getEntityClass());
     }
 
-    public function testSetEntityClassException()
+    public function testSetEntityClassException(): void
     {
         $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage('Workflow item entity CLASS can not be changed');
@@ -360,14 +360,14 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         $this->workflowItem->setEntityClass('test');
     }
 
-    public function testSetRedirectUrl()
+    public function testSetRedirectUrl(): void
     {
         $this->workflowItem->setRedirectUrl('test_url');
 
         $this->assertEquals('test_url', $this->workflowItem->getResult()->get('redirectUrl'));
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $step = new WorkflowStep();
         $step->setName('test_step');

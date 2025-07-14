@@ -9,21 +9,16 @@ use Oro\Bundle\ReminderBundle\Event\SendReminderEmailEvent;
 use Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor;
 use Oro\Bundle\ReminderBundle\Model\Email\TemplateEmailNotification;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class EmailSendProcessorTest extends \PHPUnit\Framework\TestCase
+class EmailSendProcessorTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EmailNotificationManager */
-    private $emailNotificationManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TemplateEmailNotification */
-    private $emailNotification;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcher */
-    private $eventDispatcher;
-
-    /** @var EmailSendProcessor */
-    private $processor;
+    private EmailNotificationManager&MockObject $emailNotificationManager;
+    private TemplateEmailNotification&MockObject $emailNotification;
+    private EventDispatcher&MockObject $eventDispatcher;
+    private EmailSendProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +34,7 @@ class EmailSendProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPush()
+    public function testPush(): void
     {
         $fooReminder = $this->createMock(Reminder::class);
         $barReminder = $this->createMock(Reminder::class);
@@ -53,7 +48,7 @@ class EmailSendProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $fooReminder = $this->createMock(Reminder::class);
         $barReminder = $this->createMock(Reminder::class);
@@ -90,7 +85,7 @@ class EmailSendProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process();
     }
 
-    public function testProcessFailed()
+    public function testProcessFailed(): void
     {
         $fooReminder = $this->createMock(Reminder::class);
 
@@ -118,7 +113,7 @@ class EmailSendProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process();
     }
 
-    public function testGetLabel()
+    public function testGetLabel(): void
     {
         $this->assertEquals(
             'oro.reminder.processor.email.label',

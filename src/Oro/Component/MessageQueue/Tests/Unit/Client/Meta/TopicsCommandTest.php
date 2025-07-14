@@ -8,16 +8,15 @@ use Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry;
 use Oro\Component\MessageQueue\Client\Meta\TopicsCommand;
 use Oro\Component\MessageQueue\Tests\Unit\Stub\TopicStub;
 use Oro\Component\MessageQueue\Topic\TopicRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class TopicsCommandTest extends \PHPUnit\Framework\TestCase
+class TopicsCommandTest extends TestCase
 {
-    private TopicRegistry|\PHPUnit\Framework\MockObject\MockObject $topicRegistry;
-
-    private TopicMetaRegistry|\PHPUnit\Framework\MockObject\MockObject $topicMetaRegistry;
-
-    private TopicDescriptionProvider|\PHPUnit\Framework\MockObject\MockObject $topicDescriptionProvider;
-
+    private TopicRegistry&MockObject $topicRegistry;
+    private TopicMetaRegistry&MockObject $topicMetaRegistry;
+    private TopicDescriptionProvider&MockObject $topicDescriptionProvider;
     private TopicsCommand $command;
 
     #[\Override]
@@ -56,8 +55,7 @@ class TopicsCommandTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->topicRegistry
-            ->expects(self::exactly(2))
+        $this->topicRegistry->expects(self::exactly(2))
             ->method('get')
             ->willReturn(new TopicStub());
 
@@ -68,8 +66,7 @@ class TopicsCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldShowInfoAboutTopics(): void
     {
-        $this->topicMetaRegistry
-            ->expects(self::once())
+        $this->topicMetaRegistry->expects(self::once())
             ->method('getTopicsMeta')
             ->willReturn(
                 [
@@ -78,20 +75,16 @@ class TopicsCommandTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->topicRegistry
-            ->expects(self::exactly(2))
+        $this->topicRegistry->expects(self::exactly(2))
             ->method('get')
             ->willReturn(new TopicStub());
 
-        $this->topicDescriptionProvider
-            ->expects(self::exactly(2))
+        $this->topicDescriptionProvider->expects(self::exactly(2))
             ->method('getTopicDescription')
-            ->willReturnMap(
-                [
-                    ['sample_topic1', 'sample_description1'],
-                    ['sample_topic2', 'sample_description2'],
-                ]
-            );
+            ->willReturnMap([
+                ['sample_topic1', 'sample_description1'],
+                ['sample_topic2', 'sample_description2'],
+            ]);
 
         $output = $this->executeCommand();
 

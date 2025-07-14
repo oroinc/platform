@@ -5,10 +5,11 @@ namespace Oro\Bundle\AssetBundle\Tests\Unit\Cache;
 use Oro\Bundle\AssetBundle\Cache\AssetConfigCache;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class AssetConfigCacheTest extends \PHPUnit\Framework\TestCase
+class AssetConfigCacheTest extends TestCase
 {
     use TempDirExtension;
 

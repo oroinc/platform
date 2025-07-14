@@ -7,22 +7,17 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 use Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
-class AdditionalMetadataProviderTest extends \PHPUnit\Framework\TestCase
+class AdditionalMetadataProviderTest extends TestCase
 {
-    /** @var AdditionalMetadataProvider */
-    private $additionalMetadataProvider;
-
-    /** @var ClassMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadataFactory;
-
-    /** @var CacheItemPoolInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cacheAdapter;
-
-    /** @var CacheItemInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cacheItem;
+    private AdditionalMetadataProvider $additionalMetadataProvider;
+    private ClassMetadataFactory&MockObject $metadataFactory;
+    private CacheItemPoolInterface&MockObject $cacheAdapter;
+    private CacheItemInterface&MockObject $cacheItem;
 
     #[\Override]
     protected function setUp(): void
@@ -48,7 +43,7 @@ class AdditionalMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetInversedUnidirectionalAssociationMappings()
+    public function testGetInversedUnidirectionalAssociationMappings(): void
     {
         $expectedMetadata = [
             [
@@ -92,7 +87,7 @@ class AdditionalMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWarmUpMetadata()
+    public function testWarmUpMetadata(): void
     {
         $entityMetadata = new ClassMetadata('Namespace\EntityName');
 

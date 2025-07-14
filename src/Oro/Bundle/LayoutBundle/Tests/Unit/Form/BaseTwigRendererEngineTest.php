@@ -3,17 +3,15 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Form;
 
 use Oro\Bundle\LayoutBundle\Form\BaseTwigRendererEngine;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormView;
 use Twig\Environment;
 use Twig\Template;
 
 class BaseTwigRendererEngineTest extends RendererEngineTest
 {
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $environment;
-
-    /** @var BaseTwigRendererEngine */
-    private $engine;
+    private Environment&MockObject $environment;
+    private BaseTwigRendererEngine $engine;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +21,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
         $this->engine = $this->createRendererEngine();
     }
 
-    public function testRenderBlock()
+    public function testRenderBlock(): void
     {
         $cacheKey = '_root_root';
         $blockName = 'root';
@@ -47,7 +45,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
         $this->engine->renderBlock($view, $resource, $blockName, $variables);
     }
 
-    public function testLoadResourcesFromTheme()
+    public function testLoadResourcesFromTheme(): void
     {
         $cacheKey = '_root_root';
         $blockName = 'root';
@@ -69,7 +67,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
         );
     }
 
-    public function testGetResourceHierarchyLevel()
+    public function testGetResourceHierarchyLevel(): void
     {
         $blockNameHierarchy = [
             'block',
@@ -113,10 +111,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
         $this->assertEquals(0, $this->engine->getResourceHierarchyLevel($view, $blockNameHierarchy, 1));
     }
 
-    /**
-     * @return Template|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createTheme(string $blockName)
+    private function createTheme(string $blockName): Template&MockObject
     {
         $theme = $this->createMock(Template::class);
         $theme->expects($this->any())

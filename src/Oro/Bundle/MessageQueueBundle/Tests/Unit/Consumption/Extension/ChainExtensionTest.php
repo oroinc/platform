@@ -6,13 +6,14 @@ use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Log\ConsumerState;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ChainExtensionTest extends \PHPUnit\Framework\TestCase
+class ChainExtensionTest extends TestCase
 {
-    public function testWhenConstructedShouldPassItselfToAllToAllChainExtensionAwareExtensions()
+    public function testWhenConstructedShouldPassItselfToAllToAllChainExtensionAwareExtensions(): void
     {
         $extension1 = $this->createMock(ExtensionInterface::class);
         $extension2 = $this->createMock(ChainExtension::class);
@@ -29,7 +30,7 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertSame($chainExtension, $passedChainExtension);
     }
 
-    public function testShouldProxyOnStartToAllInternalExtensions()
+    public function testShouldProxyOnStartToAllInternalExtensions(): void
     {
         $context = $this->createMock(Context::class);
 
@@ -55,7 +56,7 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $chainExtension->onStart($context);
     }
 
-    public function testShouldProxyOnBeforeReceiveToAllInternalExtensions()
+    public function testShouldProxyOnBeforeReceiveToAllInternalExtensions(): void
     {
         $context = $this->createMock(Context::class);
 
@@ -81,7 +82,7 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $chainExtension->onBeforeReceive($context);
     }
 
-    public function testShouldProxyOnPreReceiveToAllInternalExtensions()
+    public function testShouldProxyOnPreReceiveToAllInternalExtensions(): void
     {
         $context = $this->createMock(Context::class);
 
@@ -107,7 +108,7 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $chainExtension->onPreReceived($context);
     }
 
-    public function testShouldProxyOnPostReceiveToAllInternalExtensions()
+    public function testShouldProxyOnPostReceiveToAllInternalExtensions(): void
     {
         $context = $this->createMock(Context::class);
 
@@ -133,7 +134,7 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $chainExtension->onPostReceived($context);
     }
 
-    public function testShouldProxyOnIdleToAllInternalExtensions()
+    public function testShouldProxyOnIdleToAllInternalExtensions(): void
     {
         $context = $this->createMock(Context::class);
 
@@ -159,7 +160,7 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $chainExtension->onIdle($context);
     }
 
-    public function testShouldProxyOnInterruptedToAllInternalExtensions()
+    public function testShouldProxyOnInterruptedToAllInternalExtensions(): void
     {
         $context = $this->createMock(Context::class);
 
@@ -185,7 +186,7 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $chainExtension->onInterrupted($context);
     }
 
-    public function testShouldResetAllResettableExtensions()
+    public function testShouldResetAllResettableExtensions(): void
     {
         $extension1 = $this->createMock(ExtensionInterface::class);
         $extension2 = $this->createMock(ChainExtension::class);
@@ -199,7 +200,7 @@ class ChainExtensionTest extends \PHPUnit\Framework\TestCase
         $chainExtension->reset();
     }
 
-    public function testShouldSetChainExtensionToAllToAllChainExtensionAwareExtensions()
+    public function testShouldSetChainExtensionToAllToAllChainExtensionAwareExtensions(): void
     {
         $extension1 = $this->createMock(ExtensionInterface::class);
         $extension2 = $this->createMock(ChainExtension::class);

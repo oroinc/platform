@@ -12,9 +12,7 @@ use PHPUnit\Framework\TestCase;
 class CombinedConfigBagTest extends TestCase
 {
     private ConfigBagInterface&MockObject $configBag1;
-
     private ConfigBagInterface&MockObject $configBag2;
-
     private EntityConfigMerger&MockObject $entityConfigMerger;
     private CombinedConfigBag $combinedConfigBag;
 

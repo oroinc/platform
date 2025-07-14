@@ -12,33 +12,26 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Form\Guesser\ExtendFieldTypeGuesser;
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormTypeProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Guess\TypeGuess;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
+class ExtendFieldTypeGuesserTest extends TestCase
 {
     private const CLASS_NAME = 'Oro\Bundle\SomeBundle\Entity\SomeClassName';
     private const CLASS_PROPERTY = 'SomeClassProperty';
     private const PROPERTY_TYPE = 'bigint';
     private const SOME_LABEL = 'someLabel';
 
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $formConfigProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendConfigProvider;
-
-    /** @var ExtendFieldFormTypeProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendFieldFormTypeProvider;
-
-    /** @var ExtendFieldFormOptionsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendFieldFormOptionsProvider;
-
-    /** @var ExtendFieldTypeGuesser|\PHPUnit\Framework\MockObject\MockObject */
-    private $guesser;
+    private ConfigProvider&MockObject $formConfigProvider;
+    private ConfigProvider&MockObject $extendConfigProvider;
+    private ExtendFieldFormTypeProvider $extendFieldFormTypeProvider;
+    private ExtendFieldFormOptionsProviderInterface&MockObject $extendFieldFormOptionsProvider;
+    private ExtendFieldTypeGuesser $guesser;
 
     #[\Override]
     protected function setUp(): void
@@ -76,7 +69,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
     }
 
     private function createConfigProviderExpectation(
-        ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider,
+        ConfigProvider&MockObject $configProvider,
         string $fieldType,
         string $scopeName,
         array $scopeOptions

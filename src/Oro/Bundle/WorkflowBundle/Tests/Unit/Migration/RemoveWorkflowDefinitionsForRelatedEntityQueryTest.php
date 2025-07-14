@@ -8,18 +8,19 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\WorkflowBundle\Migration\RemoveWorkflowDefinitionsForRelatedEntityQuery;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class RemoveWorkflowDefinitionsForRelatedEntityQueryTest extends \PHPUnit\Framework\TestCase
+class RemoveWorkflowDefinitionsForRelatedEntityQueryTest extends TestCase
 {
-    public function testGetDescriptionIncludesEntityClassName()
+    public function testGetDescriptionIncludesEntityClassName(): void
     {
         $entityClassName = 'Some\Entity';
         $query = new RemoveWorkflowDefinitionsForRelatedEntityQuery($entityClassName);
         self::assertStringContainsString($entityClassName, $query->getDescription());
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $entityClassName = 'Some\Entity';
         $query = new RemoveWorkflowDefinitionsForRelatedEntityQuery($entityClassName);

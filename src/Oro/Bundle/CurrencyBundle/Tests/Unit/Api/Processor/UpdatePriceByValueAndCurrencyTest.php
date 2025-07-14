@@ -14,8 +14,7 @@ use Symfony\Component\Validator\ConstraintViolation;
 
 class UpdatePriceByValueAndCurrencyTest extends CustomizeFormDataProcessorTestCase
 {
-    /** @var UpdatePriceByValueAndCurrency */
-    private $processor;
+    private UpdatePriceByValueAndCurrency $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -49,7 +48,7 @@ class UpdatePriceByValueAndCurrencyTest extends CustomizeFormDataProcessorTestCa
         array $data,
         PriceAwareEntityStub $entity,
         PriceAwareEntityStub $expectedEntity
-    ) {
+    ): void {
         $form = $this->getForm();
         $form->setData($entity);
 
@@ -97,7 +96,7 @@ class UpdatePriceByValueAndCurrencyTest extends CustomizeFormDataProcessorTestCa
         ];
     }
 
-    public function testPostValidate()
+    public function testPostValidate(): void
     {
         $form = $this->getForm();
         $form->addError(new FormError(

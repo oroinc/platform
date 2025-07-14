@@ -18,6 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -34,17 +35,10 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends ConstraintValidatorTes
     private const SAMPLE_FIELD = 'sampleField';
     private const SAMPLE_ID = 1;
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigManager;
-
-    /** @var MimeTypeChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $mimeTypeChecker;
-
-    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $urlGenerator;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
+    private ConfigManager&MockObject $entityConfigManager;
+    private MimeTypeChecker&MockObject $mimeTypeChecker;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
+    private LoggerInterface&MockObject $logger;
 
     #[\Override]
     protected function setUp(): void
@@ -168,7 +162,7 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends ConstraintValidatorTes
 
     private function getDigitalAsset(
         Collection $childFiles,
-        ComponentFile|\PHPUnit\Framework\MockObject\MockObject $uploadedFile
+        ComponentFile&MockObject $uploadedFile
     ): DigitalAsset {
         $fileMimeType = 'file/type';
 

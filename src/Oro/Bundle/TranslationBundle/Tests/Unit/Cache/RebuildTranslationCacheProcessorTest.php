@@ -7,27 +7,18 @@ use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class RebuildTranslationCacheProcessorTest extends \PHPUnit\Framework\TestCase
+class RebuildTranslationCacheProcessorTest extends TestCase
 {
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var TranslationDomainProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $domainProvider;
-
-    /** @var JsTranslationDumper|\PHPUnit\Framework\MockObject\MockObject */
-    private $jsTranslationDumper;
-
-    /** @var DynamicAssetVersionManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $assetVersionManager;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var RebuildTranslationCacheProcessor */
-    private $processor;
+    private Translator&MockObject $translator;
+    private TranslationDomainProvider&MockObject $domainProvider;
+    private JsTranslationDumper&MockObject $jsTranslationDumper;
+    private DynamicAssetVersionManager&MockObject $assetVersionManager;
+    private LoggerInterface&MockObject $logger;
+    private RebuildTranslationCacheProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -47,7 +38,7 @@ class RebuildTranslationCacheProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRebuildCache()
+    public function testRebuildCache(): void
     {
         $this->domainProvider->expects(self::once())
             ->method('clearCache');
@@ -65,7 +56,7 @@ class RebuildTranslationCacheProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->processor->rebuildCache());
     }
 
-    public function testRebuildCacheWhenClearTranslationDomainCacheFailed()
+    public function testRebuildCacheWhenClearTranslationDomainCacheFailed(): void
     {
         $exception = new \Exception('some error');
 
@@ -95,7 +86,7 @@ class RebuildTranslationCacheProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->processor->rebuildCache());
     }
 
-    public function testRebuildCacheWhenRebuildTranslationCacheFailed()
+    public function testRebuildCacheWhenRebuildTranslationCacheFailed(): void
     {
         $exception = new \Exception('some error');
 
@@ -125,7 +116,7 @@ class RebuildTranslationCacheProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->processor->rebuildCache());
     }
 
-    public function testRebuildCacheWhenDumpJsTranslationsFailed()
+    public function testRebuildCacheWhenDumpJsTranslationsFailed(): void
     {
         $exception = new \Exception('some error');
 
@@ -155,7 +146,7 @@ class RebuildTranslationCacheProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->processor->rebuildCache());
     }
 
-    public function testRebuildCacheWhenUpdateTranslationAssetVersionFailed()
+    public function testRebuildCacheWhenUpdateTranslationAssetVersionFailed(): void
     {
         $exception = new \Exception('some error');
 

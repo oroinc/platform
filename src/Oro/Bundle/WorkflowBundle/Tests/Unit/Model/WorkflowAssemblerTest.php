@@ -21,10 +21,12 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 use Oro\Component\Action\Exception\AssemblerException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
+class WorkflowAssemblerTest extends TestCase
 {
     private array $workflowParameters = [
         'name' => 'test_name',
@@ -46,26 +48,13 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
         'test_transition_definition' => []
     ];
 
-    /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflow;
-
-    /** @var AttributeAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeAssembler;
-
-    /** @var StepAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    private $stepAssembler;
-
-    /** @var TransitionAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    private $transitionAssembler;
-
-    /** @var RestrictionAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    private $restrictionAssembler;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var WorkflowAssembler */
-    private $workflowAssembler;
+    private Workflow $workflow;
+    private AttributeAssembler&MockObject $attributeAssembler;
+    private StepAssembler&MockObject $stepAssembler;
+    private TransitionAssembler&MockObject $transitionAssembler;
+    private RestrictionAssembler&MockObject $restrictionAssembler;
+    private TranslatorInterface&MockObject $translator;
+    private WorkflowAssembler $workflowAssembler;
 
     #[\Override]
     protected function setUp(): void
@@ -104,7 +93,7 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider assembleDataProvider
      */
-    public function testAssemble(array $configuration, ?WorkflowStep $startStep)
+    public function testAssemble(array $configuration, ?WorkflowStep $startStep): void
     {
         $workflowDefinition = $this->createWorkflowDefinition($configuration);
         if ($startStep) {
@@ -241,7 +230,7 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testAssembleStartTransitionException()
+    public function testAssembleStartTransitionException(): void
     {
         $this->expectException(AssemblerException::class);
         $this->expectExceptionMessage(
@@ -265,7 +254,7 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->workflowAssembler->assemble($workflowDefinition);
     }
 
-    public function testAssembleWithoutValidation()
+    public function testAssembleWithoutValidation(): void
     {
         $configuration = [
             WorkflowConfiguration::NODE_ATTRIBUTES => ['attributes_configuration'],
@@ -288,7 +277,7 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($transitions->toArray(), $workflow->getTransitionManager()->getTransitions()->toArray());
     }
 
-    public function testAssembleNoStepsConfigurationException()
+    public function testAssembleNoStepsConfigurationException(): void
     {
         $configuration = [
             WorkflowConfiguration::NODE_STEPS => [],
@@ -301,7 +290,7 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->workflowAssembler->assemble($this->createWorkflowDefinition($configuration));
     }
 
-    public function testAssembleNoTransitionsConfigurationException()
+    public function testAssembleNoTransitionsConfigurationException(): void
     {
         $configuration = [
             WorkflowConfiguration::NODE_STEPS => ['step_one' => $this->stepConfiguration],

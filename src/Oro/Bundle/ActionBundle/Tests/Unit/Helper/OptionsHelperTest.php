@@ -6,13 +6,13 @@ use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class OptionsHelperTest extends \PHPUnit\Framework\TestCase
+class OptionsHelperTest extends TestCase
 {
-    /** @var OptionsHelper */
-    private $helper;
+    private OptionsHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +41,7 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFrontendOptionsProvider
      */
-    public function testGetFrontendOptions(ButtonInterface $button, array $expectedData)
+    public function testGetFrontendOptions(ButtonInterface $button, array $expectedData): void
     {
         $this->assertEquals($expectedData, $this->helper->getFrontendOptions($button));
     }

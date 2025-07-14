@@ -7,11 +7,11 @@ use Oro\Bundle\FilterBundle\Expression\Date\Parser;
 use Oro\Bundle\FilterBundle\Expression\Date\Token;
 use Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use PHPUnit\Framework\TestCase;
 
-class ParserTest extends \PHPUnit\Framework\TestCase
+class ParserTest extends TestCase
 {
-    /** @var Parser */
-    private $parser;
+    private Parser $parser;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +27,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider parseProvider
      */
-    public function testParse(array $tokens, mixed $expectedResult, ?string $expectedException = null)
+    public function testParse(array $tokens, mixed $expectedResult, ?string $expectedException = null): void
     {
         if (null !== $expectedException) {
             $this->expectException($expectedException);

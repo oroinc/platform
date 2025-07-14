@@ -4,14 +4,13 @@ namespace Oro\Bundle\CronBundle\Tests\Unit\Command;
 
 use Oro\Bundle\CronBundle\Command\CronCommandFeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CronCommandFeatureCheckerTest extends \PHPUnit\Framework\TestCase
+class CronCommandFeatureCheckerTest extends TestCase
 {
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var CronCommandFeatureChecker */
-    private $checker;
+    private FeatureChecker&MockObject $featureChecker;
+    private CronCommandFeatureChecker $checker;
 
     #[\Override]
     protected function setUp(): void

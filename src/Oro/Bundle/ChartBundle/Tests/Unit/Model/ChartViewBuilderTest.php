@@ -15,24 +15,19 @@ use Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
+class ChartViewBuilderTest extends TestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var TransformerFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $transformerFactory;
-
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $twig;
-
-    /** @var ChartViewBuilder */
-    private $builder;
+    private ConfigProvider&MockObject $configProvider;
+    private TransformerFactory&MockObject $transformerFactory;
+    private Environment&MockObject $twig;
+    private ChartViewBuilder $builder;
 
     #[\Override]
     protected function setUp(): void
@@ -68,7 +63,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         return ReflectionUtil::getPropertyValue($builder, 'dataMapping');
     }
 
-    public function testSetData()
+    public function testSetData(): void
     {
         $data = $this->createMock(DataInterface::class);
 
@@ -76,7 +71,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($data, $this->getData($this->builder));
     }
 
-    public function testSetArrayData()
+    public function testSetArrayData(): void
     {
         $result = $this->builder->setArrayData(['foo' => 'bar']);
 
@@ -85,7 +80,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(new ArrayData(['foo' => 'bar']), $this->getData($this->builder));
     }
 
-    public function testSetDataGrid()
+    public function testSetDataGrid(): void
     {
         $datagrid = $this->createMock(DatagridInterface::class);
         $columnsDefinition = ['foo' => ['foo' => 'bar']];
@@ -103,7 +98,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($columnsDefinition, $this->getDatagridColumnsDefinition($this->builder));
     }
 
-    public function testSetDataMapping()
+    public function testSetDataMapping(): void
     {
         $dataMapping = ['foo' => 'bar'];
 
@@ -113,7 +108,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($dataMapping, $this->getDataMapping($this->builder));
     }
 
-    public function testSetDataMappingIgnored()
+    public function testSetDataMappingIgnored(): void
     {
         $dataMapping = ['foo' => 'foo'];
 
@@ -123,7 +118,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($this->getDataMapping($this->builder));
     }
 
-    public function testSetOptions()
+    public function testSetOptions(): void
     {
         $options = [
             'name' => 'foo',
@@ -138,7 +133,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedOptions, $this->getOptions($this->builder));
     }
 
-    public function testSetOptionsWithDataGridColumnsDefinitionMerge()
+    public function testSetOptionsWithDataGridColumnsDefinitionMerge(): void
     {
         $columnsDefinition = ['bar' => ['name' => 'bar', 'label' => 'Foo label']];
 
@@ -169,7 +164,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedOptions, $this->getOptions($this->builder));
     }
 
-    public function testSetOptionsWithoutName()
+    public function testSetOptionsWithoutName(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have "name" key.');
@@ -182,7 +177,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($options, $this->getOptions($this->builder));
     }
 
-    public function testSetOptionsWithoutDataSchema()
+    public function testSetOptionsWithoutDataSchema(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have "data_schema" key with array.');
@@ -195,7 +190,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($options, $this->getOptions($this->builder));
     }
 
-    public function testSetOptionsWithDataMapping()
+    public function testSetOptionsWithDataMapping(): void
     {
         $options = [
             'name' => 'foo',
@@ -212,7 +207,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['foo' => 'bar'], $this->getDataMapping($this->builder));
     }
 
-    public function testSetOptionsWithDataMappingFromDataSchema()
+    public function testSetOptionsWithDataMappingFromDataSchema(): void
     {
         $options = [
             'name' => 'foo',
@@ -228,7 +223,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['label' => 'foo', 'value' => 'value'], $this->getDataMapping($this->builder));
     }
 
-    public function testGetView()
+    public function testGetView(): void
     {
         $chartName = 'chart_name';
         $chartTemplate = 'template.html.twig';
@@ -275,7 +270,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         $chartView->render();
     }
 
-    public function testGetViewWithDataTransformer()
+    public function testGetViewWithDataTransformer(): void
     {
         $chartName = 'chart_name';
         $chartTemplate = 'template.html.twig';
@@ -323,7 +318,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         $chartView->render();
     }
 
-    public function testGetViewFailsWhenConfigDontHaveTemplate()
+    public function testGetViewFailsWhenConfigDontHaveTemplate(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Config of chart "chart_name" must have "template" key.');
@@ -336,7 +331,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->setOptions(['name' => 'chart_name'])->setData(new ArrayData([]))->getView();
     }
 
-    public function testGetViewFailsWhenOptionsNotSet()
+    public function testGetViewFailsWhenOptionsNotSet(): void
     {
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage("Can't build result when setOptions() was not called.");
@@ -344,7 +339,7 @@ class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->getView();
     }
 
-    public function testGetViewFailsWhenDataNotSet()
+    public function testGetViewFailsWhenDataNotSet(): void
     {
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage("Can't build result when setData() was not called.");

@@ -12,25 +12,20 @@ use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 use Oro\Bundle\SyncBundle\EventListener\DoctrineTagEventListener;
-use Oro\Bundle\TestFrameworkBundle\Entity;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
+class DoctrineTagEventListenerTest extends TestCase
 {
-    /** @var TagGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tagGenerator;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject */
-    private $uow;
-
-    /** @var DataUpdateTopicSender|\PHPUnit\Framework\MockObject\MockObject */
-    private $dataUpdateTopicSender;
-
-    /** @var DoctrineTagEventListener */
-    private $eventListener;
+    private TagGeneratorInterface&MockObject $tagGenerator;
+    private EntityManagerInterface&MockObject $em;
+    private UnitOfWork&MockObject $uow;
+    private DataUpdateTopicSender&MockObject $dataUpdateTopicSender;
+    private DoctrineTagEventListener $eventListener;
 
     #[\Override]
     protected function setUp(): void
@@ -68,7 +63,7 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
         return $coll;
     }
 
-    public function testOnFlushForDisabledListener()
+    public function testOnFlushForDisabledListener(): void
     {
         $this->uow->expects(self::never())
             ->method('getScheduledEntityInsertions');
@@ -91,13 +86,13 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->eventListener->postFlush();
     }
 
-    public function testOnFlushForScheduledEntityInsertions()
+    public function testOnFlushForScheduledEntityInsertions(): void
     {
-        $entity1 = new Entity\TestDepartment();
-        $entity2 = new Entity\TestEmployee();
-        $entity3 = new Entity\TestProduct();
+        $entity1 = new TestDepartment();
+        $entity2 = new TestEmployee();
+        $entity3 = new TestProduct();
 
-        $this->eventListener->markSkipped(Entity\TestProduct::class);
+        $this->eventListener->markSkipped(TestProduct::class);
 
         $this->uow->expects(self::once())
             ->method('getScheduledEntityInsertions')
@@ -131,13 +126,13 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->eventListener->postFlush();
     }
 
-    public function testOnFlushForScheduledEntityDeletions()
+    public function testOnFlushForScheduledEntityDeletions(): void
     {
-        $entity1 = new Entity\TestDepartment();
-        $entity2 = new Entity\TestEmployee();
-        $entity3 = new Entity\TestProduct();
+        $entity1 = new TestDepartment();
+        $entity2 = new TestEmployee();
+        $entity3 = new TestProduct();
 
-        $this->eventListener->markSkipped(Entity\TestProduct::class);
+        $this->eventListener->markSkipped(TestProduct::class);
 
         $this->uow->expects(self::once())
             ->method('getScheduledEntityInsertions')
@@ -171,13 +166,13 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->eventListener->postFlush();
     }
 
-    public function testOnFlushForScheduledEntityUpdates()
+    public function testOnFlushForScheduledEntityUpdates(): void
     {
-        $entity1 = new Entity\TestDepartment();
-        $entity2 = new Entity\TestEmployee();
-        $entity3 = new Entity\TestProduct();
+        $entity1 = new TestDepartment();
+        $entity2 = new TestEmployee();
+        $entity3 = new TestProduct();
 
-        $this->eventListener->markSkipped(Entity\TestProduct::class);
+        $this->eventListener->markSkipped(TestProduct::class);
 
         $this->uow->expects(self::once())
             ->method('getScheduledEntityInsertions')
@@ -211,16 +206,16 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->eventListener->postFlush();
     }
 
-    public function testOnFlushForScheduledCollectionDeletions()
+    public function testOnFlushForScheduledCollectionDeletions(): void
     {
-        $entity1 = new Entity\TestDepartment();
+        $entity1 = new TestDepartment();
         $coll1 = $this->createPersistentCollection($entity1);
-        $entity2 = new Entity\TestEmployee();
+        $entity2 = new TestEmployee();
         $coll2 = $this->createPersistentCollection($entity2);
-        $entity3 = new Entity\TestProduct();
+        $entity3 = new TestProduct();
         $coll3 = $this->createPersistentCollection($entity3);
 
-        $this->eventListener->markSkipped(Entity\TestProduct::class);
+        $this->eventListener->markSkipped(TestProduct::class);
 
         $this->uow->expects(self::once())
             ->method('getScheduledEntityInsertions')
@@ -254,16 +249,16 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->eventListener->postFlush();
     }
 
-    public function testOnFlushForScheduledCollectionUpdates()
+    public function testOnFlushForScheduledCollectionUpdates(): void
     {
-        $entity1 = new Entity\TestDepartment();
+        $entity1 = new TestDepartment();
         $coll1 = $this->createPersistentCollection($entity1);
-        $entity2 = new Entity\TestEmployee();
+        $entity2 = new TestEmployee();
         $coll2 = $this->createPersistentCollection($entity2);
-        $entity3 = new Entity\TestProduct();
+        $entity3 = new TestProduct();
         $coll3 = $this->createPersistentCollection($entity3);
 
-        $this->eventListener->markSkipped(Entity\TestProduct::class);
+        $this->eventListener->markSkipped(TestProduct::class);
 
         $this->uow->expects(self::once())
             ->method('getScheduledEntityInsertions')

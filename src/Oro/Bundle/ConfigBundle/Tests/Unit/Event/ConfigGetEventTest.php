@@ -4,8 +4,9 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Event;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigGetEvent;
+use PHPUnit\Framework\TestCase;
 
-class ConfigGetEventTest extends \PHPUnit\Framework\TestCase
+class ConfigGetEventTest extends TestCase
 {
     public function testEventWhenRequestedOnlyValue(): void
     {

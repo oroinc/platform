@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class NullFolderYamlCumulativeFileLoaderTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         $relativePath = '../../config/oro/websocket_routing';
         $bundleDir = dirname(__DIR__).'/Fixtures/Bundle/TestBundle1/';

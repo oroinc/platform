@@ -15,9 +15,7 @@ class AddressExtensionTest extends TestCase
     use TwigExtensionTestCaseTrait;
 
     private AddressFormatter&MockObject $formatter;
-
     private FormattedAddressRenderer&MockObject $formattedAddressRenderer;
-
     private AddressExtension $extension;
 
     #[\Override]
@@ -74,8 +72,7 @@ class AddressExtensionTest extends TestCase
             ->willReturn($addressParts);
 
         $expectedResult = 'rendered address';
-        $this->formattedAddressRenderer
-            ->expects(self::once())
+        $this->formattedAddressRenderer->expects(self::once())
             ->method('renderAddress')
             ->with($addressParts, $addressFormat, $newLineSeparator)
             ->willReturn($expectedResult);
@@ -113,8 +110,7 @@ class AddressExtensionTest extends TestCase
             ->willReturn($addressParts);
 
         $expectedResult = 'rendered address';
-        $this->formattedAddressRenderer
-            ->expects(self::once())
+        $this->formattedAddressRenderer->expects(self::once())
             ->method('renderAddress')
             ->with($addressParts, $addressFormat, $newLineSeparator)
             ->willReturn($expectedResult);

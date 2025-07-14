@@ -8,8 +8,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class ConfigCheckboxTest extends FormIntegrationTestCase
 {
-    /** @var ConfigCheckbox */
-    private $formType;
+    private ConfigCheckbox $formType;
 
     #[\Override]
     protected function setUp(): void

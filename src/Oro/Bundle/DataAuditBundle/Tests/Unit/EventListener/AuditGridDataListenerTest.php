@@ -10,23 +10,16 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AuditGridDataListenerTest extends \PHPUnit\Framework\TestCase
+class AuditGridDataListenerTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var AuditGridDataListener */
-    private $listener;
-
-    /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagrid;
-
-    /** @var AuditFieldRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var FieldsTransformer */
-    private $fieldsTransformer;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private AuditGridDataListener $listener;
+    private DatagridInterface&MockObject $datagrid;
+    private AuditFieldRepository&MockObject $repository;
+    private FieldsTransformer $fieldsTransformer;
 
     #[\Override]
     protected function setUp(): void
@@ -43,13 +36,13 @@ class AuditGridDataListenerTest extends \PHPUnit\Framework\TestCase
         $this->datagrid = $this->createMock(DatagridInterface::class);
     }
 
-    public function testAddDataSupportNoData()
+    public function testAddDataSupportNoData(): void
     {
         $event = new OrmResultAfter($this->datagrid, []);
         $this->listener->addDataSupport($event);
     }
 
-    public function testAddDataSupportNoFields()
+    public function testAddDataSupportNoFields(): void
     {
         $record = new ResultRecord(['id' => 1]);
         $event = new OrmResultAfter($this->datagrid, [$record]);
@@ -60,7 +53,7 @@ class AuditGridDataListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($record->getValue('data'));
     }
 
-    public function testAddDataSupportNoIds()
+    public function testAddDataSupportNoIds(): void
     {
         $record = new ResultRecord([]);
         $event = new OrmResultAfter($this->datagrid, [$record]);
@@ -71,7 +64,7 @@ class AuditGridDataListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($record->getValue('data'));
     }
 
-    public function testAddDataSupportWithAData()
+    public function testAddDataSupportWithAData(): void
     {
         $record1 = new ResultRecord(['id' => 23]);
         $record2 = new ResultRecord(['id' => 24]);

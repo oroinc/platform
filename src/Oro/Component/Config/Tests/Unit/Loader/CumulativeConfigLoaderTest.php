@@ -12,11 +12,12 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\ResourcesContainer;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle2\TestBundle2;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
+class CumulativeConfigLoaderTest extends TestCase
 {
     /**
      * @param object $bundle
@@ -38,7 +39,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
 
-    public function testConstructorWithEmptyName()
+    public function testConstructorWithEmptyName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$name must not be empty.');
@@ -46,7 +47,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         new CumulativeConfigLoader('', null);
     }
 
-    public function testConstructorWithNullResourceLoader()
+    public function testConstructorWithNullResourceLoader(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$resourceLoader must not be empty.');
@@ -54,7 +55,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         new CumulativeConfigLoader('test', null);
     }
 
-    public function testConstructorWithEmptyResourceLoader()
+    public function testConstructorWithEmptyResourceLoader(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$resourceLoader must not be empty.');
@@ -62,14 +63,14 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         new CumulativeConfigLoader('test', []);
     }
 
-    public function testConstructorWithOneResourceLoader()
+    public function testConstructorWithOneResourceLoader(): void
     {
         $this->expectNotToPerformAssertions();
 
         new CumulativeConfigLoader('test', $this->createMock(CumulativeResourceLoader::class));
     }
 
-    public function testConstructorWithSeveralResourceLoader()
+    public function testConstructorWithSeveralResourceLoader(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -79,7 +80,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testRegisterResources()
+    public function testRegisterResources(): void
     {
         $bundle1 = new TestBundle1();
         $bundle1Class = get_class($bundle1);
@@ -115,7 +116,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResource, $resourcesContainer->getResources()[0]);
     }
 
-    public function testGetResources()
+    public function testGetResources(): void
     {
         $bundle1 = new TestBundle1();
         $bundle1Class = get_class($bundle1);
@@ -149,7 +150,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResource, $resource);
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $resourceRelativePath = 'Resources/config/test.yml';
         $bundle = new TestBundle1();
@@ -188,7 +189,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResource, $resourcesContainer->getResources()[0]);
     }
 
-    public function testLoadWithAppRootDirectory()
+    public function testLoadWithAppRootDirectory(): void
     {
         $pathWithoutResources = '/config/test.yml';
         $resourceRelativePath = 'Resources' . $pathWithoutResources;
@@ -224,7 +225,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         CumulativeResourceManager::getInstance()->setAppRootDir(null);
     }
 
-    public function testLoadWithoutContainer()
+    public function testLoadWithoutContainer(): void
     {
         $resourceRelativePath = 'Resources/config/test.yml';
         $bundle = new TestBundle1();
@@ -251,7 +252,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadWhenNoResources()
+    public function testLoadWhenNoResources(): void
     {
         $bundle = new TestBundle1();
         $bundleDir = $this->getBundleDir($bundle);
@@ -271,7 +272,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $result);
     }
 
-    public function testLoadWhenResourceLoaderReturnsArray()
+    public function testLoadWhenResourceLoaderReturnsArray(): void
     {
         $bundle1 = new TestBundle1();
         $bundle1Dir = $this->getBundleDir($bundle1);
@@ -302,7 +303,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$resource1, $resource2, $resource3], $result);
     }
 
-    public function testLoadEmptyFileWithoutWarnings()
+    public function testLoadEmptyFileWithoutWarnings(): void
     {
         $bundle1 = new TestBundle1();
         $bundle1Dir = $this->getBundleDir($bundle1);
@@ -325,7 +326,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$resource1], $result);
     }
 
-    public function testYamlCumulativeFileLoaderImports()
+    public function testYamlCumulativeFileLoaderImports(): void
     {
         $bundle1 = new TestBundle1();
         $bundleClass = get_class($bundle1);
@@ -339,7 +340,7 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($resource->data['test'], 'success');
     }
 
-    public function testYamlCumulativeFileLoaderImportsInfiniteLoop()
+    public function testYamlCumulativeFileLoaderImportsInfiniteLoop(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Circular import detected');

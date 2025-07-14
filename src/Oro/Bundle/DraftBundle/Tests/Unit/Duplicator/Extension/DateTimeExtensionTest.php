@@ -6,18 +6,17 @@ use DeepCopy\Matcher\PropertyTypeMatcher;
 use Oro\Bundle\DraftBundle\Duplicator\DraftContext;
 use Oro\Bundle\DraftBundle\Duplicator\Extension\DateTimeExtension;
 use Oro\Bundle\DraftBundle\Duplicator\Filter\DateTimeFilter;
-use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Bundle\DraftBundle\Manager\DraftManager;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\TestCase;
 
-class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
+class DateTimeExtensionTest extends TestCase
 {
     use  EntityTrait;
 
-    /** @var DateTimeExtension */
-    private $extension;
+    private DateTimeExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -53,7 +52,6 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testIsSupport(): void
     {
-        /** @var DraftableInterface $source */
         $source = $this->getEntity(DraftableEntityStub::class);
         $context = new DraftContext();
         $context->offsetSet('action', DraftManager::ACTION_CREATE_DRAFT);

@@ -10,9 +10,10 @@ use Oro\Bundle\NotificationBundle\Event\Handler\TemplateEmailNotificationAdapter
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
+class EmailNotificationHandlerTest extends TestCase
 {
     public function testHandle(): void
     {

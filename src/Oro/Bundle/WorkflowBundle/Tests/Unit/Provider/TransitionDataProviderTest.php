@@ -9,17 +9,14 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Provider\TransitionDataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TransitionDataProviderTest extends \PHPUnit\Framework\TestCase
+class TransitionDataProviderTest extends TestCase
 {
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var TransitionDataProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $transitionDataProvider;
-
-    /** @var Transition|\PHPUnit\Framework\MockObject\MockObject */
-    private $transition;
+    private WorkflowManager&MockObject $workflowManager;
+    private TransitionDataProvider $transitionDataProvider;
+    private Transition&MockObject $transition;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +36,7 @@ class TransitionDataProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn('test');
     }
 
-    public function testGetAvailableStartTransitionsData()
+    public function testGetAvailableStartTransitionsData(): void
     {
         $transitions = [$this->transition];
         $this->transition->expects($this->once())
@@ -70,7 +67,7 @@ class TransitionDataProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($data['test']['transition'], $this->transition);
     }
 
-    public function testGetAvailableStartTransitionsDataEmptyData()
+    public function testGetAvailableStartTransitionsDataEmptyData(): void
     {
         $this->transition->expects($this->once())
             ->method('isEmptyInitOptions')
@@ -111,7 +108,7 @@ class TransitionDataProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($data['test']['transition'], $this->transition);
     }
 
-    public function testGetAvailableTransitionsDataByWorkflowItem()
+    public function testGetAvailableTransitionsDataByWorkflowItem(): void
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
         $transitions = [$this->transition];

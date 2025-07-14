@@ -14,8 +14,7 @@ class ConfigSettingsFormOptionsEventTest extends TestCase
         'key2' => ['option2' => 'value2']
     ];
 
-    private ConfigManager|MockObject $configManager;
-
+    private ConfigManager&MockObject $configManager;
     private ConfigSettingsFormOptionsEvent $event;
 
     #[\Override]

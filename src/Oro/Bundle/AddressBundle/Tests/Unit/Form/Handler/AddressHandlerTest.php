@@ -5,25 +5,18 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Handler;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Form\Handler\AddressHandler;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class AddressHandlerTest extends \PHPUnit\Framework\TestCase
+class AddressHandlerTest extends TestCase
 {
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
-
-    /** @var Request */
-    private $request;
-
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $om;
-
-    /** @var Address|\PHPUnit\Framework\MockObject\MockObject */
-    private $address;
-
-    /** @var AddressHandler */
-    private $handler;
+    private FormInterface&MockObject $form;
+    private Request $request;
+    private ObjectManager&MockObject $om;
+    private Address&MockObject $address;
+    private AddressHandler $handler;
 
     #[\Override]
     protected function setUp(): void

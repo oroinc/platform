@@ -3,9 +3,10 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\DataGridBundle\DependencyInjection\OroDataGridExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroDataGridExtensionTest extends \PHPUnit\Framework\TestCase
+class OroDataGridExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

@@ -9,17 +9,14 @@ use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\RenameExtension;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class RenameExtensionTest extends \PHPUnit\Framework\TestCase
+class RenameExtensionTest extends TestCase
 {
-    /** @var ExtendOptionsManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $optionsManager;
-
-    /** @var AbstractPlatform|\PHPUnit\Framework\MockObject\MockObject */
-    private $databasePlatform;
-
-    /** @var RenameExtension */
-    private $extension;
+    private ExtendOptionsManager&MockObject $optionsManager;
+    private AbstractPlatform&MockObject $databasePlatform;
+    private RenameExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +28,7 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->setDatabasePlatform($this->databasePlatform);
     }
 
-    public function testRenameTableFixOnlyTableName()
+    public function testRenameTableFixOnlyTableName(): void
     {
         $oldTable = 'old_table';
         $newTable = 'new_table';
@@ -53,7 +50,7 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($queries->getPostQueries()); // make sure that parent method was called
     }
 
-    public function testRenameTableFixTableNameWithFieldName()
+    public function testRenameTableFixTableNameWithFieldName(): void
     {
         $oldTable = 'old_table';
         $newTable = 'new_table';

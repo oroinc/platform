@@ -3,13 +3,14 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Extension;
 
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowMaskBuilder;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
+class WorkflowMaskBuilderTest extends TestCase
 {
-    public function testViewWorkflowGroup()
+    public function testViewWorkflowGroup(): void
     {
         $this->assertEquals(
             WorkflowMaskBuilder::GROUP_VIEW_WORKFLOW,
@@ -21,7 +22,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPerformTransitionsGroup()
+    public function testPerformTransitionsGroup(): void
     {
         $this->assertEquals(
             WorkflowMaskBuilder::GROUP_PERFORM_TRANSITIONS,
@@ -33,7 +34,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAllGroup()
+    public function testAllGroup(): void
     {
         $this->assertEquals(
             WorkflowMaskBuilder::GROUP_ALL,
@@ -41,7 +42,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemoveServiceBits()
+    public function testRemoveServiceBits(): void
     {
         $this->assertEquals(
             WorkflowMaskBuilder::REMOVE_SERVICE_BITS,
@@ -49,7 +50,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testServiceBits()
+    public function testServiceBits(): void
     {
         $this->assertEquals(
             WorkflowMaskBuilder::SERVICE_BITS,
@@ -57,7 +58,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEmptyPattern()
+    public function testGetEmptyPattern(): void
     {
         $builder = new WorkflowMaskBuilder();
 
@@ -67,7 +68,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternViewBasic()
+    public function testGetPatternViewBasic(): void
     {
         $builder = new WorkflowMaskBuilder();
         $builder->add(WorkflowMaskBuilder::MASK_VIEW_WORKFLOW_BASIC);
@@ -78,7 +79,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternPerformBasic()
+    public function testGetPatternPerformBasic(): void
     {
         $builder = new WorkflowMaskBuilder();
         $builder->add(WorkflowMaskBuilder::MASK_PERFORM_TRANSITIONS_BASIC);
@@ -89,7 +90,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternBasic()
+    public function testGetPatternBasic(): void
     {
         $builder = new WorkflowMaskBuilder();
         $builder->add(WorkflowMaskBuilder::GROUP_BASIC);
@@ -100,7 +101,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternViewLocal()
+    public function testGetPatternViewLocal(): void
     {
         $builder = new WorkflowMaskBuilder();
         $builder->add(WorkflowMaskBuilder::MASK_VIEW_WORKFLOW_LOCAL);
@@ -111,7 +112,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternPerformLocal()
+    public function testGetPatternPerformLocal(): void
     {
         $builder = new WorkflowMaskBuilder();
         $builder->add(WorkflowMaskBuilder::MASK_PERFORM_TRANSITIONS_LOCAL);
@@ -122,7 +123,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternLocal()
+    public function testGetPatternLocal(): void
     {
         $builder = new WorkflowMaskBuilder();
         $builder->add(WorkflowMaskBuilder::GROUP_LOCAL);
@@ -133,7 +134,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternViewDeep()
+    public function testGetPatternViewDeep(): void
     {
         $builder = new WorkflowMaskBuilder();
         $builder->add(WorkflowMaskBuilder::MASK_VIEW_WORKFLOW_DEEP);
@@ -144,7 +145,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternPerformDeep()
+    public function testGetPatternPerformDeep(): void
     {
         $builder = new WorkflowMaskBuilder();
         $builder->add(WorkflowMaskBuilder::MASK_PERFORM_TRANSITIONS_DEEP);
@@ -155,7 +156,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternDeep()
+    public function testGetPatternDeep(): void
     {
         $builder = new WorkflowMaskBuilder();
         $builder->add(WorkflowMaskBuilder::GROUP_DEEP);
@@ -166,7 +167,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternViewGlobal()
+    public function testGetPatternViewGlobal(): void
     {
         $builder = new WorkflowMaskBuilder();
         $builder->add(WorkflowMaskBuilder::MASK_VIEW_WORKFLOW_GLOBAL);
@@ -177,7 +178,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternPerformGlobal()
+    public function testGetPatternPerformGlobal(): void
     {
         $builder = new WorkflowMaskBuilder();
         $builder->add(WorkflowMaskBuilder::MASK_PERFORM_TRANSITIONS_GLOBAL);
@@ -188,7 +189,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternGlobal()
+    public function testGetPatternGlobal(): void
     {
         $builder = new WorkflowMaskBuilder();
         $builder->add(WorkflowMaskBuilder::GROUP_GLOBAL);
@@ -199,7 +200,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternViewSystem()
+    public function testGetPatternViewSystem(): void
     {
         $builder = new WorkflowMaskBuilder();
         $builder->add(WorkflowMaskBuilder::MASK_VIEW_WORKFLOW_SYSTEM);
@@ -210,7 +211,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternPerformSystem()
+    public function testGetPatternPerformSystem(): void
     {
         $builder = new WorkflowMaskBuilder();
         $builder->add(WorkflowMaskBuilder::MASK_PERFORM_TRANSITIONS_SYSTEM);
@@ -221,7 +222,7 @@ class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternSystem()
+    public function testGetPatternSystem(): void
     {
         $builder = new WorkflowMaskBuilder();
         $builder->add(WorkflowMaskBuilder::GROUP_SYSTEM);

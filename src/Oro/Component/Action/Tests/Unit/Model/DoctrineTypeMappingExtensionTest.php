@@ -3,11 +3,11 @@
 namespace Oro\Component\Action\Tests\Unit\Model;
 
 use Oro\Component\Action\Model\DoctrineTypeMappingExtension;
+use PHPUnit\Framework\TestCase;
 
-class DoctrineTypeMappingExtensionTest extends \PHPUnit\Framework\TestCase
+class DoctrineTypeMappingExtensionTest extends TestCase
 {
-    /** @var DoctrineTypeMappingExtension */
-    private $extension;
+    private DoctrineTypeMappingExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -15,7 +15,7 @@ class DoctrineTypeMappingExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new DoctrineTypeMappingExtension();
     }
 
-    public function testGetDoctrineTypeMappings()
+    public function testGetDoctrineTypeMappings(): void
     {
         $this->extension->addDoctrineTypeMapping('test1', 'test1');
         $this->extension->addDoctrineTypeMapping('test2', 'test2', ['class' => 'test2']);

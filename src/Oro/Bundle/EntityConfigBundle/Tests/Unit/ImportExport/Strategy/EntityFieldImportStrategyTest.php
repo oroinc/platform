@@ -16,34 +16,21 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
+class EntityFieldImportStrategyTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DatabaseHelper */
-    private $databaseHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FieldTypeProvider */
-    private $fieldTypeProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityFieldImportStrategy */
-    private $strategy;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FieldHelper */
-    private $fieldHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ImportStrategyHelper */
-    private $strategyHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FieldNameValidationHelper */
-    private $validationHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContextInterface */
-    private $context;
-
-    /** @var ConstraintFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $constraintFactory;
+    private DatabaseHelper&MockObject $databaseHelper;
+    private FieldTypeProvider&MockObject $fieldTypeProvider;
+    private FieldHelper&MockObject $fieldHelper;
+    private ImportStrategyHelper&MockObject $strategyHelper;
+    private FieldNameValidationHelper&MockObject $validationHelper;
+    private ContextInterface&MockObject $context;
+    private ConstraintFactory&MockObject $constraintFactory;
+    private EntityFieldImportStrategy $strategy;
 
     #[\Override]
     protected function setUp(): void
@@ -76,14 +63,14 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
         $this->strategy->setConstraintFactory($this->constraintFactory);
     }
 
-    public function testProcessWrongType()
+    public function testProcessWrongType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $field = new \stdClass();
         $this->strategy->process($field);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $entity = new FieldConfigModel('testFieldName', 'integer');
         $entity->setEntity(new EntityConfigModel(\stdClass::class));
@@ -105,7 +92,7 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
         self::assertSame($entity, $this->strategy->process($entity));
     }
 
-    public function testProcessWrongFieldType()
+    public function testProcessWrongFieldType(): void
     {
         $entity = new FieldConfigModel('testFieldName', 'manyToOne');
 
@@ -122,7 +109,7 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->strategy->process($entity));
     }
 
-    public function testProcessEmptyFieldName()
+    public function testProcessEmptyFieldName(): void
     {
         $entity = new FieldConfigModel('', 'manyToOne');
 
@@ -140,7 +127,7 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->strategy->process($entity));
     }
 
-    public function testProcessValidationErrors()
+    public function testProcessValidationErrors(): void
     {
         $entityModel = new EntityConfigModel(\stdClass::class);
         $entity = new FieldConfigModel('testFieldName', 'integer');
@@ -172,7 +159,7 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->strategy->process($entity));
     }
 
-    public function testProcessValidationErrorsOfEntityFields()
+    public function testProcessValidationErrorsOfEntityFields(): void
     {
         $entityModel = new EntityConfigModel(\stdClass::class);
         $entity = new FieldConfigModel('testFieldName', 'integer');

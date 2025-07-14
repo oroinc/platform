@@ -9,13 +9,14 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowDefinitionClonerHelper;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowDefinitionClonerHelperTest extends \PHPUnit\Framework\TestCase
+class WorkflowDefinitionClonerHelperTest extends TestCase
 {
     /**
      * @dataProvider variableDefinitionsProvider
      */
-    public function testParseVariableDefinitions(array $configuration, array $expected)
+    public function testParseVariableDefinitions(array $configuration, array $expected): void
     {
         $result = WorkflowDefinitionClonerHelper::parseVariableDefinitions($configuration);
 
@@ -103,7 +104,7 @@ class WorkflowDefinitionClonerHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getOptionsProvider
      */
-    public function testGetOptions(array $options, ?string $key, mixed $expected, ?array $default = null)
+    public function testGetOptions(array $options, ?string $key, mixed $expected, ?array $default = null): void
     {
         $result = WorkflowDefinitionClonerHelper::getOption($key, $options, $default);
 
@@ -238,7 +239,7 @@ class WorkflowDefinitionClonerHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider copyConfigurationVariablesProvider
      */
-    public function testCopyConfigurationVariables(array $definition, array $source, array $expected)
+    public function testCopyConfigurationVariables(array $definition, array $source, array $expected): void
     {
         $sourceDefinition = $this->createDefinition();
         $existingDefinition = $this->createDefinition();

@@ -5,10 +5,11 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class NavigationHistoryItemTest extends \PHPUnit\Framework\TestCase
+class NavigationHistoryItemTest extends TestCase
 {
-    public function testNavigationHistoryItemEntity()
+    public function testNavigationHistoryItemEntity(): void
     {
         $organization = new Organization();
         $user = new User();
@@ -38,14 +39,14 @@ class NavigationHistoryItemTest extends \PHPUnit\Framework\TestCase
         $item->setVisitedAt($dateTime);
         $this->assertEquals($dateTime, $item->getVisitedAt());
 
-        $visitCount = rand(0, 100);
+        $visitCount = random_int(0, 100);
         $item->setVisitCount($visitCount);
         $this->assertEquals($visitCount, $item->getVisitCount());
 
         $this->assertEquals(null, $item->getId());
     }
 
-    public function testDoPrePersist()
+    public function testDoPrePersist(): void
     {
         $item = new NavigationHistoryItem();
         $item->doPrePersist();
@@ -54,7 +55,7 @@ class NavigationHistoryItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $item->getVisitCount());
     }
 
-    public function testDoUpdate()
+    public function testDoUpdate(): void
     {
         $item = new NavigationHistoryItem();
         $oldVisitedAt = $item->getVisitedAt();

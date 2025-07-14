@@ -4,13 +4,14 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\ActionBundle\Exception\CircularReferenceException;
 use Oro\Bundle\ActionBundle\Helper\ArraySubstitution;
+use PHPUnit\Framework\TestCase;
 
-class ArraySubstitutionTest extends \PHPUnit\Framework\TestCase
+class ArraySubstitutionTest extends TestCase
 {
     /**
      * @dataProvider applyProvider
      */
-    public function testApply(array $map, array $things, array $expected)
+    public function testApply(array $map, array $things, array $expected): void
     {
         $substitution = new ArraySubstitution();
         $substitution->setMap($map);
@@ -114,7 +115,7 @@ class ArraySubstitutionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testMaxDepthException()
+    public function testMaxDepthException(): void
     {
         $substitution = new ArraySubstitution(true, 2);
         $substitution->setMap([
@@ -138,7 +139,7 @@ class ArraySubstitutionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider clearUnboundProvider
      */
-    public function testNotClearUnbound(array $map, array $things, array $expected)
+    public function testNotClearUnbound(array $map, array $things, array $expected): void
     {
         $arraySubstitution = new ArraySubstitution(false);
         $arraySubstitution->setMap($map);

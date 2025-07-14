@@ -5,11 +5,12 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\DataGrid\Formatter;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\EmbeddedFormBundle\DataGrid\Formatter\EmbeddedFormTypeProperty;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmbeddedFormTypePropertyTest extends \PHPUnit\Framework\TestCase
+class EmbeddedFormTypePropertyTest extends TestCase
 {
-    public function testShouldReturnValue()
+    public function testShouldReturnValue(): void
     {
         $manager = $this->createMock(EmbeddedFormManager::class);
         $translator = $this->createMock(TranslatorInterface::class);

@@ -16,22 +16,19 @@ use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ScalarFieldDenormalizer;
 use Oro\Bundle\ImportExportBundle\Serializer\Serializer;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer\Stub\DenormalizationStub;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
+class ConfigurableEntityNormalizerTest extends TestCase
 {
-    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldHelper;
-
-    /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var ConfigurableEntityNormalizer */
-    private $normalizer;
+    private FieldHelper&MockObject $fieldHelper;
+    private EventDispatcher&MockObject $eventDispatcher;
+    private ConfigurableEntityNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void
@@ -211,8 +208,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
         }
         $this->normalizer->setSerializer($serializer);
 
-        $this->eventDispatcher
-            ->expects(self::any())
+        $this->eventDispatcher->expects(self::any())
             ->method('hasListeners')
             ->willReturn(false);
 
@@ -412,8 +408,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
             ->with($class, EntityFieldProvider::OPTION_WITH_RELATIONS)
             ->willReturn($fields);
 
-        $this->eventDispatcher
-            ->expects(self::exactly(2))
+        $this->eventDispatcher->expects(self::exactly(2))
             ->method('dispatch')
             ->withConsecutive(
                 [self::isInstanceOf(DenormalizeEntityEvent::class), Events::BEFORE_DENORMALIZE_ENTITY],
@@ -471,7 +466,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
 
     public function denormalizeDataProvider(): array
     {
-        $expected = new Stub\DenormalizationStub();
+        $expected = new DenormalizationStub();
         $expected->id = 100;
         $expected->name = 'test';
         $expected->created = 'dDateTime';

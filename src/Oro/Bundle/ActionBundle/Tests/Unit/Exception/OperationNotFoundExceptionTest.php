@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Exception;
 
 use Oro\Bundle\ActionBundle\Exception\OperationNotFoundException;
+use PHPUnit\Framework\TestCase;
 
-class OperationNotFoundExceptionTest extends \PHPUnit\Framework\TestCase
+class OperationNotFoundExceptionTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $exception = new OperationNotFoundException('test_action_name');
 

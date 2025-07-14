@@ -3,15 +3,14 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\DataProvider;
 
 use Oro\Bundle\LayoutBundle\Layout\DataProvider\AssetProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
 
-class AssetProviderTest extends \PHPUnit\Framework\TestCase
+class AssetProviderTest extends TestCase
 {
-    /** @var Packages|\PHPUnit\Framework\MockObject\MockObject */
-    private $packages;
-
-    /** @var AssetProvider */
-    private $provider;
+    private Packages&MockObject $packages;
+    private AssetProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class AssetProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getUrlDataProvider
      */
-    public function testGetUrl(string $path, ?string $packageName, ?string $normalizedPath, ?string $expected)
+    public function testGetUrl(string $path, ?string $packageName, ?string $normalizedPath, ?string $expected): void
     {
         $this->packages->expects($this->once())
             ->method('getUrl')
@@ -64,7 +63,7 @@ class AssetProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetUrlWithNullPath()
+    public function testGetUrlWithNullPath(): void
     {
         $this->packages->expects($this->never())
             ->method('getUrl');
@@ -72,7 +71,7 @@ class AssetProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->provider->getUrl(null));
     }
 
-    public function testAddErrorForInvalidPathType()
+    public function testAddErrorForInvalidPathType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected a string value for the path, got "array".');
@@ -83,7 +82,7 @@ class AssetProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->getUrl(['test']);
     }
 
-    public function testAddErrorForInvalidPackageNameType()
+    public function testAddErrorForInvalidPackageNameType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected null or a string value for the package name, got "array".');

@@ -10,10 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 class EntityAuditStrategyProcessorRegistryTest extends TestCase
 {
-    private EntityAuditStrategyProcessorInterface|MockObject $processor1;
-
-    private DefaultEntityAuditStrategyProcessor|MockObject $defaultProcessor;
-
+    private EntityAuditStrategyProcessorInterface&MockObject $processor1;
+    private DefaultEntityAuditStrategyProcessor&MockObject $defaultProcessor;
     private EntityAuditStrategyProcessorRegistry $registry;
 
     #[\Override]

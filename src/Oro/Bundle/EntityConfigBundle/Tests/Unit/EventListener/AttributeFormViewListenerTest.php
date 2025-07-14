@@ -13,24 +13,19 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\View\ScrollData;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormView;
 use Twig\Environment;
 
-class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
+class AttributeFormViewListenerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $environment;
-
-    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeManager;
-
-    /** @var FieldAclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldAclHelper;
-
-    /** @var AttributeFormViewListener */
-    private $listener;
+    private Environment&MockObject $environment;
+    private AttributeManager&MockObject $attributeManager;
+    private FieldAclHelper&MockObject $fieldAclHelper;
+    private AttributeFormViewListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -38,12 +33,10 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
         $this->environment = $this->createMock(Environment::class);
         $this->attributeManager = $this->createMock(AttributeManager::class);
         $this->fieldAclHelper = $this->createMock(FieldAclHelper::class);
-        $this->fieldAclHelper
-            ->expects($this->any())
+        $this->fieldAclHelper->expects($this->any())
             ->method('isFieldAvailable')
             ->willReturn(true);
-        $this->fieldAclHelper
-            ->expects($this->any())
+        $this->fieldAclHelper->expects($this->any())
             ->method('isFieldViewGranted')
             ->willReturn(true);
 
@@ -53,7 +46,7 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnEditWithoutFormRenderEvent()
+    public function testOnEditWithoutFormRenderEvent(): void
     {
         $this->attributeManager->expects($this->never())
             ->method('getGroupsWithAttributes');
@@ -61,7 +54,7 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onEdit(new BeforeListRenderEvent($this->environment, new ScrollData(), new \stdClass()));
     }
 
-    public function testOnViewWithoutViewRenderEvent()
+    public function testOnViewWithoutViewRenderEvent(): void
     {
         $this->attributeManager->expects($this->never())
             ->method('getGroupsWithAttributes');
@@ -78,7 +71,7 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
         string $templateHtml,
         array $expectedData,
         array $formViewChildren
-    ) {
+    ): void {
         $formView = new FormView();
         $formView->children = $formViewChildren;
 
@@ -307,7 +300,7 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
         array $scrollData,
         string $templateHtml,
         array $expectedData
-    ) {
+    ): void {
         $entity = $this->getEntity(TestActivityTarget::class, [
             'attributeFamily' => $this->getEntity(AttributeFamily::class)
         ]);

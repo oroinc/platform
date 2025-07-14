@@ -17,11 +17,8 @@ class RowHashCommentMetadataListenerTest extends TestCase
 {
     private const RELATIONS = 'customer_id,customergroup_id,localization_id';
 
-    /** @var LoadClassMetadataEventArgs|MockObject */
-    private $event;
-
-    /** @var RowHashCommentMetadataListener */
-    private $listener;
+    private LoadClassMetadataEventArgs&MockObject $event;
+    private RowHashCommentMetadataListener $listener;
 
     #[\Override]
     protected function setUp(): void

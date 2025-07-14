@@ -20,7 +20,7 @@ use Symfony\Component\Form\FormInterface;
 
 class FormInitListenerTest extends TestCase
 {
-    private EventDispatcher|MockObject $eventDispatcher;
+    private EventDispatcher&MockObject $eventDispatcher;
     private FormInitListener $listener;
 
     #[\Override]

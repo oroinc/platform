@@ -10,20 +10,17 @@ use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendTable;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ExtendTableTest extends \PHPUnit\Framework\TestCase
+class ExtendTableTest extends TestCase
 {
     private const TABLE_NAME = 'test_table';
     private const COLUMN_NAME = 'test_column';
 
-    /** @var ExtendOptionsManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendOptionsManager;
-
-    /** @var DbIdentifierNameGenerator|\PHPUnit\Framework\MockObject\MockObject */
-    private $nameGenerator;
-
-    /** @var ExtendTable */
-    private $table;
+    private ExtendOptionsManager&MockObject $extendOptionsManager;
+    private DbIdentifierNameGenerator&MockObject $nameGenerator;
+    private ExtendTable $table;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +36,7 @@ class ExtendTableTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testAddColumnWithSameExtendLength()
+    public function testAddColumnWithSameExtendLength(): void
     {
         $this->setExpectations('string', 'length', 100);
         $options = ['length' => 100, OroOptions::KEY => ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]];
@@ -48,7 +45,7 @@ class ExtendTableTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(100, $column->getLength());
     }
 
-    public function testAddColumnWithSameExtendPrecision()
+    public function testAddColumnWithSameExtendPrecision(): void
     {
         $this->setExpectations('float', 'precision', 8);
         $options = ['precision' => 8, OroOptions::KEY => ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]];
@@ -57,7 +54,7 @@ class ExtendTableTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(8, $column->getPrecision());
     }
 
-    public function testAddColumnWithSameExtendScale()
+    public function testAddColumnWithSameExtendScale(): void
     {
         $this->setExpectations('float', 'scale', 5);
         $options = ['scale' => 5, OroOptions::KEY => ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]];
@@ -66,7 +63,7 @@ class ExtendTableTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(5, $column->getScale());
     }
 
-    public function testAddColumnWithSameExtendDefault()
+    public function testAddColumnWithSameExtendDefault(): void
     {
         $this->setExpectations('string', 'default', 'N/A');
         $options = ['default' => 'N/A', OroOptions::KEY => ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]];
@@ -75,7 +72,7 @@ class ExtendTableTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('N/A', $column->getDefault());
     }
 
-    public function testAddColumnWithSameExtendNullable()
+    public function testAddColumnWithSameExtendNullable(): void
     {
         $type = Type::getType('string');
 

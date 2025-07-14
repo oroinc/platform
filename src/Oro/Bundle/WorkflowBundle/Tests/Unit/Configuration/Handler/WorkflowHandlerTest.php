@@ -5,11 +5,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Handler;
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\WorkflowHandler;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowHandlerTest extends \PHPUnit\Framework\TestCase
+class WorkflowHandlerTest extends TestCase
 {
-    /** @var WorkflowHandler */
-    private $handler;
+    private WorkflowHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class WorkflowHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider handleDataProvider
      */
-    public function testHandle(array $expected, array $input)
+    public function testHandle(array $expected, array $input): void
     {
         $otherHandler = $this->createMock(ConfigurationHandlerInterface::class);
         $otherHandler->expects($this->once())
@@ -79,7 +79,7 @@ class WorkflowHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testHandleEmptyConfiguration()
+    public function testHandleEmptyConfiguration(): void
     {
         $configuration = [
             'entity' => 'NotExistingEntity',

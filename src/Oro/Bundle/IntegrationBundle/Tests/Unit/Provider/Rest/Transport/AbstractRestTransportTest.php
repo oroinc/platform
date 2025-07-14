@@ -7,15 +7,14 @@ use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientFactoryInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\AbstractRestTransport;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class AbstractRestTransportTest extends \PHPUnit\Framework\TestCase
+class AbstractRestTransportTest extends TestCase
 {
-    /** @var RestClientFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $clientFactory;
-
-    /** @var AbstractRestTransport|\PHPUnit\Framework\MockObject\MockObject */
-    private $transport;
+    private RestClientFactoryInterface&MockObject $clientFactory;
+    private AbstractRestTransport&MockObject $transport;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class AbstractRestTransportTest extends \PHPUnit\Framework\TestCase
         $this->transport->setRestClientFactory($this->clientFactory);
     }
 
-    public function testInitWorks()
+    public function testInitWorks(): void
     {
         $expectedBaseUrl = 'https://example.com/api/v2';
         $expectedClientOptions = ['auth' => ['username', 'password']];
@@ -61,7 +60,7 @@ class AbstractRestTransportTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedClient, $this->transport->getClient());
     }
 
-    public function testGetClientFails()
+    public function testGetClientFails(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage("REST Transport isn't configured properly.");

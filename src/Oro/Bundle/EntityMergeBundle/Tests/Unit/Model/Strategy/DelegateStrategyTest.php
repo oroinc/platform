@@ -6,13 +6,12 @@ use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\DelegateStrategy;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DelegateStrategyTest extends \PHPUnit\Framework\TestCase
+class DelegateStrategyTest extends TestCase
 {
-    /**
-     * @return StrategyInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createStrategy(string $name)
+    private function createStrategy(string $name): StrategyInterface&MockObject
     {
         $result = $this->createMock(StrategyInterface::class);
         $result->expects($this->any())
@@ -22,7 +21,7 @@ class DelegateStrategyTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    public function testSupportsTrueLast()
+    public function testSupportsTrueLast(): void
     {
         $data = $this->createMock(FieldData::class);
 
@@ -48,7 +47,7 @@ class DelegateStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($strategy->supports($data));
     }
 
-    public function testSupportsTrueFirst()
+    public function testSupportsTrueFirst(): void
     {
         $data = $this->createMock(FieldData::class);
 
@@ -66,7 +65,7 @@ class DelegateStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($strategy->supports($data));
     }
 
-    public function testSupportsFalse()
+    public function testSupportsFalse(): void
     {
         $data = $this->createMock(FieldData::class);
 
@@ -86,7 +85,7 @@ class DelegateStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($strategy->supports($data));
     }
 
-    public function testMerge()
+    public function testMerge(): void
     {
         $data = $this->createMock(FieldData::class);
 
@@ -117,7 +116,7 @@ class DelegateStrategyTest extends \PHPUnit\Framework\TestCase
         $strategy->merge($data);
     }
 
-    public function testMergeFails()
+    public function testMergeFails(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot find merge strategy for "test" field.');

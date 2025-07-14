@@ -8,10 +8,11 @@ use Oro\Bundle\EntityExtendBundle\EventListener\UpdateExtendConfigPostUpMigratio
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigration;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestMigration;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
+use PHPUnit\Framework\TestCase;
 
-class UpdateExtendConfigPostUpMigrationListenerTest extends \PHPUnit\Framework\TestCase
+class UpdateExtendConfigPostUpMigrationListenerTest extends TestCase
 {
-    public function testOnPostUp()
+    public function testOnPostUp(): void
     {
         $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.yml';
         $initialStatePath = realpath(__DIR__ . '/../Fixtures') . '/initial_state.yml';

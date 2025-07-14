@@ -17,9 +17,8 @@ class WebsocketServerCommandListenerTest extends TestCase
 {
     private const COMMAND_NAME = 'gos:websocket:server';
 
-    private DsnBasedParameters|MockObject $dsnParameters;
-
-    private WebsocketServerCommandListener|MockObject $listener;
+    private DsnBasedParameters&MockObject $dsnParameters;
+    private WebsocketServerCommandListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -35,8 +34,7 @@ class WebsocketServerCommandListenerTest extends TestCase
         $output = new BufferedOutput();
         $event = new ConsoleCommandEvent($command, $this->createMock(InputInterface::class), $output);
 
-        $this->dsnParameters
-            ->expects(self::never())
+        $this->dsnParameters->expects(self::never())
             ->method(self::anything());
 
         self::assertTrue($event->commandShouldRun());
@@ -53,8 +51,7 @@ class WebsocketServerCommandListenerTest extends TestCase
         $output = new BufferedOutput();
         $event = new ConsoleCommandEvent($command, $this->createMock(InputInterface::class), $output);
 
-        $this->dsnParameters
-            ->expects(self::once())
+        $this->dsnParameters->expects(self::once())
             ->method('getHost')
             ->willReturn('example.org');
 
@@ -72,8 +69,7 @@ class WebsocketServerCommandListenerTest extends TestCase
         $output = new BufferedOutput();
         $event = new ConsoleCommandEvent($command, $this->createMock(InputInterface::class), $output);
 
-        $this->dsnParameters
-            ->expects(self::once())
+        $this->dsnParameters->expects(self::once())
             ->method('getHost')
             ->willReturn('');
 

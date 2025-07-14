@@ -19,11 +19,13 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
+class OwnershipConditionDataBuilderTest extends TestCase
 {
     private const BUSINESS_UNIT = BusinessUnit::class;
     private const ORGANIZATION = Organization::class;
@@ -53,23 +55,12 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
     private const ORG_3 = 303;
     private const ORG_4 = 304;
 
-    /** @var OwnershipConditionDataBuilder */
-    private $builder;
-
-    /** @var OwnershipMetadataProviderStub */
-    private $metadataProvider;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var AclVoter|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclVoter;
-
-    /** @var OwnerTree */
-    private $tree;
+    private OwnershipConditionDataBuilder $builder;
+    private OwnershipMetadataProviderStub $metadataProvider;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private AclVoter&MockObject $aclVoter;
+    private OwnerTree $tree;
 
     #[\Override]
     protected function setUp(): void
@@ -99,8 +90,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
             $this->metadataProvider->getUserClass(),
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id')
         );
-        $this->metadataProvider->getCacheMock()
-            ->expects(self::any())
+        $this->metadataProvider->getCacheMock()->expects(self::any())
             ->method('get')
             ->willReturn(true);
 
@@ -248,17 +238,15 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
             ->method('isGranted')
             ->with(
                 $this->equalTo('VIEW'),
-                $this->callback(
-                    function (ObjectIdentity $identity) use ($targetEntityClassName, $expectedGroup) {
-                        $this->assertEquals('entity', $identity->getIdentifier());
-                        $this->assertStringEndsWith($targetEntityClassName, $identity->getType());
-                        if ($expectedGroup) {
-                            $this->assertStringStartsWith($expectedGroup, $identity->getType());
-                        }
-
-                        return true;
+                $this->callback(function (ObjectIdentity $identity) use ($targetEntityClassName, $expectedGroup) {
+                    $this->assertEquals('entity', $identity->getIdentifier());
+                    $this->assertStringEndsWith($targetEntityClassName, $identity->getType());
+                    if ($expectedGroup) {
+                        $this->assertStringStartsWith($expectedGroup, $identity->getType());
                     }
-                )
+
+                    return true;
+                })
             )
             ->willReturn($isGranted);
         $this->tokenStorage->expects($this->any())

@@ -8,12 +8,13 @@ use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ExpressionConditionVisito
 use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 use Oro\Component\PhpUtils\ClassGenerator;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
-class ExpressionConditionVisitorTest extends \PHPUnit\Framework\TestCase
+class ExpressionConditionVisitorTest extends TestCase
 {
-    public function testVisit()
+    public function testVisit(): void
     {
         $expression = $this->createMock(ParsedExpression::class);
 

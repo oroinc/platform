@@ -2,28 +2,30 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Func;
 
-use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Condition\FalseCondition;
+use Oro\Component\ConfigExpression\Condition\TrueCondition;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Oro\Component\ConfigExpression\Func;
+use Oro\Component\ConfigExpression\Func\Iif;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class IifTest extends \PHPUnit\Framework\TestCase
+class IifTest extends TestCase
 {
-    /** @var Func\Iif */
-    protected $function;
+    private Func\Iif $function;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->function = new Func\Iif();
+        $this->function = new Iif();
         $this->function->setContextAccessor(new ContextAccessor());
     }
 
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, array $context, string $expectedResult)
+    public function testEvaluate(array $options, array $context, string $expectedResult): void
     {
         $this->assertSame($this->function, $this->function->initialize($options));
         $this->assertEquals($expectedResult, $this->function->evaluate($context));
@@ -33,12 +35,12 @@ class IifTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'true_expr'        => [
-                'options'        => [new Condition\TrueCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
+                'options'        => [new TrueCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'context'        => ['foo' => 'true', 'bar' => 'false'],
                 'expectedResult' => 'true'
             ],
             'false_expr'       => [
-                'options'        => [new Condition\FalseCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
+                'options'        => [new FalseCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'context'        => ['foo' => 'true', 'bar' => 'false'],
                 'expectedResult' => 'false'
             ],
@@ -55,7 +57,7 @@ class IifTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testInitializeFailsWhenEmptyOptions()
+    public function testInitializeFailsWhenEmptyOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 2 or 3 elements, but 0 given.');
@@ -63,7 +65,7 @@ class IifTest extends \PHPUnit\Framework\TestCase
         $this->function->initialize([]);
     }
 
-    public function testInitializeFailsWhenTooManyOptions()
+    public function testInitializeFailsWhenTooManyOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 2 or 3 elements, but 4 given.');
@@ -74,7 +76,7 @@ class IifTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray(array $options, ?string $message, array $expected)
+    public function testToArray(array $options, ?string $message, array $expected): void
     {
         $this->function->initialize($options);
         if ($message !== null) {
@@ -88,7 +90,7 @@ class IifTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                'options'  => [new Condition\TrueCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
+                'options'  => [new TrueCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'message'  => null,
                 'expected' => [
                     '@iif' => [
@@ -113,7 +115,7 @@ class IifTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
             [
-                'options'  => [new Condition\TrueCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
+                'options'  => [new TrueCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'message'  => 'Test',
                 'expected' => [
                     '@iif' => [
@@ -132,7 +134,7 @@ class IifTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile(array $options, ?string $message, string $expected)
+    public function testCompile(array $options, ?string $message, string $expected): void
     {
         $this->function->initialize($options);
         if ($message !== null) {
@@ -146,7 +148,7 @@ class IifTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                'options'  => [new Condition\TrueCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
+                'options'  => [new TrueCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'message'  => null,
                 'expected' => '$factory->create(\'iif\', [$factory->create(\'true\', []), '
                     . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false]), '
@@ -162,7 +164,7 @@ class IifTest extends \PHPUnit\Framework\TestCase
                     . '])'
             ],
             [
-                'options'  => [new Condition\TrueCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
+                'options'  => [new TrueCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'iif\', [$factory->create(\'true\', []), '
                     . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false]), '

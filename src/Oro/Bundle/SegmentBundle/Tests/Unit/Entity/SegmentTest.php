@@ -8,8 +8,9 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class SegmentTest extends \PHPUnit\Framework\TestCase
+class SegmentTest extends TestCase
 {
     use EntityTestCaseTrait;
 

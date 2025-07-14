@@ -8,17 +8,16 @@ use Oro\Bundle\LayoutBundle\Cache\Metadata\LayoutCacheMetadata;
 use Oro\Bundle\LayoutBundle\Exception\InvalidLayoutCacheMetadataException;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class CacheMetadataProviderTest extends \PHPUnit\Framework\TestCase
+class CacheMetadataProviderTest extends TestCase
 {
-    private CacheMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject $defaultProvider;
-
-    /** @var CacheMetadataProviderInterface[]|\PHPUnit\Framework\MockObject\MockObject[] */
+    private CacheMetadataProviderInterface&MockObject $defaultProvider;
+    /** @var CacheMetadataProviderInterface[]&MockObject[] */
     private array $providers;
-
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
-
+    private LoggerInterface&MockObject $logger;
     private CacheMetadataProvider $cacheMetadataProvider;
 
     #[\Override]

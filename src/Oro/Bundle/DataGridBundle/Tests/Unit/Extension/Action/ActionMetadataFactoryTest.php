@@ -5,15 +5,14 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Action;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionMetadataFactory;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ActionMetadataFactoryTest extends \PHPUnit\Framework\TestCase
+class ActionMetadataFactoryTest extends TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var ActionMetadataFactory */
-    private $actionMetadataFactory;
+    private TranslatorInterface&MockObject $translator;
+    private ActionMetadataFactory $actionMetadataFactory;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class ActionMetadataFactoryTest extends \PHPUnit\Framework\TestCase
         $this->actionMetadataFactory = new ActionMetadataFactory($this->translator);
     }
 
-    public function testCreateActionMetadataEmptyOptions()
+    public function testCreateActionMetadataEmptyOptions(): void
     {
         $action = $this->createMock(ActionInterface::class);
         $actionOptions = ActionConfiguration::create([]);
@@ -41,7 +40,7 @@ class ActionMetadataFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateActionMetadataWithAclOption()
+    public function testCreateActionMetadataWithAclOption(): void
     {
         $action = $this->createMock(ActionInterface::class);
         $actionOptions = ActionConfiguration::create(['acl_resource' => 'acl_resource1']);
@@ -59,7 +58,7 @@ class ActionMetadataFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateActionMetadataWithLabel()
+    public function testCreateActionMetadataWithLabel(): void
     {
         $action = $this->createMock(ActionInterface::class);
         $actionOptions = ActionConfiguration::create(['label' => 'label1']);
@@ -79,7 +78,7 @@ class ActionMetadataFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateActionMetadataWithAlreadyTranslatedLabel()
+    public function testCreateActionMetadataWithAlreadyTranslatedLabel(): void
     {
         $action = $this->createMock(ActionInterface::class);
         $actionOptions = ActionConfiguration::create(['label' => 'label1', 'translatable' => false]);

@@ -3,12 +3,13 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\View;
 
 use Oro\Bundle\UIBundle\View\ScrollData;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ScrollDataTest extends \PHPUnit\Framework\TestCase
+class ScrollDataTest extends TestCase
 {
     private ScrollData $scrollData;
 
@@ -18,7 +19,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->scrollData = new ScrollData();
     }
 
-    public function testSetGetData()
+    public function testSetGetData(): void
     {
         $this->assertEmpty($this->scrollData->getData());
 
@@ -36,7 +37,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         ?int $priority = null,
         ?string $class = null,
         bool $useSubBlockDivider = true
-    ) {
+    ): void {
         $this->assertEquals(0, $this->scrollData->addBlock($title, $priority, $class, $useSubBlockDivider));
         $this->assertEquals($expected, $this->scrollData->getData());
     }
@@ -79,7 +80,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider addSubBlockDataProvider
      */
-    public function testAddSubBlock(array $source, array $expected, int $blockId, ?string $title = null)
+    public function testAddSubBlock(array $source, array $expected, int $blockId, ?string $title = null): void
     {
         $this->scrollData->setData($source);
         $this->assertEquals(0, $this->scrollData->addSubBlock($blockId, $title));
@@ -102,8 +103,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         ];
 
         $expectedFirst = $source;
-        $expectedFirst[ScrollData::DATA_BLOCKS][0][ScrollData::SUB_BLOCKS][]
-            = [ScrollData::DATA => []];
+        $expectedFirst[ScrollData::DATA_BLOCKS][0][ScrollData::SUB_BLOCKS][] = [ScrollData::DATA => []];
 
         $expectedSecond = $source;
         $expectedSecond[ScrollData::DATA_BLOCKS][1][ScrollData::SUB_BLOCKS][]
@@ -127,7 +127,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider addSubBlockAsFirstDataProvider
      */
-    public function testAddSubBlockAsFirst(array $source, array $expected, int $blockId, ?string $title = null)
+    public function testAddSubBlockAsFirst(array $source, array $expected, int $blockId, ?string $title = null): void
     {
         $this->scrollData->setData($source);
         $this->assertEquals(0, $this->scrollData->addSubBlockAsFirst($blockId, $title));
@@ -154,8 +154,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         ];
 
         $expectedFirst = $source;
-        $expectedFirst[ScrollData::DATA_BLOCKS][0][ScrollData::SUB_BLOCKS][]
-            = [ScrollData::DATA => []];
+        $expectedFirst[ScrollData::DATA_BLOCKS][0][ScrollData::SUB_BLOCKS][] = [ScrollData::DATA => []];
 
         $expectedSecond = $source;
         $expectedSecond[ScrollData::DATA_BLOCKS][1][ScrollData::SUB_BLOCKS] = [
@@ -239,13 +238,13 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         string|int $expectedId,
         array $initialData,
         array $expectedData
-    ) {
+    ): void {
         $this->scrollData->setData($initialData);
         $this->assertEquals($expectedId, $this->scrollData->addSubBlockData(0, 0, $html, $fieldName));
         $this->assertEquals($expectedData, $this->scrollData->getData());
     }
 
-    public function testAddSubBlockException()
+    public function testAddSubBlockException(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Block 0 is not defined');
@@ -254,7 +253,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->scrollData->addSubBlock(0);
     }
 
-    public function testAddSubBlockDataNoBlockException()
+    public function testAddSubBlockDataNoBlockException(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Block 0 is not defined');
@@ -263,7 +262,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->scrollData->addSubBlockData(0, 0, 'html');
     }
 
-    public function testAddSubBlockDataNoSubBlockException()
+    public function testAddSubBlockDataNoSubBlockException(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Subblock 0 is not defined');
@@ -346,7 +345,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         bool $useDivider,
         array $initialData,
         array $expectedData
-    ) {
+    ): void {
         $this->scrollData->setData($initialData);
         $this->scrollData->addNamedBlock($blockName, $title, $priority, $class, $useDivider);
 
@@ -388,7 +387,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider removeNamedBlockDataProvider
      */
-    public function testRemoveNamedBlock(string $blockName, array $initialData, array $expectedData)
+    public function testRemoveNamedBlock(string $blockName, array $initialData, array $expectedData): void
     {
         $this->scrollData->setData($initialData);
         $this->scrollData->removeNamedBlock($blockName);
@@ -430,7 +429,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider hasNamedFieldDataProvider
      */
-    public function testHasNamedField(array $blockData, string $fieldName, bool $isExistingBlock)
+    public function testHasNamedField(array $blockData, string $fieldName, bool $isExistingBlock): void
     {
         $this->scrollData->setData($blockData);
         $this->assertEquals($isExistingBlock, $this->scrollData->hasNamedField($fieldName));
@@ -503,14 +502,18 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider moveFieldToBlockDataProvider
      */
-    public function testMoveFieldToBlock(array $blocksData, array $expectedData, string|int $blockId, string $fieldId)
-    {
+    public function testMoveFieldToBlock(
+        array $blocksData,
+        array $expectedData,
+        string|int $blockId,
+        string $fieldId
+    ): void {
         $this->scrollData->setData($blocksData);
         $this->scrollData->moveFieldToBlock($fieldId, $blockId);
         $this->assertEquals($expectedData, $this->scrollData->getData());
     }
 
-    public function testGetBlockIdsWhenBlocksAreEmpty()
+    public function testGetBlockIdsWhenBlocksAreEmpty(): void
     {
         $blocks = [
             ScrollData::DATA_BLOCKS => []
@@ -520,7 +523,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $this->scrollData->getBlockIds());
     }
 
-    public function testGetBlockIdsWhenBlocksAreNotEmpty()
+    public function testGetBlockIdsWhenBlocksAreNotEmpty(): void
     {
         $blocks = [
             ScrollData::DATA_BLOCKS => [
@@ -539,7 +542,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([0, 'namedBlock'], $this->scrollData->getBlockIds());
     }
 
-    public function testGetSubblockIdsWhenBlockNotExists()
+    public function testGetSubblockIdsWhenBlockNotExists(): void
     {
         $blocks = [
             ScrollData::DATA_BLOCKS => []
@@ -549,7 +552,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $this->scrollData->getBlockIds());
     }
 
-    public function testGetSubblockIdsWhenBlockExists()
+    public function testGetSubblockIdsWhenBlockExists(): void
     {
         $blocks = [
             ScrollData::DATA_BLOCKS => [
@@ -571,7 +574,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([0, 'namedSubblock'], $this->scrollData->getSubblockIds(5));
     }
 
-    public function testChangeBlockWhenNoBlockExists()
+    public function testChangeBlockWhenNoBlockExists(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Block with id "someId" has not been found');
@@ -585,7 +588,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->scrollData->changeBlock('someId');
     }
 
-    public function testChangeBlock()
+    public function testChangeBlock(): void
     {
         $blocks = [
             ScrollData::DATA_BLOCKS => [
@@ -615,7 +618,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedBlocks, $this->scrollData->getData());
     }
 
-    public function testHasBlockWhenNoBlock()
+    public function testHasBlockWhenNoBlock(): void
     {
         $blocks = [
             ScrollData::DATA_BLOCKS => [
@@ -627,7 +630,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->scrollData->hasBlock(0));
     }
 
-    public function testHasBlock()
+    public function testHasBlock(): void
     {
         $blocks = [
             ScrollData::DATA_BLOCKS => [
@@ -646,7 +649,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->scrollData->hasBlock('named'));
     }
 
-    public function testIsEmptyBlockTrue()
+    public function testIsEmptyBlockTrue(): void
     {
         $blocks = [
             ScrollData::DATA_BLOCKS => [
@@ -661,7 +664,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->scrollData->isEmptyBlock('empty_named_block'));
     }
 
-    public function testNotEmptyBlock()
+    public function testNotEmptyBlock(): void
     {
         $blocks = [
             ScrollData::DATA_BLOCKS => [
@@ -684,7 +687,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->scrollData->isEmptyBlock('not_empty_named_block'));
     }
 
-    public function testGetBlockWhenNoBlockExists()
+    public function testGetBlockWhenNoBlockExists(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Block with id "someId" has not been found');
@@ -693,7 +696,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->scrollData->getBlock('someId');
     }
 
-    public function testGetBlock()
+    public function testGetBlock(): void
     {
         $block = [
             ScrollData::TITLE => 'test title',

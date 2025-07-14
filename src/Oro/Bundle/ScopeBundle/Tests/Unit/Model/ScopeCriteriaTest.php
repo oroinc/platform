@@ -5,16 +5,20 @@ namespace Oro\Bundle\ScopeBundle\Tests\Unit\Model;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Expr\Comparison;
+use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Query\Expr\Orx;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 use Oro\Bundle\ScopeBundle\Tests\Unit\Stub\StubEntity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
+class ScopeCriteriaTest extends TestCase
 {
-    /** @var ClassMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $classMetadataFactory;
+    private ClassMetadataFactory&MockObject $classMetadataFactory;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +26,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
         $this->classMetadataFactory = $this->createMock(ClassMetadataFactory::class);
     }
 
-    public function testGetIdentifier()
+    public function testGetIdentifier(): void
     {
         $entityIdReflProperty = new \ReflectionProperty(StubEntity::class, 'id');
         $entityIdReflProperty->setAccessible(true);
@@ -62,7 +66,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $criteriaData = [
             'field1' => 1,
@@ -72,7 +76,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($criteriaData, $criteria->toArray());
     }
 
-    public function testGetIterator()
+    public function testGetIterator(): void
     {
         $criteriaData = [
             'field1' => 1,
@@ -82,7 +86,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($criteriaData, iterator_to_array($criteria));
     }
 
-    public function testApplyWhere()
+    public function testApplyWhere(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
         $scopeClassMetadata = new ClassMetadata(Scope::class);
@@ -107,14 +111,16 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
             ],
             $this->classMetadataFactory
         );
-        $qb->method('expr')->willReturn(new Expr());
+        $qb->expects(self::any())
+            ->method('expr')
+            ->willReturn(new Expr());
         $qb->expects($this->exactly(4))
             ->method('andWhere')
             ->withConsecutive(
                 ['scope.nullField IS NULL'],
                 ['scope.notNullField IS NOT NULL'],
                 ['scope.fieldWithValue = :scope_param_fieldWithValue'],
-                [new Expr\Func('scope_multiField.id IN', [':scope_multiField_param_id'])]
+                [new Func('scope_multiField.id IN', [':scope_multiField_param_id'])]
             );
 
         $qb->expects($this->exactly(2))
@@ -127,7 +133,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
         $criteria->applyWhere($qb, 'scope', ['ignoredField']);
     }
 
-    public function testApplyWhereWithPriority()
+    public function testApplyWhereWithPriority(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
 
@@ -144,14 +150,16 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
             ],
             $this->classMetadataFactory
         );
-        $qb->method('expr')->willReturn(new Expr());
+        $qb->expects(self::any())
+            ->method('expr')
+            ->willReturn(new Expr());
         $qb->expects($this->exactly(3))
             ->method('andWhere')
             ->withConsecutive(
                 ['scope.nullField IS NULL'],
                 ['scope.notNullField IS NOT NULL'],
-                [new Expr\Orx([
-                    new Expr\Comparison('scope.fieldWithValue', '=', ':scope_param_fieldWithValue'),
+                [new Orx([
+                    new Comparison('scope.fieldWithValue', '=', ':scope_param_fieldWithValue'),
                     'scope.fieldWithValue IS NULL'
                 ])]
             );
@@ -162,7 +170,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
         $criteria->applyWhereWithPriority($qb, 'scope', ['ignoredField']);
     }
 
-    public function testApplyToJoin()
+    public function testApplyToJoin(): void
     {
         $this->classMetadataFactory->expects($this->any())
             ->method('getMetadataFor')
@@ -209,7 +217,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
         $criteria->applyToJoin($qb, 'scope', ['ignoredField']);
     }
 
-    public function testApplyToJoinWithPriority()
+    public function testApplyToJoinWithPriority(): void
     {
         $scopeClassMetadata = new ClassMetadata(Scope::class);
         $scopeClassMetadata->associationMappings = [
@@ -255,9 +263,9 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
                     'scope.multiField',
                     'scope_multiField',
                     Join::WITH,
-                    new Expr\Orx(
+                    new Orx(
                         [
-                            new Expr\Func('scope_multiField.id IN', [':scope_multiField_param_id']),
+                            new Func('scope_multiField.id IN', [':scope_multiField_param_id']),
                             'scope_multiField.id IS NULL'
                         ]
                     )
@@ -287,13 +295,12 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
         $criteria->applyToJoinWithPriority($qb, 'scope', ['ignoredField']);
     }
 
-    /**
-     * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getBaseQbMock()
+    private function getBaseQbMock(): QueryBuilder&MockObject
     {
         $qb = $this->createMock(QueryBuilder::class);
-        $qb->method('expr')->willReturn(new Expr());
+        $qb->expects(self::any())
+            ->method('expr')
+            ->willReturn(new Expr());
 
         $qb->expects($this->once())
             ->method('resetDQLPart')
@@ -305,16 +312,16 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
             ->willReturn(
                 [
                     'joinGroup' => [
-                        new Expr\Join(
-                            Expr\Join::INNER_JOIN,
+                        new Join(
+                            Join::INNER_JOIN,
                             Scope::class,
                             'scope',
                             Join::WITH,
                             'scope.joinField = 1',
                             'id'
                         ),
-                        new Expr\Join(
-                            Expr\Join::LEFT_JOIN,
+                        new Join(
+                            Join::LEFT_JOIN,
                             \stdClass::class,
                             'otherJoin',
                             Join::WITH,

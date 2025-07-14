@@ -5,15 +5,14 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Client\Meta;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMeta;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Oro\Component\MessageQueue\Client\Meta\DestinationsCommand;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class DestinationsCommandTest extends \PHPUnit\Framework\TestCase
+class DestinationsCommandTest extends TestCase
 {
-    /** @var DestinationMetaRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var DestinationsCommand */
-    private $command;
+    private DestinationMetaRegistry&MockObject $registry;
+    private DestinationsCommand $command;
 
     #[\Override]
     protected function setUp(): void

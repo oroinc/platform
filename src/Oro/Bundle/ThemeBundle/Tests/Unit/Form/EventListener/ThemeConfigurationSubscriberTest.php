@@ -19,7 +19,6 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
 final class ThemeConfigurationSubscriberTest extends TestCase
 {
     private ThemeDefinitionBagInterface&MockObject $provider;
-
     private ThemeConfigurationSubscriber $subscriber;
 
     private array $themeDefinition = [

@@ -6,16 +6,15 @@ use Oro\Bundle\ActionBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class FormOptionsAssemblerTest extends \PHPUnit\Framework\TestCase
+class FormOptionsAssemblerTest extends TestCase
 {
-    /** @var ConfigurationPassInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurationPass;
-
-    /** @var FormOptionsAssembler */
-    private $assembler;
+    private ConfigurationPassInterface&MockObject $configurationPass;
+    private FormOptionsAssembler $assembler;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +33,7 @@ class FormOptionsAssemblerTest extends \PHPUnit\Framework\TestCase
         return $attribute;
     }
 
-    public function testAssemble()
+    public function testAssemble(): void
     {
         $options = [
             'attribute_fields' => [
@@ -88,7 +87,7 @@ class FormOptionsAssemblerTest extends \PHPUnit\Framework\TestCase
         array $attributes,
         string $expectedException,
         string $expectedExceptionMessage
-    ) {
+    ): void {
         $this->expectException($expectedException);
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->assembler->assemble($options, $attributes);

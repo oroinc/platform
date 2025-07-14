@@ -10,6 +10,8 @@ use Oro\Bundle\SyncBundle\Security\Token\TicketToken;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\UriInterface;
 use Ratchet\ConnectionInterface;
@@ -17,7 +19,7 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-class WebsocketAuthenticationByTicketProviderTest extends \PHPUnit\Framework\TestCase
+class WebsocketAuthenticationByTicketProviderTest extends TestCase
 {
     private const WAMP_SESSION_ID = 'sampleSessionId';
     private const USERNAME = 'sampleUsername';
@@ -26,16 +28,16 @@ class WebsocketAuthenticationByTicketProviderTest extends \PHPUnit\Framework\Tes
     private const TICKET_TTL = 300;
 
     private string $providerKey;
+    private TicketDigestGeneratorInterface&MockObject $ticketDigestGenerator;
+    private UserProviderInterface&MockObject $userProvider;
     private WebsocketAuthenticationByTicketProvider $websocketAuthenticationByTicketProvider;
-    private TicketDigestGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject $ticketDigestGenerator;
-    private UserProviderInterface|\PHPUnit\Framework\MockObject\MockObject $userProvider;
 
     #[\Override]
     protected function setUp(): void
     {
+        $this->providerKey = 'sample-provider-key';
         $this->ticketDigestGenerator = $this->createMock(TicketDigestGeneratorInterface::class);
         $this->userProvider = $this->createMock(UserProviderInterface::class);
-        $this->providerKey = 'sample-provider-key';
         $this->websocketAuthenticationByTicketProvider = new WebsocketAuthenticationByTicketProvider(
             $this->ticketDigestGenerator,
             $this->userProvider,

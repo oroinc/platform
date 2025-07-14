@@ -8,17 +8,16 @@ use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface as IntegrationInterfa
 use Oro\Bundle\IntegrationBundle\Provider\IconAwareIntegrationInterface;
 use Oro\Bundle\IntegrationBundle\Provider\IntegrationIconProvider;
 use Oro\Component\DependencyInjection\ServiceLink;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class IntegrationIconProviderTest extends \PHPUnit\Framework\TestCase
+class IntegrationIconProviderTest extends TestCase
 {
     private const CHANNEL_TYPE = 'channel_type_1';
     private const ICON = 'bundles/icon-uri.png';
 
-    /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $typesRegistry;
-
-    /** @var IntegrationIconProvider */
-    private $provider;
+    private TypesRegistry&MockObject $typesRegistry;
+    private IntegrationIconProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +35,7 @@ class IntegrationIconProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getIconDataProvider
      */
-    public function testGetIcon(string $channelType, ?string $expectedIconUri)
+    public function testGetIcon(string $channelType, ?string $expectedIconUri): void
     {
         $channelTypes = [
             self::CHANNEL_TYPE => $this->createIconAwareIntegration(self::ICON),
@@ -64,7 +63,7 @@ class IntegrationIconProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetIconIfNotIconAware()
+    public function testGetIconIfNotIconAware(): void
     {
         $channelTypes = [
             self::CHANNEL_TYPE => $this->createMock(IntegrationInterface::class),

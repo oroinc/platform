@@ -16,10 +16,9 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class ActionExecutorTest extends TestCase
 {
-    private ActionFactoryInterface|MockObject $actionFactory;
-    private ActionGroupRegistry|MockObject $actionGroupRegistry;
-    private ExpressionFactory|MockObject $expressionFactory;
-
+    private ActionFactoryInterface&MockObject $actionFactory;
+    private ActionGroupRegistry&MockObject $actionGroupRegistry;
+    private ExpressionFactory&MockObject $expressionFactory;
     private ActionExecutor $actionExecutor;
 
     #[\Override]

@@ -15,13 +15,11 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 final class ControllerTemplateListenerTest extends TestCase
 {
     private Request $request;
-
     private \Closure $controller;
-
     private ControllerEvent $event;
-
     private ControllerTemplateListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $httpKernel = $this->createMock(HttpKernelInterface::class);

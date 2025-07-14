@@ -4,16 +4,17 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Attribute;
 
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\LayoutBundle\Attribute\Layout;
+use PHPUnit\Framework\TestCase;
 
-class LayoutTest extends \PHPUnit\Framework\TestCase
+class LayoutTest extends TestCase
 {
-    public function testGetAlias()
+    public function testGetAlias(): void
     {
         $attribute = new Layout();
         $this->assertEquals('layout', $attribute->getAliasName());
     }
 
-    public function testAllowArray()
+    public function testAllowArray(): void
     {
         $attribute = new Layout();
         $this->assertFalse($attribute->allowArray());
@@ -22,7 +23,7 @@ class LayoutTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider propertiesDataProvider
      */
-    public function testSettersAndGetters(string $property, string|array $value)
+    public function testSettersAndGetters(string $property, string|array $value): void
     {
         $obj = new Layout();
 
@@ -34,7 +35,7 @@ class LayoutTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider propertiesDataProvider
      */
-    public function testConstructor(string $property, string|array $value, Layout $obj)
+    public function testConstructor(string $property, string|array $value, Layout $obj): void
     {
         $accessor = PropertyAccess::createPropertyAccessor();
         $this->assertEquals($value, $accessor->getValue($obj, $property));
@@ -51,13 +52,13 @@ class LayoutTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSingleBlockThemeSetter()
+    public function testSingleBlockThemeSetter(): void
     {
         $obj = new Layout(blockThemes: 'blockTheme');
         $this->assertEquals('blockTheme', $obj->getBlockThemes());
     }
 
-    public function testSetValueShouldSetAction()
+    public function testSetValueShouldSetAction(): void
     {
         $obj = new Layout();
         $obj->setValue('action');

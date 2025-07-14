@@ -4,12 +4,12 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExcelDateTimeTypeFormatterTest extends \PHPUnit\Framework\TestCase
+class ExcelDateTimeTypeFormatterTest extends TestCase
 {
-    /** @var ExcelDateTimeTypeFormatter */
-    private $formatter;
+    private ExcelDateTimeTypeFormatter $formatter;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +23,7 @@ class ExcelDateTimeTypeFormatterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPatternProvider
      */
-    public function testGetPattern(?int $timeType, string $locale, string $result)
+    public function testGetPattern(?int $timeType, string $locale, string $result): void
     {
         $this->assertEquals($result, $this->formatter->getPattern(1, $timeType, $locale));
     }
@@ -31,7 +31,7 @@ class ExcelDateTimeTypeFormatterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPatternWithValueProvider
      */
-    public function testGetPatternWithValue(?int $timeType, string $locale, string $value, string $result)
+    public function testGetPatternWithValue(?int $timeType, string $locale, string $value, string $result): void
     {
         $this->assertEquals($result, $this->formatter->getPattern(1, $timeType, $locale, $value));
     }

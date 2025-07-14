@@ -5,14 +5,13 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\EventListener;
 use Oro\Bundle\DataAuditBundle\EventListener\DemoDataFixturesListener;
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DemoDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
+class DemoDataFixturesListenerTest extends TestCase
 {
-    /** @var OptionalListenerManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $listenerManager;
-
-    /** @var DemoDataFixturesListener */
-    private $listener;
+    private OptionalListenerManager&MockObject $listenerManager;
+    private DemoDataFixturesListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class DemoDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new DemoDataFixturesListener($this->listenerManager);
     }
 
-    public function testOnPreLoadForNotDemoFixtures()
+    public function testOnPreLoadForNotDemoFixtures(): void
     {
         $event = $this->createMock(MigrationDataFixturesEvent::class);
 
@@ -35,7 +34,7 @@ class DemoDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onPreLoad($event);
     }
 
-    public function testOnPreLoadForDemoFixtures()
+    public function testOnPreLoadForDemoFixtures(): void
     {
         $event = $this->createMock(MigrationDataFixturesEvent::class);
 
@@ -49,7 +48,7 @@ class DemoDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onPreLoad($event);
     }
 
-    public function testOnPostLoadForNotDemoFixtures()
+    public function testOnPostLoadForNotDemoFixtures(): void
     {
         $event = $this->createMock(MigrationDataFixturesEvent::class);
 
@@ -62,7 +61,7 @@ class DemoDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onPostLoad($event);
     }
 
-    public function testOnPostLoadForDemoFixtures()
+    public function testOnPostLoadForDemoFixtures(): void
     {
         $event = $this->createMock(MigrationDataFixturesEvent::class);
 

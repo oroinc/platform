@@ -7,9 +7,10 @@ use Oro\Bundle\FilterBundle\Expression\Date\Token;
 use Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LexerTest extends \PHPUnit\Framework\TestCase
+class LexerTest extends TestCase
 {
     private Lexer $lexer;
 
@@ -17,7 +18,7 @@ class LexerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $translatorMock = $this->createMock(TranslatorInterface::class);
-        $providerMock   = $this->createMock(DateModifierProvider::class);
+        $providerMock = $this->createMock(DateModifierProvider::class);
         $providerMock->expects(self::any())
             ->method('getVariableKey')
             ->willReturnCallback(function ($variable) {

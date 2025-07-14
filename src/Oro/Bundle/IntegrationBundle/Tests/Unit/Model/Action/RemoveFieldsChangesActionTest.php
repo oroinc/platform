@@ -7,13 +7,13 @@ use Oro\Bundle\IntegrationBundle\Model\Action\RemoveFieldsChangesAction;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class RemoveFieldsChangesActionTest extends \PHPUnit\Framework\TestCase
+class RemoveFieldsChangesActionTest extends TestCase
 {
-    /** @var RemoveFieldsChangesAction */
-    private $action;
+    private RemoveFieldsChangesAction $action;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +25,7 @@ class RemoveFieldsChangesActionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeDataProvider
      */
-    public function testInitializeFailed(array $options, ?string $message)
+    public function testInitializeFailed(array $options, ?string $message): void
     {
         if ($message) {
             $this->expectException(InvalidParameterException::class);
@@ -52,7 +52,7 @@ class RemoveFieldsChangesActionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeDataProvider
      */
-    public function testExecuteAction(array $options, array $context)
+    public function testExecuteAction(array $options, array $context): void
     {
         $fieldsChangesManager = $this->createMock(FieldsChangesManager::class);
 

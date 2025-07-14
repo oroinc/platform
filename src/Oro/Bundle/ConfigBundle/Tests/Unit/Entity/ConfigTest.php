@@ -5,11 +5,11 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
+use PHPUnit\Framework\TestCase;
 
-class ConfigTest extends \PHPUnit\Framework\TestCase
+class ConfigTest extends TestCase
 {
-    /** @var Config */
-    private $object;
+    private Config $object;
 
     #[\Override]
     protected function setUp(): void
@@ -17,12 +17,12 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         $this->object = new Config();
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertNull($this->object->getId());
     }
 
-    public function testEntity()
+    public function testEntity(): void
     {
         $object = $this->object;
         $entity = 'Oro\Entity';
@@ -35,10 +35,10 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(ArrayCollection::class, $object->getValues());
     }
 
-    public function testRecordId()
+    public function testRecordId(): void
     {
         $object = $this->object;
-        $id     = 5;
+        $id = 5;
 
         $this->assertEmpty($object->getRecordId());
 
@@ -50,9 +50,9 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
     /**
      * Test getOrCreateValue
      */
-    public function testGetOrCreateValue()
+    public function testGetOrCreateValue(): void
     {
-        $object   = $this->object;
+        $object = $this->object;
 
         $value = $object->getOrCreateValue('oro_user', 'level');
 

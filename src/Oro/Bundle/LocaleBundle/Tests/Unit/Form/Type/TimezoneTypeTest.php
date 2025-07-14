@@ -3,14 +3,15 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\LocaleBundle\Form\Type\TimezoneType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class TimezoneTypeTest extends \PHPUnit\Framework\TestCase
+class TimezoneTypeTest extends TestCase
 {
-    public function testFormTypeWithoutCache()
+    public function testFormTypeWithoutCache(): void
     {
         $type = new TimezoneType();
         $resolver = $this->createMock(OptionsResolver::class);
@@ -25,7 +26,7 @@ class TimezoneTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @depends testFormTypeWithoutCache
      */
-    public function testGetTimezonesData()
+    public function testGetTimezonesData(): void
     {
         $timezones = TimezoneType::getTimezones();
         $this->assertIsArray($timezones);
@@ -37,7 +38,7 @@ class TimezoneTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @depends testGetTimezonesData
      */
-    public function testFormTypeWithFilledCache()
+    public function testFormTypeWithFilledCache(): void
     {
         $timezones = ['Test' => '(UTC +0) Test'];
 
@@ -60,7 +61,7 @@ class TimezoneTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @depends testGetTimezonesData
      */
-    public function testFormTypeWithEmptyCache()
+    public function testFormTypeWithEmptyCache(): void
     {
         $cache = $this->createMock(CacheInterface::class);
         $cache->expects($this->once())
@@ -79,7 +80,7 @@ class TimezoneTypeTest extends \PHPUnit\Framework\TestCase
         $type->configureOptions($resolver);
     }
 
-    public function testGetTimezones()
+    public function testGetTimezones(): void
     {
         $timezones = TimezoneType::getTimezonesData();
         $this->assertIsArray($timezones);

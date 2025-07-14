@@ -3,37 +3,40 @@
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Condition\FalseCondition;
+use Oro\Component\ConfigExpression\Condition\Not;
+use Oro\Component\ConfigExpression\Condition\TrueCondition;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Oro\Component\ConfigExpression\Exception\UnexpectedTypeException;
+use PHPUnit\Framework\TestCase;
 
-class NotTest extends \PHPUnit\Framework\TestCase
+class NotTest extends TestCase
 {
-    private Condition\Not $condition;
+    private Not $condition;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->condition = new Condition\Not();
+        $this->condition = new Not();
     }
 
-    public function testEvaluate()
+    public function testEvaluate(): void
     {
-        $this->assertSame($this->condition, $this->condition->initialize([new Condition\TrueCondition()]));
+        $this->assertSame($this->condition, $this->condition->initialize([new TrueCondition()]));
         $this->assertFalse($this->condition->evaluate('anything'));
 
-        $this->assertSame($this->condition, $this->condition->initialize([new Condition\FalseCondition()]));
+        $this->assertSame($this->condition, $this->condition->initialize([new FalseCondition()]));
         $this->assertTrue($this->condition->evaluate('anything'));
     }
 
-    public function testEvaluateWithErrors()
+    public function testEvaluateWithErrors(): void
     {
         $currentConditionError = 'Current condition error';
-        $nestedConditionError  = 'Nested condition error';
+        $nestedConditionError = 'Nested condition error';
 
         $this->condition->setMessage($currentConditionError);
 
-        $falseConditionWithError = new Condition\FalseCondition();
+        $falseConditionWithError = new FalseCondition();
         $falseConditionWithError->setMessage($nestedConditionError);
 
         $errors = new ArrayCollection();
@@ -45,7 +48,7 @@ class NotTest extends \PHPUnit\Framework\TestCase
             $errors->get(0)
         );
 
-        $trueConditionWithError = new Condition\TrueCondition();
+        $trueConditionWithError = new TrueCondition();
         $trueConditionWithError->setMessage($nestedConditionError);
 
         $errors = new ArrayCollection();
@@ -58,7 +61,7 @@ class NotTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInitializeFailsWhenOptionNotExpressionInterface()
+    public function testInitializeFailsWhenOptionNotExpressionInterface(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
@@ -68,7 +71,7 @@ class NotTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize(['anything']);
     }
 
-    public function testInitializeFailsWhenEmptyOptions()
+    public function testInitializeFailsWhenEmptyOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 element, but 0 given.');
@@ -79,7 +82,7 @@ class NotTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray(array $options, ?string $message, array $expected)
+    public function testToArray(array $options, ?string $message, array $expected): void
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -93,7 +96,7 @@ class NotTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                'options'  => [new Condition\TrueCondition()],
+                'options'  => [new TrueCondition()],
                 'message'  => null,
                 'expected' => [
                     '@not' => [
@@ -104,7 +107,7 @@ class NotTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
             [
-                'options'  => [new Condition\TrueCondition()],
+                'options'  => [new TrueCondition()],
                 'message'  => 'Test',
                 'expected' => [
                     '@not' => [
@@ -121,7 +124,7 @@ class NotTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile(array $options, ?string $message, string $expected)
+    public function testCompile(array $options, ?string $message, string $expected): void
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -135,12 +138,12 @@ class NotTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                'options'  => [new Condition\TrueCondition()],
+                'options'  => [new TrueCondition()],
                 'message'  => null,
                 'expected' => '$factory->create(\'not\', [$factory->create(\'true\', [])])'
             ],
             [
-                'options'  => [new Condition\TrueCondition()],
+                'options'  => [new TrueCondition()],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'not\', [$factory->create(\'true\', [])])->setMessage(\'Test\')'
             ]

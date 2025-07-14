@@ -6,24 +6,21 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Form\FormRendererInterface;
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
 use Oro\Component\Layout\LayoutRenderer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LayoutRendererTest extends \PHPUnit\Framework\TestCase
+class LayoutRendererTest extends TestCase
 {
-    /** @var FormRendererInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerRenderer;
-
-    /** @var FormRendererEngineInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formRenderer;
-
-    /** @var LayoutRenderer */
-    private $renderer;
+    private FormRendererInterface&MockObject $innerRenderer;
+    private FormRendererEngineInterface&MockObject $formRenderer;
+    private LayoutRenderer $renderer;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->innerRenderer = $this->createMock(FormRendererInterface::class);
         $this->formRenderer = $this->createMock(FormRendererEngineInterface::class);
-        $this->renderer      = new LayoutRenderer($this->innerRenderer, $this->formRenderer);
+        $this->renderer = new LayoutRenderer($this->innerRenderer, $this->formRenderer);
     }
 
     public function testRenderBlock(): void

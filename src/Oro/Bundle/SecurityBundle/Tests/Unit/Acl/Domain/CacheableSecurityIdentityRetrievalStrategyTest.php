@@ -3,17 +3,16 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\CacheableSecurityIdentityRetrievalStrategy;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class CacheableSecurityIdentityRetrievalStrategyTest extends \PHPUnit\Framework\TestCase
+class CacheableSecurityIdentityRetrievalStrategyTest extends TestCase
 {
-    /** @var SecurityIdentityRetrievalStrategyInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerStrategy;
-
-    /** @var CacheableSecurityIdentityRetrievalStrategy */
-    private $strategy;
+    private SecurityIdentityRetrievalStrategyInterface&MockObject $innerStrategy;
+    private CacheableSecurityIdentityRetrievalStrategy $strategy;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class CacheableSecurityIdentityRetrievalStrategyTest extends \PHPUnit\Framework\
         $this->strategy = new CacheableSecurityIdentityRetrievalStrategy($this->innerStrategy);
     }
 
-    public function testGetSecurityIdentities()
+    public function testGetSecurityIdentities(): void
     {
         $token1 = $this->createMock(TokenInterface::class);
         $token1->expects(self::any())

@@ -9,18 +9,15 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\Logger\BufferingLogger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Exception\IOException;
 
-class DumpJsTranslationsMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class DumpJsTranslationsMessageProcessorTest extends TestCase
 {
-    /** @var JsTranslationDumper|\PHPUnit\Framework\MockObject\MockObject */
-    private $dumper;
-
-    /** @var BufferingLogger */
-    private $logger;
-
-    /** @var DumpJsTranslationsMessageProcessor */
-    private $processor;
+    private JsTranslationDumper&MockObject $dumper;
+    private BufferingLogger $logger;
+    private DumpJsTranslationsMessageProcessor $processor;
 
     #[\Override]
     protected function setUp(): void

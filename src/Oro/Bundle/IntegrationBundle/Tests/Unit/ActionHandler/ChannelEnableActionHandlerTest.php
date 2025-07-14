@@ -5,14 +5,13 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ActionHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\IntegrationBundle\ActionHandler\ChannelEnableActionHandler;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChannelEnableActionHandlerTest extends \PHPUnit\Framework\TestCase
+class ChannelEnableActionHandlerTest extends TestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var ChannelEnableActionHandler */
-    private $handler;
+    private EntityManagerInterface&MockObject $entityManager;
+    private ChannelEnableActionHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class ChannelEnableActionHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new ChannelEnableActionHandler($this->entityManager);
     }
 
-    public function testHandleAction()
+    public function testHandleAction(): void
     {
         $this->entityManager->expects(self::once())
             ->method('flush');

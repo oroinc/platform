@@ -5,17 +5,14 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Api;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Api\UserPredefinedLanguageCodeResolver;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class UserPredefinedLanguageCodeResolverTest extends \PHPUnit\Framework\TestCase
+class UserPredefinedLanguageCodeResolverTest extends TestCase
 {
-    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationManager;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var UserPredefinedLanguageCodeResolver */
-    private $resolver;
+    private LocalizationManager&MockObject $localizationManager;
+    private ConfigManager&MockObject $configManager;
+    private UserPredefinedLanguageCodeResolver $resolver;
 
     #[\Override]
     protected function setUp(): void

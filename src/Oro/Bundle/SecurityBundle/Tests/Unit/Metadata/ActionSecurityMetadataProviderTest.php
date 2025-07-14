@@ -7,26 +7,23 @@ use Oro\Bundle\SecurityBundle\Metadata\AclAttributeProvider;
 use Oro\Bundle\SecurityBundle\Metadata\ActionSecurityMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\ActionSecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Metadata\Label;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ActionSecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
+class ActionSecurityMetadataProviderTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $attributeProvider;
-
-    /** @var ActionSecurityMetadataProvider */
-    private $provider;
+    private AclAttributeProvider&MockObject $attributeProvider;
+    private ActionSecurityMetadataProvider $provider;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->attributeProvider = $this->createMock(AclAttributeProvider::class);
 
-        $this->provider = new ActionSecurityMetadataProvider(
-            $this->attributeProvider
-        );
+        $this->provider = new ActionSecurityMetadataProvider($this->attributeProvider);
     }
 
-    public function testIsKnownActionForKnownAction()
+    public function testIsKnownActionForKnownAction(): void
     {
         $this->attributeProvider->expects($this->once())
             ->method('findAttributeById')
@@ -36,7 +33,7 @@ class ActionSecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->provider->isKnownAction('SomeAction'));
     }
 
-    public function testIsKnownActionForNotActionAclAttributeId()
+    public function testIsKnownActionForNotActionAclAttributeId(): void
     {
         $this->attributeProvider->expects($this->once())
             ->method('findAttributeById')
@@ -46,7 +43,7 @@ class ActionSecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->provider->isKnownAction('SomeAclAttributeId'));
     }
 
-    public function testIsKnownActionForUnknownAction()
+    public function testIsKnownActionForUnknownAction(): void
     {
         $this->attributeProvider->expects($this->once())
             ->method('findAttributeById')
@@ -56,7 +53,7 @@ class ActionSecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->provider->isKnownAction('UnknownAction'));
     }
 
-    public function testGetActions()
+    public function testGetActions(): void
     {
         $this->attributeProvider->expects($this->once())
             ->method('getAttributes')

@@ -7,10 +7,11 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\IdentifierToReferenceFilter;
 use Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager\Stub\Entity;
+use PHPUnit\Framework\TestCase;
 
-class IdentifierToReferenceFilterTest extends \PHPUnit\Framework\TestCase
+class IdentifierToReferenceFilterTest extends TestCase
 {
-    public function testFilterWithIdentifierField()
+    public function testFilterWithIdentifierField(): void
     {
         $testClassName = Entity::class;
         $testReference = new \stdClass();
@@ -32,7 +33,7 @@ class IdentifierToReferenceFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($testReference, $filter->filter($testId, null));
     }
 
-    public function testFilterWithNonIdentifierField()
+    public function testFilterWithNonIdentifierField(): void
     {
         $testClassName = Entity::class;
         $testFieldName = 'nickname';

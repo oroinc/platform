@@ -8,8 +8,9 @@ use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Entity\ReportType;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class ReportTest extends \PHPUnit\Framework\TestCase
+class ReportTest extends TestCase
 {
     use EntityTestCaseTrait;
 

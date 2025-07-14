@@ -5,11 +5,11 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Provider;
 use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
 use Oro\Bundle\LocaleBundle\Provider\DefaultFallbackMethodsNamesProvider;
+use PHPUnit\Framework\TestCase;
 
-class DefaultFallbackMethodsNamesProviderTest extends \PHPUnit\Framework\TestCase
+class DefaultFallbackMethodsNamesProviderTest extends TestCase
 {
     private Inflector $inflector;
-
     private DefaultFallbackMethodsNamesProvider $provider;
 
     #[\Override]

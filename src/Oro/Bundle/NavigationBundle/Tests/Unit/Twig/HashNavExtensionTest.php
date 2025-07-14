@@ -5,18 +5,17 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Oro\Bundle\NavigationBundle\Twig\HashNavExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class HashNavExtensionTest extends \PHPUnit\Framework\TestCase
+class HashNavExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var HashNavExtension */
-    private $extension;
+    private RequestStack&MockObject $requestStack;
+    private HashNavExtension $extension;
 
     #[\Override]
     protected function setUp(): void

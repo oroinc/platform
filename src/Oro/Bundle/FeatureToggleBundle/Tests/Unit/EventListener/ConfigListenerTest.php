@@ -10,21 +10,16 @@ use Oro\Bundle\FeatureToggleBundle\Event\FeatureChange;
 use Oro\Bundle\FeatureToggleBundle\Event\FeaturesChange;
 use Oro\Bundle\FeatureToggleBundle\EventListener\ConfigListener;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ConfigListenerTest extends \PHPUnit\Framework\TestCase
+class ConfigListenerTest extends TestCase
 {
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var ConfigurationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureConfigManager;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var ConfigListener */
-    private $configListener;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private ConfigurationManager&MockObject $featureConfigManager;
+    private FeatureChecker&MockObject $featureChecker;
+    private ConfigListener $configListener;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +35,7 @@ class ConfigListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnSettingsSaveBefore()
+    public function testOnSettingsSaveBefore(): void
     {
         $feature1 = 'feature1';
         $feature2 = 'feature2';
@@ -88,7 +83,7 @@ class ConfigListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnUpdateAfter()
+    public function testOnUpdateAfter(): void
     {
         ReflectionUtil::setPropertyValue(
             $this->configListener,
@@ -130,7 +125,7 @@ class ConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->configListener->onUpdateAfter();
     }
 
-    public function testOnScopeIdChange()
+    public function testOnScopeIdChange(): void
     {
         $this->featureChecker->expects($this->once())
             ->method('resetCache');

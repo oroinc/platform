@@ -3,11 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\WorkflowBundle\Model\Step;
+use PHPUnit\Framework\TestCase;
 
-class StepTest extends \PHPUnit\Framework\TestCase
+class StepTest extends TestCase
 {
-    /** @var Step */
-    private $step;
+    private Step $step;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class StepTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider propertiesDataProvider
      */
-    public function testGettersAndSetters(string $property, mixed $value)
+    public function testGettersAndSetters(string $property, mixed $value): void
     {
         $getter = 'get' . ucfirst($property);
         $setter = 'set' . ucfirst($property);
@@ -36,7 +36,7 @@ class StepTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testIsFinal()
+    public function testIsFinal(): void
     {
         $this->assertFalse($this->step->isFinal());
         $this->step->setFinal(true);
@@ -45,7 +45,7 @@ class StepTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->step->isFinal());
     }
 
-    public function testAllowTransition()
+    public function testAllowTransition(): void
     {
         $this->assertFalse($this->step->hasAllowedTransitions());
         $this->step->allowTransition('test');
@@ -77,7 +77,7 @@ class StepTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->step->isAllowedTransition('test2'), 'Unexpected transition allowed');
     }
 
-    public function testEntityAclAllowed()
+    public function testEntityAclAllowed(): void
     {
         $this->assertTrue($this->step->isEntityUpdateAllowed('not_existing_attribute'));
         $this->assertTrue($this->step->isEntityDeleteAllowed('not_existing_attribute'));

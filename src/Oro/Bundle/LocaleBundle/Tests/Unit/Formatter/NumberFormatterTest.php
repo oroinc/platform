@@ -7,6 +7,8 @@ use NumberFormatter as IntlNumberFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Please note that this test should check only our logic,
@@ -15,21 +17,16 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class NumberFormatterTest extends \PHPUnit\Framework\TestCase
+class NumberFormatterTest extends TestCase
 {
     private const UNFORMATTED_VALUE = 18908997.16908;
     private const FORMATTED_VALUE = '18908997.16908';
     private const LOCALE = 'en_US';
     private const CURRENCY = 'USD';
 
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
-
-    /** @var IntlNumberFormatterFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $intlNumberFormatterFactory;
-
-    /** @var NumberFormatter */
-    private $formatter;
+    private LocaleSettings&MockObject $localeSettings;
+    private IntlNumberFormatterFactory&MockObject $intlNumberFormatterFactory;
+    private NumberFormatter $formatter;
 
     #[\Override]
     protected function setUp(): void
@@ -61,14 +58,12 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
     private function mockFormat(string $style): void
     {
         $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
-        $this->intlNumberFormatterFactory
-            ->expects(self::once())
+        $this->intlNumberFormatterFactory->expects(self::once())
             ->method('create')
             ->with(self::LOCALE, $style, [], [], [])
             ->willReturn($intlNumberFormatter);
 
-        $intlNumberFormatter
-            ->expects(self::atLeastOnce())
+        $intlNumberFormatter->expects(self::atLeastOnce())
             ->method('format')
             ->with(self::UNFORMATTED_VALUE)
             ->willReturn(self::FORMATTED_VALUE);
@@ -81,27 +76,23 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         $formattedValue = '42$';
 
         $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
-        $this->intlNumberFormatterFactory
-            ->expects(self::once())
+        $this->intlNumberFormatterFactory->expects(self::once())
             ->method('create')
             ->with($expectedLocale, IntlNumberFormatter::CURRENCY, [], [], [])
             ->willReturn($intlNumberFormatter);
 
-        $intlNumberFormatter
-            ->expects(self::exactly(2))
+        $intlNumberFormatter->expects(self::exactly(2))
             ->method('formatCurrency')
             ->with($value, self::CURRENCY)
             ->willReturn($formattedValue);
 
         $symbol = '$';
-        $intlNumberFormatter
-            ->expects(self::exactly(2))
+        $intlNumberFormatter->expects(self::exactly(2))
             ->method('getSymbol')
             ->with(IntlNumberFormatter::CURRENCY_SYMBOL)
             ->willReturn($symbol);
 
-        $this->localeSettings
-            ->expects(self::once())
+        $this->localeSettings->expects(self::once())
             ->method('getCurrencySymbolByCurrency')
             ->with(self::CURRENCY, self::LOCALE)
             ->willReturn($symbol);
@@ -127,28 +118,24 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         $value = '42';
 
         $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
-        $this->intlNumberFormatterFactory
-            ->expects(self::once())
+        $this->intlNumberFormatterFactory->expects(self::once())
             ->method('create')
             ->with($expectedLocale, IntlNumberFormatter::CURRENCY, [], [], [])
             ->willReturn($intlNumberFormatter);
 
-        $intlNumberFormatter
-            ->expects(self::exactly(2))
+        $intlNumberFormatter->expects(self::exactly(2))
             ->method('formatCurrency')
             ->with($value, self::CURRENCY)
             ->willReturn($formattedValue);
 
         $fromSymbol = '$';
-        $intlNumberFormatter
-            ->expects(self::exactly(2))
+        $intlNumberFormatter->expects(self::exactly(2))
             ->method('getSymbol')
             ->with(IntlNumberFormatter::CURRENCY_SYMBOL)
             ->willReturn($fromSymbol);
 
         $toSymbol = 'USD';
-        $this->localeSettings
-            ->expects(self::once())
+        $this->localeSettings->expects(self::once())
             ->method('getCurrencySymbolByCurrency')
             ->with(self::CURRENCY, self::LOCALE)
             ->willReturn($toSymbol);
@@ -193,33 +180,28 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         $value = '42';
         $formattedValue = '42$';
 
-        $this->localeSettings
-            ->expects(self::exactly(2))
+        $this->localeSettings->expects(self::exactly(2))
             ->method('getCurrency')
             ->willReturn(self::CURRENCY);
 
         $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
-        $this->intlNumberFormatterFactory
-            ->expects(self::once())
+        $this->intlNumberFormatterFactory->expects(self::once())
             ->method('create')
             ->with($expectedLocale, IntlNumberFormatter::CURRENCY, [], [], [])
             ->willReturn($intlNumberFormatter);
 
-        $intlNumberFormatter
-            ->expects(self::exactly(2))
+        $intlNumberFormatter->expects(self::exactly(2))
             ->method('formatCurrency')
             ->with($value, self::CURRENCY)
             ->willReturn($formattedValue);
 
         $symbol = '$';
-        $intlNumberFormatter
-            ->expects(self::exactly(2))
+        $intlNumberFormatter->expects(self::exactly(2))
             ->method('getSymbol')
             ->with(IntlNumberFormatter::CURRENCY_SYMBOL)
             ->willReturn($symbol);
 
-        $this->localeSettings
-            ->expects(self::once())
+        $this->localeSettings->expects(self::once())
             ->method('getCurrencySymbolByCurrency')
             ->with(self::CURRENCY, self::LOCALE)
             ->willReturn($symbol);
@@ -242,33 +224,28 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         $value = '42';
         $formattedValue = '42$';
 
-        $this->localeSettings
-            ->expects(self::exactly(2))
+        $this->localeSettings->expects(self::exactly(2))
             ->method('getLocale')
             ->willReturn(self::LOCALE);
 
         $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
-        $this->intlNumberFormatterFactory
-            ->expects(self::once())
+        $this->intlNumberFormatterFactory->expects(self::once())
             ->method('create')
             ->with($expectedLocale, IntlNumberFormatter::CURRENCY, [], [], [])
             ->willReturn($intlNumberFormatter);
 
-        $intlNumberFormatter
-            ->expects(self::exactly(2))
+        $intlNumberFormatter->expects(self::exactly(2))
             ->method('formatCurrency')
             ->with($value, self::CURRENCY)
             ->willReturn($formattedValue);
 
         $symbol = '$';
-        $intlNumberFormatter
-            ->expects(self::exactly(2))
+        $intlNumberFormatter->expects(self::exactly(2))
             ->method('getSymbol')
             ->with(IntlNumberFormatter::CURRENCY_SYMBOL)
             ->willReturn($symbol);
 
-        $this->localeSettings
-            ->expects(self::once())
+        $this->localeSettings->expects(self::once())
             ->method('getCurrencySymbolByCurrency')
             ->with(self::CURRENCY, self::LOCALE)
             ->willReturn($symbol);
@@ -296,21 +273,18 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         string $formattedValue,
         array $attributes
     ): void {
-        $this->localeSettings
-            ->expects(self::any())
+        $this->localeSettings->expects(self::any())
             ->method('getCurrencySymbolByCurrency')
             ->with($currencyCode, $locale)
             ->willReturn($currencySymbol);
 
         $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
-        $intlNumberFormatter
-            ->expects($this->once())
+        $intlNumberFormatter->expects($this->once())
             ->method('formatCurrency')
             ->with($value, $currencyCode)
             ->willReturn($formattedValue);
 
-        $this->intlNumberFormatterFactory
-            ->expects($this->once())
+        $this->intlNumberFormatterFactory->expects($this->once())
             ->method('create')
             ->with($locale. '@currency=' . $currencyCode, IntlNumberFormatter::CURRENCY, $attributes, [], [])
             ->willReturn($intlNumberFormatter);
@@ -353,33 +327,28 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         array $attributes,
         int $minFractionDigits = 0
     ): void {
-        $this->localeSettings
-            ->expects($this->any())
+        $this->localeSettings->expects($this->any())
             ->method('getCurrencySymbolByCurrency')
             ->with($currencyCode, $locale)
             ->willReturn($currencySymbol);
 
         $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
-        $intlNumberFormatter
-            ->expects($this->once())
+        $intlNumberFormatter->expects($this->once())
             ->method('formatCurrency')
             ->with($value, $currencyCode)
             ->willReturn($formattedValue);
-        $intlNumberFormatter
-            ->expects($this->once())
+        $intlNumberFormatter->expects($this->once())
             ->method('getAttribute')
             ->with(\NumberFormatter::MIN_FRACTION_DIGITS)
             ->willReturn($minFractionDigits);
-        $intlNumberFormatter
-            ->expects($this->exactly(2))
+        $intlNumberFormatter->expects($this->exactly(2))
             ->method('setAttribute')
             ->withConsecutive(
                 [IntlNumberFormatter::MIN_FRACTION_DIGITS, BigDecimal::of($value)->getScale()],
                 [IntlNumberFormatter::MIN_FRACTION_DIGITS, $minFractionDigits]
             );
 
-        $this->intlNumberFormatterFactory
-            ->expects($this->once())
+        $this->intlNumberFormatterFactory->expects($this->once())
             ->method('create')
             ->with($locale. '@currency=' . $currencyCode, IntlNumberFormatter::CURRENCY, $attributes, [], [])
             ->willReturn($intlNumberFormatter);
@@ -427,34 +396,26 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         $formattedValueIntegral = '1,234';
 
         $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
-        $intlNumberFormatter
-            ->expects(self::exactly(2))
+        $intlNumberFormatter->expects(self::exactly(2))
             ->method('format')
             ->withConsecutive([$unformattedValue], [$unformattedValueIntegral])
             ->willReturnOnConsecutiveCalls($formattedValue, $formattedValueIntegral);
         $originalAttribute = 2;
-        $intlNumberFormatter
-            ->expects(self::once())
+        $intlNumberFormatter->expects(self::once())
             ->method('getAttribute')
             ->with(IntlNumberFormatter::MIN_FRACTION_DIGITS)
             ->willReturn($originalAttribute);
-        $intlNumberFormatter
-            ->expects(self::exactly(2))
+        $intlNumberFormatter->expects(self::exactly(2))
             ->method('setAttribute')
             ->withConsecutive(
                 [IntlNumberFormatter::MIN_FRACTION_DIGITS, 0],
                 [IntlNumberFormatter::MIN_FRACTION_DIGITS, $originalAttribute]
             );
-        $intlNumberFormatter
-            ->expects(self::once())
+        $intlNumberFormatter->expects(self::once())
             ->method('getSymbol')
-            ->willReturnMap(
-                [
-                    [IntlNumberFormatter::DECIMAL_SEPARATOR_SYMBOL, '.'],
-                ]
-            );
-        $this->intlNumberFormatterFactory
-            ->expects(self::once())
+            ->with(IntlNumberFormatter::DECIMAL_SEPARATOR_SYMBOL)
+            ->willReturn('.');
+        $this->intlNumberFormatterFactory->expects(self::once())
             ->method('create')
             ->with(self::LOCALE, IntlNumberFormatter::DECIMAL, [], [], [])
             ->willReturn($intlNumberFormatter);
@@ -471,14 +432,12 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         $formattedValue = '1,234.1234567891%';
 
         $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
-        $intlNumberFormatter
-            ->expects(self::atLeastOnce())
+        $intlNumberFormatter->expects(self::atLeastOnce())
             ->method('format')
             ->with($unformattedValue)
             ->willReturn($formattedValue);
 
-        $this->intlNumberFormatterFactory
-            ->expects(self::once())
+        $this->intlNumberFormatterFactory->expects(self::once())
             ->method('create')
             ->with(self::LOCALE, IntlNumberFormatter::PERCENT, [IntlNumberFormatter::MAX_FRACTION_DIGITS => 10], [], [])
             ->willReturn($intlNumberFormatter);
@@ -507,8 +466,7 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
      */
     public function testFormatDurationWhenDefaultFormat($value, string $formattedValue): void
     {
-        $this->intlNumberFormatterFactory
-            ->expects(self::never())
+        $this->intlNumberFormatterFactory->expects(self::never())
             ->method('create');
 
         self::assertEquals(
@@ -574,31 +532,20 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
     {
         $intlNumberFormatterDuration = $this->createMock(IntlNumberFormatter::class);
         $intlNumberFormatterDefault = $this->createMock(IntlNumberFormatter::class);
-        $this->intlNumberFormatterFactory
-            ->expects(self::exactly(2))
+        $this->intlNumberFormatterFactory->expects(self::exactly(2))
             ->method('create')
-            ->willReturnMap(
-                [
-                    [self::LOCALE, IntlNumberFormatter::DURATION, [], [], [], $intlNumberFormatterDuration],
-                    ['', IntlNumberFormatter::DEFAULT_STYLE, [], [], [], $intlNumberFormatterDefault],
-                ]
-            );
+            ->willReturnMap([
+                [self::LOCALE, IntlNumberFormatter::DURATION, [], [], [], $intlNumberFormatterDuration],
+                ['', IntlNumberFormatter::DEFAULT_STYLE, [], [], [], $intlNumberFormatterDefault],
+            ]);
 
-        $intlNumberFormatterDuration
-            ->expects(self::once())
+        $intlNumberFormatterDuration->expects(self::once())
             ->method('format')
             ->with(abs($value))
             ->willReturn($formattedValue);
 
-        $intlNumberFormatterDefault
-            ->expects(self::exactly(2))
+        $intlNumberFormatterDefault->expects(self::exactly(2))
             ->method('getSymbol')
-            ->willReturnMap(
-                [
-                    [IntlNumberFormatter::GROUPING_SEPARATOR_SYMBOL, ' '],
-                    [IntlNumberFormatter::DECIMAL_SEPARATOR_SYMBOL, ','],
-                ]
-            )
             ->willReturn($formattedValue);
 
         self::assertEquals(
@@ -633,15 +580,10 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $style
-     * @return IntlNumberFormatter|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function mockCreate(string $style): IntlNumberFormatter
+    private function mockCreate(string $style): IntlNumberFormatter&MockObject
     {
         $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
-        $this->intlNumberFormatterFactory
-            ->expects(self::once())
+        $this->intlNumberFormatterFactory->expects(self::once())
             ->method('create')
             ->with(self::LOCALE, $style, [], [], [])
             ->willReturn($intlNumberFormatter);
@@ -714,8 +656,7 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
     {
         $intlNumberFormatter = $this->mockCreate(IntlNumberFormatter::CURRENCY);
 
-        $intlNumberFormatter
-            ->expects(self::once())
+        $intlNumberFormatter->expects(self::once())
             ->method('formatCurrency')
             ->with(123, self::CURRENCY)
             ->willReturn($formattedValue);
@@ -788,13 +729,11 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
     {
         $intlNumberFormatter = $this->mockCreate(IntlNumberFormatter::CURRENCY);
 
-        $this->localeSettings
-            ->expects(self::once())
+        $this->localeSettings->expects(self::once())
             ->method('getLocale')
             ->willReturn(self::LOCALE);
 
-        $intlNumberFormatter
-            ->expects(self::once())
+        $intlNumberFormatter->expects(self::once())
             ->method('formatCurrency')
             ->with(123, self::CURRENCY)
             ->willReturn($formattedValue);
@@ -809,13 +748,11 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
     {
         $intlNumberFormatter = $this->mockCreate(IntlNumberFormatter::CURRENCY);
 
-        $this->localeSettings
-            ->expects(self::once())
+        $this->localeSettings->expects(self::once())
             ->method('getCurrency')
             ->willReturn(self::CURRENCY);
 
-        $intlNumberFormatter
-            ->expects(self::once())
+        $intlNumberFormatter->expects(self::once())
             ->method('formatCurrency')
             ->with(123, self::CURRENCY)
             ->willReturn($formattedValue);
@@ -826,8 +763,7 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
     public function testIsCurrencySymbolPrependWhenLocalCache(): void
     {
         $intlNumberFormatter = $this->mockCreate(IntlNumberFormatter::CURRENCY);
-        $intlNumberFormatter
-            ->expects(self::once())
+        $intlNumberFormatter->expects(self::once())
             ->method('formatCurrency')
             ->with(123, self::CURRENCY)
             ->willReturn('123$');

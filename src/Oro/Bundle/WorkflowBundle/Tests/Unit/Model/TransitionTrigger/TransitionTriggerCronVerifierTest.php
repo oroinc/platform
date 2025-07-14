@@ -19,28 +19,21 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\ExpressionVerifierInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TransitionTriggerCronVerifierTest extends \PHPUnit\Framework\TestCase
+class TransitionTriggerCronVerifierTest extends TestCase
 {
     use EntityTrait;
 
     private const ENTITY_CLASS = 'stdClass';
     private const ENTITY_ID_FIELD = 'id';
 
-    /** @var WorkflowAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowAssembler;
-
-    /** @var WorkflowItemRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowItemRepository;
-
-    /** @var ExpressionVerifierInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cronVerifier;
-
-    /** @var ExpressionVerifierInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $filterVerifier;
-
-    /** @var TransitionTriggerCronVerifier */
-    private $verifier;
+    private WorkflowAssembler&MockObject $workflowAssembler;
+    private WorkflowItemRepository&MockObject $workflowItemRepository;
+    private ExpressionVerifierInterface&MockObject $cronVerifier;
+    private ExpressionVerifierInterface&MockObject $filterVerifier;
+    private TransitionTriggerCronVerifier $verifier;
 
     #[\Override]
     protected function setUp(): void
@@ -73,7 +66,7 @@ class TransitionTriggerCronVerifierTest extends \PHPUnit\Framework\TestCase
         $this->verifier = new TransitionTriggerCronVerifier($this->workflowAssembler, $registry);
     }
 
-    public function testAddOptionVerifier()
+    public function testAddOptionVerifier(): void
     {
         $trigger = $this->createMock(TransitionCronTrigger::class);
         $trigger->expects(self::any())
@@ -96,7 +89,7 @@ class TransitionTriggerCronVerifierTest extends \PHPUnit\Framework\TestCase
         $this->verifier->verify($trigger);
     }
 
-    public function testVerify()
+    public function testVerify(): void
     {
         $cron = '* * * * *';
         $filter = 'e.test = data';

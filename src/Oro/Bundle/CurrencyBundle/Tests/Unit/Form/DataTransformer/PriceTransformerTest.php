@@ -4,11 +4,11 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Form\DataTransformer\PriceTransformer;
+use PHPUnit\Framework\TestCase;
 
-class PriceTransformerTest extends \PHPUnit\Framework\TestCase
+class PriceTransformerTest extends TestCase
 {
-    /** @var PriceTransformer */
-    private $transformer;
+    private PriceTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class PriceTransformerTest extends \PHPUnit\Framework\TestCase
         $this->transformer = new PriceTransformer();
     }
 
-    public function testTransform()
+    public function testTransform(): void
     {
         $price = Price::create(100, 'USD');
         $this->assertSame($price, $this->transformer->transform($price));
@@ -25,7 +25,7 @@ class PriceTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformDataProvider
      */
-    public function testReverseTransform(Price|string|null $data, ?Price $expected)
+    public function testReverseTransform(Price|string|null $data, ?Price $expected): void
     {
         $this->assertSame($expected, $this->transformer->reverseTransform($data));
     }

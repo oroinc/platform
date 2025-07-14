@@ -4,19 +4,17 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
-use Oro\Bundle\LocaleBundle\Validator\Constraints;
+use Oro\Bundle\LocaleBundle\Validator\Constraints\DefaultLocalization;
 use Oro\Bundle\LocaleBundle\Validator\Constraints\DefaultLocalizationValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class DefaultLocalizationValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationManager;
-
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
+    private LocalizationManager&MockObject $localizationManager;
+    private FormInterface&MockObject $form;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +33,7 @@ class DefaultLocalizationValidatorTest extends ConstraintValidatorTestCase
 
     public function testGetTargets()
     {
-        $constraint = new Constraints\DefaultLocalization();
+        $constraint = new DefaultLocalization();
         $this->assertEquals(Constraint::CLASS_CONSTRAINT, $constraint->getTargets());
     }
 
@@ -45,7 +43,7 @@ class DefaultLocalizationValidatorTest extends ConstraintValidatorTestCase
             ->method('getName')
             ->willReturn('unknown_name');
 
-        $constraint = new Constraints\DefaultLocalization();
+        $constraint = new DefaultLocalization();
         $this->validator->validate(1, $constraint);
 
         $this->assertNoViolation();
@@ -62,7 +60,7 @@ class DefaultLocalizationValidatorTest extends ConstraintValidatorTestCase
             ->with(DefaultLocalizationValidator::ENABLED_LOCALIZATIONS_NAME)
             ->willReturn(false);
 
-        $constraint = new Constraints\DefaultLocalization();
+        $constraint = new DefaultLocalization();
         $this->validator->validate(1, $constraint);
 
         $this->assertNoViolation();
@@ -85,7 +83,7 @@ class DefaultLocalizationValidatorTest extends ConstraintValidatorTestCase
                 ],
             ]);
 
-        $constraint = new Constraints\DefaultLocalization();
+        $constraint = new DefaultLocalization();
         $this->validator->validate(1, $constraint);
 
         $this->assertNoViolation();
@@ -112,7 +110,7 @@ class DefaultLocalizationValidatorTest extends ConstraintValidatorTestCase
             ->method('getLocalization')
             ->willReturn((new Localization())->setName('L1'));
 
-        $constraint = new Constraints\DefaultLocalization();
+        $constraint = new DefaultLocalization();
         $this->validator->validate(1, $constraint);
 
         $this->buildViolation('oro.locale.validators.is_not_enabled')
@@ -141,7 +139,7 @@ class DefaultLocalizationValidatorTest extends ConstraintValidatorTestCase
             ->method('getLocalization')
             ->willReturn(null);
 
-        $constraint = new Constraints\DefaultLocalization();
+        $constraint = new DefaultLocalization();
         $this->validator->validate(1, $constraint);
 
         $this->buildViolation('oro.locale.validators.unknown_localization')

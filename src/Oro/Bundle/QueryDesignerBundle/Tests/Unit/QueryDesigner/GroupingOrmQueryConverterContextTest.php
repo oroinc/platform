@@ -3,12 +3,12 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\QueryDesigner;
 
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\GroupingOrmQueryConverterContext;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 
-class GroupingOrmQueryConverterContextTest extends \PHPUnit\Framework\TestCase
+class GroupingOrmQueryConverterContextTest extends TestCase
 {
-    /** @var GroupingOrmQueryConverterContext */
-    private $context;
+    private GroupingOrmQueryConverterContext $context;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class GroupingOrmQueryConverterContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new GroupingOrmQueryConverterContext();
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $initialContext = clone $this->context;
 
@@ -27,12 +27,12 @@ class GroupingOrmQueryConverterContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($initialContext, $this->context);
     }
 
-    public function testGetFiltersWhenNoFilters()
+    public function testGetFiltersWhenNoFilters(): void
     {
         self::assertSame([], $this->context->getFilters());
     }
 
-    public function testAddFilter()
+    public function testAddFilter(): void
     {
         $this->context->beginFilterGroup();
         $this->context->addFilter(['name' => 'filter1']);
@@ -41,7 +41,7 @@ class GroupingOrmQueryConverterContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([['name' => 'filter1']], $this->context->getFilters());
     }
 
-    public function testAddFilterOperator()
+    public function testAddFilterOperator(): void
     {
         $this->context->beginFilterGroup();
         $this->context->addFilter(['name' => 'filter1']);
@@ -55,7 +55,7 @@ class GroupingOrmQueryConverterContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFilterGroups()
+    public function testFilterGroups(): void
     {
         $this->context->beginFilterGroup();
         $this->context->addFilter(['name' => 'filter1']);
@@ -75,7 +75,7 @@ class GroupingOrmQueryConverterContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddFilterWhenNoFilterGroupOpen()
+    public function testAddFilterWhenNoFilterGroupOpen(): void
     {
         $this->expectException(InvalidPropertyPathException::class);
 
@@ -84,7 +84,7 @@ class GroupingOrmQueryConverterContextTest extends \PHPUnit\Framework\TestCase
         $this->context->getFilters();
     }
 
-    public function testAddFilterWhenAllFilterGroupsClosed()
+    public function testAddFilterWhenAllFilterGroupsClosed(): void
     {
         $this->expectException(InvalidPropertyPathException::class);
 

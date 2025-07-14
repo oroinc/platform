@@ -15,21 +15,19 @@ use Oro\Bundle\BatchBundle\Tests\Unit\Item\ItemReaderTestHelper;
 use Oro\Bundle\BatchBundle\Tests\Unit\Item\ItemWriterTestHelper;
 use Oro\Bundle\BatchBundle\Tests\Unit\Step\IncompleteStep;
 use Oro\Bundle\BatchBundle\Tests\Unit\Step\InterruptedStep;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class JobTest extends \PHPUnit\Framework\TestCase
+class JobTest extends TestCase
 {
     private const JOB_TEST_NAME = 'job_test';
 
-    /** @var JobRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRepository;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
+    private JobRepositoryInterface&MockObject $jobRepository;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
     private Job $job;
 
     #[\Override]
@@ -266,7 +264,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
     private function getReaderMock(
         array $configuration,
         array $fields = []
-    ): \PHPUnit\Framework\MockObject\MockObject|ItemReaderTestHelper {
+    ): MockObject|ItemReaderTestHelper {
         $reader = $this->createMock(ItemReaderTestHelper::class);
         $reader->expects(self::any())
             ->method('getConfiguration')
@@ -278,10 +276,8 @@ class JobTest extends \PHPUnit\Framework\TestCase
         return $reader;
     }
 
-    private function getProcessorMock(
-        array $configuration,
-        array $fields = []
-    ): ItemProcessorTestHelper|\PHPUnit\Framework\MockObject\MockObject {
+    private function getProcessorMock(array $configuration, array $fields = []): ItemProcessorTestHelper&MockObject
+    {
         $processor = $this->createMock(ItemProcessorTestHelper::class);
         $processor->expects(self::any())
             ->method('getConfiguration')
@@ -293,10 +289,8 @@ class JobTest extends \PHPUnit\Framework\TestCase
         return $processor;
     }
 
-    private function getWriterMock(
-        array $configuration,
-        array $fields = []
-    ): ItemWriterTestHelper|\PHPUnit\Framework\MockObject\MockObject {
+    private function getWriterMock(array $configuration, array $fields = []): ItemWriterTestHelper&MockObject
+    {
         $writer = $this->createMock(ItemWriterTestHelper::class);
         $writer->expects(self::any())
             ->method('getConfiguration')

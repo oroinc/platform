@@ -5,14 +5,14 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\DebugTranslatorPass;
 use Oro\Bundle\TranslationBundle\Translation\DebugTranslator;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as SymfonyTranslator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
-class DebugTranslatorPassTest extends \PHPUnit\Framework\TestCase
+class DebugTranslatorPassTest extends TestCase
 {
-    /** @var DebugTranslatorPass */
-    private $compiler;
+    private DebugTranslatorPass $compiler;
 
     #[\Override]
     protected function setUp(): void

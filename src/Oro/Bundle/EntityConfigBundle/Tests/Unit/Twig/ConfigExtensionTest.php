@@ -12,20 +12,19 @@ use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
+class ConfigExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ConfigExtension */
-    private $extension;
+    private ConfigManager&MockObject $configManager;
+    private ConfigExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -45,7 +44,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new ConfigExtension($container);
     }
 
-    public function testGetClassConfigNoConfig()
+    public function testGetClassConfigNoConfig(): void
     {
         $className = 'Test\Entity';
 
@@ -62,7 +61,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldConfigForNullClassName()
+    public function testGetFieldConfigForNullClassName(): void
     {
         $this->configManager->expects($this->never())
             ->method('hasConfig');
@@ -70,7 +69,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], self::callTwigFunction($this->extension, 'oro_field_config', [null, 'testField']));
     }
 
-    public function testGetFieldConfigNoConfig()
+    public function testGetFieldConfigNoConfig(): void
     {
         $className = 'Test\Entity';
         $fieldName = 'testField';
@@ -91,7 +90,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFieldConfigDataProvider
      */
-    public function testGetFieldConfig(?string $inputScope)
+    public function testGetFieldConfig(?string $inputScope): void
     {
         $className = 'Test\Entity';
         $fieldName = 'testField';
@@ -151,7 +150,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetFieldConfigValueForNullClassName()
+    public function testGetFieldConfigValueForNullClassName(): void
     {
         $this->configManager->expects($this->never())
             ->method('hasConfig');
@@ -161,7 +160,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldConfigValueNoConfig()
+    public function testGetFieldConfigValueNoConfig(): void
     {
         $className = 'Test\Entity';
         $fieldName = 'testField';
@@ -181,7 +180,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFieldConfigValueDataProvider
      */
-    public function testGetFieldConfigValue(?string $inputScope)
+    public function testGetFieldConfigValue(?string $inputScope): void
     {
         $className = 'Test\Entity';
         $fieldName = 'testField';
@@ -243,7 +242,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetClassConfigForNullClassName()
+    public function testGetClassConfigForNullClassName(): void
     {
         $this->configManager->expects($this->never())
             ->method('hasConfig');
@@ -254,7 +253,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getClassConfigDataProvider
      */
-    public function testGetClassConfig(string $expectedScope, ?string $inputScope)
+    public function testGetClassConfig(string $expectedScope, ?string $inputScope): void
     {
         $className = 'Test\Entity';
         $config = ['key' => 'value'];
@@ -300,7 +299,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetClassConfigValueNoConfig()
+    public function testGetClassConfigValueNoConfig(): void
     {
         $className = 'Test\Entity';
 
@@ -316,7 +315,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetClassConfigValueForNullClassName()
+    public function testGetClassConfigValueForNullClassName(): void
     {
         $this->configManager->expects($this->never())
             ->method('hasConfig');
@@ -324,7 +323,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertNull(self::callTwigFunction($this->extension, 'oro_entity_config_value', [null, 'test']));
     }
 
-    public function testGetClassConfigValue()
+    public function testGetClassConfigValue(): void
     {
         $className = 'Test\Entity';
         $configEntityScope = new Config(new EntityConfigId('entity', $className));
@@ -369,7 +368,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetClassRouteForNullClassName()
+    public function testGetClassRouteForNullClassName(): void
     {
         $this->configManager->expects($this->never())
             ->method('hasConfig');
@@ -377,7 +376,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertNull(self::callTwigFunction($this->extension, 'oro_entity_route', [null]));
     }
 
-    public function testGetClassRouteNoConfig()
+    public function testGetClassRouteNoConfig(): void
     {
         $className = 'Test\Entity';
 
@@ -393,7 +392,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetClassRouteInNonStrictMode()
+    public function testGetClassRouteInNonStrictMode(): void
     {
         $className = 'Test\Entity';
         $viewRoute = 'route_view';
@@ -416,7 +415,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetClassRouteShouldPassArgumentsToDelegatingMethod()
+    public function testGetClassRouteShouldPassArgumentsToDelegatingMethod(): void
     {
         $className = 'Test\Entity';
         $createRoute = 'route_create';
@@ -439,7 +438,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetClassMetadataValueForNullClassName()
+    public function testGetClassMetadataValueForNullClassName(): void
     {
         $this->configManager->expects($this->never())
             ->method('hasConfig');
@@ -447,7 +446,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertNull(self::callTwigFunction($this->extension, 'oro_entity_metadata_value', [null, 'test']));
     }
 
-    public function testGetClassMetadataValueNoConfig()
+    public function testGetClassMetadataValueNoConfig(): void
     {
         $className = 'Test\Entity';
 
@@ -463,7 +462,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetClassMetadataValueNoAttr()
+    public function testGetClassMetadataValueNoAttr(): void
     {
         $className = 'Test\Entity';
         $configEntityScope = new Config(new EntityConfigId('entity', $className));
@@ -481,7 +480,7 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetClassMetadataValue()
+    public function testGetClassMetadataValue(): void
     {
         $className = 'Test\Entity';
         $attrName = 'routeView';

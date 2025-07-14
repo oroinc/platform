@@ -11,28 +11,22 @@ use Oro\Bundle\UserBundle\Mailer\Processor;
 use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Oro\Component\DependencyInjection\ServiceLink;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class UserManagerTest extends \PHPUnit\Framework\TestCase
+class UserManagerTest extends TestCase
 {
-    /** @var UserLoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $userLoader;
+    private UserLoaderInterface&MockObject $userLoader;
+    private ManagerRegistry&MockObject $doctrine;
+    private PasswordHasherFactoryInterface&MockObject $passwordHasherFactory;
+    private EnumOptionsProvider&MockObject $enumOptionsProvider;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var PasswordHasherFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $passwordHasherFactory;
-
-    /** @var EnumOptionsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $enumOptionsProvider;
-
-    /** var Processor|\PHPUnit\Framework\MockObject\MockObject */
+    /** var Processor&MockObject */
     private $emailProcessor;
 
-    /** @var UserManager */
-    private $userManager;
+    private UserManager $userManager;
 
     #[\Override]
     protected function setUp(): void
@@ -68,7 +62,7 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function expectGetEntityManager(): EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+    private function expectGetEntityManager(): EntityManagerInterface&MockObject
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $this->doctrine->expects(self::atLeastOnce())
@@ -79,9 +73,8 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         return $em;
     }
 
-    private function expectGetPasswordHasher(
-        User $user
-    ): PasswordHasherInterface|\PHPUnit\Framework\MockObject\MockObject {
+    private function expectGetPasswordHasher(User $user): PasswordHasherInterface&MockObject
+    {
         $passwordHasher = $this->createMock(PasswordHasherInterface::class);
         $this->passwordHasherFactory->expects(self::once())
             ->method('getPasswordHasher')

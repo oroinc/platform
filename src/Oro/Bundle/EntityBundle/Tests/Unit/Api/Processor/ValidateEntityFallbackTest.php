@@ -14,6 +14,7 @@ use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fallback\Stub\FallbackContainingEntity;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
@@ -23,11 +24,8 @@ use Symfony\Component\Form\FormInterface;
  */
 class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityFallbackResolver */
-    private $fallbackResolver;
-
-    /** @var ValidateEntityFallback */
-    private $processor;
+    private EntityFallbackResolver&MockObject $fallbackResolver;
+    private ValidateEntityFallback $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -100,7 +98,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
             ->willReturn($requiredFieldType);
     }
 
-    public function testProcessWhenFormAlreadyContainsValidationErrors()
+    public function testProcessWhenFormAlreadyContainsValidationErrors(): void
     {
         $fallbackValue = new EntityFieldFallbackValue();
         $form = $this->getEntityFieldFallbackValueForm($fallbackValue);
@@ -123,7 +121,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
     /**
      * @dataProvider invalidNumberOfAttributesDataProvider
      */
-    public function testProcessWhenFallbackValueHasInvalidNumberOfAttributes(array $submittedData)
+    public function testProcessWhenFallbackValueHasInvalidNumberOfAttributes(array $submittedData): void
     {
         $fallbackValue = new EntityFieldFallbackValue();
         $form = $this->getEntityFieldFallbackValueForm($fallbackValue);
@@ -186,7 +184,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         ];
     }
 
-    public function testProcessWhenFallbackValueHasOnlyFallback()
+    public function testProcessWhenFallbackValueHasOnlyFallback(): void
     {
         $submittedData = [
             'fallback' => 'fallbackValue'
@@ -206,7 +204,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertEquals($submittedData['fallback'], $fallbackValue->getFallback());
     }
 
-    public function testProcessWhenFallbackValueHasOnlyScalarValue()
+    public function testProcessWhenFallbackValueHasOnlyScalarValue(): void
     {
         $submittedData = [
             'scalarValue' => 'scalarValue'
@@ -226,7 +224,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertEquals($submittedData['scalarValue'], $fallbackValue->getScalarValue());
     }
 
-    public function testProcessWhenFallbackValueHasOnlyArrayValue()
+    public function testProcessWhenFallbackValueHasOnlyArrayValue(): void
     {
         $submittedData = [
             'arrayValue' => ['key' => 'value']
@@ -246,7 +244,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertEquals($submittedData['arrayValue'], $fallbackValue->getArrayValue());
     }
 
-    public function testProcessWhenFallbackValueHasNotAcceptableFallback()
+    public function testProcessWhenFallbackValueHasNotAcceptableFallback(): void
     {
         $submittedData = [
             'fallback' => 'fallback3'
@@ -287,7 +285,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertEquals('children[fallback]', $errors[0]->getCause()->getPropertyPath());
     }
 
-    public function testProcessWhenFallbackValueHasAcceptableFallback()
+    public function testProcessWhenFallbackValueHasAcceptableFallback(): void
     {
         $submittedData = [
             'fallback' => 'fallback1'
@@ -323,7 +321,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertEquals($submittedData['fallback'], $fallbackValue->getFallback());
     }
 
-    public function testProcessWhenFallbackValueHasScalarValueButShouldBeArrayValue()
+    public function testProcessWhenFallbackValueHasScalarValueButShouldBeArrayValue(): void
     {
         $submittedData = [
             'scalarValue' => 'test'
@@ -360,7 +358,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertEquals('children[arrayValue]', $errors[0]->getCause()->getPropertyPath());
     }
 
-    public function testProcessWhenFallbackValueHasArrayValueButShouldBeScalarValue()
+    public function testProcessWhenFallbackValueHasArrayValueButShouldBeScalarValue(): void
     {
         $submittedData = [
             'arrayValue' => ['key' => 'value']
@@ -397,7 +395,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertEquals('children[scalarValue]', $errors[0]->getCause()->getPropertyPath());
     }
 
-    public function testProcessWhenFallbackValueHasScalarValueAndScalarValueExpected()
+    public function testProcessWhenFallbackValueHasScalarValueAndScalarValueExpected(): void
     {
         $submittedData = [
             'scalarValue' => 'test'
@@ -432,7 +430,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertEquals($submittedData['scalarValue'], $fallbackValue->getScalarValue());
     }
 
-    public function testProcessWhenFallbackValueHasArrayValueAndArrayValueExpected()
+    public function testProcessWhenFallbackValueHasArrayValueAndArrayValueExpected(): void
     {
         $submittedData = [
             'arrayValue' => ['key' => 'value']
@@ -467,7 +465,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertEquals($submittedData['arrayValue'], $fallbackValue->getArrayValue());
     }
 
-    public function testProcessWhenAssociationNotFound()
+    public function testProcessWhenAssociationNotFound(): void
     {
         $submittedData = [
             'scalarValue' => 'test'
@@ -500,7 +498,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertEquals($submittedData['scalarValue'], $fallbackValue->getScalarValue());
     }
 
-    public function testProcessWhenAnotherIncludedEntityAssociatedWithFallbackValue()
+    public function testProcessWhenAnotherIncludedEntityAssociatedWithFallbackValue(): void
     {
         $submittedData = [
             'scalarValue' => 'test'

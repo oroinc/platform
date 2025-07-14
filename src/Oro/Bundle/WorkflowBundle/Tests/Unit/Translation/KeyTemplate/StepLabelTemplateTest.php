@@ -12,24 +12,24 @@ class StepLabelTemplateTest extends TemplateTestCase
         return new StepLabelTemplate();
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertName(StepLabelTemplate::NAME);
     }
 
     #[\Override]
-    public function testGetTemplate()
+    public function testGetTemplate(): void
     {
         $this->assertTemplate('oro.workflow.{{ workflow_name }}.step.{{ step_name }}.label');
     }
 
     #[\Override]
-    public function testGetRequiredKeys()
+    public function testGetRequiredKeys(): void
     {
         $this->assertRequiredKeys(['workflow_name', 'step_name']);
     }
 
-    public function testGetKeyTemplates()
+    public function testGetKeyTemplates(): void
     {
         $this->assertKeyTemplates([
             'workflow_name' => '{{ workflow_name }}',

@@ -5,6 +5,8 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\EventListener;
 use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
 use Oro\Bundle\MessageQueueBundle\EventListener\LoginListener;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -13,22 +15,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LoginListenerTest extends \PHPUnit\Framework\TestCase
+class LoginListenerTest extends TestCase
 {
-    /** @var LoginListener */
-    private $listener;
-
-    /** @var ConsumerHeartbeat|\PHPUnit\Framework\MockObject\MockObject */
-    private $consumerHeartbeat;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var FlashBag */
-    private $flashBag;
-
-    /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
-    private $request;
+    private LoginListener $listener;
+    private ConsumerHeartbeat&MockObject $consumerHeartbeat;
+    private TranslatorInterface&MockObject $translator;
+    private FlashBag $flashBag;
+    private Request&MockObject $request;
 
     #[\Override]
     protected function setUp(): void
@@ -59,7 +52,7 @@ class LoginListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnLoginWithTurnedOffFunctionality()
+    public function testOnLoginWithTurnedOffFunctionality(): void
     {
         $listener = new LoginListener(
             $this->consumerHeartbeat,
@@ -78,7 +71,7 @@ class LoginListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($this->flashBag->get('error'));
     }
 
-    public function testOnLoginWithAnonUser()
+    public function testOnLoginWithAnonUser(): void
     {
         $token = new UsernamePasswordToken($this->createMock(UserInterface::class), 'key', ['anon']);
         $event = new InteractiveLoginEvent($this->request, $token);
@@ -88,7 +81,7 @@ class LoginListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($this->flashBag->get('error'));
     }
 
-    public function testOnLoginWithNotOutdatedState()
+    public function testOnLoginWithNotOutdatedState(): void
     {
         $user = new User();
         $token = new UsernamePasswordToken($user, 'key', ['user']);
@@ -103,7 +96,7 @@ class LoginListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($this->flashBag->get('error'));
     }
 
-    public function testOnLoginWithOutdatedState()
+    public function testOnLoginWithOutdatedState(): void
     {
         $user = new User();
         $token = new UsernamePasswordToken($user, 'key', ['user']);

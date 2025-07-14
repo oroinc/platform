@@ -8,8 +8,9 @@ use Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuItem\CompositePropag
 use Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuItem\MenuUpdateToMenuItemPropagatorInterface;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
+use PHPUnit\Framework\TestCase;
 
-class CompositePropagatorTest extends \PHPUnit\Framework\TestCase
+class CompositePropagatorTest extends TestCase
 {
     use MenuItemTestTrait;
 
@@ -40,22 +41,19 @@ class CompositePropagatorTest extends \PHPUnit\Framework\TestCase
         $menuItem = $this->createMock(ItemInterface::class);
 
         $propagator1 = $this->createMock(MenuUpdateToMenuItemPropagatorInterface::class);
-        $propagator1
-            ->expects(self::any())
+        $propagator1->expects(self::any())
             ->method('isApplicable')
             ->with($menuItem, $menuUpdate, MenuUpdateToMenuItemPropagatorInterface::STRATEGY_BASIC)
             ->willReturn(false);
 
         $propagator2 = $this->createMock(MenuUpdateToMenuItemPropagatorInterface::class);
-        $propagator2
-            ->expects(self::any())
+        $propagator2->expects(self::any())
             ->method('isApplicable')
             ->with($menuItem, $menuUpdate, MenuUpdateToMenuItemPropagatorInterface::STRATEGY_BASIC)
             ->willReturn(true);
 
         $propagator3 = $this->createMock(MenuUpdateToMenuItemPropagatorInterface::class);
-        $propagator3
-            ->expects(self::any())
+        $propagator3->expects(self::any())
             ->method('isApplicable')
             ->with($menuItem, $menuUpdate, MenuUpdateToMenuItemPropagatorInterface::STRATEGY_BASIC)
             ->willReturn(false);
@@ -102,23 +100,19 @@ class CompositePropagatorTest extends \PHPUnit\Framework\TestCase
         $strategy = MenuUpdateToMenuItemPropagatorInterface::STRATEGY_BASIC;
 
         $propagator1 = $this->createMock(MenuUpdateToMenuItemPropagatorInterface::class);
-        $propagator1
-            ->expects(self::once())
+        $propagator1->expects(self::once())
             ->method('isApplicable')
             ->with($menuItem, $menuUpdate, MenuUpdateToMenuItemPropagatorInterface::STRATEGY_BASIC)
             ->willReturn(false);
-        $propagator1
-            ->expects(self::never())
+        $propagator1->expects(self::never())
             ->method('propagateFromMenuUpdate');
 
         $propagator2 = $this->createMock(MenuUpdateToMenuItemPropagatorInterface::class);
-        $propagator2
-            ->expects(self::any())
+        $propagator2->expects(self::any())
             ->method('isApplicable')
             ->with($menuItem, $menuUpdate, MenuUpdateToMenuItemPropagatorInterface::STRATEGY_BASIC)
             ->willReturn(true);
-        $propagator2
-            ->expects(self::once())
+        $propagator2->expects(self::once())
             ->method('propagateFromMenuUpdate')
             ->with($menuItem, $menuUpdate, MenuUpdateToMenuItemPropagatorInterface::STRATEGY_BASIC);
 

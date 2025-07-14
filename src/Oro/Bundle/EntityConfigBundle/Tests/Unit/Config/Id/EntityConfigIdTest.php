@@ -3,10 +3,11 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config\Id;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use PHPUnit\Framework\TestCase;
 
-class EntityConfigIdTest extends \PHPUnit\Framework\TestCase
+class EntityConfigIdTest extends TestCase
 {
-    public function testEntityConfigId()
+    public function testEntityConfigId(): void
     {
         $entityId = new EntityConfigId('testScope', 'Test\Class');
 
@@ -15,14 +16,14 @@ class EntityConfigIdTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('entity_testScope_Test-Class', $entityId->toString());
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $entityId = new EntityConfigId('testScope', 'Test\Class');
 
         $this->assertEquals($entityId, unserialize(serialize($entityId)));
     }
 
-    public function testSetState()
+    public function testSetState(): void
     {
         $entityId = EntityConfigId::__set_state(
             [

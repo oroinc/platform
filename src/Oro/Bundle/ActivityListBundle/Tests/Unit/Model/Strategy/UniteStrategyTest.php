@@ -7,7 +7,6 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Model\MergeModes;
-use Oro\Bundle\ActivityListBundle\Model\Strategy\ReplaceStrategy;
 use Oro\Bundle\ActivityListBundle\Model\Strategy\UniteStrategy;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
@@ -16,30 +15,26 @@ use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
-class UniteStrategyTest extends \PHPUnit\Framework\TestCase
+class UniteStrategyTest extends TestCase
 {
-    /** @var ReplaceStrategy */
-    private $strategy;
-
-    /** @var ActivityListManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityListManager;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
+    private ActivityListManager&MockObject $activityListManager;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private UniteStrategy $strategy;
 
     #[\Override]
     protected function setUp(): void
     {
-        $activityListManager = ActivityListManager::class;
-        $this->activityListManager = $this->createMock($activityListManager);
+        $this->activityListManager = $this->createMock(ActivityListManager::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->strategy = new UniteStrategy($this->activityListManager, $this->doctrineHelper);
     }
 
-    public function testNotSupports()
+    public function testNotSupports(): void
     {
         $fieldData = new FieldData(new EntityData(new EntityMetadata(), []), new FieldMetadata());
         $fieldData->setMode(MergeModes::ACTIVITY_REPLACE);
@@ -47,7 +42,7 @@ class UniteStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->strategy->supports($fieldData));
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $fieldData = new FieldData(new EntityData(new EntityMetadata(), []), new FieldMetadata());
         $fieldData->setMode(MergeModes::ACTIVITY_UNITE);
@@ -55,7 +50,7 @@ class UniteStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->strategy->supports($fieldData));
     }
 
-    public function testMerge()
+    public function testMerge(): void
     {
         $account1 = new User();
         $account2 = new User();
@@ -97,7 +92,7 @@ class UniteStrategyTest extends \PHPUnit\Framework\TestCase
         $this->strategy->merge($fieldData);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals('activity_unite', $this->strategy->getName());
     }

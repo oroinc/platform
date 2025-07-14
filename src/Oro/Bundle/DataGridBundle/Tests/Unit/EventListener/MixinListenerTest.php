@@ -7,16 +7,15 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Event\PreBuild;
 use Oro\Bundle\DataGridBundle\EventListener\MixinListener;
 use Oro\Bundle\DataGridBundle\Tools\MixinConfigurationHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MixinListenerTest extends \PHPUnit\Framework\TestCase
+class MixinListenerTest extends TestCase
 {
     private const MIXIN_NAME = 'new-mixin-for-test-grid';
 
-    /** @var MixinConfigurationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $mixinConfigurationHelper;
-
-    /** @var MixinListener */
-    private $listener;
+    private MixinConfigurationHelper&MockObject $mixinConfigurationHelper;
+    private MixinListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +28,7 @@ class MixinListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider preBuildDataProvider
      */
-    public function testOnPreBuild(string $gridName, bool $hasParameter, bool $isApplicable)
+    public function testOnPreBuild(string $gridName, bool $hasParameter, bool $isApplicable): void
     {
         $event = $this->createMock(PreBuild::class);
 

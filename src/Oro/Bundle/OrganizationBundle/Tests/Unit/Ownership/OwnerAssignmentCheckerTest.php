@@ -22,7 +22,7 @@ class OwnerAssignmentCheckerTest extends OrmTestCase
     /**
      * @dataProvider hasAssignmentsProvider
      */
-    public function testHasAssignments($records, $expectedResult)
+    public function testHasAssignments($records, $expectedResult): void
     {
         $actualSql = '';
         $statement = $this->createFetchStatementMock($records);
@@ -34,7 +34,7 @@ class OwnerAssignmentCheckerTest extends OrmTestCase
                 return $statement;
             });
 
-        $checker      = new OwnerAssignmentChecker();
+        $checker = new OwnerAssignmentChecker();
         $actualResult = $checker->hasAssignments(
             1,
             TestEntity::class,

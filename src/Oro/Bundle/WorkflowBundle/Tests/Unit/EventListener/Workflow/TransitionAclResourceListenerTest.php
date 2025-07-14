@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 
 class TransitionAclResourceListenerTest extends TestCase
 {
-    private ExpressionFactory|MockObject $expressionFactory;
+    private ExpressionFactory&MockObject $expressionFactory;
     private TransitionAclResourceListener $listener;
 
     #[\Override]
@@ -38,7 +38,9 @@ class TransitionAclResourceListenerTest extends TestCase
     public function testOnPreAnnounceWhenNoAclResource(): void
     {
         $transition = $this->createMock(Transition::class);
-        $transition->method('getAclResource')->willReturn(null);
+        $transition->expects(self::any())
+            ->method('getAclResource')
+            ->willReturn(null);
 
         $event = new PreAnnounceEvent($this->createMock(WorkflowItem::class), $transition, true);
 
@@ -54,8 +56,12 @@ class TransitionAclResourceListenerTest extends TestCase
         $aclMessage = 'Access Denied';
 
         $transition = $this->createMock(Transition::class);
-        $transition->method('getAclResource')->willReturn($aclResource);
-        $transition->method('getAclMessage')->willReturn($aclMessage);
+        $transition->expects(self::any())
+            ->method('getAclResource')
+            ->willReturn($aclResource);
+        $transition->expects(self::any())
+            ->method('getAclMessage')
+            ->willReturn($aclMessage);
 
         $workflowItem = $this->createMock(WorkflowItem::class);
         $event = new PreAnnounceEvent($workflowItem, $transition, true);
@@ -84,8 +90,12 @@ class TransitionAclResourceListenerTest extends TestCase
         $aclResource = ['some_acl_resource'];
 
         $transition = $this->createMock(Transition::class);
-        $transition->method('getAclResource')->willReturn($aclResource);
-        $transition->method('getAclMessage')->willReturn(null);
+        $transition->expects(self::any())
+            ->method('getAclResource')
+            ->willReturn($aclResource);
+        $transition->expects(self::any())
+            ->method('getAclMessage')
+            ->willReturn(null);
 
         $workflowItem = $this->createMock(WorkflowItem::class);
         $event = new PreAnnounceEvent($workflowItem, $transition, true);

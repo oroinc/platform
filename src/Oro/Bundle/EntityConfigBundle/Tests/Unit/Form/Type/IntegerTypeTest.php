@@ -8,8 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType as BaseIntegerType;
 
 class IntegerTypeTest extends AbstractConfigTypeTestCase
 {
-    /** @var IntegerType */
-    private $type;
+    private IntegerType $type;
 
     #[\Override]
     protected function setUp(): void

@@ -7,17 +7,14 @@ use Oro\Bundle\ActionBundle\Layout\DataProvider\LayoutButtonProvider;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LayoutButtonProviderTest extends \PHPUnit\Framework\TestCase
+class LayoutButtonProviderTest extends TestCase
 {
-    /** @var ButtonProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $buttonProvider;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var LayoutButtonProvider */
-    private $layoutButtonProvider;
+    private ButtonProvider&MockObject $buttonProvider;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private LayoutButtonProvider $layoutButtonProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -40,8 +37,12 @@ class LayoutButtonProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getAllDataProvider
      */
-    public function testGetAll(?object $entity, bool $isNew, string $expectSetEntityClass, string $expectSetEntityId)
-    {
+    public function testGetAll(
+        ?object $entity,
+        bool $isNew,
+        string $expectSetEntityClass,
+        string $expectSetEntityId
+    ): void {
         $this->doctrineHelper->expects($this->any())
             ->method('isNewEntity')
             ->willReturn($isNew);
@@ -93,7 +94,7 @@ class LayoutButtonProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataGroupsProvider
      */
-    public function testGetByGroup(?string $datagrid, ?string $group)
+    public function testGetByGroup(?string $datagrid, ?string $group): void
     {
         $this->buttonProvider->expects($this->once())
             ->method('findAvailable')

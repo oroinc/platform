@@ -11,6 +11,7 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
@@ -20,14 +21,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
 {
-    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowRegistry;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var WorkflowTransitionSelectType */
-    private $type;
+    private WorkflowRegistry&MockObject $workflowRegistry;
+    private TranslatorInterface&MockObject $translator;
+    private WorkflowTransitionSelectType $type;
 
     #[\Override]
     protected function setUp(): void

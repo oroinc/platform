@@ -6,20 +6,17 @@ use Oro\Bundle\CommentBundle\Placeholder\CommentPlaceholderFilter;
 use Oro\Bundle\CommentBundle\Tests\Unit\Fixtures\TestEntity;
 use Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class CommentPlaceholderTest extends \PHPUnit\Framework\TestCase
+class CommentPlaceholderTest extends TestCase
 {
     private const TEST_ENTITY_REFERENCE = TestEntity::class;
 
-    /** @var CommentAssociationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $commentAssociationHelper;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var CommentPlaceholderFilter */
-    private $filter;
+    private CommentAssociationHelper&MockObject $commentAssociationHelper;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private CommentPlaceholderFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +36,7 @@ class CommentPlaceholderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsApplicableWithNull()
+    public function testIsApplicableWithNull(): void
     {
         $this->commentAssociationHelper->expects($this->never())
             ->method('isCommentAssociationEnabled');
@@ -49,7 +46,7 @@ class CommentPlaceholderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsApplicableWithNonManagedEntity()
+    public function testIsApplicableWithNonManagedEntity(): void
     {
         $testEntity = new \stdClass();
 
@@ -61,7 +58,7 @@ class CommentPlaceholderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsApplicableWithNotObject()
+    public function testIsApplicableWithNotObject(): void
     {
         $this->commentAssociationHelper->expects($this->never())
             ->method('isCommentAssociationEnabled');
@@ -71,7 +68,7 @@ class CommentPlaceholderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsApplicableWhenPermissionsAreNotGranted()
+    public function testIsApplicableWhenPermissionsAreNotGranted(): void
     {
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
@@ -86,7 +83,7 @@ class CommentPlaceholderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsApplicableWithCommentAssociationDisabled()
+    public function testIsApplicableWithCommentAssociationDisabled(): void
     {
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
@@ -101,7 +98,7 @@ class CommentPlaceholderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->filter->isApplicable(new TestEntity()));
     }
 
-    public function testIsApplicableWithCommentAssociationEnabled()
+    public function testIsApplicableWithCommentAssociationEnabled(): void
     {
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')

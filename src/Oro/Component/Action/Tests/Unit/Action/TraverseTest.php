@@ -7,16 +7,15 @@ use Oro\Component\Action\Action\Traverse;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class TraverseTest extends \PHPUnit\Framework\TestCase
+class TraverseTest extends TestCase
 {
-    /** @var Configurable|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurableAction;
-
-    /** @var Traverse */
-    private $action;
+    private Configurable&MockObject $configurableAction;
+    private Traverse $action;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class TraverseTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeDataProvider
      */
-    public function testInitialize(array $options)
+    public function testInitialize(array $options): void
     {
         $this->assertArrayHasKey(Traverse::OPTION_KEY_ACTIONS, $options);
         $this->configurableAction->expects($this->once())
@@ -64,7 +63,7 @@ class TraverseTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, string $message)
+    public function testInitializeException(array $options, string $message): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage($message);
@@ -124,7 +123,7 @@ class TraverseTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $context = new StubStorage(
             [

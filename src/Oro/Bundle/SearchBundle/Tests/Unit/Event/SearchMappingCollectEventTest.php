@@ -3,10 +3,11 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Event;
 
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
+use PHPUnit\Framework\TestCase;
 
-class SearchMappingCollectEventTest extends \PHPUnit\Framework\TestCase
+class SearchMappingCollectEventTest extends TestCase
 {
-    public function testEvent()
+    public function testEvent(): void
     {
         $mapConfig = ['test'];
         $event = new SearchMappingCollectEvent($mapConfig);

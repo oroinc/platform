@@ -3,9 +3,10 @@
 namespace Oro\Bundle\WindowsBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\WindowsBundle\Entity\WindowsState;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class WindowsStateTest extends \PHPUnit\Framework\TestCase
+class WindowsStateTest extends TestCase
 {
     private WindowsState $windowState;
 
@@ -18,7 +19,7 @@ class WindowsStateTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider propertiesDataProvider
      */
-    public function testGetSet(string $property, mixed $value)
+    public function testGetSet(string $property, mixed $value): void
     {
         $setMethod = 'set' . ucfirst($property);
         $getMethod = 'get' . ucfirst($property);
@@ -26,7 +27,7 @@ class WindowsStateTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->windowState->$getMethod());
     }
 
-    public function testIsRenderedSuccessfully()
+    public function testIsRenderedSuccessfully(): void
     {
         $this->assertFalse($this->windowState->isRenderedSuccessfully());
         $this->windowState->setRenderedSuccessfully(true);
@@ -45,7 +46,7 @@ class WindowsStateTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetData()
+    public function testGetData(): void
     {
         $data = ['test' => true];
         $this->windowState->setData($data);

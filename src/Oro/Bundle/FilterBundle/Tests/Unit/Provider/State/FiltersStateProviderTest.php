@@ -13,8 +13,7 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 {
     use EntityTrait;
 
-    /** @var FiltersStateProvider */
-    private $provider;
+    private FiltersStateProvider $provider;
 
     private const DEFAULT_FILTERS_STATE = ['sampleFilter' => ['value' => 'sampleValue']];
 

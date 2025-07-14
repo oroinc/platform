@@ -6,17 +6,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\DigitalAssetBundle\Acl\Voter\DigitalAssetDeleteVoter;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Tests\Unit\Stub\DigitalAssetStub;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class DigitalAssetDeleteVoterTest extends TestCase
 {
-    /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $token;
-
-    /** @var DigitalAssetDeleteVoter */
-    private $voter;
+    private TokenInterface&MockObject $token;
+    private DigitalAssetDeleteVoter $voter;
 
     #[\Override]
     protected function setUp(): void

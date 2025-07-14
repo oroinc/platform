@@ -2,25 +2,26 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
-use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Condition\Contains;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class ContainsTest extends \PHPUnit\Framework\TestCase
+class ContainsTest extends TestCase
 {
     protected $condition;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->condition = new Condition\Contains();
+        $this->condition = new Contains();
         $this->condition->setContextAccessor(new ContextAccessor());
     }
 
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, $context, $expectedResult)
+    public function testEvaluate(array $options, $context, $expectedResult): void
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));

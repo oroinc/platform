@@ -8,14 +8,13 @@ use Oro\Component\Layout\BlockTypeHelper;
 use Oro\Component\Layout\LayoutRegistryInterface;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\HeaderType;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\LogoType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class BlockTypeHelperTest extends \PHPUnit\Framework\TestCase
+class BlockTypeHelperTest extends TestCase
 {
-    /** @var LayoutRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var BlockTypeHelper */
-    private $typeHelper;
+    private LayoutRegistryInterface&MockObject $registry;
+    private BlockTypeHelper $typeHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class BlockTypeHelperTest extends \PHPUnit\Framework\TestCase
         $this->typeHelper = new BlockTypeHelper($this->registry);
     }
 
-    public function testByBlockName()
+    public function testByBlockName(): void
     {
         $baseBlockType = new BaseType();
         $containerBlockType = new ContainerType();
@@ -48,7 +47,7 @@ class BlockTypeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->typeHelper->isInstanceOf(ContainerType::NAME, 'another'));
     }
 
-    public function testByAlreadyCreatedBlockTypeObject()
+    public function testByAlreadyCreatedBlockTypeObject(): void
     {
         $baseBlockType = new BaseType();
         $containerBlockType = new ContainerType();
@@ -71,7 +70,7 @@ class BlockTypeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->typeHelper->isInstanceOf($containerBlockType, 'another'));
     }
 
-    public function testForBaseTypeByBlockName()
+    public function testForBaseTypeByBlockName(): void
     {
         $type = new BaseType();
 
@@ -92,7 +91,7 @@ class BlockTypeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->typeHelper->isInstanceOf(BaseType::NAME, 'another'));
     }
 
-    public function testForBaseTypeByAlreadyCreatedBlockTypeObject()
+    public function testForBaseTypeByAlreadyCreatedBlockTypeObject(): void
     {
         $type = new BaseType();
 
@@ -111,7 +110,7 @@ class BlockTypeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->typeHelper->isInstanceOf($type, 'another'));
     }
 
-    public function testWithAlreadyInitializedContainerParent()
+    public function testWithAlreadyInitializedContainerParent(): void
     {
         $baseBlockType = new BaseType();
         $containerBlockType = new ContainerType();
@@ -148,7 +147,7 @@ class BlockTypeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->typeHelper->isInstanceOf($headerBlockType->getName(), BaseType::NAME));
     }
 
-    public function testWithAlreadyInitializedBlockParent()
+    public function testWithAlreadyInitializedBlockParent(): void
     {
         $baseBlockType = new BaseType();
         $logoBlockType = new LogoType();
@@ -182,7 +181,7 @@ class BlockTypeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->typeHelper->isInstanceOf($logoBlockType->getName(), BaseType::NAME));
     }
 
-    public function testWithAlreadyInitializedDerivedType()
+    public function testWithAlreadyInitializedDerivedType(): void
     {
         $baseBlockType = new BaseType();
         $containerBlockType = new ContainerType();

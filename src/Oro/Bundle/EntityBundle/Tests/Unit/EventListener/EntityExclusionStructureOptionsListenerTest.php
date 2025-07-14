@@ -13,19 +13,16 @@ use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
+class EntityExclusionStructureOptionsListenerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
-
-    /** @var ExclusionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $exclusionProvider;
-
-    /** @var EntityExclusionStructureOptionsListener */
-    private $listener;
+    private ManagerRegistry&MockObject $managerRegistry;
+    private ExclusionProviderInterface&MockObject $exclusionProvider;
+    private EntityExclusionStructureOptionsListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +33,7 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
         $this->listener = new EntityExclusionStructureOptionsListener($this->managerRegistry, $this->exclusionProvider);
     }
 
-    public function testOnOptionsRequestExcluded()
+    public function testOnOptionsRequestExcluded(): void
     {
         $entityStructure = $this->getEntity(
             EntityStructure::class,
@@ -95,7 +92,7 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
         $this->assertEquals([$expectedEntityStructure], $event->getData());
     }
 
-    public function testOnOptionsRequestExcludedByRelatedClass()
+    public function testOnOptionsRequestExcludedByRelatedClass(): void
     {
         $entityStructure = $this->getEntity(
             EntityStructure::class,
@@ -157,7 +154,7 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
         $this->assertEquals([$expectedEntityStructure], $event->getData());
     }
 
-    public function testOnOptionsRequestClassExcluded()
+    public function testOnOptionsRequestClassExcluded(): void
     {
         $entityStructure = $this->getEntity(
             EntityStructure::class,
@@ -201,7 +198,7 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
         $this->assertEquals([$expectedEntityStructure], $event->getData());
     }
 
-    public function testOnOptionsRequestWithoutObjectManager()
+    public function testOnOptionsRequestWithoutObjectManager(): void
     {
         $entityStructure = $this->getEntity(
             EntityStructure::class,
@@ -248,7 +245,7 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
         $this->assertEquals([$expectedEntityStructure], $event->getData());
     }
 
-    public function testOnOptionsRequestWithoutMetadata()
+    public function testOnOptionsRequestWithoutMetadata(): void
     {
         $entityStructure = $this->getEntity(
             EntityStructure::class,
@@ -300,7 +297,7 @@ class EntityExclusionStructureOptionsListenerTest extends \PHPUnit\Framework\Tes
         $this->assertEquals([$expectedEntityStructure], $event->getData());
     }
 
-    public function testOnOptionsRequestUnidirectional()
+    public function testOnOptionsRequestUnidirectional(): void
     {
         $fieldName = sprintf('class%sfield', UnidirectionalFieldHelper::DELIMITER);
         $entityStructure = $this->getEntity(

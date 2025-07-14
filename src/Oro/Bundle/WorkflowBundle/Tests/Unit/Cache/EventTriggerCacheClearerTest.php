@@ -4,11 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Cache;
 
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCacheClearer;
+use PHPUnit\Framework\TestCase;
 
-class EventTriggerCacheClearerTest extends \PHPUnit\Framework\TestCase
+class EventTriggerCacheClearerTest extends TestCase
 {
-    /** @var EventTriggerCacheClearer */
-    private $clearer;
+    private EventTriggerCacheClearer $clearer;
 
     #[\Override]
     protected function setUp(): void

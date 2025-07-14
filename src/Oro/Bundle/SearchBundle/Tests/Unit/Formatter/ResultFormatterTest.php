@@ -11,12 +11,12 @@ use Oro\Bundle\SearchBundle\Formatter\ResultFormatter;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SearchBundle\Tests\Unit\Formatter\Stub\Category;
 use Oro\Bundle\SearchBundle\Tests\Unit\Formatter\Stub\Product;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ResultFormatterTest extends \PHPUnit\Framework\TestCase
+class ResultFormatterTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
+    private DoctrineHelper&MockObject $doctrineHelper;
     private array $productStubs;
     private array $categoryStubs;
 
@@ -188,7 +188,7 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
         return $entities;
     }
 
-    public function testGetResultEntities()
+    public function testGetResultEntities(): void
     {
         $this->prepareEntityManager();
         $expectedResult = $this->prepareStubEntities();
@@ -201,7 +201,7 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $actualResult);
     }
 
-    public function testGetOrderedResultEntities()
+    public function testGetOrderedResultEntities(): void
     {
         $this->prepareEntityManager();
         $this->prepareStubEntities();

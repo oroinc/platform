@@ -10,6 +10,7 @@ use Oro\Bundle\TranslationBundle\Download\TranslationMetricsProviderInterface;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Form\Type\AddLanguageType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Intl\Locales;
@@ -17,17 +18,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AddLanguageTypeTest extends FormIntegrationTestCase
 {
-    /** @var LanguageRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
-
-    /** @var TranslationMetricsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationStatisticProvider;
-
-    /** @var AddLanguageType */
-    private $formType;
+    private LanguageRepository&MockObject $repository;
+    private LocaleSettings&MockObject $localeSettings;
+    private TranslationMetricsProviderInterface&MockObject $translationStatisticProvider;
+    private AddLanguageType $formType;
 
     #[\Override]
     protected function setUp(): void

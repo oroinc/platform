@@ -3,10 +3,11 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Test;
 
 use Oro\Bundle\IntegrationBundle\Test\FakeRestResponse;
+use PHPUnit\Framework\TestCase;
 
-class FakeRestResponseTest extends \PHPUnit\Framework\TestCase
+class FakeRestResponseTest extends TestCase
 {
-    public function testResponseGetStatusCode()
+    public function testResponseGetStatusCode(): void
     {
         $response = new FakeRestResponse(200);
         $this->assertEquals(200, $response->getStatusCode());
@@ -15,7 +16,7 @@ class FakeRestResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(404, $response->getStatusCode());
     }
 
-    public function testResponseIsSuccessful()
+    public function testResponseIsSuccessful(): void
     {
         $response = new FakeRestResponse(200);
         $this->assertTrue($response->isSuccessful());
@@ -30,7 +31,7 @@ class FakeRestResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($response->isSuccessful());
     }
 
-    public function testResponseIsError()
+    public function testResponseIsError(): void
     {
         $response = new FakeRestResponse(200);
         $this->assertFalse($response->isError());
@@ -45,7 +46,7 @@ class FakeRestResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($response->isError());
     }
 
-    public function testResponseJson()
+    public function testResponseJson(): void
     {
         $response = new FakeRestResponse(200, ['Content-Type' => 'application/json'], '{"foo": "bar"}');
         $jsonResponse = $response->json();
@@ -53,14 +54,14 @@ class FakeRestResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('bar', $jsonResponse['foo']);
     }
 
-    public function testRequestGetBody()
+    public function testRequestGetBody(): void
     {
         $response = new FakeRestResponse(200, [], 'foo');
 
         $this->assertEquals('foo', $response->getBodyAsString());
     }
 
-    public function testResponseGetHeaders()
+    public function testResponseGetHeaders(): void
     {
         $expectedHeaders = [
             'Content-Type' => 'application/json',
@@ -74,7 +75,7 @@ class FakeRestResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($response->hasHeader('baz'));
     }
 
-    public function testResponseTypes()
+    public function testResponseTypes(): void
     {
         $response = new FakeRestResponse(100);
         $this->assertTrue($response->isInformational());

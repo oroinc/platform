@@ -5,16 +5,15 @@ namespace Oro\Bundle\HelpBundle\Tests\Unit\Twig;
 use Oro\Bundle\HelpBundle\Provider\HelpLinkProvider;
 use Oro\Bundle\HelpBundle\Twig\HelpExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class HelpExtensionTest extends \PHPUnit\Framework\TestCase
+class HelpExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var HelpLinkProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $linkProvider;
-
-    /** @var HelpExtension */
-    private $extension;
+    private HelpLinkProvider&MockObject $linkProvider;
+    private HelpExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class HelpExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new HelpExtension($container);
     }
 
-    public function testGetHelpLinkUrl()
+    public function testGetHelpLinkUrl(): void
     {
         $expects = 'http://server.com/help/list';
 

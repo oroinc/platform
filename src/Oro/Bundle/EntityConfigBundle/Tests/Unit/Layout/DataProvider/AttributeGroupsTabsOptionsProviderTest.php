@@ -10,15 +10,15 @@ use Oro\Bundle\EntityConfigBundle\Layout\DataProvider\AttributeGroupsTabsOptions
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\TestCase;
 
-class AttributeGroupsTabsOptionsProviderTest extends \PHPUnit\Framework\TestCase
+class AttributeGroupsTabsOptionsProviderTest extends TestCase
 {
     use EntityTrait;
 
-    public function testGetConfig()
+    public function testGetConfig(): void
     {
         $attributeFamily = new AttributeFamily();
-        /** @var AttributeGroup $firstGroup */
         $firstGroup = $this->getEntity(
             AttributeGroup::class,
             [
@@ -27,7 +27,6 @@ class AttributeGroupsTabsOptionsProviderTest extends \PHPUnit\Framework\TestCase
                 'labels' => new ArrayCollection([(new LocalizedFallbackValue())->setString('One')])
             ]
         );
-        /** @var AttributeGroup $secondGroup */
         $secondGroup = $this->getEntity(
             AttributeGroup::class,
             [

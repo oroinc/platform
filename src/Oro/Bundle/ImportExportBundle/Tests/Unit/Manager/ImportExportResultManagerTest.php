@@ -11,19 +11,16 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
+class ImportExportResultManagerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var ImportExportResultManager */
-    private $importExportResultManager;
+    private ManagerRegistry&MockObject $doctrine;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private ImportExportResultManager $importExportResultManager;
 
     #[\Override]
     protected function setUp(): void

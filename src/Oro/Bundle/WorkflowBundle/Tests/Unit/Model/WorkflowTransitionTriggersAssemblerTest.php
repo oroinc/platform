@@ -8,10 +8,11 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggerAssemblerInterface;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowTransitionTriggersAssembler;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowTransitionTriggersAssemblerTest extends \PHPUnit\Framework\TestCase
+class WorkflowTransitionTriggersAssemblerTest extends TestCase
 {
-    public function testAssembler()
+    public function testAssembler(): void
     {
         $assembler = new WorkflowTransitionTriggersAssembler();
         $someAssembler = $this->createMock(TransitionTriggerAssemblerInterface::class);
@@ -43,7 +44,7 @@ class WorkflowTransitionTriggersAssemblerTest extends \PHPUnit\Framework\TestCas
         $this->assertEquals([$trigger], $triggers);
     }
 
-    public function testAssemblerException()
+    public function testAssemblerException(): void
     {
         $this->expectException(AssemblerException::class);
         $this->expectExceptionMessage(sprintf(

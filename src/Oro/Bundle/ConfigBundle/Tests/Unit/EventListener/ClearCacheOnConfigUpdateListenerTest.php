@@ -4,9 +4,10 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 use Oro\Bundle\ConfigBundle\EventListener\ClearCacheOnConfigUpdateListener;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
 
-class ClearCacheOnConfigUpdateListenerTest extends \PHPUnit\Framework\TestCase
+class ClearCacheOnConfigUpdateListenerTest extends TestCase
 {
     private const SAMPLE_CONFIG_PARAMETER = 'sample.config.parameter';
 

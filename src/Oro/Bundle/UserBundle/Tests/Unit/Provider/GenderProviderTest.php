@@ -4,9 +4,10 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\UserBundle\Model\Gender;
 use Oro\Bundle\UserBundle\Provider\GenderProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class GenderProviderTest extends \PHPUnit\Framework\TestCase
+class GenderProviderTest extends TestCase
 {
     private GenderProvider $genderProvider;
 
@@ -23,7 +24,7 @@ class GenderProviderTest extends \PHPUnit\Framework\TestCase
         $this->genderProvider = new GenderProvider($translator);
     }
 
-    public function testGetChoices()
+    public function testGetChoices(): void
     {
         $expectedChoices = [
             'oro.user.gender.male.translated' => Gender::MALE,
@@ -34,7 +35,7 @@ class GenderProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedChoices, $this->genderProvider->getChoices());
     }
 
-    public function testGetLabelByName()
+    public function testGetLabelByName(): void
     {
         $this->assertEquals(
             'oro.user.gender.male.translated',
@@ -46,7 +47,7 @@ class GenderProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLabelByNameUnknownGender()
+    public function testGetLabelByNameUnknownGender(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Unknown gender with name "alien"');

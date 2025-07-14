@@ -3,8 +3,9 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport;
 
 use Oro\Component\MessageQueue\Transport\DsnBasedParameters;
+use PHPUnit\Framework\TestCase;
 
-class DsnBasedParametersTest extends \PHPUnit\Framework\TestCase
+class DsnBasedParametersTest extends TestCase
 {
     /**
      * @dataProvider invalidDsnProvider

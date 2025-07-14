@@ -16,23 +16,16 @@ use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Autocomplete\AssignedToOrganizationUsersHandler;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AssignedToOrganizationUsersHandlerTest extends \PHPUnit\Framework\TestCase
+class AssignedToOrganizationUsersHandlerTest extends TestCase
 {
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
-    private $searchIndexer;
-
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var AssignedToOrganizationUsersHandler */
-    private $handler;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private Indexer&MockObject $searchIndexer;
+    private EntityRepository&MockObject $repository;
+    private ObjectManager&MockObject $manager;
+    private AssignedToOrganizationUsersHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -75,7 +68,7 @@ class AssignedToOrganizationUsersHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->initDoctrinePropertiesByEntityManager($this->manager);
     }
 
-    public function testSearchWithOrganizationInToken()
+    public function testSearchWithOrganizationInToken(): void
     {
         $query = new Query();
         $searchResult = new Result($query);
@@ -102,7 +95,7 @@ class AssignedToOrganizationUsersHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedExpression, $query->getCriteria()->getWhereExpression());
     }
 
-    public function testSearchWithoutOrganizationInToken()
+    public function testSearchWithoutOrganizationInToken(): void
     {
         $query = new Query();
         $searchResult = new Result($query);

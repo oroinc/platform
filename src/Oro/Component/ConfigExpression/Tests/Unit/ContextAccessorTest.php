@@ -5,14 +5,14 @@ namespace Oro\Component\ConfigExpression\Tests\Unit;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class ContextAccessorTest extends \PHPUnit\Framework\TestCase
+class ContextAccessorTest extends TestCase
 {
-    /** @var ContextAccessor */
-    private $contextAccessor;
+    private ContextAccessor $contextAccessor;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +23,7 @@ class ContextAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getValueDataProvider
      */
-    public function testGetValue(object|array $context, string|PropertyPath $value, ?string $expectedValue)
+    public function testGetValue(object|array $context, string|PropertyPath $value, ?string $expectedValue): void
     {
         $this->assertEquals($expectedValue, $this->contextAccessor->getValue($context, $value));
     }
@@ -62,8 +62,11 @@ class ContextAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPropertyValueDataProvider
      */
-    public function testGetPropertyValue(object|array $context, string|PropertyPath $value, ?string $expectedValue)
-    {
+    public function testGetPropertyValue(
+        object|array $context,
+        string|PropertyPath $value,
+        ?string $expectedValue
+    ): void {
         $this->assertEquals($expectedValue, $this->contextAccessor->getPropertyValue($context, $value));
     }
 
@@ -107,7 +110,7 @@ class ContextAccessorTest extends \PHPUnit\Framework\TestCase
         PropertyPath $property,
         string|PropertyPath $value,
         ?string $expectedValue
-    ) {
+    ): void {
         $this->contextAccessor->setValue($context, $property, $value);
         $actualValue = $this->contextAccessor->getValue($context, $property);
         $this->assertEquals($expectedValue, $actualValue);
@@ -166,7 +169,7 @@ class ContextAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider hasValueDataProvider
      */
-    public function testHasValue(object $context, PropertyPath $value, bool $expectedValue)
+    public function testHasValue(object $context, PropertyPath $value, bool $expectedValue): void
     {
         $this->contextAccessor->hasValue($context, $value);
         $actualValue = $this->contextAccessor->hasValue($context, $value);
@@ -209,7 +212,7 @@ class ContextAccessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetValueNoSuchProperty()
+    public function testGetValueNoSuchProperty(): void
     {
         $context = new ItemStub([]);
         $value = new PropertyPath('test');

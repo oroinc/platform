@@ -6,17 +6,15 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumPublicType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EnumPublicTypeTest extends TypeTestCase
 {
-    /** @var EnumTypeHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $typeHelper;
-
-    /** @var EnumPublicType */
-    private $type;
+    private EnumTypeHelper&MockObject $typeHelper;
+    private EnumPublicType $type;
 
     #[\Override]
     protected function setUp(): void

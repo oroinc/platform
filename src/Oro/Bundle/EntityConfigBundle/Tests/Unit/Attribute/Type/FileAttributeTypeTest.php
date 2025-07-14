@@ -21,7 +21,7 @@ class FileAttributeTypeTest extends AttributeTypeTestCase
         ];
     }
 
-    public function testGetSearchableValue()
+    public function testGetSearchableValue(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not supported');
@@ -29,7 +29,7 @@ class FileAttributeTypeTest extends AttributeTypeTestCase
         $this->getAttributeType()->getSearchableValue($this->attribute, true, $this->localization);
     }
 
-    public function testGetFilterableValue()
+    public function testGetFilterableValue(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not supported');
@@ -37,7 +37,7 @@ class FileAttributeTypeTest extends AttributeTypeTestCase
         $this->getAttributeType()->getFilterableValue($this->attribute, true, $this->localization);
     }
 
-    public function testGetSortableValue()
+    public function testGetSortableValue(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not supported');

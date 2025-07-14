@@ -3,12 +3,12 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\EntityBundle\Formatter\SimpleArrayFormatter;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SimpleArrayFormatterTest extends \PHPUnit\Framework\TestCase
+class SimpleArrayFormatterTest extends TestCase
 {
-    /** @var SimpleArrayFormatter */
-    private $formatter;
+    private SimpleArrayFormatter $formatter;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +26,7 @@ class SimpleArrayFormatterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider formatDataProvider
      */
-    public function testFormat($value, array $arguments, $expectedValue)
+    public function testFormat($value, array $arguments, $expectedValue): void
     {
         self::assertEquals($expectedValue, $this->formatter->format($value, $arguments));
     }
@@ -72,7 +72,7 @@ class SimpleArrayFormatterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetDefaultValue()
+    public function testGetDefaultValue(): void
     {
         self::assertEquals(
             'translated: oro.entity.formatter.simple_array.default',

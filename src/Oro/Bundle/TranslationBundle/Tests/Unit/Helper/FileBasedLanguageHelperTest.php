@@ -3,8 +3,9 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\TranslationBundle\Helper\FileBasedLanguageHelper;
+use PHPUnit\Framework\TestCase;
 
-class FileBasedLanguageHelperTest extends \PHPUnit\Framework\TestCase
+class FileBasedLanguageHelperTest extends TestCase
 {
     private $helper;
 

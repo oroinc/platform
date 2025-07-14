@@ -10,14 +10,13 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsOrganization;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SearchListenerTest extends \PHPUnit\Framework\TestCase
+class SearchListenerTest extends TestCase
 {
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadataProvider;
-
-    /** @var SearchListener */
-    private $listener;
+    private OwnershipMetadataProviderInterface&MockObject $metadataProvider;
+    private SearchListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class SearchListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new SearchListener($this->metadataProvider);
     }
 
-    public function testCollectEntityMapEvent()
+    public function testCollectEntityMapEvent(): void
     {
         $metadata = new OwnershipMetadata('USER', 'owner', 'owner_id', 'organization', 'organization_id');
         $this->metadataProvider->expects($this->once())
@@ -64,7 +63,7 @@ class SearchListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareEntityMapEvent()
+    public function testPrepareEntityMapEvent(): void
     {
         $entity = new CmsArticle();
         $organization = new CmsOrganization();

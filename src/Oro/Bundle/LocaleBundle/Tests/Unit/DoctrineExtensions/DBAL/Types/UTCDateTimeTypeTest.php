@@ -5,14 +5,13 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\DoctrineExtensions\DBAL\Types;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCDateTimeType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class UTCDateTimeTypeTest extends \PHPUnit\Framework\TestCase
+class UTCDateTimeTypeTest extends TestCase
 {
-    /** @var UTCDateTimeType */
-    private $type;
-
-    /** @var AbstractPlatform|\PHPUnit\Framework\MockObject\MockObject */
-    private $platform;
+    private UTCDateTimeType $type;
+    private AbstractPlatform&MockObject $platform;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class UTCDateTimeTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider convertToDatabaseValueWhenDataProvider
      */
-    public function testConvertToDatabaseValue(string $sourceDateTime, string $sourceTimeZone, string $expected)
+    public function testConvertToDatabaseValue(string $sourceDateTime, string $sourceTimeZone, string $expected): void
     {
         $source = new \DateTime($sourceDateTime, new \DateTimeZone($sourceTimeZone));
 
@@ -66,12 +65,12 @@ class UTCDateTimeTypeTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testConvertToDatabaseValueWhenNull()
+    public function testConvertToDatabaseValueWhenNull(): void
     {
         $this->assertNull($this->type->convertToDatabaseValue(null, $this->platform));
     }
 
-    public function testConvertToPHPValue()
+    public function testConvertToPHPValue(): void
     {
         $source = '2013-01-01 08:00:00';
         $expected = new \DateTime('2013-01-01 08:00:00', new \DateTimeZone('UTC'));
@@ -79,7 +78,7 @@ class UTCDateTimeTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->type->convertToPHPValue($source, $this->platform));
     }
 
-    public function testConvertToPHPValueException()
+    public function testConvertToPHPValueException(): void
     {
         $this->expectException(ConversionException::class);
         $this->type->convertToPHPValue('qwerty', $this->platform);

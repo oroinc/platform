@@ -10,14 +10,13 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityConfigProviderHelperTest extends \PHPUnit\Framework\TestCase
+class EntityConfigProviderHelperTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var EntityConfigProviderHelper */
-    private $helper;
+    private ConfigManager&MockObject $configManager;
+    private EntityConfigProviderHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class EntityConfigProviderHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getLayoutParamsForActionsDataProvider
      */
-    public function testGetLayoutParamsForActions(?string $displayOnly, array $actions, array $expected)
+    public function testGetLayoutParamsForActions(?string $displayOnly, array $actions, array $expected): void
     {
         $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects(self::once())
@@ -216,7 +215,7 @@ class EntityConfigProviderHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getLayoutParamsForJsModulesDataProvider
      */
-    public function testGetLayoutParamsForJsModules(array $jsModules, array $expected)
+    public function testGetLayoutParamsForJsModules(array $jsModules, array $expected): void
     {
         $configProvider1 = $this->createMock(ConfigProvider::class);
         $configProvider2 = $this->createMock(ConfigProvider::class);

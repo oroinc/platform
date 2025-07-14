@@ -5,17 +5,16 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\EventListener;
 use Oro\Bundle\EntityConfigBundle\EventListener\AttributeFamilyFormViewListener;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\View\ScrollData;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormView;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase
+class AttributeFamilyFormViewListenerTest extends TestCase
 {
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $environment;
-
-    /** @var AttributeFamilyFormViewListener */
-    private $listener;
+    private Environment&MockObject $environment;
+    private AttributeFamilyFormViewListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -59,7 +58,7 @@ class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onEditDataProvider
      */
-    public function testOnEdit(string $templateData, array $expectedScrollData)
+    public function testOnEdit(string $templateData, array $expectedScrollData): void
     {
         $formView = new FormView();
         $this->environment->expects($this->once())

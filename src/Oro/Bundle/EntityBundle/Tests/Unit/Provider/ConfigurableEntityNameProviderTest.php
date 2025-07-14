@@ -8,17 +8,16 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\Provider\ConfigurableEntityNameProvider;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ConfigurableEntityNameProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigurableEntityNameProviderTest extends TestCase
 {
-    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadata;
-
-    /** @var ConfigurableEntityNameProvider */
-    private $entityNameProvider;
+    private ClassMetadata&MockObject $metadata;
+    private ConfigurableEntityNameProvider $entityNameProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -45,7 +44,7 @@ class ConfigurableEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameFullNotConfigured()
+    public function testGetNameFullNotConfigured(): void
     {
         $entity = new \stdClass();
 
@@ -53,7 +52,7 @@ class ConfigurableEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($result);
     }
 
-    public function testGetNameShortNotConfigured()
+    public function testGetNameShortNotConfigured(): void
     {
         $entity = new \stdClass();
 
@@ -61,7 +60,7 @@ class ConfigurableEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($result);
     }
 
-    public function testGetNameFull()
+    public function testGetNameFull(): void
     {
         $entity = new TestEntity();
         $entity->setId(123);
@@ -72,7 +71,7 @@ class ConfigurableEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('name description', $result);
     }
 
-    public function testGetNameShort()
+    public function testGetNameShort(): void
     {
         $entity = new TestEntity();
         $entity->setId(123);
@@ -83,7 +82,7 @@ class ConfigurableEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('description', $result);
     }
 
-    public function testGetNameFullNoNameNoIdentifier()
+    public function testGetNameFullNoNameNoIdentifier(): void
     {
         $entity = new TestEntity();
 
@@ -95,7 +94,7 @@ class ConfigurableEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($result);
     }
 
-    public function testGetNameShortNoNameNoIdentifier()
+    public function testGetNameShortNoNameNoIdentifier(): void
     {
         $entity = new TestEntity();
 
@@ -107,7 +106,7 @@ class ConfigurableEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($result);
     }
 
-    public function testGetNameFullNoName()
+    public function testGetNameFullNoName(): void
     {
         $entity = new TestEntity();
         $entity->setId(123);
@@ -120,7 +119,7 @@ class ConfigurableEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame('123', $result);
     }
 
-    public function testGetNameShortNoName()
+    public function testGetNameShortNoName(): void
     {
         $entity = new TestEntity();
         $entity->setId(123);
@@ -133,7 +132,7 @@ class ConfigurableEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame('123', $result);
     }
 
-    public function testGetNameFullNoNameAndNewEntity()
+    public function testGetNameFullNoNameAndNewEntity(): void
     {
         $entity = new TestEntity();
 
@@ -145,7 +144,7 @@ class ConfigurableEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertNull($result);
     }
 
-    public function testGetNameShortNoNameAndNewEntity()
+    public function testGetNameShortNoNameAndNewEntity(): void
     {
         $entity = new TestEntity();
 
@@ -157,19 +156,19 @@ class ConfigurableEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertNull($result);
     }
 
-    public function testGetNameDQLFullNotConfigured()
+    public function testGetNameDQLFullNotConfigured(): void
     {
         $result = $this->entityNameProvider->getNameDQL('full', null, \stdClass::class, 'alias');
         self::assertFalse($result);
     }
 
-    public function testGetNameDQLShortNotConfigured()
+    public function testGetNameDQLShortNotConfigured(): void
     {
         $result = $this->entityNameProvider->getNameDQL('short', null, \stdClass::class, 'alias');
         self::assertFalse($result);
     }
 
-    public function testGetNameDQLFull()
+    public function testGetNameDQLFull(): void
     {
         $this->metadata->expects(self::once())
             ->method('getIdentifierFieldNames')
@@ -182,7 +181,7 @@ class ConfigurableEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameDQLShort()
+    public function testGetNameDQLShort(): void
     {
         $this->metadata->expects(self::once())
             ->method('getIdentifierFieldNames')
@@ -192,7 +191,7 @@ class ConfigurableEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('COALESCE(CAST(alias.description AS string), CAST(alias.id AS string))', $result);
     }
 
-    public function testGetNameDQLFullNoIdentity()
+    public function testGetNameDQLFullNoIdentity(): void
     {
         $this->metadata->expects(self::once())
             ->method('getIdentifierFieldNames')
@@ -202,7 +201,7 @@ class ConfigurableEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('CONCAT_WS(\' \', alias.name, alias.description)', $result);
     }
 
-    public function testGetNameDQLShortNoIdentity()
+    public function testGetNameDQLShortNoIdentity(): void
     {
         $this->metadata->expects(self::once())
             ->method('getIdentifierFieldNames')

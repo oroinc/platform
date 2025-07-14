@@ -9,11 +9,12 @@ use Oro\Bundle\DataAuditBundle\Strategy\Processor\DefaultEntityAuditStrategyProc
 use Oro\Bundle\DataAuditBundle\Strategy\Processor\EntityAuditStrategyProcessorInterface;
 use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\CustomFieldStub;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DefaultEntityAuditStrategyProcessorTest extends \PHPUnit\Framework\TestCase
+class DefaultEntityAuditStrategyProcessorTest extends TestCase
 {
-    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $doctrine;
-
+    private ManagerRegistry&MockObject $doctrine;
     private EntityAuditStrategyProcessorInterface $strategyProcessor;
 
     #[\Override]

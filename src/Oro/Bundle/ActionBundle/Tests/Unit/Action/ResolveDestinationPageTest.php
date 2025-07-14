@@ -7,21 +7,18 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class ResolveDestinationPageTest extends \PHPUnit\Framework\TestCase
+class ResolveDestinationPageTest extends TestCase
 {
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    protected $requestStack;
-
-    /** @var DestinationPageResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $resolver;
-
-    /** @var ResolveDestinationPage */
-    protected $action;
+    protected RequestStack&MockObject $requestStack;
+    protected DestinationPageResolver&MockObject $resolver;
+    protected ResolveDestinationPage $action;
 
     #[\Override]
     protected function setUp(): void

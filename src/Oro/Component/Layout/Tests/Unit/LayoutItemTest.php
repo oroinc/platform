@@ -5,13 +5,12 @@ namespace Oro\Component\Layout\Tests\Unit;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutItem;
 use Oro\Component\Layout\RawLayoutBuilder;
+use PHPUnit\Framework\TestCase;
 
-class LayoutItemTest extends \PHPUnit\Framework\TestCase
+class LayoutItemTest extends TestCase
 {
     private RawLayoutBuilder $rawLayoutBuilder;
-
     private LayoutContext $context;
-
     private LayoutItem $item;
 
     #[\Override]
@@ -33,7 +32,7 @@ class LayoutItemTest extends \PHPUnit\Framework\TestCase
 
     public function testInitialize(): void
     {
-        $id    = 'test_id';
+        $id = 'test_id';
         $alias = 'test_alias';
 
         $this->item->initialize($id, $alias);
@@ -44,7 +43,7 @@ class LayoutItemTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTypeName(): void
     {
-        $id        = 'test_id';
+        $id = 'test_id';
         $blockType = 'test_block_type';
 
         $this->rawLayoutBuilder->add($id, null, $blockType);
@@ -56,7 +55,7 @@ class LayoutItemTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOptions(): void
     {
-        $id      = 'test_id';
+        $id = 'test_id';
         $options = ['foo' => 'bar'];
 
         $this->rawLayoutBuilder->add($id, null, 'test', $options);

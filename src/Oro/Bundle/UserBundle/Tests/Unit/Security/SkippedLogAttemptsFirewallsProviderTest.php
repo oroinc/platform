@@ -3,8 +3,9 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
 use Oro\Bundle\UserBundle\Security\SkippedLogAttemptsFirewallsProvider;
+use PHPUnit\Framework\TestCase;
 
-class SkippedLogAttemptsFirewallsProviderTest extends \PHPUnit\Framework\TestCase
+class SkippedLogAttemptsFirewallsProviderTest extends TestCase
 {
     public function testProvider(): void
     {

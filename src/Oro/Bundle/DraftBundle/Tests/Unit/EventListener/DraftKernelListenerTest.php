@@ -12,11 +12,12 @@ use Oro\Bundle\DraftBundle\Manager\DraftManager;
 use Oro\Bundle\DraftBundle\Manager\Publisher;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class DraftKernelListenerTest extends \PHPUnit\Framework\TestCase
+class DraftKernelListenerTest extends TestCase
 {
     public function testOnKernelControllerArguments(): void
     {
@@ -26,8 +27,7 @@ class DraftKernelListenerTest extends \PHPUnit\Framework\TestCase
         $controller = static fn () => null;
         $draftManger = $this->getDraftManager();
         $draftHelper = $this->createMock(DraftHelper::class);
-        $draftHelper
-            ->expects(self::once())
+        $draftHelper->expects(self::once())
             ->method('isSaveAsDraftAction')
             ->willReturn(true);
 

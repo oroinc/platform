@@ -3,13 +3,14 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Form;
 
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FormActionTest extends \PHPUnit\Framework\TestCase
+class FormActionTest extends TestCase
 {
-    public function testCreateEmpty()
+    public function testCreateEmpty(): void
     {
         $formAction = FormAction::createEmpty();
 
@@ -30,7 +31,7 @@ class FormActionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('', $formAction->toString());
     }
 
-    public function testCreateByPath()
+    public function testCreateByPath(): void
     {
         $path = 'test';
 
@@ -53,7 +54,7 @@ class FormActionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('path:' . $path, $formAction->toString());
     }
 
-    public function testCreateByRouteWithoutParameters()
+    public function testCreateByRouteWithoutParameters(): void
     {
         $routeName = 'test';
 
@@ -76,9 +77,9 @@ class FormActionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('route:' . $routeName, $formAction->toString());
     }
 
-    public function testCreateByRouteWithParameters()
+    public function testCreateByRouteWithParameters(): void
     {
-        $routeName   = 'test';
+        $routeName = 'test';
         $routeParams = ['foo' => 'bar'];
 
         $formAction = FormAction::createByRoute($routeName, $routeParams);
@@ -100,7 +101,7 @@ class FormActionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('route:' . $routeName, $formAction->toString());
     }
 
-    public function testCreateByPathShouldAcceptStringOnly()
+    public function testCreateByPathShouldAcceptStringOnly(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The path must be a string, but "integer" given.');
@@ -108,7 +109,7 @@ class FormActionTest extends \PHPUnit\Framework\TestCase
         FormAction::createByPath(123);
     }
 
-    public function testCreateByPathShouldNotAcceptEmptyString()
+    public function testCreateByPathShouldNotAcceptEmptyString(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The path must not be empty.');
@@ -116,7 +117,7 @@ class FormActionTest extends \PHPUnit\Framework\TestCase
         FormAction::createByPath('');
     }
 
-    public function testCreateByPathShouldNotAcceptNull()
+    public function testCreateByPathShouldNotAcceptNull(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The path must be a string, but "NULL" given.');
@@ -124,7 +125,7 @@ class FormActionTest extends \PHPUnit\Framework\TestCase
         FormAction::createByPath(null);
     }
 
-    public function testCreateByRouteShouldAcceptStringOnly()
+    public function testCreateByRouteShouldAcceptStringOnly(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The route name must be a string, but "integer" given.');
@@ -132,7 +133,7 @@ class FormActionTest extends \PHPUnit\Framework\TestCase
         FormAction::createByRoute(123);
     }
 
-    public function testCreateByRouteShouldNotAcceptEmptyString()
+    public function testCreateByRouteShouldNotAcceptEmptyString(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The route name must not be empty.');
@@ -140,7 +141,7 @@ class FormActionTest extends \PHPUnit\Framework\TestCase
         FormAction::createByRoute('');
     }
 
-    public function testCreateByRouteShouldNotAcceptNull()
+    public function testCreateByRouteShouldNotAcceptNull(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The route name must be a string, but "NULL" given.');
@@ -148,7 +149,7 @@ class FormActionTest extends \PHPUnit\Framework\TestCase
         FormAction::createByRoute(null);
     }
 
-    public function testArrayAccessSetDenied()
+    public function testArrayAccessSetDenied(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Not supported');
@@ -158,7 +159,7 @@ class FormActionTest extends \PHPUnit\Framework\TestCase
         $formAction[FormAction::PATH] = 'new';
     }
 
-    public function testArrayAccessUnsetDenied()
+    public function testArrayAccessUnsetDenied(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Not supported');

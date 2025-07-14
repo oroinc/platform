@@ -5,14 +5,13 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Placeholder;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Placeholder\PlaceholderFilter;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
+class PlaceholderFilterTest extends TestCase
 {
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var PlaceholderFilter */
-    private $placeholderFilter;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private PlaceholderFilter $placeholderFilter;
 
     #[\Override]
     protected function setUp(): void

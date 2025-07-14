@@ -5,12 +5,12 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetSortByType;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Test\TypeTestCase;
 
 class WidgetSortByTypeTest extends TypeTestCase
 {
-    /** @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldProvider;
+    private EntityFieldProvider&MockObject $fieldProvider;
 
     #[\Override]
     protected function setUp(): void

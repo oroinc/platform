@@ -14,17 +14,16 @@ use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 use Oro\Bundle\SyncBundle\Content\DataGridTagListener;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DataGridTagListenerTest extends \PHPUnit\Framework\TestCase
+class DataGridTagListenerTest extends TestCase
 {
-    private const TEST_GRID_NAME   = 'gridName';
+    private const TEST_GRID_NAME = 'gridName';
     private const TEST_ENTITY_NAME = 'someEntity';
 
-    /** @var TagGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $generator;
-
-    /** @var DataGridTagListener */
-    private $listener;
+    private TagGeneratorInterface&MockObject $generator;
+    private DataGridTagListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +32,7 @@ class DataGridTagListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new DataGridTagListener($this->generator);
     }
 
-    public function testBuildAfter()
+    public function testBuildAfter(): void
     {
         $config = DatagridConfiguration::createNamed(self::TEST_GRID_NAME, []);
         $acceptor = new Acceptor();

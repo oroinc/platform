@@ -5,9 +5,10 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Exception\NotFoundSupportedOwnershipDecisionMakerException;
 use Oro\Bundle\SecurityBundle\Owner\ChainEntityOwnershipDecisionMaker;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit\Framework\TestCase
+class ChainEntityOwnershipDecisionMakerTest extends TestCase
 {
     private function getOwnershipDecisionMaker(bool $supports): AccessLevelOwnershipDecisionMakerInterface
     {
@@ -19,7 +20,7 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit\Framework\TestCase
         return $maker;
     }
 
-    public function testPassOwnershipDecisionMakersThroughConstructor()
+    public function testPassOwnershipDecisionMakersThroughConstructor(): void
     {
         $maker = $this->createMock(AccessLevelOwnershipDecisionMakerInterface::class);
         $maker->expects($this->once())
@@ -31,7 +32,7 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($chain->supports());
     }
 
-    public function testAddOwnershipDecisionMaker()
+    public function testAddOwnershipDecisionMaker(): void
     {
         $negative = $this->createMock(AccessLevelOwnershipDecisionMakerInterface::class);
         $negative->expects($this->once()) // only 1 time, despite adding it three times
@@ -51,7 +52,7 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($chain->supports());
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $chain = new ChainEntityOwnershipDecisionMaker();
         $this->assertFalse($chain->supports());
@@ -65,7 +66,7 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isOwnerEntityDataProvider
      */
-    public function testIsOwnerEntity(string $levelMethod, bool $result)
+    public function testIsOwnerEntity(string $levelMethod, bool $result): void
     {
         $maker = $this->createMock(AccessLevelOwnershipDecisionMakerInterface::class);
         $maker->expects($this->atLeastOnce())
@@ -111,7 +112,7 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testNotFoundSupportedOwnershipDecisionMakerException()
+    public function testNotFoundSupportedOwnershipDecisionMakerException(): void
     {
         $this->expectException(NotFoundSupportedOwnershipDecisionMakerException::class);
         $this->expectExceptionMessage('Not found supported ownership decision maker in chain');
@@ -125,7 +126,7 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isAssociatedWithLevelEntityDataProvider
      */
-    public function testIsAssociatedWithLevelEntity(string $associatedLevelMethod, bool $result)
+    public function testIsAssociatedWithLevelEntity(string $associatedLevelMethod, bool $result): void
     {
         $user = $this->createMock(UserInterface::class);
         $domainObject = new \stdClass();

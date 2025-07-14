@@ -10,6 +10,8 @@ use Oro\Bundle\SecurityBundle\Exception\OrganizationAccessDeniedException;
 use Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -18,16 +20,13 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Security;
 
-class ContextListenerTest extends \PHPUnit\Framework\TestCase
+class ContextListenerTest extends TestCase
 {
     use EntityTrait;
 
-    private TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject $tokenStorage;
-
-    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $doctrine;
-
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
-
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private ManagerRegistry&MockObject $doctrine;
+    private LoggerInterface&MockObject $logger;
     private ContextListener $listener;
 
     #[\Override]
@@ -72,7 +71,6 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnKernelRequestCannotSetOrganizationForNotSupportedUserException(): void
     {
         $user = null;
-        /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 1]);
         $token = $this->createMock(OrganizationAwareTokenInterface::class);
         $token->expects(self::any())
@@ -128,7 +126,6 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnKernelRequestCannotSetOrganizationForNotSupportedUser(): void
     {
         $user = null;
-        /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 1]);
         $token = $this->createMock(OrganizationAwareTokenInterface::class);
         $token->expects(self::any())
@@ -163,7 +160,6 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnKernelRequestOrganizationAccessAllowed(): void
     {
-        /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 1]);
 
         $user = $this->createMock(AbstractUser::class);
@@ -205,7 +201,6 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnKernelRequestOrganizationAccessDenied(): void
     {
-        /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 1, 'name' => 'from context']);
 
         $user = $this->createMock(AbstractUser::class);

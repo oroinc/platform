@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Event;
 
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
+use PHPUnit\Framework\TestCase;
 
-class ConfigUpdateEventTest extends \PHPUnit\Framework\TestCase
+class ConfigUpdateEventTest extends TestCase
 {
     private const SCOPE = 'scope';
     private const SCOPE_ID = 123;

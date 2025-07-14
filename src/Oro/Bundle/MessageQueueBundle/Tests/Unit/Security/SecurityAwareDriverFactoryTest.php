@@ -11,10 +11,11 @@ use Oro\Component\MessageQueue\Client\DriverFactoryInterface;
 use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class SecurityAwareDriverFactoryTest extends \PHPUnit\Framework\TestCase
+class SecurityAwareDriverFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);
         $config = $this->createMock(Config::class);
@@ -24,7 +25,6 @@ class SecurityAwareDriverFactoryTest extends \PHPUnit\Framework\TestCase
         $tokenProvider = $this->createMock(SecurityTokenProviderInterface::class);
         $tokenSerializer = $this->createMock(TokenSerializerInterface::class);
 
-        /** @var SecurityAwareDriverFactory */
         $securityAwareDriverFactory = new SecurityAwareDriverFactory(
             $driverFactory,
             ['security_agnostic_topic'],

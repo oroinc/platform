@@ -16,24 +16,17 @@ use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
 use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
+class TemplateEmailNotificationAdapterTest extends TestCase
 {
-    /** @var EmailHolderStub */
-    private $entity;
-
-    /** @var EmailNotification|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailNotification;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var TemplateEmailNotificationAdapter */
-    private $adapter;
+    private EmailHolderStub $entity;
+    private EmailNotification&MockObject $emailNotification;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private ManagerRegistry&MockObject $doctrine;
+    private TemplateEmailNotificationAdapter $adapter;
 
     #[\Override]
     protected function setUp(): void

@@ -3,8 +3,9 @@
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\ResourceProvider;
 
 use Oro\Component\Layout\Extension\Theme\ResourceProvider\LayoutUpdateFileMatcher;
+use PHPUnit\Framework\TestCase;
 
-class LayoutUpdateFileMatcherTest extends \PHPUnit\Framework\TestCase
+class LayoutUpdateFileMatcherTest extends TestCase
 {
     /**
      * @param string $fileName
@@ -23,14 +24,14 @@ class LayoutUpdateFileMatcherTest extends \PHPUnit\Framework\TestCase
         return new \SplFileInfo($path);
     }
 
-    public function testIsMatchedWhenNoPatterns()
+    public function testIsMatchedWhenNoPatterns(): void
     {
         $matcher = new LayoutUpdateFileMatcher([], []);
 
         self::assertTrue($matcher->isMatched($this->getFile('resource1.yml')));
     }
 
-    public function testIsMatchedWithoutExcludePatterns()
+    public function testIsMatchedWithoutExcludePatterns(): void
     {
         $matcher = new LayoutUpdateFileMatcher(['/\.xml$/', '/\.yml$/'], []);
 
@@ -39,7 +40,7 @@ class LayoutUpdateFileMatcherTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($matcher->isMatched($this->getFile('theme.yml')));
     }
 
-    public function testIsMatchedWithExcludePatterns()
+    public function testIsMatchedWithExcludePatterns(): void
     {
         $matcher = new LayoutUpdateFileMatcher(
             ['/\.xml$/', '/\.yml$/'],
@@ -51,7 +52,7 @@ class LayoutUpdateFileMatcherTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($matcher->isMatched($this->getFile('theme.yml')));
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $matcher = new LayoutUpdateFileMatcher(
             ['/\.xml$/', '/\.yml$/'],

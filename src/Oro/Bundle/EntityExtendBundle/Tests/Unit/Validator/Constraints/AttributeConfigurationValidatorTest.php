@@ -11,18 +11,14 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\AttributeConfiguration;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\AttributeConfigurationValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var AttributeTypeRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeTypeRegistry;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeConfigProvider;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
+    private AttributeTypeRegistry&MockObject $attributeTypeRegistry;
+    private ConfigProvider&MockObject $attributeConfigProvider;
+    private ConfigManager&MockObject $configManager;
 
     #[\Override]
     protected function setUp(): void

@@ -4,8 +4,9 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\UserBundle\Entity\Email;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class EmailTest extends \PHPUnit\Framework\TestCase
+class EmailTest extends TestCase
 {
     private $user;
 
@@ -18,7 +19,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->email = new Email();
     }
 
-    public function testEmail()
+    public function testEmail(): void
     {
         $email = 'email@example.com';
         $this->assertNull($this->email->getEmail());
@@ -26,12 +27,12 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($email, $this->email->getEmail());
     }
 
-    public function testId()
+    public function testId(): void
     {
         $this->assertNull($this->email->getId());
     }
 
-    public function testUser()
+    public function testUser(): void
     {
         $this->assertNull($this->email->getUser());
         $this->email->setUser($this->user);

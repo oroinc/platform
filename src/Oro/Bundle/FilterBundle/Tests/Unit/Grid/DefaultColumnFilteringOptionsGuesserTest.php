@@ -5,11 +5,11 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Grid;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Grid\DefaultColumnFilteringOptionsGuesser;
+use PHPUnit\Framework\TestCase;
 
-class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit\Framework\TestCase
+class DefaultColumnFilteringOptionsGuesserTest extends TestCase
 {
-    /** @var DefaultColumnFilteringOptionsGuesser */
-    private $guesser;
+    private DefaultColumnFilteringOptionsGuesser $guesser;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider guessFilterProvider
      */
-    public function testGuessFilter($type, $expected)
+    public function testGuessFilter($type, $expected): void
     {
         $guess = $this->guesser->guessFilter('TestClass', 'testProp', $type);
         $this->assertEquals($expected, $guess->getOptions());

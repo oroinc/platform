@@ -15,42 +15,25 @@ use Oro\Bundle\ImportExportBundle\Reader\ReaderChain;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExportHandlerTest extends \PHPUnit\Framework\TestCase
+class ExportHandlerTest extends TestCase
 {
     use TempDirExtension;
 
-    /** @var BatchFileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $batchFileManager;
-
-    /** @var ReaderChain|\PHPUnit\Framework\MockObject\MockObject */
-    private $readerChain;
-
-    /** @var WriterChain|\PHPUnit\Framework\MockObject\MockObject */
-    private $writerChain;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $processorRegistry;
-
-    /** @var JobExecutor|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobExecutor;
-
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var ExportHandler */
-    private $exportHandler;
-
-    /** @var string */
-    private $directory;
+    private BatchFileManager&MockObject $batchFileManager;
+    private ReaderChain&MockObject $readerChain;
+    private WriterChain&MockObject $writerChain;
+    private TranslatorInterface&MockObject $translator;
+    private ConfigProvider&MockObject $configProvider;
+    private ProcessorRegistry&MockObject $processorRegistry;
+    private JobExecutor&MockObject $jobExecutor;
+    private FileManager&MockObject $fileManager;
+    private ExportHandler $exportHandler;
+    private string $directory;
 
     #[\Override]
     protected function setUp(): void
@@ -79,7 +62,7 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
         file_put_contents($this->directory . DIRECTORY_SEPARATOR . 'test1.csv', '1,test,test2;');
     }
 
-    public function testHandleDownloadExportResult()
+    public function testHandleDownloadExportResult(): void
     {
         $fileName = 'test1.csv';
         $filePath = $this->directory . DIRECTORY_SEPARATOR . 'test1.csv';
@@ -108,7 +91,7 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertStringEqualsFile($this->directory . DIRECTORY_SEPARATOR . $fileName, $content);
     }
 
-    public function testExportResultFileMergeThrowsRuntimeExceptionWhenCannotMerge()
+    public function testExportResultFileMergeThrowsRuntimeExceptionWhenCannotMerge(): void
     {
         $jobName = 'job-name';
         $processorType = 'export';
@@ -146,7 +129,7 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
         $this->exportHandler->exportResultFileMerge($jobName, $processorType, $outputFormat, $files);
     }
 
-    public function testExportResultFileNotFound()
+    public function testExportResultFileNotFound(): void
     {
         $jobName = 'job-name';
         $processorType = 'export';

@@ -9,27 +9,20 @@ use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeFamilyManager;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AttributeFamilyManagerTest extends \PHPUnit\Framework\TestCase
+class AttributeFamilyManagerTest extends TestCase
 {
     use EntityTrait;
 
     private const FAMILY_ID = 777;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var AttributeFamilyManager */
-    private $familyManager;
-
-    /** @var AttributeFamilyRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $familyRepository;
-
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityRepository;
-
-    /** @var AttributeFamily */
-    private $attributeFamily;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private AttributeFamilyManager $familyManager;
+    private AttributeFamilyRepository&MockObject $familyRepository;
+    private EntityRepository&MockObject $entityRepository;
+    private AttributeFamily $attributeFamily;
 
     #[\Override]
     protected function setUp(): void

@@ -13,20 +13,15 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Provider\TransitionDataProvider;
 use Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowDataProviderTest extends \PHPUnit\Framework\TestCase
+class WorkflowDataProviderTest extends TestCase
 {
-    /** @var WorkflowDataProvider */
-    private $workflowDataProvider;
-
-    /** @var TransitionDataProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $transitionDataProvider;
-
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $systemWorkflowManager;
+    private WorkflowDataProvider $workflowDataProvider;
+    private TransitionDataProvider&MockObject $transitionDataProvider;
+    private WorkflowManager&MockObject $workflowManager;
+    private WorkflowManager&MockObject $systemWorkflowManager;
 
     #[\Override]
     protected function setUp(): void
@@ -49,7 +44,7 @@ class WorkflowDataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWorkflowDataWithNoAvailableWorkflow()
+    public function testWorkflowDataWithNoAvailableWorkflow(): void
     {
         $entity = new \stdClass();
 
@@ -74,7 +69,7 @@ class WorkflowDataProviderTest extends \PHPUnit\Framework\TestCase
         $this->workflowDataProvider->getWorkflowData($entity, $workflow, true);
     }
 
-    public function testBasicWorkflowData()
+    public function testBasicWorkflowData(): void
     {
         $entity = new \stdClass();
 
@@ -103,7 +98,7 @@ class WorkflowDataProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($data['isStarted']);
     }
 
-    public function testWhenWorkflowIsStarted()
+    public function testWhenWorkflowIsStarted(): void
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflow = $this->getWorkflow();
@@ -124,7 +119,7 @@ class WorkflowDataProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($data['isStarted']);
     }
 
-    public function testStepDataWhenIssetCurrentStep()
+    public function testStepDataWhenIssetCurrentStep(): void
     {
         $workflowStep = $this->createMock(WorkflowStep::class);
         $workflowStep->expects($this->atLeastOnce())
@@ -169,13 +164,10 @@ class WorkflowDataProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($steps[0]['label'], 'label_for_step_1');
     }
 
-    /**
-     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
-     */
     private function getWorkflow(
         ?WorkflowDefinition $workflowDefinition = null,
         ?StepManager $stepManager = null
-    ) {
+    ): Workflow&MockObject {
         if ($workflowDefinition === null) {
             $workflowDefinition = $this->createMock(WorkflowDefinition::class);
         }

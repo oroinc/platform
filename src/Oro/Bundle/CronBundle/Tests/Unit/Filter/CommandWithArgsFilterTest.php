@@ -7,6 +7,7 @@ use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL92Platform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\CronBundle\Filter\CommandWithArgsFilter;
 use Oro\Bundle\CronBundle\ORM\CommandArgsNormalizer;
@@ -15,12 +16,12 @@ use Oro\Bundle\CronBundle\ORM\Pgsql92CommandArgsNormalizer;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 
-class CommandWithArgsFilterTest extends \PHPUnit\Framework\TestCase
+class CommandWithArgsFilterTest extends TestCase
 {
-    /** @var CommandWithArgsFilter */
-    private $filter;
+    private CommandWithArgsFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -46,7 +47,7 @@ class CommandWithArgsFilterTest extends \PHPUnit\Framework\TestCase
         int $comparisonType,
         string $expectedDql,
         array $expectedParams
-    ) {
+    ): void {
         $paramCounter = 0;
 
         $em = $this->createMock(EntityManagerInterface::class);
@@ -68,7 +69,7 @@ class CommandWithArgsFilterTest extends \PHPUnit\Framework\TestCase
 
         $em->expects($this->any())
             ->method('getExpressionBuilder')
-            ->willReturn(new Query\Expr());
+            ->willReturn(new Expr());
 
         $qb->select('j')->from('TestEntity', 'j');
 

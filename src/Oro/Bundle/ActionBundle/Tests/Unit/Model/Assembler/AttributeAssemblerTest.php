@@ -9,17 +9,14 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
+class AttributeAssemblerTest extends TestCase
 {
-    /** @var ActionData|\PHPUnit\Framework\MockObject\MockObject */
-    private $actionData;
-
-    /** @var AttributeGuesser|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeGuesser;
-
-    /** @var AttributeAssembler */
-    private $assembler;
+    private ActionData&MockObject $actionData;
+    private AttributeGuesser&MockObject $attributeGuesser;
+    private AttributeAssembler $assembler;
 
     #[\Override]
     protected function setUp(): void

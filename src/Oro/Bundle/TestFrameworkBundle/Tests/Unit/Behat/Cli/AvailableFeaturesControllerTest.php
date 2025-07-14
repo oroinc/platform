@@ -10,11 +10,12 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableFeaturesController;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Specification\Stub\SpecificationLocatorStub;
 use Oro\Component\Testing\Unit\Command\Stub\InputStub;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 
-class AvailableFeaturesControllerTest extends \PHPUnit\Framework\TestCase
+class AvailableFeaturesControllerTest extends TestCase
 {
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $suiteRegistry = new SuiteRegistry();
         $specificationFinder = new SpecificationFinder();
@@ -27,12 +28,15 @@ class AvailableFeaturesControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($command->getDefinition()->getOption('available-features')->isValueRequired());
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
-        /** @var SuiteGenerator|\PHPUnit\Framework\MockObject\MockObject $generator */
         $generator = $this->getMockBuilder(SuiteGenerator::class)->getMock();
-        $generator->method('supportsTypeAndSettings')->willReturn(true);
-        $generator->method('generateSuite')->willReturn(new GenericSuite('AcmeSuite', []));
+        $generator->expects(self::any())
+            ->method('supportsTypeAndSettings')
+            ->willReturn(true);
+        $generator->expects(self::any())
+            ->method('generateSuite')
+            ->willReturn(new GenericSuite('AcmeSuite', []));
 
         $suiteRegistry = new SuiteRegistry();
         $suiteRegistry->registerSuiteGenerator($generator);
@@ -50,7 +54,7 @@ class AvailableFeaturesControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(5, $output->messages);
     }
 
-    public function testNotExecute()
+    public function testNotExecute(): void
     {
         $suiteRegistry = new SuiteRegistry();
         $specificationFinder = new SpecificationFinder();

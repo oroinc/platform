@@ -6,11 +6,12 @@ use Oro\Bundle\EntityBundle\Exception\DuplicateEntityAliasException;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityAliasException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
+class EntityAliasStorageTest extends TestCase
 {
     private EntityAliasStorage $storage;
 
@@ -20,7 +21,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
         $this->storage = new EntityAliasStorage();
     }
 
-    public function testGetEntityAlias()
+    public function testGetEntityAlias(): void
     {
         $entityAlias = new EntityAlias('entity1_alias', 'entity1_plural_alias');
         $this->storage->addEntityAlias('Test\Entity1', $entityAlias);
@@ -34,7 +35,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetClassByAlias()
+    public function testGetClassByAlias(): void
     {
         $this->storage->addEntityAlias(
             'Test\Entity1',
@@ -50,7 +51,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetClassByPluralAlias()
+    public function testGetClassByPluralAlias(): void
     {
         $this->storage->addEntityAlias(
             'Test\Entity1',
@@ -66,7 +67,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAll()
+    public function testGetAll(): void
     {
         $this->storage->addEntityAlias(
             'Test\Entity1',
@@ -79,7 +80,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $this->storage->addEntityAlias(
             'Test\Entity1',
@@ -93,7 +94,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider emptyAliasDataProvider
      */
-    public function testValidateEmptyEntityAlias(?string $value)
+    public function testValidateEmptyEntityAlias(?string $value): void
     {
         $this->expectException(InvalidEntityAliasException::class);
         $this->expectExceptionMessage('The alias for the "Test\Entity1" entity must not be empty.');
@@ -107,7 +108,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider emptyAliasDataProvider
      */
-    public function testValidateEmptyEntityPluralAlias(?string $value)
+    public function testValidateEmptyEntityPluralAlias(?string $value): void
     {
         $this->expectException(InvalidEntityAliasException::class);
         $this->expectExceptionMessage('The plural alias for the "Test\Entity1" entity must not be empty.');
@@ -129,7 +130,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidAliasDataProvider
      */
-    public function testValidateInvalidEntityAlias(string $value)
+    public function testValidateInvalidEntityAlias(string $value): void
     {
         $this->expectException(InvalidEntityAliasException::class);
         $this->expectExceptionMessage(
@@ -151,7 +152,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidAliasDataProvider
      */
-    public function testValidateInvalidEntityPluralAlias(string $value)
+    public function testValidateInvalidEntityPluralAlias(string $value): void
     {
         $this->expectException(InvalidEntityAliasException::class);
         $this->expectExceptionMessage(
@@ -179,7 +180,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testValidateDuplicateAliases()
+    public function testValidateDuplicateAliases(): void
     {
         $this->storage->addEntityAlias(
             'Test\Entity1',
@@ -201,7 +202,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testValidateDuplicatePluralAliases()
+    public function testValidateDuplicatePluralAliases(): void
     {
         $this->storage->addEntityAlias(
             'Test\Entity1',
@@ -223,7 +224,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testValidateDuplicateAliasAndPluralAlias()
+    public function testValidateDuplicateAliasAndPluralAlias(): void
     {
         $this->storage->addEntityAlias(
             'Test\Entity1',
@@ -245,7 +246,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testValidateDuplicatePluralAliasAndAlias()
+    public function testValidateDuplicatePluralAliasAndAlias(): void
     {
         $this->storage->addEntityAlias(
             'Test\Entity1',

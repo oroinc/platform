@@ -6,18 +6,15 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SearchBundle\Command\IndexCommand;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class IndexCommandTest extends \PHPUnit\Framework\TestCase
+class IndexCommandTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var IndexerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $indexer;
-
-    /** @var IndexCommand */
-    private $command;
+    private ManagerRegistry&MockObject $doctrine;
+    private IndexerInterface&MockObject $indexer;
+    private IndexCommand $command;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +25,7 @@ class IndexCommandTest extends \PHPUnit\Framework\TestCase
         $this->command = new IndexCommand($this->doctrine, $this->indexer);
     }
 
-    public function testShouldThrowExceptionIfClassArgumentIsMissing()
+    public function testShouldThrowExceptionIfClassArgumentIsMissing(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not enough arguments (missing: "class")');
@@ -39,7 +36,7 @@ class IndexCommandTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testShouldThrowExceptionIfIdentifiersArgumentIsMissing()
+    public function testShouldThrowExceptionIfIdentifiersArgumentIsMissing(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not enough arguments (missing: "identifiers")');
@@ -50,7 +47,7 @@ class IndexCommandTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testShouldThrowExceptionIfEntityManagerWasNotFoundForClass()
+    public function testShouldThrowExceptionIfEntityManagerWasNotFoundForClass(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Entity manager was not found for class: "class-name"');
@@ -69,7 +66,7 @@ class IndexCommandTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testShouldIndexEntities()
+    public function testShouldIndexEntities(): void
     {
         $entity = new \stdClass();
 

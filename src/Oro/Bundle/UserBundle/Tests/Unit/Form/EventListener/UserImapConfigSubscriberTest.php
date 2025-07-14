@@ -32,7 +32,7 @@ class UserImapConfigSubscriberTest extends TestCase
         $this->subscriber = new UserImapConfigSubscriber($this->doctrine, $this->requestStack, $this->tokenAccessor);
     }
 
-    public function testSubscribedEvents()
+    public function testSubscribedEvents(): void
     {
         $this->assertEquals(
             [
@@ -43,7 +43,7 @@ class UserImapConfigSubscriberTest extends TestCase
         );
     }
 
-    public function testPreSetDataForUserConfig()
+    public function testPreSetDataForUserConfig(): void
     {
         $id = 1;
         $user = new User();
@@ -81,7 +81,7 @@ class UserImapConfigSubscriberTest extends TestCase
         $this->subscriber->preSetData($event);
     }
 
-    public function testPreSetDataForProfileConfig()
+    public function testPreSetDataForProfileConfig(): void
     {
         $user = new User();
         $organization = new Organization();
@@ -113,7 +113,7 @@ class UserImapConfigSubscriberTest extends TestCase
         $this->assertSame($organization, $user->getCurrentOrganization());
     }
 
-    public function testPreSubmit()
+    public function testPreSubmit(): void
     {
         $data = ['imapConfiguration' => ['folders' => ['some folder']]];
         $eventData = ['imapConfiguration' => ['imapPort' => '111']];

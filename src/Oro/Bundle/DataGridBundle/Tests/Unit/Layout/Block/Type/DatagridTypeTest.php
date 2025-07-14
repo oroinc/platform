@@ -14,18 +14,14 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Exception\InvalidArgumentException;
 use Oro\Component\Layout\LayoutManipulatorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class DatagridTypeTest extends BlockTypeTestCase
 {
-    /** @var NameStrategyInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $nameStrategy;
-
-    /** @var ManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
+    private NameStrategyInterface&MockObject $nameStrategy;
+    private ManagerInterface&MockObject $manager;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
 
     #[\Override]
     protected function setUp(): void
@@ -37,7 +33,7 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
     }
 
-    public function testBuildView()
+    public function testBuildView(): void
     {
         $this->nameStrategy->expects($this->once())
             ->method('buildGridFullName')
@@ -63,7 +59,7 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->assertEquals(true, $view->vars['split_to_cells']);
     }
 
-    public function testBuildViewWithoutScope()
+    public function testBuildViewWithoutScope(): void
     {
         $this->nameStrategy->expects($this->never())
             ->method('buildGridFullName');
@@ -86,7 +82,7 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->assertEquals(true, $view->vars['split_to_cells']);
     }
 
-    public function testBuildViewWithParamsOverwrite()
+    public function testBuildViewWithParamsOverwrite(): void
     {
         $view = $this->getBlockView(
             new DatagridType($this->nameStrategy, $this->manager, $this->authorizationChecker),
@@ -99,7 +95,7 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->assertEquals([], $view->vars['grid_render_parameters']);
     }
 
-    public function testBuildViewThrowsExceptionIfGridNameIsNotSpecified()
+    public function testBuildViewThrowsExceptionIfGridNameIsNotSpecified(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -112,7 +108,7 @@ class DatagridTypeTest extends BlockTypeTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testBuildBlock()
+    public function testBuildBlock(): void
     {
         $gridConfig = $this->createMock(DatagridConfiguration::class);
         $gridConfig->expects($this->once())
@@ -224,7 +220,7 @@ class DatagridTypeTest extends BlockTypeTestCase
         $type->buildBlock($builder, new Options($options));
     }
 
-    public function testFinishView()
+    public function testFinishView(): void
     {
         $type = new DatagridType($this->nameStrategy, $this->manager, $this->authorizationChecker);
 
@@ -259,7 +255,7 @@ class DatagridTypeTest extends BlockTypeTestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testConfigureOptions(array $options, array $expectedOptions)
+    public function testConfigureOptions(array $options, array $expectedOptions): void
     {
         $datagridType = new DatagridType($this->nameStrategy, $this->manager, $this->authorizationChecker);
         $resolver = new OptionsResolver();

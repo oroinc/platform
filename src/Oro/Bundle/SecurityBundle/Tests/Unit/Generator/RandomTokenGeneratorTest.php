@@ -3,11 +3,11 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Generator;
 
 use Oro\Bundle\SecurityBundle\Generator\RandomTokenGenerator;
+use PHPUnit\Framework\TestCase;
 
-class RandomTokenGeneratorTest extends \PHPUnit\Framework\TestCase
+class RandomTokenGeneratorTest extends TestCase
 {
-    /** @var RandomTokenGenerator */
-    private $generator;
+    private RandomTokenGenerator $generator;
 
     #[\Override]
     protected function setUp(): void
@@ -15,7 +15,7 @@ class RandomTokenGeneratorTest extends \PHPUnit\Framework\TestCase
         $this->generator = new RandomTokenGenerator();
     }
 
-    public function testGenerateToken()
+    public function testGenerateToken(): void
     {
         $token = $this->generator->generateToken();
 

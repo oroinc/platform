@@ -4,27 +4,23 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
 use Oro\Bundle\TranslationBundle\Event\InvalidateDynamicTranslationCacheEvent;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationCache;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class DynamicTranslationCacheTest extends \PHPUnit\Framework\TestCase
+class DynamicTranslationCacheTest extends TestCase
 {
     private const NOT_CACHED_TRANSLATIONS = [
         'en' => ['messages' => ['foo' => 'foo (EN) (not cached)']]
     ];
 
-    /** @var CacheItemPoolInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cacheImpl;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
+    private CacheItemPoolInterface&MockObject $cacheImpl;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
     /** @var callable */
     private $callback;
-
-    /** @var DynamicTranslationCache */
-    private $cache;
+    private DynamicTranslationCache $cache;
 
     #[\Override]
     protected function setUp(): void

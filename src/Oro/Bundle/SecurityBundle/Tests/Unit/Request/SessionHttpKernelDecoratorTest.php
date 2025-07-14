@@ -20,10 +20,8 @@ final class SessionHttpKernelDecoratorTest extends TestCase
         'cookie_lifetime' => 10,
     ];
 
-    private HttpKernel|MockObject $kernel;
-
+    private HttpKernel&MockObject $kernel;
     private ContainerStub|ContainerInterface $container;
-
     private SessionHttpKernelDecorator $kernelDecorator;
 
     #[\Override]

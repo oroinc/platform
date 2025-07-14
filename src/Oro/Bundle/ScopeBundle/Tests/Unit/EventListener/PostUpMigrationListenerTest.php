@@ -13,7 +13,6 @@ use PHPUnit\Framework\TestCase;
 class PostUpMigrationListenerTest extends TestCase
 {
     private AddCommentToRowHashManager $manager;
-
     private ApplicationState $applicationState;
 
     #[\Override]
@@ -25,7 +24,8 @@ class PostUpMigrationListenerTest extends TestCase
 
     public function testInstalled(): void
     {
-        $this->applicationState->method('isInstalled')
+        $this->applicationState->expects(self::any())
+            ->method('isInstalled')
             ->willReturn(true);
         $listener = new PostUpMigrationListener($this->manager, $this->applicationState);
 
@@ -39,7 +39,8 @@ class PostUpMigrationListenerTest extends TestCase
 
     public function testNotInstalled(): void
     {
-        $this->applicationState->method('isInstalled')
+        $this->applicationState->expects(self::any())
+            ->method('isInstalled')
             ->willReturn(false);
         $listener = new PostUpMigrationListener($this->manager, $this->applicationState);
 

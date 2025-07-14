@@ -3,17 +3,18 @@
 namespace Oro\Component\PhpUtils\Tests\Unit;
 
 use Oro\Component\PhpUtils\ArrayUtil;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ArrayUtilTest extends \PHPUnit\Framework\TestCase
+class ArrayUtilTest extends TestCase
 {
     /**
      * @dataProvider interposeDataProvider
      */
-    public function testInterpose($separator, $array, $expectedResult)
+    public function testInterpose($separator, $array, $expectedResult): void
     {
         $this->assertEquals($expectedResult, ArrayUtil::interpose($separator, $array));
     }
@@ -34,7 +35,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testCreateOrderedComparator()
+    public function testCreateOrderedComparator(): void
     {
         $order = array_flip(['a', 'z', 'd', 'e']);
         $array = [
@@ -60,7 +61,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isAssocDataProvider
      */
-    public function testIsAssoc($array, $expectedResult)
+    public function testIsAssoc($array, $expectedResult): void
     {
         $this->assertEquals($expectedResult, ArrayUtil::isAssoc($array));
     }
@@ -76,7 +77,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSortByEmpty()
+    public function testSortByEmpty(): void
     {
         $array = [];
 
@@ -84,7 +85,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $array);
     }
 
-    public function testSortByArrayNoOrder()
+    public function testSortByArrayNoOrder(): void
     {
         $array = [
             ['name' => '1'],
@@ -103,7 +104,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByArrayNoOrderReverse()
+    public function testSortByArrayNoOrderReverse(): void
     {
         $array = [
             ['name' => '1'],
@@ -122,7 +123,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByArraySameOrder()
+    public function testSortByArraySameOrder(): void
     {
         $array = [
             ['name' => '1', 'priority' => 100],
@@ -141,7 +142,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByArraySameOrderReverse()
+    public function testSortByArraySameOrderReverse(): void
     {
         $array = [
             ['name' => '1', 'priority' => 100],
@@ -160,7 +161,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByArrayNumeric()
+    public function testSortByArrayNumeric(): void
     {
         $array = [
             ['name' => '1'],
@@ -191,7 +192,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByArrayNumericReverse()
+    public function testSortByArrayNumericReverse(): void
     {
         $array = [
             ['name' => '1'],
@@ -222,7 +223,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByAssocArrayNumeric()
+    public function testSortByAssocArrayNumeric(): void
     {
         $array = [
             'i1' => ['name' => '1'],
@@ -253,7 +254,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByAssocArrayNumericReverse()
+    public function testSortByAssocArrayNumericReverse(): void
     {
         $array = [
             'i1' => ['name' => '1'],
@@ -284,7 +285,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByArrayString()
+    public function testSortByArrayString(): void
     {
         $array = [
             ['name' => 'a'],
@@ -303,7 +304,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByArrayStringReverse()
+    public function testSortByArrayStringReverse(): void
     {
         $array = [
             ['name' => 'a'],
@@ -322,7 +323,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByArrayStringCaseInsensitive()
+    public function testSortByArrayStringCaseInsensitive(): void
     {
         $array = [
             ['name' => 'a'],
@@ -341,7 +342,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByArrayStringCaseInsensitiveReverse()
+    public function testSortByArrayStringCaseInsensitiveReverse(): void
     {
         $array = [
             ['name' => 'a'],
@@ -360,7 +361,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByArrayPath()
+    public function testSortByArrayPath(): void
     {
         $array = [
             ['name' => '1', 'child' => ['priority' => 1]],
@@ -379,16 +380,12 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByObject()
+    public function testSortByObject(): void
     {
-        $obj1  = $this->createObject(['name' => '1', 'priority' => null]);
-        $obj2  = $this->createObject(['name' => '2', 'priority' => 100]);
-        $obj3  = $this->createObject(['name' => '3', 'priority' => 0]);
-        $array = [
-            $obj1,
-            $obj2,
-            $obj3,
-        ];
+        $obj1 = $this->createObject(['name' => '1', 'priority' => null]);
+        $obj2 = $this->createObject(['name' => '2', 'priority' => 100]);
+        $obj3 = $this->createObject(['name' => '3', 'priority' => 0]);
+        $array = [$obj1, $obj2, $obj3];
 
         ArrayUtil::sortBy($array);
         $this->assertSame(
@@ -401,22 +398,18 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByObjectPath()
+    public function testSortByObjectPath(): void
     {
-        $obj1  = $this->createObject(
+        $obj1 = $this->createObject(
             ['name' => '1', 'child' => $this->createObject(['priority' => null])]
         );
-        $obj2  = $this->createObject(
+        $obj2 = $this->createObject(
             ['name' => '2', 'child' => $this->createObject(['priority' => 100])]
         );
-        $obj3  = $this->createObject(
+        $obj3 = $this->createObject(
             ['name' => '3', 'child' => $this->createObject(['priority' => 0])]
         );
-        $array = [
-            $obj1,
-            $obj2,
-            $obj3,
-        ];
+        $array = [$obj1, $obj2, $obj3];
 
         ArrayUtil::sortBy($array, false, 'child.priority');
         $this->assertSame(
@@ -429,16 +422,12 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByClosure()
+    public function testSortByClosure(): void
     {
-        $obj1  = $this->createObject(['name' => '1', 'priority' => null]);
-        $obj2  = $this->createObject(['name' => '2', 'priority' => 100]);
-        $obj3  = $this->createObject(['name' => '3', 'priority' => 0]);
-        $array = [
-            $obj1,
-            $obj2,
-            $obj3,
-        ];
+        $obj1 = $this->createObject(['name' => '1', 'priority' => null]);
+        $obj2 = $this->createObject(['name' => '2', 'priority' => 100]);
+        $obj3 = $this->createObject(['name' => '3', 'priority' => 0]);
+        $array = [$obj1, $obj2, $obj3];
 
         ArrayUtil::sortBy(
             $array,
@@ -457,16 +446,12 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortByCallable()
+    public function testSortByCallable(): void
     {
-        $obj1  = $this->createObject(['name' => '1', 'priority' => null]);
-        $obj2  = $this->createObject(['name' => '2', 'priority' => 100]);
-        $obj3  = $this->createObject(['name' => '3', 'priority' => 0]);
-        $array = [
-            $obj1,
-            $obj2,
-            $obj3,
-        ];
+        $obj1 = $this->createObject(['name' => '1', 'priority' => null]);
+        $obj2 = $this->createObject(['name' => '2', 'priority' => 100]);
+        $obj3 = $this->createObject(['name' => '3', 'priority' => 0]);
+        $array = [$obj1, $obj2, $obj3];
 
         ArrayUtil::sortBy(
             $array,
@@ -486,7 +471,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider someProvider
      */
-    public function testSome(callable $callback, array $array, $expectedResult)
+    public function testSome(callable $callback, array $array, $expectedResult): void
     {
         $this->assertSame($expectedResult, ArrayUtil::some($callback, $array));
     }
@@ -528,7 +513,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider findProvider
      */
-    public function testFind(callable $callback, array $array, $expectedResult)
+    public function testFind(callable $callback, array $array, $expectedResult): void
     {
         $this->assertSame($expectedResult, ArrayUtil::find($callback, $array));
     }
@@ -570,7 +555,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dropWhileProvider
      */
-    public function testDropWhile(callable $callback, array $array, $expectedResult)
+    public function testDropWhile(callable $callback, array $array, $expectedResult): void
     {
         $this->assertEquals($expectedResult, ArrayUtil::dropWhile($callback, $array));
     }
@@ -612,7 +597,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider shiftRangeProvider
      */
-    public function testShiftRange(array $sortedUniqueInts, $expectedResult, $expectedShiftedUniqueInts)
+    public function testShiftRange(array $sortedUniqueInts, $expectedResult, $expectedShiftedUniqueInts): void
     {
         $this->assertEquals($expectedResult, ArrayUtil::shiftRange($sortedUniqueInts));
         $this->assertEquals($expectedShiftedUniqueInts, $sortedUniqueInts);
@@ -657,7 +642,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider intRangesProvider
      */
-    public function testIntRanges($ints, array $expectedResult)
+    public function testIntRanges($ints, array $expectedResult): void
     {
         $this->assertEquals($expectedResult, ArrayUtil::intRanges($ints));
     }
@@ -689,7 +674,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider unsetPathDataProvider
      */
-    public function testUnsetPath(array $array, array $path, array $expectedValue)
+    public function testUnsetPath(array $array, array $path, array $expectedValue): void
     {
         $this->assertEquals($expectedValue, ArrayUtil::unsetPath($array, $path));
     }
@@ -759,7 +744,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getInDataProvider
      */
-    public function testGetIn(array $array, array $path, $defaultValue, $expectedValue)
+    public function testGetIn(array $array, array $path, $defaultValue, $expectedValue): void
     {
         $this->assertEquals($expectedValue, ArrayUtil::getIn($array, $path, $defaultValue));
     }
@@ -803,7 +788,7 @@ class ArrayUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider mergeDataProvider
      */
-    public function testArrayMergeRecursiveDistinct(array $expected, array $first, array $second)
+    public function testArrayMergeRecursiveDistinct(array $expected, array $first, array $second): void
     {
         $this->assertEquals($expected, ArrayUtil::arrayMergeRecursiveDistinct($first, $second));
     }

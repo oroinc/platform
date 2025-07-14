@@ -15,7 +15,7 @@ class RestRolesTest extends WebTestCase
     public function testCreateRole(): array
     {
         $roleName = 'Role_' . random_int(100, 500);
-        $request  = [
+        $request = [
             'role' => [
                 'label' => $roleName,
             ]

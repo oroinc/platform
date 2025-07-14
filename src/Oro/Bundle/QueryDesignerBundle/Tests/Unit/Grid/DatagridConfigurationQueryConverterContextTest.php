@@ -4,11 +4,11 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationQueryConverterContext;
+use PHPUnit\Framework\TestCase;
 
-class DatagridConfigurationQueryConverterContextTest extends \PHPUnit\Framework\TestCase
+class DatagridConfigurationQueryConverterContextTest extends TestCase
 {
-    /** @var DatagridConfigurationQueryConverterContext */
-    private $context;
+    private DatagridConfigurationQueryConverterContext $context;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class DatagridConfigurationQueryConverterContextTest extends \PHPUnit\Framework\
         $this->context = new DatagridConfigurationQueryConverterContext();
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $initialContext = clone $this->context;
 
@@ -31,20 +31,20 @@ class DatagridConfigurationQueryConverterContextTest extends \PHPUnit\Framework\
         self::assertEquals($initialContext, $this->context);
     }
 
-    public function testConfig()
+    public function testConfig(): void
     {
         $config = $this->createMock(DatagridConfiguration::class);
         $this->context->setConfig($config);
         self::assertSame($config, $this->context->getConfig());
     }
 
-    public function testGetConfigWhenItWasNotSet()
+    public function testGetConfigWhenItWasNotSet(): void
     {
         $this->expectException(\TypeError::class);
         $this->context->getConfig();
     }
 
-    public function testSelectColumns()
+    public function testSelectColumns(): void
     {
         self::assertSame([], $this->context->getSelectColumns());
 
@@ -53,7 +53,7 @@ class DatagridConfigurationQueryConverterContextTest extends \PHPUnit\Framework\
         self::assertSame(['column1', 'column2'], $this->context->getSelectColumns());
     }
 
-    public function testGroupingColumns()
+    public function testGroupingColumns(): void
     {
         self::assertSame([], $this->context->getGroupingColumns());
 
@@ -62,7 +62,7 @@ class DatagridConfigurationQueryConverterContextTest extends \PHPUnit\Framework\
         self::assertSame(['column1', 'column2'], $this->context->getGroupingColumns());
     }
 
-    public function testFrom()
+    public function testFrom(): void
     {
         self::assertSame([], $this->context->getFrom());
 
@@ -77,7 +77,7 @@ class DatagridConfigurationQueryConverterContextTest extends \PHPUnit\Framework\
         );
     }
 
-    public function testInnerJoins()
+    public function testInnerJoins(): void
     {
         self::assertSame([], $this->context->getInnerJoins());
 
@@ -92,7 +92,7 @@ class DatagridConfigurationQueryConverterContextTest extends \PHPUnit\Framework\
         );
     }
 
-    public function testLeftJoins()
+    public function testLeftJoins(): void
     {
         self::assertSame([], $this->context->getLeftJoins());
 

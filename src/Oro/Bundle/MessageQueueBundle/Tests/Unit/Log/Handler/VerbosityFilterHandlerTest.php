@@ -6,20 +6,17 @@ use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use Oro\Bundle\MessageQueueBundle\Log\Handler\VerbosityFilterHandler;
 use Oro\Component\MessageQueue\Log\ConsumerState;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class VerbosityFilterHandlerTest extends \PHPUnit\Framework\TestCase
+class VerbosityFilterHandlerTest extends TestCase
 {
-    /** @var ConsumerState */
-    private $consumerState;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OutputInterface */
-    private $output;
-
-    /** @var VerbosityFilterHandler */
-    private $handler;
+    private ConsumerState $consumerState;
+    private OutputInterface&MockObject $output;
+    private VerbosityFilterHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -30,11 +27,10 @@ class VerbosityFilterHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new VerbosityFilterHandler($this->consumerState, new TestHandler());
     }
 
-    public function testIsHandling()
+    public function testIsHandling(): void
     {
         $input = $this->createMock(InputInterface::class);
-        $this->output
-            ->expects($this->exactly(6))
+        $this->output->expects($this->exactly(6))
             ->method('getVerbosity')
             ->willReturn(OutputInterface::VERBOSITY_QUIET);
         $this->handler->onCommand(new ConsoleCommandEvent(null, $input, $this->output));

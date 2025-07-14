@@ -3,18 +3,15 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Authentication\Ticket\TicketDigestGenerator;
 
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestGenerator\TicketDigestGenerator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class TicketDigestGeneratorTest extends \PHPUnit\Framework\TestCase
+class TicketDigestGeneratorTest extends TestCase
 {
-    /** @var PasswordHasherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $passwordHasher;
-
-    /** @var string */
-    private $secret;
-
-    /** @var TicketDigestGenerator */
-    private $ticketDigestGenerator;
+    private PasswordHasherInterface&MockObject $passwordHasher;
+    private string $secret;
+    private TicketDigestGenerator $ticketDigestGenerator;
 
     #[\Override]
     protected function setUp(): void

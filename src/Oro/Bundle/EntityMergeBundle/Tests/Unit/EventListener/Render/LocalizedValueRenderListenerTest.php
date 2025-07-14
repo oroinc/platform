@@ -11,29 +11,18 @@ use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\AddressInterface;
 use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LocalizedValueRenderListenerTest extends \PHPUnit\Framework\TestCase
+class LocalizedValueRenderListenerTest extends TestCase
 {
-    /** @var AddressFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    private $addressFormatter;
-
-    /** @var DateTimeFormatterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dateTimeFormatter;
-
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityNameResolver;
-
-    /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    private $numberFormatter;
-
-    /** @var ValueRenderEvent|\PHPUnit\Framework\MockObject\MockObject */
-    private $event;
-
-    /** @var MetadataInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadata;
-
-    /** @var LocalizedValueRenderListener */
-    private $target;
+    private AddressFormatter&MockObject $addressFormatter;
+    private DateTimeFormatterInterface&MockObject $dateTimeFormatter;
+    private EntityNameResolver&MockObject $entityNameResolver;
+    private NumberFormatter&MockObject $numberFormatter;
+    private ValueRenderEvent&MockObject $event;
+    private MetadataInterface&MockObject $metadata;
+    private LocalizedValueRenderListener $target;
 
     #[\Override]
     protected function setUp(): void
@@ -76,7 +65,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testBeforeValueRenderWithString()
+    public function testBeforeValueRenderWithString(): void
     {
         $originalValue = 'not need to localize';
 
@@ -94,7 +83,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit\Framework\TestCase
         $this->target->beforeValueRender($this->event);
     }
 
-    public function testBeforeValueRenderWithNumber()
+    public function testBeforeValueRenderWithNumber(): void
     {
         $originalValue = '1';
         $localizedValue = '1%';
@@ -114,7 +103,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit\Framework\TestCase
         $this->target->beforeValueRender($this->event);
     }
 
-    public function testBeforeValueRenderWithNumberAndParameters()
+    public function testBeforeValueRenderWithNumberAndParameters(): void
     {
         $originalValue = '1';
         $localizedValue = '1%';
@@ -143,7 +132,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit\Framework\TestCase
         $this->target->beforeValueRender($this->event);
     }
 
-    public function testBeforeValueRenderWithAddress()
+    public function testBeforeValueRenderWithAddress(): void
     {
         $originalValue = $this->getMockForAbstractClass(AddressInterface::class);
         $localizedValue = 'address';
@@ -165,7 +154,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit\Framework\TestCase
         $this->target->beforeValueRender($this->event);
     }
 
-    public function testBeforeValueRenderWithDateTime()
+    public function testBeforeValueRenderWithDateTime(): void
     {
         $originalValue = new \DateTime();
         $localizedValue = date('Y-m-d');
@@ -186,7 +175,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit\Framework\TestCase
         $this->target->beforeValueRender($this->event);
     }
 
-    public function testBeforeValueRenderWithDateTimeAndParameters()
+    public function testBeforeValueRenderWithDateTimeAndParameters(): void
     {
         $originalValue = new \DateTime();
         $localizedValue = date('Y-m-d');
@@ -220,7 +209,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit\Framework\TestCase
         $this->target->beforeValueRender($this->event);
     }
 
-    public function testBeforeValueRenderWithNameEntity()
+    public function testBeforeValueRenderWithNameEntity(): void
     {
         $originalValue = $this->getMockForAbstractClass(FirstNameInterface::class);
         $localizedValue = 'name';

@@ -3,8 +3,11 @@
 namespace Oro\Component\PhpUtils\Tests\Unit;
 
 use Oro\Component\PhpUtils\OneFileClassLoader;
+use PHPUnit\Framework\TestCase;
+use PhpUtilsOneFileTestNamespace\Baz;
+use PhpUtilsOneFileTestNamespace\Foo;
 
-class OneFileClassLoaderTest extends \PHPUnit\Framework\TestCase
+class OneFileClassLoaderTest extends TestCase
 {
     private function getClassLoader(): OneFileClassLoader
     {
@@ -20,10 +23,10 @@ class OneFileClassLoaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadClass()
+    public function testLoadClass(): void
     {
-        $className1 = 'PhpUtilsOneFileTestNamespace\Foo';
-        $className2 = 'PhpUtilsOneFileTestNamespace\Baz';
+        $className1 = Foo::class;
+        $className2 = Baz::class;
         $notExistentClassName = 'PhpUtilsOneFileTestNamespace\Bar';
         $loader = $this->getClassLoader();
 
@@ -64,13 +67,13 @@ class OneFileClassLoaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadClassFromNotRegisteredNamespace()
+    public function testLoadClassFromNotRegisteredNamespace(): void
     {
         $loader = $this->getClassLoader();
         self::assertFalse($loader->loadClass('AnotherTestNamespace\Foo'));
     }
 
-    public function testLoadClassWhenNamespaceIsNotEqualToDirectory()
+    public function testLoadClassWhenNamespaceIsNotEqualToDirectory(): void
     {
         $loader = new OneFileClassLoader(
             'AnotherTestNamespace\\',
@@ -85,7 +88,7 @@ class OneFileClassLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($loader->loadClass('AnotherTestNamespace\Foo'));
     }
 
-    public function testLoadClassWhenFileWithClassesDoesNotExist()
+    public function testLoadClassWhenFileWithClassesDoesNotExist(): void
     {
         $loader = new OneFileClassLoader(
             'AnotherTestNamespace\\',
@@ -100,10 +103,10 @@ class OneFileClassLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($loader->loadClass('AnotherTestNamespace\Foo'));
     }
 
-    public function testRegister()
+    public function testRegister(): void
     {
         $loader = $this->getClassLoader();
         $loader->register();
-        self::assertTrue(class_exists('PhpUtilsOneFileTestNamespace\Baz'), 'class_exists after loader->register()');
+        self::assertTrue(class_exists(Baz::class), 'class_exists after loader->register()');
     }
 }

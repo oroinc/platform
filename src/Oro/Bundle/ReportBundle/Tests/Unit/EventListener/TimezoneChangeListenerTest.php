@@ -5,14 +5,13 @@ namespace Oro\Bundle\ReportBundle\Tests\Unit\EventListener;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 use Oro\Bundle\ReportBundle\Entity\Manager\CalendarDateManager;
 use Oro\Bundle\ReportBundle\EventListener\TimezoneChangeListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TimezoneChangeListenerTest extends \PHPUnit\Framework\TestCase
+class TimezoneChangeListenerTest extends TestCase
 {
-    /** @var CalendarDateManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $calendarDateManager;
-
-    /** @var TimezoneChangeListener */
-    private $listener;
+    private CalendarDateManager&MockObject $calendarDateManager;
+    private TimezoneChangeListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class TimezoneChangeListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new TimezoneChangeListener($this->calendarDateManager);
     }
 
-    public function testOnConfigUpdateTimezoneNotChanged()
+    public function testOnConfigUpdateTimezoneNotChanged(): void
     {
         $event = new ConfigUpdateEvent(['not.a.timezone' => ['old' => 1, 'new' => 2]], 'global', 0);
 
@@ -32,7 +31,7 @@ class TimezoneChangeListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onConfigUpdate($event);
     }
 
-    public function testOnConfigUpdateTimezoneChanged()
+    public function testOnConfigUpdateTimezoneChanged(): void
     {
         $event = new ConfigUpdateEvent(['oro_locale.timezone' => ['old' => 1, 'new' => 2]], 'global', 0);
 

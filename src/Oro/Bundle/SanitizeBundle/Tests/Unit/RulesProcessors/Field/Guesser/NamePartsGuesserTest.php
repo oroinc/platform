@@ -26,10 +26,11 @@ class NamePartsGuesserTest extends TestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->md5ProcessorMock = self::createMock(Md5Processor::class);
-        $this->classMetadataMock = self::createMock(ClassMetadata::class);
-        $this->configManagerMock = self::createMock(ConfigManager::class);
-        $this->extendEntityMetadataProvider = self::createMock(ExtendEntityMetadataProvider::class);
+        $this->md5ProcessorMock = $this->createMock(Md5Processor::class);
+        $this->classMetadataMock = $this->createMock(ClassMetadata::class);
+        $this->configManagerMock = $this->createMock(ConfigManager::class);
+        $this->extendEntityMetadataProvider = $this->createMock(ExtendEntityMetadataProvider::class);
+
         $this->processorHelper = new ProcessorHelper($this->configManagerMock, $this->extendEntityMetadataProvider);
     }
 
@@ -40,17 +41,14 @@ class NamePartsGuesserTest extends TestCase
     {
         $namePartsGuesser = new NamePartsGuesser($this->md5ProcessorMock, $this->processorHelper);
 
-        $this->classMetadataMock
-            ->expects(self::exactly(2))
+        $this->classMetadataMock->expects(self::exactly(2))
             ->method('getName')
             ->willReturn($className);
-        $this->extendEntityMetadataProvider
-            ->expects(self::once())
+        $this->extendEntityMetadataProvider->expects(self::once())
             ->method('getExtendEntityFieldsMetadata')
             ->with($className)
             ->willReturn([$fieldName => [ExtendEntityMetadataProvider::IS_SERIALIZED => false]]);
-        $this->classMetadataMock
-            ->expects(self::once())
+        $this->classMetadataMock->expects(self::once())
             ->method('getFieldMapping')
             ->with($fieldName)
             ->willReturn(['type' => 'string']);
@@ -78,17 +76,14 @@ class NamePartsGuesserTest extends TestCase
     {
         $namePartsGuesser = new NamePartsGuesser($this->md5ProcessorMock, $this->processorHelper);
 
-        $this->classMetadataMock
-            ->expects(self::once())
+        $this->classMetadataMock->expects(self::once())
             ->method('getName')
             ->willReturn($className);
-        $this->extendEntityMetadataProvider
-            ->expects(self::once())
+        $this->extendEntityMetadataProvider->expects(self::once())
             ->method('getExtendEntityFieldsMetadata')
             ->with($className)
             ->willReturn([$fieldName => [ExtendEntityMetadataProvider::IS_SERIALIZED => false]]);
-        $this->classMetadataMock
-            ->expects(self::once())
+        $this->classMetadataMock->expects(self::once())
             ->method('getFieldMapping')
             ->with($fieldName)
             ->willReturn(['type' => 'not_string']);
@@ -100,17 +95,14 @@ class NamePartsGuesserTest extends TestCase
     {
         $namePartsGuesser = new NamePartsGuesser($this->md5ProcessorMock, $this->processorHelper);
 
-        $this->classMetadataMock
-            ->expects(self::once())
+        $this->classMetadataMock->expects(self::once())
             ->method('getName')
             ->willReturn(FullNameInterface::class);
-        $this->extendEntityMetadataProvider
-            ->expects(self::once())
+        $this->extendEntityMetadataProvider->expects(self::once())
             ->method('getExtendEntityFieldsMetadata')
             ->with(FullNameInterface::class)
             ->willReturn([self::WRONG_FIELD_NAME => [ExtendEntityMetadataProvider::IS_SERIALIZED => false]]);
-        $this->classMetadataMock
-            ->expects(self::once())
+        $this->classMetadataMock->expects(self::once())
             ->method('getFieldMapping')
             ->with(self::WRONG_FIELD_NAME)
             ->willReturn(['type' => 'string']);

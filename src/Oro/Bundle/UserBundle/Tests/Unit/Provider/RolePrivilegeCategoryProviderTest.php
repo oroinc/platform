@@ -5,15 +5,14 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 use Oro\Bundle\UserBundle\Configuration\PrivilegeCategoryConfigurationProvider;
 use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class RolePrivilegeCategoryProviderTest extends \PHPUnit\Framework\TestCase
+class RolePrivilegeCategoryProviderTest extends TestCase
 {
-    /** @var PrivilegeCategoryConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurationProvider;
-
-    /** @var RolePrivilegeCategoryProvider */
-    private $categoryProvider;
+    private PrivilegeCategoryConfigurationProvider&MockObject $configurationProvider;
+    private RolePrivilegeCategoryProvider $categoryProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +28,7 @@ class RolePrivilegeCategoryProviderTest extends \PHPUnit\Framework\TestCase
         $this->categoryProvider = new RolePrivilegeCategoryProvider($this->configurationProvider, $translator);
     }
 
-    public function testGetCategoriesWhenNoCategories()
+    public function testGetCategoriesWhenNoCategories(): void
     {
         $this->configurationProvider->expects(self::once())
             ->method('getCategories')
@@ -40,7 +39,7 @@ class RolePrivilegeCategoryProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->categoryProvider->getCategories());
     }
 
-    public function testGetCategories()
+    public function testGetCategories(): void
     {
         $this->configurationProvider->expects(self::once())
             ->method('getCategories')
@@ -63,7 +62,7 @@ class RolePrivilegeCategoryProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $this->categoryProvider->getCategories());
     }
 
-    public function testGetTabIds()
+    public function testGetTabIds(): void
     {
         $this->configurationProvider->expects(self::once())
             ->method('getCategories')
@@ -81,7 +80,7 @@ class RolePrivilegeCategoryProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $this->categoryProvider->getTabIds());
     }
 
-    public function testGetTabs()
+    public function testGetTabs(): void
     {
         $this->configurationProvider->expects(self::once())
             ->method('getCategories')

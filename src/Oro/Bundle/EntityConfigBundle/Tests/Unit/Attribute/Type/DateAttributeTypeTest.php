@@ -21,7 +21,7 @@ class DateAttributeTypeTest extends AttributeTypeTestCase
         ];
     }
 
-    public function testGetSearchableValue()
+    public function testGetSearchableValue(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not supported');
@@ -29,7 +29,7 @@ class DateAttributeTypeTest extends AttributeTypeTestCase
         $this->getAttributeType()->getSearchableValue($this->attribute, new \DateTime(), $this->localization);
     }
 
-    public function testGetFilterableValue()
+    public function testGetFilterableValue(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not supported');
@@ -37,7 +37,7 @@ class DateAttributeTypeTest extends AttributeTypeTestCase
         $this->getAttributeType()->getFilterableValue($this->attribute, new \DateTime(), $this->localization);
     }
 
-    public function testGetSortableValue()
+    public function testGetSortableValue(): void
     {
         $date = new \DateTime('2017-01-01 12:00:00', new \DateTimeZone('America/Los_Angeles'));
 
@@ -47,12 +47,12 @@ class DateAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetSortableValueNullValue()
+    public function testGetSortableValueNullValue(): void
     {
         $this->assertNull($this->getAttributeType()->getSortableValue($this->attribute, null, $this->localization));
     }
 
-    public function testGetSortableValueException()
+    public function testGetSortableValueException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Value must be instance of "DateTime", "stdClass" given');

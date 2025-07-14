@@ -12,9 +12,10 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\AccessRule\AccessRule1;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\AccessRule\AccessRule2;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class AccessRuleExecutorTest extends \PHPUnit\Framework\TestCase
+class AccessRuleExecutorTest extends TestCase
 {
     /**
      * @param array $rules [service id => AccessRuleInterface or [AccessRuleInterface, options], ...]
@@ -42,7 +43,7 @@ class AccessRuleExecutorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $rule1 = new AccessRule1();
         $rule2 = new AccessRule2();
@@ -65,7 +66,7 @@ class AccessRuleExecutorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(new Comparison(new Path('organization'), Comparison::EQ, 1), $expressions[1]);
     }
 
-    public function testProcessWithNonApplicableRule()
+    public function testProcessWithNonApplicableRule(): void
     {
         $rule1 = new AccessRule1();
         $rule2 = new AccessRule2();
@@ -86,7 +87,7 @@ class AccessRuleExecutorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(new Comparison(new Path('owner'), Comparison::IN, [1, 2, 3, 4, 5]), $expression);
     }
 
-    public function testProcessWithNonApplicableRuleByOptions()
+    public function testProcessWithNonApplicableRuleByOptions(): void
     {
         $rule1 = new AccessRule1();
         $rule2 = new AccessRule2();

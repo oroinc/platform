@@ -6,11 +6,12 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FieldTypeProviderTest extends \PHPUnit\Framework\TestCase
+class FieldTypeProviderTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
+    private ConfigManager&MockObject $configManager;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +19,7 @@ class FieldTypeProviderTest extends \PHPUnit\Framework\TestCase
         $this->configManager = $this->createMock(ConfigManager::class);
     }
 
-    public function testGetSupportedFieldTypes()
+    public function testGetSupportedFieldTypes(): void
     {
         $types = ['string', 'boolean', 'date', 'file'];
 
@@ -27,7 +28,7 @@ class FieldTypeProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($types, $provider->getSupportedFieldTypes());
     }
 
-    public function testGetSupportedRelationTypes()
+    public function testGetSupportedRelationTypes(): void
     {
         $relations = ['oneToMany', 'manyToOne', 'manyToMany'];
 
@@ -36,7 +37,7 @@ class FieldTypeProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($relations, $provider->getSupportedRelationTypes());
     }
 
-    public function testGetFieldProperties()
+    public function testGetFieldProperties(): void
     {
         $configType = PropertyConfigContainer::TYPE_FIELD;
         $fieldType = 'string';

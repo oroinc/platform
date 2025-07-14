@@ -7,11 +7,12 @@ use Oro\Bundle\LayoutBundle\Command\DebugDataProviderSignatureCommand;
 use Oro\Bundle\LayoutBundle\Command\DebugLayoutBlockTypeSignatureCommand;
 use Oro\Bundle\LayoutBundle\Command\DebugLayoutContextConfiguratorsSignatureCommand;
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigurationPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
+class ConfigurationPassTest extends TestCase
 {
     private ConfigurationPass $compiler;
 

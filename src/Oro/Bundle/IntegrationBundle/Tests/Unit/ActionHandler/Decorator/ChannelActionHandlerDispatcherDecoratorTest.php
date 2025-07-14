@@ -9,24 +9,17 @@ use Oro\Bundle\IntegrationBundle\ActionHandler\Error\ChannelActionErrorHandlerIn
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Event\Action\ChannelActionEvent;
 use Oro\Bundle\IntegrationBundle\Factory\Event\ChannelActionEventFactoryInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ChannelActionHandlerDispatcherDecoratorTest extends \PHPUnit\Framework\TestCase
+class ChannelActionHandlerDispatcherDecoratorTest extends TestCase
 {
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dispatcher;
-
-    /** @var ChannelActionEventFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventFactory;
-
-    /** @var ChannelActionHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $actionHandler;
-
-    /** @var ChannelActionErrorHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $errorHandler;
-
-    /** @var ChannelActionHandlerDispatcherDecorator */
-    private $decorator;
+    private EventDispatcherInterface&MockObject $dispatcher;
+    private ChannelActionEventFactoryInterface&MockObject $eventFactory;
+    private ChannelActionHandlerInterface&MockObject $actionHandler;
+    private ChannelActionErrorHandlerInterface&MockObject $errorHandler;
+    private ChannelActionHandlerDispatcherDecorator $decorator;
 
     #[\Override]
     protected function setUp(): void
@@ -44,7 +37,7 @@ class ChannelActionHandlerDispatcherDecoratorTest extends \PHPUnit\Framework\Tes
         );
     }
 
-    public function testHandleActionWithErrors()
+    public function testHandleActionWithErrors(): void
     {
         $channel = new Channel();
         $errors = new ArrayCollection(['error1']);
@@ -75,7 +68,7 @@ class ChannelActionHandlerDispatcherDecoratorTest extends \PHPUnit\Framework\Tes
         self::assertFalse($this->decorator->handleAction($channel));
     }
 
-    public function testHandleActionWithNoErrors()
+    public function testHandleActionWithNoErrors(): void
     {
         $channel = new Channel();
 

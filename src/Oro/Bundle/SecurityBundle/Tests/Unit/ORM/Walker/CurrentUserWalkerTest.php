@@ -23,7 +23,7 @@ class CurrentUserWalkerTest extends OrmTestCase
         ]);
     }
 
-    public function testWalkerWithoutParameters()
+    public function testWalkerWithoutParameters(): void
     {
         $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')
@@ -41,7 +41,7 @@ class CurrentUserWalkerTest extends OrmTestCase
         );
     }
 
-    public function testWalkerNoWhere()
+    public function testWalkerNoWhere(): void
     {
         $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')
@@ -64,7 +64,7 @@ class CurrentUserWalkerTest extends OrmTestCase
         );
     }
 
-    public function testWalkerWithOneWhereCondition()
+    public function testWalkerWithOneWhereCondition(): void
     {
         $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')
@@ -88,7 +88,7 @@ class CurrentUserWalkerTest extends OrmTestCase
         );
     }
 
-    public function testWalkerWithComplexWhereCondition()
+    public function testWalkerWithComplexWhereCondition(): void
     {
         $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')
@@ -113,7 +113,7 @@ class CurrentUserWalkerTest extends OrmTestCase
         );
     }
 
-    public function testWalkerWithSeveralAndWhereCondition()
+    public function testWalkerWithSeveralAndWhereCondition(): void
     {
         $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')

@@ -5,8 +5,9 @@ namespace Oro\Component\Layout\Tests\Unit;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\BlockViewCollection;
+use PHPUnit\Framework\TestCase;
 
-class LayoutTestCase extends \PHPUnit\Framework\TestCase
+class LayoutTestCase extends TestCase
 {
     protected function assertBlockView(array $expected, BlockView $actual, bool $ignoreAuxiliaryVariables = true): void
     {

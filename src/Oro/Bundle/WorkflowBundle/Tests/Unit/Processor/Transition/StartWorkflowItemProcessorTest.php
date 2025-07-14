@@ -9,15 +9,14 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\StartWorkflowItemProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class StartWorkflowItemProcessorTest extends \PHPUnit\Framework\TestCase
+class StartWorkflowItemProcessorTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var StartWorkflowItemProcessor */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private StartWorkflowItemProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class StartWorkflowItemProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new StartWorkflowItemProcessor($this->doctrineHelper);
     }
 
-    public function testSkipFailures()
+    public function testSkipFailures(): void
     {
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
@@ -39,7 +38,7 @@ class StartWorkflowItemProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testSkipContextWithWorkflowItem()
+    public function testSkipContextWithWorkflowItem(): void
     {
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
@@ -52,7 +51,7 @@ class StartWorkflowItemProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testGetEntityByIdAndWorkflowItem()
+    public function testGetEntityByIdAndWorkflowItem(): void
     {
         $entity = (object)['id' => 42];
         $initialData = ['initial_data'];
@@ -91,7 +90,7 @@ class StartWorkflowItemProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($workflowItem, $context->getWorkflowItem());
     }
 
-    public function testCreateEntityAndWorkflowItem()
+    public function testCreateEntityAndWorkflowItem(): void
     {
         $initialData = ['initial_data'];
         $entity = (object)['id' => 1];
@@ -130,7 +129,7 @@ class StartWorkflowItemProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($workflowItem, $context->getWorkflowItem());
     }
 
-    public function testNotManageableEntityExceptionProcessing()
+    public function testNotManageableEntityExceptionProcessing(): void
     {
         $workflowDefinition = $this->createMock(WorkflowDefinition::class);
         $workflowDefinition->expects($this->once())

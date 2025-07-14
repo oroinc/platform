@@ -19,10 +19,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class ConfigurationProviderTest extends SegmentDefinitionTestCase
 {
-    private ManagerRegistry|MockObject $doctrine;
-
-    private ConfigManager|MockObject $configManager;
-
+    private ManagerRegistry&MockObject $doctrine;
+    private ConfigManager&MockObject $configManager;
     private ConfigurationProvider $provider;
 
     #[\Override]
@@ -61,14 +59,12 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
         $id = 2;
         $gridName = Segment::GRID_PREFIX . $id;
         $segmentRepository = $this->createMock(EntityRepository::class);
-        $segmentRepository
-            ->expects(self::once())
+        $segmentRepository->expects(self::once())
             ->method('find')
             ->with($id)
             ->willReturn($this->getSegment(identifier: $id));
 
-        $this->doctrine
-            ->expects(self::once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->with(Segment::class)
             ->willReturn($segmentRepository);

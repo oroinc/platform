@@ -7,17 +7,16 @@ use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\D
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\OnlyTopicNameTopicSubscriber;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class BuildDestinationMetaRegistryPassTest extends \PHPUnit\Framework\TestCase
+class BuildDestinationMetaRegistryPassTest extends TestCase
 {
     private const REGISTRY_ID = 'oro_message_queue.client.meta.destination_meta_registry';
 
     private BuildDestinationMetaRegistryPass $compiler;
-
     private ContainerBuilder $container;
-
     private Definition $registryDefinition;
 
     #[\Override]

@@ -19,17 +19,10 @@ class OrmTest extends TestCase
     private const TEST_CLASS = 'Stub\TestEntity';
     private const TEST_ALIAS = 'test_entity';
 
-    /** @var SearchIndexRepository|MockObject */
-    private $repository;
-
-    /** @var ObjectMapper|MockObject */
-    private $mapper;
-
-    /** @var EventDispatcherInterface|MockObject */
-    private $eventDispatcher;
-
-    /** @var Orm */
-    private $engine;
+    private SearchIndexRepository&MockObject $repository;
+    private ObjectMapper&MockObject $mapper;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private Orm $engine;
 
     #[\Override]
     protected function setUp(): void
@@ -57,7 +50,7 @@ class OrmTest extends TestCase
     /**
      * @dataProvider searchDataProvider
      */
-    public function testSearch(array $response, array $items, int $count, array $aggregatedData = [])
+    public function testSearch(array $response, array $items, int $count, array $aggregatedData = []): void
     {
         $query = new Query();
 

@@ -17,8 +17,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 
 class AttributeFamilyTypeTest extends FormIntegrationTestCase
 {
-    /** @var AttributeFamilyType */
-    private $type;
+    private AttributeFamilyType $type;
 
     #[\Override]
     protected function setUp(): void

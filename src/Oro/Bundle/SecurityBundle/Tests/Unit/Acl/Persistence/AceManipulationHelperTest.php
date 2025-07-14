@@ -5,17 +5,16 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Persistence;
 use Oro\Bundle\SecurityBundle\Acl\Extension\NullAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AceManipulationHelper;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Model\MutableAclInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
-class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
+class AceManipulationHelperTest extends TestCase
 {
-    /** @var AceManipulationHelper */
-    private $manipulator;
-
-    /** @var MutableAclInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $acl;
+    private AceManipulationHelper $manipulator;
+    private MutableAclInterface&MockObject $acl;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
      * @dataProvider aceTypesProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSetPermissionShouldCallUpdateAceForAce3(string $type, ?string $field)
+    public function testSetPermissionShouldCallUpdateAceForAce3(string $type, ?string $field): void
     {
         $sid = $this->createMock(SecurityIdentityInterface::class);
         $replace = true;
@@ -118,7 +117,7 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
      * @dataProvider aceTypesProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSetPermissionShouldCallInsertAce(string $type, ?string $field)
+    public function testSetPermissionShouldCallInsertAce(string $type, ?string $field): void
     {
         $sid = $this->createMock(SecurityIdentityInterface::class);
         $replace = false;
@@ -203,7 +202,7 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider aceTypesProvider
      */
-    public function testDeletePermission(string $type, ?string $field)
+    public function testDeletePermission(string $type, ?string $field): void
     {
         $sid = $this->createMock(SecurityIdentityInterface::class);
         $granting = true;
@@ -272,7 +271,7 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider aceTypesProvider
      */
-    public function testDeleteAllPermissions(string $type, ?string $field)
+    public function testDeleteAllPermissions(string $type, ?string $field): void
     {
         $sid = $this->createMock(SecurityIdentityInterface::class);
 
@@ -323,7 +322,7 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider aceTypesProvider
      */
-    public function testGetAces(string $type, ?string $field)
+    public function testGetAces(string $type, ?string $field): void
     {
         if ($field === null) {
             $this->acl->expects($this->once())
@@ -345,7 +344,7 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider aceTypesProvider
      */
-    public function testInsertAce(string $type, ?string $field)
+    public function testInsertAce(string $type, ?string $field): void
     {
         $index = 1;
         $sid = $this->createMock(SecurityIdentityInterface::class);
@@ -381,7 +380,7 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider aceTypesProvider
      */
-    public function testUpdateAce(string $type, ?string $field)
+    public function testUpdateAce(string $type, ?string $field): void
     {
         $index = 1;
         $mask = 123;
@@ -411,7 +410,7 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider aceTypesProvider
      */
-    public function testDeleteAce(string $type, ?string $field)
+    public function testDeleteAce(string $type, ?string $field): void
     {
         $index = 1;
         if ($field === null) {

@@ -10,19 +10,16 @@ use Oro\Bundle\DigitalAssetBundle\Entity\Repository\DigitalAssetRepository;
 use Oro\Bundle\DigitalAssetBundle\EventListener\DigitalAssetSourceChangedListener;
 use Oro\Bundle\DigitalAssetBundle\Reflector\FileReflector;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DigitalAssetSourceChangedListenerTest extends \PHPUnit\Framework\TestCase
+class DigitalAssetSourceChangedListenerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var FileReflector|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileReflector;
-
-    /** @var DigitalAssetSourceChangedListener */
-    private $listener;
+    private EntityManagerInterface&MockObject $em;
+    private FileReflector&MockObject $fileReflector;
+    private DigitalAssetSourceChangedListener $listener;
 
     #[\Override]
     protected function setUp(): void

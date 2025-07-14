@@ -9,6 +9,8 @@ use Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Form\Type\Stub\CompoundFormTypeStub
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -17,21 +19,16 @@ use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormType;
 
-class GroupingFormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
+class GroupingFormLayoutBuilderTest extends TestCase
 {
     private const ROOT_ID = 'rootId';
     private const FORM_NAME = 'testForm';
     private const FIELD_PREFIX = 'testForm_';
     private const GROUP_PREFIX = 'testForm:group_';
 
-    /** @var LayoutManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $layoutManipulator;
-
-    /** @var BlockBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $blockBuilder;
-
-    /** @var GroupingFormLayoutBuilder */
-    private $builder;
+    private LayoutManipulatorInterface&MockObject $layoutManipulator;
+    private BlockBuilderInterface&MockObject $blockBuilder;
+    private GroupingFormLayoutBuilder $builder;
 
     #[\Override]
     protected function setUp(): void
@@ -71,7 +68,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
         return new Form($formConfig);
     }
 
-    public function testGrouping()
+    public function testGrouping(): void
     {
         $options = $this->getOptions();
         $options['groups'] = [
@@ -142,7 +139,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGroupingWithPreferredFields()
+    public function testGroupingWithPreferredFields(): void
     {
         $options = $this->getOptions();
         $options['preferred_fields'] = ['field2.field22'];
@@ -222,7 +219,7 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGroupingByParentFieldPath()
+    public function testGroupingByParentFieldPath(): void
     {
         $options = $this->getOptions();
         $options['groups'] = [

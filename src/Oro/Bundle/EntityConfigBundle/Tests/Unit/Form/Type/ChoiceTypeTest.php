@@ -8,8 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType as BaseChoiceType;
 
 class ChoiceTypeTest extends AbstractConfigTypeTestCase
 {
-    /** @var ChoiceType */
-    private $type;
+    private ChoiceType $type;
 
     #[\Override]
     protected function setUp(): void

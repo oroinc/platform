@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Query;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
@@ -38,8 +37,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
 {
-    /** @var FormFactoryInterface */
-    private $formFactory;
+    private FormFactoryInterface $formFactory;
 
     #[\Override]
     protected function setUp(): void
@@ -65,7 +63,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
             ->getFormFactory();
     }
 
-    public function testBuild()
+    public function testBuild(): void
     {
         $segment = $this->getSegment();
         $segment->setType(new SegmentType(SegmentType::TYPE_DYNAMIC));
@@ -75,7 +73,6 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
             [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]
         );
         $builder = $this->getQueryBuilder($doctrine);
-        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em */
         $em = $doctrine->getManagerForClass(self::TEST_ENTITY);
         $qb = new QueryBuilder($em);
         $connection = $this->createMock(Connection::class);
@@ -115,7 +112,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         );
     }
 
-    public function testBuildExtended()
+    public function testBuildExtended(): void
     {
         $segment = $this->getSegment(
             [
@@ -173,7 +170,6 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
             [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]
         );
         $builder = $this->getQueryBuilder($doctrine);
-        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em */
         $em = $doctrine->getManagerForClass(self::TEST_ENTITY);
         $qb = new QueryBuilder($em);
         $connection = $this->createMock(Connection::class);

@@ -6,11 +6,11 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction\ResetTranslationsMassAction;
 use Oro\Component\Config\Common\ConfigObject;
+use PHPUnit\Framework\TestCase;
 
-class ResetTranslationsMassActionTest extends \PHPUnit\Framework\TestCase
+class ResetTranslationsMassActionTest extends TestCase
 {
-    /** @var ResetTranslationsMassAction */
-    private $action;
+    private ResetTranslationsMassAction $action;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class ResetTranslationsMassActionTest extends \PHPUnit\Framework\TestCase
         $this->action = new ResetTranslationsMassAction();
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $this->action->setOptions(ActionConfiguration::create([
             ConfigObject::NAME_KEY => 'test-config',
@@ -37,7 +37,7 @@ class ResetTranslationsMassActionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('POST', $options['requestType']);
     }
 
-    public function testRequiredOptions()
+    public function testRequiredOptions(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('"data_identifier"');
@@ -47,7 +47,7 @@ class ResetTranslationsMassActionTest extends \PHPUnit\Framework\TestCase
         ]));
     }
 
-    public function testSetOptions()
+    public function testSetOptions(): void
     {
         $customOptions = [
             ConfigObject::NAME_KEY => 'test-config',

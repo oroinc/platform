@@ -11,17 +11,14 @@ use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRelationReposi
 use Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent;
 use Oro\Bundle\EntityConfigBundle\EventListener\RemoveAttributeGroupRelationListener;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class RemoveAttributeGroupRelationListenerTest extends \PHPUnit\Framework\TestCase
+class RemoveAttributeGroupRelationListenerTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var RemoveAttributeGroupRelationListener */
-    private $listener;
+    private ManagerRegistry&MockObject $doctrine;
+    private ConfigManager&MockObject $configManager;
+    private RemoveAttributeGroupRelationListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +29,7 @@ class RemoveAttributeGroupRelationListenerTest extends \PHPUnit\Framework\TestCa
         $this->listener = new RemoveAttributeGroupRelationListener($this->doctrine);
     }
 
-    public function testOnPostFlushConfigShouldRemoveAttributeGroupRelationForRemovedAttribute()
+    public function testOnPostFlushConfigShouldRemoveAttributeGroupRelationForRemovedAttribute(): void
     {
         $entityClass = 'Test\Entity';
         $fieldName = 'testField';
@@ -62,7 +59,7 @@ class RemoveAttributeGroupRelationListenerTest extends \PHPUnit\Framework\TestCa
         $this->listener->onPostFlushConfig($event);
     }
 
-    public function testOnPostFlushConfigShouldDoNothingForRemovedField()
+    public function testOnPostFlushConfigShouldDoNothingForRemovedField(): void
     {
         $entityClass = 'Test\Entity';
         $fieldName = 'testField';
@@ -85,7 +82,7 @@ class RemoveAttributeGroupRelationListenerTest extends \PHPUnit\Framework\TestCa
         $this->listener->onPostFlushConfig($event);
     }
 
-    public function testOnPostFlushConfigShouldDoNothingForRestoredAttribute()
+    public function testOnPostFlushConfigShouldDoNothingForRestoredAttribute(): void
     {
         $entityClass = 'Test\Entity';
         $fieldName = 'testField';
@@ -109,7 +106,7 @@ class RemoveAttributeGroupRelationListenerTest extends \PHPUnit\Framework\TestCa
         $this->listener->onPostFlushConfig($event);
     }
 
-    public function testOnPostFlushConfigShouldDoNothingForChangedEntityConfig()
+    public function testOnPostFlushConfigShouldDoNothingForChangedEntityConfig(): void
     {
         $entityClass = 'Test\Entity';
 

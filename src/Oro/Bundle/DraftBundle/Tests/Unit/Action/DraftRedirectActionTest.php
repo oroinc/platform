@@ -9,24 +9,21 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Routing\RouterInterface;
 
-class DraftRedirectActionTest extends \PHPUnit\Framework\TestCase
+class DraftRedirectActionTest extends TestCase
 {
     private const ROUTE_NAME = 'route_name';
 
-    /** @var ContextAccessor */
-    private $contextAccessor;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    private $configManager;
-
-    /** @var DraftRedirectAction */
-    private $action;
+    private ContextAccessor $contextAccessor;
+    private ConfigManager&MockObject $configManager;
+    private DraftRedirectAction $action;
 
     #[\Override]
     protected function setUp(): void

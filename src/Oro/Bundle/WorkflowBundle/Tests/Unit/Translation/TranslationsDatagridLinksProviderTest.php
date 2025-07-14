@@ -7,19 +7,16 @@ use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationsDatagridLinksProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TranslationsDatagridLinksProviderTest extends \PHPUnit\Framework\TestCase
+class TranslationsDatagridLinksProviderTest extends TestCase
 {
     private const WORKFLOW_LABEL = 'test.workflow.label.key';
 
-    /** @var TranslationsDatagridRouteHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $routeHelper;
-
-    /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $languageProvider;
-
-    /** @var TranslationsDatagridLinksProvider */
-    private $linksProvider;
+    private TranslationsDatagridRouteHelper&MockObject $routeHelper;
+    private LanguageProvider&MockObject $languageProvider;
+    private TranslationsDatagridLinksProvider $linksProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +33,7 @@ class TranslationsDatagridLinksProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getWorkflowTranslateLinksDataProvider
      */
-    public function testGetWorkflowTranslateLinks(array $config, bool $languagesAvailable, array $expected)
+    public function testGetWorkflowTranslateLinks(array $config, bool $languagesAvailable, array $expected): void
     {
         $definition = new WorkflowDefinition();
         $definition->setName('test_workflow')->setLabel(self::WORKFLOW_LABEL)->setConfiguration($config);

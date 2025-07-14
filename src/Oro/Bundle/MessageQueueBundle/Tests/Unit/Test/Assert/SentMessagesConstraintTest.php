@@ -3,10 +3,12 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Test\Assert;
 
 use Oro\Bundle\MessageQueueBundle\Test\Assert\SentMessagesConstraint;
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
 
-class SentMessagesConstraintTest extends \PHPUnit\Framework\TestCase
+class SentMessagesConstraintTest extends TestCase
 {
-    public function testShouldBeEvaluatedToFalseIfValueIsNotEqualToExpectedMessages()
+    public function testShouldBeEvaluatedToFalseIfValueIsNotEqualToExpectedMessages(): void
     {
         $expectedMessages = [
             ['topic' => 'test topic', 'message' => 'test message']
@@ -20,7 +22,7 @@ class SentMessagesConstraintTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($constraint->evaluate($allMessages, '', true));
     }
 
-    public function testShouldBeEvaluatedToTrueIfValueEqualsToExpectedMessage()
+    public function testShouldBeEvaluatedToTrueIfValueEqualsToExpectedMessage(): void
     {
         $expectedMessages = [
             ['topic' => 'test topic', 'message' => 'test message 1'],
@@ -35,7 +37,7 @@ class SentMessagesConstraintTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($constraint->evaluate($allMessages, '', true));
     }
 
-    public function testShouldThrowExceptionWithValidMessage()
+    public function testShouldThrowExceptionWithValidMessage(): void
     {
         $expectedMessages = [
             ['topic' => 'test topic', 'message' => 'test message']
@@ -64,7 +66,7 @@ TEXT;
         $constraint = new SentMessagesConstraint($expectedMessages);
         try {
             $constraint->evaluate($allMessages, 'additional description');
-        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             self::assertEquals(
                 $expectedExceptionMessage,
                 $e->getMessage() . $e->getComparisonFailure()->getDiff()

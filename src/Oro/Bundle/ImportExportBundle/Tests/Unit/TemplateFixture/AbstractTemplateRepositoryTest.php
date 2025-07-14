@@ -8,19 +8,16 @@ use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AbstractTemplateRepositoryTest extends \PHPUnit\Framework\TestCase
+class AbstractTemplateRepositoryTest extends TestCase
 {
     private const ENTITY_CLASS = 'Test\Entity';
 
-    /** @var TemplateEntityRegistry */
-    private $entityRegistry;
-
-    /** @var TemplateManager */
-    private $templateManager;
-
-    /** @var AbstractTemplateRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $templateRepository;
+    private TemplateEntityRegistry $entityRegistry;
+    private TemplateManager $templateManager;
+    private AbstractTemplateRepository&MockObject $templateRepository;
 
     #[\Override]
     protected function setUp(): void
@@ -45,7 +42,7 @@ class AbstractTemplateRepositoryTest extends \PHPUnit\Framework\TestCase
             ->willReturn(self::ENTITY_CLASS);
     }
 
-    public function testGetEntity()
+    public function testGetEntity(): void
     {
         $entityKey = 'test1';
         $entity = new \stdClass();
@@ -76,7 +73,7 @@ class AbstractTemplateRepositoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityData()
+    public function testGetEntityData(): void
     {
         $entityKey = 'test1';
         $entity = new \stdClass();
@@ -120,7 +117,7 @@ class AbstractTemplateRepositoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFillEntityData()
+    public function testFillEntityData(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Unknown entity: "stdClass"; key: "test1".');

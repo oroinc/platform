@@ -4,11 +4,11 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
+use PHPUnit\Framework\TestCase;
 
-class EntitySecurityMetadataTest extends \PHPUnit\Framework\TestCase
+class EntitySecurityMetadataTest extends TestCase
 {
-    /** @var EntitySecurityMetadata */
-    private $entity;
+    private EntitySecurityMetadata $entity;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +28,7 @@ class EntitySecurityMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetters()
+    public function testGetters(): void
     {
         self::assertEquals('SomeType', $this->entity->getSecurityType());
         self::assertEquals(\stdClass::class, $this->entity->getClassName());
@@ -45,7 +45,7 @@ class EntitySecurityMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['VIEW'], $secondFieldConfig->getPermissions());
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $data = serialize($this->entity);
         $emptyEntity = unserialize($data);

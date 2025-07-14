@@ -12,23 +12,16 @@ use Oro\Bundle\TagBundle\EventListener\MergeListener;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Tests\Unit\Stub\NotTaggableEntityStub;
 use Oro\Bundle\TagBundle\Tests\Unit\Stub\TaggableEntityStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MergeListenerTest extends \PHPUnit\Framework\TestCase
+class MergeListenerTest extends TestCase
 {
-    /** @var TagManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var TaggableHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $helper;
-
-    /** @var EntityMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityMetadata;
-
-    /** @var EntityData|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityData;
-
-    /** @var MergeListener */
-    private $listener;
+    private TagManager&MockObject $manager;
+    private TaggableHelper&MockObject $helper;
+    private EntityMetadata&MockObject $entityMetadata;
+    private EntityData&MockObject $entityData;
+    private MergeListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -45,7 +38,7 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new MergeListener($this->manager, $this->helper);
     }
 
-    public function testOnBuildMetadata()
+    public function testOnBuildMetadata(): void
     {
         $this->helper->expects($this->once())
             ->method('isTaggable')
@@ -62,7 +55,7 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBuildMetadata($event);
     }
 
-    public function testOnCreateEntityData()
+    public function testOnCreateEntityData(): void
     {
         $this->entityMetadata->expects($this->once())
             ->method('getClassName')
@@ -87,7 +80,7 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onCreateEntityData($event);
     }
 
-    public function testAfterMergeEntity()
+    public function testAfterMergeEntity(): void
     {
         $this->entityMetadata->expects($this->once())
             ->method('getClassName')
@@ -109,7 +102,7 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->afterMergeEntity($event);
     }
 
-    public function testNotTaggable()
+    public function testNotTaggable(): void
     {
         $this->helper->expects($this->once())
             ->method('isTaggable')

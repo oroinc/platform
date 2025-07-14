@@ -6,18 +6,15 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\LinkProperty;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyConfiguration;
 use Oro\Bundle\UIBundle\Twig\Environment;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 
-class LinkPropertyTest extends \PHPUnit\Framework\TestCase
+class LinkPropertyTest extends TestCase
 {
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $twig;
-
-    /** @var LinkProperty */
-    private $property;
+    private RouterInterface&MockObject $router;
+    private Environment&MockObject $twig;
+    private LinkProperty $property;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +28,7 @@ class LinkPropertyTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider valueDataProvider
      */
-    public function testGetRawValue(array $params, array $data, array $expected)
+    public function testGetRawValue(array $params, array $data, array $expected): void
     {
         $this->property->init(PropertyConfiguration::create($params));
 

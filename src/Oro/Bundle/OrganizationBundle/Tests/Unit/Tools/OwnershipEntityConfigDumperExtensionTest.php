@@ -12,20 +12,15 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
 use Oro\Bundle\OrganizationBundle\Tools\OwnershipEntityConfigDumperExtension;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
+class OwnershipEntityConfigDumperExtensionTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var RelationBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $relationBuilder;
-
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipMetadataProvider;
-
-    /** @var OwnershipEntityConfigDumperExtension */
-    private $extension;
+    private ConfigManager&MockObject $configManager;
+    private RelationBuilder&MockObject $relationBuilder;
+    private OwnershipMetadataProviderInterface&MockObject $ownershipMetadataProvider;
+    private OwnershipEntityConfigDumperExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -41,14 +36,14 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCa
         );
     }
 
-    public function testSupportsPreUpdate()
+    public function testSupportsPreUpdate(): void
     {
         $this->assertTrue(
             $this->extension->supports(ExtendConfigDumper::ACTION_PRE_UPDATE)
         );
     }
 
-    public function testSupportsPostUpdate()
+    public function testSupportsPostUpdate(): void
     {
         $this->assertFalse(
             $this->extension->supports(ExtendConfigDumper::ACTION_POST_UPDATE)
@@ -59,7 +54,7 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCa
      * @dataProvider preUpdateProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testPreUpdate($ownerType, $getOwnerClassMethodName, $getOwnerClassMethodNameCalls)
+    public function testPreUpdate($ownerType, $getOwnerClassMethodName, $getOwnerClassMethodNameCalls): void
     {
         $extendConfig1 = new Config(new EntityConfigId('extend', 'Test\Entity1'));
         $extendConfig1->set('owner', ExtendScope::OWNER_CUSTOM);
@@ -86,7 +81,7 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCa
         $ownershipConfig1->set('organization_field_name', 'organization_field');
         $ownershipConfig2 = new Config(new EntityConfigId('ownership', 'Test\Entity2'));
 
-        $extendConfigs    = [$extendConfig1, $extendConfig3, $extendConfig3, $extendConfig4, $extendConfig5];
+        $extendConfigs = [$extendConfig1, $extendConfig3, $extendConfig3, $extendConfig4, $extendConfig5];
         $ownershipConfigs = [$ownershipConfig1, $ownershipConfig2];
 
         $extendConfigProvider = $this->createMock(ConfigProvider::class);

@@ -25,7 +25,7 @@ class PreciseOrderByWalkerTest extends OrmTestCase
     /**
      * @dataProvider queryModificationProvider
      */
-    public function testQueryModification(string $dql, string $expectedSql)
+    public function testQueryModification(string $dql, string $expectedSql): void
     {
         $query = $this->em->createQuery($dql);
         $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, [PreciseOrderByWalker::class]);

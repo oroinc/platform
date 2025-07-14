@@ -11,20 +11,15 @@ use Oro\Component\Layout\LayoutFactory;
 use Oro\Component\Layout\LayoutRegistryInterface;
 use Oro\Component\Layout\LayoutRendererRegistryInterface;
 use Oro\Component\Layout\RawLayoutBuilderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LayoutFactoryTest extends \PHPUnit\Framework\TestCase
+class LayoutFactoryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $rendererRegistry;
-
-    /** @var ExpressionProcessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $expressionProcessor;
-
-    /** @var LayoutFactory */
-    private $layoutFactory;
+    private LayoutRegistryInterface&MockObject $registry;
+    private LayoutRendererRegistryInterface&MockObject $rendererRegistry;
+    private ExpressionProcessor&MockObject $expressionProcessor;
+    private LayoutFactory $layoutFactory;
 
     #[\Override]
     protected function setUp(): void
@@ -40,17 +35,17 @@ class LayoutFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetRegistry()
+    public function testGetRegistry(): void
     {
         $this->assertSame($this->registry, $this->layoutFactory->getRegistry());
     }
 
-    public function testGetRendererRegistry()
+    public function testGetRendererRegistry(): void
     {
         $this->assertSame($this->rendererRegistry, $this->layoutFactory->getRendererRegistry());
     }
 
-    public function testGetType()
+    public function testGetType(): void
     {
         $name = 'test';
         $type = $this->createMock(BlockTypeInterface::class);
@@ -63,7 +58,7 @@ class LayoutFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($type, $this->layoutFactory->getType($name));
     }
 
-    public function testCreateRawLayoutBuilder()
+    public function testCreateRawLayoutBuilder(): void
     {
         $this->assertInstanceOf(
             RawLayoutBuilderInterface::class,
@@ -71,7 +66,7 @@ class LayoutFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateLayoutManipulator()
+    public function testCreateLayoutManipulator(): void
     {
         $rawLayoutBuilder = $this->createMock(RawLayoutBuilderInterface::class);
 
@@ -81,7 +76,7 @@ class LayoutFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateBlockFactory()
+    public function testCreateBlockFactory(): void
     {
         $layoutManipulator = $this->createMock(DeferredLayoutManipulatorInterface::class);
 
@@ -91,7 +86,7 @@ class LayoutFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateLayoutBuilder()
+    public function testCreateLayoutBuilder(): void
     {
         $this->assertInstanceOf(
             LayoutBuilderInterface::class,

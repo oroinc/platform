@@ -3,13 +3,13 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Util;
 
 use Oro\Bundle\SecurityBundle\Util\UriSecurityHelper;
+use PHPUnit\Framework\TestCase;
 
-class UriSecurityHelperTest extends \PHPUnit\Framework\TestCase
+class UriSecurityHelperTest extends TestCase
 {
     private const PROTOCOLS = ['sample-proto1', 'sample-proto2'];
 
-    /** @var UriSecurityHelper */
-    private $helper;
+    private UriSecurityHelper $helper;
 
     #[\Override]
     protected function setUp(): void

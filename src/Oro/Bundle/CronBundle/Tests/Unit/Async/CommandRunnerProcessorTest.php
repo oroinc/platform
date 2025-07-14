@@ -8,21 +8,16 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
+class CommandRunnerProcessorTest extends TestCase
 {
-    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRunner;
-
-    /** @var CommandRunnerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $commandRunner;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var CommandRunnerProcessor */
-    private $commandRunnerProcessor;
+    private JobRunner&MockObject $jobRunner;
+    private CommandRunnerInterface&MockObject $commandRunner;
+    private LoggerInterface&MockObject $logger;
+    private CommandRunnerProcessor $commandRunnerProcessor;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +33,7 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider jobDataProvider
      */
-    public function testProcessUniqueJob(bool $jobResult, string $expectedResult)
+    public function testProcessUniqueJob(bool $jobResult, string $expectedResult): void
     {
         $commandName = 'test:command';
         $commandArguments = ['argKey' => 'argVal'];
@@ -67,7 +62,7 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider jobDataProvider
      */
-    public function testProcessDelayedJob(bool $jobResult, string $expectedResult)
+    public function testProcessDelayedJob(bool $jobResult, string $expectedResult): void
     {
         $jobId = 'job_id';
         $commandName = 'test:command';

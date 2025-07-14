@@ -7,16 +7,15 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterDecorator;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-class AclVoterDecoratorTest extends \PHPUnit\Framework\TestCase
+class AclVoterDecoratorTest extends TestCase
 {
-    /** @var AclVoterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $wrapped;
-
-    /** @var AclVoterDecorator */
-    private $decorator;
+    private AclVoterInterface&MockObject $wrapped;
+    private AclVoterDecorator $decorator;
 
     #[\Override]
     protected function setUp(): void

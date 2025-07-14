@@ -9,20 +9,15 @@ use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
+class WebSocketSendProcessorTest extends TestCase
 {
-    /** @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $websocketClient;
-
-    /** @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $connectionChecker;
-
-    /** @var MessageParamsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $messageParamsProvider;
-
-    /** @var WebSocketSendProcessor */
-    private $processor;
+    private WebsocketClientInterface&MockObject $websocketClient;
+    private ConnectionChecker&MockObject $connectionChecker;
+    private MessageParamsProvider&MockObject $messageParamsProvider;
+    private WebSocketSendProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +33,7 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPush()
+    public function testPush(): void
     {
         $fooUserId = 100;
         $fooUser = $this->createUser($fooUserId);
@@ -62,7 +57,7 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $fooUserId = 100;
         $fooUser = $this->createUser($fooUserId);
@@ -114,7 +109,7 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process();
     }
 
-    public function testProcessFail()
+    public function testProcessFail(): void
     {
         $fooUserId = 100;
         $fooUser = $this->createUser($fooUserId);
@@ -164,7 +159,7 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process();
     }
 
-    public function testProcessNoConnection()
+    public function testProcessNoConnection(): void
     {
         $fooUserId = 100;
         $fooUser = $this->createUser($fooUserId);
@@ -193,7 +188,7 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process();
     }
 
-    public function testGetLabel()
+    public function testGetLabel(): void
     {
         $this->assertEquals(
             'oro.reminder.processor.web_socket.label',
@@ -201,10 +196,7 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return Reminder|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createReminder(User $recipient)
+    private function createReminder(User $recipient): Reminder&MockObject
     {
         $result = $this->createMock(Reminder::class);
         $result->expects($this->atLeastOnce())
@@ -214,10 +206,7 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    /**
-     * @return User|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createUser(int $userId)
+    private function createUser(int $userId): User&MockObject
     {
         $result = $this->createMock(User::class);
         $result->expects($this->atLeastOnce())

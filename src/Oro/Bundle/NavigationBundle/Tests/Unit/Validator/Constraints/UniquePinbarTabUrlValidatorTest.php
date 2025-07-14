@@ -12,6 +12,7 @@ use Oro\Bundle\NavigationBundle\Validator\Constraints\UniquePinbarTabUrl;
 use Oro\Bundle\NavigationBundle\Validator\Constraints\UniquePinbarTabUrlValidator;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class UniquePinbarTabUrlValidatorTest extends ConstraintValidatorTestCase
@@ -21,11 +22,8 @@ class UniquePinbarTabUrlValidatorTest extends ConstraintValidatorTestCase
     private const TYPE = 'sample-type';
     private const PINBAR_TAB_CLASS_NAME = PinbarTabStub::class;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var PinbarTabUrlNormalizerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $pinbarTabUrlNormalizer;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private PinbarTabUrlNormalizerInterface&MockObject $pinbarTabUrlNormalizer;
 
     #[\Override]
     protected function setUp(): void

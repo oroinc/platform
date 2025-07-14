@@ -6,8 +6,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class RecipientListTest extends \PHPUnit\Framework\TestCase
+class RecipientListTest extends TestCase
 {
     private RecipientList $entity;
 

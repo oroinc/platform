@@ -7,31 +7,22 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Form\Handler\SegmentHandler;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class SegmentHandlerTest extends \PHPUnit\Framework\TestCase
+class SegmentHandlerTest extends TestCase
 {
     private const FORM_DATA = ['field' => 'value'];
 
-    /** @var Form|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
-
-    /** @var Request */
-    private $request;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
-
-    /** @var StaticSegmentManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $staticSegmentManager;
-
-    /** @var Segment|\PHPUnit\Framework\MockObject\MockObject */
-    private $entity;
-
-    /** @var SegmentHandler */
-    private $handler;
+    private Form&MockObject $form;
+    private Request $request;
+    private ManagerRegistry&MockObject $managerRegistry;
+    private StaticSegmentManager&MockObject $staticSegmentManager;
+    private Segment&MockObject $entity;
+    private SegmentHandler $handler;
 
     #[\Override]
     protected function setUp(): void

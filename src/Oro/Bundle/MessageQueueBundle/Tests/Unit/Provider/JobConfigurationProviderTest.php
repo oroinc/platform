@@ -3,17 +3,18 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\MessageQueueBundle\Provider\JobConfigurationProvider;
+use PHPUnit\Framework\TestCase;
 
-class JobConfigurationProviderTest extends \PHPUnit\Framework\TestCase
+class JobConfigurationProviderTest extends TestCase
 {
-    public function testTimeBeforeStaleIsTakenFromDefaultIfNoneJobNameMatch()
+    public function testTimeBeforeStaleIsTakenFromDefaultIfNoneJobNameMatch(): void
     {
         $provider = new JobConfigurationProvider();
         $provider->setConfiguration(['default' => 1, 'jobs' => ['job1' => 2]]);
         $this->assertEquals(1, $provider->getTimeBeforeStaleForJobName('job2'));
     }
 
-    public function testTimeBeforeStaleIsNullWhenConfigurationDoesNotHaveAnyDefaultValue()
+    public function testTimeBeforeStaleIsNullWhenConfigurationDoesNotHaveAnyDefaultValue(): void
     {
         $provider = new JobConfigurationProvider();
         $this->assertNull($provider->getTimeBeforeStaleForJobName('job'));
@@ -22,7 +23,7 @@ class JobConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProviderForJobNames
      */
-    public function testTimeBeforeStaleForJobName(string $jobName, array $configuration, int $expectedTime)
+    public function testTimeBeforeStaleForJobName(string $jobName, array $configuration, int $expectedTime): void
     {
         $provider = new JobConfigurationProvider();
         $provider->setConfiguration($configuration);

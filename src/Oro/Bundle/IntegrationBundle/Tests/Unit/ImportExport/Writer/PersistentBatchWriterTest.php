@@ -14,25 +14,18 @@ use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 use Oro\Bundle\IntegrationBundle\Event\WriterErrorEvent;
 use Oro\Bundle\IntegrationBundle\ImportExport\Writer\PersistentBatchWriter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class PersistentBatchWriterTest extends \PHPUnit\Framework\TestCase
+class PersistentBatchWriterTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextRegistry;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
+    private ManagerRegistry&MockObject $registry;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private ContextRegistry&MockObject $contextRegistry;
+    private LoggerInterface&MockObject $logger;
+    private EntityManager&MockObject $entityManager;
 
     #[\Override]
     protected function setUp(): void
@@ -43,7 +36,8 @@ class PersistentBatchWriterTest extends \PHPUnit\Framework\TestCase
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->entityManager = $this->createMock(EntityManager::class);
 
-        $this->registry->expects($this->any())->method('getManager')
+        $this->registry->expects($this->any())
+            ->method('getManager')
             ->willReturn($this->entityManager);
     }
 
@@ -174,10 +168,7 @@ class PersistentBatchWriterTest extends \PHPUnit\Framework\TestCase
         return $context;
     }
 
-    /**
-     * @param StepExecution|\PHPUnit\Framework\MockObject\MockObject $stepExecution
-     */
-    private function expectGetJobName($stepExecution): void
+    private function expectGetJobName(StepExecution&MockObject $stepExecution): void
     {
         $jobInstance = new JobInstance(null, null, 'test');
         $jobExecution = new JobExecution();

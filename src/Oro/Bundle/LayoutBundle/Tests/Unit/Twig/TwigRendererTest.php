@@ -7,26 +7,20 @@ use Oro\Bundle\LayoutBundle\Cache\RenderCache;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererEngineInterface;
 use Oro\Bundle\LayoutBundle\Twig\TwigRenderer;
 use Oro\Component\Layout\LayoutContextStack;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Twig\Environment;
 
-class TwigRendererTest extends \PHPUnit\Framework\TestCase
+class TwigRendererTest extends TestCase
 {
-    /** @var TwigRendererEngineInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $twigRendererEngine;
-
+    private TwigRendererEngineInterface&MockObject $twigRendererEngine;
     private LayoutContextStack $layoutContextStack;
 
-    private RenderCache|\PHPUnit\Framework\MockObject\MockObject $rendererCache;
-
-    /** @var PlaceholderRenderer|\PHPUnit\Framework\MockObject\MockObject */
-    private $placeholderRenderer;
-
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $environment;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
+    private RenderCache&MockObject $rendererCache;
+    private PlaceholderRenderer&MockObject $placeholderRenderer;
+    private Environment&MockObject $environment;
+    private LoggerInterface&MockObject $logger;
 
     #[\Override]
     protected function setUp(): void

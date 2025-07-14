@@ -5,11 +5,12 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Util;
 use Oro\Component\MessageQueue\Tests\Unit\Util\Fixtures\JsonSerializableClass;
 use Oro\Component\MessageQueue\Tests\Unit\Util\Fixtures\SimpleClass;
 use Oro\Component\MessageQueue\Util\JSON;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class JSONTest extends \PHPUnit\Framework\TestCase
+class JSONTest extends TestCase
 {
     public function testShouldDecodeString(): void
     {

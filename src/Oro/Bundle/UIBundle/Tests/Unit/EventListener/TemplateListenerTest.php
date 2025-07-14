@@ -5,6 +5,8 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\EventListener;
 use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\UIBundle\EventListener\TemplateListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,19 +17,12 @@ use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\Loader\LoaderInterface;
 
-class TemplateListenerTest extends \PHPUnit\Framework\TestCase
+class TemplateListenerTest extends TestCase
 {
-    /** @var Request */
-    private $request;
-
-    /** @var ViewEvent|\PHPUnit\Framework\MockObject\MockObject */
-    private $event;
-
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $twig;
-
-    /** @var TemplateListener */
-    private $listener;
+    private Request $request;
+    private ViewEvent $event;
+    private Environment&MockObject $twig;
+    private TemplateListener $listener;
 
     #[\Override]
     protected function setUp(): void

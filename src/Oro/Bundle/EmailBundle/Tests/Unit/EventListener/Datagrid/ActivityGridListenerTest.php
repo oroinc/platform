@@ -33,8 +33,8 @@ class ActivityGridListenerTest extends TestCase
     public function testOnBuildAfter(): void
     {
         $encodedEntityClass = 'Test_Entity';
-        $entityClass        = 'Test\Entity';
-        $entityId           = 123;
+        $entityClass = 'Test\Entity';
+        $entityId = 123;
 
         $parameters = new ParameterBag(['entityClass' => $encodedEntityClass, 'entityId' => $entityId]);
         $datasource = $this->createMock(OrmDatasource::class);
@@ -67,8 +67,8 @@ class ActivityGridListenerTest extends TestCase
     public function testOnBuildAfterForUser(): void
     {
         $encodedEntityClass = 'Test_Entity';
-        $entityClass        = 'Test\Entity';
-        $entityId           = 123;
+        $entityClass = 'Test\Entity';
+        $entityId = 123;
 
         $parameters = new ParameterBag(['entityClass' => $encodedEntityClass, 'entityId' => $entityId]);
         $datasource = $this->createMock(OrmDatasource::class);

@@ -14,20 +14,11 @@ use PHPUnit\Framework\TestCase;
 
 class ChannelDeleteManagerTest extends TestCase
 {
-    /** @var Integration */
-    private $testIntegration;
-
-    /** @var EntityManager|MockObject */
-    private $em;
-
-    /** @var ClassMetadata|MockObject */
-    private $entityMetadata;
-
-    /** @var Connection|MockObject */
-    private $connection;
-
-    /** @var DeleteManager */
-    private $deleteManager;
+    private Integration $testIntegration;
+    private EntityManager&MockObject $em;
+    private ClassMetadata&MockObject $entityMetadata;
+    private Connection&MockObject $connection;
+    private DeleteManager $deleteManager;
 
     #[\Override]
     protected function setUp(): void
@@ -47,7 +38,7 @@ class ChannelDeleteManagerTest extends TestCase
         $this->deleteManager->addProvider(new TestIntegrationDeleteProvider());
     }
 
-    public function testDeleteChannelWithoutErrors()
+    public function testDeleteChannelWithoutErrors(): void
     {
         $this->entityMetadata->expects(self::once())
             ->method('getTableName')
@@ -67,7 +58,7 @@ class ChannelDeleteManagerTest extends TestCase
         $this->assertTrue($this->deleteManager->delete($this->testIntegration));
     }
 
-    public function testDeleteIntegrationWithErrors()
+    public function testDeleteIntegrationWithErrors(): void
     {
         $this->entityMetadata->expects(self::once())
             ->method('getTableName')

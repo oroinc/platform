@@ -8,13 +8,13 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class IncreaseValueTest extends \PHPUnit\Framework\TestCase
+class IncreaseValueTest extends TestCase
 {
-    /** @var IncreaseValue */
-    private $action;
+    private IncreaseValue $action;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +23,7 @@ class IncreaseValueTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $options = [
             'attribute' => new PropertyPath('test'),
@@ -34,7 +34,7 @@ class IncreaseValueTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
-    public function testInitializeNoParametersException()
+    public function testInitializeNoParametersException(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute parameter is required.');
@@ -42,7 +42,7 @@ class IncreaseValueTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize([]);
     }
 
-    public function testInitializeNoAttributeException()
+    public function testInitializeNoAttributeException(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute must be defined.');
@@ -50,7 +50,7 @@ class IncreaseValueTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize(['test' => 'test']);
     }
 
-    public function testInitializeInvalidAttributeException()
+    public function testInitializeInvalidAttributeException(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute must be valid property definition.');
@@ -58,7 +58,7 @@ class IncreaseValueTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize(['attribute' => 'test']);
     }
 
-    public function testInitializeInvalidValueExceptionWithString()
+    public function testInitializeInvalidValueExceptionWithString(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Value must be integer.');
@@ -66,7 +66,7 @@ class IncreaseValueTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize(['attribute' => new PropertyPath('test'), 'value' => 'string']);
     }
 
-    public function testInitializeInvalidValueExceptionWithPropertyPath()
+    public function testInitializeInvalidValueExceptionWithPropertyPath(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Value must be integer.');
@@ -74,7 +74,7 @@ class IncreaseValueTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize(['attribute' => new PropertyPath('test'), 'value' => new PropertyPath('test2')]);
     }
 
-    public function testExecuteActionWithoutValueParam()
+    public function testExecuteActionWithoutValueParam(): void
     {
         $options = ['attribute' => new PropertyPath('test')];
         $context = new StubStorage(['test' => 100]);
@@ -88,7 +88,7 @@ class IncreaseValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeActionDataProvider
      */
-    public function testExecuteAction(int $value, int $expected)
+    public function testExecuteAction(int $value, int $expected): void
     {
         $options = ['attribute' => new PropertyPath('test'), 'value' => $value];
         $context = new StubStorage(['test' => 100]);

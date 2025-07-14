@@ -4,11 +4,11 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Serializer;
 
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Serializer\ParameterBagNormalizer;
+use PHPUnit\Framework\TestCase;
 
-class ParameterBagNormalizerTest extends \PHPUnit\Framework\TestCase
+class ParameterBagNormalizerTest extends TestCase
 {
-    /** @var ParameterBagNormalizer */
-    private $normalizer;
+    private ParameterBagNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void
@@ -19,19 +19,19 @@ class ParameterBagNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDataProvider
      */
-    public function testSupportsNormalization(object $object, bool $expected)
+    public function testSupportsNormalization(object $object, bool $expected): void
     {
         $this->assertSame($expected, $this->normalizer->supportsNormalization($object));
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $data = ['_attribute1' => 'value1', '_attribute2' => 'value2'];
         $parameters = new ParameterBag($data);
         $this->assertEquals($data, $this->normalizer->normalize($parameters));
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $data = ['_attribute1' => 'value1', '_attribute2' => 'value2'];
         $parameters = new ParameterBag($data);

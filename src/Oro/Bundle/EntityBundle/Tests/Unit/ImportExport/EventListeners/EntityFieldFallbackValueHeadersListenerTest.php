@@ -5,11 +5,11 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\ImportExport\EventListeners;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\ImportExport\EventListeners\EntityFieldFallbackValueHeadersListener;
 use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
+use PHPUnit\Framework\TestCase;
 
-class EntityFieldFallbackValueHeadersListenerTest extends \PHPUnit\Framework\TestCase
+class EntityFieldFallbackValueHeadersListenerTest extends TestCase
 {
-    /** @var EntityFieldFallbackValueHeadersListener */
-    private $listener;
+    private EntityFieldFallbackValueHeadersListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +17,7 @@ class EntityFieldFallbackValueHeadersListenerTest extends \PHPUnit\Framework\Tes
         $this->listener = new EntityFieldFallbackValueHeadersListener();
     }
 
-    public function testAfterLoadEntityRulesAndBackendHeaders()
+    public function testAfterLoadEntityRulesAndBackendHeaders(): void
     {
         $event = new LoadEntityRulesAndBackendHeadersEvent(EntityFieldFallbackValue::class, [], [], ':', 'full', true);
         $this->listener->afterLoadEntityRulesAndBackendHeaders($event);
@@ -25,7 +25,7 @@ class EntityFieldFallbackValueHeadersListenerTest extends \PHPUnit\Framework\Tes
         $this->assertSame(['value' => ['value' => 'value', 'order' => 10005]], $event->getRules());
     }
 
-    public function testAfterLoadEntityRulesAndBackendHeadersDuplicateHeader()
+    public function testAfterLoadEntityRulesAndBackendHeadersDuplicateHeader(): void
     {
         $event = new LoadEntityRulesAndBackendHeadersEvent(
             EntityFieldFallbackValue::class,

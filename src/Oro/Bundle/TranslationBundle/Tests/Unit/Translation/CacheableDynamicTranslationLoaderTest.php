@@ -8,23 +8,16 @@ use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationLoaderInterface;
 use Oro\Bundle\TranslationBundle\Translation\TranslationMessageSanitizationError;
 use Oro\Bundle\TranslationBundle\Translation\TranslationMessageSanitizationErrorCollection;
 use Oro\Bundle\TranslationBundle\Translation\TranslationsSanitizer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CacheableDynamicTranslationLoaderTest extends \PHPUnit\Framework\TestCase
+class CacheableDynamicTranslationLoaderTest extends TestCase
 {
-    /** @var DynamicTranslationLoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $loader;
-
-    /** @var DynamicTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var TranslationsSanitizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $sanitizer;
-
-    /** @var TranslationMessageSanitizationErrorCollection */
-    private $sanitizationErrorCollection;
-
-    /** @var CacheableDynamicTranslationLoader */
-    private $cacheableLoader;
+    private DynamicTranslationLoaderInterface&MockObject $loader;
+    private DynamicTranslationCache&MockObject $cache;
+    private TranslationsSanitizer&MockObject $sanitizer;
+    private TranslationMessageSanitizationErrorCollection $sanitizationErrorCollection;
+    private CacheableDynamicTranslationLoader $cacheableLoader;
 
     #[\Override]
     protected function setUp(): void

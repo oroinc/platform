@@ -7,17 +7,15 @@ use Oro\Bundle\LocaleBundle\Form\Type\FormattingSelectType;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class FormattingSelectTypeTest extends FormIntegrationTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LocalizationChoicesProvider */
-    private $provider;
-
-    /** @var AbstractType */
-    private $formType;
+    private LocalizationChoicesProvider&MockObject $provider;
+    private AbstractType $formType;
 
     #[\Override]
     protected function setUp(): void

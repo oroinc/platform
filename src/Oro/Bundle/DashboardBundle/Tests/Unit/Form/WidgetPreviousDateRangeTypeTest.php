@@ -3,12 +3,12 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Form;
 
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetPreviousDateRangeType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
-class WidgetPreviousDateRangeTypeTest extends \PHPUnit\Framework\TestCase
+class WidgetPreviousDateRangeTypeTest extends TestCase
 {
-    /** @var WidgetPreviousDateRangeType */
-    private $formType;
+    private WidgetPreviousDateRangeType $formType;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class WidgetPreviousDateRangeTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType = new WidgetPreviousDateRangeType();
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(CheckboxType::class, $this->formType->getParent());
     }

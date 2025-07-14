@@ -6,18 +6,15 @@ use Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider;
 use Oro\Bundle\UIBundle\Provider\LabelProviderInterface;
 use Oro\Bundle\UIBundle\Provider\WidgetProviderInterface;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class GroupingChainWidgetProviderTest extends \PHPUnit\Framework\TestCase
+class GroupingChainWidgetProviderTest extends TestCase
 {
-    /** @var WidgetProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $highPriorityProvider;
-
-    /** @var WidgetProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $lowPriorityProvider;
-
-    /** @var WidgetProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $unsupportedProvider;
+    private WidgetProviderInterface&MockObject $highPriorityProvider;
+    private WidgetProviderInterface&MockObject $lowPriorityProvider;
+    private WidgetProviderInterface&MockObject $unsupportedProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -27,13 +24,13 @@ class GroupingChainWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->unsupportedProvider = $this->createMock(WidgetProviderInterface::class);
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $chainProvider = $this->getChainProvider(false, false);
         $this->assertTrue($chainProvider->supports(new \stdClass()));
     }
 
-    public function testGetWidgetsWithoutGroupNameProvider()
+    public function testGetWidgetsWithoutGroupNameProvider(): void
     {
         $chainProvider = $this->getChainProvider();
 
@@ -104,7 +101,7 @@ class GroupingChainWidgetProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetWidgetsWithGroupNameProvider()
+    public function testGetWidgetsWithGroupNameProvider(): void
     {
         $chainProvider = $this->getChainProvider(true);
 

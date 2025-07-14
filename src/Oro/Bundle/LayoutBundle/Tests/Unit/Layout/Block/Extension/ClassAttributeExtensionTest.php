@@ -11,11 +11,11 @@ use Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\OptionValueBag;
+use PHPUnit\Framework\TestCase;
 
-class ClassAttributeExtensionTest extends \PHPUnit\Framework\TestCase
+class ClassAttributeExtensionTest extends TestCase
 {
-    /** @var ClassAttributeExtension */
-    private $extension;
+    private ClassAttributeExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -29,12 +29,12 @@ class ClassAttributeExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new ClassAttributeExtension($encoderRegistry);
     }
 
-    public function testGetExtendedType()
+    public function testGetExtendedType(): void
     {
         $this->assertEquals(BaseType::NAME, $this->extension->getExtendedType());
     }
 
-    public function testFinishViewEvaluatesClassAttrExpression()
+    public function testFinishViewEvaluatesClassAttrExpression(): void
     {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
@@ -55,7 +55,7 @@ class ClassAttributeExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test_class', $view->vars['attr']['class']);
     }
 
-    public function testFinishViewEvaluatesClassAttrExpressionAndRemovesEmptyClass()
+    public function testFinishViewEvaluatesClassAttrExpressionAndRemovesEmptyClass(): void
     {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
@@ -76,7 +76,7 @@ class ClassAttributeExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayNotHasKey('class', $view->vars['attr']);
     }
 
-    public function testFinishViewDoNothingIfEvaluationOfExpressionsDisabledAndEncodingIsNotSet()
+    public function testFinishViewDoNothingIfEvaluationOfExpressionsDisabledAndEncodingIsNotSet(): void
     {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
@@ -97,7 +97,7 @@ class ClassAttributeExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($classAttr, $view->vars['attr']['class']);
     }
 
-    public function testFinishViewEncodesClassAttrExpression()
+    public function testFinishViewEncodesClassAttrExpression(): void
     {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
@@ -119,7 +119,7 @@ class ClassAttributeExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('{"@actions":[{"name":"add","args":["test_class"]}]}', $view->vars['attr']['class']);
     }
 
-    public function testFinishViewRemovesEmptyClassWhenEncodingEnabled()
+    public function testFinishViewRemovesEmptyClassWhenEncodingEnabled(): void
     {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');

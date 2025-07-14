@@ -5,13 +5,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Translation\WorkflowDefinitionTranslationFieldsIterator;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit\Framework\TestCase
+class WorkflowDefinitionTranslationFieldsIteratorTest extends TestCase
 {
     /**
      * @dataProvider readWorkflowDefinitionFieldsProvider
      */
-    public function testReadWorkflowDefinition(WorkflowDefinition $definition, array $expected)
+    public function testReadWorkflowDefinition(WorkflowDefinition $definition, array $expected): void
     {
         $iterator = new WorkflowDefinitionTranslationFieldsIterator($definition);
         $this->assertEquals($expected, iterator_to_array($iterator));
@@ -117,7 +118,7 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit\Framework
     public function testWriteWorkflowDefinition(
         WorkflowDefinition $actualDefinition,
         WorkflowDefinition $expectedDefinitionState
-    ) {
+    ): void {
         $iterator = new WorkflowDefinitionTranslationFieldsIterator($actualDefinition);
         $values = [];
         foreach ($iterator as $key => $value) {

@@ -11,11 +11,13 @@ use Oro\Component\MessageQueue\Log\Processor\AddConsumerStateProcessor;
 use Oro\Component\MessageQueue\Tests\Unit\Log\Processor\Stub\ExtensionProxy;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\PhpUtils\Formatter\BytesFormatter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class AddConsumerStateProcessorTest extends \PHPUnit\Framework\TestCase
+class AddConsumerStateProcessorTest extends TestCase
 {
     /** Simple test message */
     private const MESSAGE = ['message' => 'test', 'extra' => []];
@@ -29,15 +31,14 @@ class AddConsumerStateProcessorTest extends \PHPUnit\Framework\TestCase
         $this->consumerState = new ConsumerState();
 
         $messageToArrayConverter = $this->createMock(MessageToArrayConverterInterface::class);
-        $messageToArrayConverter
-            ->expects(self::any())
+        $messageToArrayConverter->expects(self::any())
             ->method('convert')
             ->willReturnCallback(static fn (MessageInterface $message) => ['id' => $message->getMessageId()]);
 
         $this->processor = new AddConsumerStateProcessor($this->consumerState, $messageToArrayConverter);
     }
 
-    private function getMessageMock(string $messageId): MessageInterface|\PHPUnit\Framework\MockObject\MockObject
+    private function getMessageMock(string $messageId): MessageInterface&MockObject
     {
         $message = $this->createMock(MessageInterface::class);
         $message->expects(self::any())
@@ -94,7 +95,6 @@ class AddConsumerStateProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testAddExtensionInfoForLazyService(): void
     {
-        /** @var ExtensionInterface|\PHPUnit\Framework\MockObject\MockObject $extension */
         $extension = $this->createMock(ExtensionInterface::class);
         $extensionProxy = new ExtensionProxy($extension);
 

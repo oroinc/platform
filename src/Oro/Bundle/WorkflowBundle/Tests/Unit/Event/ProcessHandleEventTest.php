@@ -5,17 +5,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Event;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Event\ProcessHandleEvent;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ProcessHandleEventTest extends \PHPUnit\Framework\TestCase
+class ProcessHandleEventTest extends TestCase
 {
-    /** @var ProcessTrigger|\PHPUnit\Framework\MockObject\MockObject */
-    private $processTrigger;
-
-    /** @var ProcessData|\PHPUnit\Framework\MockObject\MockObject */
-    private $processData;
-
-    /** @var ProcessHandleEvent */
-    private $event;
+    private ProcessTrigger&MockObject $processTrigger;
+    private ProcessData&MockObject $processData;
+    private ProcessHandleEvent $event;
 
     #[\Override]
     protected function setUp(): void
@@ -26,12 +23,12 @@ class ProcessHandleEventTest extends \PHPUnit\Framework\TestCase
         $this->event = new ProcessHandleEvent($this->processTrigger, $this->processData);
     }
 
-    public function testGetProcessTriggerWorks()
+    public function testGetProcessTriggerWorks(): void
     {
         $this->assertSame($this->processTrigger, $this->event->getProcessTrigger());
     }
 
-    public function testGetProcessDataWorks()
+    public function testGetProcessDataWorks(): void
     {
         $this->assertSame($this->processData, $this->event->getProcessData());
     }

@@ -6,6 +6,8 @@ use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Bundle\SecurityBundle\Csrf\CookieTokenStorage;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Oro\Bundle\SecurityBundle\EventListener\CsrfProtectionRequestListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,16 +17,11 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
-class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
+class CsrfProtectionRequestListenerTest extends TestCase
 {
-    /** @var CsrfRequestManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $csrfRequestManager;
-
-    /** @var CsrfTokenManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $csrfTokenManager;
-
-    /** @var CsrfProtectionRequestListener */
-    private $listener;
+    private CsrfRequestManager&MockObject $csrfRequestManager;
+    private CsrfTokenManagerInterface&MockObject $csrfTokenManager;
+    private CsrfProtectionRequestListener $listener;
 
     #[\Override]
     protected function setUp(): void

@@ -3,10 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid\Action;
 
 use Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowActivateAction;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowActivateActionTest extends \PHPUnit\Framework\TestCase
+class WorkflowActivateActionTest extends TestCase
 {
-    public function testGetOptions()
+    public function testGetOptions(): void
     {
         $action = new WorkflowActivateAction();
         $options = $action->getOptions()->toArray();

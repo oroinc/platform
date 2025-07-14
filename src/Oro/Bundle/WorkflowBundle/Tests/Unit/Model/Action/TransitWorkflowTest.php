@@ -11,16 +11,15 @@ use Oro\Component\Action\Exception\ActionException;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class TransitWorkflowTest extends \PHPUnit\Framework\TestCase
+class TransitWorkflowTest extends TestCase
 {
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var TransitWorkflow */
-    private $action;
+    private WorkflowManager&MockObject $workflowManager;
+    private TransitWorkflow $action;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +30,7 @@ class TransitWorkflowTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
-    public function testExecuteWorks()
+    public function testExecuteWorks(): void
     {
         $expectedEntity = new \stdClass();
         $expectedParameter = new \DateTime();
@@ -75,7 +74,7 @@ class TransitWorkflowTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    public function testExecuteFailsWhenThereIsNoWorkflowItem()
+    public function testExecuteFailsWhenThereIsNoWorkflowItem(): void
     {
         $this->expectException(ActionException::class);
         $this->expectExceptionMessage('Cannot transit workflow, instance of "stdClass" doesn\'t have workflow item.');
@@ -111,7 +110,7 @@ class TransitWorkflowTest extends \PHPUnit\Framework\TestCase
         string $expectedTransition,
         string $expectedWorkflow,
         array $expectedData = []
-    ) {
+    ): void {
         $this->action->initialize($options);
         self::assertEquals($expectedEntity, ReflectionUtil::getPropertyValue($this->action, 'entity'));
         self::assertEquals($expectedTransition, ReflectionUtil::getPropertyValue($this->action, 'transition'));
@@ -184,7 +183,7 @@ class TransitWorkflowTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage): void
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);

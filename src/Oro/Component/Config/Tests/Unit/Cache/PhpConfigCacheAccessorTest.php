@@ -4,10 +4,11 @@ namespace Oro\Component\Config\Tests\Unit\Cache;
 
 use Oro\Component\Config\Cache\PhpConfigCacheAccessor;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\ConfigCacheInterface;
 
-class PhpConfigCacheAccessorTest extends \PHPUnit\Framework\TestCase
+class PhpConfigCacheAccessorTest extends TestCase
 {
     use TempDirExtension;
 
@@ -28,7 +29,7 @@ class PhpConfigCacheAccessorTest extends \PHPUnit\Framework\TestCase
         });
     }
 
-    public function testLoadNotExistingFile()
+    public function testLoadNotExistingFile(): void
     {
         self::assertFileDoesNotExist($this->cacheFile);
 
@@ -38,7 +39,7 @@ class PhpConfigCacheAccessorTest extends \PHPUnit\Framework\TestCase
         $this->accessor->load($this->cache);
     }
 
-    public function testLoadWhenFileContentIsInvalid()
+    public function testLoadWhenFileContentIsInvalid(): void
     {
         file_put_contents($this->cacheFile, sprintf('<?php return %s;', var_export([], true)));
 
@@ -51,7 +52,7 @@ class PhpConfigCacheAccessorTest extends \PHPUnit\Framework\TestCase
         $this->accessor->load($this->cache);
     }
 
-    public function testSaveWhenConfigIsInvalid()
+    public function testSaveWhenConfigIsInvalid(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf(
@@ -62,7 +63,7 @@ class PhpConfigCacheAccessorTest extends \PHPUnit\Framework\TestCase
         $this->accessor->save($this->cache, []);
     }
 
-    public function testSaveWhenConfigIsNull()
+    public function testSaveWhenConfigIsNull(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf(
@@ -73,7 +74,7 @@ class PhpConfigCacheAccessorTest extends \PHPUnit\Framework\TestCase
         $this->accessor->save($this->cache, null);
     }
 
-    public function testSaveAndLoad()
+    public function testSaveAndLoad(): void
     {
         $config = 'test';
 
@@ -84,7 +85,7 @@ class PhpConfigCacheAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         file_put_contents($this->cacheFile, sprintf('<?php return %s;', var_export([], true)));
 
@@ -92,7 +93,7 @@ class PhpConfigCacheAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertFileDoesNotExist($this->cacheFile);
     }
 
-    public function testRemoveWhenCacheFileDoesNotExist()
+    public function testRemoveWhenCacheFileDoesNotExist(): void
     {
         // guard
         self::assertFileDoesNotExist($this->cacheFile);

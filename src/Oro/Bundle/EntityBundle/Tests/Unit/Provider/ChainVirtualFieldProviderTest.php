@@ -8,18 +8,16 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 
-class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
+class ChainVirtualFieldProviderTest extends TestCase
 {
-    /** @var VirtualFieldProviderInterface[]|\PHPUnit\Framework\MockObject\MockObject[] */
-    private $providers = [];
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var ChainVirtualFieldProvider */
-    private $chainProvider;
+    /** @var VirtualFieldProviderInterface[]&MockObject[] */
+    private array $providers = [];
+    private ConfigProvider&MockObject $configProvider;
+    private ChainVirtualFieldProvider $chainProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +30,7 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->chainProvider = new ChainVirtualFieldProvider($this->providers, $this->configProvider);
     }
 
-    public function testIsVirtualFieldByLowPriorityProvider()
+    public function testIsVirtualFieldByLowPriorityProvider(): void
     {
         $this->providers[0]->expects($this->once())
             ->method('isVirtualField')
@@ -44,7 +42,7 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->chainProvider->isVirtualField('testClass', 'testField'));
     }
 
-    public function testIsVirtualFieldByHighPriorityProvider()
+    public function testIsVirtualFieldByHighPriorityProvider(): void
     {
         $this->providers[0]->expects($this->once())
             ->method('isVirtualField')
@@ -58,7 +56,7 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->chainProvider->isVirtualField('testClass', 'testField'));
     }
 
-    public function testIsVirtualFieldNone()
+    public function testIsVirtualFieldNone(): void
     {
         $this->providers[0]->expects($this->once())
             ->method('isVirtualField')
@@ -72,13 +70,13 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->chainProvider->isVirtualField('testClass', 'testField'));
     }
 
-    public function testIsVirtualFieldWithoutChildProviders()
+    public function testIsVirtualFieldWithoutChildProviders(): void
     {
         $chainProvider = new ChainVirtualFieldProvider([], $this->configProvider);
         $this->assertFalse($chainProvider->isVirtualField('testClass', 'testField'));
     }
 
-    public function testGetVirtualFields()
+    public function testGetVirtualFields(): void
     {
         $entityClass = 'testClass';
 
@@ -104,7 +102,7 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVirtualFieldsForNotAccessibleEntity()
+    public function testGetVirtualFieldsForNotAccessibleEntity(): void
     {
         $entityClass = 'testClass';
 
@@ -132,13 +130,13 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVirtualFieldsWithoutChildProviders()
+    public function testGetVirtualFieldsWithoutChildProviders(): void
     {
         $chainProvider = new ChainVirtualFieldProvider([], $this->configProvider);
         $this->assertSame([], $chainProvider->getVirtualFields('testClass'));
     }
 
-    public function testGetVirtualFieldQuery()
+    public function testGetVirtualFieldQuery(): void
     {
         $fieldsConfig = [
             'testClass0' => [
@@ -209,7 +207,7 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testGetVirtualFieldQueryWithoutChildProviders()
+    public function testGetVirtualFieldQueryWithoutChildProviders(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('A query for field "testField" in class "testClass" was not found.');

@@ -3,18 +3,18 @@
 namespace Oro\Component\PhpUtils\Tests\Unit\CommandExecutor;
 
 use Oro\Component\PhpUtils\Tools\CommandExecutor\CommandExecutor;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
-class CommandExecutorTest extends \PHPUnit\Framework\TestCase
+class CommandExecutorTest extends TestCase
 {
     private const ENV = 'dev';
     private const CONSOLE_CMD_PATH = '-r';
     private const NON_DEFAULT_OPTION_NAME = 'non_default_option_name';
     private const DEFAULT_OPTION_NAME = 'default_option_name';
 
-    /** @var CommandExecutor */
-    private $commandExecutor;
+    private CommandExecutor $commandExecutor;
 
     #[\Override]
     protected function setUp(): void

@@ -14,7 +14,7 @@ class LoaderTest extends TestCase
 {
     use TempDirExtension;
 
-    private const string TEST_FILE_SYSTEM_NAME  = 'testFileSystem';
+    private const string TEST_FILE_SYSTEM_NAME = 'testFileSystem';
 
     private string $directory;
     private SymfonyFilesystem $fileSystem;

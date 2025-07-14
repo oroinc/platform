@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class WebsocketRouterConfigurationPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         CumulativeResourceManager::getInstance()
             ->clear()

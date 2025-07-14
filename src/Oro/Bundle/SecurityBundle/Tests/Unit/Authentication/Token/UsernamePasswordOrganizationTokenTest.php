@@ -7,16 +7,15 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\TestCase;
 
-class UsernamePasswordOrganizationTokenTest extends \PHPUnit\Framework\TestCase
+class UsernamePasswordOrganizationTokenTest extends TestCase
 {
     use EntityTrait;
 
-    public function testGetOrganization()
+    public function testGetOrganization(): void
     {
-        /** @var User $user */
         $user = $this->getEntity(User::class, ['id' => 1]);
-        /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 3]);
 
         $token = new UsernamePasswordOrganizationToken($user, 'main', $organization);
@@ -24,15 +23,12 @@ class UsernamePasswordOrganizationTokenTest extends \PHPUnit\Framework\TestCase
         self::assertSame($organization, $token->getOrganization());
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
-        /** @var User $user */
         $user = $this->getEntity(User::class, ['id' => 1]);
         $firewall = 'main';
-        /** @var Role $role */
         $role = $this->getEntity(Role::class, ['id' => 2]);
         $user->addUserRole($role);
-        /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 3]);
 
         $token = new UsernamePasswordOrganizationToken($user, $firewall, $organization, [$role]);

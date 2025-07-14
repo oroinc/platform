@@ -11,21 +11,16 @@ use Oro\Bundle\EntityConfigBundle\ImportExport\Serializer\EntityFieldNormalizer;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
-class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
+class EntityFieldNormalizerTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var FieldTypeProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldTypeProvider;
-
-    /** @var EntityFieldNormalizer */
-    private $normalizer;
+    private ManagerRegistry&MockObject $registry;
+    private ConfigManager&MockObject $configManager;
+    private FieldTypeProvider&MockObject $fieldTypeProvider;
+    private EntityFieldNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +35,7 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsNormalizationProvider
      */
-    public function testSupportsNormalization(mixed $inputData, bool $expected)
+    public function testSupportsNormalization(mixed $inputData, bool $expected): void
     {
         $this->assertEquals($expected, $this->normalizer->supportsNormalization($inputData));
     }
@@ -48,7 +43,7 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDenormalizationProvider
      */
-    public function testSupportsDenormalization(array $inputData, bool $expected)
+    public function testSupportsDenormalization(array $inputData, bool $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -59,7 +54,7 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeProvider
      */
-    public function testNormalize(array $inputData, array $expectedData)
+    public function testNormalize(array $inputData, array $expectedData): void
     {
         $this->configManager->expects($this->once())
             ->method('getProviders')
@@ -74,7 +69,7 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider denormalizeExceptionDataProvider
      */
-    public function testDenormalizeException(array $data)
+    public function testDenormalizeException(array $data): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage("Data doesn't contains entity id");
@@ -100,9 +95,8 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider denormalizeProvider
      */
-    public function testDenormalize(array $inputData, FieldConfigModel $expectedData)
+    public function testDenormalize(array $inputData, FieldConfigModel $expectedData): void
     {
-        /* @var \PHPUnit\Framework\MockObject\MockObject|ObjectManager $objectManager */
         $objectManager = $this->createMock(ObjectManager::class);
 
         $this->registry->expects($this->once())

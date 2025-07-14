@@ -6,23 +6,20 @@ use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ContextHelperTest extends \PHPUnit\Framework\TestCase
+class ContextHelperTest extends TestCase
 {
     private const ROUTE = 'test_route';
     private const REQUEST_URI = '/test/request/uri';
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var ContextHelper */
-    private $helper;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private RequestStack&MockObject $requestStack;
+    private ContextHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +37,7 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getContextDataProvider
      */
-    public function testGetContext(?Request $request, array $expected, int $calls)
+    public function testGetContext(?Request $request, array $expected, int $calls): void
     {
         $this->requestStack->expects($this->exactly($calls))
             ->method('getCurrentRequest')
@@ -107,7 +104,7 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getActionParametersDataProvider
      */
-    public function testGetActionParameters(array $context, array $expected)
+    public function testGetActionParameters(array $context, array $expected): void
     {
         $request = $this->createMock(Request::class);
         $requestAttributes = $this->createMock(ParameterBag::class);
@@ -145,7 +142,7 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->helper->getActionParameters($context));
     }
 
-    public function testGetActionParametersException()
+    public function testGetActionParametersException(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The main request is not defined');
@@ -217,7 +214,7 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
         int $requestStackCalls,
         ActionData $expected,
         ?array $context = null
-    ) {
+    ): void {
         $entity = new \stdClass();
         $entity->id = 42;
 
@@ -349,7 +346,7 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetActionDataWithCache()
+    public function testGetActionDataWithCache(): void
     {
         $entity = new \stdClass();
         $entity->id1 = 42;

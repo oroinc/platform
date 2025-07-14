@@ -19,14 +19,9 @@ use Symfony\Component\DependencyInjection\Container;
 
 class ConnectorContextMediatorTest extends TestCase
 {
-    /** @var ConnectorContextMediator */
-    private $contextMediator;
-
-    /** @var EntityRepository|MockObject */
-    private $repo;
-
-    /** @var TypesRegistry|MockObject */
-    private $registry;
+    private EntityRepository&MockObject $repo;
+    private TypesRegistry&MockObject $registry;
+    private ConnectorContextMediator $contextMediator;
 
     #[\Override]
     protected function setUp(): void
@@ -57,7 +52,7 @@ class ConnectorContextMediatorTest extends TestCase
     /**
      * @dataProvider transportSourceProvider
      */
-    public function testGetTransportFromSource(mixed $source, mixed $exceptionExpected)
+    public function testGetTransportFromSource(mixed $source, mixed $exceptionExpected): void
     {
         if (false !== $exceptionExpected) {
             $this->expectException($exceptionExpected);
@@ -81,7 +76,7 @@ class ConnectorContextMediatorTest extends TestCase
         ];
     }
 
-    public function testGetTransportFromContext()
+    public function testGetTransportFromContext(): void
     {
         $testID = 1;
         $testTransport = new \stdClass();
@@ -107,7 +102,7 @@ class ConnectorContextMediatorTest extends TestCase
         $this->assertEquals($testTransport, $result);
     }
 
-    public function testGetChannelFromContext()
+    public function testGetChannelFromContext(): void
     {
         $testID = 1;
         $integration = new Integration();
@@ -128,7 +123,7 @@ class ConnectorContextMediatorTest extends TestCase
         $this->assertEquals($integration, $result);
     }
 
-    public function testGetInitializedTransport()
+    public function testGetInitializedTransport(): void
     {
         $testTransport = $this->createMock(TransportInterface::class);
         $transportEntity = $this->getMockForAbstractClass(Transport::class);

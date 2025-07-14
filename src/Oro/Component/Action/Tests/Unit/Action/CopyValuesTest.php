@@ -7,13 +7,13 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class CopyValuesTest extends \PHPUnit\Framework\TestCase
+class CopyValuesTest extends TestCase
 {
-    /** @var CopyValues */
-    private $action;
+    private CopyValues $action;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +22,7 @@ class CopyValuesTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $this->action->initialize([
             new PropertyPath('attr'),
@@ -40,14 +40,14 @@ class CopyValuesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInitializeWithEmptyOptions()
+    public function testInitializeWithEmptyOptions(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute and data parameters are required');
         $this->action->initialize([]);
     }
 
-    public function testInitializeWithIncorrectAttribute()
+    public function testInitializeWithIncorrectAttribute(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute must be valid property definition');
@@ -57,7 +57,7 @@ class CopyValuesTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeProvider
      */
-    public function testExecute(array $inputData, array $options, array $expectedData)
+    public function testExecute(array $inputData, array $options, array $expectedData): void
     {
         $context = new ItemStub($inputData);
 

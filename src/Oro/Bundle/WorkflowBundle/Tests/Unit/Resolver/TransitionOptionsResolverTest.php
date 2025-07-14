@@ -6,14 +6,13 @@ use Oro\Bundle\ActionBundle\Resolver\OptionsResolver;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TransitionOptionsResolverTest extends \PHPUnit\Framework\TestCase
+class TransitionOptionsResolverTest extends TestCase
 {
-    /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $optionsResolver;
-
-    /** @var TransitionOptionsResolver */
-    private $transitionOptionsResolver;
+    private OptionsResolver&MockObject $optionsResolver;
+    private TransitionOptionsResolver $transitionOptionsResolver;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class TransitionOptionsResolverTest extends \PHPUnit\Framework\TestCase
         $this->transitionOptionsResolver = new TransitionOptionsResolver($this->optionsResolver);
     }
 
-    public function testResolveTransitionOptions()
+    public function testResolveTransitionOptions(): void
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
 
@@ -42,7 +41,7 @@ class TransitionOptionsResolverTest extends \PHPUnit\Framework\TestCase
         $this->transitionOptionsResolver->resolveTransitionOptions($transition, $workflowItem);
     }
 
-    public function testResolveTransitionOptionsWithoutOptions()
+    public function testResolveTransitionOptionsWithoutOptions(): void
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
 

@@ -5,18 +5,15 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Import;
 use Oro\Bundle\WorkflowBundle\Configuration\ConfigImportProcessorInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\ResourceFileImportProcessor;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocatorInterface;
 
-class ResourceFileImportProcessorTest extends \PHPUnit\Framework\TestCase
+class ResourceFileImportProcessorTest extends TestCase
 {
-    /** @var ConfigFileReaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $reader;
-
-    /** @var FileLocatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileLocator;
-
-    /** @var ConfigImportProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $parentProcessor;
+    private ConfigFileReaderInterface&MockObject $reader;
+    private FileLocatorInterface&MockObject $fileLocator;
+    private ConfigImportProcessorInterface&MockObject $parentProcessor;
 
     #[\Override]
     protected function setUp(): void

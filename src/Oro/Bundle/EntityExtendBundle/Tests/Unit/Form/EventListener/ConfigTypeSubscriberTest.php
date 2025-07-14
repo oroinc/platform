@@ -10,34 +10,25 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\EventListener\ConfigTypeSubscriber;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormInterface;
 
-class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
+class ConfigTypeSubscriberTest extends TestCase
 {
     private const FORM_NAME = 'oro_config_type';
     private const SCOPE = 'extend';
     private const CLASS_NAME = 'stdClass';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManger;
-
-    /** @var EntityConfigId */
-    private $entityConfigId;
-
-    /** @var FormConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formConfig;
-
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var PropertyConfigContainer|\PHPUnit\Framework\MockObject\MockObject */
-    private $propertyConfigContainer;
+    private ConfigManager&MockObject $configManger;
+    private EntityConfigId $entityConfigId;
+    private FormConfigInterface&MockObject $formConfig;
+    private FormInterface&MockObject $form;
+    private ConfigProvider&MockObject $configProvider;
+    private PropertyConfigContainer&MockObject $propertyConfigContainer;
 
     #[\Override]
     protected function setUp(): void
@@ -66,7 +57,7 @@ class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->propertyConfigContainer);
     }
 
-    public function testPostSubmitWithInvalidForm()
+    public function testPostSubmitWithInvalidForm(): void
     {
         $this->form->expects($this->once())
             ->method('isValid')
@@ -79,7 +70,7 @@ class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber->postSubmit($event);
     }
 
-    public function testPostSubmitWhenSchemaUpdateIsntRequired()
+    public function testPostSubmitWhenSchemaUpdateIsntRequired(): void
     {
         $this->form->expects($this->once())
             ->method('isValid')
@@ -99,7 +90,7 @@ class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber->postSubmit($event);
     }
 
-    public function testPostSubmitWithFalseSchemaUpdateRequiredCallback()
+    public function testPostSubmitWithFalseSchemaUpdateRequiredCallback(): void
     {
         $this->form->expects($this->once())
             ->method('isValid')
@@ -139,7 +130,7 @@ class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber->postSubmit($event);
     }
 
-    public function testPostSubmitWithEntityConfig()
+    public function testPostSubmitWithEntityConfig(): void
     {
         $newVal = 'new_value';
         $oldVal = 'old_value';
@@ -189,7 +180,7 @@ class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(ExtendScope::STATE_UPDATE, $values['state']);
     }
 
-    public function testPostSubmitWithFieldConfig()
+    public function testPostSubmitWithFieldConfig(): void
     {
         $fieldConfigId = new FieldConfigId(self::SCOPE, self::CLASS_NAME, 'fieldName');
 
@@ -264,7 +255,7 @@ class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber->postSubmit($event);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
             [FormEvents::POST_SUBMIT => 'postSubmit'],

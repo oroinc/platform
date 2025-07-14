@@ -4,13 +4,13 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class OperationDefinitionTest extends \PHPUnit\Framework\TestCase
+class OperationDefinitionTest extends TestCase
 {
     use EntityTestCaseTrait;
 
-    /** @var OperationDefinition */
-    private $definition;
+    private OperationDefinition $definition;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class OperationDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->definition = new OperationDefinition();
     }
 
-    public function testSetAndGetActions()
+    public function testSetAndGetActions(): void
     {
         $this->definition->setActions('name1', ['func1', 'func2']);
 
@@ -26,7 +26,7 @@ class OperationDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['name1' => ['func1', 'func2']], $this->definition->getActions());
     }
 
-    public function testSetAndGetConditions()
+    public function testSetAndGetConditions(): void
     {
         $this->definition->setConditions('name1', ['cond1', 'cond2']);
 
@@ -34,7 +34,7 @@ class OperationDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['name1' => ['cond1', 'cond2']], $this->definition->getConditions());
     }
 
-    public function testGetAllowedActions()
+    public function testGetAllowedActions(): void
     {
         $this->assertEquals(
             [OperationDefinition::PREACTIONS, OperationDefinition::FORM_INIT, OperationDefinition::ACTIONS],
@@ -42,7 +42,7 @@ class OperationDefinitionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAllowedConditions()
+    public function testGetAllowedConditions(): void
     {
         $this->assertEquals(
             [OperationDefinition::PRECONDITIONS, OperationDefinition::CONDITIONS],
@@ -50,7 +50,7 @@ class OperationDefinitionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGettersAndSetters()
+    public function testGettersAndSetters(): void
     {
         self::assertPropertyAccessors(
             $this->definition,

@@ -4,16 +4,15 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageProcessorRegistryPass;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class BuildMessageProcessorRegistryPassTest extends \PHPUnit\Framework\TestCase
+class BuildMessageProcessorRegistryPassTest extends TestCase
 {
     private BuildMessageProcessorRegistryPass $compiler;
-
     private ContainerBuilder $container;
-
     private Definition $registryDefinition;
 
     #[\Override]

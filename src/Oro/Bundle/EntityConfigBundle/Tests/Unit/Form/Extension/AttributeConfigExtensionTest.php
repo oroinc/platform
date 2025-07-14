@@ -12,6 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\SerializedFieldProvider;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
@@ -20,17 +21,10 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class AttributeConfigExtensionTest extends TypeTestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeConfigProvider;
-
-    /** @var SerializedFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializedFieldProvider;
-
-    /** @var AttributeTypeRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeTypeRegistry;
-
-    /** @var AttributeConfigExtension */
-    private $extension;
+    private ConfigProvider&MockObject $attributeConfigProvider;
+    private SerializedFieldProvider&MockObject $serializedFieldProvider;
+    private AttributeTypeRegistry&MockObject $attributeTypeRegistry;
+    private AttributeConfigExtension $extension;
 
     #[\Override]
     protected function setUp(): void

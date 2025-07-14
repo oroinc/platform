@@ -3,13 +3,14 @@
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\DistributionBundle\Entity\Bundle;
+use PHPUnit\Framework\TestCase;
 
-class BundleTest extends \PHPUnit\Framework\TestCase
+class BundleTest extends TestCase
 {
     /**
      * @dataProvider provideSetterDataset
      */
-    public function testShouldAllowToSetProperty(string $setter, mixed $value)
+    public function testShouldAllowToSetProperty(string $setter, mixed $value): void
     {
         $bundle = new Bundle();
         $bundle->{$setter}($value);
@@ -18,7 +19,7 @@ class BundleTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider provideSetterGetterDataset
      */
-    public function testShouldReturnValueThatWasSetBefore(string $getter, string $setter, mixed $value)
+    public function testShouldReturnValueThatWasSetBefore(string $getter, string $setter, mixed $value): void
     {
         $bundle = new Bundle();
         $bundle->{$setter}($value);

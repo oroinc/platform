@@ -14,7 +14,6 @@ class UpdateTest extends TestCase
     public function testUpdateMethods(): void
     {
         $data = new \stdClass();
-        /** @var FormInterface $form */
         $form = $this->createMock(FormInterface::class);
         $formHandler = $this->createMock(FormHandlerInterface::class);
         $formTemplateDataProvider = $this->createMock(FormTemplateDataProviderInterface::class);

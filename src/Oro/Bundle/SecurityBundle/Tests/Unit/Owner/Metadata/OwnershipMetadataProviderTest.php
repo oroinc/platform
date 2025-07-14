@@ -11,7 +11,9 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -19,22 +21,13 @@ use Symfony\Contracts\Cache\ItemInterface;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class OwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
+class OwnershipMetadataProviderTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassResolver;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var OwnershipMetadataProvider */
-    private $provider;
+    private ConfigManager&MockObject $configManager;
+    private EntityClassResolver|MockObject|null $entityClassResolver;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private AbstractAdapter&MockObject $cache;
+    private OwnershipMetadataProvider $provider;
 
     #[\Override]
     protected function setUp(): void

@@ -3,8 +3,9 @@
 namespace Oro\Bundle\CacheBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\CacheBundle\Provider\MemoryCache;
+use PHPUnit\Framework\TestCase;
 
-class MemoryCacheTest extends \PHPUnit\Framework\TestCase
+class MemoryCacheTest extends TestCase
 {
     private MemoryCache $memoryCache;
 

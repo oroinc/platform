@@ -4,20 +4,15 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityMergeBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ValueRenderEventTest extends \PHPUnit\Framework\TestCase
+class ValueRenderEventTest extends TestCase
 {
-    /** @var MetadataInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadata;
-
-    /** @var \DateTime */
-    private $originalValue;
-
-    /** @var string */
-    private $convertedValue;
-
-    /** @var ValueRenderEvent */
-    private $target;
+    private MetadataInterface&MockObject $metadata;
+    private \DateTime $originalValue;
+    private string $convertedValue;
+    private ValueRenderEvent $target;
 
     #[\Override]
     protected function setUp(): void
@@ -29,22 +24,22 @@ class ValueRenderEventTest extends \PHPUnit\Framework\TestCase
         $this->target = new ValueRenderEvent($this->convertedValue, $this->originalValue, $this->metadata);
     }
 
-    public function testGetMetadataReturnsAnOriginalMetadata()
+    public function testGetMetadataReturnsAnOriginalMetadata(): void
     {
         $this->assertEquals($this->target->getMetadata(), $this->metadata);
     }
 
-    public function testGetOriginalValueReturnAnOriginalValue()
+    public function testGetOriginalValueReturnAnOriginalValue(): void
     {
         $this->assertEquals($this->target->getOriginalValue(), $this->originalValue);
     }
 
-    public function testGetConvertedValueShouldReturnConvertedValue()
+    public function testGetConvertedValueShouldReturnConvertedValue(): void
     {
         $this->assertEquals($this->target->getConvertedValue(), $this->convertedValue);
     }
 
-    public function testSetConvertedValueShouldChangeConvertedValue()
+    public function testSetConvertedValueShouldChangeConvertedValue(): void
     {
         $newConvertedValue = date('Y');
 

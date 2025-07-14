@@ -12,17 +12,14 @@ use Oro\Bundle\TranslationBundle\Download\TranslationMetricsProviderInterface;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\EventListener\Datagrid\LanguageTranslationCompletenessAndAvailabilityListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUnit\Framework\TestCase
+class LanguageTranslationCompletenessAndAvailabilityListenerTest extends TestCase
 {
-    /** @var TranslationMetricsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationMetricsProvider;
-
-    /** @var TranslationKeyRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationKeyRepository;
-
-    /** @var LanguageTranslationCompletenessAndAvailabilityListener */
-    private $listener;
+    private TranslationMetricsProviderInterface&MockObject $translationMetricsProvider;
+    private TranslationKeyRepository&MockObject $translationKeyRepository;
+    private LanguageTranslationCompletenessAndAvailabilityListener $listener;
 
     #[\Override]
     protected function setUp(): void

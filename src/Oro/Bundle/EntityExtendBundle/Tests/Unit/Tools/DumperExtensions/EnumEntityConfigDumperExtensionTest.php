@@ -22,23 +22,16 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
+class EnumEntityConfigDumperExtensionTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var RelationBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $relationBuilder;
-
-    /** @var ExtendDbIdentifierNameGenerator */
-    private $nameGenerator;
-
-    /** @var ExtendEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendEntityConfigProvider;
-
-    /** @var EnumEntityConfigDumperExtension */
-    private $extension;
+    private ConfigManager&MockObject $configManager;
+    private RelationBuilder&MockObject $relationBuilder;
+    private ExtendDbIdentifierNameGenerator $nameGenerator;
+    private ExtendEntityConfigProviderInterface&MockObject $extendEntityConfigProvider;
+    private EnumEntityConfigDumperExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -62,14 +55,14 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSupportsPreUpdate()
+    public function testSupportsPreUpdate(): void
     {
         $this->assertTrue(
             $this->extension->supports(ExtendConfigDumper::ACTION_PRE_UPDATE)
         );
     }
 
-    public function testSupportsPostUpdate()
+    public function testSupportsPostUpdate(): void
     {
         $this->assertTrue(
             $this->extension->supports(ExtendConfigDumper::ACTION_POST_UPDATE)
@@ -79,7 +72,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testPreUpdate()
+    public function testPreUpdate(): void
     {
         $entityConfig1 = new Config(new EntityConfigId('extend', 'Test\EnumValue1'));
         $entityConfig1->set('is_extend', true);
@@ -273,7 +266,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testPreUpdateForNewEnumWithLongEnumCode()
+    public function testPreUpdateForNewEnumWithLongEnumCode(): void
     {
         $entityConfig1 = new Config(new EntityConfigId('extend', 'Test\EnumValue1'));
         $entityConfig1->set('is_extend', true);
@@ -434,7 +427,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
             );
     }
 
-    public function testPostUpdateForEnumValues()
+    public function testPostUpdateForEnumValues(): void
     {
         $entityConfig1 = new Config(new EntityConfigId('extend', 'Test\EnumValue1'));
         $entityConfig1->set('inherit', AbstractEnumValue::class);
@@ -480,7 +473,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPostUpdateForMultiEnumFieldsInCustomEntity()
+    public function testPostUpdateForMultiEnumFieldsInCustomEntity(): void
     {
         $entityConfig1 = new Config(new EntityConfigId('extend', 'Extend\EnumValue1'));
         $entityConfig1->set('owner', ExtendScope::OWNER_CUSTOM);
@@ -552,7 +545,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPostUpdateForDeletedMultiEnumField()
+    public function testPostUpdateForDeletedMultiEnumField(): void
     {
         $entityConfig = new Config(new EntityConfigId('extend', 'Extend\EnumValue1'));
         $entityConfig->set('owner', ExtendScope::OWNER_CUSTOM);

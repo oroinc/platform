@@ -9,15 +9,13 @@ use Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeTextType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 class AttributeTextTypeTest extends BlockTypeTestCase
 {
-    /** @var AttributeConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeConfigurationProvider;
-
-    /** @var AttributeTextType */
-    private $attributeTextType;
+    private AttributeConfigurationProvider&MockObject $attributeConfigurationProvider;
+    private AttributeTextType $attributeTextType;
 
     #[\Override]
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
@@ -31,7 +29,7 @@ class AttributeTextTypeTest extends BlockTypeTestCase
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);
     }
 
-    public function testGetBlockView()
+    public function testGetBlockView(): void
     {
         $attribute = new FieldConfigModel('attributeFieldName', 'string');
         $attribute->setEntity(new EntityConfigModel('attributeClassName'));
@@ -76,7 +74,7 @@ class AttributeTextTypeTest extends BlockTypeTestCase
         $this->assertEquals('=value === null', $view->vars['visible']);
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $type = $this->getBlockType(AttributeTextType::NAME);
 

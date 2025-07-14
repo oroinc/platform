@@ -11,18 +11,17 @@ use Oro\Bundle\DraftBundle\EventListener\DraftableFilterListener;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\StubController;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class DraftableFilterListenerTest extends \PHPUnit\Framework\TestCase
+class DraftableFilterListenerTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var DraftableFilterListener */
-    private $listener;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private DraftableFilterListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -228,7 +227,7 @@ class DraftableFilterListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelRequest($event);
     }
 
-    private function getFilters(): FilterCollection|\PHPUnit\Framework\MockObject\MockObject
+    private function getFilters(): FilterCollection&MockObject
     {
         $filters = $this->createMock(FilterCollection::class);
         $filters->expects(self::once())
@@ -244,7 +243,7 @@ class DraftableFilterListenerTest extends \PHPUnit\Framework\TestCase
 
     private function mockEntityManager(
         int $id,
-        FilterCollection|\PHPUnit\Framework\MockObject\MockObject $filters,
+        FilterCollection&MockObject $filters,
         ?DraftableInterface $expectedEntity = null
     ): void {
         $repository = $this->createMock(EntityRepository::class);

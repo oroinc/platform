@@ -6,17 +6,14 @@ use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FieldDataTest extends \PHPUnit\Framework\TestCase
+class FieldDataTest extends TestCase
 {
-    /** @var EntityData|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityData;
-
-    /** @var FieldMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldMetadata;
-
-    /** @var FieldData */
-    private $fieldData;
+    private EntityData&MockObject $entityData;
+    private FieldMetadata&MockObject $fieldMetadata;
+    private FieldData $fieldData;
 
     #[\Override]
     protected function setUp(): void
@@ -35,12 +32,12 @@ class FieldDataTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    public function testGetMetadata()
+    public function testGetMetadata(): void
     {
         $this->assertEquals($this->fieldMetadata, $this->fieldData->getMetadata());
     }
 
-    public function testSetGetSourceEntity()
+    public function testSetGetSourceEntity(): void
     {
         $this->assertNull($this->fieldData->getSourceEntity());
         $entity = $this->createTestEntity(1);
@@ -48,19 +45,19 @@ class FieldDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($entity, $this->fieldData->getSourceEntity());
     }
 
-    public function testSetGetMode()
+    public function testSetGetMode(): void
     {
         $this->assertEquals(MergeModes::REPLACE, $this->fieldData->getMode());
         $this->assertEquals($this->fieldData, $this->fieldData->setMode(MergeModes::UNITE));
         $this->assertEquals(MergeModes::UNITE, $this->fieldData->getMode());
     }
 
-    public function testGetEntityData()
+    public function testGetEntityData(): void
     {
         $this->assertEquals($this->entityData, $this->fieldData->getEntityData());
     }
 
-    public function testGetFieldName()
+    public function testGetFieldName(): void
     {
         $fieldName = 'test';
         $this->fieldMetadata->expects($this->once())

@@ -4,19 +4,18 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Client;
 
 use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
 use Oro\Bundle\MessageQueueBundle\Client\RequestWatcher;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class RequestWatcherTest extends \PHPUnit\Framework\TestCase
+class RequestWatcherTest extends TestCase
 {
-    /** @var BufferedMessageProducer|\PHPUnit\Framework\MockObject\MockObject */
-    private $bufferedProducer;
-
-    /** @var RequestWatcher */
-    private $requestWatcher;
+    private BufferedMessageProducer&MockObject $bufferedProducer;
+    private RequestWatcher $requestWatcher;
 
     #[\Override]
     protected function setUp(): void

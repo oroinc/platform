@@ -15,13 +15,15 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\FieldSessionStorage;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
+class CreateUpdateConfigFieldHandlerTest extends TestCase
 {
     use EntityTrait;
 
@@ -33,20 +35,11 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
     private const SUCCESS_MESSAGE = 'success_message';
     private const CLASS_NAME = \stdClass::class;
 
-    /** @var ConfigHelperHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $configHelperHandler;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $configHelper;
-
-    /** @var FieldSessionStorage|\PHPUnit\Framework\MockObject\MockObject */
-    private $sessionStorage;
-
-    /** @var CreateUpdateConfigFieldHandler */
-    private $handler;
+    private ConfigHelperHandler&MockObject $configHelperHandler;
+    private ConfigManager&MockObject $configManager;
+    private ConfigHelper&MockObject $configHelper;
+    private FieldSessionStorage&MockObject $sessionStorage;
+    private CreateUpdateConfigFieldHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -88,10 +81,10 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
     }
 
     private function assertArrayResponseReturned(
-        FormInterface|\PHPUnit\Framework\MockObject\MockObject $form,
+        FormInterface&MockObject $form,
         EntityConfigModel $entityConfigModel,
         FieldConfigModel $fieldConfigModel,
-        Request|\PHPUnit\Framework\MockObject\MockObject $request
+        Request&MockObject $request
     ): void {
         $formView = $this->createMock(FormView::class);
 
@@ -116,7 +109,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResponse, $response);
     }
 
-    public function testHandleCreateWhenFormIsNotValidAfterSubmit()
+    public function testHandleCreateWhenFormIsNotValidAfterSubmit(): void
     {
         $form = $this->createMock(FormInterface::class);
         $request = $this->createMock(Request::class);
@@ -162,7 +155,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         array $originalFieldNames,
         string $fieldName,
         string $expectedFieldName
-    ) {
+    ): void {
         $form = $this->createMock(FormInterface::class);
         $request = $this->createMock(Request::class);
 
@@ -256,7 +249,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         return [$newFieldModel, $extendEntityConfig];
     }
 
-    public function testHandleFieldSaveWhenRedirectedToCreateAction()
+    public function testHandleFieldSaveWhenRedirectedToCreateAction(): void
     {
         $request = $this->createMock(Request::class);
         $entityConfigModel = $this->createEntityConfigModel();
@@ -286,8 +279,8 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
     }
 
     private function assertFieldSaveArrayResponseReturned(
-        Request|\PHPUnit\Framework\MockObject\MockObject $request,
-        FormInterface|\PHPUnit\Framework\MockObject\MockObject $form,
+        Request&MockObject $request,
+        FormInterface&MockObject $form,
         EntityConfigModel $entityConfigModel,
         FieldConfigModel $newFieldModel
     ): void {
@@ -312,7 +305,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResponse, $response);
     }
 
-    public function testHandleFieldSaveWhenFormIsNotValidAfterSubmit()
+    public function testHandleFieldSaveWhenFormIsNotValidAfterSubmit(): void
     {
         $entityConfigModel = $this->createEntityConfigModel();
 
@@ -361,7 +354,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
         return $redirectResponse;
     }
 
-    public function testHandleFieldSaveWhenMethodIsPostAndFormIsValid()
+    public function testHandleFieldSaveWhenMethodIsPostAndFormIsValid(): void
     {
         $entityConfigModel = $this->createEntityConfigModel();
 

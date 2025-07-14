@@ -27,7 +27,7 @@ class CountQueryOptimizationListenerTest extends OrmTestCase
     /**
      * @dataProvider getCountQueryBuilderDataProvider
      */
-    public function testGetCountQueryBuilder(callable $queryBuilder, string $expectedDql)
+    public function testGetCountQueryBuilder(callable $queryBuilder, string $expectedDql): void
     {
         $listener = new CountQueryOptimizationListener();
         $eventDispatcher = new EventDispatcher();

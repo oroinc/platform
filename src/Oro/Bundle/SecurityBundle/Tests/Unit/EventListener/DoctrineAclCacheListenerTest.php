@@ -21,6 +21,7 @@ class DoctrineAclCacheListenerTest extends TestCase
     private OwnerTreeProviderInterface&MockObject $ownerTreeProvider;
     private DoctrineAclCacheListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->queryCacheProvider = $this->createMock(DoctrineAclCacheProvider::class);

@@ -5,18 +5,15 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Extension;
 use Oro\Bundle\WorkflowBundle\Extension\TranslationContextResolver;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplateParametersResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TranslationContextResolverTest extends \PHPUnit\Framework\TestCase
+class TranslationContextResolverTest extends TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var KeyTemplateParametersResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $resolver;
-
-    /** @var TranslationContextResolver */
-    private $extension;
+    private TranslatorInterface&MockObject $translator;
+    private KeyTemplateParametersResolver&MockObject $resolver;
+    private TranslationContextResolver $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +27,7 @@ class TranslationContextResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider resolveProvider
      */
-    public function testResolve(string $inputKey, string $resolvedId, array $resolvedParameters)
+    public function testResolve(string $inputKey, string $resolvedId, array $resolvedParameters): void
     {
         $this->resolver->expects($this->once())
             ->method('resolveTemplateParameters')
@@ -91,7 +88,7 @@ class TranslationContextResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider resolveUnresolvedKeysProvider
      */
-    public function testResolveUnresolvedKeys(string $input)
+    public function testResolveUnresolvedKeys(string $input): void
     {
         $this->translator->expects($this->never())
             ->method('trans');

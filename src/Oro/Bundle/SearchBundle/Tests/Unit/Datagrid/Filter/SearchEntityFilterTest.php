@@ -15,22 +15,19 @@ use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchEntityFilterType;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Component\Exception\UnexpectedTypeException;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-class SearchEntityFilterTest extends \PHPUnit\Framework\TestCase
+class SearchEntityFilterTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var SearchEntityFilter */
-    private $filter;
+    private FormFactoryInterface&MockObject $formFactory;
+    private ManagerRegistry&MockObject $doctrine;
+    private SearchEntityFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -45,14 +42,14 @@ class SearchEntityFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApplyExceptionForWrongFilterDatasourceAdapter()
+    public function testApplyExceptionForWrongFilterDatasourceAdapter(): void
     {
         $this->expectException(UnexpectedTypeException::class);
 
         $this->filter->apply($this->createMock(FilterDatasourceAdapterInterface::class), []);
     }
 
-    public function testGetMetadata()
+    public function testGetMetadata(): void
     {
         $this->filter->init('test', [FilterUtility::DATA_NAME_KEY => 'field', 'class' => \stdClass::class]);
 
@@ -95,7 +92,7 @@ class SearchEntityFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApply()
+    public function testApply(): void
     {
         $fieldName = 'field';
         $entity1 = $this->getEntity(Item::class, ['id' => 1001]);
@@ -148,7 +145,7 @@ class SearchEntityFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->filter->apply($ds, ['type' => null, 'value' => $value]));
     }
 
-    public function testPrepareData()
+    public function testPrepareData(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->filter->prepareData([]);

@@ -12,6 +12,8 @@ use Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\OptionValueBag;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
@@ -20,13 +22,11 @@ use Symfony\Component\ExpressionLanguage\SyntaxError;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
+class ExpressionProcessorTest extends TestCase
 {
-    /** @var ExpressionLanguage|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ExpressionLanguage&MockObject */
     protected $expressionLanguage;
-
-    /** @var ExpressionProcessor */
-    protected $processor;
+    protected ExpressionProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -66,7 +66,7 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessExpressionsEvaluatesAllExpressions()
+    public function testProcessExpressionsEvaluatesAllExpressions(): void
     {
         $values['expr_object'] = new ParsedExpression('true', new ConstantNode(true));
         $values['expr_closure'] = function () {
@@ -155,7 +155,7 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessExpressionsWithCircularReference()
+    public function testProcessExpressionsWithCircularReference(): void
     {
         $this->expectException(CircularReferenceException::class);
         $this->expectExceptionMessage(
@@ -172,7 +172,7 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->processExpressions($values, $context, $data, true, null);
     }
 
-    public function testProcessExpressionsWithDataKey()
+    public function testProcessExpressionsWithDataKey(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('"data" should not be used as value key.');
@@ -183,7 +183,7 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->processExpressions($values, $context, $data, true, null);
     }
 
-    public function testProcessExpressionsWithContextKey()
+    public function testProcessExpressionsWithContextKey(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('"context" should not be used as value key.');
@@ -194,7 +194,7 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->processExpressions($values, $context, $data, true, null);
     }
 
-    public function testProcessExpressionsDoNothingIfEvaluationOfExpressionsDisabledAndEncodingIsNotSet()
+    public function testProcessExpressionsDoNothingIfEvaluationOfExpressionsDisabledAndEncodingIsNotSet(): void
     {
         $values['expr_object'] = $this->createMock(ParsedExpression::class);
         $values['expr_closure'] = function () {
@@ -222,7 +222,7 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($initialVars, $values);
     }
 
-    public function testProcessExpressionsEncodesAllExpressions()
+    public function testProcessExpressionsEncodesAllExpressions(): void
     {
         $values['expr_object'] = new ParsedExpression('true', new ConstantNode(true));
         $values['expr_closure'] = function () {
@@ -300,7 +300,7 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessExpressionsWithVisibleFalse()
+    public function testProcessExpressionsWithVisibleFalse(): void
     {
         $values['expr_object'] = new ParsedExpression('true', new ConstantNode(true));
         $values['expr_closure'] = function () {
@@ -336,7 +336,7 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['item1' => 'val1', 'item2' => null], $values['array_with_expr']);
     }
 
-    public function testEvaluateStringExpressionWhenValueUsedInThisExpressionDoesNotExist()
+    public function testEvaluateStringExpressionWhenValueUsedInThisExpressionDoesNotExist(): void
     {
         $this->expectException(SyntaxError::class);
         $this->expectExceptionMessage(
@@ -352,7 +352,7 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->processExpressions($values, $context, $data, true, null);
     }
 
-    public function testEvaluateClosureWithExtraParamsWhenValueUsedInThisExpressionDoesNotExist()
+    public function testEvaluateClosureWithExtraParamsWhenValueUsedInThisExpressionDoesNotExist(): void
     {
         $this->expectException(SyntaxError::class);
         $this->expectExceptionMessage(
@@ -380,7 +380,7 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
     public function testEvaluateClosureWithExtraParamsWhenValuesUsedInThisExpressionAlreadyEvaluated(
         ClosureWithExtraParams $closureWithExtraParams,
         $expectedEvaluationResult
-    ) {
+    ): void {
         $values['expr_object'] = new ParsedExpression('true', new ConstantNode(true));
         $values['expr_closure'] = function () {
             return true;
@@ -408,7 +408,7 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
     public function testEvaluateClosureWithExtraParamsWhenValuesUsedInThisExpressionIsEvaluatedYet(
         ClosureWithExtraParams $closureWithExtraParams,
         $expectedEvaluationResult
-    ) {
+    ): void {
         $values['expr_closure_with_extra_params'] = $closureWithExtraParams;
 
         $values['expr_object'] = new ParsedExpression('true', new ConstantNode(true));

@@ -3,8 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation\KeyTemplate;
 
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
+use PHPUnit\Framework\TestCase;
 
-abstract class TemplateTestCase extends \PHPUnit\Framework\TestCase
+abstract class TemplateTestCase extends TestCase
 {
     /** @return TranslationKeyTemplateInterface */
     abstract public function getTemplateInstance();

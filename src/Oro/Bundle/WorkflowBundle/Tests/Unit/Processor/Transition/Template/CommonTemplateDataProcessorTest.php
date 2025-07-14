@@ -8,15 +8,15 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TemplateResultType;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Template\CommonTemplateDataProcessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-class CommonTemplateDataProcessorTest extends \PHPUnit\Framework\TestCase
+class CommonTemplateDataProcessorTest extends TestCase
 {
-    /** @var CommonTemplateDataProcessor */
-    private $processor;
+    private CommonTemplateDataProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +24,7 @@ class CommonTemplateDataProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new CommonTemplateDataProcessor();
     }
 
-    public function testDataProcessing()
+    public function testDataProcessing(): void
     {
         $form = $this->createMock(FormInterface::class);
 
@@ -72,7 +72,7 @@ class CommonTemplateDataProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSkipNonTemplateResponseTypeContext()
+    public function testSkipNonTemplateResponseTypeContext(): void
     {
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
@@ -85,7 +85,7 @@ class CommonTemplateDataProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testSkipSavedContext()
+    public function testSkipSavedContext(): void
     {
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())

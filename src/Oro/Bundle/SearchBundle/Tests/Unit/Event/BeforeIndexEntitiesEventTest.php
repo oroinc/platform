@@ -4,8 +4,9 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Event;
 
 use Oro\Bundle\SearchBundle\Event\BeforeIndexEntitiesEvent;
 use Oro\Bundle\SearchBundle\Tests\Unit\Stub\EntityStub;
+use PHPUnit\Framework\TestCase;
 
-class BeforeIndexEntitiesEventTest extends \PHPUnit\Framework\TestCase
+class BeforeIndexEntitiesEventTest extends TestCase
 {
     public function testBeforeIndexEntitiesEvent(): void
     {

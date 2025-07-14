@@ -7,20 +7,15 @@ use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
+class EntityWithFieldsProviderTest extends TestCase
 {
-    /** @var EntityProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityProvider;
-
-    /** @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldProvider;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var EntityWithFieldsProvider */
-    private $provider;
+    private EntityProvider&MockObject $entityProvider;
+    private EntityFieldProvider&MockObject $fieldProvider;
+    private ConfigManager&MockObject $configManager;
+    private EntityWithFieldsProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -38,12 +33,12 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFields(): void
     {
-        $className          = 'Test\Entity';
-        $withVirtualFields  = true;
+        $className = 'Test\Entity';
+        $withVirtualFields = true;
         $withUnidirectional = true;
-        $withRelations      = true;
-        $applyExclusions    = true;
-        $translate          = true;
+        $withRelations = true;
+        $applyExclusions = true;
+        $translate = true;
 
         $entities = [
             [
@@ -52,7 +47,7 @@ class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
                 'plural_label' => 'Items'
             ],
         ];
-        $fields   = [
+        $fields = [
             [
                 'name'  => 'field1',
                 'type'  => 'string',

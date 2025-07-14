@@ -4,6 +4,7 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\AddressBundle\DependencyInjection\Compiler\PhoneProviderPass;
 use Oro\Bundle\AddressBundle\Provider\PhoneProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -11,12 +12,10 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class PhoneProviderPassTest extends \PHPUnit\Framework\TestCase
+class PhoneProviderPassTest extends TestCase
 {
     private ContainerBuilder $container;
-
     private Definition $phoneProvider;
-
     private PhoneProviderPass $compiler;
 
     #[\Override]

@@ -9,14 +9,13 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowItem\EntityWorkflowResultObject
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowItem\WorkflowItemSerializer;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\WorkflowItem\Stub\TestObject;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\WorkflowItem\Stub\TestObjectWorkflowResultObjectSerializer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowItemSerializerTest extends \PHPUnit\Framework\TestCase
+class WorkflowItemSerializerTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var WorkflowItemSerializer */
-    private $serializer;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private WorkflowItemSerializer $serializer;
 
     #[\Override]
     protected function setUp(): void

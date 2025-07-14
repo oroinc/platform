@@ -5,17 +5,14 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Log\Converter;
 use Oro\Component\MessageQueue\Log\Converter\ChainMessageToArrayConverter;
 use Oro\Component\MessageQueue\Log\Converter\MessageToArrayConverterInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChainMessageToArrayConverterTest extends \PHPUnit\Framework\TestCase
+class ChainMessageToArrayConverterTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $converter1;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $converter2;
-
-    /** @var ChainMessageToArrayConverter */
-    private $chainConverter;
+    private MessageToArrayConverterInterface&MockObject $converter1;
+    private MessageToArrayConverterInterface&MockObject $converter2;
+    private ChainMessageToArrayConverter $chainConverter;
 
     #[\Override]
     protected function setUp(): void
@@ -26,9 +23,8 @@ class ChainMessageToArrayConverterTest extends \PHPUnit\Framework\TestCase
         $this->chainConverter = new ChainMessageToArrayConverter([$this->converter1, $this->converter2]);
     }
 
-    public function testConvert()
+    public function testConvert(): void
     {
-        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject $message */
         $message = $this->createMock(MessageInterface::class);
 
         $this->converter1->expects(self::once())

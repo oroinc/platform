@@ -16,20 +16,16 @@ use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 class AttributeGroupTypeTest extends BlockTypeTestCase
 {
     use EntityTrait;
 
-    /** @var AttributeRenderRegistry */
-    private $attributeRenderRegistry;
-
-    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeManager;
-
-    /** @var AttributeBlockTypeMapperInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $blockTypeMapper;
+    private AttributeRenderRegistry $attributeRenderRegistry;
+    private AttributeManager&MockObject $attributeManager;
+    private AttributeBlockTypeMapperInterface&MockObject $blockTypeMapper;
 
     #[\Override]
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
@@ -61,7 +57,7 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);
     }
 
-    public function testGetBlockView()
+    public function testGetBlockView(): void
     {
         $firstAttribute = $this->getEntity(
             FieldConfigModel::class,
@@ -156,7 +152,7 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
         $this->assertTrue($this->attributeRenderRegistry->isGroupRendered($attributeFamily, $attributeGroup));
     }
 
-    public function testGetBlockViewWithNonExistentAttributeGroup()
+    public function testGetBlockViewWithNonExistentAttributeGroup(): void
     {
         $this->attributeManager->expects($this->never())
             ->method('getAttributesByGroup');
@@ -184,7 +180,7 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
         $this->assertCount(0, $view->children);
     }
 
-    public function testGetBlockViewNotExcludeFromRest()
+    public function testGetBlockViewNotExcludeFromRest(): void
     {
         $attribute = $this->getEntity(
             FieldConfigModel::class,
@@ -237,7 +233,7 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
         $this->assertFalse($this->attributeRenderRegistry->isGroupRendered($attributeFamily, $attributeGroup));
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $type = $this->getBlockType(AttributeGroupType::NAME);
 

@@ -4,6 +4,8 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -11,28 +13,17 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Twig\Environment;
 
-class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
+class ResponseHashnavListenerTest extends TestCase
 {
     private const TEST_URL = 'http://test_url/';
     private const TEMPLATE = '@OroNavigation/HashNav/redirect.html.twig';
 
-    /** @var Request */
-    private $request;
-
-    /** @var Response */
-    private $response;
-
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $twig;
-
-    /** @var ResponseEvent|\PHPUnit\Framework\MockObject\MockObject */
-    private $event;
-
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var ResponseHashnavListener */
-    private $listener;
+    private Request $request;
+    private Response $response;
+    private Environment&MockObject $twig;
+    private ResponseEvent $event;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private ResponseHashnavListener $listener;
 
     #[\Override]
     protected function setUp(): void

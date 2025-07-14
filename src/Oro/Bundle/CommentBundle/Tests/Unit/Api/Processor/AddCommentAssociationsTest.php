@@ -7,14 +7,12 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\ConfigProcessorTestCase;
 use Oro\Bundle\CommentBundle\Api\CommentAssociationProvider;
 use Oro\Bundle\CommentBundle\Api\Processor\AddCommentAssociations;
 use Oro\Bundle\CommentBundle\Entity\Comment;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class AddCommentAssociationsTest extends ConfigProcessorTestCase
 {
-    /** @var CommentAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $commentAssociationProvider;
-
-    /** @var AddCommentAssociations */
-    private $processor;
+    private CommentAssociationProvider&MockObject $commentAssociationProvider;
+    private AddCommentAssociations $processor;
 
     #[\Override]
     protected function setUp(): void

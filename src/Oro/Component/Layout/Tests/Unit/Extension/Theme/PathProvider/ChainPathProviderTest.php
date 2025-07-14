@@ -7,11 +7,11 @@ use Oro\Component\Layout\Extension\Theme\PathProvider\ChainPathProvider;
 use Oro\Component\Layout\Extension\Theme\PathProvider\PathProviderInterface;
 use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\StubContextAwarePathProvider;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class ChainPathProviderTest extends \PHPUnit\Framework\TestCase
+class ChainPathProviderTest extends TestCase
 {
-    /** @var ChainPathProvider */
-    private $provider;
+    private ChainPathProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class ChainPathProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new ChainPathProvider();
     }
 
-    public function testAddProviderUsePriorityForSorting()
+    public function testAddProviderUsePriorityForSorting(): void
     {
         $provider1 = $this->createMock(PathProviderInterface::class);
         $provider2 = $this->createMock(PathProviderInterface::class);
@@ -34,7 +34,7 @@ class ChainPathProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetContext()
+    public function testSetContext(): void
     {
         $context = $this->createMock(ContextInterface::class);
 
@@ -49,7 +49,7 @@ class ChainPathProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->setContext($context);
     }
 
-    public function testGetPaths()
+    public function testGetPaths(): void
     {
         $provider1 = $this->createMock(PathProviderInterface::class);
         $provider2 = $this->createMock(PathProviderInterface::class);

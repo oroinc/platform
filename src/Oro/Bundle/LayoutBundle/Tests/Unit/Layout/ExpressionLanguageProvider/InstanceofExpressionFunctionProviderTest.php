@@ -3,13 +3,13 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\ExpressionLanguageProvider;
 
 use Oro\Bundle\LayoutBundle\Layout\ExpressionLanguageProvider\InstanceofExpressionFunctionProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
-class InstanceofExpressionFunctionProviderTest extends \PHPUnit\Framework\TestCase
+class InstanceofExpressionFunctionProviderTest extends TestCase
 {
-    /** @var InstanceofExpressionFunctionProvider */
-    private $provider;
+    private InstanceofExpressionFunctionProvider $provider;
 
     #[\Override]
     protected function setUp(): void

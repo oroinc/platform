@@ -3,11 +3,12 @@
 namespace Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\HelpBundle\DependencyInjection\OroHelpExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroHelpExtensionTest extends \PHPUnit\Framework\TestCase
+class OroHelpExtensionTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         $container = new ContainerBuilder();
 

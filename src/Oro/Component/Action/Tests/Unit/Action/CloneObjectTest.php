@@ -7,13 +7,13 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class CloneObjectTest extends \PHPUnit\Framework\TestCase
+class CloneObjectTest extends TestCase
 {
-    /** @var CloneObject */
-    private $action;
+    private CloneObject $action;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +22,7 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
-    public function testInitializeExceptionNoTargetObject()
+    public function testInitializeExceptionNoTargetObject(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Target parameter is required');
@@ -30,7 +30,7 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize(['some' => 1, 'attribute' => $this->createMock(PropertyPath::class)]);
     }
 
-    public function testInitializeExceptionNoAttribute()
+    public function testInitializeExceptionNoAttribute(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute name parameter is required.');
@@ -38,7 +38,7 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize(['target' => new \stdClass()]);
     }
 
-    public function testInitializeExceptionInvalidAttribute()
+    public function testInitializeExceptionInvalidAttribute(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute must be valid property definition.');
@@ -46,7 +46,7 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize(['target' => new \stdClass(), 'attribute' => 'string']);
     }
 
-    public function testInitializeExceptionInvalidData()
+    public function testInitializeExceptionInvalidData(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Object data must be an array.');
@@ -58,7 +58,7 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testInitializeExceptionInvalidIgnoredProperties()
+    public function testInitializeExceptionInvalidIgnoredProperties(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Ignored properties should be a sequence.');
@@ -70,7 +70,7 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $options = ['target' => new \stdClass(), 'attribute' => $this->createMock(PropertyPath::class)];
         self::assertEquals($this->action, $this->action->initialize($options));
@@ -80,7 +80,7 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeDataProvider
      */
-    public function testExecute(array $options, array $contextData = [], ?array $expectedData = null)
+    public function testExecute(array $options, array $contextData = [], ?array $expectedData = null): void
     {
         $context = new ItemStub($contextData);
         $attributeName = (string)$options['attribute'];

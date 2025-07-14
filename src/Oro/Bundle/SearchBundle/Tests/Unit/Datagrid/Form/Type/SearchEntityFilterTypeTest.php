@@ -12,20 +12,16 @@ use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchEntityFilterType;
 use Oro\Component\Testing\Unit\Form\Type\Stub\EntityTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SearchEntityFilterTypeTest extends FormIntegrationTestCase
 {
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityNameResolver;
-
-    /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationHelper;
-
-    /** @var SearchEntityFilterType */
-    private $type;
+    private EntityNameResolver&MockObject $entityNameResolver;
+    private LocalizationHelper&MockObject $localizationHelper;
+    private SearchEntityFilterType $type;
 
     #[\Override]
     protected function setUp(): void

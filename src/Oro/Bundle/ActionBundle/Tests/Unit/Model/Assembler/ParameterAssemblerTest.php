@@ -4,11 +4,11 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 use Oro\Bundle\ActionBundle\Model\Parameter;
+use PHPUnit\Framework\TestCase;
 
-class ParameterAssemblerTest extends \PHPUnit\Framework\TestCase
+class ParameterAssemblerTest extends TestCase
 {
-    /** @var ParameterAssembler */
-    private $assembler;
+    private ParameterAssembler $assembler;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class ParameterAssemblerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider assembleProvider
      */
-    public function testAssemble(array $configuration, array $expected)
+    public function testAssemble(array $configuration, array $expected): void
     {
         $definitions = $this->assembler->assemble($configuration);
 

@@ -12,8 +12,7 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
 {
     use EntityTrait;
 
-    /** @var ColumnsStateProvider */
-    private $provider;
+    private ColumnsStateProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -461,7 +460,7 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
 
         $this->assertNoCurrentGridView();
 
-        $user  = $this->getEntity(User::class, ['id' => 42]);
+        $user = $this->getEntity(User::class, ['id' => 42]);
 
         $this->tokenAccessor->expects(self::once())
             ->method('getUser')

@@ -7,25 +7,20 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class WorkflowAwareCacheInvalidationTest extends \PHPUnit\Framework\TestCase
+class WorkflowAwareCacheInvalidationTest extends TestCase
 {
     private const ACTIVE_WORKFLOW_RELATED_CLASSES_KEY = 'active_workflow_related';
     private const WORKFLOW_RELATED_CLASSES_KEY = 'all_workflow_related';
 
-    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var WorkflowDefinitionRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $definitionRepository;
-
-    /** @var \stdClass */
-    private $entity;
-
-    /** @var WorkflowAwareCache */
-    private $workflowAwareCache;
+    private CacheInterface&MockObject $cache;
+    private WorkflowDefinitionRepository&MockObject $definitionRepository;
+    private \stdClass $entity;
+    private WorkflowAwareCache $workflowAwareCache;
 
     #[\Override]
     protected function setUp(): void
@@ -46,7 +41,7 @@ class WorkflowAwareCacheInvalidationTest extends \PHPUnit\Framework\TestCase
         $this->workflowAwareCache = new WorkflowAwareCache($this->cache, $doctrineHelper);
     }
 
-    public function testInvalidationOfActiveWorkflowRelatedEntityClassesList()
+    public function testInvalidationOfActiveWorkflowRelatedEntityClassesList(): void
     {
         $this->definitionRepository->expects($this->once())
             ->method('getAllRelatedEntityClasses')
@@ -76,7 +71,7 @@ class WorkflowAwareCacheInvalidationTest extends \PHPUnit\Framework\TestCase
         $this->workflowAwareCache->invalidateActiveRelated();
     }
 
-    public function testInvalidationOfWorkflowRelatedEntityClassesList()
+    public function testInvalidationOfWorkflowRelatedEntityClassesList(): void
     {
         $this->definitionRepository->expects($this->once())
             ->method('getAllRelatedEntityClasses')
@@ -106,7 +101,7 @@ class WorkflowAwareCacheInvalidationTest extends \PHPUnit\Framework\TestCase
         $this->workflowAwareCache->invalidateRelated();
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
             [
@@ -123,7 +118,7 @@ class WorkflowAwareCacheInvalidationTest extends \PHPUnit\Framework\TestCase
     /**
      * Due to possibility to cover with functional test only one case
      */
-    public function testDeletionTriggersSameMethodsAsCreateOrUpdate()
+    public function testDeletionTriggersSameMethodsAsCreateOrUpdate(): void
     {
         $subscribedEvents = WorkflowAwareCache::getSubscribedEvents();
 

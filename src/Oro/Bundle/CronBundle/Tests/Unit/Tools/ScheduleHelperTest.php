@@ -11,7 +11,7 @@ class ScheduleHelperTest extends TestCase
     /**
      * @dataProvider scheduleDataProvider
      */
-    public function testHasActiveSchedule(iterable $schedules, bool $expected)
+    public function testHasActiveSchedule(iterable $schedules, bool $expected): void
     {
         $this->assertEquals($expected, ScheduleHelper::hasActiveSchedule($schedules));
     }

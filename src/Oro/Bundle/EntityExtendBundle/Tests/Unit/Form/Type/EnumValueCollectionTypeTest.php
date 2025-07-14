@@ -8,6 +8,7 @@ use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueCollectionType;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -15,11 +16,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EnumValueCollectionTypeTest extends TypeTestCase
 {
-    /** @var EnumValueCollectionType */
-    private $type;
-
-    /** @var EnumTypeHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $typeHelper;
+    private EnumValueCollectionType $type;
+    private EnumTypeHelper&MockObject $typeHelper;
 
     #[\Override]
     protected function setUp(): void

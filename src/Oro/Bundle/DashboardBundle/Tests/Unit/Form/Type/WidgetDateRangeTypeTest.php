@@ -30,24 +30,20 @@ class WidgetDateRangeTypeTest extends TypeTestCase
         'oro.dashboard.widget.filter.date_range.this_year' => AbstractDateFilterType::TYPE_THIS_YEAR,
     ];
 
+    private TranslatorInterface&MockObject $translator;
     private DateModifierProvider $dateModifier;
-
-    private TranslatorInterface|MockObject $translator;
-
-    private EventSubscriberInterface|MockObject $subscriber;
+    private EventSubscriberInterface&MockObject $subscriber;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this
-            ->translator
-            ->expects(self::any())
-            ->method('trans')
-            ->willReturnArgument(0);
-
         $this->dateModifier = new DateModifierProvider();
         $this->subscriber = $this->createMock(EventSubscriberInterface::class);
+
+        $this->translator->expects(self::any())
+            ->method('trans')
+            ->willReturnArgument(0);
 
         parent::setUp();
     }

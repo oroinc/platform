@@ -5,12 +5,12 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Datagrid;
 use Oro\Bundle\DataAuditBundle\Datagrid\AuthorProvider;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AuthorProviderTest extends \PHPUnit\Framework\TestCase
+class AuthorProviderTest extends TestCase
 {
-    /** @var AuthorProvider */
-    private $provider;
+    private AuthorProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -25,14 +25,14 @@ class AuthorProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new AuthorProvider($translator);
     }
 
-    public function testGetAuthorEmpty()
+    public function testGetAuthorEmpty(): void
     {
         $callable = $this->provider->getAuthor('gridName', 'keyName', []);
 
         $this->assertSame(null, call_user_func_array($callable, [new ResultRecord([])]));
     }
 
-    public function testGetAuthorImpresonationOnly()
+    public function testGetAuthorImpresonationOnly(): void
     {
         $callable = $this->provider->getAuthor('gridName', 'keyName', []);
 
@@ -42,7 +42,7 @@ class AuthorProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAuthorOnly()
+    public function testGetAuthorOnly(): void
     {
         $callable = $this->provider->getAuthor('gridName', 'keyName', []);
 
@@ -52,7 +52,7 @@ class AuthorProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAuthorAndImpresonation()
+    public function testGetAuthorAndImpresonation(): void
     {
         $callable = $this->provider->getAuthor('gridName', 'keyName', []);
 

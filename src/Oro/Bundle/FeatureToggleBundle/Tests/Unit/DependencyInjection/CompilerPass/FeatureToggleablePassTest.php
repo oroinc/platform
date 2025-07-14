@@ -3,15 +3,15 @@
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
 use Oro\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass\FeatureToggleablePass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class FeatureToggleablePassTest extends \PHPUnit\Framework\TestCase
+class FeatureToggleablePassTest extends TestCase
 {
     private const CHECKER_SERVICE_ID = 'oro_featuretoggle.checker.feature_checker';
 
-    /** @var FeatureToggleablePass */
-    private $compiler;
+    private FeatureToggleablePass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class FeatureToggleablePassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new FeatureToggleablePass();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->register(self::CHECKER_SERVICE_ID);

@@ -8,6 +8,7 @@ use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryDefinition;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryDefinitionValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -17,11 +18,8 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class QueryDefinitionValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigProvider;
-
-    /** @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldProvider;
+    private ConfigProvider&MockObject $entityConfigProvider;
+    private EntityFieldProvider&MockObject $fieldProvider;
 
     #[\Override]
     protected function createValidator(): QueryDefinitionValidator

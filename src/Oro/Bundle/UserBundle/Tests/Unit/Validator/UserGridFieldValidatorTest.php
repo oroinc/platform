@@ -6,14 +6,13 @@ use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Validator\UserGridFieldValidator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class UserGridFieldValidatorTest extends \PHPUnit\Framework\TestCase
+class UserGridFieldValidatorTest extends TestCase
 {
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var UserGridFieldValidator */
-    private $validator;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private UserGridFieldValidator $validator;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class UserGridFieldValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator = new UserGridFieldValidator($this->tokenAccessor, PropertyAccess::createPropertyAccessor());
     }
 
-    public function testHasAccessEditFieldWhenValidatedUserIsCurrentUserAndFieldIsInBlackList()
+    public function testHasAccessEditFieldWhenValidatedUserIsCurrentUserAndFieldIsInBlackList(): void
     {
         $currentUser = new User();
         $currentUser->setId(1);
@@ -37,7 +36,7 @@ class UserGridFieldValidatorTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->validator->hasAccessEditField($entity, 'enabled'));
     }
 
-    public function testHasAccessEditFieldWhenValidatedUserIsCurrentUserAndFieldIsNotInBlackList()
+    public function testHasAccessEditFieldWhenValidatedUserIsCurrentUserAndFieldIsNotInBlackList(): void
     {
         $currentUser = new User();
         $currentUser->setId(1);
@@ -51,7 +50,7 @@ class UserGridFieldValidatorTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->validator->hasAccessEditField($entity, 'email'));
     }
 
-    public function testHasAccessEditFieldWhenValidatedUserIsNotCurrentUser()
+    public function testHasAccessEditFieldWhenValidatedUserIsNotCurrentUser(): void
     {
         $currentUser = new User();
         $currentUser->setId(1);

@@ -6,28 +6,20 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\FormBundle\Form\Handler\FormWithAjaxReloadHandler;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Form\Handler\EmailNotificationHandler;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
+class EmailNotificationHandlerTest extends TestCase
 {
     private const FORM_DATA = ['field' => 'value'];
 
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
-
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var Request */
-    private $request;
-
-    /** @var EmailNotification */
-    private $entity;
-
-    /** @var EmailNotificationHandler */
-    private $handler;
-
+    private FormInterface&MockObject $form;
+    private ObjectManager&MockObject $manager;
+    private Request $request;
+    private EmailNotification $entity;
+    private EmailNotificationHandler $handler;
     private FormWithAjaxReloadHandler $formWithAjaxReloadHandler;
 
     #[\Override]
@@ -53,10 +45,9 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->process(new \stdClass(), $this->form, $this->request);
     }
 
-    public function testValidRequest()
+    public function testValidRequest(): void
     {
-        $this->formWithAjaxReloadHandler
-            ->expects(self::once())
+        $this->formWithAjaxReloadHandler->expects(self::once())
             ->method('process')
             ->with($this->entity, $this->form, $this->request)
             ->willReturn(true);

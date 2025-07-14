@@ -12,8 +12,9 @@ use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Config\ResourcesContainer;
 use Oro\Component\PhpUtils\Attribute\Reader\AttributeReader;
+use PHPUnit\Framework\TestCase;
 
-class AclAttributeLoadersTest extends \PHPUnit\Framework\TestCase
+class AclAttributeLoadersTest extends TestCase
 {
     private function getControllers(): array
     {
@@ -44,7 +45,7 @@ class AclAttributeLoadersTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    public function testLoaders()
+    public function testLoaders(): void
     {
         $controllerClassProvider = $this->createMock(ControllerClassProvider::class);
         $controllerClassProvider->expects(self::once())

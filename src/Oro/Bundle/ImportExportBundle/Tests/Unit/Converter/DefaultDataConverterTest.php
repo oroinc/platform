@@ -4,11 +4,11 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Converter;
 
 use Oro\Bundle\ImportExportBundle\Converter\DefaultDataConverter;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use PHPUnit\Framework\TestCase;
 
-class DefaultDataConverterTest extends \PHPUnit\Framework\TestCase
+class DefaultDataConverterTest extends TestCase
 {
-    /** @var DefaultDataConverter */
-    private $dataConverter;
+    private DefaultDataConverter $dataConverter;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class DefaultDataConverterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider convertDataProvider
      */
-    public function testConvertImportExport(array $importedRecord, array $exportedRecord)
+    public function testConvertImportExport(array $importedRecord, array $exportedRecord): void
     {
         $this->assertEquals($exportedRecord, $this->dataConverter->convertToExportFormat($importedRecord));
         $this->assertEquals($importedRecord, $this->dataConverter->convertToImportFormat($exportedRecord));
@@ -77,7 +77,7 @@ class DefaultDataConverterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testConvertToExportFormatTypeCasting()
+    public function testConvertToExportFormatTypeCasting(): void
     {
         $testData = [
             'intAttribute' => 123,
@@ -101,7 +101,7 @@ class DefaultDataConverterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $this->dataConverter->convertToExportFormat($testData));
     }
 
-    public function testConvertToExportFormatIncorrectKey()
+    public function testConvertToExportFormatIncorrectKey(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Delimiter ":" is not allowed in keys');
@@ -113,7 +113,7 @@ class DefaultDataConverterTest extends \PHPUnit\Framework\TestCase
         $this->dataConverter->convertToExportFormat($invalidImportedRecord);
     }
 
-    public function testConvertToImportIncorrectKey()
+    public function testConvertToImportIncorrectKey(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Can\'t set nested value under key "owner"');

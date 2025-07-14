@@ -4,16 +4,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Handler;
 
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\CleanConfigurationHandler;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CleanConfigurationHandlerTest extends \PHPUnit\Framework\TestCase
+class CleanConfigurationHandlerTest extends TestCase
 {
-    /** @var RequestStack */
-    private $requestStack;
-
-    /** @var CleanConfigurationHandler */
-    private $handler;
+    private RequestStack $requestStack;
+    private CleanConfigurationHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +21,7 @@ class CleanConfigurationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new CleanConfigurationHandler($this->requestStack);
     }
 
-    public function testHandleNotApplicable()
+    public function testHandleNotApplicable(): void
     {
         $config = [
             WorkflowConfiguration::NODE_TRANSITIONS => [
@@ -54,7 +52,7 @@ class CleanConfigurationHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider handleDataProvider
      */
-    public function testHandle(array $configuration, array $expected)
+    public function testHandle(array $configuration, array $expected): void
     {
         $this->requestStack->push(new Request());
 

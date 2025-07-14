@@ -6,8 +6,9 @@ use Oro\Component\MessageQueue\Client\NoopMessageProcessor;
 use Oro\Component\MessageQueue\Exception\MessageProcessorNotSpecifiedException;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 
-class NoopMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class NoopMessageProcessorTest extends TestCase
 {
     public function testProcess(): void
     {

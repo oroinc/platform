@@ -4,10 +4,11 @@ namespace Oro\Bundle\CronBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Filter\SchedulesByArgumentsFilter;
+use PHPUnit\Framework\TestCase;
 
-class SchedulesByArgumentsFilterTest extends \PHPUnit\Framework\TestCase
+class SchedulesByArgumentsFilterTest extends TestCase
 {
-    public function testFilter()
+    public function testFilter(): void
     {
         $schedules = [
             $this->createSchedule('oro:test', [], '* * * * *'),

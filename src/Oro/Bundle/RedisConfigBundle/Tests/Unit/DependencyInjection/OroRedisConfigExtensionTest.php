@@ -3,9 +3,10 @@
 namespace Oro\Bundle\RedisConfigBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\RedisConfigBundle\DependencyInjection\OroRedisConfigExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroRedisConfigExtensionTest extends \PHPUnit\Framework\TestCase
+class OroRedisConfigExtensionTest extends TestCase
 {
     private ContainerBuilder $container;
     private OroRedisConfigExtension $extension;

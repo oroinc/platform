@@ -4,14 +4,13 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityDataEventTest extends \PHPUnit\Framework\TestCase
+class EntityDataEventTest extends TestCase
 {
-    /** @var EntityData|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityData;
-
-    /** @var EntityDataEvent */
-    private $event;
+    private EntityData&MockObject $entityData;
+    private EntityDataEvent $event;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class EntityDataEventTest extends \PHPUnit\Framework\TestCase
         $this->event = new EntityDataEvent($this->entityData);
     }
 
-    public function testGetEntityData()
+    public function testGetEntityData(): void
     {
         $this->assertEquals($this->entityData, $this->event->getEntityData());
     }

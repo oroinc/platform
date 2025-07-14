@@ -32,10 +32,10 @@ class FileExtensionTest extends TestCase
 
     private const int FILE_ID = 42;
 
-    private AttachmentManager|MockObject $attachmentManager;
-    private PictureSourcesProviderInterface|MockObject $pictureSourcesProvider;
-    private ConfigManager|MockObject $configManager;
-    private FileTitleProviderInterface|MockObject $fileTitleProvider;
+    private AttachmentManager&MockObject $attachmentManager;
+    private PictureSourcesProviderInterface&MockObject $pictureSourcesProvider;
+    private ConfigManager&MockObject $configManager;
+    private FileTitleProviderInterface&MockObject $fileTitleProvider;
     private FileExtension $extension;
     private File $file;
 
@@ -366,7 +366,7 @@ class FileExtensionTest extends TestCase
         File $file,
         int $width = 16,
         int $height = 16
-    ): Environment|MockObject {
+    ): Environment&MockObject {
         $environment = $this->createMock(Environment::class);
         $environment->expects(self::once())
             ->method('render')

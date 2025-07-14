@@ -9,33 +9,20 @@ use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class EntityDataFactoryTest extends \PHPUnit\Framework\TestCase
+class EntityDataFactoryTest extends TestCase
 {
-    /** @var EntityDataFactory */
-    private $factory;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $metadataRegistry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $metadata;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject[] */
-    private $entities = [];
-
-    /** @var array */
-    private $fieldsMetadata = [];
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var string */
-    private $entitiesClassName;
+    private string $entitiesClassName;
+    /** @var MockObject[] */
+    private array $entities = [];
+    private MetadataRegistry&MockObject $metadataRegistry;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityMetadata&MockObject $metadata;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private EntityDataFactory $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -45,7 +32,6 @@ class EntityDataFactoryTest extends \PHPUnit\Framework\TestCase
         $this->entities[] = $this->getMockBuilder(\stdClass::class)
             ->setMockClassName($this->entitiesClassName)
             ->getMock();
-
         $this->entities[] = $this->getMockBuilder(\stdClass::class)
             ->setMockClassName($this->entitiesClassName)
             ->getMock();
@@ -53,21 +39,19 @@ class EntityDataFactoryTest extends \PHPUnit\Framework\TestCase
         $this->metadataRegistry = $this->createMock(MetadataRegistry::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->metadata = $this->createMock(EntityMetadata::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->metadata->expects($this->any())
             ->method('getClassName')
             ->willReturn($this->entitiesClassName);
-
         $this->metadata->expects($this->any())
             ->method('getFieldsMetadata')
-            ->willReturn($this->fieldsMetadata);
+            ->willReturn([]);
 
         $this->metadataRegistry->expects($this->any())
             ->method('getEntityMetadata')
             ->with($this->entitiesClassName)
             ->willReturn($this->metadata);
-
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->factory = new EntityDataFactory(
             $this->metadataRegistry,
@@ -76,7 +60,7 @@ class EntityDataFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateEntityData()
+    public function testCreateEntityData(): void
     {
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
@@ -96,7 +80,7 @@ class EntityDataFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->entities, $result->getEntities());
     }
 
-    public function testCreateEntityDataByIds()
+    public function testCreateEntityDataByIds(): void
     {
         $this->doctrineHelper->expects($this->once())
             ->method('getEntitiesByIds')

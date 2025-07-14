@@ -4,16 +4,15 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Request;
 
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Oro\Bundle\SecurityBundle\Request\CsrfProtectedRequestHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-class CsrfProtectedRequestHelperTest extends \PHPUnit\Framework\TestCase
+class CsrfProtectedRequestHelperTest extends TestCase
 {
-    /** @var CsrfRequestManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $csrfRequestManager;
-
-    /** @var CsrfProtectedRequestHelper */
-    private $csrfProtectedRequestHelper;
+    private CsrfRequestManager&MockObject $csrfRequestManager;
+    private CsrfProtectedRequestHelper $csrfProtectedRequestHelper;
 
     #[\Override]
     protected function setUp(): void

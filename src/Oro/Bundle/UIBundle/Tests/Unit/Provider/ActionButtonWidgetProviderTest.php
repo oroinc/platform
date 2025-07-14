@@ -4,11 +4,12 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 use Oro\Bundle\UIBundle\Provider\ActionButtonWidgetProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ActionButtonWidgetProviderTest extends \PHPUnit\Framework\TestCase
+class ActionButtonWidgetProviderTest extends TestCase
 {
-    /** @var PlaceholderProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $placeholderProvider;
+    private PlaceholderProvider&MockObject $placeholderProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +17,7 @@ class ActionButtonWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->placeholderProvider = $this->createMock(PlaceholderProvider::class);
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $entity = new \stdClass();
 
@@ -29,7 +30,7 @@ class ActionButtonWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($provider->supports($entity));
     }
 
-    public function testGetWidgets()
+    public function testGetWidgets(): void
     {
         $entity = new \stdClass();
 
@@ -62,7 +63,7 @@ class ActionButtonWidgetProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetWidgetsButtonPlaceholderIsNotApplicable()
+    public function testGetWidgetsButtonPlaceholderIsNotApplicable(): void
     {
         $entity = new \stdClass();
 
@@ -83,7 +84,7 @@ class ActionButtonWidgetProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetWidgetsLinkPlaceholderIsNotApplicable()
+    public function testGetWidgetsLinkPlaceholderIsNotApplicable(): void
     {
         $entity = new \stdClass();
 
@@ -113,7 +114,7 @@ class ActionButtonWidgetProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetWidgetsNoLink()
+    public function testGetWidgetsNoLink(): void
     {
         $entity = new \stdClass();
 

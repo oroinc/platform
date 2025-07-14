@@ -19,20 +19,11 @@ class WorkflowPermissionRegistryTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var WorkflowEntityAclRepository|MockObject */
-    private $aclRepository;
-
-    /** @var WorkflowEntityAclIdentityRepository|MockObject */
-    private $aclIdentityRepository;
-
-    /** @var DoctrineHelper|MockObject */
-    private $doctrineHelper;
-
-    /** @var WorkflowRegistry|MockObject */
-    private $workflowRegistry;
-
-    /** @var WorkflowPermissionRegistry */
-    private $registry;
+    private WorkflowEntityAclRepository&MockObject $aclRepository;
+    private WorkflowEntityAclIdentityRepository&MockObject $aclIdentityRepository;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private WorkflowRegistry&MockObject $workflowRegistry;
+    private WorkflowPermissionRegistry $registry;
 
     #[\Override]
     protected function setUp(): void

@@ -6,10 +6,11 @@ use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class ConfigValueTest extends \PHPUnit\Framework\TestCase
+class ConfigValueTest extends TestCase
 {
-    public function testIdGetter()
+    public function testIdGetter(): void
     {
         $obj = new ConfigValue();
 
@@ -17,7 +18,7 @@ class ConfigValueTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, $obj->getId());
     }
 
-    public function testCreatedAtGetter()
+    public function testCreatedAtGetter(): void
     {
         $date = new \DateTime('now');
 
@@ -29,7 +30,7 @@ class ConfigValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider propertiesDataProvider
      */
-    public function testSettersAndGetters(string $property, mixed $value)
+    public function testSettersAndGetters(string $property, mixed $value): void
     {
         $obj = new ConfigValue();
 
@@ -52,7 +53,7 @@ class ConfigValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider valuesDataProvider
      */
-    public function testValueSettersAndGetters(mixed $value, string $expectedType)
+    public function testValueSettersAndGetters(mixed $value, string $expectedType): void
     {
         $obj = new ConfigValue();
 
@@ -71,7 +72,7 @@ class ConfigValueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testPrePersist()
+    public function testPrePersist(): void
     {
         $obj = new ConfigValue();
 
@@ -83,7 +84,7 @@ class ConfigValueTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(\DateTime::class, $obj->getUpdatedAt());
     }
 
-    public function testPreUpdate()
+    public function testPreUpdate(): void
     {
         $obj = new ConfigValue();
 

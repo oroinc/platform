@@ -32,8 +32,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         ];
         $actualSql = '';
 
-        $this->getDriverConnectionMock($this->em)
-            ->expects($this->any())
+        $this->getDriverConnectionMock($this->em)->expects($this->any())
             ->method('query')
             ->willReturnCallback(function ($sql) use (&$records, &$actualSql) {
                 $actualSql = $sql;
@@ -62,8 +61,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         ];
         $actualSql = '';
 
-        $this->getDriverConnectionMock($this->em)
-            ->expects($this->any())
+        $this->getDriverConnectionMock($this->em)->expects($this->any())
             ->method('query')
             ->willReturnCallback(function ($sql) use (&$records, &$actualSql) {
                 $actualSql = $sql;
@@ -90,8 +88,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $maxResults = 2;
         $actualSql = '';
 
-        $this->getDriverConnectionMock($this->em)
-            ->expects($this->any())
+        $this->getDriverConnectionMock($this->em)->expects($this->any())
             ->method('query')
             ->willReturnCallback(function ($sql) use (&$maxResults, &$actualSql) {
                 $actualSql = $sql;
@@ -189,8 +186,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
     private function mockQuery(array &$statements, int &$statementCounter, ?array &$actualSqls): void
     {
-        $this->getDriverConnectionMock($this->em)
-            ->expects($this->any())
+        $this->getDriverConnectionMock($this->em)->expects($this->any())
             ->method('query')
             ->willReturnCallback(function ($sql) use (&$statements, &$statementCounter, &$actualSqls) {
                 $actualSqls[$statementCounter] = $sql;

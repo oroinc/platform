@@ -9,8 +9,9 @@ use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
 use Oro\Bundle\DataGridBundle\EventListener\OrmDatasourceAclListener;
 use Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use PHPUnit\Framework\TestCase;
 
-class OrmDatasourceAclListenerTest extends \PHPUnit\Framework\TestCase
+class OrmDatasourceAclListenerTest extends TestCase
 {
     public function testOnResultBeforeWithDisabledAclApplyInConfig(): void
     {

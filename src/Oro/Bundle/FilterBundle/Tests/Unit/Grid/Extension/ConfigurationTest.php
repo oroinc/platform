@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Grid\Extension;
 
 use Oro\Bundle\FilterBundle\Grid\Extension\Configuration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\Processor;
@@ -10,7 +11,7 @@ use Symfony\Component\Config\Definition\Processor;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
  */
-class ConfigurationTest extends \PHPUnit\Framework\TestCase
+class ConfigurationTest extends TestCase
 {
     private Configuration $configuration;
     private Processor $processor;
@@ -25,7 +26,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processConfigurationDataProvider
      */
-    public function testProcessConfiguration(array $configs, array $expected)
+    public function testProcessConfiguration(array $configs, array $expected): void
     {
         $this->assertEquals($expected, $this->processor->processConfiguration($this->configuration, $configs));
     }
@@ -33,7 +34,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processInvalidConfigurationStructure
      */
-    public function testInvalidConfigurationStructure(array $configs)
+    public function testInvalidConfigurationStructure(array $configs): void
     {
         $this->expectException(InvalidTypeException::class);
         $this->processor->processConfiguration($this->configuration, $configs);
@@ -42,7 +43,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processInvalidConfigurationValues
      */
-    public function testInvalidConfigurationValues(array $configs)
+    public function testInvalidConfigurationValues(array $configs): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->processor->processConfiguration($this->configuration, $configs);

@@ -6,14 +6,13 @@ use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityMetadataTest extends \PHPUnit\Framework\TestCase
+class EntityMetadataTest extends TestCase
 {
-    /** @var DoctrineMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineMetadata;
-
-    /** @var EntityMetadata */
-    private $metadata;
+    private DoctrineMetadata&MockObject $doctrineMetadata;
+    private EntityMetadata $metadata;
 
     #[\Override]
     protected function setUp(): void
@@ -23,17 +22,17 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $this->metadata = new EntityMetadata(['foo' => 'bar'], $this->doctrineMetadata);
     }
 
-    public function testAddFieldMetadata()
+    public function testAddFieldMetadata(): void
     {
         $this->assertEquals([], $this->metadata->getFieldsMetadata());
     }
 
-    public function testGetDoctrineMetadata()
+    public function testGetDoctrineMetadata(): void
     {
         $this->assertEquals($this->doctrineMetadata, $this->metadata->getDoctrineMetadata());
     }
 
-    public function testGetDoctrineMetadataFails()
+    public function testGetDoctrineMetadataFails(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Doctrine metadata is not configured.');
@@ -42,7 +41,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $metadata->getDoctrineMetadata();
     }
 
-    public function testFieldsMetadata()
+    public function testFieldsMetadata(): void
     {
         $fieldName = 'test';
         $fieldMetadata = $this->createMock(FieldMetadata::class);
@@ -55,7 +54,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$fieldName => $fieldMetadata], $this->metadata->getFieldsMetadata());
     }
 
-    public function testGetClassName()
+    public function testGetClassName(): void
     {
         $className = 'TestEntity';
 
@@ -72,7 +71,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($className, $this->metadata->getClassName());
     }
 
-    public function testGetClassNameFails()
+    public function testGetClassNameFails(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot get class name from merge entity metadata.');

@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 class ActionGroupServiceAdapterTest extends TestCase
 {
     private ParametersResolver $parametersResolver;
-    private ActionGroupEventDispatcher|MockObject $eventDispatcher;
+    private ActionGroupEventDispatcher&MockObject $eventDispatcher;
     private ActionGroupDefinition $definition;
 
     #[\Override]

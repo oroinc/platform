@@ -4,11 +4,11 @@ namespace Oro\Component\PhpUtils\Tests\Unit;
 
 use Oro\Component\PhpUtils\ReflectionClassHelper;
 use Oro\Component\PhpUtils\Tests\Unit\Stubs\StubInterface;
+use PHPUnit\Framework\TestCase;
 
-class ReflectionClassHelperTest extends \PHPUnit\Framework\TestCase
+class ReflectionClassHelperTest extends TestCase
 {
-    /** @var ReflectionClassHelper */
-    private $utils;
+    private ReflectionClassHelper $utils;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class ReflectionClassHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider hasMethodDataProvider
      */
-    public function testHasMethod(string $methodName, bool $expectedResult)
+    public function testHasMethod(string $methodName, bool $expectedResult): void
     {
         $this->assertSame($expectedResult, $this->utils->hasMethod($methodName));
     }
@@ -54,7 +54,7 @@ class ReflectionClassHelperTest extends \PHPUnit\Framework\TestCase
         bool $expectedResult,
         ?string $expectedErrorMessage,
         string $actionName = 'add'
-    ) {
+    ): void {
         $result = $this->utils->isValidArguments($actionName, $arguments);
         $this->assertSame($expectedErrorMessage, $this->utils->getLastError());
         $this->assertSame($expectedResult, $result);
@@ -127,7 +127,7 @@ class ReflectionClassHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider completeArgumentsDataProvider
      */
-    public function testCompleteArguments(array $arguments, array $expectedResults)
+    public function testCompleteArguments(array $arguments, array $expectedResults): void
     {
         $this->utils->completeArguments('add', $arguments);
 

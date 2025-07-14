@@ -5,6 +5,8 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Handler;
 use Monolog\Logger;
 use Oro\Bundle\MessageQueueBundle\Log\Handler\ConsoleHandler;
 use Oro\Component\MessageQueue\Log\ConsumerState;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
@@ -12,16 +14,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ConsoleHandlerTest extends \PHPUnit\Framework\TestCase
+class ConsoleHandlerTest extends TestCase
 {
-    /** @var ConsumerState */
-    private $consumerState;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OutputInterface */
-    private $output;
-
-    /** @var ConsoleHandler */
-    private $handler;
+    private ConsumerState $consumerState;
+    private OutputInterface&MockObject $output;
+    private ConsoleHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +29,7 @@ class ConsoleHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new ConsoleHandler($this->consumerState);
     }
 
-    public function testIsHandlingWhenConsumptionIsNotStarted()
+    public function testIsHandlingWhenConsumptionIsNotStarted(): void
     {
         $this->output->expects(self::never())
             ->method('getVerbosity');
@@ -42,7 +39,7 @@ class ConsoleHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->handler->isHandling([]));
     }
 
-    public function testIsHandlingWhenConsumptionIsStarted()
+    public function testIsHandlingWhenConsumptionIsStarted(): void
     {
         $this->output->expects(self::once())
             ->method('getVerbosity')
@@ -54,7 +51,7 @@ class ConsoleHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->handler->isHandling(['level' => Logger::DEBUG]));
     }
 
-    public function testHandleWhenConsumptionIsNotStarted()
+    public function testHandleWhenConsumptionIsNotStarted(): void
     {
         $this->output->expects(self::never())
             ->method('getVerbosity');
@@ -66,7 +63,7 @@ class ConsoleHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->handler->handle([]));
     }
 
-    public function testHandleWhenConsumptionIsStarted()
+    public function testHandleWhenConsumptionIsStarted(): void
     {
         $this->output->expects(self::any())
             ->method('getVerbosity')
@@ -95,7 +92,7 @@ class ConsoleHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCommandEventSubscriber()
+    public function testCommandEventSubscriber(): void
     {
         $this->consumerState->startConsumption();
         $input = $this->createMock(InputInterface::class);
@@ -160,7 +157,7 @@ class ConsoleHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($handler->isHandling(['level' => Logger::DEBUG]));
     }
 
-    public function testOnCommandShouldSetStdoutNotStderr()
+    public function testOnCommandShouldSetStdoutNotStderr(): void
     {
         $output = $this->createMock(ConsoleOutputInterface::class);
 

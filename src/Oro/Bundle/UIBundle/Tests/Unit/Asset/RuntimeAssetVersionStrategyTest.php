@@ -4,9 +4,10 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Asset;
 
 use Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager;
 use Oro\Bundle\UIBundle\Asset\RuntimeAssetVersionStrategy;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
-class RuntimeAssetVersionStrategyTest extends \PHPUnit\Framework\TestCase
+class RuntimeAssetVersionStrategyTest extends TestCase
 {
     /**
      * @dataProvider applyVersionProvider
@@ -18,7 +19,7 @@ class RuntimeAssetVersionStrategyTest extends \PHPUnit\Framework\TestCase
     ): void {
         $assetVersionManager = $this->createMock(DynamicAssetVersionManager::class);
         $wrappedStrategy = $this->createMock(VersionStrategyInterface::class);
-        $wrappedStrategy
+        $wrappedStrategy->expects(self::any())
             ->method('getVersion')
             ->willReturn('123');
         $assetVersionStrategy = new RuntimeAssetVersionStrategy('test_package', $wrappedStrategy, $assetVersionManager);

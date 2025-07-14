@@ -16,6 +16,7 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 
 /**
@@ -29,14 +30,9 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
 {
     protected const USER_ID = 505;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
-    private $tokenAccessor;
-
-    /** @var OwnershipMetadataProviderStub */
-    private $metadataProvider;
-
-    /** @var EntityOwnershipDecisionMaker */
-    private $decisionMaker;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private OwnershipMetadataProviderStub $metadataProvider;
+    private EntityOwnershipDecisionMaker $decisionMaker;
 
     #[\Override]
     protected function setUp(): void
@@ -56,8 +52,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
             $this->metadataProvider->getUserClass(),
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id', 'organization')
         );
-        $this->metadataProvider->getCacheMock()
-            ->expects(self::any())
+        $this->metadataProvider->getCacheMock()->expects(self::any())
             ->method('get')
             ->willReturn(true);
 
@@ -79,7 +74,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         );
     }
 
-    public function testIsOrganization()
+    public function testIsOrganization(): void
     {
         $this->assertFalse($this->decisionMaker->isOrganization(null));
         $this->assertFalse($this->decisionMaker->isOrganization('test'));
@@ -88,7 +83,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->assertTrue($this->decisionMaker->isOrganization($this->createMock(Organization::class)));
     }
 
-    public function testIsBusinessUnit()
+    public function testIsBusinessUnit(): void
     {
         $this->assertFalse($this->decisionMaker->isBusinessUnit(null));
         $this->assertFalse($this->decisionMaker->isBusinessUnit('test'));
@@ -97,7 +92,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->assertTrue($this->decisionMaker->isBusinessUnit($this->createMock(BusinessUnit::class)));
     }
 
-    public function testIsUser()
+    public function testIsUser(): void
     {
         $this->assertFalse($this->decisionMaker->isUser(null));
         $this->assertFalse($this->decisionMaker->isUser('test'));
@@ -106,64 +101,64 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->assertTrue($this->decisionMaker->isUser($this->createMock(User::class)));
     }
 
-    public function testIsAssociatedWithOrganizationNullUser()
+    public function testIsAssociatedWithOrganizationNullUser(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $this->decisionMaker->isAssociatedWithOrganization(null, null);
     }
 
-    public function testIsAssociatedWithOrganizationNullObject()
+    public function testIsAssociatedWithOrganizationNullObject(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $user = new User(self::USER_ID);
         $this->decisionMaker->isAssociatedWithOrganization($user, null);
     }
 
-    public function testIsAssociatedWithBusinessUnitNullUser()
+    public function testIsAssociatedWithBusinessUnitNullUser(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $this->decisionMaker->isAssociatedWithBusinessUnit(null, null);
     }
 
-    public function testIsAssociatedWithBusinessUnitNullObject()
+    public function testIsAssociatedWithBusinessUnitNullObject(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $user = new User(self::USER_ID);
         $this->decisionMaker->isAssociatedWithBusinessUnit($user, null);
     }
 
-    public function testIsAssociatedWithUserNullUser()
+    public function testIsAssociatedWithUserNullUser(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $this->decisionMaker->isAssociatedWithUser(null, null);
     }
 
-    public function testIsAssociatedWithUserNullObject()
+    public function testIsAssociatedWithUserNullObject(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $user = new User(self::USER_ID);
         $this->decisionMaker->isAssociatedWithUser($user, null);
     }
 
-    public function testIsAssociatedWithOrganizationForSystemObject()
+    public function testIsAssociatedWithOrganizationForSystemObject(): void
     {
         $user = new User(self::USER_ID);
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($user, new \stdClass()));
     }
 
-    public function testIsAssociatedWithBusinessUnitForSystemObject()
+    public function testIsAssociatedWithBusinessUnitForSystemObject(): void
     {
         $user = new User(self::USER_ID);
         $this->assertFalse($this->decisionMaker->isAssociatedWithBusinessUnit($user, new \stdClass()));
     }
 
-    public function testIsAssociatedWithUserForSystemObject()
+    public function testIsAssociatedWithUserForSystemObject(): void
     {
         $user = new User(self::USER_ID);
         $this->assertFalse($this->decisionMaker->isAssociatedWithUser($user, new \stdClass()));
     }
 
-    public function testIsAssociatedWithOrganizationForOrganizationObject()
+    public function testIsAssociatedWithOrganizationForOrganizationObject(): void
     {
         $this->buildTestTree();
 
@@ -176,7 +171,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user411, $this->org4));
     }
 
-    public function testIsAssociatedWithOrganizationForUserObject()
+    public function testIsAssociatedWithOrganizationForUserObject(): void
     {
         $this->buildTestTree();
 
@@ -192,7 +187,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user411, $this->user411));
     }
 
-    public function testIsAssociatedWithOrganizationForOrganizationOwnedObject()
+    public function testIsAssociatedWithOrganizationForOrganizationOwnedObject(): void
     {
         $this->buildTestTree();
 
@@ -218,7 +213,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj4));
     }
 
-    public function testIsAssociatedWithOrganizationForBusinessUnitOwnedObject()
+    public function testIsAssociatedWithOrganizationForBusinessUnitOwnedObject(): void
     {
         $this->buildTestTree();
 
@@ -251,7 +246,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj411));
     }
 
-    public function testIsAssociatedWithOrganizationForUserOwnedObject()
+    public function testIsAssociatedWithOrganizationForUserOwnedObject(): void
     {
         $this->buildTestTree();
 
@@ -282,7 +277,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj411));
     }
 
-    public function testIsAssociatedWithBusinessUnitForOrganizationObject()
+    public function testIsAssociatedWithBusinessUnitForOrganizationObject(): void
     {
         $this->buildTestTree();
 
@@ -293,7 +288,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->assertFalse($this->decisionMaker->isAssociatedWithBusinessUnit($this->user4, $this->org4));
     }
 
-    public function testIsAssociatedWithBusinessUnitForBusinessUnitObject()
+    public function testIsAssociatedWithBusinessUnitForBusinessUnitObject(): void
     {
         $this->buildTestTree();
 
@@ -312,7 +307,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->assertTrue($this->decisionMaker->isAssociatedWithBusinessUnit($this->user4, $this->bu411, true));
     }
 
-    public function testIsAssociatedWithBusinessUnitForUserObject()
+    public function testIsAssociatedWithBusinessUnitForUserObject(): void
     {
         $this->buildTestTree();
 
@@ -336,7 +331,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->assertTrue($this->decisionMaker->isAssociatedWithBusinessUnit($this->user411, $this->user411, true));
     }
 
-    public function testIsAssociatedWithBusinessUnitForOrganizationOwnedObject()
+    public function testIsAssociatedWithBusinessUnitForOrganizationOwnedObject(): void
     {
         $this->buildTestTree();
 
@@ -362,7 +357,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->assertFalse($this->decisionMaker->isAssociatedWithBusinessUnit($this->user4, $obj4));
     }
 
-    public function testIsAssociatedWithBusinessUnitForBusinessUnitOwnedObject()
+    public function testIsAssociatedWithBusinessUnitForBusinessUnitOwnedObject(): void
     {
         $this->buildTestTree();
 
@@ -399,7 +394,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->assertTrue($this->decisionMaker->isAssociatedWithBusinessUnit($this->user4, $obj411, true));
     }
 
-    public function testIsAssociatedWithBusinessUnitForUserOwnedObject()
+    public function testIsAssociatedWithBusinessUnitForUserOwnedObject(): void
     {
         $this->buildTestTree();
 
@@ -434,7 +429,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->assertTrue($this->decisionMaker->isAssociatedWithBusinessUnit($this->user4, $obj411, true));
     }
 
-    public function testIsAssociatedWithUserForUserObject()
+    public function testIsAssociatedWithUserForUserObject(): void
     {
         $this->buildTestTree();
 
@@ -449,7 +444,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->assertTrue($this->decisionMaker->isAssociatedWithUser($this->user411, $this->user411));
     }
 
-    public function testIsAssociatedWithUserForOrganizationOwnedObject()
+    public function testIsAssociatedWithUserForOrganizationOwnedObject(): void
     {
         $this->buildTestTree();
 
@@ -475,7 +470,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->assertFalse($this->decisionMaker->isAssociatedWithUser($this->user4, $obj4));
     }
 
-    public function testIsAssociatedWithUserForBusinessUnitOwnedObject()
+    public function testIsAssociatedWithUserForBusinessUnitOwnedObject(): void
     {
         $this->buildTestTree();
 
@@ -508,7 +503,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
         $this->assertFalse($this->decisionMaker->isAssociatedWithUser($this->user4, $obj411));
     }
 
-    public function testIsAssociatedWithUserForUserOwnedObject()
+    public function testIsAssociatedWithUserForUserOwnedObject(): void
     {
         $this->buildTestTree();
 
@@ -542,7 +537,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
     /**
      * @dataProvider supportsDataProvider
      */
-    public function testSupports(?object $user, bool $expectedResult)
+    public function testSupports(?object $user, bool $expectedResult): void
     {
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')

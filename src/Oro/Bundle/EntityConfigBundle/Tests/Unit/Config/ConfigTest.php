@@ -5,10 +5,11 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
+use PHPUnit\Framework\TestCase;
 
-class ConfigTest extends \PHPUnit\Framework\TestCase
+class ConfigTest extends TestCase
 {
-    public function testCloneConfig()
+    public function testCloneConfig(): void
     {
         $config = new Config(new EntityConfigId('testScope', 'testClass'));
 
@@ -21,7 +22,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertNotSame($config, $clone);
     }
 
-    public function testValueConfig()
+    public function testValueConfig(): void
     {
         $config = new Config(new EntityConfigId('testScope', 'testClass'));
 
@@ -76,7 +77,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         $config->get('nonExistKey', true);
     }
 
-    public function testSetState()
+    public function testSetState(): void
     {
         $configId = new EntityConfigId('testScope', 'Test\Class');
         $configValues = ['test' => 'testVal'];

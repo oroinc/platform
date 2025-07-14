@@ -3,11 +3,11 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\DataCollector\Analyzer;
 
 use Oro\Bundle\EntityBundle\DataCollector\Analyzer\DuplicateQueryAnalyzer;
+use PHPUnit\Framework\TestCase;
 
-class DuplicateQueryAnalyzerTest extends \PHPUnit\Framework\TestCase
+class DuplicateQueryAnalyzerTest extends TestCase
 {
-    /** @var DuplicateQueryAnalyzer */
-    private $queryAnalyzer;
+    private DuplicateQueryAnalyzer $queryAnalyzer;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class DuplicateQueryAnalyzerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getIdenticalQueriesDataProvider
      */
-    public function testGetIdenticalQueries(array $queries, array $expectedIdenticalQueries)
+    public function testGetIdenticalQueries(array $queries, array $expectedIdenticalQueries): void
     {
         foreach ($queries as $query) {
             $this->queryAnalyzer->addQuery($query['sql'], $query['params']);
@@ -79,7 +79,7 @@ class DuplicateQueryAnalyzerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getSimilarQueriesDataProvider
      */
-    public function testGetSimilarQueries(array $queries, array $expectedIdenticalQueries)
+    public function testGetSimilarQueries(array $queries, array $expectedIdenticalQueries): void
     {
         foreach ($queries as $query) {
             $this->queryAnalyzer->addQuery($query['sql'], $query['params']);

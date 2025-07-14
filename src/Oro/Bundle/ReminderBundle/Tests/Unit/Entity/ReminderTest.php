@@ -7,11 +7,11 @@ use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
 use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class ReminderTest extends \PHPUnit\Framework\TestCase
+class ReminderTest extends TestCase
 {
-    /** @var Reminder */
-    private $entity;
+    private Reminder $entity;
 
     #[\Override]
     protected function setUp(): void
@@ -19,13 +19,13 @@ class ReminderTest extends \PHPUnit\Framework\TestCase
         $this->entity = new Reminder();
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         self::assertEmpty($this->entity->getId());
         self::assertEquals(Reminder::STATE_NOT_SENT, $this->entity->getState());
     }
 
-    public function testIntervalAndStartAt()
+    public function testIntervalAndStartAt(): void
     {
         $expireAt = new \DateTime('2014-01-15');
         $number = 3;
@@ -40,28 +40,28 @@ class ReminderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(new \DateTime('2014-01-12'), $this->entity->getStartAt());
     }
 
-    public function testPrePersist()
+    public function testPrePersist(): void
     {
         $this->entity->prePersist();
 
         self::assertEquals($this->entity->getCreatedAt()->format('Y-m-d'), date('Y-m-d'));
     }
 
-    public function testPreUpdate()
+    public function testPreUpdate(): void
     {
         $this->entity->preUpdate();
 
         self::assertEquals($this->entity->getUpdatedAt()->format('Y-m-d'), date('Y-m-d'));
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $this->entity->setSubject('subject');
 
         self::assertEquals('subject', (string)$this->entity);
     }
 
-    public function testSetSentState()
+    public function testSetSentState(): void
     {
         $this->entity->setState(Reminder::STATE_SENT);
 
@@ -69,7 +69,7 @@ class ReminderTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf('DateTime', $this->entity->getSentAt());
     }
 
-    public function testSetReminderData()
+    public function testSetReminderData(): void
     {
         $expectedSubject = 'subject';
         $expectedExpireAt = new \DateTime();
@@ -94,7 +94,7 @@ class ReminderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedRecipient, $this->entity->getRecipient());
     }
 
-    public function testSetFailureException()
+    public function testSetFailureException(): void
     {
         $expectedMessage = 'Expected message';
         $expectedCode = 100;
@@ -120,7 +120,7 @@ class ReminderTest extends \PHPUnit\Framework\TestCase
         string $property,
         ?string $getter = null,
         ?string $setter = null
-    ) {
+    ): void {
         $getter = $getter ?: 'get' . \ucfirst($property);
         $setter = $setter ?: 'set' . \ucfirst($property);
 

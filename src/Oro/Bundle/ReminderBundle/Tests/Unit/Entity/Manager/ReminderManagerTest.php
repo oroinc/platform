@@ -21,14 +21,9 @@ use PHPUnit\Framework\TestCase;
 
 class ReminderManagerTest extends TestCase
 {
-    /** @var EntityManagerInterface|MockObject */
-    private $entityManager;
-
-    /** @var DoctrineHelper|MockObject */
-    private $doctrineHelper;
-
-    /** @var ReminderManager */
-    private $manager;
+    private EntityManagerInterface&MockObject $entityManager;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ReminderManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -43,7 +38,7 @@ class ReminderManagerTest extends TestCase
         $this->manager = new ReminderManager($this->doctrineHelper);
     }
 
-    public function testSaveRemindersOnCreate()
+    public function testSaveRemindersOnCreate(): void
     {
         $fooReminder = $this->createReminder(100);
         $barReminder = $this->createReminder(200);
@@ -82,7 +77,7 @@ class ReminderManagerTest extends TestCase
         $this->manager->saveReminders($entity);
     }
 
-    public function testSaveEmptyEntityId()
+    public function testSaveEmptyEntityId(): void
     {
         $entity = $this->createMock(RemindableInterface::class);
 
@@ -96,7 +91,7 @@ class ReminderManagerTest extends TestCase
         $this->manager->saveReminders($entity);
     }
 
-    public function testSaveRemindersOnUpdate()
+    public function testSaveRemindersOnUpdate(): void
     {
         $fooReminder = $this->createReminder(100);
         $barReminder = $this->createReminder(200);
@@ -148,7 +143,7 @@ class ReminderManagerTest extends TestCase
     /**
      * @dataProvider emptyRemindersProvider
      */
-    public function testSaveRemindersEmpty(Collection|array $reminders)
+    public function testSaveRemindersEmpty(Collection|array $reminders): void
     {
         $entityId = 101;
         $entity = $this->createMock(RemindableInterface::class);
@@ -184,7 +179,7 @@ class ReminderManagerTest extends TestCase
         ];
     }
 
-    public function testLoadReminders()
+    public function testLoadReminders(): void
     {
         $entityId = 101;
         $entity = $this->createMock(RemindableInterface::class);
@@ -215,7 +210,7 @@ class ReminderManagerTest extends TestCase
         $this->manager->loadReminders($entity);
     }
 
-    public function testApplyRemindersNoItems()
+    public function testApplyRemindersNoItems(): void
     {
         $entityClassName = Reminder::class;
         $items = [];
@@ -226,7 +221,7 @@ class ReminderManagerTest extends TestCase
         $this->manager->applyReminders($items, $entityClassName);
     }
 
-    public function testApplyRemindersNotRemindableEntity()
+    public function testApplyRemindersNotRemindableEntity(): void
     {
         $entityClassName = Reminder::class;
         $items = [
@@ -243,7 +238,7 @@ class ReminderManagerTest extends TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testApplyReminders()
+    public function testApplyReminders(): void
     {
         $entityClassName = RemindableEntity::class;
         $items = [
@@ -357,10 +352,7 @@ class ReminderManagerTest extends TestCase
             ->with($reminderData);
     }
 
-    /**
-     * @return Reminder|MockObject
-     */
-    private function createReminder(int $id)
+    private function createReminder(int $id): Reminder&MockObject
     {
         $result = $this->createMock(Reminder::class);
         $result->expects(self::any())

@@ -29,7 +29,8 @@ class FormExtensionTest extends TestCase
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
         $this->formRenderer = $this->createMock(FormRendererInterface::class);
 
-        $this->container->method('get')
+        $this->container->expects(self::any())
+            ->method('get')
             ->willReturnMap([
                 ['oro_form.captcha.settings_provider', $this->captchaSettingsProvider],
                 ['form.factory', $this->formFactory],

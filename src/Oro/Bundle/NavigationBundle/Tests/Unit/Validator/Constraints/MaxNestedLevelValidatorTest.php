@@ -12,14 +12,14 @@ use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevel;
 use Oro\Bundle\NavigationBundle\Validator\Constraints\MaxNestedLevelValidator;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class MaxNestedLevelValidatorTest extends ConstraintValidatorTestCase
 {
     use MenuItemTestTrait;
 
-    private BuilderChainProvider|\PHPUnit\Framework\MockObject\MockObject $builderChainProvider;
-
+    private BuilderChainProvider&MockObject $builderChainProvider;
     private MenuUpdateApplierInterface $menuUpdateApplier;
 
     #[\Override]
@@ -28,8 +28,7 @@ class MaxNestedLevelValidatorTest extends ConstraintValidatorTestCase
         $this->builderChainProvider = $this->createMock(BuilderChainProvider::class);
 
         $localizationHelper = $this->createMock(LocalizationHelper::class);
-        $localizationHelper
-            ->expects(self::any())
+        $localizationHelper->expects(self::any())
             ->method('getLocalizedValue')
             ->willReturnCallback(static fn ($collection) => $collection[0] ?? null);
 
@@ -61,8 +60,7 @@ class MaxNestedLevelValidatorTest extends ConstraintValidatorTestCase
         $update->setParentKey('item-1-1');
         $update->setUri('#');
 
-        $this->builderChainProvider
-            ->expects(self::once())
+        $this->builderChainProvider->expects(self::once())
             ->method('get')
             ->with('menu', ['ignoreCache' => true, 'scopeContext' => $scope])
             ->willReturn($menu);
@@ -70,8 +68,7 @@ class MaxNestedLevelValidatorTest extends ConstraintValidatorTestCase
         $constraint = new MaxNestedLevel();
         $this->validator->validate($update, $constraint);
 
-        $this
-            ->buildViolation('oro.navigation.validator.menu_update.max_nested_level.message')
+        $this->buildViolation('oro.navigation.validator.menu_update.max_nested_level.message')
             ->setParameter('{{ label }}', '"item-1-1-1"')
             ->setParameter('{{ max }}', $maxNestingLevel)
             ->setCode(MaxNestedLevel::MAX_NESTING_LEVEL_ERROR)
@@ -101,8 +98,7 @@ class MaxNestedLevelValidatorTest extends ConstraintValidatorTestCase
         $update->setUri('#');
         $update->setCustom(true);
 
-        $this->builderChainProvider
-            ->expects(self::once())
+        $this->builderChainProvider->expects(self::once())
             ->method('get')
             ->with('menu', ['ignoreCache' => true, 'scopeContext' => $scope])
             ->willReturn($menu);
@@ -110,8 +106,7 @@ class MaxNestedLevelValidatorTest extends ConstraintValidatorTestCase
         $constraint = new MaxNestedLevel();
         $this->validator->validate($update, $constraint);
 
-        $this
-            ->buildViolation('oro.navigation.validator.menu_update.max_nested_level.message')
+        $this->buildViolation('oro.navigation.validator.menu_update.max_nested_level.message')
             ->setParameter('{{ label }}', '"item-1-1-1-1"')
             ->setParameter('{{ max }}', $maxNestingLevel)
             ->setCode(MaxNestedLevel::MAX_NESTING_LEVEL_ERROR)

@@ -5,14 +5,13 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Permission;
 use Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider;
 use Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigurablePermissionProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigurablePermissionProviderTest extends TestCase
 {
-    /** @var ConfigurablePermissionConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurationProvider;
-
-    /** @var ConfigurablePermissionProvider */
-    private $provider;
+    private ConfigurablePermissionConfigurationProvider&MockObject $configurationProvider;
+    private ConfigurablePermissionProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class ConfigurablePermissionProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getDataProvider
      */
-    public function testGet(string $name, array $data, ConfigurablePermission $expected)
+    public function testGet(string $name, array $data, ConfigurablePermission $expected): void
     {
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')

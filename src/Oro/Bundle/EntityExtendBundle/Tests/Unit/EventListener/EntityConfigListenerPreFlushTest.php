@@ -199,7 +199,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
         }
 
         $fieldConfigId = new FieldConfigId($scope, 'TestClass', 'testFieldName', $type);
-        $eventConfig   = new Config($fieldConfigId);
+        $eventConfig = new Config($fieldConfigId);
         $eventConfig->setValues($resultValues);
 
         return $eventConfig;
@@ -230,7 +230,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
         }
 
         $entityConfigId = new EntityConfigId($scope, 'TestClass');
-        $entityConfig   = new Config($entityConfigId);
+        $entityConfig = new Config($entityConfigId);
         $entityConfig->setValues($resultValues);
 
         return $entityConfig;

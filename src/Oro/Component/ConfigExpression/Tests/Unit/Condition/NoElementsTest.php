@@ -6,9 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\ConfigExpression\Condition\NoElements;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class NoElementsTest extends \PHPUnit\Framework\TestCase
+class NoElementsTest extends TestCase
 {
     private NoElements $condition;
 
@@ -22,7 +23,7 @@ class NoElementsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, array $context, bool $expectedResult)
+    public function testEvaluate(array $options, array $context, bool $expectedResult): void
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -64,7 +65,7 @@ class NoElementsTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testAddError()
+    public function testAddError(): void
     {
         $context = ['foo' => ['bar']];
         $options = [new PropertyPath('foo')];
@@ -84,7 +85,7 @@ class NoElementsTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInitializeFailsWithEmptyOptions()
+    public function testInitializeFailsWithEmptyOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 element, but 0 given.');
@@ -95,7 +96,7 @@ class NoElementsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray(array $options, ?string $message, array $expected)
+    public function testToArray(array $options, ?string $message, array $expected): void
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -137,7 +138,7 @@ class NoElementsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile(array $options, ?string $message, string $expected)
+    public function testCompile(array $options, ?string $message, string $expected): void
     {
         $this->condition->initialize($options);
         if ($message !== null) {

@@ -3,13 +3,14 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EntityExtendBundle\Tools\AssociationNameGenerator;
+use PHPUnit\Framework\TestCase;
 
-class AssociationNameGeneratorTest extends \PHPUnit\Framework\TestCase
+class AssociationNameGeneratorTest extends TestCase
 {
     /**
      * @dataProvider getMethodNamesProvider
      */
-    public function testGenerateMethodNames($method, $kind, $methodName)
+    public function testGenerateMethodNames($method, $kind, $methodName): void
     {
         $this->assertEquals(
             $methodName,

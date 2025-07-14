@@ -9,6 +9,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -16,14 +17,9 @@ class LocalizationFallbackStrategyTest extends OrmTestCase
 {
     private const CACHE_KEY = 'localization_fallbacks';
 
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var LocalizationFallbackStrategy */
-    private $strategy;
+    private EntityManagerInterface $em;
+    private CacheInterface&MockObject $cache;
+    private LocalizationFallbackStrategy $strategy;
 
     #[\Override]
     protected function setUp(): void
@@ -42,7 +38,7 @@ class LocalizationFallbackStrategyTest extends OrmTestCase
         $this->strategy = new LocalizationFallbackStrategy($doctrine, $this->cache);
     }
 
-    public function testIsApplicable()
+    public function testIsApplicable(): void
     {
         self::assertTrue($this->strategy->isApplicable());
     }
@@ -50,7 +46,7 @@ class LocalizationFallbackStrategyTest extends OrmTestCase
     /**
      * @dataProvider getLocaleFallbacksDataProvider
      */
-    public function testGetLocaleFallbacks(array $rows, array $localizations)
+    public function testGetLocaleFallbacks(array $rows, array $localizations): void
     {
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
@@ -94,7 +90,7 @@ class LocalizationFallbackStrategyTest extends OrmTestCase
     /**
      * @dataProvider getLocaleFallbacksCacheDataProvider
      */
-    public function testGetLocaleFallbacksCache(array $localizations)
+    public function testGetLocaleFallbacksCache(array $localizations): void
     {
         $this->getDriverConnectionMock($this->em)->expects(self::never())
             ->method('query');
@@ -119,12 +115,12 @@ class LocalizationFallbackStrategyTest extends OrmTestCase
         ];
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         self::assertEquals('oro_localization_fallback_strategy', $this->strategy->getName());
     }
 
-    public function testClearCache()
+    public function testClearCache(): void
     {
         $this->cache->expects(self::once())
             ->method('delete')

@@ -4,14 +4,14 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChainEntityClassNameProviderTest extends \PHPUnit\Framework\TestCase
+class ChainEntityClassNameProviderTest extends TestCase
 {
-    /** @var EntityClassNameProviderInterface[]|\PHPUnit\Framework\MockObject\MockObject[] */
+    /** @var EntityClassNameProviderInterface[]&MockObject[] */
     private $providers = [];
-
-    /** @var ChainEntityClassNameProvider */
-    private $chainProvider;
+    private ChainEntityClassNameProvider $chainProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +24,7 @@ class ChainEntityClassNameProviderTest extends \PHPUnit\Framework\TestCase
         $this->chainProvider = new ChainEntityClassNameProvider($this->providers);
     }
 
-    public function testGetEntityClassNameByFirstProvider()
+    public function testGetEntityClassNameByFirstProvider(): void
     {
         $entityClass = 'Test\Entity';
 
@@ -38,7 +38,7 @@ class ChainEntityClassNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('Test Entity 1', $this->chainProvider->getEntityClassName($entityClass));
     }
 
-    public function testGetEntityClassNameBySecondProvider()
+    public function testGetEntityClassNameBySecondProvider(): void
     {
         $entityClass = 'Test\Entity';
 
@@ -54,7 +54,7 @@ class ChainEntityClassNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('Test Entity 2', $this->chainProvider->getEntityClassName($entityClass));
     }
 
-    public function testGetEntityClassNameWhenNoProvidersThatCanReturnIt()
+    public function testGetEntityClassNameWhenNoProvidersThatCanReturnIt(): void
     {
         $entityClass = 'Test\Entity';
 
@@ -70,7 +70,7 @@ class ChainEntityClassNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->chainProvider->getEntityClassName($entityClass));
     }
 
-    public function testGetEntityClassPluralNameByFirstProvider()
+    public function testGetEntityClassPluralNameByFirstProvider(): void
     {
         $entityClass = 'Test\Entity';
 
@@ -84,7 +84,7 @@ class ChainEntityClassNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('Test Entity 1', $this->chainProvider->getEntityClassPluralName($entityClass));
     }
 
-    public function testGetEntityClassPluralNameBySecondProvider()
+    public function testGetEntityClassPluralNameBySecondProvider(): void
     {
         $entityClass = 'Test\Entity';
 
@@ -100,7 +100,7 @@ class ChainEntityClassNameProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('Test Entity 2', $this->chainProvider->getEntityClassPluralName($entityClass));
     }
 
-    public function testGetEntityClassPluralNameWhenNoProvidersThatCanReturnIt()
+    public function testGetEntityClassPluralNameWhenNoProvidersThatCanReturnIt(): void
     {
         $entityClass = 'Test\Entity';
 

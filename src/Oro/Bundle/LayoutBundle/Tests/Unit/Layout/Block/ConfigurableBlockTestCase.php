@@ -24,7 +24,7 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
         ];
     }
 
-    public function testBuildViewWithoutOptions()
+    public function testBuildViewWithoutOptions(): void
     {
         $view = $this->getBlockBuilder($this->type, ['option_required' => true], 'test:block--1')
             ->getBlockView();
@@ -62,7 +62,7 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
     /**
      * @dataProvider buildViewDataProvider
      */
-    public function testBuildView(array $options, array $expected)
+    public function testBuildView(array $options, array $expected): void
     {
         $view = $this->getBlockBuilder(static::TYPE_NAME, $options)
             ->getBlockView();
@@ -128,7 +128,7 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
         ];
     }
 
-    public function testConfigureOptionsWithEmptyOptions()
+    public function testConfigureOptionsWithEmptyOptions(): void
     {
         $this->assertEquals([
             'option_default' => 'value',
@@ -139,7 +139,7 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
         ], $this->resolveOptions(static::TYPE_NAME, ['option_required' => 'required_value']));
     }
 
-    public function testConfigureOptionsWithValidOptions()
+    public function testConfigureOptionsWithValidOptions(): void
     {
         $this->assertEquals([
             'option' => 'value',

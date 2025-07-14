@@ -3,10 +3,11 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\BlockViewCollection;
+use PHPUnit\Framework\TestCase;
 
-class BlockViewCollectionTest extends \PHPUnit\Framework\TestCase
+class BlockViewCollectionTest extends TestCase
 {
-    public function testGet()
+    public function testGet(): void
     {
         $elements = [1, 'A' => 'a', 2, 'null' => null, 3, 'A2' => 'a', 'zero' => 0];
         $collection = new BlockViewCollection($elements);
@@ -15,7 +16,7 @@ class BlockViewCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('a', $collection['A']);
     }
 
-    public function testGetUnknown()
+    public function testGetUnknown(): void
     {
         $this->expectException(\OutOfBoundsException::class);
         $this->expectExceptionMessage('Undefined index: unknown.');
@@ -24,7 +25,7 @@ class BlockViewCollectionTest extends \PHPUnit\Framework\TestCase
         $collection['unknown'];
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Not supported');
@@ -33,7 +34,7 @@ class BlockViewCollectionTest extends \PHPUnit\Framework\TestCase
         $collection['exist'] = 'New exist';
     }
 
-    public function testExist()
+    public function testExist(): void
     {
         $elements = ['exist' => true, 'null' => null];
         $collection = new BlockViewCollection($elements);
@@ -43,7 +44,7 @@ class BlockViewCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(isset($collection['null']));
     }
 
-    public function testUnset()
+    public function testUnset(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Not supported');

@@ -4,8 +4,9 @@ namespace Oro\Bundle\BatchBundle\Tests\Unit\Monolog\Handler;
 
 use Oro\Bundle\BatchBundle\Monolog\Handler\BatchLogHandler;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class BatchLogHandlerTest extends \PHPUnit\Framework\TestCase
+class BatchLogHandlerTest extends TestCase
 {
     use TempDirExtension;
 

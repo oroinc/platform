@@ -6,14 +6,13 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityClassResolverTest extends \PHPUnit\Framework\TestCase
+class EntityClassResolverTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var EntityClassResolver */
-    private $resolver;
+    private ManagerRegistry&MockObject $doctrine;
+    private EntityClassResolver $resolver;
 
     #[\Override]
     protected function setUp(): void
@@ -23,25 +22,25 @@ class EntityClassResolverTest extends \PHPUnit\Framework\TestCase
         $this->resolver = new EntityClassResolver($this->doctrine);
     }
 
-    public function testGetEntityClassWithFullClassName()
+    public function testGetEntityClassWithFullClassName(): void
     {
         $testClass = 'Acme\Bundle\SomeBundle\SomeClass';
         $this->assertEquals($testClass, $this->resolver->getEntityClass($testClass));
     }
 
-    public function testGetEntityClassWithInvalidEntityName()
+    public function testGetEntityClassWithInvalidEntityName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->resolver->getEntityClass('AcmeSomeBundle:Entity:SomeClass');
     }
 
-    public function testGetEntityClassWithUnsupportedEntityName()
+    public function testGetEntityClassWithUnsupportedEntityName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->resolver->getEntityClass('AcmeSomeBundle:SomeClass');
     }
 
-    public function testIsKnownEntityClassNamespace()
+    public function testIsKnownEntityClassNamespace(): void
     {
         $config = $this->createMock(Configuration::class);
         $config->expects($this->exactly(2))
@@ -65,7 +64,7 @@ class EntityClassResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->resolver->isKnownEntityClassNamespace('Acme\Bundle\AnotherBundle\Entity'));
     }
 
-    public function testIsEntity()
+    public function testIsEntity(): void
     {
         $className = 'Test\Entity';
 
@@ -80,7 +79,7 @@ class EntityClassResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsEntityForNotManageableEntity()
+    public function testIsEntityForNotManageableEntity(): void
     {
         $className = 'Test\Entity';
 

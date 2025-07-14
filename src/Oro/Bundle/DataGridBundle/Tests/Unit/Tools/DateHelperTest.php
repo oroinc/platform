@@ -4,14 +4,13 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\DataGridBundle\Tools\DateHelper;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DateHelperTest extends \PHPUnit\Framework\TestCase
+class DateHelperTest extends TestCase
 {
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
-
-    /** @var DateHelper */
-    private $dateHelper;
+    private LocaleSettings&MockObject $localeSettings;
+    private DateHelper $dateHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->dateHelper = new DateHelper($this->localeSettings);
     }
 
-    public function testGetTimeZoneOffset()
+    public function testGetTimeZoneOffset(): void
     {
         $this->localeSettings->expects(self::once())
             ->method('getTimeZone')
@@ -32,7 +31,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('+09:00', $this->dateHelper->getTimeZoneOffset());
     }
 
-    public function testGetTimeZoneOffsetForUTC()
+    public function testGetTimeZoneOffsetForUTC(): void
     {
         $this->localeSettings->expects(self::once())
             ->method('getTimeZone')
@@ -41,7 +40,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('+00:00', $this->dateHelper->getTimeZoneOffset());
     }
 
-    public function testGetConvertTimezoneExpression()
+    public function testGetConvertTimezoneExpression(): void
     {
         $this->localeSettings->expects(self::once())
             ->method('getTimeZone')
@@ -53,7 +52,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetConvertTimezoneExpressionForUTC()
+    public function testGetConvertTimezoneExpressionForUTC(): void
     {
         $this->localeSettings->expects(self::once())
             ->method('getTimeZone')

@@ -6,17 +6,16 @@ use Oro\Bundle\SegmentBundle\Event\ConditionBuilderOptionsLoadEvent;
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
 use Oro\Bundle\SegmentBundle\Twig\SegmentExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
+class SegmentExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dispatcher;
-
-    /** @var SegmentExtension */
-    private $segmentExtension;
+    private EventDispatcherInterface&MockObject $dispatcher;
+    private SegmentExtension $segmentExtension;
 
     #[\Override]
     protected function setUp(): void

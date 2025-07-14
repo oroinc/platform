@@ -6,17 +6,14 @@ use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Factory\QueryFactoryInterface;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Oro\Bundle\SearchBundle\Query\SearchRepository;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SearchRepositoryTest extends \PHPUnit\Framework\TestCase
+class SearchRepositoryTest extends TestCase
 {
-    /** @var QueryFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryFactory;
-
-    /** @var AbstractSearchMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $mappingProvider;
-
-    /** @var SearchRepository */
-    private $repository;
+    private QueryFactoryInterface&MockObject $queryFactory;
+    private AbstractSearchMappingProvider&MockObject $mappingProvider;
+    private SearchRepository $repository;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +27,7 @@ class SearchRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->repository = new SearchRepository($this->queryFactory, $this->mappingProvider);
     }
 
-    public function testCreateQueryWithoutEntity()
+    public function testCreateQueryWithoutEntity(): void
     {
         $query = $this->createMock(SearchQueryInterface::class);
 
@@ -44,7 +41,7 @@ class SearchRepositoryTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($query, $this->repository->createQuery());
     }
 
-    public function testCreateQueryWithEntity()
+    public function testCreateQueryWithEntity(): void
     {
         $entityClass = 'TestClass';
         $entityAlias = 'test_class';
@@ -68,26 +65,26 @@ class SearchRepositoryTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($query, $this->repository->createQuery());
     }
 
-    public function testSetEntityName()
+    public function testSetEntityName(): void
     {
         self::assertEmpty($this->repository->getEntityName());
         $this->repository->setEntityName('TestClass');
         self::assertEquals('TestClass', $this->repository->getEntityName());
     }
 
-    public function testGetEntityName()
+    public function testGetEntityName(): void
     {
         self::assertNull($this->repository->getEntityName());
         $this->repository->setEntityName('TestClass');
         self::assertEquals('TestClass', $this->repository->getEntityName());
     }
 
-    public function testGetQueryFactory()
+    public function testGetQueryFactory(): void
     {
         self::assertEquals($this->queryFactory, $this->repository->getQueryFactory());
     }
 
-    public function testGetMappingProvider()
+    public function testGetMappingProvider(): void
     {
         self::assertEquals($this->mappingProvider, $this->repository->getMappingProvider());
     }

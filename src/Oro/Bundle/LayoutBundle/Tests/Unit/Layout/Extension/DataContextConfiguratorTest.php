@@ -5,11 +5,11 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 use Oro\Bundle\LayoutBundle\Layout\Extension\DataContextConfigurator;
 use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\TestCase;
 
-class DataContextConfiguratorTest extends \PHPUnit\Framework\TestCase
+class DataContextConfiguratorTest extends TestCase
 {
-    /** @var DataContextConfigurator */
-    private $contextConfigurator;
+    private DataContextConfigurator $contextConfigurator;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +17,7 @@ class DataContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->contextConfigurator = new DataContextConfigurator();
     }
 
-    public function testMoveDataToDataCollection()
+    public function testMoveDataToDataCollection(): void
     {
         $dataKey1 = 'test1';
         $data1 = new \stdClass();
@@ -45,7 +45,7 @@ class DataContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($data2, $context->data()->get($dataKey2));
     }
 
-    public function testEmptyData()
+    public function testEmptyData(): void
     {
         $context = new LayoutContext();
         $context['data'] = [];
@@ -55,14 +55,14 @@ class DataContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($context->has('data'));
     }
 
-    public function testNoData()
+    public function testNoData(): void
     {
         $context = new LayoutContext();
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
     }
 
-    public function testShouldThrowExceptionIfDataNotArray()
+    public function testShouldThrowExceptionIfDataNotArray(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -75,7 +75,7 @@ class DataContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $context->resolve();
     }
 
-    public function testShouldThrowExceptionIfInvalidDataArray()
+    public function testShouldThrowExceptionIfInvalidDataArray(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The data key "0" must be a string, but "integer" given.');
@@ -85,7 +85,7 @@ class DataContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->contextConfigurator->configureContext($context);
     }
 
-    public function testShouldThrowExceptionIfNoDataValue()
+    public function testShouldThrowExceptionIfNoDataValue(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The data item "test" must have "data" key.');

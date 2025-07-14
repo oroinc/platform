@@ -7,14 +7,13 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\TransitionHandleProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TransitionHandleProcessorTest extends \PHPUnit\Framework\TestCase
+class TransitionHandleProcessorTest extends TestCase
 {
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var TransitionHandleProcessor */
-    private $processor;
+    private WorkflowManager&MockObject $workflowManager;
+    private TransitionHandleProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class TransitionHandleProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new TransitionHandleProcessor($this->workflowManager);
     }
 
-    public function testHandle()
+    public function testHandle(): void
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())
@@ -44,7 +43,7 @@ class TransitionHandleProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testHandleFailures()
+    public function testHandleFailures(): void
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())
@@ -71,7 +70,7 @@ class TransitionHandleProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('normalize', $context->getFirstGroup());
     }
 
-    public function testSkipNotSavedForm()
+    public function testSkipNotSavedForm(): void
     {
         $context = new TransitionContext();
 
@@ -83,7 +82,7 @@ class TransitionHandleProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testSkipContextWithFailures()
+    public function testSkipContextWithFailures(): void
     {
         $context = new TransitionContext();
         $context->setSaved(true);

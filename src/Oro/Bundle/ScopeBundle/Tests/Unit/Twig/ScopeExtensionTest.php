@@ -15,10 +15,8 @@ class ScopeExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    private PropertyAccessorInterface|MockObject $propertyAccessor;
-
-    private ScopeManager|MockObject $scopeManager;
-
+    private PropertyAccessorInterface&MockObject $propertyAccessor;
+    private ScopeManager&MockObject $scopeManager;
     private ScopeExtension $extension;
 
     #[\Override]
@@ -101,8 +99,7 @@ class ScopeExtensionTest extends TestCase
         $scopeEntities = ['firstField' => 'FirstClass', 'secondField' => 'SecondClass'];
         $scopeType = 'sample_type';
 
-        $this->scopeManager
-            ->expects(self::once())
+        $this->scopeManager->expects(self::once())
             ->method('getScopeEntities')
             ->with($scopeType)
             ->willReturn($scopeEntities);

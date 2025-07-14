@@ -5,17 +5,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\StandardAttributeNormalizer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class StandardAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
+class StandardAttributeNormalizerTest extends TestCase
 {
-    /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflow;
-
-    /** @var Attribute|\PHPUnit\Framework\MockObject\MockObject */
-    private $attribute;
-
-    /** @var StandardAttributeNormalizer */
-    private $normalizer;
+    private Workflow&MockObject $workflow;
+    private Attribute&MockObject $attribute;
+    private StandardAttributeNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +26,7 @@ class StandardAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeScalarsAndArrayDataProvider
      */
-    public function testNormalizeScalarsAndArray(string $type, mixed $value, mixed $expected)
+    public function testNormalizeScalarsAndArray(string $type, mixed $value, mixed $expected): void
     {
         $this->workflow->expects($this->never())
             ->method($this->anything());
@@ -95,7 +92,7 @@ class StandardAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeObjectDataProvider
      */
-    public function testNormalizeObject(mixed $value, string $class, ?string $expected)
+    public function testNormalizeObject(mixed $value, string $class, ?string $expected): void
     {
         $type = 'object';
 
@@ -136,7 +133,7 @@ class StandardAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider denormalizeScalarsAndArrayDataProvider
      */
-    public function testDenormalizeScalarsAndArray(string $type, mixed $value, mixed $expected)
+    public function testDenormalizeScalarsAndArray(string $type, mixed $value, mixed $expected): void
     {
         $this->workflow->expects($this->never())
             ->method($this->anything());
@@ -207,7 +204,7 @@ class StandardAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider denormalizeObjectDataProvider
      */
-    public function testDenormalizeObject(string $value, string $class, ?object $expected)
+    public function testDenormalizeObject(string $value, string $class, ?object $expected): void
     {
         $type = 'object';
 
@@ -248,7 +245,7 @@ class StandardAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsNormalizeAndDenormalizeDataProvider
      */
-    public function testSupportsNormalizeAndDenormalize(string $direction, string $type, bool $expected)
+    public function testSupportsNormalizeAndDenormalize(string $direction, string $type, bool $expected): void
     {
         $attributeValue = 'bar';
 

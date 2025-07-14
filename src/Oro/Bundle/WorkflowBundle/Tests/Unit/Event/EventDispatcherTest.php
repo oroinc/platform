@@ -28,7 +28,9 @@ class EventDispatcherTest extends TestCase
         $contextName = 'context';
 
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->method('getWorkflowName')->willReturn($workflowName);
+        $workflowItem->expects(self::any())
+            ->method('getWorkflowName')
+            ->willReturn($workflowName);
 
         $event = $this->createConfiguredMock(
             WorkflowItemAwareEvent::class,
@@ -38,8 +40,7 @@ class EventDispatcherTest extends TestCase
             ]
         );
 
-        $this->innerDispatcher
-            ->expects($this->exactly(3))
+        $this->innerDispatcher->expects($this->exactly(3))
             ->method('dispatch')
             ->withConsecutive(
                 [$event, 'oro_workflow.some_event'],

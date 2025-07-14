@@ -17,13 +17,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserPasswordResetHandlerTest extends TestCase
 {
-    private UserManager|MockObject $userManager;
-    private TranslatorInterface|MockObject $translator;
-    private LoggerInterface|MockObject $logger;
-    private UserLoggingInfoProviderInterface|MockObject $userLoggingInfoProvider;
-    private UserPasswordResetHandler $handler;
     private int $ttl = 3600;
+    private UserManager&MockObject $userManager;
+    private TranslatorInterface&MockObject $translator;
+    private LoggerInterface&MockObject $logger;
+    private UserLoggingInfoProviderInterface&MockObject $userLoggingInfoProvider;
+    private UserPasswordResetHandler $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->userManager = $this->createMock(UserManager::class);

@@ -8,20 +8,15 @@ use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\EventListener\InvalidateCacheListener;
 use Oro\Bundle\NotificationBundle\Provider\NotificationManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class InvalidateCacheListenerTest extends \PHPUnit\Framework\TestCase
+class InvalidateCacheListenerTest extends TestCase
 {
-    /** @var NotificationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $notificationManager;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject */
-    private $uow;
-
-    /** @var InvalidateCacheListener */
-    private $listener;
+    private NotificationManager&MockObject $notificationManager;
+    private EntityManagerInterface&MockObject $em;
+    private UnitOfWork&MockObject $uow;
+    private InvalidateCacheListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -37,7 +32,7 @@ class InvalidateCacheListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new InvalidateCacheListener($this->notificationManager);
     }
 
-    public function testWhenNoChangesAffectsRulesCache()
+    public function testWhenNoChangesAffectsRulesCache(): void
     {
         $emailNotification = $this->createMock(EmailNotification::class);
 
@@ -63,7 +58,7 @@ class InvalidateCacheListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postFlush();
     }
 
-    public function testShouldNotClearCacheTwiceInCaseNestedOnFlushEvent()
+    public function testShouldNotClearCacheTwiceInCaseNestedOnFlushEvent(): void
     {
         $this->uow->expects(self::once())
             ->method('getScheduledEntityInsertions')
@@ -87,7 +82,7 @@ class InvalidateCacheListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postFlush();
     }
 
-    public function testWhenHasInsertedEmailNotification()
+    public function testWhenHasInsertedEmailNotification(): void
     {
         $this->uow->expects(self::once())
             ->method('getScheduledEntityInsertions')
@@ -106,7 +101,7 @@ class InvalidateCacheListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postFlush();
     }
 
-    public function testWhenHasDeletedEmailNotification()
+    public function testWhenHasDeletedEmailNotification(): void
     {
         $this->uow->expects(self::once())
             ->method('getScheduledEntityInsertions')
@@ -126,7 +121,7 @@ class InvalidateCacheListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postFlush();
     }
 
-    public function testWhenHasUpdatedEntityNameFieldForEmailNotification()
+    public function testWhenHasUpdatedEntityNameFieldForEmailNotification(): void
     {
         $emailNotification = $this->createMock(EmailNotification::class);
 
@@ -151,7 +146,7 @@ class InvalidateCacheListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postFlush();
     }
 
-    public function testWhenHasUpdatedEventNameFieldForEmailNotification()
+    public function testWhenHasUpdatedEventNameFieldForEmailNotification(): void
     {
         $emailNotification = $this->createMock(EmailNotification::class);
 

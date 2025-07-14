@@ -10,26 +10,21 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
+class EnumTranslationCacheTest extends TestCase
 {
     private const CLASS_NAME = 'FooBar';
     private const LOCALE = 'en_US';
 
-    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var EnumTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $enumTranslationCache;
-
-    /** @var LocalizationHelper */
-    private $localizationHelper;
-
-    /** @var LocaleSettings */
-    private $localeSettings;
+    private CacheInterface&MockObject $cache;
+    private LocalizationHelper $localizationHelper;
+    private LocaleSettings $localeSettings;
+    private EnumTranslationCache $enumTranslationCache;
 
     #[\Override]
     protected function setUp(): void
@@ -47,7 +42,7 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $localization = (new Localization())->setFormattingCode(self::LOCALE);
         $this->localizationHelper->expects($this->exactly(2))
@@ -71,7 +66,7 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $this->enumTranslationCache->get(EnumOption::class, $repo));
     }
 
-    public function testGetCached()
+    public function testGetCached(): void
     {
         $localization = (new Localization())->setFormattingCode(self::LOCALE);
         $this->localizationHelper->expects($this->exactly(2))
@@ -89,7 +84,7 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $this->enumTranslationCache->get($enumCode, $repo));
     }
 
-    public function testInvalidate()
+    public function testInvalidate(): void
     {
         $key = $this->getKey();
         $localization = new Localization();

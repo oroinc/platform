@@ -9,18 +9,17 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 use Oro\Bundle\ConfigBundle\EventListener\EntitySystemConfigListener;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntitySystemConfigListenerTest extends \PHPUnit\Framework\TestCase
+class EntitySystemConfigListenerTest extends TestCase
 {
     private const ENTITY_CLASS = User::class;
     private const CONFIG_KEY = 'alias.config_key';
     private const SETTINGS_KEY = 'alias___config_key';
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var EntitySystemConfigListener */
-    private $listener;
+    private ManagerRegistry&MockObject $doctrine;
+    private EntitySystemConfigListener $listener;
 
     #[\Override]
     protected function setUp(): void

@@ -6,8 +6,9 @@ use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class ImportExportResultTest extends \PHPUnit\Framework\TestCase
+class ImportExportResultTest extends TestCase
 {
     use EntityTestCaseTrait;
 

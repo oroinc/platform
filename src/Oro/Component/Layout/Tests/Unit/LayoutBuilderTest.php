@@ -17,33 +17,24 @@ use Oro\Component\Layout\OptionValueBag;
 use Oro\Component\Layout\RawLayout;
 use Oro\Component\Layout\RawLayoutBuilderInterface;
 use Oro\Component\Layout\Tests\Unit\Stubs\LayoutContextStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class LayoutBuilderTest extends \PHPUnit\Framework\TestCase
+class LayoutBuilderTest extends TestCase
 {
-    protected LayoutRegistryInterface|\PHPUnit\Framework\MockObject\MockObject $registry;
-
-    protected RawLayoutBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $rawLayoutBuilder;
-
-    protected DeferredLayoutManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject $layoutManipulator;
-
-    protected BlockFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $blockFactory;
-
-    protected LayoutRendererInterface|\PHPUnit\Framework\MockObject\MockObject $renderer;
-
+    protected LayoutRegistryInterface&MockObject $registry;
+    protected RawLayoutBuilderInterface&MockObject $rawLayoutBuilder;
+    protected DeferredLayoutManipulatorInterface&MockObject $layoutManipulator;
+    protected BlockFactoryInterface&MockObject $blockFactory;
+    protected LayoutRendererInterface&MockObject $renderer;
     protected LayoutContextStack $layoutContextStack;
-
-    protected ExpressionProcessor|\PHPUnit\Framework\MockObject\MockObject $expressionProcessor;
-
-    /** @var LayoutBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $layoutBuilder;
-
-    /** @var LayoutBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $layoutBuilderWithoutCache;
-
-    protected BlockViewCache|\PHPUnit\Framework\MockObject\MockObject $blockViewCache;
+    protected ExpressionProcessor&MockObject $expressionProcessor;
+    protected LayoutBuilder&MockObject $layoutBuilder;
+    protected LayoutBuilder&MockObject $layoutBuilderWithoutCache;
+    protected BlockViewCache&MockObject $blockViewCache;
 
     #[\Override]
     protected function setUp(): void

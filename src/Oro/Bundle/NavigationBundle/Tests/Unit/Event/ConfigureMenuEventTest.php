@@ -5,17 +5,14 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Event;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigureMenuEventTest extends \PHPUnit\Framework\TestCase
+class ConfigureMenuEventTest extends TestCase
 {
-    /** @var FactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $factory;
-
-    /** @var ItemInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $menu;
-
-    /** @var ConfigureMenuEvent */
-    private $event;
+    private FactoryInterface&MockObject $factory;
+    private ItemInterface&MockObject $menu;
+    private ConfigureMenuEvent $event;
 
     #[\Override]
     protected function setUp(): void
@@ -26,17 +23,17 @@ class ConfigureMenuEventTest extends \PHPUnit\Framework\TestCase
         $this->event = new ConfigureMenuEvent($this->factory, $this->menu);
     }
 
-    public function testGetFactory()
+    public function testGetFactory(): void
     {
         $this->assertEquals($this->event->getFactory(), $this->factory);
     }
 
-    public function testGetMenu()
+    public function testGetMenu(): void
     {
         $this->assertEquals($this->event->getMenu(), $this->menu);
     }
 
-    public function testGetEventName()
+    public function testGetEventName(): void
     {
         $this->assertEquals('oro_menu.configure.test', ConfigureMenuEvent::getEventName('test'));
     }

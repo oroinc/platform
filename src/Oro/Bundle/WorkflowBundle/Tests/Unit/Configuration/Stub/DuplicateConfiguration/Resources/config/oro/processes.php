@@ -1,5 +1,6 @@
 <?php
 
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
@@ -9,7 +10,7 @@ return [
         'test_definition' => [
             'label'   => 'Test Definition',
             'enabled' => true,
-            'entity'  => 'Oro\Bundle\UserBundle\Entity\User',
+            'entity'  => User::class,
             'order'   => 20,
             'exclude_definitions'   => [],
             'actions_configuration' => [

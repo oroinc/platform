@@ -4,11 +4,11 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Form\DataTransformer\EntityFieldFallbackTransformer;
+use PHPUnit\Framework\TestCase;
 
-class EntityFieldFallbackTransformerTest extends \PHPUnit\Framework\TestCase
+class EntityFieldFallbackTransformerTest extends TestCase
 {
-    /** @var EntityFieldFallbackTransformer */
-    private $entityFieldFallbackTransformer;
+    private EntityFieldFallbackTransformer $entityFieldFallbackTransformer;
 
     #[\Override]
     protected function setUp(): void
@@ -16,12 +16,12 @@ class EntityFieldFallbackTransformerTest extends \PHPUnit\Framework\TestCase
         $this->entityFieldFallbackTransformer = new EntityFieldFallbackTransformer();
     }
 
-    public function testTransformReturnsValueIfNotFallbackType()
+    public function testTransformReturnsValueIfNotFallbackType(): void
     {
         $this->assertEquals('testValue', $this->entityFieldFallbackTransformer->transform('testValue'));
     }
 
-    public function testTransformSetsScalarValueIfScalar()
+    public function testTransformSetsScalarValueIfScalar(): void
     {
         $value = new EntityFieldFallbackValue();
         $testValue = 'testValue';
@@ -30,7 +30,7 @@ class EntityFieldFallbackTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($testValue, $value->getScalarValue());
     }
 
-    public function testReverseTransformClearsOwnValues()
+    public function testReverseTransformClearsOwnValues(): void
     {
         $value = new EntityFieldFallbackValue();
         $value->setScalarValue('testValue');
@@ -43,7 +43,7 @@ class EntityFieldFallbackTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($value->getOwnValue());
     }
 
-    public function testReverseTransformClearsFallbackAndArrayIfScalar()
+    public function testReverseTransformClearsFallbackAndArrayIfScalar(): void
     {
         $value = new EntityFieldFallbackValue();
         $scalarValue = 'testValue';
@@ -57,7 +57,7 @@ class EntityFieldFallbackTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertNotNull($value->getOwnValue());
     }
 
-    public function testReverseTransformClearsFallbackAndArrayIfArray()
+    public function testReverseTransformClearsFallbackAndArrayIfArray(): void
     {
         $value = new EntityFieldFallbackValue();
         $arrayValue = ['testValue'];

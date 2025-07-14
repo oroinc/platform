@@ -281,7 +281,7 @@ class MarkdownApiDocParserTest extends TestCase
         string $className,
         string $subresourceName,
         string $actionName
-    ) {
+    ): void {
         $apiDocParser = $this->loadDocument();
 
         self::assertSame(

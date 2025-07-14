@@ -13,12 +13,13 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 
-class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class ReindexEntityMessageProcessorTest extends TestCase
 {
     use MessageQueueExtension;
 
-    public function testCouldBeConstructedWithRequiredArguments()
+    public function testCouldBeConstructedWithRequiredArguments(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -29,14 +30,14 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldReturnSubscribedTopics()
+    public function testShouldReturnSubscribedTopics(): void
     {
         $expectedSubscribedTopics = [ReindexTopic::getName()];
 
         $this->assertEquals($expectedSubscribedTopics, ReindexEntityMessageProcessor::getSubscribedTopics());
     }
 
-    public function testShouldReindexWholeIndexIfMessageIsEmpty()
+    public function testShouldReindexWholeIndexIfMessageIsEmpty(): void
     {
         $indexer = $this->createMock(IndexerInterface::class);
         $indexer->expects($this->once())
@@ -78,7 +79,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldReindexOnlySingleClass()
+    public function testShouldReindexOnlySingleClass(): void
     {
         $indexer = $this->createMock(IndexerInterface::class);
         $indexer->expects($this->once())
@@ -122,7 +123,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldReindexArrayOfClasses()
+    public function testShouldReindexArrayOfClasses(): void
     {
         $indexer = $this->createMock(IndexerInterface::class);
         $indexer->expects($this->once())

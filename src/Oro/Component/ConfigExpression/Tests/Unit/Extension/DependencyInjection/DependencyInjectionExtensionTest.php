@@ -5,18 +5,15 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Extension\DependencyInjectio
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 use Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
+class DependencyInjectionExtensionTest extends TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var DependencyInjectionExtension */
-    private $extension;
-
-    /** @var array */
-    private $serviceIds;
+    private ContainerInterface&MockObject $container;
+    private DependencyInjectionExtension $extension;
+    private array $serviceIds;
 
     #[\Override]
     protected function setUp(): void
@@ -29,13 +26,13 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasExpression()
+    public function testHasExpression(): void
     {
         $this->assertTrue($this->extension->hasExpression('test'));
         $this->assertFalse($this->extension->hasExpression('unknown'));
     }
 
-    public function testGetExpression()
+    public function testGetExpression(): void
     {
         $expr = $this->createMock(ExpressionInterface::class);
 
@@ -47,7 +44,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expr, $this->extension->getExpression('test'));
     }
 
-    public function testGetUnknownExpression()
+    public function testGetUnknownExpression(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The expression "unknown" is not registered with the service container.');
@@ -55,7 +52,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->getExpression('unknown');
     }
 
-    public function testGetServiceIds()
+    public function testGetServiceIds(): void
     {
         $this->assertSame($this->serviceIds, $this->extension->getServiceIds());
     }

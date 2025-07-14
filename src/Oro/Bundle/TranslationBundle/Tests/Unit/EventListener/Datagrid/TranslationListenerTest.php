@@ -9,11 +9,12 @@ use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\EventListener\Datagrid\TranslationListener;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TranslationListenerTest extends \PHPUnit\Framework\TestCase
+class TranslationListenerTest extends TestCase
 {
-    private LanguageProvider|\PHPUnit\Framework\MockObject\MockObject $languageProvider;
-
+    private LanguageProvider&MockObject $languageProvider;
     private TranslationListener $listener;
 
     #[\Override]

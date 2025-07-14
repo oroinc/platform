@@ -4,17 +4,16 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\EventListener\AttributeManagerCacheListener;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit test for AttributeManagerCacheListener
  */
-class AttributeManagerCacheListenerTest extends \PHPUnit\Framework\TestCase
+class AttributeManagerCacheListenerTest extends TestCase
 {
-    /** @var AttributeManagerCacheListener */
-    private $listener;
-
-    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeManager;
+    private AttributeManagerCacheListener $listener;
+    private AttributeManager&MockObject $attributeManager;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class AttributeManagerCacheListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new AttributeManagerCacheListener($this->attributeManager);
     }
 
-    public function testOnCreateEntity()
+    public function testOnCreateEntity(): void
     {
         $this->attributeManager->expects(self::once())
             ->method('clearAttributesCache');
@@ -31,7 +30,7 @@ class AttributeManagerCacheListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onCreateEntity();
     }
 
-    public function testOnCreateField()
+    public function testOnCreateField(): void
     {
         $this->attributeManager->expects(self::once())
             ->method('clearAttributesCache');
@@ -39,7 +38,7 @@ class AttributeManagerCacheListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onCreateField();
     }
 
-    public function testOnUpdateEntity()
+    public function testOnUpdateEntity(): void
     {
         $this->attributeManager->expects(self::once())
             ->method('clearAttributesCache');
@@ -47,7 +46,7 @@ class AttributeManagerCacheListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onUpdateEntity();
     }
 
-    public function testOnUpdateField()
+    public function testOnUpdateField(): void
     {
         $this->attributeManager->expects(self::once())
             ->method('clearAttributesCache');
@@ -55,7 +54,7 @@ class AttributeManagerCacheListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onUpdateField();
     }
 
-    public function testOnRenameField()
+    public function testOnRenameField(): void
     {
         $this->attributeManager->expects(self::once())
             ->method('clearAttributesCache');

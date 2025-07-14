@@ -8,8 +8,7 @@ use Oro\Bundle\LocaleBundle\Api\LocalizedFallbackValueCompleter;
 
 class LocalizedFallbackValueCompleterTest extends CompleteDefinitionHelperTestCase
 {
-    /** @var LocalizedFallbackValueCompleter */
-    private $localizedFallbackValueCompleter;
+    private LocalizedFallbackValueCompleter $localizedFallbackValueCompleter;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +18,7 @@ class LocalizedFallbackValueCompleterTest extends CompleteDefinitionHelperTestCa
         $this->localizedFallbackValueCompleter = new LocalizedFallbackValueCompleter();
     }
 
-    public function testCompleteLocalizedFallbackValue()
+    public function testCompleteLocalizedFallbackValue(): void
     {
         $dataType = 'localizedFallbackValue:names';
         $fieldName = 'name';
@@ -63,7 +62,7 @@ class LocalizedFallbackValueCompleterTest extends CompleteDefinitionHelperTestCa
         );
     }
 
-    public function testCompleteLocalizedFallbackValueWhenItsNameEqualToTargetFieldName()
+    public function testCompleteLocalizedFallbackValueWhenItsNameEqualToTargetFieldName(): void
     {
         $fieldName = 'names';
         $dataType = 'localizedFallbackValue:' . $fieldName;
@@ -111,7 +110,7 @@ class LocalizedFallbackValueCompleterTest extends CompleteDefinitionHelperTestCa
         );
     }
 
-    public function testCompleteLocalizedFallbackValueWhenItsNameEqualToTargetFieldNameAndTargetFieldWasNotRenamed()
+    public function testCompleteLocalizedFallbackValueWhenItsNameEqualToTargetFieldNameAndItWasNotRenamed(): void
     {
         $fieldName = 'names';
         $dataType = 'localizedFallbackValue:' . $fieldName;
@@ -145,7 +144,7 @@ class LocalizedFallbackValueCompleterTest extends CompleteDefinitionHelperTestCa
         );
     }
 
-    public function testCompleteLocalizedFallbackValueWhenAnotherLocalizedFallbackValueAlreadyCompleted()
+    public function testCompleteLocalizedFallbackValueWhenAnotherLocalizedFallbackValueAlreadyCompleted(): void
     {
         $dataType = 'localizedFallbackValue:names';
         $fieldName = 'name';
@@ -200,7 +199,7 @@ class LocalizedFallbackValueCompleterTest extends CompleteDefinitionHelperTestCa
         );
     }
 
-    public function testNotSupportedDataType()
+    public function testNotSupportedDataType(): void
     {
         $dataType = 'another_type';
         $fieldName = 'name';

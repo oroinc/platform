@@ -7,20 +7,17 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\Manager\Db\EntityTriggerManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\TriggerDriver\PdoMysql;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityTriggerManagerTest extends \PHPUnit\Framework\TestCase
+class EntityTriggerManagerTest extends TestCase
 {
-    /** @var EntityTriggerManager */
-    private $testable;
+    private EntityTriggerManager $testable;
 
-    /** @var string */
-    private $testEntityClass = 'testEntity';
+    private string $testEntityClass = 'testEntity';
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private Connection&MockObject $connection;
 
     #[\Override]
     protected function setUp(): void
@@ -46,7 +43,7 @@ class EntityTriggerManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDriverException()
+    public function testDriverException(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->connection->expects($this->once())
@@ -56,7 +53,7 @@ class EntityTriggerManagerTest extends \PHPUnit\Framework\TestCase
         $this->testable->disable();
     }
 
-    public function testAddingDriver()
+    public function testAddingDriver(): void
     {
         $driver = $this->createMock(PdoMysql::class);
         $driver->expects($this->once())

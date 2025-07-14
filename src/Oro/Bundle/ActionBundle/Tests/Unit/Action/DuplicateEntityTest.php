@@ -13,13 +13,13 @@ use Oro\Component\Duplicator\Filter\FilterFactory;
 use Oro\Component\Duplicator\Matcher\Matcher;
 use Oro\Component\Duplicator\Matcher\MatcherFactory;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class DuplicateEntityTest extends \PHPUnit\Framework\TestCase
+class DuplicateEntityTest extends TestCase
 {
-    /** @var DuplicateEntity */
-    private $action;
+    private DuplicateEntity $action;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +29,7 @@ class DuplicateEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->setDuplicatorFactory($this->getDuplicateFactory());
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $options = [
             DuplicateEntity::OPTION_KEY_TARGET => 'test_value',
@@ -44,7 +44,7 @@ class DuplicateEntityTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, string $exception, string $exceptionMessage)
+    public function testInitializeException(array $options, string $exception, string $exceptionMessage): void
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($exceptionMessage);
@@ -72,7 +72,7 @@ class DuplicateEntityTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $child = new \stdClass();
         $child->name = 'child';
@@ -90,7 +90,7 @@ class DuplicateEntityTest extends \PHPUnit\Framework\TestCase
         self::assertSame($copyObject->child, $copyObject->child);
     }
 
-    public function testExecuteWithEntity()
+    public function testExecuteWithEntity(): void
     {
         $target = new \stdClass();
 

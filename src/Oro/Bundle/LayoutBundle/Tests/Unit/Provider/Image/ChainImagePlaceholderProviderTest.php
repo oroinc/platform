@@ -4,14 +4,14 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Provider\Image;
 
 use Oro\Bundle\LayoutBundle\Provider\Image\ChainImagePlaceholderProvider;
 use Oro\Bundle\LayoutBundle\Provider\Image\ImagePlaceholderProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ChainImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
+class ChainImagePlaceholderProviderTest extends TestCase
 {
-    private ImagePlaceholderProviderInterface|\PHPUnit\Framework\MockObject\MockObject $provider1;
-
-    private ImagePlaceholderProviderInterface|\PHPUnit\Framework\MockObject\MockObject $provider2;
-
+    private ImagePlaceholderProviderInterface&MockObject $provider1;
+    private ImagePlaceholderProviderInterface&MockObject $provider2;
     private ChainImagePlaceholderProvider $provider;
 
     #[\Override]

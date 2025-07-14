@@ -4,15 +4,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Transition;
 
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\StartContextInitProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class StartContextInitProcessorTest extends \PHPUnit\Framework\TestCase
+class StartContextInitProcessorTest extends TestCase
 {
-    /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
-    private $request;
-
-    /** @var StartContextInitProcessor */
-    private $processor;
+    private Request&MockObject $request;
+    private StartContextInitProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class StartContextInitProcessorTest extends \PHPUnit\Framework\TestCase
         $this->request = $this->createMock(Request::class);
     }
 
-    public function testSkipNotStartTransitionContext()
+    public function testSkipNotStartTransitionContext(): void
     {
         $context = new TransitionContext();
         $context->setIsStartTransition(false);
@@ -36,7 +35,7 @@ class StartContextInitProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($context->has(TransitionContext::ENTITY_ID));
     }
 
-    public function testSetEntityIdAndInitDataArray()
+    public function testSetEntityIdAndInitDataArray(): void
     {
         $context = new TransitionContext();
         $context->setIsStartTransition(true);
@@ -54,7 +53,7 @@ class StartContextInitProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /** Expected context behavior dependency check */
-    public function testSetEntityIdAppliesEvenIfNoId()
+    public function testSetEntityIdAppliesEvenIfNoId(): void
     {
         $context = new TransitionContext();
         $context->setIsStartTransition(true);

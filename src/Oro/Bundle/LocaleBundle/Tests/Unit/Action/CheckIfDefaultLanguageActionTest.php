@@ -9,10 +9,11 @@ use Oro\Bundle\LocaleBundle\Action\CheckIfDefaultLanguageAction;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class CheckIfDefaultLanguageActionTest extends \PHPUnit\Framework\TestCase
+class CheckIfDefaultLanguageActionTest extends TestCase
 {
     private string $otherCode;
     private string $defaultCode;

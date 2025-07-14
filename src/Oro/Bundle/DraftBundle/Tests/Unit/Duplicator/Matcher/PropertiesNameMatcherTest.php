@@ -3,8 +3,9 @@
 namespace Oro\Bundle\DraftBundle\Tests\Unit\Duplicator\Matcher;
 
 use Oro\Bundle\DraftBundle\Duplicator\Matcher\PropertiesNameMatcher;
+use PHPUnit\Framework\TestCase;
 
-class PropertiesNameMatcherTest extends \PHPUnit\Framework\TestCase
+class PropertiesNameMatcherTest extends TestCase
 {
     public function testMatches(): void
     {

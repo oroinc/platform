@@ -7,15 +7,14 @@ use Oro\Bundle\BatchBundle\Event\EventInterface;
 use Oro\Bundle\BatchBundle\Event\JobExecutionEvent;
 use Oro\Bundle\BatchBundle\EventListener\SetJobExecutionLogFileSubscriber;
 use Oro\Bundle\BatchBundle\Monolog\Handler\BatchLogHandler;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SetJobExecutionLogFileSubscriberTest extends \PHPUnit\Framework\TestCase
+class SetJobExecutionLogFileSubscriberTest extends TestCase
 {
-    /** @var BatchLogHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var SetJobExecutionLogFileSubscriber */
-    private $subscriber;
+    private BatchLogHandler&MockObject $logger;
+    private SetJobExecutionLogFileSubscriber $subscriber;
 
     #[\Override]
     protected function setUp(): void
@@ -42,8 +41,7 @@ class SetJobExecutionLogFileSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testSetJobExecutionLogFile(): void
     {
-        $this->logger
-            ->expects(self::any())
+        $this->logger->expects(self::any())
             ->method('getFileName')
             ->willReturn('/tmp/foo.log');
 

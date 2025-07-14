@@ -4,14 +4,13 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
+class EntityNameProviderTest extends TestCase
 {
-    /** @var EntityNameProvider */
-    private $provider;
-
-    /** @var AbstractQueryDesigner|\PHPUnit\Framework\MockObject\MockObject */
-    private $entity;
+    private EntityNameProvider $provider;
+    private AbstractQueryDesigner&MockObject $entity;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new EntityNameProvider();
     }
 
-    public function testProvider()
+    public function testProvider(): void
     {
         $this->assertFalse($this->provider->getEntityName());
 

@@ -12,18 +12,15 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordActionHandler;
 use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ResetPasswordActionHandlerTest extends \PHPUnit\Framework\TestCase
+class ResetPasswordActionHandlerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResetPasswordActionHandler */
-    private $handler;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResetPasswordActionHandler */
-    private $translator;
-
-    /** @var int */
-    private $methodCalls;
+    private TranslatorInterface&MockObject $translator;
+    private int $methodCalls;
+    private ResetPasswordActionHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -45,7 +42,7 @@ class ResetPasswordActionHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandle()
+    public function testHandle(): void
     {
         $responseMessage = 'TEST123';
 

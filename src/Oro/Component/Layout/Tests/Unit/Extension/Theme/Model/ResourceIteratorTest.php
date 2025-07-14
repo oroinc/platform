@@ -3,8 +3,9 @@
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
 use Oro\Component\Layout\Extension\Theme\Model\ResourceIterator;
+use PHPUnit\Framework\TestCase;
 
-class ResourceIteratorTest extends \PHPUnit\Framework\TestCase
+class ResourceIteratorTest extends TestCase
 {
     private array $resources = [
         'base'  => [
@@ -27,7 +28,7 @@ class ResourceIteratorTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    public function testIteratorReturnAllKnownResources()
+    public function testIteratorReturnAllKnownResources(): void
     {
         $this->assertSame(
             [

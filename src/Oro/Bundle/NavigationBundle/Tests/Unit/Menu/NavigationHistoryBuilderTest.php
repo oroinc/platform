@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
+use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\Matcher;
+use Knp\Menu\MenuItem;
 use Knp\Menu\Util\MenuManipulator;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NavigationBundle\Menu\NavigationHistoryBuilder;
@@ -10,26 +12,17 @@ use Oro\Bundle\NavigationBundle\Provider\NavigationItemsProviderInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class NavigationHistoryBuilderTest extends \PHPUnit\Framework\TestCase
+class NavigationHistoryBuilderTest extends TestCase
 {
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var NavigationItemsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $navigationItemsProvider;
-
-    /** @var Matcher|\PHPUnit\Framework\MockObject\MockObject */
-    private $matcher;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var MenuManipulator|\PHPUnit\Framework\MockObject\MockObject */
-    private $menuManipulator;
-
-    /** @var NavigationHistoryBuilder */
-    private $builder;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private NavigationItemsProviderInterface&MockObject $navigationItemsProvider;
+    private Matcher&MockObject $matcher;
+    private ConfigManager&MockObject $configManager;
+    private MenuManipulator&MockObject $menuManipulator;
+    private NavigationHistoryBuilder $builder;
 
     #[\Override]
     protected function setUp(): void
@@ -72,9 +65,9 @@ class NavigationHistoryBuilderTest extends \PHPUnit\Framework\TestCase
                 ['id' => 2, 'title' => 'sample-title-2', 'url' => '', 'route' => 'sample_route_2', 'type' => $type],
             ]);
 
-        $menu = $this->createMock(\Knp\Menu\MenuItem::class);
+        $menu = $this->createMock(MenuItem::class);
 
-        $childMock = $this->createMock(\Knp\Menu\ItemInterface::class);
+        $childMock = $this->createMock(ItemInterface::class);
         $childMock2 = clone $childMock;
         $children = [$childMock, $childMock2];
 

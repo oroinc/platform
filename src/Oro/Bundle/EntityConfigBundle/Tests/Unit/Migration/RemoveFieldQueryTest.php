@@ -5,15 +5,14 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Migration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Statement;
 use Oro\Bundle\EntityConfigBundle\Migration\RemoveFieldQuery;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class RemoveFieldQueryTest extends \PHPUnit\Framework\TestCase
+class RemoveFieldQueryTest extends TestCase
 {
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connector;
+    private LoggerInterface&MockObject $logger;
+    private Connection&MockObject $connector;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class RemoveFieldQueryTest extends \PHPUnit\Framework\TestCase
         $this->logger = $this->createMock(LoggerInterface::class);
     }
 
-    public function testExecuteConfigFieldIsAbsent()
+    public function testExecuteConfigFieldIsAbsent(): void
     {
         $migration = new RemoveFieldQuery('TestClassName', 'TestFieldName');
         $migration->setConnection($this->connector);
@@ -36,7 +35,7 @@ class RemoveFieldQueryTest extends \PHPUnit\Framework\TestCase
         $migration->execute($this->logger);
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $entityClass = 'TestClassName';
         $fieldName = 'TestFieldName';

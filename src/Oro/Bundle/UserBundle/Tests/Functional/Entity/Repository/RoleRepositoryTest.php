@@ -10,6 +10,7 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
 
 class RoleRepositoryTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

@@ -3,14 +3,14 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ProcessorRegistryCompilerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ProcessorRegistryCompilerPassTest extends \PHPUnit\Framework\TestCase
+class ProcessorRegistryCompilerPassTest extends TestCase
 {
-    /** @var ProcessorRegistryCompilerPass */
-    private $compiler;
+    private ProcessorRegistryCompilerPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -69,7 +69,7 @@ class ProcessorRegistryCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWhenTypeAttributeIsMissing()
+    public function testProcessWhenTypeAttributeIsMissing(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -86,7 +86,7 @@ class ProcessorRegistryCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    public function testProcessWhenEntityAttributeIsMissing()
+    public function testProcessWhenEntityAttributeIsMissing(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -103,7 +103,7 @@ class ProcessorRegistryCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    public function testProcessWhenAliasAttributeIsMissing()
+    public function testProcessWhenAliasAttributeIsMissing(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(

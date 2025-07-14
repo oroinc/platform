@@ -6,28 +6,21 @@ use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\GuesserInterface;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptionsGuesser;
 use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class InlineEditColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
+class InlineEditColumnOptionsGuesserTest extends TestCase
 {
     private const TEST_COLUMN_NAME = 'test_column';
     private const TEST_ENTITY_NAME = 'TestEntityName';
 
-    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $validator;
-
-    /** @var ConstraintConverterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $constraintConverter;
-
-    /** @var GuesserInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerGuesser;
-
-    /** @var ClassMetadataInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $validatorMetaData;
-
-    /** @var InlineEditColumnOptionsGuesser */
-    private $guesser;
+    private ValidatorInterface&MockObject $validator;
+    private ConstraintConverterInterface&MockObject $constraintConverter;
+    private GuesserInterface&MockObject $innerGuesser;
+    private ClassMetadataInterface&MockObject $validatorMetaData;
+    private InlineEditColumnOptionsGuesser $guesser;
 
     #[\Override]
     protected function setUp(): void

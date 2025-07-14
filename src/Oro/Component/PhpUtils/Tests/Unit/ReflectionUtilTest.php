@@ -6,13 +6,14 @@ use Oro\Component\PhpUtils\ReflectionUtil;
 use Oro\Component\PhpUtils\Tests\Unit\Stubs\AbstractTestObject;
 use Oro\Component\PhpUtils\Tests\Unit\Stubs\TestObject1;
 use Oro\Component\PhpUtils\Tests\Unit\Stubs\TestObject2;
+use PHPUnit\Framework\TestCase;
 
-class ReflectionUtilTest extends \PHPUnit\Framework\TestCase
+class ReflectionUtilTest extends TestCase
 {
     /**
      * @dataProvider getPropertyDataProvider
      */
-    public function testGetProperty(object $object, string $propertyName, ?string $expectedDeclaringClass)
+    public function testGetProperty(object $object, string $propertyName, ?string $expectedDeclaringClass): void
     {
         $property = ReflectionUtil::getProperty(new \ReflectionClass($object), $propertyName);
         if (null === $expectedDeclaringClass) {

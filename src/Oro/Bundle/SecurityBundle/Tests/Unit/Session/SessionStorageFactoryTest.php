@@ -3,18 +3,18 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Session;
 
 use Oro\Bundle\SecurityBundle\Session\SessionStorageFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageFactoryInterface;
 
-class SessionStorageFactoryTest extends \PHPUnit\Framework\TestCase
+class SessionStorageFactoryTest extends TestCase
 {
-    private SessionStorageFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $innerSessionStorageFactory;
-
+    private SessionStorageFactoryInterface&MockObject $innerSessionStorageFactory;
     private SessionBagInterface $sessionBag;
-
     private SessionStorageFactory $factory;
 
     #[\Override]

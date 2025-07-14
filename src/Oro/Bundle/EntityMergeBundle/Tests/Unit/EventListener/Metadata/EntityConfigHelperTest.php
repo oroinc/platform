@@ -7,17 +7,14 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\EntityConfigHelper;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
+class EntityConfigHelperTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendConfigProvider;
-
-    /** @var EntityConfigHelper */
-    private $helper;
+    private ConfigManager&MockObject $configManager;
+    private ConfigProvider&MockObject $extendConfigProvider;
+    private EntityConfigHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +25,7 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper = new EntityConfigHelper($this->configManager);
     }
 
-    public function testGetConfigForExtendField()
+    public function testGetConfigForExtendField(): void
     {
         $scope = 'merge';
         $className = 'Namespace\Entity';
@@ -56,7 +53,7 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($mergeConfig, $this->helper->getConfig($scope, $className, $fieldName));
     }
 
-    public function testGetConfigByFieldMetadataForNotExtendField()
+    public function testGetConfigByFieldMetadataForNotExtendField(): void
     {
         $scope = 'merge';
         $className = 'Namespace\Entity';
@@ -92,7 +89,7 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($mergeConfig, $this->helper->getConfigByFieldMetadata($scope, $fieldMetadata));
     }
 
-    public function testPrepareFieldMetadataPropertyPathWithExtendField()
+    public function testPrepareFieldMetadataPropertyPathWithExtendField(): void
     {
         $className = 'Namespace\Entity';
         $fieldName = 'test';
@@ -137,7 +134,7 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->prepareFieldMetadataPropertyPath($fieldMetadata);
     }
 
-    public function testPrepareFieldMetadataPropertyPathWithNotExtendField()
+    public function testPrepareFieldMetadataPropertyPathWithNotExtendField(): void
     {
         $className = 'Namespace\\Entity';
         $fieldName = 'test';

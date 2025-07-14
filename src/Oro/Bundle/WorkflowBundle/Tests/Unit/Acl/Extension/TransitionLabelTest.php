@@ -3,12 +3,13 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Extension;
 
 use Oro\Bundle\WorkflowBundle\Acl\Extension\TransitionLabel;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TransitionLabelTest extends \PHPUnit\Framework\TestCase
+class TransitionLabelTest extends TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
+    private TranslatorInterface&MockObject $translator;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +32,7 @@ class TransitionLabelTest extends \PHPUnit\Framework\TestCase
             });
     }
 
-    public function testTrans()
+    public function testTrans(): void
     {
         $label = new TransitionLabel('transition', 'to_step', 'from_step');
 
@@ -42,7 +43,7 @@ class TransitionLabelTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTransWithoutFromStep()
+    public function testTransWithoutFromStep(): void
     {
         $label = new TransitionLabel('transition', 'to_step');
 
@@ -53,7 +54,7 @@ class TransitionLabelTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTransWithoutSteps()
+    public function testTransWithoutSteps(): void
     {
         $label = new TransitionLabel('transition');
 
@@ -64,7 +65,7 @@ class TransitionLabelTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $label = new TransitionLabel('transition', 'to_step', 'from_step');
 
@@ -73,7 +74,7 @@ class TransitionLabelTest extends \PHPUnit\Framework\TestCase
         $this->assertNotSame($label, $unserialized);
     }
 
-    public function testSetState()
+    public function testSetState(): void
     {
         $label = new TransitionLabel('transition', 'to_step', 'from_step');
 

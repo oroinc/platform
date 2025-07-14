@@ -15,21 +15,21 @@ use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
+class ExecuteProcessJobProcessorTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
     use ClassExtensionTrait;
     use EntityTrait;
 
-    private EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entityManager;
-
-    private ProcessHandler|\PHPUnit\Framework\MockObject\MockObject $processHandler;
-
+    private EntityManagerInterface&MockObject $entityManager;
+    private ProcessHandler&MockObject $processHandler;
     private ExecuteProcessJobProcessor $processor;
 
     #[\Override]

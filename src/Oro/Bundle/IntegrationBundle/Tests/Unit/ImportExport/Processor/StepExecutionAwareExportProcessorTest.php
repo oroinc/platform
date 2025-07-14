@@ -6,15 +6,12 @@ use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Processor\ExportProcessorTest;
 use Oro\Bundle\IntegrationBundle\ImportExport\Processor\StepExecutionAwareExportProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class StepExecutionAwareExportProcessorTest extends ExportProcessorTest
 {
-    /** @var StepExecution|\PHPUnit\Framework\MockObject\MockObject */
-    private $stepExecution;
-
-    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextRegistry;
-
+    private StepExecution&MockObject $stepExecution;
+    private ContextRegistry&MockObject $contextRegistry;
     /** @var StepExecutionAwareExportProcessor */
     protected $processor;
 
@@ -29,7 +26,7 @@ class StepExecutionAwareExportProcessorTest extends ExportProcessorTest
         $this->processor = new StepExecutionAwareExportProcessor();
     }
 
-    public function testSetStepExecutionWithoutContextRegistry()
+    public function testSetStepExecutionWithoutContextRegistry(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Missing ContextRegistry');
@@ -37,7 +34,7 @@ class StepExecutionAwareExportProcessorTest extends ExportProcessorTest
         $this->processor->setStepExecution($this->stepExecution);
     }
 
-    public function testSetStepExecution()
+    public function testSetStepExecution(): void
     {
         $this->processor->setContextRegistry($this->contextRegistry);
 

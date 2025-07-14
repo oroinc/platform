@@ -4,15 +4,14 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 use Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\SomeClass;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
+class SystemAwareResolverTest extends TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var SystemAwareResolver */
-    private $resolver;
+    private ContainerInterface&MockObject $container;
+    private SystemAwareResolver $resolver;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
                 ['oro_datagrid.some_class', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, new SomeClass()]
             ]);
 
-        $this->resolver  = new SystemAwareResolver($this->container);
+        $this->resolver = new SystemAwareResolver($this->container);
     }
 
     /**
@@ -143,7 +142,7 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
 
         self::assertEmpty($gridDefinition);
 
-        $definition     = [
+        $definition = [
             'filters' => [
                 'entityName' => [
                     'choices' => 'test-not-valid'

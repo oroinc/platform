@@ -33,13 +33,13 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         ];
     }
 
-    public function testResolveOptionsWithoutFormName()
+    public function testResolveOptionsWithoutFormName(): void
     {
         $options = $this->resolveOptions(EmbedFormFieldType::NAME, ['field_path' => 'firstName']);
         $this->assertEquals('form', $options['form_name']);
     }
 
-    public function testResolveOptionsWithoutFieldName()
+    public function testResolveOptionsWithoutFieldName(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage('The required option "field_path" is missing.');
@@ -47,7 +47,7 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         $this->resolveOptions(EmbedFormFieldType::NAME, []);
     }
 
-    public function testGetBlockView()
+    public function testGetBlockView(): void
     {
         $formName = 'test_form';
         $formPath = 'firstName';
@@ -70,7 +70,7 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         $this->assertFalse($formView->isRendered());
     }
 
-    public function testGetBlockViewWithoutForm()
+    public function testGetBlockViewWithoutForm(): void
     {
         $this->expectException(\OutOfBoundsException::class);
         $this->expectExceptionMessage('Undefined index: test_form.');
@@ -81,7 +81,7 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         );
     }
 
-    public function testBuildViewWithInvalidForm()
+    public function testBuildViewWithInvalidForm(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(sprintf(
@@ -99,7 +99,7 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         );
     }
 
-    public function testGetBlockViewForVisibleField()
+    public function testGetBlockViewForVisibleField(): void
     {
         $formName = 'test_form';
         $formPath = 'firstName';
@@ -122,7 +122,7 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         $this->assertFalse($formView->isRendered());
     }
 
-    public function testGetBlockViewForInvisibleField()
+    public function testGetBlockViewForInvisibleField(): void
     {
         $this->expectException(ItemNotFoundException::class);
 
@@ -136,7 +136,7 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         );
     }
 
-    public function testGetBlockViewForFieldWithVisibleOptionAsNotEvaluatedExpression()
+    public function testGetBlockViewForFieldWithVisibleOptionAsNotEvaluatedExpression(): void
     {
         $formName = 'test_form';
         $formPath = 'firstName';
@@ -159,7 +159,7 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         $this->assertFalse($formView->isRendered());
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $type = $this->getBlockType(EmbedFormFieldType::NAME);
 

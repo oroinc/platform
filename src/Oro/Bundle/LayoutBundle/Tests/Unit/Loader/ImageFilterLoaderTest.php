@@ -9,8 +9,10 @@ use Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 use Oro\Bundle\LayoutBundle\Provider\CustomImageFilterProviderInterface;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
+class ImageFilterLoaderTest extends TestCase
 {
     private const PRODUCT_ORIGINAL = 'product_original';
     private const PRODUCT_ORIGINAL_WITH_FORMAT = 'product_original_with_format';
@@ -20,11 +22,9 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
     private const LARGE_SIZE = 378;
     private const SMALL_SIZE = 56;
 
+    private ImageTypeProvider&MockObject $imageTypeProvider;
+    private FilterConfiguration&MockObject $filterConfig;
     private ImageFilterLoader $imageFilterLoader;
-
-    private ImageTypeProvider|\PHPUnit\Framework\MockObject\MockObject $imageTypeProvider;
-
-    private FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject $filterConfig;
 
     #[\Override]
     protected function setUp(): void

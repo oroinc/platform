@@ -62,7 +62,6 @@ class FormFieldTypeTest extends FormIntegrationTestCase
      */
     public function testListeners(bool $resettable, int $expectedCount): void
     {
-        /* @var FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
         $fieldBuilder = $this->createMock(FormBuilderInterface::class);
 

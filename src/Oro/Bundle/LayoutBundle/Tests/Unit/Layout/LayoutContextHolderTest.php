@@ -4,14 +4,12 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout;
 
 use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 use Oro\Component\Layout\ContextInterface;
+use PHPUnit\Framework\TestCase;
 
-class LayoutContextHolderTest extends \PHPUnit\Framework\TestCase
+class LayoutContextHolderTest extends TestCase
 {
-    /** @var LayoutContextHolder */
-    private $layoutContextHolder;
-
-    /** @var ContextInterface */
-    private $context;
+    private LayoutContextHolder $layoutContextHolder;
+    private ContextInterface $context;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +19,7 @@ class LayoutContextHolderTest extends \PHPUnit\Framework\TestCase
         $this->context = $this->createMock(ContextInterface::class);
     }
 
-    public function testContextAccessor()
+    public function testContextAccessor(): void
     {
         $this->layoutContextHolder->setContext($this->context);
 

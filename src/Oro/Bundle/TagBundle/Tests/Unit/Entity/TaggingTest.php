@@ -6,11 +6,11 @@ use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\Tagging;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class TaggingTest extends \PHPUnit\Framework\TestCase
+class TaggingTest extends TestCase
 {
-    /** @var Tagging */
-    private $tagging;
+    private Tagging $tagging;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class TaggingTest extends \PHPUnit\Framework\TestCase
         $this->tagging = new Tagging();
     }
 
-    public function testSetGetUserMethods()
+    public function testSetGetUserMethods(): void
     {
         $user = $this->createMock(User::class);
 
@@ -26,7 +26,7 @@ class TaggingTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($user, $this->tagging->getOwner());
     }
 
-    public function testSetGetTagMethods()
+    public function testSetGetTagMethods(): void
     {
         $tag = $this->createMock(Tag::class);
         $this->tagging->setTag($tag);
@@ -39,7 +39,7 @@ class TaggingTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($tag, $tagging->getTag());
     }
 
-    public function testSetGetResourceMethods()
+    public function testSetGetResourceMethods(): void
     {
         $resource = $this->getMockForAbstractClass(Taggable::class);
         $resource->expects($this->exactly(2))
@@ -58,7 +58,7 @@ class TaggingTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(get_class($resource), $tagging->getEntityName());
     }
 
-    public function testDateTimeMethods()
+    public function testDateTimeMethods(): void
     {
         $timeCreated = new \DateTime('now');
         $this->tagging->setCreated($timeCreated);

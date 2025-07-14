@@ -5,20 +5,17 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationCache;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationLoaderInterface;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DynamicTranslationProviderTest extends \PHPUnit\Framework\TestCase
+class DynamicTranslationProviderTest extends TestCase
 {
-    /** @var DynamicTranslationLoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $loader;
-
-    /** @var DynamicTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var DynamicTranslationProvider */
-    private $provider;
+    private DynamicTranslationLoaderInterface&MockObject $loader;
+    private DynamicTranslationCache&MockObject $cache;
+    private DynamicTranslationProvider $provider;
 
     #[\Override]
     protected function setUp(): void

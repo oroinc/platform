@@ -4,11 +4,11 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction\Actions\Ajax
 
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\AjaxMassAction;
+use PHPUnit\Framework\TestCase;
 
-class AjaxMassActionTest extends \PHPUnit\Framework\TestCase
+class AjaxMassActionTest extends TestCase
 {
-    /** @var AjaxMassAction */
-    private $action;
+    private AjaxMassAction $action;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class AjaxMassActionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setOptionsDataProvider
      */
-    public function testSetOptions(array $source, array $expected)
+    public function testSetOptions(array $source, array $expected): void
     {
         $this->action->setOptions(ActionConfiguration::create($source));
 

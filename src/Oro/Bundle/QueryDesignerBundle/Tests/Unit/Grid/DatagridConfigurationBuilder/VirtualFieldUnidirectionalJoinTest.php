@@ -10,7 +10,7 @@ class VirtualFieldUnidirectionalJoinTest extends DatagridConfigurationBuilderTes
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testVirtualColumns()
+    public function testVirtualColumns(): void
     {
         $en = 'Acme\Entity\TestEntity';
         $definition = [

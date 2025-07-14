@@ -3,13 +3,13 @@
 namespace Oro\Bundle\ChartBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\ChartBundle\Form\EventListener\ChartTypeEventListener;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class ChartTypeEventListenerTest extends \PHPUnit\Framework\TestCase
+class ChartTypeEventListenerTest extends TestCase
 {
-    /** @var ChartTypeEventListener */
-    private $listener;
+    private ChartTypeEventListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +17,7 @@ class ChartTypeEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new ChartTypeEventListener();
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $events = $this->listener->getSubscribedEvents();
 
@@ -28,7 +28,7 @@ class ChartTypeEventListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider chartConfigsProvider
      */
-    public function testPostSubmit(array $data, array $expected)
+    public function testPostSubmit(array $data, array $expected): void
     {
         $event = $this->createMock(FormEvent::class);
         $event->expects($this->once())
@@ -44,7 +44,7 @@ class ChartTypeEventListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider chartConfigsProvider
      */
-    public function testPreSetData(array $data, array $expected)
+    public function testPreSetData(array $data, array $expected): void
     {
         $event = $this->createMock(FormEvent::class);
         $event->expects($this->once())
@@ -87,7 +87,7 @@ class ChartTypeEventListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testEmptyData()
+    public function testEmptyData(): void
     {
         $event = $this->createMock(FormEvent::class);
         $event->expects($this->exactly(2))

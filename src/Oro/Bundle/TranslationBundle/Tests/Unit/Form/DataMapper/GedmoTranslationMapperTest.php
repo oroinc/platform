@@ -3,17 +3,16 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Form\DataMapper;
 
 use Oro\Bundle\TranslationBundle\Form\DataMapper\GedmoTranslationMapper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormInterface;
 
-class GedmoTranslationMapperTest extends \PHPUnit\Framework\TestCase
+class GedmoTranslationMapperTest extends TestCase
 {
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
-
-    /** @var GedmoTranslationMapper */
-    private $mapper;
+    private FormInterface&MockObject $form;
+    private GedmoTranslationMapper $mapper;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class GedmoTranslationMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider mapDataToFormsEmptyDataProvider
      */
-    public function testMapDataToFormsEmptyData(?array $data)
+    public function testMapDataToFormsEmptyData(?array $data): void
     {
         $this->form->expects($this->never())
             ->method('getConfig');
@@ -41,7 +40,7 @@ class GedmoTranslationMapperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testMapDataToFormsException()
+    public function testMapDataToFormsException(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('object, array or empty');
@@ -49,7 +48,7 @@ class GedmoTranslationMapperTest extends \PHPUnit\Framework\TestCase
         $this->mapper->mapDataToForms('', [$this->form]);
     }
 
-    public function testMapDataToForms()
+    public function testMapDataToForms(): void
     {
         $formConfig = $this->createMock(FormConfigInterface::class);
 

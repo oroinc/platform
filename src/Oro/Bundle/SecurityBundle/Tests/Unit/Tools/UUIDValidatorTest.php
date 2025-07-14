@@ -3,8 +3,9 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\SecurityBundle\Tools\UUIDValidator;
+use PHPUnit\Framework\TestCase;
 
-class UUIDValidatorTest extends \PHPUnit\Framework\TestCase
+class UUIDValidatorTest extends TestCase
 {
     public function testIsValidV4(): void
     {

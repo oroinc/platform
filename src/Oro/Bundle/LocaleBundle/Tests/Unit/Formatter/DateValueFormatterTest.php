@@ -4,18 +4,15 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\LocaleBundle\Formatter\DateValueFormatter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DateValueFormatterTest extends \PHPUnit\Framework\TestCase
+class DateValueFormatterTest extends TestCase
 {
-    /** @var DateTimeFormatterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $datetimeFormatter;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var DateValueFormatter */
-    private $formatter;
+    private DateTimeFormatterInterface&MockObject $datetimeFormatter;
+    private TranslatorInterface&MockObject $translator;
+    private DateValueFormatter $formatter;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +26,7 @@ class DateValueFormatterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormat()
+    public function testFormat(): void
     {
         $parameter = new \DateTime();
         $this->datetimeFormatter->expects($this->once())
@@ -39,7 +36,7 @@ class DateValueFormatterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('01 Jan 2016', $this->formatter->format($parameter));
     }
 
-    public function testGetDefaultValue()
+    public function testGetDefaultValue(): void
     {
         $this->translator->expects($this->once())
             ->method('trans')

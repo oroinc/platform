@@ -20,35 +20,26 @@ use Oro\Bundle\EntityExtendBundle\Test\ExtendedEntityTestTrait;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
+class ActivityListChainProviderTest extends TestCase
 {
     use ExtendedEntityTestTrait;
 
     private const TEST_ACTIVITY_CLASS = EntityStub::class;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var EntityRoutingHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $routeHelper;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var TestActivityProvider */
-    private $testActivityProvider;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ConfigManager&MockObject $configManager;
+    private EntityRoutingHelper&MockObject $routeHelper;
+    private TranslatorInterface&MockObject $translator;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private TestActivityProvider $testActivityProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -85,7 +76,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetProviders()
+    public function testGetProviders(): void
     {
         $provider = $this->getActivityListChainProvider();
         $this->assertEquals(
@@ -94,7 +85,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsApplicableTarget()
+    public function testIsApplicableTarget(): void
     {
         $targetClassName = TestActivityProvider::SUPPORTED_TARGET_CLASS_NAME;
 
@@ -113,7 +104,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsApplicableTargetForNotSupportedTargetEntity()
+    public function testIsApplicableTargetForNotSupportedTargetEntity(): void
     {
         $targetClassName = 'Test\NotSupportedTargetEntity';
 
@@ -132,7 +123,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsApplicableTargetForNotRegisteredActivityEntity()
+    public function testIsApplicableTargetForNotRegisteredActivityEntity(): void
     {
         $targetClassName = TestActivityProvider::SUPPORTED_TARGET_CLASS_NAME;
         $activityClassName = 'Test\NotRegisteredActivityEntity';
@@ -146,7 +137,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsApplicableTargetForNotConfigurableTargetEntity()
+    public function testIsApplicableTargetForNotConfigurableTargetEntity(): void
     {
         $targetClassName = 'Test\NotConfigurableTargetEntity';
 
@@ -163,7 +154,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSupportedActivities()
+    public function testGetSupportedActivities(): void
     {
         $provider = $this->getActivityListChainProvider();
         $this->assertEquals(
@@ -172,7 +163,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsSupportedEntity()
+    public function testIsSupportedEntity(): void
     {
         $testEntity = new \stdClass();
         $this->doctrineHelper->expects($this->once())
@@ -184,7 +175,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($provider->isSupportedEntity($testEntity));
     }
 
-    public function testIsSupportedEntityWrongEntity()
+    public function testIsSupportedEntityWrongEntity(): void
     {
         $testEntity = new \stdClass();
         $this->doctrineHelper->expects($this->once())
@@ -196,7 +187,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($provider->isSupportedEntity($testEntity));
     }
 
-    public function testIsSupportedTargetEntity()
+    public function testIsSupportedTargetEntity(): void
     {
         $correctTarget = new EntityConfigId('entity', 'Acme\DemoBundle\Entity\CorrectEntity');
         $notCorrectTarget = new EntityConfigId('entity', 'Acme\DemoBundle\Entity\NotCorrectEntity');
@@ -214,7 +205,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($provider->isSupportedTargetEntity($testEntity));
     }
 
-    public function testIsSupportedTargetEntityWrongEntity()
+    public function testIsSupportedTargetEntityWrongEntity(): void
     {
         $correctTarget = new EntityConfigId('entity', 'Acme\DemoBundle\Entity\CorrectEntity');
         $notCorrectTarget = new EntityConfigId('entity', 'Acme\DemoBundle\Entity\NotCorrectEntity');
@@ -232,7 +223,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($provider->isSupportedTargetEntity($testEntity));
     }
 
-    public function testGetSubject()
+    public function testGetSubject(): void
     {
         $testEntity = new \stdClass();
         $testEntity->subject = 'test';
@@ -241,7 +232,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test', $provider->getSubject($testEntity));
     }
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $testEntity = new \stdClass();
         $testEntity->description = 'test';
@@ -250,7 +241,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test', $provider->getDescription($testEntity));
     }
 
-    public function testGetEmptySubject()
+    public function testGetEmptySubject(): void
     {
         $testEntity = new TestTarget(1);
 
@@ -258,7 +249,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($provider->getSubject($testEntity));
     }
 
-    public function testGetTargetEntityClasses()
+    public function testGetTargetEntityClasses(): void
     {
         $correctTarget = new EntityConfigId('entity', 'Acme\DemoBundle\Entity\CorrectEntity');
         $notCorrectTarget = new EntityConfigId('entity', 'Acme\DemoBundle\Entity\NotCorrectEntity');
@@ -270,7 +261,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['Acme\DemoBundle\Entity\CorrectEntity'], $provider->getTargetEntityClasses());
     }
 
-    public function testGetTargetEntityClassesOnEmptyTargetList()
+    public function testGetTargetEntityClassesOnEmptyTargetList(): void
     {
         $this->configManager->expects($this->once())
             ->method('getIds')
@@ -285,7 +276,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $provider->getTargetEntityClasses();
     }
 
-    public function testGetActivityListOption()
+    public function testGetActivityListOption(): void
     {
         $entityConfigProvider = $this->createMock(ConfigProvider::class);
         $entityConfig = new Config(new EntityConfigId('entity', self::TEST_ACTIVITY_CLASS));
@@ -322,7 +313,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetUpdatedActivityList()
+    public function testGetUpdatedActivityList(): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $repo = $this->createMock(ActivityListRepository::class);
@@ -379,7 +370,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('testSubject', $result->getSubject());
     }
 
-    public function testGetNewActivityList()
+    public function testGetNewActivityList(): void
     {
         $testEntity = new \stdClass();
         $testEntity->id = 123;
@@ -429,7 +420,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($testEntity->id, $result->getRelatedActivityId());
     }
 
-    public function testGetSupportedOwnerActivities()
+    public function testGetSupportedOwnerActivities(): void
     {
         $provider = $this->getActivityListChainProvider();
         $this->assertEquals(
@@ -453,7 +444,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsSupportedOwnerEntity()
+    public function testIsSupportedOwnerEntity(): void
     {
         $testEntityClass = self::TEST_ACTIVITY_CLASS;
         $testEntity = new $testEntityClass();
@@ -467,7 +458,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($provider->isSupportedEntity($testEntity));
     }
 
-    public function testGetProviderByClassWhenProvidersAreNotInitializedYet()
+    public function testGetProviderByClassWhenProvidersAreNotInitializedYet(): void
     {
         $provider = $this->getActivityListChainProvider();
         $this->assertSame(
@@ -476,7 +467,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetProviderByClassWhenProvidersAlreadyInitialized()
+    public function testGetProviderByClassWhenProvidersAlreadyInitialized(): void
     {
         $provider = $this->getActivityListChainProvider();
 
@@ -489,7 +480,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetProviderForEntity()
+    public function testGetProviderForEntity(): void
     {
         $testEntityClass = self::TEST_ACTIVITY_CLASS;
         $testEntity = new $testEntityClass();
@@ -506,7 +497,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetProviderByOwnerClass()
+    public function testGetProviderByOwnerClass(): void
     {
         $provider = $this->getActivityListChainProvider();
         $this->assertSame(
@@ -515,7 +506,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetProviderForOwnerEntity()
+    public function testGetProviderForOwnerEntity(): void
     {
         $testEntityClass = self::TEST_ACTIVITY_CLASS;
         $testEntity = new $testEntityClass();
@@ -532,7 +523,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetActivityListEntitiesByActivityEntityForEntityWithoutId()
+    public function testGetActivityListEntitiesByActivityEntityForEntityWithoutId(): void
     {
         $testEntity = new \stdClass();
         $testEntity->subject = 'testSubject';

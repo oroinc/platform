@@ -5,11 +5,11 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
+use PHPUnit\Framework\TestCase;
 
-class RestrictHelperTest extends \PHPUnit\Framework\TestCase
+class RestrictHelperTest extends TestCase
 {
-    /** @var RestrictHelper */
-    private $helper;
+    private RestrictHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +24,7 @@ class RestrictHelperTest extends \PHPUnit\Framework\TestCase
         array $operationsValues,
         mixed $definedGroups,
         array $expectedOperations
-    ) {
+    ): void {
         /** @var Operation[] $operations */
         $operations = [];
         foreach ($operationsValues as $operationName => $buttonOptions) {

@@ -150,11 +150,9 @@ class SearchQueryBuilderTest extends TestCase
 
     private function simpleFieldTestingWithClosure(string $name)
     {
-        /** @var SearchQuery $query */
         $query = $this->createSearchQueryBuilder()
             ->$name(
-                function ($builder) {
-                    /** @var SearchQueryValueBuilder $builder */
+                function (SearchQueryValueBuilder $builder) {
                     $builder
                         ->value('val1')
                         ->value('val2');

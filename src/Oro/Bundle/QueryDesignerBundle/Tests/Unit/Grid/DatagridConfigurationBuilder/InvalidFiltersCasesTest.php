@@ -11,7 +11,7 @@ class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
     /**
      * @dataProvider invalidFiltersStructureProvider
      */
-    public function testInvalidFiltersStructure(string $expectedExceptionMessage, array $filters)
+    public function testInvalidFiltersStructure(string $expectedExceptionMessage, array $filters): void
     {
         $en = 'Acme\Entity\TestEntity';
         $definition = [

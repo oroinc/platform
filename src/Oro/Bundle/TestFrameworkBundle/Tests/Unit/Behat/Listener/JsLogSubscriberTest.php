@@ -11,15 +11,16 @@ use Behat\Testwork\Environment\Environment;
 use Behat\Testwork\Tester\Setup\Teardown;
 use Oro\Bundle\TestFrameworkBundle\Behat\Listener\JsLogSubscriber;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class JsLogSubscriberTest extends \PHPUnit\Framework\TestCase
+class JsLogSubscriberTest extends TestCase
 {
     use TempDirExtension;
 
     /**
      * @dataProvider logProvider
      */
-    public function testLog(array $logs, string $expectedContent)
+    public function testLog(array $logs, string $expectedContent): void
     {
         $tempDir = $this->getTempDir('behat_js_log');
         $jsLogSubscriber = $this->getMockBuilder(JsLogSubscriber::class)
@@ -39,7 +40,7 @@ class JsLogSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertStringEqualsFile($expectedLogFile, $expectedContent);
     }
 
-    public function testEmptyLog()
+    public function testEmptyLog(): void
     {
         $tempDir = $this->getTempDir('behat_js_log');
         $jsLogSubscriber = $this->getMockBuilder(JsLogSubscriber::class)

@@ -8,14 +8,13 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\ImportExport\Serializer\TranslationNormalizer;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TranslationNormalizerTest extends \PHPUnit\Framework\TestCase
+class TranslationNormalizerTest extends TestCase
 {
-    /** @var TranslationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationManager;
-
-    /** @var TranslationNormalizer */
-    private $normalizer;
+    private TranslationManager&MockObject $translationManager;
+    private TranslationNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class TranslationNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->normalizer = new TranslationNormalizer($this->translationManager);
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $language = (new Language())->setCode('test_code');
         $translationKey = (new TranslationKey())->setDomain('test_domain')->setKey('test_key');
@@ -55,7 +54,7 @@ class TranslationNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(Translation::SCOPE_UI, $translation->getScope());
     }
 
-    public function testDenormalizeEmpty()
+    public function testDenormalizeEmpty(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Incorrect record format');
@@ -66,7 +65,7 @@ class TranslationNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization(string $type, string $languageCode, bool $expected)
+    public function testSupportsDenormalization(string $type, string $languageCode, bool $expected): void
     {
         $context = ['language_code' => $languageCode];
         $this->assertEquals($expected, $this->normalizer->supportsDenormalization([], $type, null, $context));

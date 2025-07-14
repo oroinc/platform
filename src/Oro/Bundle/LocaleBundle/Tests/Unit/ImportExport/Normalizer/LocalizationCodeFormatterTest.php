@@ -4,11 +4,11 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\ImportExport\Normalizer;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocalizationCodeFormatter;
+use PHPUnit\Framework\TestCase;
 
-class LocalizationCodeFormatterTest extends \PHPUnit\Framework\TestCase
+class LocalizationCodeFormatterTest extends TestCase
 {
-    /** @var LocalizationCodeFormatter */
-    private $formatter;
+    private LocalizationCodeFormatter $formatter;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class LocalizationCodeFormatterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider nameDataProvider
      */
-    public function testFormatName(mixed $localization, string $expected)
+    public function testFormatName(mixed $localization, string $expected): void
     {
         $this->assertEquals($expected, $this->formatter->formatName($localization));
     }
@@ -39,7 +39,7 @@ class LocalizationCodeFormatterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider keyDataProvider
      */
-    public function testFormatKey(mixed $localization, ?string $expected)
+    public function testFormatKey(mixed $localization, ?string $expected): void
     {
         $this->assertEquals($expected, $this->formatter->formatKey($localization));
     }

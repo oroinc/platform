@@ -7,6 +7,7 @@ use Monolog\Logger;
 use Oro\Bundle\LoggerBundle\Monolog\DisableDeprecationsHandlerWrapper;
 use Oro\Bundle\LoggerBundle\Monolog\LogLevelConfig;
 use Oro\Bundle\LoggerBundle\Test\MonologTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\TestCase;
 
@@ -14,9 +15,10 @@ class DisableDeprecationsHandlerWrapperTest extends TestCase
 {
     use MonologTestCaseTrait;
 
-    private LogLevelConfig|\PHPUnit\Framework\MockObject\MockObject $config;
+    private LogLevelConfig&MockObject $config;
     private DisableDeprecationsHandlerWrapper $wrapper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->inner = $this->createMock(HandlerInterface::class);

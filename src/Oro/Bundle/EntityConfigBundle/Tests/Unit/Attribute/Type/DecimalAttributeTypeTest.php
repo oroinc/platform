@@ -21,7 +21,7 @@ class DecimalAttributeTypeTest extends AttributeTypeTestCase
         ];
     }
 
-    public function testGetSearchableValue()
+    public function testGetSearchableValue(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not supported');
@@ -29,7 +29,7 @@ class DecimalAttributeTypeTest extends AttributeTypeTestCase
         $this->getAttributeType()->getSearchableValue($this->attribute, 42.42, $this->localization);
     }
 
-    public function testGetFilterableValue()
+    public function testGetFilterableValue(): void
     {
         $this->assertSame(
             42.42,
@@ -37,14 +37,14 @@ class DecimalAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetFilterableNull()
+    public function testGetFilterableNull(): void
     {
         $this->assertNull(
             $this->getAttributeType()->getFilterableValue($this->attribute, null, $this->localization)
         );
     }
 
-    public function testGetSortableValue()
+    public function testGetSortableValue(): void
     {
         $this->assertSame(
             42.42,
@@ -52,7 +52,7 @@ class DecimalAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetSortableValueNull()
+    public function testGetSortableValueNull(): void
     {
         $this->assertNull(
             $this->getAttributeType()->getSortableValue($this->attribute, null, $this->localization)

@@ -6,10 +6,11 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Validator\Constraints\Provider\StringFieldConfigConstraintsProvider;
 use Oro\Bundle\EntityConfigBundle\Validator\FieldConfigConstraintsFactory;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Validator\Constraints\Length;
 
-class FieldConfigConstraintsFactoryTest extends \PHPUnit\Framework\TestCase
+class FieldConfigConstraintsFactoryTest extends TestCase
 {
     private const STRING_TYPE = 'string';
 

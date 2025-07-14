@@ -6,22 +6,19 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer;
 use Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\ConfigBundle\Form\Type\ConfigFileType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 
-class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
+class ConfigSubscriberTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var FormEvent|\PHPUnit\Framework\MockObject\MockObject */
-    private $event;
-
-    /** @var ConfigSubscriber */
-    private $subscriber;
+    private ConfigManager&MockObject $configManager;
+    private FormEvent&MockObject $event;
+    private ConfigSubscriber $subscriber;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +29,7 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->event = $this->createMock(FormEvent::class);
     }
 
-    public function testPreSubmit()
+    public function testPreSubmit(): void
     {
         $data = ['oro_user___level' => ['use_parent_scope_value' => true]];
 
@@ -56,7 +53,7 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->preSubmit($this->event);
     }
 
-    public function testPreSubmitConfigFileType()
+    public function testPreSubmitConfigFileType(): void
     {
         $data = ['oro_user___level' => ['use_parent_scope_value' => true,]];
 

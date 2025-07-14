@@ -3,10 +3,11 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Encoder;
 
 use Oro\Bundle\SecurityBundle\Encoder\RepetitiveCrypter;
+use PHPUnit\Framework\TestCase;
 
-class RepetitiveCrypterTest extends \PHPUnit\Framework\TestCase
+class RepetitiveCrypterTest extends TestCase
 {
-    public function testCryptData()
+    public function testCryptData(): void
     {
         $testString = 'test string';
 

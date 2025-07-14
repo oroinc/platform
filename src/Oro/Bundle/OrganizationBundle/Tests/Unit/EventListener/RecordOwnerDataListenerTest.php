@@ -6,14 +6,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\OrganizationBundle\EventListener\RecordOwnerDataListener;
 use Oro\Bundle\OrganizationBundle\Ownership\EntityOwnershipAssociationsSetter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class RecordOwnerDataListenerTest extends \PHPUnit\Framework\TestCase
+class RecordOwnerDataListenerTest extends TestCase
 {
-    /** @var EntityOwnershipAssociationsSetter|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityOwnershipAssociationsSetter;
-
-    /** @var RecordOwnerDataListener */
-    private $listener;
+    private EntityOwnershipAssociationsSetter&MockObject $entityOwnershipAssociationsSetter;
+    private RecordOwnerDataListener $listener;
 
     #[\Override]
     protected function setUp(): void

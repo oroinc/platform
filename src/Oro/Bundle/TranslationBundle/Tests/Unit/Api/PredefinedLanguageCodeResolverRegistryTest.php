@@ -5,17 +5,14 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Api;
 use Oro\Bundle\TranslationBundle\Api\PredefinedLanguageCodeResolverInterface;
 use Oro\Bundle\TranslationBundle\Api\PredefinedLanguageCodeResolverRegistry;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PredefinedLanguageCodeResolverRegistryTest extends \PHPUnit\Framework\TestCase
+class PredefinedLanguageCodeResolverRegistryTest extends TestCase
 {
-    /** @var PredefinedLanguageCodeResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $resolver1;
-
-    /** @var PredefinedLanguageCodeResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $resolver2;
-
-    /** @var PredefinedLanguageCodeResolverRegistry */
-    private $registry;
+    private PredefinedLanguageCodeResolverInterface&MockObject $resolver1;
+    private PredefinedLanguageCodeResolverInterface&MockObject $resolver2;
+    private PredefinedLanguageCodeResolverRegistry $registry;
 
     #[\Override]
     protected function setUp(): void

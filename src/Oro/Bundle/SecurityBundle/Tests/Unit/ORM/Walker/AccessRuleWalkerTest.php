@@ -77,7 +77,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertEquals($expectedQuery, $dqlQuery->getSQL());
     }
 
-    public function testWalkerWithEmptyRules()
+    public function testWalkerWithEmptyRules(): void
     {
         $this->rule->setRule(function () {
         });
@@ -91,7 +91,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerWithSimpleComparisonExpression()
+    public function testWalkerWithSimpleComparisonExpression(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             $criteria->andExpression(new Comparison(new Path('user'), Comparison::IN, [1, 2, 3, 4, 5]));
@@ -108,7 +108,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerQueryWithWhereAndWithSimpleComparisonExpression()
+    public function testWalkerQueryWithWhereAndWithSimpleComparisonExpression(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             $criteria->orExpression(new Comparison(new Path('user'), Comparison::IN, [1, 2, 3, 4, 5]));
@@ -127,7 +127,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerQueryWithWhereAndWithCompositeExpression()
+    public function testWalkerQueryWithWhereAndWithCompositeExpression(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             $criteria->andExpression(new Comparison(new Path('user'), Comparison::IN, [1, 2, 3, 4, 5]));
@@ -149,7 +149,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerQueryWithWhereAndWithOrCompositeExpression()
+    public function testWalkerQueryWithWhereAndWithOrCompositeExpression(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             $criteria->andExpression(new Comparison(new Path('user'), Comparison::IN, [1, 2, 3, 4, 5]));
@@ -169,7 +169,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerQueryWithMultiplyWhereAndWithComplicatedCompositeExpression()
+    public function testWalkerQueryWithMultiplyWhereAndWithComplicatedCompositeExpression(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             $criteria->andExpression(
@@ -201,7 +201,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerQueryWithJoinByPathAndWithComplicatedCompositeExpression()
+    public function testWalkerQueryWithJoinByPathAndWithComplicatedCompositeExpression(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             if ($criteria->getEntityClass() === CmsAddress::class) {
@@ -233,7 +233,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerQueryWithJoinByPathAndWithAccessDeniedInJoin()
+    public function testWalkerQueryWithJoinByPathAndWithAccessDeniedInJoin(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             if ($criteria->getEntityClass() === CmsAddress::class) {
@@ -257,7 +257,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerQueryWithJoin()
+    public function testWalkerQueryWithJoin(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             if ($criteria->getEntityClass() === CmsAddress::class) {
@@ -281,7 +281,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerQueryWithJoinAndDisabledCheckRootEntity()
+    public function testWalkerQueryWithJoinAndDisabledCheckRootEntity(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             if ($criteria->getEntityClass() === CmsAddress::class) {
@@ -305,7 +305,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query, [AclHelper::CHECK_ROOT_ENTITY => false]);
     }
 
-    public function testWalkerQueryWithJoinAndDisabledCheckRelationships()
+    public function testWalkerQueryWithJoinAndDisabledCheckRelationships(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             if ($criteria->getEntityClass() === CmsAddress::class) {
@@ -329,7 +329,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query, [AclHelper::CHECK_RELATIONS => false]);
     }
 
-    public function testWalkerQueryWithSubselect()
+    public function testWalkerQueryWithSubselect(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             if ($criteria->getEntityClass() === CmsAddress::class) {
@@ -363,7 +363,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerQueryWithSubselectAndMultipleWhereConditions()
+    public function testWalkerQueryWithSubselectAndMultipleWhereConditions(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             if ($criteria->getEntityClass() === CmsAddress::class) {
@@ -397,7 +397,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerQueryWithSubselectAndDisabledCheckRootEntityAndCheckRelationships()
+    public function testWalkerQueryWithSubselectAndDisabledCheckRootEntityAndCheckRelationships(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             if ($criteria->getEntityClass() === CmsAddress::class) {
@@ -448,7 +448,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertEquals($originalContext, $context);
     }
 
-    public function testWalkerQueryWithSubselectAccessRule()
+    public function testWalkerQueryWithSubselectAccessRule(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             if ($criteria->getEntityClass() === CmsArticle::class) {
@@ -493,7 +493,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerQueryWithNotExistsSubselectAccessRule()
+    public function testWalkerQueryWithNotExistsSubselectAccessRule(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             if ($criteria->getEntityClass() === CmsArticle::class) {
@@ -538,7 +538,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerQueryWithNullComparisonExpression()
+    public function testWalkerQueryWithNullComparisonExpression(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             $criteria->andExpression(new NullComparison(new Path('user')));
@@ -554,7 +554,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerQueryWithNotNullComparisonExpression()
+    public function testWalkerQueryWithNotNullComparisonExpression(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             $criteria->andExpression(new NullComparison(new Path('user'), true));
@@ -571,7 +571,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerWithAssociationRuleExpressionWithWrongParameter()
+    public function testWalkerWithAssociationRuleExpressionWithWrongParameter(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
@@ -592,7 +592,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $query->getSQL();
     }
 
-    public function testWalkerWithAssociationRuleExpressionWithOneToManyParameter()
+    public function testWalkerWithAssociationRuleExpressionWithOneToManyParameter(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
@@ -612,7 +612,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $query->getSQL();
     }
 
-    public function testWalkerWithAssociationRuleExpressionWithManyToManyParameter()
+    public function testWalkerWithAssociationRuleExpressionWithManyToManyParameter(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
@@ -632,7 +632,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $query->getSQL();
     }
 
-    public function testWalkerWithAssociationRuleExpressionOnSimpleQuery()
+    public function testWalkerWithAssociationRuleExpressionOnSimpleQuery(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             if ($criteria->getEntityClass() === CmsAddress::class) {
@@ -656,7 +656,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerWithAssociationRuleExpressionInJoinByPath()
+    public function testWalkerWithAssociationRuleExpressionInJoinByPath(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             if ($criteria->getEntityClass() === CmsAddress::class) {
@@ -683,7 +683,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerWithAssociationRuleExpressionInJoin()
+    public function testWalkerWithAssociationRuleExpressionInJoin(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             if ($criteria->getEntityClass() === CmsAddress::class) {
@@ -711,7 +711,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerWithAssociationRuleExpressionOnQueryWithSubselect()
+    public function testWalkerWithAssociationRuleExpressionOnQueryWithSubselect(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             if ($criteria->getEntityClass() === CmsUser::class) {
@@ -739,7 +739,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerQueryWithSubselectInJoin()
+    public function testWalkerQueryWithSubselectInJoin(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             if ($criteria->getEntityClass() === CmsAddress::class) {
@@ -779,7 +779,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerWithAssociationRuleExpressionOnInverseMappedRelation()
+    public function testWalkerWithAssociationRuleExpressionOnInverseMappedRelation(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             if ($criteria->getEntityClass() === CmsUser::class) {
@@ -802,7 +802,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerWithContainsExpressionForStringField()
+    public function testWalkerWithContainsExpressionForStringField(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             $criteria->andExpression(new Comparison(new Path('topic'), Comparison::CONTAINS, 'test'));
@@ -817,7 +817,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerWithContainsExpressionForStringFieldForNotStringValue()
+    public function testWalkerWithContainsExpressionForStringFieldForNotStringValue(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The right operand for string CONTAINS comparison must be a string.');
@@ -834,7 +834,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $query->getSQL();
     }
 
-    public function testWalkerWithContainsExpressionForJsonArrayField()
+    public function testWalkerWithContainsExpressionForJsonArrayField(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             $criteria->andExpression(new Comparison(new Path('types'), Comparison::CONTAINS, 'val'));
@@ -851,7 +851,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerWithContainsExpressionWithOneValueInArrayForJsonArrayField()
+    public function testWalkerWithContainsExpressionWithOneValueInArrayForJsonArrayField(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             $criteria->andExpression(new Comparison(new Path('types'), Comparison::CONTAINS, 'val'));
@@ -868,7 +868,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerWithContainsExpressionWithSeveralValuesForJsonArrayField()
+    public function testWalkerWithContainsExpressionWithSeveralValuesForJsonArrayField(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             $criteria->andExpression(new Comparison(new Path('types'), Comparison::CONTAINS, ['val1', 'val2']));
@@ -885,7 +885,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerWithContainsExpressionWithSeveralValuesForJsonArrayFieldAndWhereNotEmpty()
+    public function testWalkerWithContainsExpressionWithSeveralValuesForJsonArrayFieldAndWhereNotEmpty(): void
     {
         $this->rule->setRule(function (Criteria $criteria) {
             $criteria->andExpression(new Comparison(new Path('types'), Comparison::CONTAINS, ['val1', 'val2']));
@@ -903,7 +903,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    public function testWalkerWithContainsExpressionWithNoValuesInArrayForJsonArrayField()
+    public function testWalkerWithContainsExpressionWithNoValuesInArrayForJsonArrayField(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
@@ -923,7 +923,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $query->getSQL();
     }
 
-    public function testWalkerWithContainsExpressionWithNotStringAndNotArrayValueForJsonArrayField()
+    public function testWalkerWithContainsExpressionWithNotStringAndNotArrayValueForJsonArrayField(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
@@ -943,7 +943,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $query->getSQL();
     }
 
-    public function testWalkerWithContainsExpressionForJsonArrayFieldWhenLeftOperandIsNotPath()
+    public function testWalkerWithContainsExpressionForJsonArrayFieldWhenLeftOperandIsNotPath(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The left operand for CONTAINS comparison must be a path.');
@@ -961,7 +961,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $query->getSQL();
     }
 
-    public function testWalkerWithContainsExpressionForJsonArrayFieldWhenRightOperandIsNotValue()
+    public function testWalkerWithContainsExpressionForJsonArrayFieldWhenRightOperandIsNotValue(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The right operand for CONTAINS comparison must be a value.');

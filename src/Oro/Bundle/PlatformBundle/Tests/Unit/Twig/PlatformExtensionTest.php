@@ -5,16 +5,15 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\Twig;
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
 use Oro\Bundle\PlatformBundle\Twig\PlatformExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PlatformExtensionTest extends \PHPUnit\Framework\TestCase
+class PlatformExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $versionHelper;
-
-    /** @var PlatformExtension */
-    private $extension;
+    private VersionHelper&MockObject $versionHelper;
+    private PlatformExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class PlatformExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new PlatformExtension($container);
     }
 
-    public function testGetVersion()
+    public function testGetVersion(): void
     {
         $undefinedVersion = 'N/A';
 

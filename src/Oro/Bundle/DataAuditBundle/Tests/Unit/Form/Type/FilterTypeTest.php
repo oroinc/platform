@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\DataAuditBundle\Form\Type\FilterType as AuditFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -13,15 +14,13 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FilterTypeTest extends \PHPUnit\Framework\TestCase
+class FilterTypeTest extends TestCase
 {
     private FormFactoryInterface $factory;
 
     #[\Override]
     protected function setUp(): void
     {
-        parent::setUp();
-
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->expects($this->any())
             ->method('validate')
@@ -34,7 +33,7 @@ class FilterTypeTest extends \PHPUnit\Framework\TestCase
             ->getFormFactory();
     }
 
-    public function testSubmit()
+    public function testSubmit(): void
     {
         $formData = [
             'filter' => [

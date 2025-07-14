@@ -4,10 +4,11 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\ActivityListBundle\EventListener\SegmentConditionBuilderOptionsListener;
 use Oro\Bundle\SegmentBundle\Event\ConditionBuilderOptionsLoadEvent;
+use PHPUnit\Framework\TestCase;
 
-class SegmentConditionBuilderOptionsListenerTest extends \PHPUnit\Framework\TestCase
+class SegmentConditionBuilderOptionsListenerTest extends TestCase
 {
-    public function testListener()
+    public function testListener(): void
     {
         $options = [
             'fieldsRelatedCriteria' => [

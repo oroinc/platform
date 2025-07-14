@@ -4,10 +4,11 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Event;
 
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
+use PHPUnit\Framework\TestCase;
 
-class PrepareEntityMapEventTest extends \PHPUnit\Framework\TestCase
+class PrepareEntityMapEventTest extends TestCase
 {
-    public function testEvent()
+    public function testEvent(): void
     {
         $entity = new Product();
         $class = get_class($entity);

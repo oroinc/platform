@@ -7,12 +7,13 @@ use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Model\EntityMerger;
 use Oro\Bundle\EntityMergeBundle\Model\Step\MergeStepInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class EntityMergerTest extends \PHPUnit\Framework\TestCase
+class EntityMergerTest extends TestCase
 {
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
 
     #[\Override]
     protected function setUp(): void

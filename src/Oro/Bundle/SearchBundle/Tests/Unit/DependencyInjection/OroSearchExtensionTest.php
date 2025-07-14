@@ -3,9 +3,10 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
+class OroSearchExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

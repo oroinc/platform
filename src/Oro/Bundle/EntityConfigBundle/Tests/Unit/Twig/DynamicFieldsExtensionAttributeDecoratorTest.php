@@ -9,22 +9,19 @@ use Oro\Bundle\EntityExtendBundle\Twig\AbstractDynamicFieldsExtension;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit\Framework\TestCase
+class DynamicFieldsExtensionAttributeDecoratorTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
     use EntityTrait;
 
     private const ENTITY_CLASS_NAME = 'entity_class';
 
-    /** @var AbstractDynamicFieldsExtension|\PHPUnit\Framework\MockObject\MockObject */
-    private $baseExtension;
-
-    /** @var AttributeConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeConfigHelper;
-
-    /** @var DynamicFieldsExtensionAttributeDecorator */
-    private $extension;
+    private AbstractDynamicFieldsExtension&MockObject $baseExtension;
+    private AttributeConfigHelper&MockObject $attributeConfigHelper;
+    private DynamicFieldsExtensionAttributeDecorator $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -42,7 +39,7 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit\Framework\Te
         );
     }
 
-    public function testGetField()
+    public function testGetField(): void
     {
         $expectedData = [
             'type' => 'bigint',
@@ -54,7 +51,6 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit\Framework\Te
             ->willReturn($expectedData);
 
         $entity = $this->getEntity(TestActivityTarget::class);
-        /** @var FieldConfigModel $field */
         $field = $this->getEntity(FieldConfigModel::class);
         $this->assertEquals(
             $expectedData,
@@ -137,7 +133,7 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit\Framework\Te
         array $attributeHelperWiths,
         array $attributeHelperReturns,
         array $expectedFields
-    ) {
+    ): void {
         $entity = $this->getEntity(TestActivityTarget::class);
 
         $this->baseExtension->expects($this->once())

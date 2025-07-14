@@ -9,6 +9,7 @@ use Oro\Component\Action\Model\ActionDataStorageAwareInterface;
 use Oro\Component\Action\Model\ExtendableConditionEventErrorsProcessorInterface;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -16,10 +17,10 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
+class ExtendableConditionTest extends TestCase
 {
-    private EventDispatcherInterface|MockObject $eventDispatcher;
-    private ExtendableConditionEventErrorsProcessorInterface|MockObject $errorsProcessor;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private ExtendableConditionEventErrorsProcessorInterface&MockObject $errorsProcessor;
     private ExtendableCondition $extendableCondition;
 
     #[\Override]

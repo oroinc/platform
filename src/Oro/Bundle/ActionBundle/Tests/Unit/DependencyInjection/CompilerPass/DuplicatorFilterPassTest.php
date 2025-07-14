@@ -3,16 +3,16 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\DuplicatorFilterPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class DuplicatorFilterPassTest extends \PHPUnit\Framework\TestCase
+class DuplicatorFilterPassTest extends TestCase
 {
     private const FACTORY_SERVICE_ID = 'oro_action.factory.duplicator_filter_factory';
     private const TAG_NAME = 'oro_action.duplicate.filter_type';
 
-    /** @var DuplicatorFilterPass */
-    private $compiler;
+    private DuplicatorFilterPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -20,12 +20,12 @@ class DuplicatorFilterPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new DuplicatorFilterPass();
     }
 
-    public function testProcessWithoutFactoryService()
+    public function testProcessWithoutFactoryService(): void
     {
         $this->compiler->process(new ContainerBuilder());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->register(self::FACTORY_SERVICE_ID)

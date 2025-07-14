@@ -4,15 +4,14 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Bundle\LayoutBundle\Layout\Extension\ApplicationContextConfigurator;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class ApplicationContextConfiguratorTest extends \PHPUnit\Framework\TestCase
+class ApplicationContextConfiguratorTest extends TestCase
 {
-    /** @var KernelInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $kernel;
-
-    /** @var ApplicationContextConfigurator */
-    private $contextConfigurator;
+    private KernelInterface&MockObject $kernel;
+    private ApplicationContextConfigurator $contextConfigurator;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class ApplicationContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->contextConfigurator = new ApplicationContextConfigurator($this->kernel);
     }
 
-    public function testConfigureContext()
+    public function testConfigureContext(): void
     {
         $context = new LayoutContext();
 
@@ -36,7 +35,7 @@ class ApplicationContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($context['debug']);
     }
 
-    public function testConfigureContextOverride()
+    public function testConfigureContextOverride(): void
     {
         $context = new LayoutContext();
 

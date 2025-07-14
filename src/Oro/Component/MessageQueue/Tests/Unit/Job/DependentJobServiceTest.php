@@ -8,11 +8,12 @@ use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobManagerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DependentJobServiceTest extends \PHPUnit\Framework\TestCase
+class DependentJobServiceTest extends TestCase
 {
-    private JobManagerInterface|\PHPUnit\Framework\MockObject\MockObject $jobManager;
-
+    private JobManagerInterface&MockObject $jobManager;
     private DependentJobService $dependentJobService;
 
     #[\Override]
@@ -40,8 +41,7 @@ class DependentJobServiceTest extends \PHPUnit\Framework\TestCase
         $job = new Job();
         $job->setId(12345);
 
-        $this->jobManager
-            ->expects(self::once())
+        $this->jobManager->expects(self::once())
             ->method('saveJobWithLock')
             ->willReturnCallback(static fn (Job $job, $callback) => $callback($job));
 
@@ -68,8 +68,7 @@ class DependentJobServiceTest extends \PHPUnit\Framework\TestCase
         $job = new Job();
         $job->setId(12345);
 
-        $this->jobManager
-            ->expects(self::once())
+        $this->jobManager->expects(self::once())
             ->method('saveJobWithLock')
             ->willReturnCallback(static fn (Job $job, $callback) => $callback($job));
 

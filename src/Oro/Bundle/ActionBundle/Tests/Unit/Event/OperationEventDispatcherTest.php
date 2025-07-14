@@ -12,9 +12,10 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class OperationEventDispatcherTest extends TestCase
 {
-    private EventDispatcherInterface|MockObject $eventDispatcher;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
     private OperationEventDispatcher $dispatcher;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);

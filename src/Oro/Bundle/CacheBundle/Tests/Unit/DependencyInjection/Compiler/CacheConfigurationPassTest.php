@@ -6,6 +6,7 @@ use Oro\Bundle\CacheBundle\Adapter\ChainAdapter;
 use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CacheConfigurationPass;
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 use Oro\Component\Config\Cache\ConfigCacheWarmer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ChainAdapter as SymfonyChainAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -13,9 +14,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
+class CacheConfigurationPassTest extends TestCase
 {
-    public function testExistingCacheDefinitionsShouldNotBeChanged()
+    public function testExistingCacheDefinitionsShouldNotBeChanged(): void
     {
         $cacheDefinition = new Definition(
             FilesystemAdapter::class,
@@ -36,7 +37,7 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAbstractDefinitionWithoutClass()
+    public function testAbstractDefinitionWithoutClass(): void
     {
         $abstractDataCacheDef = new Definition();
         $abstractDataCacheDef->setAbstract(true);
@@ -50,7 +51,7 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $compiler->process($container);
     }
 
-    public function testAbstractDefinitionWithSupportedClass()
+    public function testAbstractDefinitionWithSupportedClass(): void
     {
         $abstractDataCacheDef = $this->getFilesystemCache();
 
@@ -63,7 +64,7 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $compiler->process($container);
     }
 
-    public function testDataCacheManagerConfiguration()
+    public function testDataCacheManagerConfiguration(): void
     {
         $dataCacheManagerDef = new Definition(OroDataCacheManager::class);
         $dataCacheDef = new ChildDefinition(CacheConfigurationPass::DATA_CACHE_POOL);
@@ -88,7 +89,7 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testStaticConfigCacheWarmers()
+    public function testStaticConfigCacheWarmers(): void
     {
         $providerDef = new ChildDefinition(CacheConfigurationPass::STATIC_CONFIG_PROVIDER_SERVICE);
         $abstractProviderDef = new ChildDefinition(CacheConfigurationPass::STATIC_CONFIG_PROVIDER_SERVICE);
@@ -126,7 +127,7 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($container->hasDefinition('not_config_provider.warmer'));
     }
 
-    public function testClassForChainAdapter()
+    public function testClassForChainAdapter(): void
     {
         $dataCachePoolDef = new Definition(SymfonyChainAdapter::class);
         $container = new ContainerBuilder();

@@ -9,17 +9,16 @@ use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Comparison;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Path;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class OrganizationRestrictionProviderTest extends \PHPUnit\Framework\TestCase
+class OrganizationRestrictionProviderTest extends TestCase
 {
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var OrganizationRestrictionProvider */
-    private $organizationRestrictionProvider;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private OrganizationRestrictionProvider $organizationRestrictionProvider;
 
     #[\Override]
     protected function setUp(): void

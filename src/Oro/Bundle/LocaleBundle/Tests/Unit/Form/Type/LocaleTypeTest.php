@@ -9,8 +9,7 @@ use Symfony\Component\Intl\Locales;
 
 class LocaleTypeTest extends FormIntegrationTestCase
 {
-    /** @var LocaleType */
-    private $formType;
+    private LocaleType $formType;
 
     #[\Override]
     protected function setUp(): void

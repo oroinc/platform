@@ -42,7 +42,7 @@ class DownloadLinksTypeTest extends TestCase
         $resolver = new OptionsResolver();
         $this->type->configureOptions($resolver);
 
-        $options         = ['source' => []];
+        $options = ['source' => []];
         $resolvedOptions = $resolver->resolve($options);
         $this->assertEquals(
             [

@@ -6,11 +6,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\DiscriminatorMapListener;
+use PHPUnit\Framework\TestCase;
 
-class DiscriminatorMapListenerTest extends \PHPUnit\Framework\TestCase
+class DiscriminatorMapListenerTest extends TestCase
 {
-    /** @var DiscriminatorMapListener */
-    private $listener;
+    private DiscriminatorMapListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class DiscriminatorMapListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new DiscriminatorMapListener();
     }
 
-    public function testEmptyClasses()
+    public function testEmptyClasses(): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
 
@@ -30,7 +30,7 @@ class DiscriminatorMapListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($metadata->discriminatorMap);
     }
 
-    public function testNotSingleTable()
+    public function testNotSingleTable(): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
 
@@ -43,7 +43,7 @@ class DiscriminatorMapListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($metadata->discriminatorMap);
     }
 
-    public function testSingleTableNotRoot()
+    public function testSingleTableNotRoot(): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
 
@@ -58,7 +58,7 @@ class DiscriminatorMapListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($metadata->discriminatorMap);
     }
 
-    public function testSingleTableRoot()
+    public function testSingleTableRoot(): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
 
@@ -72,7 +72,7 @@ class DiscriminatorMapListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['key' => 'stdClass'], $metadata->discriminatorMap);
     }
 
-    public function testMapOverride()
+    public function testMapOverride(): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
 

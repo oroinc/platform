@@ -7,17 +7,14 @@ use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolverFactory;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchQueryFilter;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchQueryFilterFactory;
 use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SearchQueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
+class SearchQueryFilterFactoryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AbstractSearchMappingProvider */
-    private $searchMappingProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SearchFieldResolverFactory */
-    private $searchFieldResolverFactory;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ExpressionVisitor */
-    private $searchQueryCriteriaVisitor;
+    private AbstractSearchMappingProvider&MockObject $searchMappingProvider;
+    private SearchFieldResolverFactory&MockObject $searchFieldResolverFactory;
+    private ExpressionVisitor&MockObject $searchQueryCriteriaVisitor;
 
     #[\Override]
     protected function setUp(): void

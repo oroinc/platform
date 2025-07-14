@@ -6,11 +6,12 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\PlatformBundle\MaterializedView\MaterializedViewRepository;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MaterializedViewRepositoryTest extends \PHPUnit\Framework\TestCase
+class MaterializedViewRepositoryTest extends TestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
+    private EntityManagerInterface&MockObject $entityManager;
 
     #[\Override]
     protected function setUp(): void

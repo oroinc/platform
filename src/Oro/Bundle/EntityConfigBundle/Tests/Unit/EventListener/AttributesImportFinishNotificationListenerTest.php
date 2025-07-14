@@ -11,18 +11,17 @@ use Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender;
 use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AttributesImportFinishNotificationListenerTest extends \PHPUnit\Framework\TestCase
+class AttributesImportFinishNotificationListenerTest extends TestCase
 {
     use EntityTrait;
 
     private const ENTITY_ID = 27;
 
-    /** @var AttributesImportTopicSender|\PHPUnit\Framework\MockObject\MockObject */
-    private $topicSender;
-
-    /** @var AttributesImportFinishNotificationListener */
-    private $attributesImportFinishNotificationListener;
+    private AttributesImportTopicSender&MockObject $topicSender;
+    private AttributesImportFinishNotificationListener $attributesImportFinishNotificationListener;
 
     #[\Override]
     protected function setUp(): void
@@ -34,10 +33,9 @@ class AttributesImportFinishNotificationListenerTest extends \PHPUnit\Framework\
         );
     }
 
-    public function testOnAfterAttributesImportWhenNotIsSuccessful()
+    public function testOnAfterAttributesImportWhenNotIsSuccessful(): void
     {
         $jobResult = (new JobResult())->setSuccessful(false);
-        /** @var JobExecution $jobExecution */
         $jobExecution = $this->getEntity(JobExecution::class);
         $event = new AfterJobExecutionEvent($jobExecution, $jobResult);
 
@@ -47,10 +45,9 @@ class AttributesImportFinishNotificationListenerTest extends \PHPUnit\Framework\
         $this->attributesImportFinishNotificationListener->onAfterAttributesImport($event);
     }
 
-    public function testOnAfterAttributesImportWhenJobInstanceAliasIsWrong()
+    public function testOnAfterAttributesImportWhenJobInstanceAliasIsWrong(): void
     {
         $jobResult = (new JobResult())->setSuccessful(true);
-        /** @var JobExecution $jobExecution */
         $jobExecution = $this->getEntity(JobExecution::class, [
             'jobInstance' => $this->getEntity(JobInstance::class, ['alias' => 'some_alias'])
         ]);
@@ -62,14 +59,13 @@ class AttributesImportFinishNotificationListenerTest extends \PHPUnit\Framework\
         $this->attributesImportFinishNotificationListener->onAfterAttributesImport($event);
     }
 
-    public function testOnAfterAttributesImport()
+    public function testOnAfterAttributesImport(): void
     {
         $jobResult = (new JobResult())->setSuccessful(true);
         $context = (new ExecutionContext())->put(
             AttributesImportFinishNotificationListener::ENTITY_CONFIG_MODEL_ID_KEY,
             self::ENTITY_ID
         );
-        /** @var JobExecution $jobExecution */
         $jobExecution = $this->getEntity(JobExecution::class, [
             'jobInstance' => $this->getEntity(JobInstance::class, [
                 'alias' => AttributeImportExportConfigurationProvider::ATTRIBUTE_IMPORT_FROM_CSV_JOB_NAME

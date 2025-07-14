@@ -17,15 +17,14 @@ use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class IndexListenerTest extends \PHPUnit\Framework\TestCase
+class IndexListenerTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var IndexerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $searchIndexer;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private IndexerInterface&MockObject $searchIndexer;
 
     private array $entitiesMapping = [
         Product::class => [
@@ -45,7 +44,7 @@ class IndexListenerTest extends \PHPUnit\Framework\TestCase
         $this->searchIndexer = $this->createMock(IndexerInterface::class);
     }
 
-    public function testOnFlush()
+    public function testOnFlush(): void
     {
         $insertedEntity = $this->createTestEntity('inserted');
         $updatedEntity = $this->createTestEntity('updated');
@@ -120,7 +119,7 @@ class IndexListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPostFlushNoEntities()
+    public function testPostFlushNoEntities(): void
     {
         $this->searchIndexer->expects($this->never())
             ->method('save');
@@ -131,7 +130,7 @@ class IndexListenerTest extends \PHPUnit\Framework\TestCase
         $listener->postFlush(new PostFlushEventArgs($this->createMock(EntityManager::class)));
     }
 
-    public function testPostFlush()
+    public function testPostFlush(): void
     {
         $insertedEntity = $this->createTestEntity('inserted');
         $insertedEntities = ['inserted' => $insertedEntity];
@@ -177,7 +176,7 @@ class IndexListenerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse(ReflectionUtil::callMethod($listener, 'hasEntitiesToIndex', []));
     }
 
-    public function testOnClear()
+    public function testOnClear(): void
     {
         $insertedEntity = $this->createTestEntity('inserted');
         $insertedEntities = ['inserted' => $insertedEntity];

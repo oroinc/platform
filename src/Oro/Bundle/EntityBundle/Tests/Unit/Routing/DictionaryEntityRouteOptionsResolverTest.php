@@ -7,28 +7,19 @@ use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 use Oro\Bundle\EntityBundle\Routing\DictionaryEntityRouteOptionsResolver;
 use Oro\Component\Routing\Resolver\EnhancedRouteCollection;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Route;
 
-class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
+class DictionaryEntityRouteOptionsResolverTest extends TestCase
 {
-    /** @var ChainDictionaryValueListProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $dictionaryProvider;
-
-    /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityAliasResolver;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var EnhancedRouteCollection */
-    private $routeCollection;
-
-    /** @var RouteCollectionAccessor */
-    private $routeCollectionAccessor;
-
-    /** @var DictionaryEntityRouteOptionsResolver */
-    private $routeOptionsResolver;
+    private ChainDictionaryValueListProvider&MockObject $dictionaryProvider;
+    private EntityAliasResolver&MockObject $entityAliasResolver;
+    private LoggerInterface&MockObject $logger;
+    private EnhancedRouteCollection $routeCollection;
+    private RouteCollectionAccessor $routeCollectionAccessor;
+    private DictionaryEntityRouteOptionsResolver $routeOptionsResolver;
 
     #[\Override]
     protected function setUp(): void
@@ -47,7 +38,7 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit\Framework\TestCa
         $this->routeCollectionAccessor = new RouteCollectionAccessor($this->routeCollection);
     }
 
-    public function testResolveUnsupportedRoute()
+    public function testResolveUnsupportedRoute(): void
     {
         $route = new Route('/route');
 
@@ -56,7 +47,7 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit\Framework\TestCa
         $this->assertEquals([], $route->getRequirements());
     }
 
-    public function testResolveDictionaryEntityRouteWithoutEntityPlaceholder()
+    public function testResolveDictionaryEntityRouteWithoutEntityPlaceholder(): void
     {
         $route = new Route('/route', [], [], ['group' => DictionaryEntityRouteOptionsResolver::ROUTE_GROUP]);
 
@@ -65,7 +56,7 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit\Framework\TestCa
         $this->assertEquals([], $route->getRequirements());
     }
 
-    public function testResolve()
+    public function testResolve(): void
     {
         $route = new Route(
             '/{dictionary}/route',
@@ -92,14 +83,12 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit\Framework\TestCa
 
         $this->entityAliasResolver->expects($this->exactly(4))
             ->method('getPluralAlias')
-            ->willReturnMap(
-                [
-                    ['Test\Status', 'statuses'],
-                    ['Test\Priority', 'priorities'],
-                    ['Test\Source', 'sources'],
-                    ['Test\Group', 'groups'],
-                ]
-            );
+            ->willReturnMap([
+                ['Test\Status', 'statuses'],
+                ['Test\Priority', 'priorities'],
+                ['Test\Source', 'sources'],
+                ['Test\Group', 'groups'],
+            ]);
 
         $this->routeOptionsResolver->resolve($route, $this->routeCollectionAccessor);
 

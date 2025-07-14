@@ -9,8 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class ThemeConfigurationProviderTest extends TestCase
 {
-    private GeneralThemeConfigurationProvider|MockObject $generalThemeConfigurationProvider;
-
+    private GeneralThemeConfigurationProvider&MockObject $generalThemeConfigurationProvider;
     private ThemeConfigurationProvider $provider;
 
     #[\Override]
@@ -28,8 +27,7 @@ class ThemeConfigurationProviderTest extends TestCase
     {
         $configurationKey = 'some_option';
 
-        $this->generalThemeConfigurationProvider
-            ->expects(self::once())
+        $this->generalThemeConfigurationProvider->expects(self::once())
             ->method('getThemeConfigurationOption')
             ->with($configurationKey, $scopeIdentifier)
             ->willReturn($expectedOptionValue);

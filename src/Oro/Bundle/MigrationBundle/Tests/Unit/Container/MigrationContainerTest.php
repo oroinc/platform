@@ -3,6 +3,8 @@
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Container;
 
 use Oro\Bundle\MigrationBundle\Container\MigrationContainer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\DependencyInjection\Container as DependencyInjectionContainer;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -10,19 +12,12 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MigrationContainerTest extends \PHPUnit\Framework\TestCase
+class MigrationContainerTest extends TestCase
 {
-    /** @var ParameterBagInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $parameterBag;
-
-    /** @var DependencyInjectionContainer|\PHPUnit\Framework\MockObject\MockObject */
-    private $publicContainer;
-
-    /** @var PsrContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $privateContainer;
-
-    /** @var MigrationContainer */
-    private $migrationContainer;
+    private ParameterBagInterface&MockObject $parameterBag;
+    private DependencyInjectionContainer&MockObject $publicContainer;
+    private PsrContainerInterface&MockObject $privateContainer;
+    private MigrationContainer $migrationContainer;
 
     #[\Override]
     protected function setUp(): void

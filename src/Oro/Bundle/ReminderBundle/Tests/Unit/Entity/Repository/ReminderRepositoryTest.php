@@ -19,7 +19,7 @@ class ReminderRepositoryTest extends OrmTestCase
         $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
     }
 
-    public function testFindRemindersByEntitiesQueryBuilder()
+    public function testFindRemindersByEntitiesQueryBuilder(): void
     {
         $entityClassName = 'Test\Entity';
         $entityIds = [1, 2, 3];

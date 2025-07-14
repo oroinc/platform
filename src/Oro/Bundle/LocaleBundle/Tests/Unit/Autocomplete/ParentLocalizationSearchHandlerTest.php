@@ -47,7 +47,7 @@ class ParentLocalizationSearchHandlerTest extends TestCase
         $this->searchHandler->setPropertyAccessor(PropertyAccess::createPropertyAccessor());
     }
 
-    public function testSearchNoDelimiter()
+    public function testSearchNoDelimiter(): void
     {
         $this->indexer->expects($this->never())
             ->method($this->anything());
@@ -72,7 +72,7 @@ class ParentLocalizationSearchHandlerTest extends TestCase
         array $resultData,
         array $expectedIds,
         bool $byId = false
-    ) {
+    ): void {
         $page = 1;
         $perPage = 15;
 

@@ -6,14 +6,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Layout\LocaleProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LocaleProviderTest extends \PHPUnit\Framework\TestCase
+class LocaleProviderTest extends TestCase
 {
-    /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationHelper;
-
-    /** @var LocaleProvider */
-    private $provider;
+    private LocalizationHelper&MockObject $localizationHelper;
+    private LocaleProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class LocaleProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new LocaleProvider($this->localizationHelper);
     }
 
-    public function testGetLocalizedValue()
+    public function testGetLocalizedValue(): void
     {
         $value = new LocalizedFallbackValue();
         $collection = new ArrayCollection();

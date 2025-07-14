@@ -4,15 +4,15 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Tools;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Tools\SchemaDumper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 
-class SchemaDumperTest extends \PHPUnit\Framework\TestCase
+class SchemaDumperTest extends TestCase
 {
-    protected SchemaDumper $schemaDumper;
-
+    protected Environment&MockObject $twig;
     protected Schema $schema;
-
-    protected Environment|\PHPUnit\Framework\MockObject\MockObject $twig;
+    protected SchemaDumper $schemaDumper;
 
     #[\Override]
     protected function setUp(): void

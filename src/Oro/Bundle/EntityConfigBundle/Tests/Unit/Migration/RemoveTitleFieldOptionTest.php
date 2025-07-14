@@ -11,9 +11,8 @@ use Psr\Log\LoggerInterface;
 
 class RemoveTitleFieldOptionTest extends TestCase
 {
-    private LoggerInterface|MockObject $logger;
-
-    private Connection|MockObject $connector;
+    private LoggerInterface&MockObject $logger;
+    private Connection&MockObject $connector;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class RemoveTitleFieldOptionTest extends TestCase
     /**
      * @dataProvider configFieldDataDataProvider
      */
-    public function testExecute($phpData, $expectedUpdateCalls)
+    public function testExecute($phpData, $expectedUpdateCalls): void
     {
         $dbPlatform = $this->createMock(AbstractPlatform::class);
         $migration = new RemoveTitleFieldOption();

@@ -6,17 +6,14 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\Voter\ConfigVoter;
 use Oro\Bundle\FeatureToggleBundle\Checker\Voter\VoterInterface;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigVoterTest extends \PHPUnit\Framework\TestCase
+class ConfigVoterTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ConfigurationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureConfigManager;
-
-    /** @var ConfigVoter */
-    private $configVoter;
+    private ConfigManager&MockObject $configManager;
+    private ConfigurationManager&MockObject $featureConfigManager;
+    private ConfigVoter $configVoter;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +27,7 @@ class ConfigVoterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider voteDataProvider
      */
-    public function testVote(bool $enabled, int $expectedVote)
+    public function testVote(bool $enabled, int $expectedVote): void
     {
         $feature = 'test';
         $scopeIdentifier = new \stdClass();
@@ -57,7 +54,7 @@ class ConfigVoterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testVoteAbstain()
+    public function testVoteAbstain(): void
     {
         $feature = 'test';
         $scopeIdentifier = new \stdClass();

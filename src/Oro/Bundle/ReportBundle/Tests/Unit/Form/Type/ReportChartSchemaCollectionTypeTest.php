@@ -13,8 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportChartSchemaCollectionTypeTest extends FormIntegrationTestCase
 {
-    /** @var ReportChartSchemaCollectionType */
-    private $type;
+    private ReportChartSchemaCollectionType $type;
 
     #[\Override]
     protected function setUp(): void

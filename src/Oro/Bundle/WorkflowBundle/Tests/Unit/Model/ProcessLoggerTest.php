@@ -7,16 +7,17 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessLogger;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class ProcessLoggerTest extends \PHPUnit\Framework\TestCase
+class ProcessLoggerTest extends TestCase
 {
     /**
      * @param bool $hasLogger
      * @param bool $hasCron
      * @dataProvider debugDataProvider
      */
-    public function testDebug($hasLogger, $hasCron = false)
+    public function testDebug($hasLogger, $hasCron = false): void
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
 
@@ -82,7 +83,7 @@ class ProcessLoggerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testNotEnabled()
+    public function testNotEnabled(): void
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $logger = $this->createMock(LoggerInterface::class);

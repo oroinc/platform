@@ -9,11 +9,13 @@ use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\AttributeAssembler;
 use Oro\Component\Action\Exception\AssemblerException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
+class AttributeAssemblerTest extends TestCase
 {
-    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
+    private TranslatorInterface&MockObject $translator;
 
     #[\Override]
     protected function setUp(): void
@@ -37,10 +39,7 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
         $assembler->assemble($definition, $configuration);
     }
 
-    /**
-     * @return WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getWorkflowDefinition()
+    private function getWorkflowDefinition(): WorkflowDefinition&MockObject
     {
         $definition = $this->createMock(WorkflowDefinition::class);
         $definition->expects($this->any())

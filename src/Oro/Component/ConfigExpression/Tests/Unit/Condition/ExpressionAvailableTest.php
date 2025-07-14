@@ -6,14 +6,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\ConfigExpression\Condition\ExpressionAvailable;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
+use PHPUnit\Framework\TestCase;
 
-class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
+class ExpressionAvailableTest extends TestCase
 {
     private const NAME = 'test_condition_name';
     private const TEST_TYPE = 'test_type';
 
-    /** @var ExpressionAvailable */
-    private $condition;
+    private ExpressionAvailable $condition;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +26,7 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
         $this->condition = new ExpressionAvailable($factory, self::NAME);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals(self::NAME, $this->condition->getName());
     }
@@ -34,7 +34,7 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, bool $expectedResult)
+    public function testEvaluate(array $options, bool $expectedResult): void
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertSame($expectedResult, $this->condition->evaluate([]));
@@ -54,7 +54,7 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testAddError()
+    public function testAddError(): void
     {
         $message = 'Error message.';
 
@@ -68,7 +68,7 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['message' => $message, 'parameters' => ['{{ type }}' => 'test']], $errors->first());
     }
 
-    public function testInitializeFailsWhenEmptyOptions()
+    public function testInitializeFailsWhenEmptyOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 element, but 0 given.');
@@ -79,7 +79,7 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray(?string $message, array $expected)
+    public function testToArray(?string $message, array $expected): void
     {
         $this->condition->initialize([self::TEST_TYPE]);
         $this->condition->setMessage($message);
@@ -108,7 +108,7 @@ class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile(?string $message, string $expected)
+    public function testCompile(?string $message, string $expected): void
     {
         $this->condition->initialize([self::TEST_TYPE]);
         $this->condition->setMessage($message);

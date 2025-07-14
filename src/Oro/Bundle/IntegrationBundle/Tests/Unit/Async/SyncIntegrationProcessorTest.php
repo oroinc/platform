@@ -23,6 +23,8 @@ use Oro\Component\MessageQueue\Test\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -32,7 +34,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
+class SyncIntegrationProcessorTest extends TestCase
 {
     use ClassExtensionTrait;
     use IntegrationTokenAwareTestTrait;
@@ -373,7 +375,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider tokenProvider
      */
-    public function testThatCorrectTokenIsPassedToTokenStorage(?OrganizationToken $token)
+    public function testThatCorrectTokenIsPassedToTokenStorage(?OrganizationToken $token): void
     {
         $integration = new Integration();
         $integration->setEnabled(true);
@@ -391,10 +393,9 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $tokenStorage->setToken($token);
 
         $message = $this->createMock(Message::class);
-        $message->method('getBody')->willReturn([
-            'integration_id' => $integrationID,
-            'transport_batch_size' => 100,
-        ]);
+        $message->expects(self::any())
+            ->method('getBody')
+            ->willReturn(['integration_id' => $integrationID, 'transport_batch_size' => 100]);
 
         $processor = new SyncIntegrationProcessor(
             $this->createDoctrine($entityManager),
@@ -425,7 +426,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    private function createEntityManager(): EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+    private function createEntityManager(): EntityManagerInterface&MockObject
     {
         $connection = $this->createMock(Connection::class);
         $connection->expects(self::any())
@@ -442,7 +443,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
 
     private function createDoctrine(
         ?EntityManagerInterface $entityManager = null
-    ): ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject {
+    ): ManagerRegistry&MockObject {
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())
             ->method('getManager')
@@ -451,7 +452,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         return $doctrine;
     }
 
-    private function createSyncProcessor(): AbstractSyncProcessor|\PHPUnit\Framework\MockObject\MockObject
+    private function createSyncProcessor(): AbstractSyncProcessor&MockObject
     {
         $syncProcessor = $this->getMockBuilder(AbstractSyncProcessor::class)
             ->disableOriginalConstructor()
@@ -467,7 +468,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
 
     private function createSyncProcessorRegistry(
         ?SyncProcessorInterface $syncProcessor
-    ): SyncProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject {
+    ): SyncProcessorRegistry&MockObject {
         $syncProcessorRegistry = $this->createMock(SyncProcessorRegistry::class);
         $syncProcessorRegistry->expects(self::any())
             ->method('getProcessorForIntegration')
@@ -476,7 +477,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         return $syncProcessorRegistry;
     }
 
-    private function createTransport(): Transport|\PHPUnit\Framework\MockObject\MockObject
+    private function createTransport(): Transport&MockObject
     {
         $transport = $this->createMock(Transport::class);
         $transport->expects(self::any())

@@ -3,12 +3,13 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\SecurityBundle\Metadata\Label;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LabelTest extends \PHPUnit\Framework\TestCase
+class LabelTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    private $translator;
+    private TranslatorInterface&MockObject $translator;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +17,7 @@ class LabelTest extends \PHPUnit\Framework\TestCase
         $this->translator = $this->createMock(TranslatorInterface::class);
     }
 
-    public function testTrans()
+    public function testTrans(): void
     {
         $label = new Label('test');
 
@@ -28,7 +29,7 @@ class LabelTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('translated', $label->trans($this->translator));
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $label = new Label('test');
 
@@ -37,7 +38,7 @@ class LabelTest extends \PHPUnit\Framework\TestCase
         $this->assertNotSame($label, $unserialized);
     }
 
-    public function testSetState()
+    public function testSetState(): void
     {
         $label = new Label('test');
 

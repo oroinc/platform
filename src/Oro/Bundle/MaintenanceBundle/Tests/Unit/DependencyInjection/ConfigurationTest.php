@@ -3,9 +3,10 @@
 namespace Oro\Bundle\MaintenanceBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\MaintenanceBundle\DependencyInjection\Configuration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit\Framework\TestCase
+class ConfigurationTest extends TestCase
 {
     /**
      * @dataProvider processConfigurationDataProvider

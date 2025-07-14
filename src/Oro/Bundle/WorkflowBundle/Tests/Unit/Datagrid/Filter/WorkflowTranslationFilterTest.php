@@ -10,21 +10,16 @@ use Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowTranslationFilter;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 
-class WorkflowTranslationFilterTest extends \PHPUnit\Framework\TestCase
+class WorkflowTranslationFilterTest extends TestCase
 {
-    /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationHelper;
-
-    /** @var FilterDatasourceAdapterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $datasourceAdapter;
-
-    /** @var ExpressionBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $expressionBuilder;
-
-    /** @var WorkflowTranslationFilter */
-    private $filter;
+    private WorkflowTranslationHelper&MockObject $translationHelper;
+    private FilterDatasourceAdapterInterface&MockObject $datasourceAdapter;
+    private ExpressionBuilderInterface&MockObject $expressionBuilder;
+    private WorkflowTranslationFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +36,7 @@ class WorkflowTranslationFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInit()
+    public function testInit(): void
     {
         $this->filter->init('test', []);
 
@@ -73,7 +68,7 @@ class WorkflowTranslationFilterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('translated-label', $choiceLabel($definition));
     }
 
-    public function testApply()
+    public function testApply(): void
     {
         $definition = (new WorkflowDefinition())->setName('definition1');
 

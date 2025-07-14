@@ -5,19 +5,18 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Twig;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Twig\LocaleExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
+class LocaleExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     private const TEST_TYPE = 'test_format_type';
     private const TEST_FORMAT = 'MMM, d y t';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
-
-    /** @var LocaleExtension */
-    private $extension;
+    private LocaleSettings&MockObject $localeSettings;
+    private LocaleExtension $extension;
 
     #[\Override]
     protected function setUp(): void

@@ -5,10 +5,11 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Metadata\Attribute;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Exception\AttributeException;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
+use PHPUnit\Framework\TestCase;
 
-class ConfigFieldTest extends \PHPUnit\Framework\TestCase
+class ConfigFieldTest extends TestCase
 {
-    public function testConstructorDefaultValues()
+    public function testConstructorDefaultValues(): void
     {
         $expectedMode = ConfigModel::MODE_DEFAULT;
         $expectedDefaultValues = [];
@@ -18,7 +19,7 @@ class ConfigFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedDefaultValues, $configField->defaultValues);
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $expectedMode = ConfigModel::MODE_READONLY;
         $expectedDefaultValues = ['test' => 'test_val'];
@@ -32,7 +33,7 @@ class ConfigFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedDefaultValues, $configField->defaultValues);
     }
 
-    public function testConstructorWithValueValue()
+    public function testConstructorWithValueValue(): void
     {
         $expectedMode = ConfigModel::MODE_HIDDEN;
         $expectedDefaultValues = [];
@@ -46,7 +47,7 @@ class ConfigFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedDefaultValues, $configField->defaultValues);
     }
 
-    public function testAttributeExceptionInvalidMode()
+    public function testAttributeExceptionInvalidMode(): void
     {
         $this->expectException(AttributeException::class);
         $this->expectExceptionMessage('Attribute "ConfigField" has an invalid value parameter "mode" : "some mode"');
@@ -54,7 +55,7 @@ class ConfigFieldTest extends \PHPUnit\Framework\TestCase
         new ConfigField(mode: 'some mode');
     }
 
-    public function testAttributeExceptionNonSupportedArgument()
+    public function testAttributeExceptionNonSupportedArgument(): void
     {
         $this->expectException(AttributeException::class);
         $this->expectExceptionMessage(
@@ -67,7 +68,7 @@ class ConfigFieldTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider arraysDataProvider
      */
-    public function testAttributeExceptionArrayAsArgument($data)
+    public function testAttributeExceptionArrayAsArgument($data): void
     {
         $this->expectException(AttributeException::class);
         $this->expectExceptionMessage(

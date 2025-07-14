@@ -3,11 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessObjectNormalizer;
+use PHPUnit\Framework\TestCase;
 
-class ProcessObjectNormalizerTest extends \PHPUnit\Framework\TestCase
+class ProcessObjectNormalizerTest extends TestCase
 {
-    /** @var ProcessObjectNormalizer */
-    private $normalizer;
+    private ProcessObjectNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void
@@ -15,7 +15,7 @@ class ProcessObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->normalizer = new ProcessObjectNormalizer();
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $object = new \DateTime();
         $serializedObject = base64_encode(serialize($object));
@@ -29,7 +29,7 @@ class ProcessObjectNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider denormalizeDataProvider
      */
-    public function testDenormalize(mixed $data, ?\DateTime $expected)
+    public function testDenormalize(mixed $data, ?\DateTime $expected): void
     {
         $this->assertEquals($expected, $this->normalizer->denormalize($data, ''));
     }
@@ -54,7 +54,7 @@ class ProcessObjectNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsNormalizationDataProvider
      */
-    public function testSupportsNormalization(mixed $data, bool $expected)
+    public function testSupportsNormalization(mixed $data, bool $expected): void
     {
         $this->assertEquals($expected, $this->normalizer->supportsNormalization($data));
     }
@@ -71,7 +71,7 @@ class ProcessObjectNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization(mixed $data, bool $expected)
+    public function testSupportsDenormalization(mixed $data, bool $expected): void
     {
         $this->assertEquals($expected, $this->normalizer->supportsDenormalization($data, ''));
     }

@@ -5,8 +5,9 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Client\Meta;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\Meta\TopicMeta;
 use Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry;
+use PHPUnit\Framework\TestCase;
 
-class TopicMetaRegistryTest extends \PHPUnit\Framework\TestCase
+class TopicMetaRegistryTest extends TestCase
 {
     public function testShouldAllowGetTopicByNameWithDefaultInfo(): void
     {

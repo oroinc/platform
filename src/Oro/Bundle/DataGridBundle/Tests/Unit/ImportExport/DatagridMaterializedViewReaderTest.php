@@ -17,11 +17,12 @@ use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Component\DoctrineUtils\ORM\Walker\MaterializedViewOutputResultModifier;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DatagridMaterializedViewReaderTest extends \PHPUnit\Framework\TestCase
+class DatagridMaterializedViewReaderTest extends TestCase
 {
-    private DatagridManager|\PHPUnit\Framework\MockObject\MockObject $datagridManager;
-
+    private DatagridManager&MockObject $datagridManager;
     private DatagridMaterializedViewReader $reader;
 
     #[\Override]
@@ -84,8 +85,7 @@ class DatagridMaterializedViewReaderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->datagridManager
-            ->expects(self::once())
+        $this->datagridManager->expects(self::once())
             ->method('getDatagrid')
             ->with($context->getOption('gridName'), $context->getOption('gridParameters'))
             ->willReturn($datagrid);
@@ -94,8 +94,7 @@ class DatagridMaterializedViewReaderTest extends \PHPUnit\Framework\TestCase
         $datagrid->setDatasource($ormDatasource);
 
         $records = [new ResultRecord(['column1' => 'row1']), new ResultRecord(['column1' => 'row2'])];
-        $ormDatasource
-            ->expects(self::once())
+        $ormDatasource->expects(self::once())
             ->method('getResults')
             ->willReturn($records);
 
@@ -126,9 +125,7 @@ class DatagridMaterializedViewReaderTest extends \PHPUnit\Framework\TestCase
     public function testOnResultsBeforeWhenNoContext(): void
     {
         $event = $this->createMock(OrmResultBefore::class);
-
-        $event
-            ->expects(self::never())
+        $event->expects(self::never())
             ->method(self::anything());
 
         $this->reader->onResultBefore($event);
@@ -154,8 +151,7 @@ class DatagridMaterializedViewReaderTest extends \PHPUnit\Framework\TestCase
         );
 
         $query = $this->createMock(AbstractQuery::class);
-        $query
-            ->expects(self::never())
+        $query->expects(self::never())
             ->method(self::anything());
 
         $event = new OrmResultBefore($datagrid, $query);
@@ -191,21 +187,15 @@ class DatagridMaterializedViewReaderTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['setHint'])
             ->addMethods(['setFirstResult', 'setMaxResults'])
             ->getMockForAbstractClass();
-
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('setHint')
             ->with(MaterializedViewOutputResultModifier::USE_MATERIALIZED_VIEW, $materializedViewName)
             ->willReturnSelf();
-
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('setFirstResult')
             ->with($rowsOffset)
             ->willReturnSelf();
-
-        $query
-            ->expects(self::once())
+        $query->expects(self::once())
             ->method('setMaxResults')
             ->with($rowsLimit)
             ->willReturnSelf();

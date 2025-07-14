@@ -3,13 +3,14 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Model\ActionData;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ActionDataTest extends \PHPUnit\Framework\TestCase
+class ActionDataTest extends TestCase
 {
-    public function testOffsetExistsSetGetUnset()
+    public function testOffsetExistsSetGetUnset(): void
     {
         $data = new ActionData();
         $name = 'foo';
@@ -27,7 +28,7 @@ class ActionDataTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($data[$name]);
     }
 
-    public function testIssetGetSetUnset()
+    public function testIssetGetSetUnset(): void
     {
         $data = new ActionData();
 
@@ -43,7 +44,7 @@ class ActionDataTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($data->foo);
     }
 
-    public function testGetEntity()
+    public function testGetEntity(): void
     {
         $data = new ActionData();
         $this->assertNull($data->getEntity());
@@ -52,7 +53,7 @@ class ActionDataTest extends \PHPUnit\Framework\TestCase
         $this->assertIsObject($data->getEntity());
     }
 
-    public function testGetIterator()
+    public function testGetIterator(): void
     {
         $array = ['foo' => 'bar', 'bar' => 'foo'];
         $data = new ActionData($array);
@@ -65,7 +66,7 @@ class ActionDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($array, $result);
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         $data = new ActionData();
         $this->assertEquals(0, count($data));
@@ -83,7 +84,7 @@ class ActionDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, count($data));
     }
 
-    public function testIsModified()
+    public function testIsModified(): void
     {
         $data1 = new ActionData(['foo' => 'bar']);
         $this->assertFalse($data1->isModified());
@@ -100,7 +101,7 @@ class ActionDataTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($data1->isModified());
     }
 
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $data = new ActionData();
         $this->assertTrue($data->isEmpty());
@@ -109,7 +110,7 @@ class ActionDataTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($data->isEmpty());
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $array = ['foo' => 'bar', 'bar' => 'foo'];
 
@@ -117,7 +118,7 @@ class ActionDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($array, $data->toArray());
     }
 
-    public function testGetRedirectUrl()
+    public function testGetRedirectUrl(): void
     {
         $data = new ActionData();
         $this->assertNull($data->getRedirectUrl());
@@ -128,7 +129,7 @@ class ActionDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($url, $data->getRedirectUrl());
     }
 
-    public function testGetRefreshGrid()
+    public function testGetRefreshGrid(): void
     {
         $data = new ActionData();
         $this->assertNull($data->getRefreshGrid());
@@ -139,7 +140,7 @@ class ActionDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($name, $data->getRefreshGrid());
     }
 
-    public function testGetValues()
+    public function testGetValues(): void
     {
         $date = new \DateTime();
         $array = ['foo' => 'bar', 'bar' => 'foo', 'baz' => $date, 'tango' => null];
@@ -153,7 +154,7 @@ class ActionDataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetScalarValues()
+    public function testGetScalarValues(): void
     {
         $data = new ActionData([
             'key1' => ['param1'],

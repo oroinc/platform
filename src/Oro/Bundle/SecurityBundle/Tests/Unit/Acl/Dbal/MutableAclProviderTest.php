@@ -8,6 +8,8 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Oro\Bundle\SecurityBundle\Acl\Cache\AclCache;
 use Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider;
 use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityToStringConverterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
@@ -19,22 +21,13 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
+class MutableAclProviderTest extends TestCase
 {
-    /** @var MutableAclProvider */
-    private $provider;
-
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var PermissionGrantingStrategyInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $permissionGrantingStrategy;
-
-    /** @var SecurityIdentityToStringConverterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $sidConverter;
-
-    /** @var AclCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
+    private MutableAclProvider $provider;
+    private Connection&MockObject $connection;
+    private PermissionGrantingStrategyInterface&MockObject $permissionGrantingStrategy;
+    private SecurityIdentityToStringConverterInterface&MockObject $sidConverter;
+    private AclCache&MockObject $cache;
 
     #[\Override]
     protected function setUp(): void
@@ -77,21 +70,21 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->setSecurityIdentityToStringConverter($this->sidConverter);
     }
 
-    public function testBeginTransaction()
+    public function testBeginTransaction(): void
     {
         $this->connection->expects($this->once())
             ->method('beginTransaction');
         $this->provider->beginTransaction();
     }
 
-    public function testCommit()
+    public function testCommit(): void
     {
         $this->connection->expects($this->once())
             ->method('commit');
         $this->provider->commit();
     }
 
-    public function testRollBack()
+    public function testRollBack(): void
     {
         $this->connection->expects($this->once())
             ->method('rollBack');
@@ -101,7 +94,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider deleteSecurityIdentityProvider
      */
-    public function testDeleteSecurityIdentity(SecurityIdentityInterface $sid, $parameters)
+    public function testDeleteSecurityIdentity(SecurityIdentityInterface $sid, $parameters): void
     {
         $this->connection->expects($this->once())
             ->method('executeStatement')
@@ -116,7 +109,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider updateSecurityIdentityProvider
      */
-    public function testUpdateSecurityIdentity(SecurityIdentityInterface $sid, $oldName, $parameters)
+    public function testUpdateSecurityIdentity(SecurityIdentityInterface $sid, $oldName, $parameters): void
     {
         $this->connection->expects($this->once())
             ->method('executeStatement')
@@ -134,7 +127,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
     public function testUpdateSecurityIdentityShouldThrowInvalidArgumentException(
         SecurityIdentityInterface $sid,
         $oldName
-    ) {
+    ): void {
         $this->expectException(\InvalidArgumentException::class);
         $this->provider->updateSecurityIdentity($sid, $oldName);
     }
@@ -177,7 +170,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testDeleteAclClass()
+    public function testDeleteAclClass(): void
     {
         $oid = new ObjectIdentity('entity', 'Test\Class');
 
@@ -208,7 +201,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
         $provider->deleteAclClass($oid);
     }
 
-    public function testDeleteAclClassFailure()
+    public function testDeleteAclClassFailure(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('some exception');
@@ -260,7 +253,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->clearOidCache($oid);
     }
 
-    public function testFindAclsAclNotFoundExceptionThrownForEmptyAncestorIdsAndDbQueriesExecutedOnlyOnce()
+    public function testFindAclsAclNotFoundExceptionThrownForEmptyAncestorIdsAndDbQueriesExecutedOnlyOnce(): void
     {
         $oid = new ObjectIdentity('(root)', 'entity');
         $sid = new RoleSecurityIdentity('ROLE_TEST');
@@ -291,7 +284,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(2, $exceptionCount);
     }
 
-    public function testFindAclsShouldUseEmptyAclWhenNonEmptyAncestorIdsAndAclNotFound()
+    public function testFindAclsShouldUseEmptyAclWhenNonEmptyAncestorIdsAndAclNotFound(): void
     {
         $oid = new ObjectIdentity('(root)', 'entity');
         $sid = new RoleSecurityIdentity('ROLE_TEST');

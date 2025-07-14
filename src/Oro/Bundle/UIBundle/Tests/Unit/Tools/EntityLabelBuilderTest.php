@@ -3,10 +3,11 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\UIBundle\Tools\EntityLabelBuilder;
+use PHPUnit\Framework\TestCase;
 
-class EntityLabelBuilderTest extends \PHPUnit\Framework\TestCase
+class EntityLabelBuilderTest extends TestCase
 {
-    public function testGetEntityLabelTranslationKey()
+    public function testGetEntityLabelTranslationKey(): void
     {
         $this->assertEquals(
             'acme.product.entity_label',
@@ -14,7 +15,7 @@ class EntityLabelBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityPluralLabelTranslationKey()
+    public function testGetEntityPluralLabelTranslationKey(): void
     {
         $this->assertEquals(
             'acme.product.entity_plural_label',
@@ -22,7 +23,7 @@ class EntityLabelBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityDescriptionTranslationKey()
+    public function testGetEntityDescriptionTranslationKey(): void
     {
         $this->assertEquals(
             'acme.product.entity_description',
@@ -30,7 +31,7 @@ class EntityLabelBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldLabelTranslationKey()
+    public function testGetFieldLabelTranslationKey(): void
     {
         $this->assertEquals(
             'acme.product.sell_price.label',
@@ -38,7 +39,7 @@ class EntityLabelBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldDescriptionTranslationKey()
+    public function testGetFieldDescriptionTranslationKey(): void
     {
         $this->assertEquals(
             'acme.product.sell_price.description',
@@ -57,7 +58,7 @@ class EntityLabelBuilderTest extends \PHPUnit\Framework\TestCase
         string $propertyName,
         string $className,
         ?string $fieldName
-    ) {
+    ): void {
         $result = EntityLabelBuilder::getTranslationKey($propertyName, $className, $fieldName);
         $this->assertEquals($expected, $result);
     }

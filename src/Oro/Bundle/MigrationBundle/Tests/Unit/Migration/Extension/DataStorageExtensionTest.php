@@ -3,10 +3,11 @@
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Extension;
 
 use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension;
+use PHPUnit\Framework\TestCase;
 
-class DataStorageExtensionTest extends \PHPUnit\Framework\TestCase
+class DataStorageExtensionTest extends TestCase
 {
-    public function testGet()
+    public function testGet(): void
     {
         $dataStorage = new DataStorageExtension();
         $this->assertNull($dataStorage->get('test'));
@@ -17,7 +18,7 @@ class DataStorageExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($value, $dataStorage->get('test'));
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $dataStorage = new DataStorageExtension();
         $this->assertFalse($dataStorage->has('test'));
@@ -26,7 +27,7 @@ class DataStorageExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($dataStorage->has('test'));
     }
 
-    public function testSetAndRemove()
+    public function testSetAndRemove(): void
     {
         $dataStorage = new DataStorageExtension();
 

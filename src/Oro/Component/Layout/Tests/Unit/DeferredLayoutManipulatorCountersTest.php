@@ -9,7 +9,7 @@ use Oro\Component\Layout\LayoutContext;
  */
 class DeferredLayoutManipulatorCountersTest extends DeferredLayoutManipulatorTestCase
 {
-    public function testAdd()
+    public function testAdd(): void
     {
         $this->assertEquals(0, $this->layoutManipulator->getNumberOfAddedItems());
 
@@ -27,7 +27,7 @@ class DeferredLayoutManipulatorCountersTest extends DeferredLayoutManipulatorTes
         $this->assertEquals(0, $this->layoutManipulator->getNumberOfAddedItems());
     }
 
-    public function testMove()
+    public function testMove(): void
     {
         $this->layoutManipulator->add('root', null, 'root');
         $this->layoutManipulator->add('header', 'root', 'header');

@@ -3,10 +3,11 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
+use PHPUnit\Framework\TestCase;
 
-class WidgetOptionBagTest extends \PHPUnit\Framework\TestCase
+class WidgetOptionBagTest extends TestCase
 {
-    public function testExistingOptionsOfOptionsBag()
+    public function testExistingOptionsOfOptionsBag(): void
     {
         $options = [
             'option1' => 'val',
@@ -23,7 +24,7 @@ class WidgetOptionBagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($options, $bag->all());
     }
 
-    public function testNonExistingOptionsOfOptionsBag()
+    public function testNonExistingOptionsOfOptionsBag(): void
     {
         $bag = new WidgetOptionBag([
             'option1' => 'val',

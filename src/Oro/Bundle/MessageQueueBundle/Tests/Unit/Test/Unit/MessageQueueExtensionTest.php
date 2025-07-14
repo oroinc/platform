@@ -3,8 +3,9 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Test\Unit;
 
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
+use PHPUnit\Framework\TestCase;
 
-class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
+class MessageQueueExtensionTest extends TestCase
 {
     use MessageQueueExtension;
 

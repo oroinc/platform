@@ -3,11 +3,12 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\UIBundle\Provider\ActionButtonGroupLabelProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ActionButtonGroupLabelProviderTest extends \PHPUnit\Framework\TestCase
+class ActionButtonGroupLabelProviderTest extends TestCase
 {
-    public function testGetLabelWithDefaultGroupAndWithoutEntityClass()
+    public function testGetLabelWithDefaultGroupAndWithoutEntityClass(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $provider = new ActionButtonGroupLabelProvider($translator);
@@ -23,7 +24,7 @@ class ActionButtonGroupLabelProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLabelWithoutEntityClass()
+    public function testGetLabelWithoutEntityClass(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $provider = new ActionButtonGroupLabelProvider($translator);
@@ -39,7 +40,7 @@ class ActionButtonGroupLabelProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLabelWithoutEntityPlaceholder()
+    public function testGetLabelWithoutEntityPlaceholder(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $provider = new ActionButtonGroupLabelProvider($translator);
@@ -60,7 +61,7 @@ class ActionButtonGroupLabelProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLabel()
+    public function testGetLabel(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $provider = new ActionButtonGroupLabelProvider($translator);

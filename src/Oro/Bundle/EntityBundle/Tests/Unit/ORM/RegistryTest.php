@@ -10,20 +10,19 @@ use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\OroEntityManagerStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class RegistryTest extends \PHPUnit\Framework\TestCase
+class RegistryTest extends TestCase
 {
     private const TEST_NAMESPACE_ALIAS = 'Test';
     private const TEST_NAMESPACE = 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures';
     private const TEST_ENTITY_CLASS = TestEntity::class;
     private const TEST_ENTITY_PROXY_CLASS = Proxy::class;
 
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var Registry */
-    private $registry;
+    private ContainerInterface&MockObject $container;
+    private Registry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -62,7 +61,7 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
         return $manager;
     }
 
-    public function testManagerServiceCache()
+    public function testManagerServiceCache(): void
     {
         $manager1 = $this->getManager();
         $manager2 = $this->getManager();
@@ -86,7 +85,7 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($manager2, $this->registry->getManager('default'));
     }
 
-    public function testManagerCache()
+    public function testManagerCache(): void
     {
         $manager1 = $this->getManager();
         $manager2 = $this->getManager();
@@ -110,7 +109,7 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($manager2, $this->registry->getManagerForClass(self::TEST_ENTITY_CLASS));
     }
 
-    public function testDefaultQueryCacheLifetimeWhenItWasSpecifiedExplicitly()
+    public function testDefaultQueryCacheLifetimeWhenItWasSpecifiedExplicitly(): void
     {
         $defaultQueryCacheLifetime = 3600;
 
@@ -129,7 +128,7 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($defaultQueryCacheLifetime, $query->getQueryCacheLifetime());
     }
 
-    public function testDefaultQueryCacheLifetimeWhenItWasNotSpecified()
+    public function testDefaultQueryCacheLifetimeWhenItWasNotSpecified(): void
     {
         $manager = $this->getManager();
 
@@ -144,7 +143,7 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
         self::assertNull($query->getQueryCacheLifetime());
     }
 
-    public function testDefaultQueryCacheLifetimeWhenItWasSetToZero()
+    public function testDefaultQueryCacheLifetimeWhenItWasSetToZero(): void
     {
         $manager = $this->getManager();
 

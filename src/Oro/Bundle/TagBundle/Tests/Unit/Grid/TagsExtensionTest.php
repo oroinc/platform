@@ -12,35 +12,22 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Grid\TagsExtension;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class TagsExtensionTest extends \PHPUnit\Framework\TestCase
+class TagsExtensionTest extends TestCase
 {
-    /** @var TagManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $tagManager;
-
-    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassResolver;
-
-    /** @var TaggableHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $taggableHelper;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var InlineEditingConfigurator|\PHPUnit\Framework\MockObject\MockObject */
-    private $inlineEditingConfigurator;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var TagsExtension */
-    private $extension;
+    private TagManager&MockObject $tagManager;
+    private EntityClassResolver&MockObject $entityClassResolver;
+    private TaggableHelper&MockObject $taggableHelper;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private InlineEditingConfigurator&MockObject $inlineEditingConfigurator;
+    private FeatureChecker&MockObject $featureChecker;
+    private TagsExtension $extension;
 
     #[\Override]
     protected function setUp(): void

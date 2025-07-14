@@ -5,14 +5,13 @@ namespace Oro\Bundle\SoapBundle\Tests\Unit\Client;
 use Oro\Bundle\SoapBundle\Client\Factory\NativeSoapClientFactory;
 use Oro\Bundle\SoapBundle\Client\Settings\SoapClientSettings;
 use Oro\Bundle\SoapBundle\Client\SoapClient;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SoapClientTest extends \PHPUnit\Framework\TestCase
+class SoapClientTest extends TestCase
 {
-    /** @var NativeSoapClientFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $clientFactory;
-
-    /** @var SoapClient */
-    private $client;
+    private NativeSoapClientFactory&MockObject $clientFactory;
+    private SoapClient $client;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class SoapClientTest extends \PHPUnit\Framework\TestCase
         $this->client = new SoapClient($this->clientFactory);
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $wsdlFilePath = null;
         $methodName = '__setSoapHeaders';

@@ -8,8 +8,9 @@ use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionFactory;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\TestCase;
 
-class MassActionFactoryTest extends \PHPUnit\Framework\TestCase
+class MassActionFactoryTest extends TestCase
 {
     private function getActionFactory(array $actions): MassActionFactory
     {
@@ -21,7 +22,7 @@ class MassActionFactoryTest extends \PHPUnit\Framework\TestCase
         return new MassActionFactory($containerBuilder->getContainer($this));
     }
 
-    public function testCreateActionWithoutType()
+    public function testCreateActionWithoutType(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The "type" option must be defined. Action: action1.');
@@ -30,7 +31,7 @@ class MassActionFactoryTest extends \PHPUnit\Framework\TestCase
         $factory->createAction('action1', []);
     }
 
-    public function testCreateUnregisteredAction()
+    public function testCreateUnregisteredAction(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unknown action type "type1". Action: action1.');
@@ -39,7 +40,7 @@ class MassActionFactoryTest extends \PHPUnit\Framework\TestCase
         $factory->createAction('action1', ['type' => 'type1']);
     }
 
-    public function testCreateActionForInvalidActionClass()
+    public function testCreateActionForInvalidActionClass(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(sprintf(
@@ -51,7 +52,7 @@ class MassActionFactoryTest extends \PHPUnit\Framework\TestCase
         $factory->createAction('action1', ['type' => 'type1']);
     }
 
-    public function testCreateActionWhenRegularActionIsCreatedInsteadOfMassAction()
+    public function testCreateActionWhenRegularActionIsCreatedInsteadOfMassAction(): void
     {
         $action = $this->createMock(ActionInterface::class);
         $factory = $this->getActionFactory(['type1' => $action]);
@@ -66,7 +67,7 @@ class MassActionFactoryTest extends \PHPUnit\Framework\TestCase
         $factory->createAction('action1', ['type' => 'type1']);
     }
 
-    public function testCreateAction()
+    public function testCreateAction(): void
     {
         $action = $this->createMock(MassActionInterface::class);
         $actionName = 'action1';

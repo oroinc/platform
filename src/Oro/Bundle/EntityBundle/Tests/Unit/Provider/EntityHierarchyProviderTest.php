@@ -13,16 +13,14 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class EntityHierarchyProviderTest extends OrmTestCase
 {
     private const ENTITY_NAMESPACE = 'Oro\Bundle\EntityBundle\Tests\Unit\Provider\Fixtures\Hierarchy';
 
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendConfigProvider;
-
-    /** @var EntityManagerInterface */
-    private $emMock;
+    private ConfigProvider&MockObject $extendConfigProvider;
+    private EntityManagerInterface $emMock;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +31,7 @@ class EntityHierarchyProviderTest extends OrmTestCase
         $this->extendConfigProvider = $this->getExtendConfigMock();
     }
 
-    public function testGetHierarchy()
+    public function testGetHierarchy(): void
     {
         $this->assertEquals(
             [
@@ -51,7 +49,7 @@ class EntityHierarchyProviderTest extends OrmTestCase
     /**
      * @dataProvider getHierarchyForClassNameProvider
      */
-    public function testGetHierarchyForClassName(string $className, array $expected)
+    public function testGetHierarchyForClassName(string $className, array $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -72,7 +70,7 @@ class EntityHierarchyProviderTest extends OrmTestCase
     /**
      * @dataProvider getNoManagerForClassNameProvider
      */
-    public function testGetNoManagerForClassName(string $className, array $expected)
+    public function testGetNoManagerForClassName(string $className, array $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -90,10 +88,7 @@ class EntityHierarchyProviderTest extends OrmTestCase
         ];
     }
 
-    /**
-     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getExtendConfigMock()
+    protected function getExtendConfigMock(): ConfigProvider&MockObject
     {
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
 

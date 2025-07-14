@@ -7,23 +7,24 @@ use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class LoggerExtensionTest extends \PHPUnit\Framework\TestCase
+class LoggerExtensionTest extends TestCase
 {
     use ClassExtensionTrait;
 
-    public function testShouldImplementExtensionInterface()
+    public function testShouldImplementExtensionInterface(): void
     {
         $this->assertClassImplements(ExtensionInterface::class, LoggerExtension::class);
     }
 
-    public function testCouldBeConstructedWithLoggerAsFirstArgument()
+    public function testCouldBeConstructedWithLoggerAsFirstArgument(): void
     {
         new LoggerExtension($this->createMock(LoggerInterface::class));
     }
 
-    public function testShouldSetLoggerToContextOnStart()
+    public function testShouldSetLoggerToContextOnStart(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
 
@@ -36,7 +37,7 @@ class LoggerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($logger, $context->getLogger());
     }
 
-    public function testShouldAddInfoMessageOnStart()
+    public function testShouldAddInfoMessageOnStart(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())

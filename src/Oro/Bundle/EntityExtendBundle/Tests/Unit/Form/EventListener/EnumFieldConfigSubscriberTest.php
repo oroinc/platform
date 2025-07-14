@@ -16,6 +16,8 @@ use Oro\Bundle\EntityExtendBundle\Form\EventListener\EnumFieldConfigSubscriber;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
@@ -25,22 +27,13 @@ use Symfony\Component\Translation\Translator;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
+class EnumFieldConfigSubscriberTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var EnumSynchronizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $enumSynchronizer;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var EnumFieldConfigSubscriber */
-    private $subscriber;
+    private ConfigManager&MockObject $configManager;
+    private Translator&MockObject $translator;
+    private EnumSynchronizer&MockObject $enumSynchronizer;
+    private LoggerInterface&MockObject $logger;
+    private EnumFieldConfigSubscriber $subscriber;
 
     #[\Override]
     protected function setUp(): void
@@ -70,7 +63,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->setLogger($this->logger);
     }
 
-    public function testPreSetDataForEntityConfigModel()
+    public function testPreSetDataForEntityConfigModel(): void
     {
         $configModel = $this->createMock(EntityConfigModel::class);
 
@@ -81,7 +74,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->preSetData($event);
     }
 
-    public function testPreSetDataForNotEnumFieldType()
+    public function testPreSetDataForNotEnumFieldType(): void
     {
         $configModel = $this->createMock(FieldConfigModel::class);
         $configModel->expects($this->once())
@@ -98,7 +91,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testPreSetDataForNewEnum(string $dataType)
+    public function testPreSetDataForNewEnum(string $dataType): void
     {
         $configModel = $this->createMock(FieldConfigModel::class);
         $configModel->expects($this->once())
@@ -126,7 +119,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testPreSetDataForExistingEnum(string $dataType)
+    public function testPreSetDataForExistingEnum(string $dataType): void
     {
         $enumCode = 'test_enum';
         $enumLabel = ExtendHelper::getEnumTranslationKey('label', $enumCode);
@@ -186,7 +179,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->preSetData($event);
     }
 
-    public function testPostSubmitForEntityConfigModel()
+    public function testPostSubmitForEntityConfigModel(): void
     {
         $configModel = $this->createMock(EntityConfigModel::class);
 
@@ -197,7 +190,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->postSubmit($event);
     }
 
-    public function testPostSubmitForNotEnumFieldType()
+    public function testPostSubmitForNotEnumFieldType(): void
     {
         $configModel = $this->createMock(FieldConfigModel::class);
         $configModel->expects($this->once())
@@ -215,7 +208,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testPostSubmitForNotValidForm(string $dataType)
+    public function testPostSubmitForNotValidForm(string $dataType): void
     {
         $configModel = $this->createMock(FieldConfigModel::class);
         $configModel->expects($this->once())
@@ -242,7 +235,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testPostSubmitForNewEnum(string $dataType)
+    public function testPostSubmitForNewEnum(string $dataType): void
     {
         $enumName = 'Test Enum';
         $enumValueClassName = EnumOption::class;
@@ -250,8 +243,12 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $configModel = $this->createMock(FieldConfigModel::class);
         $entityConfigModel = $this->createMock(EntityConfigModel::class);
-        $configModel->expects($this->once())->method('getEntity')->willReturn($entityConfigModel);
-        $entityConfigModel->expects($this->once())->method('getClassName')->willReturn($enumValueClassName);
+        $configModel->expects($this->once())
+            ->method('getEntity')
+            ->willReturn($entityConfigModel);
+        $entityConfigModel->expects($this->once())
+            ->method('getClassName')
+            ->willReturn($enumValueClassName);
         $configModel->expects($this->never())
             ->method('getId');
         $configModel->expects($this->once())
@@ -323,7 +320,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testPostSubmitForNewEnumWithoutNameAndPublic(string $dataType)
+    public function testPostSubmitForNewEnumWithoutNameAndPublic(string $dataType): void
     {
         $entityClassName = 'Test\Entity';
         $fieldName = 'testField';
@@ -401,7 +398,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testPostSubmitForExistingEnum(string $dataType)
+    public function testPostSubmitForExistingEnum(string $dataType): void
     {
         $enumCode = 'test_enum';
         $enumName = 'Test Enum';
@@ -411,8 +408,12 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $configModel = $this->createMock(FieldConfigModel::class);
         $entityConfigModel = $this->createMock(EntityConfigModel::class);
-        $configModel->expects($this->once())->method('getEntity')->willReturn($entityConfigModel);
-        $entityConfigModel->expects($this->once())->method('getClassName')->willReturn($enumValueClassName);
+        $configModel->expects($this->once())
+            ->method('getEntity')
+            ->willReturn($entityConfigModel);
+        $entityConfigModel->expects($this->once())
+            ->method('getClassName')
+            ->willReturn($enumValueClassName);
 
         $configModel->expects($this->once())
             ->method('getType')
@@ -504,7 +505,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testPostSubmitForEnumSyncError(string $dataType)
+    public function testPostSubmitForEnumSyncError(string $dataType): void
     {
         $enumName = 'Test Enum';
         $enumValueClassName = EnumOption::class;
@@ -512,8 +513,12 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $configModel = $this->createMock(FieldConfigModel::class);
         $entityConfigModel = $this->createMock(EntityConfigModel::class);
-        $configModel->expects($this->once())->method('getEntity')->willReturn($entityConfigModel);
-        $entityConfigModel->expects($this->once())->method('getClassName')->willReturn($enumValueClassName);
+        $configModel->expects($this->once())
+            ->method('getEntity')
+            ->willReturn($entityConfigModel);
+        $entityConfigModel->expects($this->once())
+            ->method('getClassName')
+            ->willReturn($enumValueClassName);
 
         $configModel->expects($this->any())
             ->method('getId')
@@ -590,8 +595,8 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getFormEventMock(
         ConfigModel $configModel,
-        FormInterface|\PHPUnit\Framework\MockObject\MockObject|null $form = null
-    ): FormEvent|\PHPUnit\Framework\MockObject\MockObject {
+        FormInterface|MockObject|null $form = null
+    ): FormEvent&MockObject {
         if (!$form) {
             $form = $this->createMock(FormInterface::class);
         }

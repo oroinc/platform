@@ -9,7 +9,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class JsValidationExtensionTest extends TestCase
 {
@@ -156,7 +158,7 @@ class JsValidationExtensionTest extends TestCase
      */
     public function finishViewAddDataValidationAttributeDataProvider(): array
     {
-        $constraintWithNestedData = new Constraints\NotNull();
+        $constraintWithNestedData = new NotNull();
         $constraintWithNestedData->message = [
             'object' => new \stdClass(),
             'array' => [
@@ -189,7 +191,7 @@ class JsValidationExtensionTest extends TestCase
             'set_default' => [
                 'view' => $this->createView(),
                 'form' => $this->createForm(),
-                'expectedConstraints' => [new Constraints\NotBlank()],
+                'expectedConstraints' => [new NotBlank()],
                 'expectedAttributes' => [
                     'data-required'   => 1,
                     'data-validation' => '{"NotBlank":{"payload":null,"message":"This value should not be blank.",' .
@@ -206,11 +208,11 @@ class JsValidationExtensionTest extends TestCase
                 ),
                 'form' => $this->createForm(),
                 'expectedConstraints' => [
-                    new Constraints\Regex([
+                    new Regex([
                         'pattern' => '/^[a-z]+[a-z]*$/i',
                         'message' => 'Value should start with a symbol and contain only alphabetic symbols'
                     ]),
-                    new Constraints\Regex([
+                    new Regex([
                         'pattern' => '/^id$/i',
                         'match' => false,
                         'message' => 'Value cannot be used as a field name.'
@@ -238,7 +240,7 @@ class JsValidationExtensionTest extends TestCase
                     ]
                 ),
                 'form' => $this->createForm(),
-                'expectedConstraints' => [new Constraints\NotBlank()],
+                'expectedConstraints' => [new NotBlank()],
                 'expectedAttributes' => [
                     'data-validation' =>
                         '{' .
@@ -258,7 +260,7 @@ class JsValidationExtensionTest extends TestCase
                     ]
                 ),
                 'form' => $this->createForm(),
-                'expectedConstraints' => [new Constraints\NotBlank()],
+                'expectedConstraints' => [new NotBlank()],
                 'expectedAttributes' => [
                     'data-validation' =>
                         '{' .
@@ -278,7 +280,7 @@ class JsValidationExtensionTest extends TestCase
                     ]
                 ),
                 'form' => $this->createForm(),
-                'expectedConstraints' => [new Constraints\NotBlank()],
+                'expectedConstraints' => [new NotBlank()],
                 'expectedAttributes' => [
                     'data-validation' =>
                         '{"NotBlank":{"payload":null,"message":"This value should not be blank.","allowNull":false,' .
@@ -289,7 +291,7 @@ class JsValidationExtensionTest extends TestCase
             'not_blank_with_allow_null' => [
                 'view' => $this->createView(),
                 'form' => $this->createForm(),
-                'expectedConstraints' => [new Constraints\NotBlank(['allowNull' => true])],
+                'expectedConstraints' => [new NotBlank(['allowNull' => true])],
                 'expectedAttributes' => []
             ],
         ];

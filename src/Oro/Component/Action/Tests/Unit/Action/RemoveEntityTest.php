@@ -10,16 +10,15 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class RemoveEntityTest extends \PHPUnit\Framework\TestCase
+class RemoveEntityTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var ActionInterface */
-    private $action;
+    private ManagerRegistry&MockObject $registry;
+    private ActionInterface $action;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +32,7 @@ class RemoveEntityTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidOptionsDataProvider
      */
-    public function testInitializeException(array $options)
+    public function testInitializeException(array $options): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->action->initialize($options);
@@ -47,14 +46,14 @@ class RemoveEntityTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $target = new \stdClass();
         $this->action->initialize([$target]);
         self::assertEquals($target, ReflectionUtil::getPropertyValue($this->action, 'target'));
     }
 
-    public function testExecuteNotObjectException()
+    public function testExecuteNotObjectException(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage(
@@ -67,7 +66,7 @@ class RemoveEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    public function testExecuteNotManageableException()
+    public function testExecuteNotManageableException(): void
     {
         $this->expectException(NotManageableEntityException::class);
         $this->expectExceptionMessage('Entity class "stdClass" is not manageable.');
@@ -85,7 +84,7 @@ class RemoveEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $context = new \stdClass();
         $context->test = new \stdClass();

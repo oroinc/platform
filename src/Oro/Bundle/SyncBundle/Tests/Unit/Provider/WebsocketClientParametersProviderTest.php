@@ -3,9 +3,10 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\SyncBundle\Provider\WebsocketClientParametersProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
-class WebsocketClientParametersProviderTest extends \PHPUnit\Framework\TestCase
+class WebsocketClientParametersProviderTest extends TestCase
 {
     /**
      * @dataProvider invalidTransportsProvider
@@ -126,7 +127,7 @@ class WebsocketClientParametersProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testUserAgent()
+    public function testUserAgent(): void
     {
         $userAgent = 'user_agent/1.2';
         $wsClientParamsProvider = new WebsocketClientParametersProvider(sprintf(

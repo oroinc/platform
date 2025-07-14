@@ -6,16 +6,16 @@ use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryConverterContext;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
-class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
+class QueryConverterContextTest extends TestCase
 {
-    /** @var QueryConverterContext */
-    private $context;
+    private QueryConverterContext $context;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +23,7 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new QueryConverterContext();
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $initialContext = clone $this->context;
 
@@ -43,7 +43,7 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($initialContext, $this->context);
     }
 
-    public function testShouldNotBePossibleToInitWithoutEntity()
+    public function testShouldNotBePossibleToInitWithoutEntity(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The entity must be specified.');
@@ -55,7 +55,7 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         $this->context->init($source);
     }
 
-    public function testShouldNotBePossibleToInitWithoutColumns()
+    public function testShouldNotBePossibleToInitWithoutColumns(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The "columns" definition does not exist.');
@@ -67,7 +67,7 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         $this->context->init($source);
     }
 
-    public function testShouldNotBePossibleToInitWithEmptyColumns()
+    public function testShouldNotBePossibleToInitWithEmptyColumns(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The "columns" definition must not be empty.');
@@ -79,7 +79,7 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         $this->context->init($source);
     }
 
-    public function testInit()
+    public function testInit(): void
     {
         $entity = 'Test\Entity';
         $definition = ['columns' => [['name' => 'column1']]];
@@ -91,12 +91,12 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($definition, $this->context->getDefinition());
     }
 
-    public function testRootJoinId()
+    public function testRootJoinId(): void
     {
         self::assertSame('', $this->context->getRootJoinId());
     }
 
-    public function testRootTableAlias()
+    public function testRootTableAlias(): void
     {
         $alias = 'test_alias';
         $this->context->setRootTableAlias($alias);
@@ -105,14 +105,14 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([$alias => ''], $this->context->getJoins());
     }
 
-    public function testGetRootTableAliasWhenItWasNotSet()
+    public function testGetRootTableAliasWhenItWasNotSet(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The root table alias is not defined.');
         $this->context->getRootTableAlias();
     }
 
-    public function testJoins()
+    public function testJoins(): void
     {
         self::assertSame([], $this->context->getJoins());
 
@@ -137,20 +137,20 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($joinId, $this->context->getJoin($alias));
     }
 
-    public function testGetJoinForUnknownAlias()
+    public function testGetJoinForUnknownAlias(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The join for the alias "unknown" is not defined.');
         $this->context->getJoin('unknown');
     }
 
-    public function testGenerateTableAlias()
+    public function testGenerateTableAlias(): void
     {
         self::assertEquals('t1', $this->context->generateTableAlias());
         self::assertEquals('t2', $this->context->generateTableAlias());
     }
 
-    public function testTableAliases()
+    public function testTableAliases(): void
     {
         self::assertSame([], $this->context->getTableAliases());
 
@@ -175,14 +175,14 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($alias, $this->context->getTableAlias($joinId));
     }
 
-    public function testGetTableAliasForUnknownJoinId()
+    public function testGetTableAliasForUnknownJoinId(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The table alias for the join "unknown" is not defined.');
         $this->context->getTableAlias('unknown');
     }
 
-    public function testGenerateColumnAlias()
+    public function testGenerateColumnAlias(): void
     {
         self::assertEquals('c1', $this->context->generateColumnAlias());
         self::assertEquals('c1', $this->context->generateColumnAlias());
@@ -192,7 +192,7 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('c2', $this->context->generateColumnAlias());
     }
 
-    public function testColumnAliases()
+    public function testColumnAliases(): void
     {
         self::assertSame([], $this->context->getColumnAliases());
 
@@ -212,14 +212,14 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($columnAlias, $this->context->getColumnAlias($columnId));
     }
 
-    public function testGetColumnAliasForUnknownColumnId()
+    public function testGetColumnAliasForUnknownColumnId(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The column alias for the column "unknown" is not defined.');
         $this->context->getColumnAlias('unknown');
     }
 
-    public function testGetAndFindColumnId()
+    public function testGetAndFindColumnId(): void
     {
         $columnId = 'test_column_id';
         $columnAlias = 'test_column_alias';
@@ -232,14 +232,14 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->findColumnId('unknown'));
     }
 
-    public function testGetColumnIdForUnknownColumnAlias()
+    public function testGetColumnIdForUnknownColumnAlias(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The column identifier for the column alias "unknown" is not defined.');
         $this->context->getColumnId('unknown');
     }
 
-    public function testColumnNames()
+    public function testColumnNames(): void
     {
         $columnId = 'test_column_id';
         $columnAlias = 'test_column_alias';
@@ -255,14 +255,14 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($columnName, $this->context->getColumnName($columnId));
     }
 
-    public function testGetColumnNameForUnknownColumnId()
+    public function testGetColumnNameForUnknownColumnId(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The column name for the column "unknown" is not defined.');
         $this->context->getColumnName('unknown');
     }
 
-    public function testVirtualColumnExpressions()
+    public function testVirtualColumnExpressions(): void
     {
         $column = 'column1';
         $expr = 'test_expr';
@@ -274,14 +274,14 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expr, $this->context->getVirtualColumnExpression($column));
     }
 
-    public function testGetVirtualColumnExpressionForUnknownColumn()
+    public function testGetVirtualColumnExpressionForUnknownColumn(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The virtual column expression for the column "unknown" is not defined.');
         $this->context->getVirtualColumnExpression('unknown');
     }
 
-    public function testVirtualColumnOptions()
+    public function testVirtualColumnOptions(): void
     {
         $columnJoinId = 'column_join_id';
         $options = ['option1' => 'value1'];
@@ -299,21 +299,21 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame('value1', $this->context->getVirtualColumnOption($columnJoinId, 'option1'));
     }
 
-    public function testGetVirtualColumnOptionsForUnknownColumn()
+    public function testGetVirtualColumnOptionsForUnknownColumn(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The virtual column options for the column "unknown" are not defined.');
         $this->context->getVirtualColumnOptions('unknown');
     }
 
-    public function testGetVirtualColumnOptionForUnknownColumn()
+    public function testGetVirtualColumnOptionForUnknownColumn(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The virtual column options for the column "unknown" are not defined.');
         $this->context->getVirtualColumnOptions('unknown');
     }
 
-    public function testGetVirtualColumnOptionForUnknownOption()
+    public function testGetVirtualColumnOptionForUnknownOption(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -323,7 +323,7 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         $this->context->getVirtualColumnOption('column_join_id', 'unknown');
     }
 
-    public function testVirtualRelationJoins()
+    public function testVirtualRelationJoins(): void
     {
         self::assertFalse($this->context->hasVirtualRelationJoins());
 
@@ -342,14 +342,14 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->findJoinByVirtualRelationJoin('unknown'));
     }
 
-    public function testGetVirtualRelationJoinForUnknownJoin()
+    public function testGetVirtualRelationJoinForUnknownJoin(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The virtual relation join for the join "unknown" is not defined.');
         $this->context->getVirtualRelationJoin('unknown');
     }
 
-    public function testAliases()
+    public function testAliases(): void
     {
         self::assertSame([], $this->context->getAliases());
 
@@ -365,14 +365,14 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($tableAlias, $this->context->getAlias($alias));
     }
 
-    public function testGetAliasForUnknownJoinId()
+    public function testGetAliasForUnknownJoinId(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The table alias for the alias "unknown" is not defined.');
         $this->context->getAlias('unknown');
     }
 
-    public function testQueryAliases()
+    public function testQueryAliases(): void
     {
         self::assertSame([], $this->context->getQueryAliases());
 

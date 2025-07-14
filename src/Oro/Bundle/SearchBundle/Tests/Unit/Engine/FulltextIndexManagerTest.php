@@ -7,17 +7,16 @@ use Doctrine\DBAL\DBALException;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\SearchBundle\Engine\FulltextIndexManager;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FulltextIndexManagerTest extends \PHPUnit\Framework\TestCase
+class FulltextIndexManagerTest extends TestCase
 {
     private const TABLE_NAME = 'oro_test_table';
     private const INDEX_NAME = 'oro_test_table_value_idx';
 
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var FulltextIndexManager */
-    private $indexManager;
+    private Connection&MockObject $connection;
+    private FulltextIndexManager $indexManager;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +30,7 @@ class FulltextIndexManagerTest extends \PHPUnit\Framework\TestCase
         $this->indexManager = new FulltextIndexManager($this->connection, $config, self::TABLE_NAME, self::INDEX_NAME);
     }
 
-    public function testCreateIndexes()
+    public function testCreateIndexes(): void
     {
         $this->connection->expects($this->once())
             ->method('getParams')
@@ -46,7 +45,7 @@ class FulltextIndexManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->indexManager->createIndexes());
     }
 
-    public function testCreateIndexWithError()
+    public function testCreateIndexWithError(): void
     {
         $this->connection->expects($this->once())
             ->method('getParams')
@@ -61,7 +60,7 @@ class FulltextIndexManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->indexManager->createIndexes());
     }
 
-    public function testGetQueryForUnknownDriver()
+    public function testGetQueryForUnknownDriver(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Driver "postgresql" not found');

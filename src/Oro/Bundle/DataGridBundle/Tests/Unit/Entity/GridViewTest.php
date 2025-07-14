@@ -6,13 +6,14 @@ use Oro\Bundle\DataGridBundle\Entity\AppearanceType;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class GridViewTest extends \PHPUnit\Framework\TestCase
+class GridViewTest extends TestCase
 {
     /**
      * @dataProvider provider
      */
-    public function testSettersAndGetters(string $property, mixed $value)
+    public function testSettersAndGetters(string $property, mixed $value): void
     {
         $gridView = new GridView();
 
@@ -41,7 +42,7 @@ class GridViewTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testCreateView()
+    public function testCreateView(): void
     {
         $gridView = new GridView();
         $gridView->setName('name');

@@ -6,31 +6,22 @@ use Oro\Bundle\InstallerBundle\Command\InstallCommand;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Oro\Bundle\SearchBundle\EventListener\Command\InstallCommandListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class InstallCommandListenerTest extends \PHPUnit\Framework\TestCase
+class InstallCommandListenerTest extends TestCase
 {
-    /** @var RequestStack */
-    private $requestStack;
-
-    /** @var Command|\PHPUnit\Framework\MockObject\MockObject */
-    private $command;
-
-    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $input;
-
-    /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $output;
-
-    /** @var CommandExecutor|\PHPUnit\Framework\MockObject\MockObject */
-    private $commandExecutor;
-
-    /** @var InstallerEvent */
-    private $event;
+    private RequestStack $requestStack;
+    private Command&MockObject $command;
+    private InputInterface&MockObject $input;
+    private OutputInterface&MockObject $output;
+    private CommandExecutor&MockObject $commandExecutor;
+    private InstallerEvent $event;
 
     #[\Override]
     protected function setUp(): void
@@ -45,7 +36,7 @@ class InstallCommandListenerTest extends \PHPUnit\Framework\TestCase
         $this->event = new InstallerEvent($this->command, $this->input, $this->output, $this->commandExecutor);
     }
 
-    public function testOnAfterDatabasePreparationNotSupportedCommand()
+    public function testOnAfterDatabasePreparationNotSupportedCommand(): void
     {
         $this->command->expects($this->once())
             ->method('getName')
@@ -67,7 +58,7 @@ class InstallCommandListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onAfterDatabasePreparationProvider
      */
-    public function testOnAfterDatabasePreparation(bool $isScheduled, bool $isIsolated)
+    public function testOnAfterDatabasePreparation(bool $isScheduled, bool $isIsolated): void
     {
         $commandName = 'test:command';
 

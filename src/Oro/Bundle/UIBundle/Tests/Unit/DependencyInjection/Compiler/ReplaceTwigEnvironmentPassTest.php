@@ -13,9 +13,9 @@ use Twig\Environment as TwigEnvironment;
 class ReplaceTwigEnvironmentPassTest extends TestCase
 {
     private ReplaceTwigEnvironmentPass $compiler;
-
     private ContainerInterface $container;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new ReplaceTwigEnvironmentPass();

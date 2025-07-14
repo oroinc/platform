@@ -4,20 +4,20 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EntityExtend;
 
 use Oro\Bundle\EntityExtendBundle\EntityExtend\PropertyAccessorWithDotArraySyntax;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
-abstract class PropertyAccessorArrayAccessTest extends \PHPUnit\Framework\TestCase
+abstract class PropertyAccessorArrayAccessTest extends TestCase
 {
-    /**
-     * @var PropertyAccessorWithDotArraySyntax
-     */
-    protected $propertyAccessor;
+    protected PropertyAccessorInterface $propertyAccessor;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax(
-            throw: PropertyAccessorWithDotArraySyntax::THROW_ON_INVALID_INDEX
+            null,
+            PropertyAccessorWithDotArraySyntax::THROW_ON_INVALID_INDEX
         );
     }
 
@@ -25,52 +25,52 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit\Framework\TestCa
 
     public function getValidPropertyPaths()
     {
-        return array(
-            array($this->getContainer(array('firstName' => 'John')), 'firstName', 'John'),
-            array($this->getContainer(array('firstName' => 'John')), '[firstName]', 'John'),
-            array(
-                $this->getContainer(array('person' => $this->getContainer(array('firstName' => 'John')))),
+        return [
+            [$this->getContainer(['firstName' => 'John']), 'firstName', 'John'],
+            [$this->getContainer(['firstName' => 'John']), '[firstName]', 'John'],
+            [
+                $this->getContainer(['person' => $this->getContainer(['firstName' => 'John'])]),
                 'person.firstName',
                 'John'
-            ),
-            array(
-                $this->getContainer(array('person' => $this->getContainer(array('firstName' => 'John')))),
+            ],
+            [
+                $this->getContainer(['person' => $this->getContainer(['firstName' => 'John'])]),
                 'person[firstName]',
                 'John'
-            ),
-            array(
-                $this->getContainer(array('person' => $this->getContainer(array('firstName' => 'John')))),
+            ],
+            [
+                $this->getContainer(['person' => $this->getContainer(['firstName' => 'John'])]),
                 '[person][firstName]',
                 'John'
-            ),
-            array(
-                $this->getContainer(array('person' => $this->getContainer(array('firstName' => 'John')))),
+            ],
+            [
+                $this->getContainer(['person' => $this->getContainer(['firstName' => 'John'])]),
                 '[person].firstName',
                 'John'
-            ),
-        );
+            ],
+        ];
     }
 
     public function getPathsWithMissingIndex()
     {
-        return array(
-            array($this->getContainer(array('firstName' => 'John')), 'lastName'),
-            array($this->getContainer(array('firstName' => 'John')), '[lastName]'),
-            array($this->getContainer(array()), 'index.lastName'),
-            array($this->getContainer(array()), 'index[lastName]'),
-            array($this->getContainer(array()), '[index][lastName]'),
-            array($this->getContainer(array()), '[index].lastName'),
-            array($this->getContainer(array('index' => array())), 'index.lastName'),
-            array($this->getContainer(array('index' => array())), '[index][lastName]'),
-            array($this->getContainer(array('index' => array('firstName' => 'John'))), 'index.lastName'),
-            array($this->getContainer(array('index' => array('firstName' => 'John'))), '[index][lastName]'),
-        );
+        return [
+            [$this->getContainer(['firstName' => 'John']), 'lastName'],
+            [$this->getContainer(['firstName' => 'John']), '[lastName]'],
+            [$this->getContainer([]), 'index.lastName'],
+            [$this->getContainer([]), 'index[lastName]'],
+            [$this->getContainer([]), '[index][lastName]'],
+            [$this->getContainer([]), '[index].lastName'],
+            [$this->getContainer(['index' => []]), 'index.lastName'],
+            [$this->getContainer(['index' => []]), '[index][lastName]'],
+            [$this->getContainer(['index' => ['firstName' => 'John']]), 'index.lastName'],
+            [$this->getContainer(['index' => ['firstName' => 'John']]), '[index][lastName]'],
+        ];
     }
 
     /**
      * @dataProvider getValidPropertyPaths
      */
-    public function testGetValue($collection, $path, $value)
+    public function testGetValue($collection, $path, $value): void
     {
         $this->assertSame($value, $this->propertyAccessor->getValue($collection, $path));
     }
@@ -78,7 +78,7 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider getPathsWithMissingIndex
      */
-    public function testGetValueThrowsExceptionIfIndexNotFound($collection, $path)
+    public function testGetValueThrowsExceptionIfIndexNotFound($collection, $path): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->getValue($collection, $path);
@@ -87,10 +87,11 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider getPathsWithMissingIndex
      */
-    public function testGetValueThrowsNoExceptionIfIndexNotFoundAndIndexExceptionsDisabled($collection, $path)
+    public function testGetValueThrowsNoExceptionIfIndexNotFoundAndIndexExceptionsDisabled($collection, $path): void
     {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax(
-            throw: PropertyAccessorWithDotArraySyntax::DO_NOT_THROW
+            null,
+            PropertyAccessorWithDotArraySyntax::DO_NOT_THROW
         );
         $this->assertNull($this->propertyAccessor->getValue($collection, $path));
     }
@@ -98,7 +99,7 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider getValidPropertyPaths
      */
-    public function testSetValue($collection, $path)
+    public function testSetValue($collection, $path): void
     {
         $this->propertyAccessor->setValue($collection, $path, 'Updated');
 
@@ -108,7 +109,7 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider getPathsWithMissingIndex
      */
-    public function testSetValueThrowsNoExceptionIfIndexNotFound($collection, $path)
+    public function testSetValueThrowsNoExceptionIfIndexNotFound($collection, $path): void
     {
         $this->propertyAccessor->setValue($collection, $path, 'Updated');
 
@@ -118,7 +119,7 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider getValidPropertyPaths
      */
-    public function testRemove($collection, $path)
+    public function testRemove($collection, $path): void
     {
         $this->propertyAccessor->remove($collection, $path);
 
@@ -132,7 +133,7 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider getPathsWithMissingIndex
      */
-    public function testRemoveThrowsNoExceptionIfIndexNotFound($collection, $path)
+    public function testRemoveThrowsNoExceptionIfIndexNotFound($collection, $path): void
     {
         $clone = unserialize(serialize($collection));
 
@@ -144,7 +145,7 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider getValidPropertyPaths
      */
-    public function testIsReadable($collection, $path)
+    public function testIsReadable($collection, $path): void
     {
         $this->assertTrue($this->propertyAccessor->isReadable($collection, $path));
     }
@@ -152,8 +153,8 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider getValidPropertyPaths
      */
-    public function testIsWritable($collection, $path)
+    public function testIsWritable($collection, $path): void
     {
-        $this->assertTrue($this->propertyAccessor->isWritable($collection, $path, 'Updated'));
+        $this->assertTrue($this->propertyAccessor->isWritable($collection, $path));
     }
 }

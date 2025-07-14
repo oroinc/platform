@@ -3,17 +3,18 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\FieldAcl;
 
 use Oro\Bundle\DataGridBundle\Extension\FieldAcl\Configuration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit\Framework\TestCase
+class ConfigurationTest extends TestCase
 {
     private function processConfiguration(array $config): array
     {
         return (new Processor())->processConfiguration(new Configuration(), $config);
     }
 
-    public function testValidateWrongArrayData()
+    public function testValidateWrongArrayData(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Unrecognized option "a" under "fields_acl"');
@@ -22,7 +23,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->processConfiguration($config);
     }
 
-    public function testValidateWrongNonArrayData()
+    public function testValidateWrongNonArrayData(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid type for path "fields_acl');
@@ -31,7 +32,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->processConfiguration($config);
     }
 
-    public function testValidateWithFullData()
+    public function testValidateWithFullData(): void
     {
         $config = ['fields_acl' =>
            [

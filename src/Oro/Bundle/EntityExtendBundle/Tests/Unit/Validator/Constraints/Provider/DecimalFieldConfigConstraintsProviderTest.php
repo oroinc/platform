@@ -6,11 +6,11 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\Decimal;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\Provider\DecimalFieldConfigConstraintsProvider;
+use PHPUnit\Framework\TestCase;
 
-class DecimalFieldConfigConstraintsProviderTest extends \PHPUnit\Framework\TestCase
+class DecimalFieldConfigConstraintsProviderTest extends TestCase
 {
     private FieldConfigId $configId;
-
     private DecimalFieldConfigConstraintsProvider $provider;
 
     #[\Override]

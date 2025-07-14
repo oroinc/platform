@@ -6,24 +6,25 @@ use Oro\Bundle\MessageQueueBundle\Profiler\MessageQueueCollector;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class MessageQueueCollectorTest extends \PHPUnit\Framework\TestCase
+class MessageQueueCollectorTest extends TestCase
 {
-    public function testCouldBeConstructedWithMessageProducerAsFirstArgument()
+    public function testCouldBeConstructedWithMessageProducerAsFirstArgument(): void
     {
         new MessageQueueCollector($this->createMock(MessageProducerInterface::class));
     }
 
-    public function testShouldReturnExpectedName()
+    public function testShouldReturnExpectedName(): void
     {
         $collector = new MessageQueueCollector($this->createMock(MessageProducerInterface::class));
 
         $this->assertEquals('message_queue', $collector->getName());
     }
 
-    public function testShouldReturnEmptySentMessageArrayIfNotTraceableMessageProducer()
+    public function testShouldReturnEmptySentMessageArrayIfNotTraceableMessageProducer(): void
     {
         $collector = new MessageQueueCollector($this->createMock(MessageProducerInterface::class));
 
@@ -32,7 +33,7 @@ class MessageQueueCollectorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $collector->getSentMessages());
     }
 
-    public function testShouldReturnSentMessageArrayTakenFromTraceableMessageProducer()
+    public function testShouldReturnSentMessageArrayTakenFromTraceableMessageProducer(): void
     {
         $producer = $this->createMock(TraceableMessageProducer::class);
         $producer->expects($this->once())
@@ -46,21 +47,21 @@ class MessageQueueCollectorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([['foo'], ['bar']], $collector->getSentMessages());
     }
 
-    public function testShouldPrettyPrintKnownPriority()
+    public function testShouldPrettyPrintKnownPriority(): void
     {
         $collector = new MessageQueueCollector($this->createMock(MessageProducerInterface::class));
 
         $this->assertEquals('normal', $collector->prettyPrintPriority(MessagePriority::NORMAL));
     }
 
-    public function testShouldPrettyPrintUnknownPriority()
+    public function testShouldPrettyPrintUnknownPriority(): void
     {
         $collector = new MessageQueueCollector($this->createMock(MessageProducerInterface::class));
 
         $this->assertEquals('unknownPriority', $collector->prettyPrintPriority('unknownPriority'));
     }
 
-    public function testShouldPrettyPrintScalarMessage()
+    public function testShouldPrettyPrintScalarMessage(): void
     {
         $collector = new MessageQueueCollector($this->createMock(MessageProducerInterface::class));
 
@@ -68,7 +69,7 @@ class MessageQueueCollectorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('&lt;p&gt;', $collector->prettyPrintMessage('<p>'));
     }
 
-    public function testShouldPrettyPrintArrayMessage()
+    public function testShouldPrettyPrintArrayMessage(): void
     {
         $collector = new MessageQueueCollector($this->createMock(MessageProducerInterface::class));
 

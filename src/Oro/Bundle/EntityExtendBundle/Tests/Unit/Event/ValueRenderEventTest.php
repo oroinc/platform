@@ -4,33 +4,20 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
+use PHPUnit\Framework\TestCase;
 
-class ValueRenderEventTest extends \PHPUnit\Framework\TestCase
+class ValueRenderEventTest extends TestCase
 {
-    /** @var |\PHPUnit\Framework\MockObject\MockObject */
-    private $entity;
-
-    /** @var |\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldValue;
-
-    /** @var FieldConfigId|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldConfigId;
-
-    #[\Override]
-    protected function setUp(): void
+    public function testGetterSetters(): void
     {
-        $this->fieldConfigId = $this->createMock(FieldConfigId::class);
-    }
+        $entity = new \stdClass();
+        $fieldValue = 'testValue';
+        $fieldConfigId = $this->createMock(FieldConfigId::class);
+        $event = new ValueRenderEvent($entity, $fieldValue, $fieldConfigId);
 
-    public function testGetterSetters()
-    {
-        $this->entity = new \stdClass();
-        $this->fieldValue = 'testValue';
-        $event = new ValueRenderEvent($this->entity, $this->fieldValue, $this->fieldConfigId);
-
-        $this->assertEquals($this->entity, $event->getEntity());
-        $this->assertEquals($this->fieldValue, $event->getFieldValue());
-        $this->assertEquals($this->fieldConfigId, $event->getFieldConfigId());
+        $this->assertEquals($entity, $event->getEntity());
+        $this->assertEquals($fieldValue, $event->getFieldValue());
+        $this->assertEquals($fieldConfigId, $event->getFieldConfigId());
         $this->assertTrue($event->isFieldVisible());
         $event->setFieldVisibility(false);
         $this->assertFalse($event->isFieldVisible());

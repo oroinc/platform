@@ -2,18 +2,20 @@
 
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\Provider;
 
-class PackageProviderTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class PackageProviderTest extends TestCase
 {
     protected TestablePackageProvider $provider;
 
-    public function testGetThirdPartyPackagesEmpty()
+    public function testGetThirdPartyPackagesEmpty(): void
     {
         $provider = new TestablePackageProvider();
         $provider->setInstalledPackages(['oro/platform' => ['pretty_version' => '1.0.0']]);
         $this->assertEmpty($provider->getThirdPartyPackages());
     }
 
-    public function testGetThirdPartyPackages()
+    public function testGetThirdPartyPackages(): void
     {
         $provider = new TestablePackageProvider();
         $provider->setInstalledPackages([
@@ -26,14 +28,14 @@ class PackageProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetOroPackagesEmpty()
+    public function testGetOroPackagesEmpty(): void
     {
         $provider = new TestablePackageProvider();
         $provider->setInstalledPackages(['not-oro/platform' => ['pretty_version' => '1.0.0']]);
         $this->assertEmpty($provider->getOroPackages());
     }
 
-    public function testGetOroPackages()
+    public function testGetOroPackages(): void
     {
         $provider = new TestablePackageProvider();
         $provider->setInstalledPackages([
@@ -46,7 +48,7 @@ class PackageProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFilterOroPackages()
+    public function testFilterOroPackages(): void
     {
         $provider = new TestablePackageProvider();
         $provider->setInstalledPackages([
@@ -67,7 +69,7 @@ class PackageProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($provider->getThirdPartyPackages());
     }
 
-    public function testLicenseRetrieval()
+    public function testLicenseRetrieval(): void
     {
         $file = __DIR__ . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'installed.json';
         $provider = new TestablePackageProvider($file);
@@ -85,7 +87,7 @@ class PackageProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLicenseRetrievalFailure()
+    public function testLicenseRetrievalFailure(): void
     {
         $file = __DIR__ . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'wrong.json';
         $this->expectErrorMessage(sprintf('File "%s" does not exists.', $file));

@@ -17,6 +17,8 @@ use Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
@@ -25,33 +27,18 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
+class DynamicFieldsExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var ConfigProviderMock */
-    private $extendConfigProvider;
-
-    /** @var ConfigProviderMock */
-    private $entityConfigProvider;
-
-    /** @var ConfigProviderMock */
-    private $viewConfigProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $fieldTypeHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $dispatcher;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FeatureChecker */
-    private $featureChecker;
-
-    /** @var DynamicFieldsExtension */
-    private $extension;
+    private ConfigProviderMock $extendConfigProvider;
+    private ConfigProviderMock $entityConfigProvider;
+    private ConfigProviderMock $viewConfigProvider;
+    private FieldTypeHelper&MockObject $fieldTypeHelper;
+    private EventDispatcherInterface&MockObject $dispatcher;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private FeatureChecker&MockObject $featureChecker;
+    private DynamicFieldsExtension $extension;
 
     #[\Override]
     protected function setUp(): void

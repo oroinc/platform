@@ -6,19 +6,19 @@ use Oro\Bundle\ReminderBundle\Exception\MethodNotSupportedException;
 use Oro\Bundle\ReminderBundle\Model\SendProcessorInterface;
 use Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SendProcessorRegistryTest extends \PHPUnit\Framework\TestCase
+class SendProcessorRegistryTest extends TestCase
 {
     private const FOO_METHOD = 'foo';
-    private const FOO_LABEL  = 'foo_label';
+    private const FOO_LABEL = 'foo_label';
     private const BAR_METHOD = 'bar';
-    private const BAR_LABEL  = 'bar_label';
+    private const BAR_LABEL = 'bar_label';
 
-    /** @var SendProcessorInterface[]|\PHPUnit\Framework\MockObject\MockObject[] */
-    private $processors;
-
-    /** @var SendProcessorRegistry */
-    private $registry;
+    /** @var SendProcessorInterface[]&MockObject[] */
+    private array $processors;
+    private SendProcessorRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -48,7 +48,7 @@ class SendProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    public function testGetProcessors()
+    public function testGetProcessors(): void
     {
         $this->assertEquals(
             [
@@ -59,13 +59,13 @@ class SendProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetProcessor()
+    public function testGetProcessor(): void
     {
         $this->assertEquals($this->processors[self::FOO_METHOD], $this->registry->getProcessor(self::FOO_METHOD));
         $this->assertEquals($this->processors[self::BAR_METHOD], $this->registry->getProcessor(self::BAR_METHOD));
     }
 
-    public function testGetProcessorFails()
+    public function testGetProcessorFails(): void
     {
         $this->expectException(MethodNotSupportedException::class);
         $this->expectExceptionMessage('Reminder method "not_exist" is not supported.');

@@ -23,6 +23,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormConfigInterface;
@@ -46,26 +47,13 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
     private const SAMPLE_CLASS = 'SampleClass';
     private const SAMPLE_FIELD = 'sampleField';
 
-    /** @var AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentEntityConfigProvider;
-
-    /** @var EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassNameHelper;
-
-    /** @var PreviewMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $previewMetadataProvider;
-
-    /** @var EntityToIdTransformer|\PHPUnit\Framework\MockObject\MockObject */
-    private $digitalAssetToIdTransformer;
-
-    /** @var FileReflector|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileReflector;
-
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
-
-    /** @var DigitalAssetManagerExtension */
-    private $extension;
+    private AttachmentEntityConfigProviderInterface&MockObject $attachmentEntityConfigProvider;
+    private EntityClassNameHelper&MockObject $entityClassNameHelper;
+    private PreviewMetadataProviderInterface&MockObject $previewMetadataProvider;
+    private EntityToIdTransformer&MockObject $digitalAssetToIdTransformer;
+    private FileReflector&MockObject $fileReflector;
+    private FormInterface&MockObject $form;
+    private DigitalAssetManagerExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -118,19 +106,17 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
-            ->willReturnCallback(
-                function (array $defaults) use ($resolver) {
-                    $this->assertArrayHasKey('dam_widget_enabled', $defaults);
-                    $this->assertIsCallable($defaults['dam_widget_enabled']);
-                    $this->assertArrayHasKey('dam_widget_route', $defaults);
-                    $this->assertSame($defaults['dam_widget_route'], 'oro_digital_asset_widget_choose');
-                    $this->assertArrayHasKey('dam_widget_parameters', $defaults);
-                    $this->assertNull($defaults['dam_widget_parameters']);
-                    $this->assertArrayHasKey('validation_groups', $defaults);
+            ->willReturnCallback(function (array $defaults) use ($resolver) {
+                $this->assertArrayHasKey('dam_widget_enabled', $defaults);
+                $this->assertIsCallable($defaults['dam_widget_enabled']);
+                $this->assertArrayHasKey('dam_widget_route', $defaults);
+                $this->assertSame($defaults['dam_widget_route'], 'oro_digital_asset_widget_choose');
+                $this->assertArrayHasKey('dam_widget_parameters', $defaults);
+                $this->assertNull($defaults['dam_widget_parameters']);
+                $this->assertArrayHasKey('validation_groups', $defaults);
 
-                    return $resolver;
-                }
-            );
+                return $resolver;
+            });
         $resolver->expects($this->once())
             ->method('addNormalizer')
             ->with('fileOptions', $this->isType('callable'), true);
@@ -607,7 +593,7 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
         $this->assertArrayNotHasKey('dam_widget', $formView->vars);
     }
 
-    private function mockEntityFieldConfig(): ConfigInterface|\PHPUnit\Framework\MockObject\MockObject
+    private function mockEntityFieldConfig(): ConfigInterface&MockObject
     {
         $entityFieldConfig = $this->createMock(ConfigInterface::class);
 

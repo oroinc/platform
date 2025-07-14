@@ -4,16 +4,14 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Bundle\LayoutBundle\Layout\Extension\RouteContextConfigurator;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class RouteContextConfiguratorTest extends \PHPUnit\Framework\TestCase
+class RouteContextConfiguratorTest extends TestCase
 {
-    /** @var RequestStack */
-    private $requestStack;
-
-    /** @var RouteContextConfigurator */
-    private $configurator;
+    private RequestStack $requestStack;
+    private RouteContextConfigurator $configurator;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +20,7 @@ class RouteContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->configurator = new RouteContextConfigurator($this->requestStack);
     }
 
-    public function testConfigureContextWithOutRequest()
+    public function testConfigureContextWithOutRequest(): void
     {
         $context = new LayoutContext();
 
@@ -32,7 +30,7 @@ class RouteContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($context->get('route_name'));
     }
 
-    public function testConfigureContextWithRequest()
+    public function testConfigureContextWithRequest(): void
     {
         $context = new LayoutContext();
 
@@ -46,7 +44,7 @@ class RouteContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('testRoteName', $context->get('route_name'));
     }
 
-    public function testConfigureContextWithSubRequest()
+    public function testConfigureContextWithSubRequest(): void
     {
         $context = new LayoutContext();
 
@@ -60,7 +58,7 @@ class RouteContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('testRoteName', $context->get('route_name'));
     }
 
-    public function testConfigureContextWithRequestAndDataSetInContext()
+    public function testConfigureContextWithRequestAndDataSetInContext(): void
     {
         $context = new LayoutContext();
         $context->set('route_name', 'routeShouldNotBeOverridden');

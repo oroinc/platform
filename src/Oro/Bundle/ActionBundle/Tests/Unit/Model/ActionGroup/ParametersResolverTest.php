@@ -9,8 +9,9 @@ use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
 use Oro\Bundle\ActionBundle\Model\Parameter;
 use Oro\Component\Action\Exception\InvalidParameterException;
+use PHPUnit\Framework\TestCase;
 
-class ParametersResolverTest extends \PHPUnit\Framework\TestCase
+class ParametersResolverTest extends TestCase
 {
     private static array $typeAliases = [
         'boolean' => 'bool',
@@ -18,8 +19,7 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
         'double' => 'float',
     ];
 
-    /** @var ParametersResolver */
-    private $resolver;
+    private ParametersResolver $resolver;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +27,7 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
         $this->resolver = new ParametersResolver();
     }
 
-    public function testResolveWithSnakeCase()
+    public function testResolveWithSnakeCase(): void
     {
         $actionData = new ActionData(['test_parameter' => 'value']);
         $parameter = new Parameter('testParameter');
@@ -46,7 +46,7 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider resolveDataProvider
      */
-    public function testResolveOk(ActionData $data, array $parameters, ActionData $expected)
+    public function testResolveOk(ActionData $data, array $parameters, ActionData $expected): void
     {
         $actionGroup = $this->createMock(ActionGroup::class);
         $actionGroup->expects($this->atLeastOnce())
@@ -116,7 +116,7 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
         array $parameters,
         array $exception,
         array $expectedErrors
-    ) {
+    ): void {
         $definition = $this->createMock(ActionGroupDefinition::class);
         $definition->expects($this->once())
             ->method('getName')

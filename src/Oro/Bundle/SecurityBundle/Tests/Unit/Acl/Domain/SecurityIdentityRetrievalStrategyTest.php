@@ -5,11 +5,12 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain;
 use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityRetrievalStrategy;
 use Oro\Bundle\SecurityBundle\Authentication\Token\AnonymousToken;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 
-class SecurityIdentityRetrievalStrategyTest extends \PHPUnit\Framework\TestCase
+class SecurityIdentityRetrievalStrategyTest extends TestCase
 {
     private SecurityIdentityRetrievalStrategy $strategy;
 

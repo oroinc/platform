@@ -11,22 +11,17 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\EventListener\EntityPaginationListener;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityPaginationListenerTest extends \PHPUnit\Framework\TestCase
+class EntityPaginationListenerTest extends TestCase
 {
     private const ENTITY_NAME = 'test_entity';
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EntityPaginationStorage|\PHPUnit\Framework\MockObject\MockObject */
-    private $storage;
-
-    /** @var EntityPaginationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $paginationManager;
-
-    /** @var EntityPaginationListener */
-    private $listener;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityPaginationStorage&MockObject $storage;
+    private EntityPaginationManager&MockObject $paginationManager;
+    private EntityPaginationListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +33,7 @@ class EntityPaginationListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new EntityPaginationListener($this->doctrineHelper, $this->storage, $this->paginationManager);
     }
 
-    public function testOnResultAfterSystemPaginationDisabled()
+    public function testOnResultAfterSystemPaginationDisabled(): void
     {
         $this->paginationManager->expects($this->once())
             ->method('isEnabled')
@@ -49,7 +44,7 @@ class EntityPaginationListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onResultAfter(new OrmResultAfter($this->createGrid()));
     }
 
-    public function testOnResultAfterGridNotApplicable()
+    public function testOnResultAfterGridNotApplicable(): void
     {
         $this->paginationManager->expects($this->once())
             ->method('isEnabled')
@@ -63,7 +58,7 @@ class EntityPaginationListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onResultAfter(new OrmResultAfter($this->createGrid()));
     }
 
-    public function testOnResultClearData()
+    public function testOnResultClearData(): void
     {
         $this->paginationManager->expects($this->once())
             ->method('isEnabled')

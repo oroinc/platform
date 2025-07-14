@@ -8,6 +8,7 @@ use Oro\Bundle\EntityExtendBundle\Form\Type\EnumNameType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueEnumName;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -19,14 +20,9 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class EnumNameTypeTest extends TypeTestCase
 {
-    /** @var EnumNameType */
-    private $type;
-
-    /** @var EnumTypeHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $typeHelper;
-
-    /** @var ExtendDbIdentifierNameGenerator */
-    private $nameGenerator;
+    private EnumTypeHelper&MockObject $typeHelper;
+    private ExtendDbIdentifierNameGenerator $nameGenerator;
+    private EnumNameType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -51,7 +47,7 @@ class EnumNameTypeTest extends TypeTestCase
         bool $hasEnumCode,
         array $options,
         array $expectedOptions
-    ) {
+    ): void {
         $fieldName = $configId instanceof FieldConfigId ? $configId->getFieldName() : null;
 
         $this->typeHelper->expects($this->any())
@@ -62,7 +58,7 @@ class EnumNameTypeTest extends TypeTestCase
         $resolver = $this->getOptionsResolver();
         $this->type->configureOptions($resolver);
 
-        $options['config_id']     = $configId;
+        $options['config_id'] = $configId;
         $options['config_is_new'] = $isNewConfig;
 
         $resolvedOptions = $resolver->resolve($options);
@@ -154,7 +150,7 @@ class EnumNameTypeTest extends TypeTestCase
         ];
     }
 
-    public function testExistingEnumNameValidators()
+    public function testExistingEnumNameValidators(): void
     {
         $configId = new FieldConfigId('enum', 'Test\Entity', 'testField', 'enum');
 
@@ -180,7 +176,7 @@ class EnumNameTypeTest extends TypeTestCase
         $this->assertEquals(255, $resolvedOptions['constraints'][1]->max);
     }
 
-    public function testNewEnumNameValidators()
+    public function testNewEnumNameValidators(): void
     {
         $configId = new FieldConfigId('enum', 'Test\Entity', 'testField', 'enum');
 
@@ -232,7 +228,7 @@ class EnumNameTypeTest extends TypeTestCase
         $this->assertEquals($configId->getFieldName(), $resolvedOptions['constraints'][4]->fieldName);
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(TextType::class, $this->type->getParent());
     }

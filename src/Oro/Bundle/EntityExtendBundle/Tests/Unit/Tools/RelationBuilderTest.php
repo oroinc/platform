@@ -10,17 +10,16 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class RelationBuilderTest extends \PHPUnit\Framework\TestCase
+class RelationBuilderTest extends TestCase
 {
     private const SOURCE_CLASS = 'Test\SourceEntity';
     private const TARGET_CLASS = 'Test\TargetEntity';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var RelationBuilder */
-    private $builder;
+    private ConfigManager&MockObject $configManager;
+    private RelationBuilder $builder;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +32,7 @@ class RelationBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testAddManyToOneRelationForNewRelation()
+    public function testAddManyToOneRelationForNewRelation(): void
     {
         $relationName = 'testRelation';
         $relationKey = 'manyToOne|Test\SourceEntity|Test\TargetEntity|testRelation';
@@ -131,7 +130,7 @@ class RelationBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testAddManyToManyRelationForNewRelation()
+    public function testAddManyToManyRelationForNewRelation(): void
     {
         $relationName = 'testRelation';
         $relationKey = 'manyToMany|Test\SourceEntity|Test\TargetEntity|testRelation';
@@ -235,7 +234,7 @@ class RelationBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testAddManyToOneRelationWithCascade()
+    public function testAddManyToOneRelationWithCascade(): void
     {
         $relationName = 'testRelation';
         $relationKey = 'manyToOne|Test\SourceEntity|Test\TargetEntity|testRelation';
@@ -339,7 +338,7 @@ class RelationBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testAddManyToManyRelationWithCascade()
+    public function testAddManyToManyRelationWithCascade(): void
     {
         $relationName = 'testRelation';
         $relationKey = 'manyToMany|Test\SourceEntity|Test\TargetEntity|testRelation';
@@ -446,7 +445,7 @@ class RelationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedTestFieldConfig, $testFieldConfig);
     }
 
-    public function testAddManyToOneRelationForAlreadyExistRelationWithDifferentFieldType()
+    public function testAddManyToOneRelationForAlreadyExistRelationWithDifferentFieldType(): void
     {
         $relationName = 'testRelation';
         $relationKey = 'manyToOne|Test\SourceEntity|Test\TargetEntity|testRelation';
@@ -519,7 +518,7 @@ class RelationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedExtendFieldConfig, $extendFieldConfig);
     }
 
-    public function testAddManyToManyRelationForAlreadyExistRelationWithDifferentFieldType()
+    public function testAddManyToManyRelationForAlreadyExistRelationWithDifferentFieldType(): void
     {
         $relationName = 'testRelation';
         $relationKey = 'manyToMany|Test\SourceEntity|Test\TargetEntity|testRelation';
@@ -601,7 +600,7 @@ class RelationBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testAddManyToOneRelationForAlreadyExistRelationWithOptions()
+    public function testAddManyToOneRelationForAlreadyExistRelationWithOptions(): void
     {
         $relationName = 'testRelation';
         $relationKey = 'manyToOne|Test\SourceEntity|Test\TargetEntity|testRelation';
@@ -701,7 +700,7 @@ class RelationBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testAddManyToManyRelationForAlreadyExistRelationWithOptions()
+    public function testAddManyToManyRelationForAlreadyExistRelationWithOptions(): void
     {
         $relationName = 'testRelation';
         $relationKey = 'manyToMany|Test\SourceEntity|Test\TargetEntity|testRelation';

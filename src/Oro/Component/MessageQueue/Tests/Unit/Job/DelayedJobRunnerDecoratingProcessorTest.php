@@ -7,11 +7,12 @@ use Oro\Component\MessageQueue\Job\DelayedJobRunnerDecoratingProcessor;
 use Oro\Component\MessageQueue\Test\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DelayedJobRunnerDecoratingProcessorTest extends \PHPUnit\Framework\TestCase
+class DelayedJobRunnerDecoratingProcessorTest extends TestCase
 {
-    private MessageProcessorInterface|\PHPUnit\Framework\MockObject\MockObject $processor;
-
+    private MessageProcessorInterface&MockObject $processor;
     private DelayedJobRunnerDecoratingProcessor $decoratorProcessor;
 
     #[\Override]

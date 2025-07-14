@@ -8,13 +8,13 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\LayoutDialogResultType;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Layout\FormSubmitLayoutAjaxResponseProcessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class FormSubmitLayoutAjaxResponseProcessorTest extends \PHPUnit\Framework\TestCase
+class FormSubmitLayoutAjaxResponseProcessorTest extends TestCase
 {
-    /** @var FormSubmitLayoutAjaxResponseProcessor */
-    private $processor;
+    private FormSubmitLayoutAjaxResponseProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +22,7 @@ class FormSubmitLayoutAjaxResponseProcessorTest extends \PHPUnit\Framework\TestC
         $this->processor = new FormSubmitLayoutAjaxResponseProcessor();
     }
 
-    public function testCreateJsonResponseResult()
+    public function testCreateJsonResponseResult(): void
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())
@@ -53,7 +53,7 @@ class FormSubmitLayoutAjaxResponseProcessorTest extends \PHPUnit\Framework\TestC
         $this->assertTrue($context->isProcessed());
     }
 
-    public function testShouldSkipNotSaved()
+    public function testShouldSkipNotSaved(): void
     {
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
@@ -66,7 +66,7 @@ class FormSubmitLayoutAjaxResponseProcessorTest extends \PHPUnit\Framework\TestC
         $this->processor->process($context);
     }
 
-    public function testShouldSkipUnsupportedResultType()
+    public function testShouldSkipUnsupportedResultType(): void
     {
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
@@ -82,7 +82,7 @@ class FormSubmitLayoutAjaxResponseProcessorTest extends \PHPUnit\Framework\TestC
         $this->processor->process($context);
     }
 
-    public function testShouldSkipNotXhr()
+    public function testShouldSkipNotXhr(): void
     {
         $request = $this->createMock(Request::class);
         $request->expects($this->once())

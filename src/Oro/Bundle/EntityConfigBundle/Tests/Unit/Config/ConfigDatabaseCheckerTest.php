@@ -8,17 +8,14 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigDatabaseChecker;
 use Oro\Bundle\EntityConfigBundle\Config\LockObject;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
+class ConfigDatabaseCheckerTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var LockObject|\PHPUnit\Framework\MockObject\MockObject */
-    private $lockObject;
-
-    /** @var ApplicationState|\PHPUnit\Framework\MockObject\MockObject */
-    private $applicationState;
+    private ManagerRegistry&MockObject $doctrine;
+    private LockObject&MockObject $lockObject;
+    private ApplicationState&MockObject $applicationState;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +25,7 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         $this->applicationState = $this->createMock(ApplicationState::class);
     }
 
-    public function testCheckDatabaseForInstalledApplication()
+    public function testCheckDatabaseForInstalledApplication(): void
     {
         $this->applicationState->expects(self::once())
             ->method('isInstalled')
@@ -47,7 +44,7 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($databaseChecker->checkDatabase());
     }
 
-    public function testCheckDatabaseForInstalledApplicationAfterCallClearCheckDatabaseAndConfigIsNotLocked()
+    public function testCheckDatabaseForInstalledApplicationAfterCallClearCheckDatabaseAndConfigIsNotLocked(): void
     {
         $connection = $this->setTablesExistExpectation(['test_table'], true);
         $this->doctrine->expects(self::once())
@@ -74,7 +71,7 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($databaseChecker->checkDatabase());
     }
 
-    public function testCheckDatabaseForInstalledApplicationAfterCallClearCheckDatabaseAndConfigIsLocked()
+    public function testCheckDatabaseForInstalledApplicationAfterCallClearCheckDatabaseAndConfigIsLocked(): void
     {
         $this->doctrine->expects(self::never())
             ->method('getConnection');
@@ -100,7 +97,7 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($databaseChecker->checkDatabase());
     }
 
-    public function testCheckDatabaseForNotInstalledApplicationAndConfigIsNotLocked()
+    public function testCheckDatabaseForNotInstalledApplicationAndConfigIsNotLocked(): void
     {
         $connection = $this->setTablesExistExpectation(['test_table'], true);
         $this->doctrine->expects(self::once())
@@ -128,7 +125,7 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($databaseChecker->checkDatabase());
     }
 
-    public function testCheckDatabaseForNotInstalledApplicationAndConfigIsLocked()
+    public function testCheckDatabaseForNotInstalledApplicationAndConfigIsLocked(): void
     {
         $this->doctrine->expects(self::never())
             ->method('getConnection');
@@ -157,7 +154,7 @@ class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($databaseChecker->checkDatabase());
     }
 
-    public function testCheckDatabaseForNotInstalledApplicationAndTablesDoNotExistAndConfigIsNotLocked()
+    public function testCheckDatabaseForNotInstalledApplicationAndTablesDoNotExistAndConfigIsNotLocked(): void
     {
         $connection = $this->setTablesExistExpectation(['test_table'], false);
         $this->doctrine->expects(self::once())

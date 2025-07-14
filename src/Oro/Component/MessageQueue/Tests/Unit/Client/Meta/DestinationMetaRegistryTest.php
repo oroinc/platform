@@ -5,8 +5,9 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Client\Meta;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMeta;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
+use PHPUnit\Framework\TestCase;
 
-class DestinationMetaRegistryTest extends \PHPUnit\Framework\TestCase
+class DestinationMetaRegistryTest extends TestCase
 {
     public function testGetDestinationMetaWhenDestinationNotPresent(): void
     {

@@ -9,16 +9,15 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class StartWorkflowTest extends \PHPUnit\Framework\TestCase
+class StartWorkflowTest extends TestCase
 {
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var StartWorkflow */
-    private $action;
+    private WorkflowManager&MockObject $workflowManager;
+    private StartWorkflow $action;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +31,7 @@ class StartWorkflowTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testInitialize(array $options)
+    public function testInitialize(array $options): void
     {
         $this->action->initialize($options);
         self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
@@ -101,7 +100,7 @@ class StartWorkflowTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage): void
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
@@ -151,7 +150,7 @@ class StartWorkflowTest extends \PHPUnit\Framework\TestCase
         ItemStub $actualContext,
         ItemStub $expectedContext,
         array $expectedData = []
-    ) {
+    ): void {
         $expectedWorkflowName = $expectedContext->workflowName;
         $expectedEntity = !empty($options['entity']) ? $expectedContext->entityValue : null;
         $expectedTransition = !empty($options['transition']) ? $expectedContext->startTransition : null;
@@ -176,7 +175,7 @@ class StartWorkflowTest extends \PHPUnit\Framework\TestCase
         return $workflowItem;
     }
 
-    public function testExecuteEntityNotAnObject()
+    public function testExecuteEntityNotAnObject(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Entity value must be an object');

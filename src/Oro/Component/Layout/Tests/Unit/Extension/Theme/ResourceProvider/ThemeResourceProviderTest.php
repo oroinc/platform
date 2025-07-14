@@ -9,25 +9,18 @@ use Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Bundle\TestBundle\TestBundle;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
+class ThemeResourceProviderTest extends TestCase
 {
     use TempDirExtension;
 
-    /** @var LastModificationDateProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $lastModificationDateProvider;
-
-    /** @var LayoutUpdateLoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $loader;
-
-    /** @var BlockViewCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $blockViewCache;
-
-    /** @var string */
-    private $cacheFile;
-
-    /** @var ThemeResourceProvider */
-    private $provider;
+    private LastModificationDateProvider&MockObject $lastModificationDateProvider;
+    private LayoutUpdateLoaderInterface&MockObject $loader;
+    private BlockViewCache&MockObject $blockViewCache;
+    private string $cacheFile;
+    private ThemeResourceProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -55,7 +48,7 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
         return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
 
-    public function testFindApplicableResources()
+    public function testFindApplicableResources(): void
     {
         $bundleDir = dirname((new \ReflectionClass(TestBundle::class))->getFileName());
         $appRootDir = realpath($bundleDir . '/../../app');
@@ -85,7 +78,7 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResourcesWhenCachedDataDoesNotExist()
+    public function testGetResourcesWhenCachedDataDoesNotExist(): void
     {
         $bundleDir = dirname((new \ReflectionClass(TestBundle::class))->getFileName());
         $appRootDir = realpath($bundleDir . '/../../app');
@@ -119,7 +112,7 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($result, $this->provider->getResources());
     }
 
-    public function testGetResourcesWhenCachedDataExist()
+    public function testGetResourcesWhenCachedDataExist(): void
     {
         $bundleDir = dirname((new \ReflectionClass(TestBundle::class))->getFileName());
         $appRootDir = realpath($bundleDir . '/../../app');

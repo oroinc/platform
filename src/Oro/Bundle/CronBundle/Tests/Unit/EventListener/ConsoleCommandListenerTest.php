@@ -5,18 +5,17 @@ namespace Oro\Bundle\CronBundle\Tests\Unit\EventListener;
 use Oro\Bundle\CronBundle\EventListener\ConsoleCommandListener;
 use Oro\Bundle\CronBundle\Tests\Unit\Stub\CronCommandStub;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-class ConsoleCommandListenerTest extends \PHPUnit\Framework\TestCase
+class ConsoleCommandListenerTest extends TestCase
 {
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var ConsoleCommandListener */
-    private $listener;
+    private FeatureChecker&MockObject $featureChecker;
+    private ConsoleCommandListener $listener;
 
     #[\Override]
     protected function setUp(): void

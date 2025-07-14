@@ -32,8 +32,6 @@ class MaterializedViewManagerTest extends TestCase
     #[\Override]
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->materializedViewByQueryFactory = $this->createMock(MaterializedViewByQueryFactory::class);
         $this->materializedViewSchemaManager = $this->createMock(MaterializedViewSchemaManager::class);
         $this->logger = $this->createMock(LoggerInterface::class);

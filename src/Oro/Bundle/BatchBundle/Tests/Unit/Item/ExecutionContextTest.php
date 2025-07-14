@@ -3,8 +3,9 @@
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Item;
 
 use Oro\Bundle\BatchBundle\Item\ExecutionContext;
+use PHPUnit\Framework\TestCase;
 
-class ExecutionContextTest extends \PHPUnit\Framework\TestCase
+class ExecutionContextTest extends TestCase
 {
     private ExecutionContext $executionContext;
 

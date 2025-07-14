@@ -7,10 +7,11 @@ use Oro\Bundle\EntityBundle\Provider\EntityAliasLoader;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
 use Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface;
+use PHPUnit\Framework\TestCase;
 
-class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
+class EntityAliasLoaderTest extends TestCase
 {
-    public function testEmptyLoader()
+    public function testEmptyLoader(): void
     {
         $storage = new EntityAliasStorage();
         $loader = new EntityAliasLoader([], []);
@@ -19,7 +20,7 @@ class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $storage->getAll());
     }
 
-    public function testLoadWhenSeveralProvidersReturnSameClass()
+    public function testLoadWhenSeveralProvidersReturnSameClass(): void
     {
         $classProvider1 = $this->createMock(EntityClassProviderInterface::class);
         $classProvider1->expects(self::once())
@@ -53,7 +54,7 @@ class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testThatEarlierAliasProviderWins()
+    public function testThatEarlierAliasProviderWins(): void
     {
         $classProvider1 = $this->createMock(EntityClassProviderInterface::class);
         $classProvider1->expects(self::once())
@@ -81,7 +82,7 @@ class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEntityAliasCanBeDisabled()
+    public function testEntityAliasCanBeDisabled(): void
     {
         $classProvider1 = $this->createMock(EntityClassProviderInterface::class);
         $classProvider1->expects(self::once())

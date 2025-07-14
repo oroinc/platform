@@ -8,22 +8,15 @@ use Monolog\Logger;
 use Oro\Bundle\LoggerBundle\Monolog\DisableFilterHandlerWrapper;
 use Oro\Bundle\LoggerBundle\Monolog\LogLevelConfig;
 use Oro\Bundle\LoggerBundle\Test\MonologTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class DisableFilterHandlerWrapperTest extends TestCase
 {
     use MonologTestCaseTrait;
 
-    /**
-     * @var LogLevelConfig|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $config;
-
-    /**
-     * @var HandlerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $inner;
-
+    private LogLevelConfig&MockObject $config;
+    private HandlerInterface&MockObject $inner;
     private DisableFilterHandlerWrapper $wrapper;
 
     #[\Override]
@@ -34,7 +27,7 @@ class DisableFilterHandlerWrapperTest extends TestCase
         $this->wrapper = new DisableFilterHandlerWrapper($this->config, $this->inner);
     }
 
-    public function testHandleBatch()
+    public function testHandleBatch(): void
     {
         $this->config->expects(self::once())
             ->method('isActive')
@@ -48,7 +41,7 @@ class DisableFilterHandlerWrapperTest extends TestCase
         $this->wrapper->handleBatch($records);
     }
 
-    public function testHandleBatchDisabled()
+    public function testHandleBatchDisabled(): void
     {
         $records = $this->getMultipleLogRecords();
         $this->config->expects(self::once())
@@ -62,14 +55,14 @@ class DisableFilterHandlerWrapperTest extends TestCase
         $this->wrapper->handleBatch($records);
     }
 
-    public function testGetAcceptedLevels()
+    public function testGetAcceptedLevels(): void
     {
         $this->inner->expects(self::once())
             ->method('getAcceptedLevels');
         $this->wrapper->getAcceptedLevels();
     }
 
-    public function testSetAcceptedLevels()
+    public function testSetAcceptedLevels(): void
     {
         $this->inner->expects(self::once())
             ->method('setAcceptedLevels')
@@ -77,7 +70,7 @@ class DisableFilterHandlerWrapperTest extends TestCase
         $this->wrapper->setAcceptedLevels(Logger::INFO, Logger::WARNING);
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $this->inner->expects(self::once())
             ->method('reset');

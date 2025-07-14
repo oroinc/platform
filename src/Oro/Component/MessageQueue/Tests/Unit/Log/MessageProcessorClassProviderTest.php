@@ -7,11 +7,12 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Log\MessageProcessorClassProvider;
 use Oro\Component\MessageQueue\Tests\Unit\Log\Processor\Stub\MessageProcessorLazyLoadingProxy;
 use Oro\Component\MessageQueue\Tests\Unit\Log\Processor\Stub\MessageProcessorProxy;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MessageProcessorClassProviderTest extends \PHPUnit\Framework\TestCase
+class MessageProcessorClassProviderTest extends TestCase
 {
-    private MessageProcessorRegistryInterface|\PHPUnit\Framework\MockObject\MockObject $messageProcessorRegistry;
-
+    private MessageProcessorRegistryInterface&MockObject $messageProcessorRegistry;
     private MessageProcessorClassProvider $messageProcessorClassProvider;
 
     #[\Override]
@@ -27,8 +28,7 @@ class MessageProcessorClassProviderTest extends \PHPUnit\Framework\TestCase
         $messageProcessorProxy = new MessageProcessorProxy($messageProcessor);
         $messageProcessorName = 'sample_processor';
 
-        $this->messageProcessorRegistry
-            ->expects(self::once())
+        $this->messageProcessorRegistry->expects(self::once())
             ->method('get')
             ->with($messageProcessorName)
             ->willReturn($messageProcessorProxy);
@@ -54,8 +54,7 @@ class MessageProcessorClassProviderTest extends \PHPUnit\Framework\TestCase
         $messageProcessorLazyLoadingProxy = new MessageProcessorLazyLoadingProxy($messageProcessor, $isInitialized);
         $messageProcessorName = 'sample_processor';
 
-        $this->messageProcessorRegistry
-            ->expects(self::once())
+        $this->messageProcessorRegistry->expects(self::once())
             ->method('get')
             ->with($messageProcessorName)
             ->willReturn($messageProcessorLazyLoadingProxy);

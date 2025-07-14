@@ -23,22 +23,20 @@ class DependentDateWidgetDateRangeTypeTest extends TypeTestCase
             AbstractDateFilterType::TYPE_MORE_THAN,
     ];
 
+    private TranslatorInterface&MockObject $translator;
     private DateModifierProvider $dateModifier;
-
-    private TranslatorInterface|MockObject $translator;
-
-    private EventSubscriberInterface|MockObject $subscriber;
+    private EventSubscriberInterface&MockObject $subscriber;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->dateModifier = new DateModifierProvider();
+        $this->subscriber = $this->createMock(EventSubscriberInterface::class);
+
         $this->translator->expects(self::any())
             ->method('trans')
             ->willReturnArgument(0);
-
-        $this->dateModifier = new DateModifierProvider();
-        $this->subscriber = $this->createMock(EventSubscriberInterface::class);
 
         parent::setUp();
     }

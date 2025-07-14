@@ -4,10 +4,11 @@ namespace Oro\Bundle\SoapBundle\Tests\Unit\EventListener;
 
 use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\SoapBundle\EventListener\LocaleListener;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
-class LocaleListenerTest extends \PHPUnit\Framework\TestCase
+class LocaleListenerTest extends TestCase
 {
     private string $defaultLocale;
 

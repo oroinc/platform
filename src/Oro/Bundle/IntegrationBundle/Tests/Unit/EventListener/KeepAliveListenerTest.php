@@ -8,10 +8,11 @@ use Oro\Bundle\BatchBundle\Entity\JobExecution;
 use Oro\Bundle\BatchBundle\Job\DoctrineJobRepository;
 use Oro\Bundle\IntegrationBundle\Event\WriterAfterFlushEvent;
 use Oro\Bundle\IntegrationBundle\EventListener\KeepAliveListener;
+use PHPUnit\Framework\TestCase;
 
-class KeepAliveListenerTest extends \PHPUnit\Framework\TestCase
+class KeepAliveListenerTest extends TestCase
 {
-    public function testOnWriterAfterFlush()
+    public function testOnWriterAfterFlush(): void
     {
         $expectedDql = 'SELECT e.id FROM ' . JobExecution::class . ' e WHERE e.id = 1';
 

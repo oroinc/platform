@@ -5,21 +5,18 @@ namespace Oro\Component\Layout\Tests\Unit;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\BlockViewCache;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class BlockViewCacheTest extends \PHPUnit\Framework\TestCase
+class BlockViewCacheTest extends TestCase
 {
-    /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var SerializerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializer;
-
-    /** @var BlockViewCache */
-    private $blockViewCache;
+    private AbstractAdapter&MockObject $cache;
+    private SerializerInterface&MockObject $serializer;
+    private BlockViewCache $blockViewCache;
 
     #[\Override]
     protected function setUp(): void

@@ -3,10 +3,11 @@
 namespace Oro\Component\ExpressionLanguage\Tests\Unit;
 
 use Oro\Component\ExpressionLanguage\Lexer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Token;
 use Symfony\Component\ExpressionLanguage\TokenStream;
 
-class LexerTest extends \PHPUnit\Framework\TestCase
+class LexerTest extends TestCase
 {
     /**
      * @dataProvider getTokenizeData

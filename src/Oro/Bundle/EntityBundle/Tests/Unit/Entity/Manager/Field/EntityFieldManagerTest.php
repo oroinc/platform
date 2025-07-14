@@ -15,30 +15,19 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 
-class EntityFieldManagerTest extends \PHPUnit\Framework\TestCase
+class EntityFieldManagerTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var EntityApiBaseHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $handler;
-
-    /** @var FormBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $formBuilder;
-
-    /** @var EntityRoutingHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityRoutingHelper;
-
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipMetadataProvider;
-
-    /** @var EntityFieldValidator|\PHPUnit\Framework\MockObject\MockObject */
-    private $validator;
-
-    /** @var EntityFieldManager */
-    private $manager;
+    private ManagerRegistry&MockObject $doctrine;
+    private EntityApiBaseHandler&MockObject $handler;
+    private FormBuilder&MockObject $formBuilder;
+    private EntityRoutingHelper&MockObject $entityRoutingHelper;
+    private OwnershipMetadataProviderInterface&MockObject $ownershipMetadataProvider;
+    private EntityFieldValidator&MockObject $validator;
+    private EntityFieldManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -60,7 +49,7 @@ class EntityFieldManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testUpdate()
+    public function testUpdate(): void
     {
         $form = $this->createMock(FormInterface::class);
         $this->formBuilder->expects($this->once())
@@ -103,7 +92,7 @@ class EntityFieldManagerTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testBlockedFieldNameUpdate()
+    public function testBlockedFieldNameUpdate(): void
     {
         $this->expectException(FieldUpdateAccessException::class);
         $entityManager = $this->createMock(ObjectManager::class);

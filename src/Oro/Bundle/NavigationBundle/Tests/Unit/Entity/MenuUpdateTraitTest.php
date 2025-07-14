@@ -7,8 +7,9 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class MenuUpdateTraitTest extends \PHPUnit\Framework\TestCase
+class MenuUpdateTraitTest extends TestCase
 {
     use EntityTestCaseTrait;
 

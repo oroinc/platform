@@ -8,17 +8,14 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\DefaultUserProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DefaultUserProviderTest extends \PHPUnit\Framework\TestCase
+class DefaultUserProviderTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var DefaultUserProvider */
-    private $provider;
+    private ConfigManager&MockObject $configManager;
+    private ManagerRegistry&MockObject $doctrine;
+    private DefaultUserProvider $provider;
 
     #[\Override]
     protected function setUp(): void

@@ -5,17 +5,14 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Checker;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureDecisionManagerInterface;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureResourceDecisionManager;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FeatureResourceDecisionManagerTest extends \PHPUnit\Framework\TestCase
+class FeatureResourceDecisionManagerTest extends TestCase
 {
-    /** @var FeatureDecisionManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureDecisionManager;
-
-    /** @var ConfigurationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var FeatureResourceDecisionManager */
-    private $featureResourceDecisionManager;
+    private FeatureDecisionManagerInterface&MockObject $featureDecisionManager;
+    private ConfigurationManager&MockObject $configManager;
+    private FeatureResourceDecisionManager $featureResourceDecisionManager;
 
     #[\Override]
     protected function setUp(): void

@@ -17,21 +17,22 @@ use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RenameExtensionTest extends \PHPUnit\Framework\TestCase
+class RenameExtensionTest extends TestCase
 {
     /**
      * @dataProvider renameTableProvider
      */
-    public function testRenameTable(AbstractPlatform $platform, string|array $expectedSql)
+    public function testRenameTable(AbstractPlatform $platform, string|array $expectedSql): void
     {
         $extension = new RenameExtension();
         $extension->setDatabasePlatform($platform);
 
-        $schema  = new Schema([new Table('old_table')]);
+        $schema = new Schema([new Table('old_table')]);
         $queries = new QueryBag();
 
         $extension->renameTable($schema, $queries, 'old_table', 'new_table');
@@ -44,7 +45,7 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider renameTableWithSequencesProvider
      */
-    public function testRenameTableWithSequences(AbstractPlatform $platform, array $expectedSql)
+    public function testRenameTableWithSequences(AbstractPlatform $platform, array $expectedSql): void
     {
         $extension = new RenameExtension();
         $extension->setDatabasePlatform($platform);
@@ -54,7 +55,7 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
 
         $sequence = new Sequence($platform->getIdentitySequenceName('old_table', 'id'));
 
-        $schema  = new Schema([$table], [$sequence]);
+        $schema = new Schema([$table], [$sequence]);
         $queries = new QueryBag();
 
         $extension->renameTable($schema, $queries, 'old_table', 'new_table');
@@ -71,12 +72,12 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider renameColumnProvider
      */
-    public function testRenameColumn(AbstractPlatform $platform, string $expectedSql)
+    public function testRenameColumn(AbstractPlatform $platform, string $expectedSql): void
     {
         $extension = new RenameExtension();
         $extension->setDatabasePlatform($platform);
 
-        $schema  = new Schema(
+        $schema = new Schema(
             [
                 new Table(
                     'test_table',
@@ -91,7 +92,7 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
             ]
         );
         $queries = new QueryBag();
-        $table   = $schema->getTable('test_table');
+        $table = $schema->getTable('test_table');
 
         $extension->renameColumn($schema, $queries, $table, 'old_column', 'new_column');
         /** @var MigrationQuery $query */
@@ -103,13 +104,13 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider addIndexProvider
      */
-    public function testAddIndex(AbstractPlatform $platform, string $expectedSql)
+    public function testAddIndex(AbstractPlatform $platform, string $expectedSql): void
     {
         $extension = new RenameExtension();
         $extension->setDatabasePlatform($platform);
         $extension->setNameGenerator(new DbIdentifierNameGenerator());
 
-        $schema  = new Schema();
+        $schema = new Schema();
         $queries = new QueryBag();
 
         $extension->addIndex($schema, $queries, 'test_table', ['new_column']);
@@ -122,13 +123,13 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider addUniqueIndexProvider
      */
-    public function testUniqueAddIndex(AbstractPlatform $platform, string $expectedSql)
+    public function testUniqueAddIndex(AbstractPlatform $platform, string $expectedSql): void
     {
         $extension = new RenameExtension();
         $extension->setDatabasePlatform($platform);
         $extension->setNameGenerator(new DbIdentifierNameGenerator());
 
-        $schema  = new Schema();
+        $schema = new Schema();
         $queries = new QueryBag();
 
         $extension->addUniqueIndex($schema, $queries, 'test_table', ['new_column']);
@@ -141,13 +142,13 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider addForeignKeyConstraintProvider
      */
-    public function testAddForeignKeyConstraint(AbstractPlatform $platform, string $expectedSql)
+    public function testAddForeignKeyConstraint(AbstractPlatform $platform, string $expectedSql): void
     {
         $extension = new RenameExtension();
         $extension->setDatabasePlatform($platform);
         $extension->setNameGenerator(new DbIdentifierNameGenerator());
 
-        $schema  = new Schema();
+        $schema = new Schema();
         $queries = new QueryBag();
 
         $extension->addForeignKeyConstraint(

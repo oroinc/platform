@@ -7,8 +7,9 @@ use Oro\Bundle\NavigationBundle\Event\MenuUpdatesApplyAfterEvent;
 use Oro\Bundle\NavigationBundle\Menu\OrphanItemsBuilder;
 use Oro\Bundle\NavigationBundle\MenuUpdate\Applier\Model\MenuUpdateApplierContext;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
+use PHPUnit\Framework\TestCase;
 
-class OrphanItemsBuilderTest extends \PHPUnit\Framework\TestCase
+class OrphanItemsBuilderTest extends TestCase
 {
     use MenuItemTestTrait;
 

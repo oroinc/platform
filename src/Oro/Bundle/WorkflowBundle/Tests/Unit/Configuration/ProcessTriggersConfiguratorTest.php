@@ -12,35 +12,22 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
+class ProcessTriggersConfiguratorTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var ProcessConfigurationBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurationBuilder;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
-
-    /** @var string|\PHPUnit\Framework\MockObject\MockObject */
-    private $triggerEntityClass;
-
-    /** @var ProcessTriggerCronScheduler|\PHPUnit\Framework\MockObject\MockObject */
-    private $processCronScheduler;
-
-    /** @var ProcessTriggerRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $objectManager;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var ProcessTriggersConfigurator */
-    private $processTriggersConfigurator;
+    private ProcessConfigurationBuilder&MockObject $configurationBuilder;
+    private ManagerRegistry&MockObject $managerRegistry;
+    private string $triggerEntityClass;
+    private ProcessTriggerCronScheduler&MockObject $processCronScheduler;
+    private ProcessTriggerRepository&MockObject $repository;
+    private ObjectManager&MockObject $objectManager;
+    private LoggerInterface&MockObject $logger;
+    private ProcessTriggersConfigurator $processTriggersConfigurator;
 
     #[\Override]
     protected function setUp(): void
@@ -63,7 +50,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->processTriggersConfigurator->setLogger($this->logger);
     }
 
-    public function testConfigureTriggers()
+    public function testConfigureTriggers(): void
     {
         $triggersConfiguration = ['definition_name' => [['exist'], ['not_exist']]];
         $definition = new ProcessDefinition();
@@ -141,7 +128,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([$nonExistentNewTrigger], $this->getForPersistPropertyValue());
     }
 
-    public function testRemoveDefinitionTriggers()
+    public function testRemoveDefinitionTriggers(): void
     {
         $this->assertManagerRegistryCalled($this->triggerEntityClass);
         $this->assertObjectManagerCalledForRepository($this->triggerEntityClass);
@@ -175,7 +162,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider flushDataProvider
      */
-    public function testFlush(bool $dirty, array $triggers, int $expectedSchedulesCount)
+    public function testFlush(bool $dirty, array $triggers, int $expectedSchedulesCount): void
     {
         $this->setValue($this->processTriggersConfigurator, 'dirty', $dirty);
         $this->setValue($this->processTriggersConfigurator, 'triggers', $triggers);
@@ -222,7 +209,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testFlushRemoves()
+    public function testFlushRemoves(): void
     {
         $this->setValue($this->processTriggersConfigurator, 'dirty', true);
 
@@ -250,7 +237,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->processTriggersConfigurator->flush();
     }
 
-    public function testFlushPersists()
+    public function testFlushPersists(): void
     {
         $this->setValue($this->processTriggersConfigurator, 'dirty', true);
 

@@ -9,6 +9,8 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -17,16 +19,11 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
+class ResponseHistoryListenerTest extends TestCase
 {
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var NavigationHistoryLogger|\PHPUnit\Framework\MockObject\MockObject */
-    private $navigationHistoryLogger;
-
-    /** @var ResponseHistoryListener */
-    private $listener;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private NavigationHistoryLogger&MockObject $navigationHistoryLogger;
+    private ResponseHistoryListener $listener;
 
     #[\Override]
     protected function setUp(): void

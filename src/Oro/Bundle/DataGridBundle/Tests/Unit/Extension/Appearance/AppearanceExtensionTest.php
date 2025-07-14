@@ -7,15 +7,14 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\Configuration;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AppearanceExtensionTest extends \PHPUnit\Framework\TestCase
+class AppearanceExtensionTest extends TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var AppearanceExtension */
-    private $extension;
+    private TranslatorInterface&MockObject $translator;
+    private AppearanceExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +28,7 @@ class AppearanceExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->setParameters(new ParameterBag());
     }
 
-    public function testIsApplicable()
+    public function testIsApplicable(): void
     {
         $config = DatagridConfiguration::create([
             AppearanceExtension::APPEARANCE_CONFIG_PATH => [
@@ -40,13 +39,13 @@ class AppearanceExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->extension->isApplicable($config));
     }
 
-    public function testIsNotApplicable()
+    public function testIsNotApplicable(): void
     {
         $config = DatagridConfiguration::create([]);
         $this->assertFalse($this->extension->isApplicable($config));
     }
 
-    public function testSetParameters()
+    public function testSetParameters(): void
     {
         $parameters = new ParameterBag(
             [
@@ -65,7 +64,7 @@ class AppearanceExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $params);
     }
 
-    public function testProcessConfigs()
+    public function testProcessConfigs(): void
     {
         $config = DatagridConfiguration::create([
             AppearanceExtension::APPEARANCE_CONFIG_PATH => [
@@ -90,7 +89,7 @@ class AppearanceExtensionTest extends \PHPUnit\Framework\TestCase
         $config->offsetGetByPath(AppearanceExtension::APPEARANCE_OPTION_PATH, $expected);
     }
 
-    public function testVisitMetadata()
+    public function testVisitMetadata(): void
     {
         $config = DatagridConfiguration::create([
             AppearanceExtension::APPEARANCE_CONFIG_PATH => [
@@ -121,7 +120,7 @@ class AppearanceExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($state, $data->offsetGet('state'));
     }
 
-    public function testVisitMetadataGridOnly()
+    public function testVisitMetadataGridOnly(): void
     {
         $config = DatagridConfiguration::create([
             AppearanceExtension::APPEARANCE_CONFIG_PATH => [

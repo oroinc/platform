@@ -5,14 +5,15 @@ namespace Oro\Component\Layout\Tests\Unit\Util;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Util\BlockUtils;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class BlockUtilsTest extends \PHPUnit\Framework\TestCase
+class BlockUtilsTest extends TestCase
 {
-    public function testRegisterPlugin()
+    public function testRegisterPlugin(): void
     {
         $view = new BlockView();
 
@@ -29,7 +30,7 @@ class BlockUtilsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeTransValueDataProvider
      */
-    public function testNormalizeTransValue($text, $parameters, $expected)
+    public function testNormalizeTransValue($text, $parameters, $expected): void
     {
         $result = BlockUtils::normalizeTransValue($text, $parameters);
         $this->assertSame($expected, $result);
@@ -68,7 +69,7 @@ class BlockUtilsTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testProcessUrlShouldThrowExceptionIfRequiredAndEmptyOptions()
+    public function testProcessUrlShouldThrowExceptionIfRequiredAndEmptyOptions(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage('Either "path" or "route_name" must be set.');
@@ -80,7 +81,7 @@ class BlockUtilsTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessUrlWithEmptyOptions()
+    public function testProcessUrlWithEmptyOptions(): void
     {
         $view = new BlockView();
         BlockUtils::processUrl(
@@ -93,7 +94,7 @@ class BlockUtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayNotHasKey('route_parameters', $view->vars);
     }
 
-    public function testProcessUrlWithPrefixAndEmptyOptions()
+    public function testProcessUrlWithPrefixAndEmptyOptions(): void
     {
         $view = new BlockView();
         BlockUtils::processUrl(
@@ -108,7 +109,7 @@ class BlockUtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayNotHasKey('test_route_parameters', $view->vars);
     }
 
-    public function testProcessUrlWithPath()
+    public function testProcessUrlWithPath(): void
     {
         $view = new BlockView();
         BlockUtils::processUrl(
@@ -121,7 +122,7 @@ class BlockUtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayNotHasKey('route_parameters', $view->vars);
     }
 
-    public function testProcessUrlWithPrefixAndPath()
+    public function testProcessUrlWithPrefixAndPath(): void
     {
         $view = new BlockView();
         BlockUtils::processUrl(
@@ -136,7 +137,7 @@ class BlockUtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayNotHasKey('test_route_parameters', $view->vars);
     }
 
-    public function testProcessUrlWithRoute()
+    public function testProcessUrlWithRoute(): void
     {
         $view = new BlockView();
         BlockUtils::processUrl(
@@ -149,7 +150,7 @@ class BlockUtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $view->vars['route_parameters']);
     }
 
-    public function testProcessUrlWithPrefixAndRoute()
+    public function testProcessUrlWithPrefixAndRoute(): void
     {
         $view = new BlockView();
         BlockUtils::processUrl(
@@ -164,7 +165,7 @@ class BlockUtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $view->vars['test_route_parameters']);
     }
 
-    public function testProcessUrlWithRouteParameters()
+    public function testProcessUrlWithRouteParameters(): void
     {
         $view = new BlockView();
         BlockUtils::processUrl(
@@ -177,7 +178,7 @@ class BlockUtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(new Options(['foo' => 'bar']), $view->vars['route_parameters']);
     }
 
-    public function testProcessUrlWithPrefixAndRouteParameters()
+    public function testProcessUrlWithPrefixAndRouteParameters(): void
     {
         $view = new BlockView();
         BlockUtils::processUrl(
@@ -192,7 +193,7 @@ class BlockUtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(new Options(['foo' => 'bar']), $view->vars['test_route_parameters']);
     }
 
-    public function testProcessUrlWithPathAndRoute()
+    public function testProcessUrlWithPathAndRoute(): void
     {
         $view = new BlockView();
         BlockUtils::processUrl(
@@ -209,7 +210,7 @@ class BlockUtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayNotHasKey('route_parameters', $view->vars);
     }
 
-    public function testProcessUrlWithPrefixAndPathAndRoute()
+    public function testProcessUrlWithPrefixAndPathAndRoute(): void
     {
         $view = new BlockView();
         BlockUtils::processUrl(
@@ -228,7 +229,7 @@ class BlockUtilsTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayNotHasKey('test_route_parameters', $view->vars);
     }
 
-    public function testSetViewVarsFromOptions()
+    public function testSetViewVarsFromOptions(): void
     {
         $view = new BlockView();
         BlockUtils::setViewVarsFromOptions(

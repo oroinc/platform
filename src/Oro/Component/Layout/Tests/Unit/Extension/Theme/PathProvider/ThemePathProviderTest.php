@@ -7,11 +7,12 @@ use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Extension\Theme\PathProvider\ThemePathProvider;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ThemePathProviderTest extends \PHPUnit\Framework\TestCase
+class ThemePathProviderTest extends TestCase
 {
-    private ThemeManager|\PHPUnit\Framework\MockObject\MockObject $themeManager;
-
+    private ThemeManager&MockObject $themeManager;
     private ThemePathProvider $provider;
 
     #[\Override]
@@ -32,8 +33,7 @@ class ThemePathProviderTest extends \PHPUnit\Framework\TestCase
         $context->set('route_name', $route);
         $context->set('action', $action);
 
-        $this->themeManager
-            ->expects(self::any())
+        $this->themeManager->expects(self::any())
             ->method('getThemesHierarchy')
             ->willReturnMap([
                 ['base', [new Theme('base')]],
@@ -130,8 +130,7 @@ class ThemePathProviderTest extends \PHPUnit\Framework\TestCase
         $theme = (new Theme($themeName, $parentName))
             ->addPageTemplate($pageTemplate);
 
-        $this->themeManager
-            ->expects(self::any())
+        $this->themeManager->expects(self::any())
             ->method('getThemesHierarchy')
             ->with($themeName)
             ->willReturn([new Theme($parentName), $theme]);

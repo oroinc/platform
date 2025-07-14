@@ -10,23 +10,16 @@ use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ManagerTest extends \PHPUnit\Framework\TestCase
+class ManagerTest extends TestCase
 {
-    /** @var ConfigurationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurationProvider;
-
-    /** @var Builder|\PHPUnit\Framework\MockObject\MockObject */
-    private $builder;
-
-    /** @var RequestParameterBagFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $parametersFactory;
-
-    /** @var NameStrategyInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $nameStrategy;
-
-    /** @var Manager */
-    private $manager;
+    private ConfigurationProviderInterface&MockObject $configurationProvider;
+    private Builder&MockObject $builder;
+    private RequestParameterBagFactory&MockObject $parametersFactory;
+    private NameStrategyInterface&MockObject $nameStrategy;
+    private Manager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -50,7 +43,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDatagridByRequestParamsWorksWithoutScope()
+    public function testGetDatagridByRequestParamsWorksWithoutScope(): void
     {
         $datagridName = 'test_grid';
         $additionalParameters = ['foo' => 'bar'];
@@ -103,7 +96,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDatagridByRequestParamsWorksWithScope()
+    public function testGetDatagridByRequestParamsWorksWithScope(): void
     {
         $gridFullName = 'test_grid:test_scope';
         $gridName = 'test_grid';
@@ -162,7 +155,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDatagridWithoutScope()
+    public function testGetDatagridWithoutScope(): void
     {
         $datagridName = 'test_grid';
         $parameters = $this->createMock(ParameterBag::class);
@@ -200,7 +193,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDatagridWithScope()
+    public function testGetDatagridWithScope(): void
     {
         $gridFullName = 'test_grid:test_scope';
         $gridName = 'test_grid';
@@ -244,7 +237,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDatagridWithDefaultParameters()
+    public function testGetDatagridWithDefaultParameters(): void
     {
         $datagridName = 'test_grid';
 
@@ -271,14 +264,12 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
             ->method('build')
             ->with(
                 $configuration,
-                $this->callback(
-                    function ($parameters) {
-                        $this->assertInstanceOf(ParameterBag::class, $parameters);
-                        $this->assertEquals([], $parameters->all());
+                $this->callback(function ($parameters) {
+                    $this->assertInstanceOf(ParameterBag::class, $parameters);
+                    $this->assertEquals([], $parameters->all());
 
-                        return true;
-                    }
-                )
+                    return true;
+                })
             )
             ->willReturn($datagrid);
 
@@ -288,7 +279,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDatagridWithArrayParameters()
+    public function testGetDatagridWithArrayParameters(): void
     {
         $datagridName = 'test_grid';
         $parameters = ['foo' => 'bar'];
@@ -316,14 +307,12 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
             ->method('build')
             ->with(
                 $configuration,
-                $this->callback(
-                    function ($value) use ($parameters) {
-                        $this->assertInstanceOf(ParameterBag::class, $value);
-                        $this->assertEquals($parameters, $value->all());
+                $this->callback(function ($value) use ($parameters) {
+                    $this->assertInstanceOf(ParameterBag::class, $value);
+                    $this->assertEquals($parameters, $value->all());
 
-                        return true;
-                    }
-                )
+                    return true;
+                })
             )
             ->willReturn($datagrid);
 
@@ -333,7 +322,7 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDatagridThrowsException()
+    public function testGetDatagridThrowsException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$parameters must be an array or instance of ParameterBag.');

@@ -4,10 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Context;
 
 use Oro\Bundle\WorkflowBundle\Processor\Context\TemplateResultType;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface;
+use PHPUnit\Framework\TestCase;
 
-class TemplateResultTypeTest extends \PHPUnit\Framework\TestCase
+class TemplateResultTypeTest extends TestCase
 {
-    public function testInterface()
+    public function testInterface(): void
     {
         $resultType = new TemplateResultType();
 

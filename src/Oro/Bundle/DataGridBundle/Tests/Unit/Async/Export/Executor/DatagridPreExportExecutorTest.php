@@ -9,8 +9,9 @@ use Oro\Bundle\DataGridBundle\Datagrid\Datagrid;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use PHPUnit\Framework\TestCase;
 
-class DatagridPreExportExecutorTest extends \PHPUnit\Framework\TestCase
+class DatagridPreExportExecutorTest extends TestCase
 {
     public function testRunWhenNoExecutors(): void
     {
@@ -53,8 +54,7 @@ class DatagridPreExportExecutorTest extends \PHPUnit\Framework\TestCase
         );
 
         $sampleExecutor = $this->createMock(DatagridPreExportExecutorInterface::class);
-        $sampleExecutor
-            ->expects(self::once())
+        $sampleExecutor->expects(self::once())
             ->method('isSupported')
             ->with($datagrid, $options)
             ->willReturn(false);
@@ -72,25 +72,21 @@ class DatagridPreExportExecutorTest extends \PHPUnit\Framework\TestCase
         $options = ['sample-key' => 'sample-value'];
 
         $sampleNotSupportedExecutor = $this->createMock(DatagridPreExportExecutorInterface::class);
-        $sampleNotSupportedExecutor
-            ->expects(self::once())
+        $sampleNotSupportedExecutor->expects(self::once())
             ->method('isSupported')
             ->with($datagrid, $options)
             ->willReturn(false);
 
-        $sampleNotSupportedExecutor
-            ->expects(self::never())
+        $sampleNotSupportedExecutor->expects(self::never())
             ->method('run');
 
         $sampleExecutor = $this->createMock(DatagridPreExportExecutorInterface::class);
-        $sampleExecutor
-            ->expects(self::once())
+        $sampleExecutor->expects(self::once())
             ->method('isSupported')
             ->with($datagrid, $options)
             ->willReturn(true);
 
-        $sampleExecutor
-            ->expects(self::once())
+        $sampleExecutor->expects(self::once())
             ->method('run')
             ->with($jobRunner, $job, $datagrid, $options)
             ->willReturn(true);
@@ -114,8 +110,7 @@ class DatagridPreExportExecutorTest extends \PHPUnit\Framework\TestCase
         $options = ['sample-key' => 'sample-value'];
 
         $sampleExecutor = $this->createMock(DatagridPreExportExecutorInterface::class);
-        $sampleExecutor
-            ->expects(self::once())
+        $sampleExecutor->expects(self::once())
             ->method('isSupported')
             ->with($datagrid, $options)
             ->willReturn(false);
@@ -130,15 +125,13 @@ class DatagridPreExportExecutorTest extends \PHPUnit\Framework\TestCase
         $options = ['sample-key' => 'sample-value'];
 
         $sampleNotSupportedExecutor = $this->createMock(DatagridPreExportExecutorInterface::class);
-        $sampleNotSupportedExecutor
-            ->expects(self::once())
+        $sampleNotSupportedExecutor->expects(self::once())
             ->method('isSupported')
             ->with($datagrid, $options)
             ->willReturn(false);
 
         $sampleExecutor = $this->createMock(DatagridPreExportExecutorInterface::class);
-        $sampleExecutor
-            ->expects(self::once())
+        $sampleExecutor->expects(self::once())
             ->method('isSupported')
             ->with($datagrid, $options)
             ->willReturn(true);

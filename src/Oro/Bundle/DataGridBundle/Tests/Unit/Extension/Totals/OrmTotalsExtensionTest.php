@@ -19,40 +19,30 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Component\DoctrineUtils\ORM\Walker\PostgreSqlOrderByNullsOutputResultModifier as OutputResultModifier;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OrmTotalsExtensionTest extends OrmTestCase
 {
-    /** @var DatagridConfiguration */
-    private $config;
-
-    /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    private $numberFormatter;
-
-    /** @var DateTimeFormatterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dateTimeFormatter;
-
-    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclHelper;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var OrmTotalsExtension */
-    private $extension;
+    private DatagridConfiguration $config;
+    private NumberFormatter&MockObject $numberFormatter;
+    private DateTimeFormatterInterface&MockObject $dateTimeFormatter;
+    private AclHelper&MockObject $aclHelper;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private OrmTotalsExtension $extension;
 
     #[\Override]
     protected function setUp(): void
     {
-        $translator = self::createMock(TranslatorInterface::class);
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects(self::any())
             ->method('trans')
             ->willReturnArgument(0);
 
-        $this->numberFormatter = self::createMock(NumberFormatter::class);
-        $this->dateTimeFormatter = self::createMock(DateTimeFormatterInterface::class);
-        $this->aclHelper = self::createMock(AclHelper::class);
-        $this->doctrineHelper = self::createMock(DoctrineHelper::class);
+        $this->numberFormatter = $this->createMock(NumberFormatter::class);
+        $this->dateTimeFormatter = $this->createMock(DateTimeFormatterInterface::class);
+        $this->aclHelper = $this->createMock(AclHelper::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->config = $this->getTestConfig();
 
@@ -66,14 +56,14 @@ class OrmTotalsExtensionTest extends OrmTestCase
         $this->extension->setParameters(new ParameterBag());
     }
 
-    public function testIsApplicable()
+    public function testIsApplicable(): void
     {
         self::assertTrue($this->extension->isApplicable($this->config));
         $this->config->offsetSetByPath(DatagridConfiguration::DATASOURCE_TYPE_PATH, 'non_orm');
         self::assertFalse($this->extension->isApplicable($this->config));
     }
 
-    public function testProcessConfigs()
+    public function testProcessConfigs(): void
     {
         $this->extension->processConfigs($this->config);
         $resultConfig = $this->config->offsetGetByPath(Configuration::TOTALS_PATH);
@@ -88,7 +78,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
         self::assertEquals('SUM(a.won)', $resultConfig['total']['columns']['wonCount']['expr']);
     }
 
-    public function testWrongProcessConfigs()
+    public function testWrongProcessConfigs(): void
     {
         $config = DatagridConfiguration::create(
             [
@@ -115,7 +105,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
         $this->extension->processConfigs($config);
     }
 
-    public function testVisitMetadata()
+    public function testVisitMetadata(): void
     {
         $metadata = MetadataObject::create([]);
         $this->extension->visitMetadata($this->config, $metadata);
@@ -126,12 +116,12 @@ class OrmTotalsExtensionTest extends OrmTestCase
         self::assertEquals('orodatagrid/js/totals-builder', $metadata->offsetGet('jsmodules')[0]);
     }
 
-    public function testGetPriority()
+    public function testGetPriority(): void
     {
         self::assertEquals(-PHP_INT_MAX, $this->extension->getPriority());
     }
 
-    public function testVisitResult()
+    public function testVisitResult(): void
     {
         $config = $this->getTestConfig();
         $result = $this->getTestResult();
@@ -224,8 +214,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
 
     private function expectsQueryBuilderCalled(DatagridConfiguration $config): void
     {
-        $this->doctrineHelper
-            ->expects(self::any())
+        $this->doctrineHelper->expects(self::any())
             ->method('getSingleEntityIdentifierFieldName')
             ->willReturn('id');
 
@@ -235,83 +224,67 @@ class OrmTotalsExtensionTest extends OrmTestCase
             ->addMethods(['setFirstResult', 'setMaxResults'])
             ->getMockForAbstractClass();
 
-        $query
-            ->expects(self::any())
+        $query->expects(self::any())
             ->method('setFirstResult')
             ->willReturnSelf();
-        $query
-            ->expects(self::any())
+        $query->expects(self::any())
             ->method('setMaxResults')
             ->willReturnSelf();
-        $query
-            ->expects(self::any())
+        $query->expects(self::any())
             ->method('getArrayResult')
             ->willReturn([
                 ['_identifier' => 1],
                 ['_identifier' => 2],
                 ['_identifier' => 3],
             ]);
-        $query
-            ->expects(self::any())
+        $query->expects(self::any())
             ->method('getScalarResult')
             ->willReturn([
                 ['id' => 14, 'wonCount' => 14]
             ]);
-        $query
-            ->expects(self::any())
+        $query->expects(self::any())
             ->method('setHint')
             ->with(OutputResultModifier::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS, true);
 
-        $qb = self::createMock(QueryBuilder::class);
-        $qb
-            ->expects(self::any())
+        $qb = $this->createMock(QueryBuilder::class);
+        $qb->expects(self::any())
             ->method('getRootAliases')
             ->willReturn(['root_alias']);
-        $qb
-            ->expects(self::any())
+        $qb->expects(self::any())
             ->method('getRootEntities')
             ->willReturn([TestActivity::class]);
-        $qb
-            ->expects(self::any())
+        $qb->expects(self::any())
             ->method('addSelect')
             ->with('GROUP_CONCAT(root_alias.id) as _identifier')
             ->willReturnSelf();
-        $qb
-            ->expects(self::any())
+        $qb->expects(self::any())
             ->method('getQuery')
             ->willReturn($query);
-        $qb
-            ->expects(self::any())
+        $qb->expects(self::any())
             ->method('setParameters')
             ->willReturn($query);
-        $qb
-            ->expects(self::any())
+        $qb->expects(self::any())
             ->method('expr')
             ->willReturn(new Expr());
-        $qb
-            ->expects(self::atLeastOnce())
+        $qb->expects(self::atLeastOnce())
             ->method('resetDQLParts')
             ->with(['groupBy', 'having', 'orderBy'])
             ->willReturnSelf();
-        $qb
-            ->expects(self::any())
+        $qb->expects(self::any())
             ->method('getParameters')
             ->willReturn([]);
-        $qb
-            ->expects(self::any())
+        $qb->expects(self::any())
             ->method('setMaxResults')
             ->willReturnSelf();
-        $qb
-            ->expects(self::any())
+        $qb->expects(self::any())
             ->method('setFirstResult')
             ->willReturnSelf();
 
-        $this->aclHelper
-            ->expects(self::any())
+        $this->aclHelper->expects(self::any())
             ->method('apply')
             ->willReturnArgument(0);
 
-        $datasource = self::createMock(OrmDatasource::class);
+        $datasource = $this->createMock(OrmDatasource::class);
         $datasource->expects(self::any())
             ->method('getQueryBuilder')
             ->willReturn($qb);

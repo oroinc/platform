@@ -4,15 +4,15 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Provider\Image;
 
 use Oro\Bundle\LayoutBundle\Provider\Image\CacheImagePlaceholderProvider;
 use Oro\Bundle\LayoutBundle\Provider\Image\ImagePlaceholderProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 
-class CacheImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
+class CacheImagePlaceholderProviderTest extends TestCase
 {
-    private ImagePlaceholderProviderInterface|\PHPUnit\Framework\MockObject\MockObject $imagePlaceholderProvider;
-
-    private CacheInterface|\PHPUnit\Framework\MockObject\MockObject $cache;
-
+    private ImagePlaceholderProviderInterface&MockObject $imagePlaceholderProvider;
+    private CacheInterface&MockObject $cache;
     private CacheImagePlaceholderProvider $decorator;
 
     #[\Override]

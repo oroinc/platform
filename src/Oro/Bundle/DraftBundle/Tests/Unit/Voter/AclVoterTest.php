@@ -6,10 +6,11 @@ use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Bundle\DraftBundle\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterInterface;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-class AclVoterTest extends \PHPUnit\Framework\TestCase
+class AclVoterTest extends TestCase
 {
     /**
      * @dataProvider voteDataProvider

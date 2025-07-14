@@ -8,10 +8,11 @@ use Doctrine\Persistence\Mapping\ClassMetadata as ClassMetadataInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\ORM\ShortClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\ShortMetadataProvider;
+use PHPUnit\Framework\TestCase;
 
-class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
+class ShortMetadataProviderTest extends TestCase
 {
-    public function testGetAllShortMetadataWithEmptyCache()
+    public function testGetAllShortMetadataWithEmptyCache(): void
     {
         $manager = $this->createMock(ObjectManager::class);
         $metadataFactory = $this->createMock(AbstractClassMetadataFactory::class);
@@ -57,7 +58,7 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAllShortMetadataWithoutCache()
+    public function testGetAllShortMetadataWithoutCache(): void
     {
         $manager = $this->createMock(ObjectManager::class);
         $metadataFactory = $this->createMock(AbstractClassMetadataFactory::class);
@@ -98,7 +99,7 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAllShortMetadataWhenLoadMetadataThrowsExceptionIgnoreExceptionsIsRequested()
+    public function testGetAllShortMetadataWhenLoadMetadataThrowsExceptionIgnoreExceptionsIsRequested(): void
     {
         $manager = $this->createMock(ObjectManager::class);
         $metadataFactory = $this->createMock(AbstractClassMetadataFactory::class);
@@ -118,7 +119,7 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAllShortMetadataWhenLoadMetadataThrowsExceptionIgnoreExceptionsIsNotRequested()
+    public function testGetAllShortMetadataWhenLoadMetadataThrowsExceptionIgnoreExceptionsIsNotRequested(): void
     {
         $manager = $this->createMock(ObjectManager::class);
         $metadataFactory = $this->createMock(AbstractClassMetadataFactory::class);

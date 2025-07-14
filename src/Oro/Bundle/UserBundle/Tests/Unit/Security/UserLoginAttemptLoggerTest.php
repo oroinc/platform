@@ -413,7 +413,7 @@ class UserLoginAttemptLoggerTest extends TestCase
         self::assertEquals('Success login attempt.', $message);
     }
 
-    public function testGetSourceChoices()
+    public function testGetSourceChoices(): void
     {
         self::assertEquals(
             [

@@ -12,11 +12,8 @@ use PHPUnit\Framework\TestCase;
 
 class ColumnCurrencyNormalizationTest extends TestCase
 {
-    /** @var DatagridInterface | MockObject */
-    private $datagrid;
-
-    /** @var DatagridConfiguration | MockObject */
-    private $config;
+    private DatagridInterface&MockObject $datagrid;
+    private DatagridConfiguration&MockObject $config;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +22,7 @@ class ColumnCurrencyNormalizationTest extends TestCase
         $this->config = $this->createMock(DatagridConfiguration::class);
     }
 
-    public function testOnBuildBefore()
+    public function testOnBuildBefore(): void
     {
         $this->datagrid->expects($this->once())
             ->method('getName')

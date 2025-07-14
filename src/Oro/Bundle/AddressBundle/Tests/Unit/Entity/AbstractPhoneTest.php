@@ -3,11 +3,11 @@
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractPhone;
+use PHPUnit\Framework\TestCase;
 
-class AbstractPhoneTest extends \PHPUnit\Framework\TestCase
+class AbstractPhoneTest extends TestCase
 {
-    /** @var AbstractPhone */
-    private $phone;
+    private AbstractPhone $phone;
 
     #[\Override]
     protected function setUp(): void
@@ -15,42 +15,42 @@ class AbstractPhoneTest extends \PHPUnit\Framework\TestCase
         $this->phone = $this->createPhone();
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $this->phone = $this->createPhone('080011223355');
 
         $this->assertEquals('080011223355', $this->phone->getPhone());
     }
 
-    public function testId()
+    public function testId(): void
     {
         $this->assertNull($this->phone->getId());
         $this->phone->setId(100);
         $this->assertEquals(100, $this->phone->getId());
     }
 
-    public function testPhone()
+    public function testPhone(): void
     {
         $this->assertNull($this->phone->getPhone());
         $this->phone->setPhone('080011223355');
         $this->assertEquals('080011223355', $this->phone->getPhone());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertEquals('', (string)$this->phone);
         $this->phone->setPhone('080011223355');
         $this->assertEquals('080011223355', (string)$this->phone);
     }
 
-    public function testPrimary()
+    public function testPrimary(): void
     {
         $this->assertFalse($this->phone->isPrimary());
         $this->phone->setPrimary(true);
         $this->assertTrue($this->phone->isPrimary());
     }
 
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $this->assertTrue($this->createPhone()->isEmpty());
         $this->assertFalse($this->createPhone('00110011')->isEmpty());
@@ -59,7 +59,7 @@ class AbstractPhoneTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isEqualDataProvider
      */
-    public function testIsEqual(AbstractPhone $first, ?AbstractPhone $second, bool $expectedResult)
+    public function testIsEqual(AbstractPhone $first, ?AbstractPhone $second, bool $expectedResult): void
     {
         $this->assertEquals($expectedResult, $first->isEqual($second));
     }

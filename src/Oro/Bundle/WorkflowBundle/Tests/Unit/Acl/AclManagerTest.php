@@ -14,17 +14,14 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AclManagerTest extends \PHPUnit\Framework\TestCase
+class AclManagerTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowRegistry;
-
-    /** @var AclManager */
-    private $manager;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private WorkflowRegistry&MockObject $workflowRegistry;
+    private AclManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +32,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager = new AclManager($this->doctrineHelper, $this->workflowRegistry);
     }
 
-    public function testUpdateAclIdentities()
+    public function testUpdateAclIdentities(): void
     {
         $entity = new \DateTime();
         $entityIdentifier = 42;
@@ -86,7 +83,7 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($workflowItem, $aclIdentity->getWorkflowItem());
     }
 
-    public function testUpdateAclIdentitiesNotAnObjectException()
+    public function testUpdateAclIdentitiesNotAnObjectException(): void
     {
         $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage('Value of attribute "attribute" must be an object');

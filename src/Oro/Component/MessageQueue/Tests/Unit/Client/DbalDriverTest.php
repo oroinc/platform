@@ -10,11 +10,12 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSessionInterface;
 use Oro\Component\MessageQueue\Transport\MessageProducerInterface;
 use Oro\Component\MessageQueue\Transport\Queue;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DbalDriverTest extends \PHPUnit\Framework\TestCase
+class DbalDriverTest extends TestCase
 {
-    private DbalSessionInterface|\PHPUnit\Framework\MockObject\MockObject $session;
-
+    private DbalSessionInterface&MockObject $session;
     private DbalDriver $driver;
 
     #[\Override]
@@ -33,8 +34,7 @@ class DbalDriverTest extends \PHPUnit\Framework\TestCase
     {
         $queue = new Queue('queue name');
 
-        $this->session
-            ->expects(self::once())
+        $this->session->expects(self::once())
             ->method('createMessage')
             ->willReturn(new DbalMessage());
 
@@ -43,8 +43,7 @@ class DbalDriverTest extends \PHPUnit\Framework\TestCase
             ->method('send')
             ->with($queue, $expectedTransportMessage);
 
-        $this->session
-            ->expects(self::once())
+        $this->session->expects(self::once())
             ->method('createProducer')
             ->willReturn($producer);
 

@@ -4,19 +4,16 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\ActionBundle\Helper\DefaultOperationRequestHelper;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class DefaultOperationRequestHelperTest extends \PHPUnit\Framework\TestCase
+class DefaultOperationRequestHelperTest extends TestCase
 {
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $routeProvider;
-
-    /** @var DefaultOperationRequestHelper */
-    private $helper;
+    private RequestStack&MockObject $requestStack;
+    private RouteProviderInterface&MockObject $routeProvider;
+    private DefaultOperationRequestHelper $helper;
 
     #[\Override]
     protected function setUp(): void

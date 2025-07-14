@@ -7,19 +7,16 @@ use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 use Oro\Bundle\EntityBundle\ImportExport\Serializer\EntityFieldFallbackValueNormalizer;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityFieldFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
+class EntityFieldFallbackValueNormalizerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var EntityFallbackResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $resolver;
-
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
-
-    /** @var EntityFieldFallbackValueNormalizer */
-    private $normalizer;
+    private EntityFallbackResolver&MockObject $resolver;
+    private LocaleSettings&MockObject $localeSettings;
+    private EntityFieldFallbackValueNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +29,7 @@ class EntityFieldFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeDataProvider
      */
-    public function testNormalize(object $object, ?array $expected = null)
+    public function testNormalize(object $object, ?array $expected = null): void
     {
         $this->assertSame($expected, $this->normalizer->normalize($object));
     }
@@ -71,7 +68,7 @@ class EntityFieldFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider denormalizeDataProvider
      */
-    public function testDenormalize(string $value, bool $isFallbackConfigure, object $expected)
+    public function testDenormalize(string $value, bool $isFallbackConfigure, object $expected): void
     {
         $this->localeSettings->expects($this->never())
             ->method('getLocale');
@@ -111,7 +108,7 @@ class EntityFieldFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider denormalizeDecimalValueDataProvider
      */
-    public function testDenormalizeDecimalValue(mixed $value, string $type, string $locale, mixed $expected)
+    public function testDenormalizeDecimalValue(mixed $value, string $type, string $locale, mixed $expected): void
     {
         $this->resolver->expects($this->once())
             ->method('getType')
@@ -180,22 +177,22 @@ class EntityFieldFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSupportsDenormalization()
+    public function testSupportsDenormalization(): void
     {
         $this->assertTrue($this->normalizer->supportsDenormalization([], EntityFieldFallbackValue::class));
     }
 
-    public function testDoesNotSupportsDenormalization()
+    public function testDoesNotSupportsDenormalization(): void
     {
         $this->assertFalse($this->normalizer->supportsDenormalization([], \stdClass::class));
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $this->assertTrue($this->normalizer->supportsNormalization(new EntityFieldFallbackValue()));
     }
 
-    public function testDoesNotSupportsNormalization()
+    public function testDoesNotSupportsNormalization(): void
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }

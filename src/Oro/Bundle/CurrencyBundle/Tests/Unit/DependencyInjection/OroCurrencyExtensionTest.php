@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\CurrencyBundle\DependencyInjection\OroCurrencyExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroCurrencyExtensionTest extends \PHPUnit\Framework\TestCase
+class OroCurrencyExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

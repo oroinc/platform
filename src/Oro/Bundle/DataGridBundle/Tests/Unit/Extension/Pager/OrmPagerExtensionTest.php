@@ -13,11 +13,11 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\OrmPagerExtension;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
+class OrmPagerExtensionTest extends TestCase
 {
-    private Pager|MockObject $pager;
-
+    private Pager&MockObject $pager;
     private OrmPagerExtension $extension;
 
     #[\Override]
@@ -31,7 +31,7 @@ class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setParametersDataProvider
      */
-    public function testSetParameters(array $input, array $expected)
+    public function testSetParameters(array $input, array $expected): void
     {
         $this->extension->setParameters(new ParameterBag($input));
         $this->assertEquals($expected, $this->extension->getParameters()->all());
@@ -115,7 +115,7 @@ class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider visitDatasourceNoRestrictionsDataProvider
      */
-    public function testVisitDatasourceNoPagerRestrictions(array $config, int $page, int $maxPerPage)
+    public function testVisitDatasourceNoPagerRestrictions(array $config, int $page, int $maxPerPage): void
     {
         $configObject = DatagridConfiguration::create($config);
         $dataSource = $this->createMock(OrmDatasource::class);
@@ -161,7 +161,7 @@ class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider adjustedCountDataProvider
      */
-    public function testVisitDatasourceWithAdjustedCount(mixed $count, bool $adjustTotalCount = false)
+    public function testVisitDatasourceWithAdjustedCount(mixed $count, bool $adjustTotalCount = false): void
     {
         $configObject = DatagridConfiguration::create([]);
         $dataSource = $this->createMock(OrmDatasource::class);
@@ -199,7 +199,7 @@ class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitDatasource($configObject, $dataSource);
     }
 
-    public function testHintCount()
+    public function testHintCount(): void
     {
         $hints = ['HINT'];
 

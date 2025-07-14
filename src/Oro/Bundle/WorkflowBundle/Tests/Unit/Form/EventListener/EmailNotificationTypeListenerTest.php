@@ -11,6 +11,7 @@ use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionSelectType;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\EmailNotificationStub as EmailNotification;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
@@ -23,14 +24,9 @@ class EmailNotificationTypeListenerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowRegistry;
-
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
-
-    /** @var EmailNotificationTypeListener */
-    private $listener;
+    private WorkflowRegistry&MockObject $workflowRegistry;
+    private FormInterface&MockObject $form;
+    private EmailNotificationTypeListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -48,7 +44,7 @@ class EmailNotificationTypeListenerTest extends TestCase
         $this->listener = new EmailNotificationTypeListener($this->workflowRegistry);
     }
 
-    public function testOnPostSetDataInvalidData()
+    public function testOnPostSetDataInvalidData(): void
     {
         $event = $this->getEvent();
 
@@ -61,7 +57,7 @@ class EmailNotificationTypeListenerTest extends TestCase
         $this->listener->onPostSetData($event);
     }
 
-    public function testOnPostSetDataUnsupportedData()
+    public function testOnPostSetDataUnsupportedData(): void
     {
         $event = $this->getEvent(new EmailNotification());
 
@@ -77,7 +73,7 @@ class EmailNotificationTypeListenerTest extends TestCase
     /**
      * @dataProvider onPostSetDataWithoutWorkflowProvider
      */
-    public function testOnPostSetDataWithoutWorkflow(EmailNotification $data, EmailNotification $expected)
+    public function testOnPostSetDataWithoutWorkflow(EmailNotification $data, EmailNotification $expected): void
     {
         $event = $this->getEvent($data);
 
@@ -115,7 +111,7 @@ class EmailNotificationTypeListenerTest extends TestCase
         ];
     }
 
-    private function assertEventFieldUpdated()
+    private function assertEventFieldUpdated(): void
     {
         $choices = ['test_1', 'test2'];
         $config = $this->createMock(FormConfigInterface::class);
@@ -136,7 +132,7 @@ class EmailNotificationTypeListenerTest extends TestCase
             ->method('getType')
             ->willReturn($resolvedFormType);
 
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $eventForm */
+        /** @var FormInterface&MockObject $eventForm */
         $eventForm = $this->form->get('eventName');
         $eventForm->expects($this->any())
             ->method('getConfig')
@@ -146,8 +142,11 @@ class EmailNotificationTypeListenerTest extends TestCase
     /**
      * @dataProvider formDataProvider
      */
-    public function testOnPostSetData(bool $hasWorkflowDefinition, bool $hasWorkflowTransitionName, array $expected)
-    {
+    public function testOnPostSetData(
+        bool $hasWorkflowDefinition,
+        bool $hasWorkflowTransitionName,
+        array $expected
+    ): void {
         $data = $this->getEntity(
             EmailNotification::class,
             [
@@ -190,8 +189,11 @@ class EmailNotificationTypeListenerTest extends TestCase
     /**
      * @dataProvider formDataProvider
      */
-    public function testOnPreSubmit(bool $hasWorkflowDefinition, bool $hasWorkflowTransitionName, array $expected)
-    {
+    public function testOnPreSubmit(
+        bool $hasWorkflowDefinition,
+        bool $hasWorkflowTransitionName,
+        array $expected
+    ): void {
         $event = $this->getEvent(['entityName' => \stdClass::class, 'workflow_definition' => 'test_workflow']);
 
         $forms = $this->assertFormUpdate($hasWorkflowDefinition, $hasWorkflowTransitionName);
@@ -252,7 +254,7 @@ class EmailNotificationTypeListenerTest extends TestCase
     /**
      * @dataProvider onPreSubmitUnsupportedDataProvider
      */
-    public function testOnPreSubmitUnsupportedData(array $data)
+    public function testOnPreSubmitUnsupportedData(array $data): void
     {
         $event = $this->getEvent($data);
 

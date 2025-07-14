@@ -9,12 +9,13 @@ use Oro\Bundle\LayoutBundle\Layout\CacheLayoutFactoryBuilder;
 use Oro\Component\Layout\BlockViewCache;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Oro\Component\Layout\LayoutContextStack;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class CacheLayoutFactoryBuilderTest extends \PHPUnit\Framework\TestCase
+class CacheLayoutFactoryBuilderTest extends TestCase
 {
-    private CacheMetadataProvider|\PHPUnit\Framework\MockObject\MockObject $cacheMetadataProvider;
-
+    private CacheMetadataProvider&MockObject $cacheMetadataProvider;
     private CacheLayoutFactoryBuilder $cacheLayoutFactoryBuilder;
 
     #[\Override]

@@ -12,23 +12,18 @@ use Oro\Bundle\EntityConfigBundle\Provider\DeletedAttributeProviderInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
+class DeletedAttributeRelationProcessorTest extends TestCase
 {
     private const ENTITY_CLASS = 'SomeClass';
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var DeletedAttributeProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $deletedAttributeProvider;
-
-    /** @var DeletedAttributeRelationProcessor */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private LoggerInterface&MockObject $logger;
+    private DeletedAttributeProviderInterface&MockObject $deletedAttributeProvider;
+    private DeletedAttributeRelationProcessor $processor;
 
     #[\Override]
     protected function setUp(): void

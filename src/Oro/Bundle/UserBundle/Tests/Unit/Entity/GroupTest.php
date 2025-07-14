@@ -7,16 +7,16 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class GroupTest extends \PHPUnit\Framework\TestCase
+class GroupTest extends TestCase
 {
     private const TEST_ROLE = 'ROLE_FOO';
 
-    /** @var Group */
-    private $group;
+    private Group $group;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +24,7 @@ class GroupTest extends \PHPUnit\Framework\TestCase
         $this->group = new Group();
     }
 
-    public function testGroup()
+    public function testGroup(): void
     {
         $name = 'Users';
 
@@ -36,7 +36,7 @@ class GroupTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($name, $this->group->getName());
     }
 
-    public function testGetRoleLabelsAsString()
+    public function testGetRoleLabelsAsString(): void
     {
         $roleFoo = new Role('ROLE_FOO');
         $roleFoo->setLabel('Role foo');
@@ -52,7 +52,7 @@ class GroupTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasRoleWithStringArgument()
+    public function testHasRoleWithStringArgument(): void
     {
         $role = new Role(self::TEST_ROLE);
 
@@ -61,7 +61,7 @@ class GroupTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->group->hasRole(self::TEST_ROLE));
     }
 
-    public function testHasRoleWithObjectArgument()
+    public function testHasRoleWithObjectArgument(): void
     {
         $role = new Role(self::TEST_ROLE);
 
@@ -70,7 +70,7 @@ class GroupTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->group->hasRole($role));
     }
 
-    public function testHasRoleThrowsInvalidArgumentException()
+    public function testHasRoleThrowsInvalidArgumentException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$role must be an instance of Oro\Bundle\UserBundle\Entity\Role or a string');
@@ -78,7 +78,7 @@ class GroupTest extends \PHPUnit\Framework\TestCase
         $this->group->hasRole(new \stdClass());
     }
 
-    public function testRemoveRoleWithStringArgument()
+    public function testRemoveRoleWithStringArgument(): void
     {
         $role = new Role(self::TEST_ROLE);
         $this->group->addRole($role);
@@ -88,7 +88,7 @@ class GroupTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->group->hasRole($role));
     }
 
-    public function testRemoveRoleWithObjectArgument()
+    public function testRemoveRoleWithObjectArgument(): void
     {
         $role = new Role(self::TEST_ROLE);
         $this->group->addRole($role);
@@ -98,7 +98,7 @@ class GroupTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->group->hasRole($role));
     }
 
-    public function testRemoveRoleThrowsInvalidArgumentException()
+    public function testRemoveRoleThrowsInvalidArgumentException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$role must be an instance of Oro\Bundle\UserBundle\Entity\Role or a string');
@@ -106,7 +106,7 @@ class GroupTest extends \PHPUnit\Framework\TestCase
         $this->group->removeRole(new \stdClass());
     }
 
-    public function testSetRolesWithArrayArgument()
+    public function testSetRolesWithArrayArgument(): void
     {
         $roles = [new Role(self::TEST_ROLE)];
         $this->assertCount(0, $this->group->getRoles());
@@ -114,7 +114,7 @@ class GroupTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($roles, $this->group->getRoles()->toArray());
     }
 
-    public function testSetRolesWithCollectionArgument()
+    public function testSetRolesWithCollectionArgument(): void
     {
         $roles = new ArrayCollection([new Role(self::TEST_ROLE)]);
         $this->assertCount(0, $this->group->getRoles());
@@ -122,7 +122,7 @@ class GroupTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($roles->toArray(), $this->group->getRoles()->toArray());
     }
 
-    public function testSetRolesThrowsInvalidArgumentException()
+    public function testSetRolesThrowsInvalidArgumentException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -132,7 +132,7 @@ class GroupTest extends \PHPUnit\Framework\TestCase
         $this->group->setRoles('roles');
     }
 
-    public function testOwners()
+    public function testOwners(): void
     {
         $entity = $this->group;
         $businessUnit = new BusinessUnit();
@@ -144,7 +144,7 @@ class GroupTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($businessUnit, $entity->getOwner());
     }
 
-    public function testOrganization()
+    public function testOrganization(): void
     {
         $entity = new Group();
         $organization = new Organization();

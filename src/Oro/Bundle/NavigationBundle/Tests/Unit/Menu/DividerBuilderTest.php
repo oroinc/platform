@@ -6,8 +6,9 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuFactory;
 use Knp\Menu\MenuItem;
 use Oro\Bundle\NavigationBundle\Menu\DividerBuilder;
+use PHPUnit\Framework\TestCase;
 
-class DividerBuilderTest extends \PHPUnit\Framework\TestCase
+class DividerBuilderTest extends TestCase
 {
     private DividerBuilder $dividerBuilder;
 

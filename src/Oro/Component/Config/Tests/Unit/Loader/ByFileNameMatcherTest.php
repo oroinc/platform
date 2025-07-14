@@ -3,8 +3,9 @@
 namespace Oro\Component\Config\Tests\Unit\Loader;
 
 use Oro\Component\Config\Loader\ByFileNameMatcher;
+use PHPUnit\Framework\TestCase;
 
-class ByFileNameMatcherTest extends \PHPUnit\Framework\TestCase
+class ByFileNameMatcherTest extends TestCase
 {
     /**
      * @param string $fileName
@@ -19,14 +20,14 @@ class ByFileNameMatcherTest extends \PHPUnit\Framework\TestCase
         return new \SplFileInfo($path);
     }
 
-    public function testIsMatchedWhenNoPatterns()
+    public function testIsMatchedWhenNoPatterns(): void
     {
         $matcher = new ByFileNameMatcher([]);
 
         self::assertTrue($matcher->isMatched($this->getFile('test.xml')));
     }
 
-    public function testIsMatchedWithPatterns()
+    public function testIsMatchedWithPatterns(): void
     {
         $matcher = new ByFileNameMatcher(['/\.yml$/', '/\.xml$/']);
 
@@ -34,7 +35,7 @@ class ByFileNameMatcherTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($matcher->isMatched($this->getFile('test.txt')));
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $matcher = new ByFileNameMatcher(['/\.yml$/', '/\.xml$/']);
 

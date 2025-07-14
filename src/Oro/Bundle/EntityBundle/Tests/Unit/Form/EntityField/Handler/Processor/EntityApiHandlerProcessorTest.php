@@ -6,14 +6,14 @@ use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerInterface;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
+class EntityApiHandlerProcessorTest extends TestCase
 {
-    /** @var EntityApiHandlerProcessor */
-    private $processor;
+    private EntityApiHandlerProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +21,7 @@ class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new EntityApiHandlerProcessor();
     }
 
-    public function testAddAndGetHandlers()
+    public function testAddAndGetHandlers(): void
     {
         $handlers = [
             $this->createMock(EntityApiHandlerInterface::class),
@@ -38,7 +38,7 @@ class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetHandlerByClass()
+    public function testGetHandlerByClass(): void
     {
         $entity = new SomeEntity();
         $handler = $this->createMock(EntityApiHandlerInterface::class);
@@ -54,7 +54,7 @@ class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetHandlerByClassNull()
+    public function testGetHandlerByClassNull(): void
     {
         $entity = new SomeEntity();
         $handler = $this->createMock(EntityApiHandlerInterface::class);
@@ -70,7 +70,7 @@ class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPreProcess()
+    public function testPreProcess(): void
     {
         $entity = new SomeEntity();
         $this->prepareProcess($entity, 'preProcess', 1);
@@ -78,7 +78,7 @@ class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->preProcess($entity);
     }
 
-    public function testPreProcessSkipp()
+    public function testPreProcessSkipp(): void
     {
         $entity = new SomeEntity();
         $this->prepareProcess($entity, 'preProcess');
@@ -86,7 +86,7 @@ class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->preProcess($entity);
     }
 
-    public function testBeforeProcess()
+    public function testBeforeProcess(): void
     {
         $entity = new SomeEntity();
         $this->prepareProcess($entity, 'beforeProcess', 1);
@@ -94,7 +94,7 @@ class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->beforeProcess($entity);
     }
 
-    public function testBeforeProcessSkipp()
+    public function testBeforeProcessSkipp(): void
     {
         $entity = new SomeEntity();
         $this->prepareProcess($entity, 'beforeProcess');
@@ -102,7 +102,7 @@ class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->beforeProcess($entity);
     }
 
-    public function testAfterProcess()
+    public function testAfterProcess(): void
     {
         $entity = new SomeEntity();
         $this->prepareProcess($entity, 'afterProcess', 1);
@@ -110,7 +110,7 @@ class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->afterProcess($entity);
     }
 
-    public function testAfterProcessSkipp()
+    public function testAfterProcessSkipp(): void
     {
         $entity = new SomeEntity();
         $this->prepareProcess($entity, 'afterProcess');
@@ -118,7 +118,7 @@ class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->invalidateProcess($entity);
     }
 
-    public function testInvalidateProcess()
+    public function testInvalidateProcess(): void
     {
         $entity = new SomeEntity();
         $this->prepareProcess($entity, 'invalidateProcess', 1);
@@ -126,7 +126,7 @@ class EntityApiHandlerProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->invalidateProcess($entity);
     }
 
-    public function testInvalidateProcessSkipp()
+    public function testInvalidateProcessSkipp(): void
     {
         $entity = new SomeEntity();
         $this->prepareProcess($entity, 'invalidateProcess');

@@ -14,49 +14,49 @@ use PHPUnit\Framework\TestCase;
  */
 class CriteriaTest extends TestCase
 {
-    public function testGetDefaultPermission()
+    public function testGetDefaultPermission(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'alias');
         $this->assertEquals('VIEW', $criteria->getPermission());
     }
 
-    public function testGetPermission()
+    public function testGetPermission(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'alias', 'EDIT');
         $this->assertEquals('EDIT', $criteria->getPermission());
     }
 
-    public function testGetEntityClass()
+    public function testGetEntityClass(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'alias');
         $this->assertEquals(\stdClass::class, $criteria->getEntityClass());
     }
 
-    public function testGetAlias()
+    public function testGetAlias(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'alias');
         $this->assertEquals('alias', $criteria->getAlias());
     }
 
-    public function testDefaultIsRoot()
+    public function testDefaultIsRoot(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'alias', "VIEW");
         $this->assertTrue($criteria->isRoot());
     }
 
-    public function testIsRoot()
+    public function testIsRoot(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'alias', "VIEW", false);
         $this->assertFalse($criteria->isRoot());
     }
 
-    public function testEmptyExpression()
+    public function testEmptyExpression(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'alias');
         $this->assertNull($criteria->getExpression());
     }
 
-    public function testAndOnEmptyCriteriaExpression()
+    public function testAndOnEmptyCriteriaExpression(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'alias');
         $criteria->andExpression(new Comparison(new Path('owner'), Comparison::IN, [1,2,3,4,5]));
@@ -67,7 +67,7 @@ class CriteriaTest extends TestCase
         );
     }
 
-    public function testOrOnEmptyCriteriaExpression()
+    public function testOrOnEmptyCriteriaExpression(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'alias');
         $criteria->orExpression(new Comparison(new Path('owner'), Comparison::IN, [1,2,3,4,5]));
@@ -78,7 +78,7 @@ class CriteriaTest extends TestCase
         );
     }
 
-    public function testAnd()
+    public function testAnd(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'alias');
         $criteria->andExpression(new Comparison(new Path('owner'), Comparison::IN, [1,2,3,4,5]));
@@ -96,7 +96,7 @@ class CriteriaTest extends TestCase
         );
     }
 
-    public function testOr()
+    public function testOr(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'alias');
         $criteria->andExpression(new Comparison(new Path('owner'), Comparison::IN, [1,2,3,4,5]));
@@ -114,25 +114,25 @@ class CriteriaTest extends TestCase
         );
     }
 
-    public function testHasOnNotExistAdditionalDataItem()
+    public function testHasOnNotExistAdditionalDataItem(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'alias');
         $this->assertFalse($criteria->hasOption('test'));
     }
 
-    public function testGetOnNotExistAdditionalDataItemWithDefaultValue()
+    public function testGetOnNotExistAdditionalDataItemWithDefaultValue(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'alias');
         $this->assertNull($criteria->getOption('test'));
     }
 
-    public function testGetOnNotExistAdditionalDataItem()
+    public function testGetOnNotExistAdditionalDataItem(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'alias');
         $this->assertEquals('default', $criteria->getOption('test', 'default'));
     }
 
-    public function testSetOption()
+    public function testSetOption(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'alias');
         $criteria->setOption('test', 'value');
@@ -141,7 +141,7 @@ class CriteriaTest extends TestCase
         $this->assertEquals('value', $criteria->getOption('test'));
     }
 
-    public function testGetType()
+    public function testGetType(): void
     {
         $type = 'test';
         $criteria = new Criteria($type, \stdClass::class, 'alias');
@@ -149,7 +149,7 @@ class CriteriaTest extends TestCase
         $this->assertEquals($type, $criteria->getType());
     }
 
-    public function testSetExpression()
+    public function testSetExpression(): void
     {
         $expression = new Comparison(new Path('owner'), Comparison::IN, [1,2,3,4,5]);
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'alias');

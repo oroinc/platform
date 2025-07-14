@@ -19,9 +19,11 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
+class TransitionCronTriggerHandlerTest extends TestCase
 {
     use EntityTrait;
 
@@ -29,20 +31,11 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
     private const WORKFLOW_NAME = 'test_workflow';
     private const TRANSITION_NAME = 'test_transition';
 
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var TransitionCronTriggerHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $helper;
-
-    /** @var TransitionCronTriggerHandler */
-    private $handler;
-
-    /** @var TransitionCronTrigger */
-    private $trigger;
+    private FeatureChecker&MockObject $featureChecker;
+    private WorkflowManager&MockObject $workflowManager;
+    private TransitionCronTriggerHelper&MockObject $helper;
+    private TransitionCronTriggerHandler $handler;
+    private TransitionCronTrigger $trigger;
 
     #[\Override]
     protected function setUp(): void
@@ -68,7 +61,7 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessException()
+    public function testProcessException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
@@ -82,7 +75,7 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->process($trigger, TransitionTriggerMessage::create($trigger));
     }
 
-    public function testProcessWithoutWorkflow()
+    public function testProcessWithoutWorkflow(): void
     {
         $trigger = new TransitionCronTrigger();
         $trigger->setWorkflowDefinition($this->getEntity(WorkflowDefinition::class, ['name' => self::WORKFLOW_NAME]));
@@ -103,7 +96,7 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->handler->process($trigger, TransitionTriggerMessage::create($trigger)));
     }
 
-    public function testProcessWithoutTransition()
+    public function testProcessWithoutTransition(): void
     {
         $trigger = new TransitionCronTrigger();
         $trigger->setWorkflowDefinition($this->getEntity(WorkflowDefinition::class, ['name' => self::WORKFLOW_NAME]));
@@ -127,7 +120,7 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->handler->process($trigger, TransitionTriggerMessage::create($trigger)));
     }
 
-    public function testProcessStartTransition()
+    public function testProcessStartTransition(): void
     {
         $trigger = new TransitionCronTrigger();
         $trigger->setTransitionName(self::TRANSITION_NAME)
@@ -159,7 +152,7 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->handler->process($trigger, TransitionTriggerMessage::create($trigger)));
     }
 
-    public function testProcessTransition()
+    public function testProcessTransition(): void
     {
         $trigger = new TransitionCronTrigger();
         $trigger->setTransitionName(self::TRANSITION_NAME)
@@ -189,7 +182,7 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->handler->process($trigger, TransitionTriggerMessage::create($trigger)));
     }
 
-    public function testProcessDisabledFeature()
+    public function testProcessDisabledFeature(): void
     {
         $trigger = new TransitionCronTrigger();
         $trigger->setTransitionName(self::TRANSITION_NAME)

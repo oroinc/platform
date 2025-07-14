@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DraftBundle\Tests\Unit\Action;
 
-use Oro\Bundle\DraftBundle\Action\DraftCreateAction;
 use Oro\Bundle\DraftBundle\Action\DraftPublishAction;
 use Oro\Bundle\DraftBundle\Duplicator\DraftContext;
 use Oro\Bundle\DraftBundle\Manager\DraftManager;
@@ -10,32 +9,27 @@ use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class DraftPublishActionTest extends \PHPUnit\Framework\TestCase
+class DraftPublishActionTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var DraftCreateAction */
-    private $action;
-
-    /** @var ContextAccessor */
-    private $contextAccessor;
-
-    /** @var DraftManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $draftMananager;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
+    private DraftPublishAction $action;
+    private ContextAccessor $contextAccessor;
+    private DraftManager&MockObject $draftManager;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
-        $this->draftMananager = $this->createMock(DraftManager::class);
+        $this->draftManager = $this->createMock(DraftManager::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->action = new DraftPublishAction($this->contextAccessor, $this->draftMananager);
+        $this->action = new DraftPublishAction($this->contextAccessor, $this->draftManager);
         $this->action->setDispatcher($this->eventDispatcher);
     }
 
@@ -60,8 +54,7 @@ class DraftPublishActionTest extends \PHPUnit\Framework\TestCase
         $this->contextAccessor->setValue($context, $sourceProperty, $source);
         $this->contextAccessor->setValue($context, $targetProperty, null);
 
-        $this->draftMananager
-            ->expects($this->once())
+        $this->draftManager->expects($this->once())
             ->method('createPublication')
             ->willReturn($source);
 

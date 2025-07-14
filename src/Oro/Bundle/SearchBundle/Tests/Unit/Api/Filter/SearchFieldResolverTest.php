@@ -4,14 +4,14 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Api\Filter;
 
 use Oro\Bundle\ApiBundle\Exception\InvalidFilterException;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolver;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
+class SearchFieldResolverTest extends TestCase
 {
-    /** @var SearchFieldResolver */
-    private $fieldResolver;
+    private SearchFieldResolver $fieldResolver;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +33,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResolveFieldNameForFieldWithMapping()
+    public function testResolveFieldNameForFieldWithMapping(): void
     {
         self::assertEquals(
             'field_1',
@@ -41,7 +41,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResolveFieldTypeForFieldWithMapping()
+    public function testResolveFieldTypeForFieldWithMapping(): void
     {
         self::assertEquals(
             'integer',
@@ -49,7 +49,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResolveFieldNameForFieldWithoutMapping()
+    public function testResolveFieldNameForFieldWithoutMapping(): void
     {
         self::assertEquals(
             'field2',
@@ -57,7 +57,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResolveFieldTypeForFieldWithoutMapping()
+    public function testResolveFieldTypeForFieldWithoutMapping(): void
     {
         self::assertEquals(
             'decimal',
@@ -65,7 +65,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResolveFieldTypeWhenFieldTypeIsNull()
+    public function testResolveFieldTypeWhenFieldTypeIsNull(): void
     {
         self::assertEquals(
             'text',
@@ -73,7 +73,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResolveFieldTypeWhenFieldTypeIsNotDefined()
+    public function testResolveFieldTypeWhenFieldTypeIsNotDefined(): void
     {
         self::assertEquals(
             'text',
@@ -81,7 +81,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResolveFieldNameForFieldWithPlaceholder()
+    public function testResolveFieldNameForFieldWithPlaceholder(): void
     {
         self::assertEquals(
             'price_item',
@@ -89,7 +89,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResolveFieldTypeForFieldWithPlaceholder()
+    public function testResolveFieldTypeForFieldWithPlaceholder(): void
     {
         self::assertEquals(
             'decimal',
@@ -97,7 +97,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResolveFieldNameForFieldNotDefinedInSearchFieldMappings()
+    public function testResolveFieldNameForFieldNotDefinedInSearchFieldMappings(): void
     {
         self::assertEquals(
             'another_field',
@@ -105,7 +105,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResolveFieldTypeForFieldNotDefinedInSearchFieldMappings()
+    public function testResolveFieldTypeForFieldNotDefinedInSearchFieldMappings(): void
     {
         self::assertEquals(
             'text',
@@ -113,7 +113,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResolveFieldNameForFieldWithPlaceholderButNotDefinedInSearchFieldMappings()
+    public function testResolveFieldNameForFieldWithPlaceholderButNotDefinedInSearchFieldMappings(): void
     {
         $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage('The field "another_item" is not supported.');
@@ -121,7 +121,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
         $this->fieldResolver->resolveFieldName('another_item');
     }
 
-    public function testResolveFieldTypeForFieldWithPlaceholderButNotDefinedInSearchFieldMappings()
+    public function testResolveFieldTypeForFieldWithPlaceholderButNotDefinedInSearchFieldMappings(): void
     {
         $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage('The field "another_item" is not supported.');
@@ -129,7 +129,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
         $this->fieldResolver->resolveFieldType('another_item');
     }
 
-    public function testResolveFieldNameForUndefinedField()
+    public function testResolveFieldNameForUndefinedField(): void
     {
         $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage('The field "someField" is not supported.');
@@ -137,7 +137,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
         $this->fieldResolver->resolveFieldName('someField');
     }
 
-    public function testResolveFieldTypeForUndefinedField()
+    public function testResolveFieldTypeForUndefinedField(): void
     {
         $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage('The field "someField" is not supported.');

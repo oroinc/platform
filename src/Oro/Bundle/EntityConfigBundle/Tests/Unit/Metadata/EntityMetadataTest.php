@@ -6,11 +6,11 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
+use PHPUnit\Framework\TestCase;
 
-class EntityMetadataTest extends \PHPUnit\Framework\TestCase
+class EntityMetadataTest extends TestCase
 {
-    /** @var EntityMetadata */
-    private $classMetadata;
+    private EntityMetadata $classMetadata;
 
     #[\Override]
     protected function setUp(): void
@@ -19,13 +19,13 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $this->classMetadata->mode = ConfigModel::MODE_DEFAULT;
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $this->classMetadata->addFieldMetadata(new FieldMetadata(DemoEntity::class, 'id'));
         $this->assertEquals($this->classMetadata, unserialize(serialize($this->classMetadata)));
     }
 
-    public function testMerge()
+    public function testMerge(): void
     {
         $newMetadata = new EntityMetadata(DemoEntity::class);
         $newMetadata->mode = ConfigModel::MODE_READONLY;
@@ -34,7 +34,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(ConfigModel::MODE_READONLY, $this->classMetadata->mode);
     }
 
-    public function testGetRoutes()
+    public function testGetRoutes(): void
     {
         $metadata = new EntityMetadata(DemoEntity::class);
 
@@ -54,7 +54,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetRouteFromAnnotationValues()
+    public function testGetRouteFromAnnotationValues(): void
     {
         $metadata = new EntityMetadata(DemoEntity::class);
 
@@ -69,7 +69,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test_route_custom', $metadata->getRoute('custom'));
     }
 
-    public function testGetRouteGeneratedAutomaticallyInNonStrictMode()
+    public function testGetRouteGeneratedAutomaticallyInNonStrictMode(): void
     {
         $metadata = new EntityMetadata(DemoEntity::class);
 
@@ -82,7 +82,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getRouteThrowExceptionProvider
      */
-    public function testGetRouteThrowExceptionInStrictMode(string $name)
+    public function testGetRouteThrowExceptionInStrictMode(string $name): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('No route "%s" found for entity', $name));
@@ -102,7 +102,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider hasRouteDataProvider
      */
-    public function testHasRoute(string $routeName, bool $strict, bool $expected, array $properties = [])
+    public function testHasRoute(string $routeName, bool $strict, bool $expected, array $properties = []): void
     {
         $metadata = new EntityMetadata(DemoEntity::class);
 

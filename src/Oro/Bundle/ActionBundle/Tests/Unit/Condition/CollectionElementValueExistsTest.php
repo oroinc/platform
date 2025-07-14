@@ -5,12 +5,12 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Condition;
 use Oro\Bundle\ActionBundle\Condition\CollectionElementValueExists;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class CollectionElementValueExistsTest extends \PHPUnit\Framework\TestCase
+class CollectionElementValueExistsTest extends TestCase
 {
-    /** @var CollectionElementValueExists */
-    private $condition;
+    private CollectionElementValueExists $condition;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +22,7 @@ class CollectionElementValueExistsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage): void
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
@@ -49,7 +49,7 @@ class CollectionElementValueExistsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, array $context, bool $expectedResult)
+    public function testEvaluate(array $options, array $context, bool $expectedResult): void
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -108,7 +108,7 @@ class CollectionElementValueExistsTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals(CollectionElementValueExists::NAME, $this->condition->getName());
     }

@@ -4,10 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Context;
 
 use Oro\Bundle\WorkflowBundle\Processor\Context\LayoutDialogResultType;
 use Oro\Bundle\WorkflowBundle\Processor\Context\LayoutResultTypeInterface;
+use PHPUnit\Framework\TestCase;
 
-class LayoutDialogResultTypeTest extends \PHPUnit\Framework\TestCase
+class LayoutDialogResultTypeTest extends TestCase
 {
-    public function testInterface()
+    public function testInterface(): void
     {
         $formRouteName = 'route_name';
         $resultType = new LayoutDialogResultType($formRouteName);

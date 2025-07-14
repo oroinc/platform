@@ -12,22 +12,17 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
+class DictionaryVirtualFieldProviderTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var DictionaryVirtualFieldProvider */
-    private $provider;
+    private ConfigManager&MockObject $configManager;
+    private EntityManager&MockObject $em;
+    private AbstractAdapter&MockObject $cache;
+    private DictionaryVirtualFieldProvider $provider;
 
     #[\Override]
     protected function setUp(): void

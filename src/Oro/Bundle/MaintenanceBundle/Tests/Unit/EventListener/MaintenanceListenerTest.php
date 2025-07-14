@@ -6,6 +6,8 @@ use Oro\Bundle\MaintenanceBundle\Drivers\AbstractDriver;
 use Oro\Bundle\MaintenanceBundle\Drivers\DriverFactory;
 use Oro\Bundle\MaintenanceBundle\EventListener\MaintenanceListener;
 use Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceRestrictionsChecker;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
@@ -13,22 +15,13 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
+class MaintenanceListenerTest extends TestCase
 {
-    /** @var AbstractDriver|\PHPUnit\Framework\MockObject\MockObject */
-    private $driver;
-
-    /** @var DriverFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $driverFactory;
-
-    /** @var RouterListener|\PHPUnit\Framework\MockObject\MockObject */
-    private $routerListener;
-
-    /** @var MaintenanceRestrictionsChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $maintenanceRestrictionsChecker;
-
-    /** @var MaintenanceListener */
-    private $maintenanceListener;
+    private AbstractDriver&MockObject $driver;
+    private DriverFactory&MockObject $driverFactory;
+    private RouterListener&MockObject $routerListener;
+    private MaintenanceRestrictionsChecker&MockObject $maintenanceRestrictionsChecker;
+    private MaintenanceListener $maintenanceListener;
 
     #[\Override]
     protected function setUp(): void

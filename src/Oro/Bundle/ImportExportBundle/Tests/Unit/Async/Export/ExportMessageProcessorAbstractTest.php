@@ -12,21 +12,16 @@ use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use PHPUnit\Framework\Constraint\IsType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
+class ExportMessageProcessorAbstractTest extends TestCase
 {
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRunner;
-
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var ExportMessageProcessorAbstract|\PHPUnit\Framework\MockObject\MockObject */
-    private $processor;
+    private LoggerInterface&MockObject $logger;
+    private JobRunner&MockObject $jobRunner;
+    private FileManager&MockObject $fileManager;
+    private ExportMessageProcessorAbstract&MockObject $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -41,18 +36,18 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testMustImplementMessageProcessorAndTopicSubscriberInterfaces()
+    public function testMustImplementMessageProcessorAndTopicSubscriberInterfaces(): void
     {
         $this->assertInstanceOf(MessageProcessorInterface::class, $this->processor);
         $this->assertInstanceOf(TopicSubscriberInterface::class, $this->processor);
     }
 
-    public function testCanBeConstructedWithRequiredAttributes()
+    public function testCanBeConstructedWithRequiredAttributes(): void
     {
         $this->assertInstanceOf(ExportMessageProcessorAbstract::class, $this->processor);
     }
 
-    public function testShouldRejectMessageIfGetMessageBodyReturnFalse()
+    public function testShouldRejectMessageIfGetMessageBodyReturnFalse(): void
     {
         $this->processor->expects($this->once())
             ->method('getMessageBody')
@@ -76,7 +71,7 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider runDelayedJobResultProvider
      */
-    public function testShouldReturnMessageStatusDependsOfJobResult(bool $jobResult, string $expectedResult)
+    public function testShouldReturnMessageStatusDependsOfJobResult(bool $jobResult, string $expectedResult): void
     {
         $this->jobRunner->expects($this->once())
             ->method('runDelayed')
@@ -94,7 +89,7 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    public function testShouldHandleExportLogMessageAndSaveJobResult()
+    public function testShouldHandleExportLogMessageAndSaveJobResult(): void
     {
         $exportResult = ['success' => true, 'readsCount' => 10, 'errorsCount' => 0];
 

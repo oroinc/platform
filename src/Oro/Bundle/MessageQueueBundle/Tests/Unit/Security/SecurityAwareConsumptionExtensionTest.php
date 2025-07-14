@@ -11,18 +11,17 @@ use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
+class SecurityAwareConsumptionExtensionTest extends TestCase
 {
-    private TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject $tokenStorage;
-
-    private TokenSerializerInterface|\PHPUnit\Framework\MockObject\MockObject $tokenSerializer;
-
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
-
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private TokenSerializerInterface&MockObject $tokenSerializer;
+    private LoggerInterface&MockObject $logger;
     private SecurityAwareConsumptionExtension $extension;
 
     #[\Override]
@@ -95,15 +94,12 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
         $context->setMessage($message);
         $context->setLogger($this->logger);
 
-        $this->tokenSerializer
-            ->expects(self::once())
+        $this->tokenSerializer->expects(self::once())
             ->method('deserialize')
             ->willThrowException(new InvalidTokenUserOrganizationException('Exception message'));
-        $this->tokenStorage
-            ->expects(self::never())
+        $this->tokenStorage->expects(self::never())
             ->method('setToken');
-        $this->logger
-            ->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('error')
             ->with('Exception message');
 
@@ -121,15 +117,12 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
         $context->setMessage($message);
         $context->setLogger($this->logger);
 
-        $this->tokenSerializer
-            ->expects(self::once())
+        $this->tokenSerializer->expects(self::once())
             ->method('deserialize')
             ->willThrowException(new InvalidTokenSerializationException('Exception message'));
-        $this->tokenStorage
-            ->expects(self::never())
+        $this->tokenStorage->expects(self::never())
             ->method('setToken');
-        $this->logger
-            ->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('error')
             ->with('Exception message');
 

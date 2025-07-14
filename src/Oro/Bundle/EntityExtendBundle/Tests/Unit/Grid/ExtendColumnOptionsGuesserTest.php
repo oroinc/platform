@@ -9,18 +9,17 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Grid\ExtendColumnOptionsGuesser;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Guess\Guess;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
+class ExtendColumnOptionsGuesserTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ExtendColumnOptionsGuesser */
-    private $guesser;
+    private ConfigManager&MockObject $configManager;
+    private ExtendColumnOptionsGuesser $guesser;
 
     #[\Override]
     protected function setUp(): void
@@ -30,19 +29,19 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         $this->guesser = new ExtendColumnOptionsGuesser($this->configManager);
     }
 
-    public function testGuessFormatterNoGuess()
+    public function testGuessFormatterNoGuess(): void
     {
         $guess = $this->guesser->guessFormatter('TestClass', 'testProp', 'string');
         $this->assertNull($guess);
     }
 
-    public function testGuessFilterNoGuess()
+    public function testGuessFilterNoGuess(): void
     {
         $guess = $this->guesser->guessFilter('TestClass', 'testProp', 'string');
         $this->assertNull($guess);
     }
 
-    public function testGuessFormatterForEnumNoConfig()
+    public function testGuessFormatterForEnumNoConfig(): void
     {
         $class = 'TestClass';
         $property = 'testProp';
@@ -61,7 +60,7 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($guess);
     }
 
-    public function testGuessFilterForEnumNoConfig()
+    public function testGuessFilterForEnumNoConfig(): void
     {
         $class = 'TestClass';
         $property = 'testProp';
@@ -80,7 +79,7 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($guess);
     }
 
-    public function testGuessFormatterForMultiEnumNoConfig()
+    public function testGuessFormatterForMultiEnumNoConfig(): void
     {
         $class = 'TestClass';
         $property = 'testProp';
@@ -99,7 +98,7 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($guess);
     }
 
-    public function testGuessFilterForMultiEnumNoConfig()
+    public function testGuessFilterForMultiEnumNoConfig(): void
     {
         $class = 'TestClass';
         $property = 'testProp';
@@ -118,7 +117,7 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($guess);
     }
 
-    public function testGuessFormatterForEnum()
+    public function testGuessFormatterForEnum(): void
     {
         $class = 'TestClass';
         $property = 'testProp';
@@ -156,7 +155,7 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(Guess::MEDIUM_CONFIDENCE, $guess->getConfidence());
     }
 
-    public function testGuessSorterForEnum()
+    public function testGuessSorterForEnum(): void
     {
         $class = 'TestClass';
         $property = 'testProp';
@@ -165,7 +164,7 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($guess);
     }
 
-    public function testGuessFilterForEnum()
+    public function testGuessFilterForEnum(): void
     {
         $class = 'TestClass';
         $property = 'testProp';
@@ -212,7 +211,7 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(Guess::MEDIUM_CONFIDENCE, $guess->getConfidence());
     }
 
-    public function testGuessFormatterForMultiEnum()
+    public function testGuessFormatterForMultiEnum(): void
     {
         $class = 'TestClass';
         $property = 'testProp';
@@ -251,7 +250,7 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(Guess::MEDIUM_CONFIDENCE, $guess->getConfidence());
     }
 
-    public function testGuessSorterForMultiEnum()
+    public function testGuessSorterForMultiEnum(): void
     {
         $class = 'TestClass';
         $property = 'testProp';
@@ -266,7 +265,7 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(Guess::MEDIUM_CONFIDENCE, $guess->getConfidence());
     }
 
-    public function testGuessFilterForMultiEnum()
+    public function testGuessFilterForMultiEnum(): void
     {
         $class = 'TestClass';
         $property = 'testProp';

@@ -17,29 +17,19 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserHandlerTest extends TestCase
 {
     private const FORM_DATA = ['field' => 'value'];
 
-    private FormInterface|MockObject $form;
-
-    private Request|MockObject $request;
-
-    private UserManager|MockObject $manager;
-
-    private EmailTemplateSender|MockObject $emailTemplateSender;
-
-    private ConfigManager|MockObject $userConfigManager;
-
-    private FlashBagInterface|MockObject $flashBag;
-
-    private TranslatorInterface|MockObject $translator;
-
-    private LoggerInterface|MockObject $logger;
-
+    private FormInterface&MockObject $form;
+    private Request $request;
+    private UserManager&MockObject $manager;
+    private EmailTemplateSender&MockObject $emailTemplateSender;
+    private ConfigManager&MockObject $userConfigManager;
+    private TranslatorInterface&MockObject $translator;
+    private LoggerInterface&MockObject $logger;
     private UserHandler $handler;
 
     #[\Override]
@@ -52,7 +42,6 @@ class UserHandlerTest extends TestCase
         $this->manager = $this->createMock(UserManager::class);
         $this->emailTemplateSender = $this->createMock(EmailTemplateSender::class);
         $this->userConfigManager = $this->createMock(ConfigManager::class);
-        $this->flashBag = $this->createMock(FlashBagInterface::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 

@@ -16,11 +16,9 @@ class SegmentChoiceTypeTest extends TestCase
 {
     private const ENTITY_CLASS = 'TestEntityClass';
 
+    private ManagerRegistry&MockObject $doctrine;
+    private AclHelper&MockObject $aclHelper;
     private SegmentChoiceType $formType;
-
-    private ManagerRegistry|MockObject $doctrine;
-
-    private AclHelper|MockObject $aclHelper;
 
     #[\Override]
     protected function setUp(): void

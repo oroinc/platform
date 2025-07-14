@@ -3,9 +3,10 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\NotificationBundle\DependencyInjection\OroNotificationExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroNotificationExtensionTest extends \PHPUnit\Framework\TestCase
+class OroNotificationExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

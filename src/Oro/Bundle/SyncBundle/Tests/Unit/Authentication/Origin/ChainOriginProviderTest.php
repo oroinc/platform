@@ -4,16 +4,17 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Authentication\Origin;
 
 use Oro\Bundle\SyncBundle\Authentication\Origin\ChainOriginProvider;
 use Oro\Bundle\SyncBundle\Authentication\Origin\OriginProviderInterface;
+use PHPUnit\Framework\TestCase;
 
-class ChainOriginProviderTest extends \PHPUnit\Framework\TestCase
+class ChainOriginProviderTest extends TestCase
 {
-    public function testGetOriginsWhenNoChildProviders()
+    public function testGetOriginsWhenNoChildProviders(): void
     {
         $chainOriginProvider = new ChainOriginProvider([]);
         self::assertSame([], $chainOriginProvider->getOrigins());
     }
 
-    public function testGetOrigins()
+    public function testGetOrigins(): void
     {
         $originProvider1 = $this->createMock(OriginProviderInterface::class);
         $originProvider1->expects(self::once())

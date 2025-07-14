@@ -6,8 +6,10 @@ use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\PlatformBundle\EventListener\AbstractDemoDataFixturesListener;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-abstract class DemoDataFixturesListenerTestCase extends \PHPUnit\Framework\TestCase
+abstract class DemoDataFixturesListenerTestCase extends TestCase
 {
     use EntityTrait;
 
@@ -16,14 +18,9 @@ abstract class DemoDataFixturesListenerTestCase extends \PHPUnit\Framework\TestC
         'test_listener_2',
     ];
 
-    /** @var OptionalListenerManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $listenerManager;
-
-    /** @var MigrationDataFixturesEvent|\PHPUnit\Framework\MockObject\MockObject */
-    protected $event;
-
-    /** @var AbstractDemoDataFixturesListener */
-    protected $listener;
+    protected OptionalListenerManager&MockObject $listenerManager;
+    protected MigrationDataFixturesEvent&MockObject $event;
+    protected AbstractDemoDataFixturesListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +38,7 @@ abstract class DemoDataFixturesListenerTestCase extends \PHPUnit\Framework\TestC
      */
     abstract protected function getListener();
 
-    public function testOnPreLoad()
+    public function testOnPreLoad(): void
     {
         $this->event->expects($this->once())
             ->method('isDemoFixtures')
@@ -54,7 +51,7 @@ abstract class DemoDataFixturesListenerTestCase extends \PHPUnit\Framework\TestC
         $this->listener->onPreLoad($this->event);
     }
 
-    public function testOnPreLoadWithNoDemoFixtures()
+    public function testOnPreLoadWithNoDemoFixtures(): void
     {
         $this->event->expects($this->once())
             ->method('isDemoFixtures')
@@ -66,7 +63,7 @@ abstract class DemoDataFixturesListenerTestCase extends \PHPUnit\Framework\TestC
         $this->listener->onPreLoad($this->event);
     }
 
-    public function testOnPostLoad()
+    public function testOnPostLoad(): void
     {
         $this->event->expects($this->once())
             ->method('isDemoFixtures')
@@ -79,7 +76,7 @@ abstract class DemoDataFixturesListenerTestCase extends \PHPUnit\Framework\TestC
         $this->listener->onPostLoad($this->event);
     }
 
-    public function testOnPostLoadWithNoDemoFixtures()
+    public function testOnPostLoadWithNoDemoFixtures(): void
     {
         $this->event->expects($this->once())
             ->method('isDemoFixtures')

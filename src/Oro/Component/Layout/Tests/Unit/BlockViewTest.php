@@ -6,13 +6,13 @@ use Oro\Component\Layout\BlockView;
 
 class BlockViewTest extends LayoutTestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $rootView = new BlockView();
         $this->assertArrayNotHasKey('value', $rootView->vars);
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $blockView = new BlockView();
         $blockView->vars['id'] = 21;
@@ -20,14 +20,14 @@ class BlockViewTest extends LayoutTestCase
         $this->assertEquals(21, $blockView->getId());
     }
 
-    public function testGetIdEmpty()
+    public function testGetIdEmpty(): void
     {
         $blockView = new BlockView();
 
         $this->assertNull($blockView->getId());
     }
 
-    public function testGetVisible()
+    public function testGetVisible(): void
     {
         $blockView = new BlockView();
         $blockView->vars['visible'] = false;
@@ -35,7 +35,7 @@ class BlockViewTest extends LayoutTestCase
         $this->assertFalse($blockView->isVisible());
     }
 
-    public function testGetVisibleScalar()
+    public function testGetVisibleScalar(): void
     {
         $blockView = new BlockView();
         $blockView->vars['visible'] = 'string';
@@ -43,7 +43,7 @@ class BlockViewTest extends LayoutTestCase
         $this->assertTrue($blockView->isVisible());
     }
 
-    public function testGetVisibleEmpty()
+    public function testGetVisibleEmpty(): void
     {
         $blockView = new BlockView();
 

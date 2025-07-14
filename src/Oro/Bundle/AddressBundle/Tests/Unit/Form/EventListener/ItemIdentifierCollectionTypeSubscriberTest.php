@@ -5,14 +5,14 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Form\EventListener\ItemIdentifierCollectionTypeSubscriber;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormInterface;
 
-class ItemIdentifierCollectionTypeSubscriberTest extends \PHPUnit\Framework\TestCase
+class ItemIdentifierCollectionTypeSubscriberTest extends TestCase
 {
-    /** @var ItemIdentifierCollectionTypeSubscriber */
-    private $subscriber;
+    private ItemIdentifierCollectionTypeSubscriber $subscriber;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +31,7 @@ class ItemIdentifierCollectionTypeSubscriberTest extends \PHPUnit\Framework\Test
         return new FormEvent($form, $submittedData);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         self::assertEquals(
             [
@@ -41,7 +41,7 @@ class ItemIdentifierCollectionTypeSubscriberTest extends \PHPUnit\Framework\Test
         );
     }
 
-    public function testNoSubmittedData()
+    public function testNoSubmittedData(): void
     {
         $event = $this->getFormEvent([new Country('c1')], null);
 
@@ -50,7 +50,7 @@ class ItemIdentifierCollectionTypeSubscriberTest extends \PHPUnit\Framework\Test
         self::assertNull($event->getData());
     }
 
-    public function testEmptySubmittedData()
+    public function testEmptySubmittedData(): void
     {
         $event = $this->getFormEvent([new Country('c1')], []);
 
@@ -59,7 +59,7 @@ class ItemIdentifierCollectionTypeSubscriberTest extends \PHPUnit\Framework\Test
         self::assertSame([], $event->getData());
     }
 
-    public function testEmptyExistingData()
+    public function testEmptyExistingData(): void
     {
         $submittedData = [
             ['name' => 'item1'],
@@ -74,7 +74,7 @@ class ItemIdentifierCollectionTypeSubscriberTest extends \PHPUnit\Framework\Test
         self::assertEquals($submittedData, $event->getData());
     }
 
-    public function testAtLeastOneItemInSubmittedDataHasId()
+    public function testAtLeastOneItemInSubmittedDataHasId(): void
     {
         $submittedData = [
             ['name' => 'item1'],
@@ -90,7 +90,7 @@ class ItemIdentifierCollectionTypeSubscriberTest extends \PHPUnit\Framework\Test
         self::assertEquals($submittedData, $event->getData());
     }
 
-    public function testAddItem()
+    public function testAddItem(): void
     {
         $submittedData = [
             ['name' => 'item1'],
@@ -112,7 +112,7 @@ class ItemIdentifierCollectionTypeSubscriberTest extends \PHPUnit\Framework\Test
         );
     }
 
-    public function testRemoveItem()
+    public function testRemoveItem(): void
     {
         $submittedData = [
             ['name' => 'item1'],
@@ -132,7 +132,7 @@ class ItemIdentifierCollectionTypeSubscriberTest extends \PHPUnit\Framework\Test
         );
     }
 
-    public function testUpdateItem()
+    public function testUpdateItem(): void
     {
         $submittedData = [
             ['name' => 'item1'],
@@ -154,7 +154,7 @@ class ItemIdentifierCollectionTypeSubscriberTest extends \PHPUnit\Framework\Test
         );
     }
 
-    public function testRemoveNotLastItem()
+    public function testRemoveNotLastItem(): void
     {
         $submittedData = [
             ['name' => 'item2'],

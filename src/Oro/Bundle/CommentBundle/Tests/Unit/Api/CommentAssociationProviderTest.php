@@ -8,17 +8,14 @@ use Oro\Bundle\CommentBundle\Api\CommentAssociationProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CommentAssociationProviderTest extends \PHPUnit\Framework\TestCase
+class CommentAssociationProviderTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var CommentAssociationProvider */
-    private $commentAssociationProvider;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ConfigManager&MockObject $configManager;
+    private CommentAssociationProvider $commentAssociationProvider;
 
     #[\Override]
     protected function setUp(): void

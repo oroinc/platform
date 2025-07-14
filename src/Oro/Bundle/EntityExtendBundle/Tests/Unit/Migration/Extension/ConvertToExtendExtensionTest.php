@@ -11,29 +11,20 @@ use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ConvertToExtendExtension;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class ConvertToExtendExtensionTest extends \PHPUnit\Framework\TestCase
+class ConvertToExtendExtensionTest extends TestCase
 {
-    /** @var EntityMetadataHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityMetadataHelper;
-
-    /** @var ExtendOptionsManager */
-    private $extendOptionsManager;
-
-    /** @var ConfigModelManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configModelManager;
-
-    /** @var QueryBag|\PHPUnit\Framework\MockObject\MockObject */
-    private $queries;
-
-    /** @var Schema|\PHPUnit\Framework\MockObject\MockObject */
-    private $schema;
-
-    /** @var ConvertToExtendExtension */
-    private $convertToExtendExtension;
+    private EntityMetadataHelper&MockObject $entityMetadataHelper;
+    private ExtendOptionsManager $extendOptionsManager;
+    private ConfigModelManager&MockObject $configModelManager;
+    private QueryBag&MockObject $queries;
+    private Schema&MockObject $schema;
+    private ConvertToExtendExtension $convertToExtendExtension;
 
     #[\Override]
     protected function setUp(): void
@@ -51,7 +42,7 @@ class ConvertToExtendExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testManyToOneRelationNewFiledNameSameCurrentFieldName()
+    public function testManyToOneRelationNewFiledNameSameCurrentFieldName(): void
     {
         $configFieldModel = $this->createMock(FieldConfigModel::class);
 
@@ -129,7 +120,7 @@ class ConvertToExtendExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedOptions, $this->extendOptionsManager->getExtendOptions());
     }
 
-    public function testManyToOneRelationNewFiledNameNotSameCurrentFieldName()
+    public function testManyToOneRelationNewFiledNameNotSameCurrentFieldName(): void
     {
         $configFieldModel = $this->createMock(FieldConfigModel::class);
 
@@ -139,16 +130,14 @@ class ConvertToExtendExtensionTest extends \PHPUnit\Framework\TestCase
 
         $configFieldModel->expects($this->any())
             ->method('toArray')
-            ->willReturnMap(
-                [
-                    ['entity', ['label' => 'label', 'description' => 'description']],
-                    ['extend', ['is_extend' => false]],
-                    ['form', ['is_enabled' => false]],
-                    ['view', ['is_displayable' => true]],
-                    ['merge', ['display' => true]],
-                    ['dataaudit', ['auditable' => true]]
-                ]
-            );
+            ->willReturnMap([
+                ['entity', ['label' => 'label', 'description' => 'description']],
+                ['extend', ['is_extend' => false]],
+                ['form', ['is_enabled' => false]],
+                ['view', ['is_displayable' => true]],
+                ['merge', ['display' => true]],
+                ['dataaudit', ['auditable' => true]]
+            ]);
 
         $currentEntityName = 'TestEntityClass';
         $currentAssociationName = 'TestFieldClass';

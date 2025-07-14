@@ -9,18 +9,17 @@ use Oro\Component\Layout\Exception\InvalidArgumentException;
 use Oro\Component\Layout\Extension\DependencyInjection\DependencyInjectionExtension;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutUpdateInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
+class DependencyInjectionExtensionTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var DependencyInjectionExtension */
-    private $extension;
+    private ContainerInterface&MockObject $container;
+    private DependencyInjectionExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -36,18 +35,18 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTypeNames()
+    public function testGetTypeNames(): void
     {
         $this->assertEquals(['test'], $this->extension->getTypeNames());
     }
 
-    public function testHasType()
+    public function testHasType(): void
     {
         $this->assertTrue($this->extension->hasType('test'));
         $this->assertFalse($this->extension->hasType('unknown'));
     }
 
-    public function testGetType()
+    public function testGetType(): void
     {
         $type = $this->createMock(BlockTypeInterface::class);
         $type->expects($this->once())
@@ -62,7 +61,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($type, $this->extension->getType('test'));
     }
 
-    public function testGetTypeWithInvalidAlias()
+    public function testGetTypeWithInvalidAlias(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -83,7 +82,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->getType('test');
     }
 
-    public function testGetUnknownType()
+    public function testGetUnknownType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The block type "unknown" is not registered with the service container.');
@@ -91,13 +90,13 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->getType('unknown');
     }
 
-    public function testHasTypeExtensions()
+    public function testHasTypeExtensions(): void
     {
         $this->assertTrue($this->extension->hasTypeExtensions('test'));
         $this->assertFalse($this->extension->hasTypeExtensions('unknown'));
     }
 
-    public function testGetTypeExtensions()
+    public function testGetTypeExtensions(): void
     {
         $typeExtension = $this->createMock(BlockTypeExtensionInterface::class);
 
@@ -111,12 +110,12 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($typeExtension, $typeExtensions[0]);
     }
 
-    public function testGetUnknownBlockTypeExtensions()
+    public function testGetUnknownBlockTypeExtensions(): void
     {
         $this->assertSame([], $this->extension->getTypeExtensions('unknown'));
     }
 
-    public function testHasLayoutUpdates()
+    public function testHasLayoutUpdates(): void
     {
         $this->assertTrue($this->extension->hasLayoutUpdates($this->getLayoutItem('test')));
         $this->assertFalse($this->extension->hasLayoutUpdates($this->getLayoutItem('unknown')));
@@ -129,7 +128,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->extension->hasLayoutUpdates($layoutItem));
     }
 
-    public function testGetLayoutUpdates()
+    public function testGetLayoutUpdates(): void
     {
         $layoutUpdate = $this->createMock(LayoutUpdateInterface::class);
 
@@ -151,17 +150,17 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($layoutUpdate, $layoutUpdates[0]);
     }
 
-    public function testGetUnknownBlockLayoutUpdates()
+    public function testGetUnknownBlockLayoutUpdates(): void
     {
         $this->assertSame([], $this->extension->getLayoutUpdates($this->getLayoutItem('unknown')));
     }
 
-    public function testHasContextConfigurators()
+    public function testHasContextConfigurators(): void
     {
         $this->assertTrue($this->extension->hasContextConfigurators());
     }
 
-    public function testGetContextConfigurators()
+    public function testGetContextConfigurators(): void
     {
         $configurator = $this->createMock(ContextConfiguratorInterface::class);
 
@@ -175,27 +174,27 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($configurator, $result[0]);
     }
 
-    public function testHasContextConfiguratorsWhenNoAnyRegistered()
+    public function testHasContextConfiguratorsWhenNoAnyRegistered(): void
     {
         $extension = new DependencyInjectionExtension($this->container, [], [], [], [], []);
 
         $this->assertFalse($extension->hasContextConfigurators());
     }
 
-    public function testGetContextConfiguratorsWhenNoAnyRegistered()
+    public function testGetContextConfiguratorsWhenNoAnyRegistered(): void
     {
         $extension = new DependencyInjectionExtension($this->container, [], [], [], [], []);
 
         $this->assertSame([], $extension->getContextConfigurators());
     }
 
-    public function testHasDataProvider()
+    public function testHasDataProvider(): void
     {
         $this->assertTrue($this->extension->hasDataProvider('test'));
         $this->assertFalse($this->extension->hasDataProvider('unknown'));
     }
 
-    public function testGetDataProvider()
+    public function testGetDataProvider(): void
     {
         $dataProvider = $this->createMock(\stdClass::class);
 
@@ -207,7 +206,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($dataProvider, $this->extension->getDataProvider('test'));
     }
 
-    public function testGetUnknownDataProvider()
+    public function testGetUnknownDataProvider(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The data provider "unknown" is not registered with the service container.');
@@ -215,10 +214,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->getDataProvider('unknown');
     }
 
-    /**
-     * @return LayoutItemInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getLayoutItem(string $id)
+    private function getLayoutItem(string $id): LayoutItemInterface&MockObject
     {
         $layoutItem = $this->createMock(LayoutItemInterface::class);
         $layoutItem->expects($this->any())

@@ -6,8 +6,9 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\DataCollector;
 
 use Oro\Bundle\LayoutBundle\DataCollector\DataCollectorBasicLayoutNameProvider;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\TestCase;
 
-class DataCollectorBasicLayoutNameProviderTest extends \PHPUnit\Framework\TestCase
+class DataCollectorBasicLayoutNameProviderTest extends TestCase
 {
     /**
      * @dataProvider getNameByContextDataProvider

@@ -4,19 +4,16 @@ namespace Oro\Bundle\CacheBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Oro\Bundle\CacheBundle\Provider\MemoryCacheProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\CacheItem;
 
-class MemoryCacheProviderTest extends \PHPUnit\Framework\TestCase
+class MemoryCacheProviderTest extends TestCase
 {
-    /** @var UniversalCacheKeyGenerator|\PHPUnit\Framework\MockObject\MockObject */
-    private $universalCacheKeyGenerator;
-
-    /** @var ArrayAdapter|\PHPUnit\Framework\MockObject\MockObject */
-    private $arrayAdapter;
-
-    /** @var MemoryCacheProvider */
-    private $provider;
+    private UniversalCacheKeyGenerator&MockObject $universalCacheKeyGenerator;
+    private ArrayAdapter&MockObject $arrayAdapter;
+    private MemoryCacheProvider $provider;
 
     #[\Override]
     protected function setUp(): void

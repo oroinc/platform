@@ -9,20 +9,17 @@ use Oro\Bundle\EmbeddedFormBundle\Manager\SessionIdProviderInterface;
 use Oro\Component\Layout\LayoutBuilderInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Test\FormInterface;
 
-class EmbedFormLayoutManagerTest extends \PHPUnit\Framework\TestCase
+class EmbedFormLayoutManagerTest extends TestCase
 {
     private const TEST_SESSION_FIELD_NAME = 'test_session_field';
 
-    /** @var LayoutManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $layoutManager;
-
-    /** @var SessionIdProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $sessionIdProvider;
-
-    /** @var EmbedFormLayoutManager */
-    private $embedFormLayoutManager;
+    private LayoutManager&MockObject $layoutManager;
+    private SessionIdProviderInterface&MockObject $sessionIdProvider;
+    private EmbedFormLayoutManager $embedFormLayoutManager;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +32,7 @@ class EmbedFormLayoutManagerTest extends \PHPUnit\Framework\TestCase
         $this->embedFormLayoutManager->setSessionIdFieldName(self::TEST_SESSION_FIELD_NAME);
     }
 
-    public function testGetLayoutWithoutForm()
+    public function testGetLayoutWithoutForm(): void
     {
         $formEntity = new EmbeddedForm();
         $formEntity->setFormType('testForm');
@@ -72,7 +69,7 @@ class EmbedFormLayoutManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLayoutWithForm()
+    public function testGetLayoutWithForm(): void
     {
         $formEntity = new EmbeddedForm();
         $formEntity->setFormType('testForm');

@@ -7,13 +7,14 @@ use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
+class QueryBuilderToolsTest extends TestCase
 {
-    public function testPrepareFieldAliases()
+    public function testPrepareFieldAliases(): void
     {
         $subSelectExpression = '(SELECT sub_select_alias.id as subselect_id, sub_select_alias.name' .
             ' as subselect_name FROM FAKE\ENTITY as sub_select_alias)';
@@ -43,7 +44,7 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($tools->getFieldByAlias('eData'));
     }
 
-    public function testFixUnusedParameters()
+    public function testFixUnusedParameters(): void
     {
         $dql = 'SELECT a.name FROM Some:Other as a WHERE a.name = :param1
             AND a.name != :param2 AND a.status = ?1';
@@ -78,7 +79,7 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dqlParametersDataProvider
      */
-    public function testDqlContainsParameter(string $dql, string|int $parameter, bool $expected)
+    public function testDqlContainsParameter(string $dql, string|int $parameter, bool $expected): void
     {
         $tools = new QueryBuilderTools();
         $this->assertEquals($expected, $tools->dqlContainsParameter($dql, $parameter));
@@ -101,7 +102,7 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider aliasConditionDataProvider
      */
-    public function testReplaceAliasesWithFields(string $condition, string $expected)
+    public function testReplaceAliasesWithFields(string $condition, string $expected): void
     {
         $selects = [
             $this->getSelect(['e.data as eData']),
@@ -158,7 +159,7 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider usedAliasesDataProvider
      */
-    public function testGetUsedAliases(string|array $condition, array $expected)
+    public function testGetUsedAliases(string|array $condition, array $expected): void
     {
         $selects = [
             $this->getSelect(['e.data as eData']),
@@ -188,7 +189,7 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider usedTableAliasesDataProvider
      */
-    public function testGetUsedTableAliases(string|array $condition, array $expected)
+    public function testGetUsedTableAliases(string|array $condition, array $expected): void
     {
         $selects = [
             $this->getSelect(['e.data as eData']),
@@ -221,7 +222,7 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider joinAliasesDataProvider
      */
-    public function testGetUsedJoinAliases(array $joins, array $aliases, array $expected)
+    public function testGetUsedJoinAliases(array $joins, array $aliases, array $expected): void
     {
         $selects = [
             $this->getSelect(['e.data as eData']),
@@ -285,7 +286,7 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetFieldsWithoutAggregateFunctions()
+    public function testGetFieldsWithoutAggregateFunctions(): void
     {
         $tools = new QueryBuilderTools();
 
@@ -302,7 +303,7 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsWithoutAggregateFunctionsForSeveralNestedFunctions()
+    public function testGetFieldsWithoutAggregateFunctionsForSeveralNestedFunctions(): void
     {
         $tools = new QueryBuilderTools();
 
@@ -317,7 +318,7 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsWithoutAggregateFunctionsForFunctionInMiddleOfMatchedExpression()
+    public function testGetFieldsWithoutAggregateFunctionsForFunctionInMiddleOfMatchedExpression(): void
     {
         $tools = new QueryBuilderTools();
 
@@ -335,7 +336,7 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fieldsDataProvider
      */
-    public function testGetFields(string $condition, array $expected)
+    public function testGetFields(string $condition, array $expected): void
     {
         $tools = new QueryBuilderTools();
         $this->assertEquals($expected, $tools->getFields($condition));

@@ -57,9 +57,7 @@ class ValidLoadedItemsValidatorTest extends ConstraintValidatorTestCase
         $constraint = new ValidLoadedItems();
         $constraint->constraints = [new NotBlank(), new NotNull()];
 
-        /** @var EntityManagerInterface $em */
         $em = $this->createMock(EntityManagerInterface::class);
-        /** @var ClassMetadata $class */
         $class = $this->createMock(ClassMetadata::class);
         $collection = new PersistentCollection($em, $class, new ArrayCollection([1]));
 

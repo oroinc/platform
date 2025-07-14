@@ -18,17 +18,14 @@ use Oro\Component\Layout\LayoutRegistry;
 use Oro\Component\Layout\LayoutRendererInterface;
 use Oro\Component\Layout\LayoutRendererRegistry;
 use Oro\Component\Layout\LayoutUpdateInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LayoutFactoryBuilderTest extends \PHPUnit\Framework\TestCase
+class LayoutFactoryBuilderTest extends TestCase
 {
-    /** @var ExpressionProcessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $expressionProcessor;
-
-    /** @var BlockViewCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $blockViewCache;
-
-    /** @var LayoutFactoryBuilder */
-    private $layoutFactoryBuilder;
+    private ExpressionProcessor&MockObject $expressionProcessor;
+    private BlockViewCache&MockObject $blockViewCache;
+    private LayoutFactoryBuilder $layoutFactoryBuilder;
 
     #[\Override]
     protected function setUp(): void
@@ -39,13 +36,13 @@ class LayoutFactoryBuilderTest extends \PHPUnit\Framework\TestCase
         $this->layoutFactoryBuilder = new LayoutFactoryBuilder($this->expressionProcessor, $this->blockViewCache);
     }
 
-    public function testGetEmptyLayoutFactory()
+    public function testGetEmptyLayoutFactory(): void
     {
         $layoutFactory = $this->layoutFactoryBuilder->getLayoutFactory();
         $this->assertInstanceOf(LayoutFactoryInterface::class, $layoutFactory);
     }
 
-    public function testGetLayoutFactoryWithImplicitSetOfDefaultRenderer()
+    public function testGetLayoutFactoryWithImplicitSetOfDefaultRenderer(): void
     {
         $renderer1 = $this->createMock(LayoutRendererInterface::class);
         $renderer2 = $this->createMock(LayoutRendererInterface::class);
@@ -69,7 +66,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLayoutFactoryWithExplicitSetOfDefaultRenderer()
+    public function testGetLayoutFactoryWithExplicitSetOfDefaultRenderer(): void
     {
         $renderer1 = $this->createMock(LayoutRendererInterface::class);
         $renderer2 = $this->createMock(LayoutRendererInterface::class);
@@ -94,7 +91,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLayoutFactoryWithDebug()
+    public function testGetLayoutFactoryWithDebug(): void
     {
         $this->layoutFactoryBuilder->setDebug(true);
         $layoutFactory = $this->layoutFactoryBuilder->getLayoutFactory();
@@ -107,7 +104,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLayoutFactoryWithoutDebug()
+    public function testGetLayoutFactoryWithoutDebug(): void
     {
         $layoutFactory = $this->layoutFactoryBuilder->getLayoutFactory();
 
@@ -119,7 +116,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddExtension()
+    public function testAddExtension(): void
     {
         $name = 'test';
         $type = $this->createMock(BlockTypeInterface::class);
@@ -144,7 +141,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddType()
+    public function testAddType(): void
     {
         $name = 'test';
         $type = $this->createMock(BlockTypeInterface::class);
@@ -162,7 +159,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddTypeExtension()
+    public function testAddTypeExtension(): void
     {
         $name = 'test';
         $typeExtension = $this->createMock(BlockTypeExtensionInterface::class);
@@ -182,7 +179,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit\Framework\TestCase
         $layoutFactory->getRegistry()->buildBlock($name, $blockBuilder, new Options());
     }
 
-    public function testAddLayoutUpdate()
+    public function testAddLayoutUpdate(): void
     {
         $id = 'test';
         $layoutUpdate = $this->createMock(LayoutUpdateInterface::class);

@@ -9,15 +9,14 @@ use Oro\Component\Action\Tests\Unit\Action\Stub\ArrayCondition;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class AbstractActionTest extends \PHPUnit\Framework\TestCase
+class AbstractActionTest extends TestCase
 {
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dispatcher;
-
-    /** @var AbstractAction|\PHPUnit\Framework\MockObject\MockObject */
-    private $action;
+    private EventDispatcherInterface&MockObject $dispatcher;
+    private AbstractAction&MockObject $action;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class AbstractActionTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->dispatcher);
     }
 
-    public function testSetCondition()
+    public function testSetCondition(): void
     {
         $condition = $this->createMock(ExpressionInterface::class);
         $this->action->setCondition($condition);
@@ -40,7 +39,7 @@ class AbstractActionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeDataProvider
      */
-    public function testExecute(bool $expectedAllowed, ?bool $conditionAllowed = null)
+    public function testExecute(bool $expectedAllowed, ?bool $conditionAllowed = null): void
     {
         $context = ['key' => 'value'];
 

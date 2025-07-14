@@ -5,21 +5,18 @@ namespace Oro\Component\Layout\Tests\Unit\ExpressionLanguage;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCacheWarmer;
 use Oro\Component\Layout\Tests\Unit\ExpressionLanguage\Fixtures\ClassWithConstant;
 use Oro\Component\Testing\Logger\BufferingLogger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Filesystem\Filesystem;
 
-class ExpressionLanguageCacheWarmerTest extends \PHPUnit\Framework\TestCase
+class ExpressionLanguageCacheWarmerTest extends TestCase
 {
     private const CACHE_FILE_PATH = 'cache/file/path';
 
-    /** @var Filesystem|\PHPUnit\Framework\MockObject\MockObject */
-    private $fs;
-
-    /** @var BufferingLogger */
-    private $logger;
-
-    /** @var ExpressionLanguageCacheWarmer */
-    private $warmer;
+    private Filesystem&MockObject $fs;
+    private BufferingLogger $logger;
+    private ExpressionLanguageCacheWarmer $warmer;
 
     #[\Override]
     protected function setUp(): void

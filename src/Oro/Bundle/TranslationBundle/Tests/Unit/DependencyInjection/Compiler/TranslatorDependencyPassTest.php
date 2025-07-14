@@ -4,10 +4,11 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslatorDependencyPass;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class TranslatorDependencyPassTest extends \PHPUnit\Framework\TestCase
+class TranslatorDependencyPassTest extends TestCase
 {
     public function testProcess(): void
     {

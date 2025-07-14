@@ -5,14 +5,13 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowItem\DebugWorkflowItemSerializer;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowItem\WorkflowItemSerializerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DebugWorkflowItemSerializerTest extends \PHPUnit\Framework\TestCase
+class DebugWorkflowItemSerializerTest extends TestCase
 {
-    /** @var WorkflowItemSerializerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerSerializer;
-
-    /** @var DebugWorkflowItemSerializer */
-    private $serializer;
+    private WorkflowItemSerializerInterface&MockObject $innerSerializer;
+    private DebugWorkflowItemSerializer $serializer;
 
     #[\Override]
     protected function setUp(): void

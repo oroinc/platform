@@ -3,12 +3,12 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer;
 
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\AbstractContextModeAwareNormalizer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 
-class AbstractContextModeAwareNormalizerTest extends \PHPUnit\Framework\TestCase
+class AbstractContextModeAwareNormalizerTest extends TestCase
 {
-    /** @var AbstractContextModeAwareNormalizer */
-    private $normalizer;
+    private AbstractContextModeAwareNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class AbstractContextModeAwareNormalizerTest extends \PHPUnit\Framework\TestCase
             ->getMockForAbstractClass();
     }
 
-    public function testNormalizeException()
+    public function testNormalizeException(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Normalization with mode "import" is not supported');
@@ -26,7 +26,7 @@ class AbstractContextModeAwareNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->normalizer->normalize(new \stdClass());
     }
 
-    public function testNormalizeUnsupportedMode()
+    public function testNormalizeUnsupportedMode(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Mode "unknown" is not supported');
@@ -34,7 +34,7 @@ class AbstractContextModeAwareNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->normalizer->normalize(new \stdClass(), null, ['mode' => 'unknown']);
     }
 
-    public function testConstructorException()
+    public function testConstructorException(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Mode "unknown" is not supported, available modes are "import", export"');
@@ -44,7 +44,7 @@ class AbstractContextModeAwareNormalizerTest extends \PHPUnit\Framework\TestCase
             ->getMockForAbstractClass();
     }
 
-    public function testDenormalizeUnsupportedMode()
+    public function testDenormalizeUnsupportedMode(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Denormalization with mode "import" is not supported');

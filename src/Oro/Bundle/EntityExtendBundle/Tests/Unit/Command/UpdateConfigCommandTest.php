@@ -6,19 +6,16 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Command\UpdateConfigCommand;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Component\Testing\Command\CommandTestingTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class UpdateConfigCommandTest extends \PHPUnit\Framework\TestCase
+class UpdateConfigCommandTest extends TestCase
 {
     use CommandTestingTrait;
 
-    /** @var ExtendConfigDumper|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendConfigDumper;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var UpdateConfigCommand */
-    private $command;
+    private ExtendConfigDumper&MockObject $extendConfigDumper;
+    private ConfigManager&MockObject $configManager;
+    private UpdateConfigCommand $command;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +26,7 @@ class UpdateConfigCommandTest extends \PHPUnit\Framework\TestCase
         $this->command = new UpdateConfigCommand($this->extendConfigDumper, $this->configManager);
     }
 
-    public function testExecuteWithoutForce()
+    public function testExecuteWithoutForce(): void
     {
         $this->extendConfigDumper->expects(self::never())
             ->method('updateConfig');
@@ -44,7 +41,7 @@ class UpdateConfigCommandTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testExecuteWithForce()
+    public function testExecuteWithForce(): void
     {
         $this->extendConfigDumper->expects(self::once())
             ->method('updateConfig');

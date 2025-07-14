@@ -14,17 +14,14 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Provider\AttributeValueProvider;
 use Oro\Bundle\PlatformBundle\Provider\DbalTypeDefaultValueProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AttributeValueProviderTest extends \PHPUnit\Framework\TestCase
+class AttributeValueProviderTest extends TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var ClassMetadata */
-    private $classMetadata;
-
-    /** @var AttributeValueProvider */
-    private $provider;
+    private EntityManager&MockObject $entityManager;
+    private ClassMetadata $classMetadata;
+    private AttributeValueProvider $provider;
 
     #[\Override]
     protected function setUp(): void

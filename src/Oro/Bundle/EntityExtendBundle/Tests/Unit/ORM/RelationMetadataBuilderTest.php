@@ -17,21 +17,18 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass2;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
+class RelationMetadataBuilderTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ExtendDbIdentifierNameGenerator */
-    private $nameGenerator;
-
-    /** @var RelationMetadataBuilder */
-    private $builder;
+    private ConfigManager&MockObject $configManager;
+    private ExtendDbIdentifierNameGenerator $nameGenerator;
+    private RelationMetadataBuilder $builder;
 
     #[\Override]
     protected function setUp(): void
@@ -58,7 +55,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDataProvider
      */
-    public function testSupports(Config $extendConfig, bool $expected)
+    public function testSupports(Config $extendConfig, bool $expected): void
     {
         self::assertEquals(
             $expected,
@@ -83,7 +80,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider statesToSkipDataProvider
      */
-    public function testShouldSkipBuildForSpecifiedStateOfTargetEntity(string $state)
+    public function testShouldSkipBuildForSpecifiedStateOfTargetEntity(string $state): void
     {
         $entityClass = TestClass::class;
         $fieldName = 'srcField';
@@ -135,7 +132,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testBuildManyToOne()
+    public function testBuildManyToOne(): void
     {
         $entityClass = TestClass::class;
         $fieldName = 'srcField';
@@ -225,7 +222,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBuildManyToOneWithAdditionalOptions()
+    public function testBuildManyToOneWithAdditionalOptions(): void
     {
         $entityClass = TestClass::class;
         $fieldName = 'srcField';
@@ -319,7 +316,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBuildManyToOneBidirectional()
+    public function testBuildManyToOneBidirectional(): void
     {
         $entityClass = TestClass::class;
         $fieldName = 'srcField';
@@ -414,7 +411,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testBuildManyToOneWithCustomizedColumnName()
+    public function testBuildManyToOneWithCustomizedColumnName(): void
     {
         $entityClass = TestClass::class;
         $fieldName = 'srcField';
@@ -517,7 +514,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBuildOneToMany()
+    public function testBuildOneToMany(): void
     {
         $entityClass = TestClass::class;
         $fieldName = 'srcField';
@@ -602,7 +599,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBuildOneToManyWithAdditionalCascadeOption()
+    public function testBuildOneToManyWithAdditionalCascadeOption(): void
     {
         $entityClass = TestClass::class;
         $fieldName = 'srcField';
@@ -689,7 +686,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBuildOneToManyWithAdditionalOrphanRemovalOption()
+    public function testBuildOneToManyWithAdditionalOrphanRemovalOption(): void
     {
         $entityClass = TestClass::class;
         $fieldName = 'srcField';
@@ -778,7 +775,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testBuildOneToManyWithDefaultRelation()
+    public function testBuildOneToManyWithDefaultRelation(): void
     {
         $entityClass = TestClass::class;
         $fieldName = 'srcField';
@@ -899,7 +896,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBuildOneToManyForInheritedRelation()
+    public function testBuildOneToManyForInheritedRelation(): void
     {
         $entityClass = TestClass::class;
         $fieldName = 'srcField';
@@ -1108,7 +1105,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testBuildManyToManyWithAdditionalCascadeOption()
+    public function testBuildManyToManyWithAdditionalCascadeOption(): void
     {
         $entityClass = TestClass::class;
 
@@ -1234,7 +1231,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testBuildManyToManyWithDefaultRelation()
+    public function testBuildManyToManyWithDefaultRelation(): void
     {
         $entityClass = TestClass::class;
 
@@ -1394,7 +1391,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testBuildManyToManyTargetSide()
+    public function testBuildManyToManyTargetSide(): void
     {
         $entityClass = TestClass::class;
 
@@ -1478,7 +1475,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testBuildManyToManyTargetSideWithAdditionalCascadeOption()
+    public function testBuildManyToManyTargetSideWithAdditionalCascadeOption(): void
     {
         $entityClass = TestClass::class;
 

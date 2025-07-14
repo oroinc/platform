@@ -6,17 +6,14 @@ use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use Oro\Bundle\MessageQueueBundle\Log\Handler\ConsoleErrorHandler;
 use Oro\Component\MessageQueue\Log\ConsumerState;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConsoleErrorHandlerTest extends \PHPUnit\Framework\TestCase
+class ConsoleErrorHandlerTest extends TestCase
 {
-    /** @var ConsumerState */
-    private $consumerState;
-
-    /** @var TestHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerHandler;
-
-    /** @var ConsoleErrorHandler */
-    private $handler;
+    private ConsumerState $consumerState;
+    private TestHandler&MockObject $innerHandler;
+    private ConsoleErrorHandler $handler;
 
     #[\Override]
     protected function setUp(): void

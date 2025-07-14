@@ -5,17 +5,14 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Authentication\Origin;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SyncBundle\Authentication\Origin\ApplicationOriginProvider;
 use Oro\Bundle\SyncBundle\Authentication\Origin\OriginExtractor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ApplicationOriginProviderTest extends \PHPUnit\Framework\TestCase
+class ApplicationOriginProviderTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var OriginExtractor|\PHPUnit\Framework\MockObject\MockObject */
-    private $originExtractor;
-
-    /** @var ApplicationOriginProvider */
-    private $applicationOriginProvider;
+    private ConfigManager&MockObject $configManager;
+    private OriginExtractor&MockObject $originExtractor;
+    private ApplicationOriginProvider $applicationOriginProvider;
 
     #[\Override]
     protected function setUp(): void

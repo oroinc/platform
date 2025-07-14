@@ -8,8 +8,9 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class IntegrationTokenAwareTraitTest extends \PHPUnit\Framework\TestCase
+class IntegrationTokenAwareTraitTest extends TestCase
 {
     public function testTraitIfTokenIsNull(): void
     {

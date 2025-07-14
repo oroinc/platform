@@ -10,22 +10,17 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Factory\MetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\EntityConfig\Mock\ConfigurationHandlerMock;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class EntityConfigListenerTestCase extends \PHPUnit\Framework\TestCase
+class EntityConfigListenerTestCase extends TestCase
 {
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configProvider;
-
-    /** @var ConfigCache|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configCache;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $eventDispatcher;
+    protected ConfigManager $configManager;
+    protected ConfigProvider&MockObject $configProvider;
+    protected ConfigCache&MockObject $configCache;
+    protected EventDispatcherInterface&MockObject $eventDispatcher;
 
     #[\Override]
     protected function setUp(): void

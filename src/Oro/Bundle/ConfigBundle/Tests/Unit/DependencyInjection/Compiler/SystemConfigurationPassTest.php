@@ -5,17 +5,16 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass;
 use Oro\Bundle\ConfigBundle\Tests\Unit\Fixtures\TestBundle;
 use Oro\Component\Config\CumulativeResourceManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
+class SystemConfigurationPassTest extends TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var SystemConfigurationPass */
-    private $compiler;
+    private ContainerBuilder&MockObject $container;
+    private SystemConfigurationPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcess()
+    public function testProcess(): void
     {
         $bundle = new TestBundle();
         $bundles = [$bundle->getName() => get_class($bundle)];
@@ -126,7 +125,7 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($this->container);
     }
 
-    public function testProcessDefaultValueProvider()
+    public function testProcessDefaultValueProvider(): void
     {
         $bundle = new TestBundle();
         $bundles = [$bundle->getName() => get_class($bundle)];

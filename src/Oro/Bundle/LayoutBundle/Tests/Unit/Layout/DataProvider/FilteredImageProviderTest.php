@@ -6,17 +6,14 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\LayoutBundle\Layout\DataProvider\FilteredImageProvider;
 use Oro\Bundle\LayoutBundle\Provider\Image\ImagePlaceholderProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FilteredImageProviderTest extends \PHPUnit\Framework\TestCase
+class FilteredImageProviderTest extends TestCase
 {
-    /** @var AttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentManager;
-
-    /** @var ImagePlaceholderProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $imagePlaceholderProvider;
-
-    /** @var FilteredImageProvider */
-    private $placeholderDataProvider;
+    private AttachmentManager&MockObject $attachmentManager;
+    private ImagePlaceholderProviderInterface&MockObject $imagePlaceholderProvider;
+    private FilteredImageProvider $placeholderDataProvider;
 
     #[\Override]
     protected function setUp(): void

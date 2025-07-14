@@ -6,18 +6,15 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\NotificationBundle\Provider\ContactInformationEmailsProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ContactInformationEmailsProviderTest extends \PHPUnit\Framework\TestCase
+class ContactInformationEmailsProviderTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var ContactInformationEmailsProvider */
-    private $provider;
+    private ConfigManager&MockObject $configManager;
+    private TranslatorInterface&MockObject $translator;
+    private ContactInformationEmailsProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +28,7 @@ class ContactInformationEmailsProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetRecipients()
+    public function testGetRecipients(): void
     {
         $entity = new \stdClass();
         $entity->name = get_class($entity);

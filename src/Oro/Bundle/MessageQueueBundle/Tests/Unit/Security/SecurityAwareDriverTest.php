@@ -11,24 +11,19 @@ use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\QueueInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
+class SecurityAwareDriverTest extends TestCase
 {
-    /** @var DriverInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $driver;
-
-    /** @var SecurityTokenProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenProvider;
-
-    /** @var TokenSerializerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenSerializer;
-
-    /** @var SecurityAwareDriver */
-    private $securityAwareDriver;
+    private DriverInterface&MockObject $driver;
+    private SecurityTokenProviderInterface&MockObject $tokenProvider;
+    private TokenSerializerInterface&MockObject $tokenSerializer;
+    private SecurityAwareDriver $securityAwareDriver;
 
     #[\Override]
     protected function setUp(): void
@@ -45,7 +40,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSendShouldNotAddSecurityTokenToMessageIfItWasSentToSecurityAgnosticTopic()
+    public function testSendShouldNotAddSecurityTokenToMessageIfItWasSentToSecurityAgnosticTopic(): void
     {
         $message = new Message();
         $message->setProperty(Config::PARAMETER_TOPIC_NAME, 'security_agnostic_topic');
@@ -68,7 +63,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSendShouldAddSecurityTokenToMessageIfItWasNotAddedYet()
+    public function testSendShouldAddSecurityTokenToMessageIfItWasNotAddedYet(): void
     {
         $message = new Message();
         $queue = $this->createMock(QueueInterface::class);
@@ -95,7 +90,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSendShouldNotAddSecurityTokenToMessageIfItWasAlreadyAdded()
+    public function testSendShouldNotAddSecurityTokenToMessageIfItWasAlreadyAdded(): void
     {
         $message = new Message();
         $queue = $this->createMock(QueueInterface::class);
@@ -120,7 +115,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSendShouldNotAddSecurityTokenToMessageIfNoToken()
+    public function testSendShouldNotAddSecurityTokenToMessageIfNoToken(): void
     {
         $message = new Message();
         $queue = $this->createMock(QueueInterface::class);
@@ -140,7 +135,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $message->getProperties());
     }
 
-    public function testSendShouldNotAddSecurityTokenToMessageIfTokenCannotBeSerialized()
+    public function testSendShouldNotAddSecurityTokenToMessageIfTokenCannotBeSerialized(): void
     {
         $message = new Message();
         $queue = $this->createMock(QueueInterface::class);
@@ -162,7 +157,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $message->getProperties());
     }
 
-    public function testSendShouldSerializeAlreadyAddedSecurityTokenIfItImplementsTokenInterface()
+    public function testSendShouldSerializeAlreadyAddedSecurityTokenIfItImplementsTokenInterface(): void
     {
         $message = new Message();
         $queue = $this->createMock(QueueInterface::class);
@@ -190,7 +185,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSendShouldRemoveAlreadyAddedSecurityTokenIfItImplementsTokenInterfaceButItCannotBeSerialized()
+    public function testSendShouldRemoveAlreadyAddedTokenIfItImplementsTokenInterfaceButItCannotBeSerialized(): void
     {
         $message = new Message();
         $queue = $this->createMock(QueueInterface::class);
@@ -213,7 +208,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $message->getProperties());
     }
 
-    public function testSendShouldRemoveAlreadyAddedSecurityTokenIfMessageWasSentToSecurityAgnosticTopic()
+    public function testSendShouldRemoveAlreadyAddedTokenIfMessageWasSentToSecurityAgnosticTopic(): void
     {
         $message = new Message();
         $message->setProperty(Config::PARAMETER_TOPIC_NAME, 'security_agnostic_topic');
@@ -237,7 +232,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateTransportMessage()
+    public function testCreateTransportMessage(): void
     {
         $message = $this->createMock(MessageInterface::class);
         $this->driver->expects(self::once())
@@ -247,7 +242,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
         self::assertSame($message, $this->securityAwareDriver->createTransportMessage());
     }
 
-    public function testCreateQueue()
+    public function testCreateQueue(): void
     {
         $queueName = 'testQueue';
         $queue = $this->createMock(QueueInterface::class);
@@ -259,7 +254,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
         self::assertSame($queue, $this->securityAwareDriver->createQueue($queueName));
     }
 
-    public function testGetConfig()
+    public function testGetConfig(): void
     {
         $config = $this->createMock(Config::class);
         $this->driver->expects(self::once())

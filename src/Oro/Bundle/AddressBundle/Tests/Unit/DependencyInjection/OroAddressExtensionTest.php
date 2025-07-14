@@ -3,9 +3,10 @@
 namespace Oro\Bundle\AddressBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\AddressBundle\DependencyInjection\OroAddressExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroAddressExtensionTest extends \PHPUnit\Framework\TestCase
+class OroAddressExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

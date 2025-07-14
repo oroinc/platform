@@ -7,14 +7,13 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\NavigationBundle\Entity\Listener\PrepareUrlListener;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\UrlAwareStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PrepareUrlListenerTest extends \PHPUnit\Framework\TestCase
+class PrepareUrlListenerTest extends TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var PrepareUrlListener */
-    private $listener;
+    private EntityManager&MockObject $entityManager;
+    private PrepareUrlListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class PrepareUrlListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new PrepareUrlListener();
     }
 
-    public function testPrePersist()
+    public function testPrePersist(): void
     {
         $entity = new UrlAwareStub('url_too_long');
 
@@ -45,7 +44,7 @@ class PrepareUrlListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('url', $entity->getUrl());
     }
 
-    public function testPreUpdate()
+    public function testPreUpdate(): void
     {
         $entity = new UrlAwareStub('url_too_long');
 

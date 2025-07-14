@@ -9,16 +9,15 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ExportQueryProvider;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ExportQueryProviderTest extends \PHPUnit\Framework\TestCase
+class ExportQueryProviderTest extends TestCase
 {
     private const DEFAULT_FIELD = 'fieldName';
 
-    /** @var EntityConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigManager;
-
-    /** @var ExportQueryProvider */
-    private $exportQueryProvider;
+    private EntityConfigManager&MockObject $entityConfigManager;
+    private ExportQueryProvider $exportQueryProvider;
 
     #[\Override]
     protected function setUp(): void

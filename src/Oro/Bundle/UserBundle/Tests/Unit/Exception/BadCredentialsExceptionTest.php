@@ -3,8 +3,9 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Exception;
 
 use Oro\Bundle\UserBundle\Exception\BadCredentialsException;
+use PHPUnit\Framework\TestCase;
 
-class BadCredentialsExceptionTest extends \PHPUnit\Framework\TestCase
+class BadCredentialsExceptionTest extends TestCase
 {
     private $exception;
 

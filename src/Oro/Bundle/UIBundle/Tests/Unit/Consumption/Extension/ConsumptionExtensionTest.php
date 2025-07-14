@@ -8,9 +8,10 @@ use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RequestContext;
 
-class ConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
+class ConsumptionExtensionTest extends TestCase
 {
     private const URL = 'https://test.host:444/index.php/admin/path';
 

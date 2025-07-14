@@ -5,14 +5,13 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\DoctrineExtensions\DBAL\Types;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCTimeType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class UTCTimeTypeTest extends \PHPUnit\Framework\TestCase
+class UTCTimeTypeTest extends TestCase
 {
-    /** @var UTCTimeType */
-    private $type;
-
-    /** @var AbstractPlatform|\PHPUnit\Framework\MockObject\MockObject */
-    private $platform;
+    private UTCTimeType $type;
+    private AbstractPlatform&MockObject $platform;
 
     #[\Override]
     protected function setUp(): void
@@ -28,8 +27,11 @@ class UTCTimeTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider convertToDatabaseValueWhenNoDstDataProvider
      */
-    public function testConvertToDatabaseValueWhenNoDst(?string $sourceTime, ?string $sourceTimeZone, ?string $expected)
-    {
+    public function testConvertToDatabaseValueWhenNoDst(
+        ?string $sourceTime,
+        ?string $sourceTimeZone,
+        ?string $expected
+    ): void {
         $source = new \DateTime('01 Jan 2019 ' . $sourceTime, new \DateTimeZone($sourceTimeZone));
         $this->assertEquals($expected, $this->type->convertToDatabaseValue($source, $this->platform));
     }
@@ -68,8 +70,11 @@ class UTCTimeTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider convertToDatabaseValueWhenDstDataProvider
      */
-    public function testConvertToDatabaseValueWhenDst(?string $sourceTime, ?string $sourceTimeZone, ?string $expected)
-    {
+    public function testConvertToDatabaseValueWhenDst(
+        ?string $sourceTime,
+        ?string $sourceTimeZone,
+        ?string $expected
+    ): void {
         $source = new \DateTime('01 Jun 2019 ' . $sourceTime, new \DateTimeZone($sourceTimeZone));
         $this->assertEquals($expected, $this->type->convertToDatabaseValue($source, $this->platform));
     }
@@ -90,12 +95,12 @@ class UTCTimeTypeTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testConvertToDatabaseValueWhenNull()
+    public function testConvertToDatabaseValueWhenNull(): void
     {
         $this->assertNull($this->type->convertToDatabaseValue(null, $this->platform));
     }
 
-    public function testConvertToPHPValue()
+    public function testConvertToPHPValue(): void
     {
         $source = '08:00:00';
         $expected = \DateTime::createFromFormat('H:i:s|', '08:00:00', new \DateTimeZone('UTC'));
@@ -103,7 +108,7 @@ class UTCTimeTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->type->convertToPHPValue($source, $this->platform));
     }
 
-    public function testConvertToPHPValueException()
+    public function testConvertToPHPValueException(): void
     {
         $this->expectException(ConversionException::class);
         $this->type->convertToPHPValue('qwerty', $this->platform);

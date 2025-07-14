@@ -6,12 +6,12 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
 use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
 use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexityValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class PasswordComplexityValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
+    private ConfigManager&MockObject $configManager;
 
     #[\Override]
     protected function setUp(): void

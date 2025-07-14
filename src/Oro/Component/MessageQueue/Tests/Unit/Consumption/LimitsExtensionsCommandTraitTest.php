@@ -8,11 +8,12 @@ use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumptionTimeExtensi
 use Oro\Component\MessageQueue\Consumption\Extension\LimitGarbageCollectionExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitObjectExtension;
 use Oro\Component\MessageQueue\Tests\Unit\Consumption\Mock\LimitsExtensionsCommand;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class LimitsExtensionsCommandTraitTest extends \PHPUnit\Framework\TestCase
+class LimitsExtensionsCommandTraitTest extends TestCase
 {
-    public function testShouldAddExtensionsOptions()
+    public function testShouldAddExtensionsOptions(): void
     {
         $trait = new LimitsExtensionsCommand('name');
 
@@ -27,7 +28,7 @@ class LimitsExtensionsCommandTraitTest extends \PHPUnit\Framework\TestCase
         self::assertArrayHasKey('stop-when-unique-jobs-processed', $options);
     }
 
-    public function testShouldAddMessageLimitExtension()
+    public function testShouldAddMessageLimitExtension(): void
     {
         $command = new LimitsExtensionsCommand('name');
 
@@ -43,7 +44,7 @@ class LimitsExtensionsCommandTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(LimitConsumedMessagesExtension::class, $result[0]);
     }
 
-    public function testShouldAddTimeLimitExtension()
+    public function testShouldAddTimeLimitExtension(): void
     {
         $command = new LimitsExtensionsCommand('name');
 
@@ -59,7 +60,7 @@ class LimitsExtensionsCommandTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(LimitConsumptionTimeExtension::class, $result[0]);
     }
 
-    public function testShouldThrowExceptionIfTimeLimitExpressionIsNotValid()
+    public function testShouldThrowExceptionIfTimeLimitExpressionIsNotValid(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Failed to parse time string (time is not valid) at position');
@@ -74,7 +75,7 @@ class LimitsExtensionsCommandTraitTest extends \PHPUnit\Framework\TestCase
         $command->getExtensions();
     }
 
-    public function testShouldAddMemoryLimitExtension()
+    public function testShouldAddMemoryLimitExtension(): void
     {
         $command = new LimitsExtensionsCommand('name');
 
@@ -90,7 +91,7 @@ class LimitsExtensionsCommandTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(LimitConsumerMemoryExtension::class, $result[0]);
     }
 
-    public function testShouldAddObjectLimitExtension()
+    public function testShouldAddObjectLimitExtension(): void
     {
         $command = new LimitsExtensionsCommand('name');
 
@@ -106,7 +107,7 @@ class LimitsExtensionsCommandTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(LimitObjectExtension::class, $result[0]);
     }
 
-    public function testShouldAddGCLimitExtension()
+    public function testShouldAddGCLimitExtension(): void
     {
         $command = new LimitsExtensionsCommand('name');
 
@@ -122,7 +123,7 @@ class LimitsExtensionsCommandTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(LimitGarbageCollectionExtension::class, $result[0]);
     }
 
-    public function testShouldAddFiveLimitExtensions()
+    public function testShouldAddFiveLimitExtensions(): void
     {
         $command = new LimitsExtensionsCommand('name');
 

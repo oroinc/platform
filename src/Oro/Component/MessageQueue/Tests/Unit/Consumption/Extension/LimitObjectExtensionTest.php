@@ -6,9 +6,10 @@ use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitObjectExtension;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
 
-class LimitObjectExtensionTest extends \PHPUnit\Framework\TestCase
+class LimitObjectExtensionTest extends TestCase
 {
     private $gcEnabled;
 

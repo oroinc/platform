@@ -7,16 +7,15 @@ use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\TwigTemplateProperty;
 use Oro\Bundle\UIBundle\Twig\Environment;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TwigTemplatePropertyTest extends \PHPUnit\Framework\TestCase
+class TwigTemplatePropertyTest extends TestCase
 {
     private const TEMPLATE = 'sample_template.html.twig';
 
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $twig;
-
-    /** @var TwigTemplateProperty */
-    private $property;
+    private Environment&MockObject $twig;
+    private TwigTemplateProperty $property;
 
     #[\Override]
     protected function setUp(): void

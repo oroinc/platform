@@ -6,13 +6,13 @@ use Oro\Bundle\UIBundle\Tools\HTMLPurifier\Error;
 use Oro\Bundle\UIBundle\Tools\HTMLPurifier\ErrorCollector;
 use Oro\Bundle\UIBundle\Tools\HTMLPurifier\HTMLPurifier;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class HTMLPurifierTest extends \PHPUnit\Framework\TestCase
+class HTMLPurifierTest extends TestCase
 {
     use TempDirExtension;
 
-    /** @var HTMLPurifier */
-    private $purifier;
+    private HTMLPurifier $purifier;
 
     #[\Override]
     protected function setUp(): void

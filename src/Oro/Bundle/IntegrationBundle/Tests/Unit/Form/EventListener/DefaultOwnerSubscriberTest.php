@@ -10,21 +10,18 @@ use Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Form\Type\OrganizationUserAclSelectType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
+class DefaultOwnerSubscriberTest extends TestCase
 {
-    /** @var AbstractUser|\PHPUnit\Framework\MockObject\MockObject */
-    private $user;
-
-    /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $typesRegistry;
-
-    /** @var DefaultOwnerSubscriber */
-    private $subscriber;
+    private AbstractUser&MockObject $user;
+    private TypesRegistry&MockObject $typesRegistry;
+    private DefaultOwnerSubscriber $subscriber;
 
     #[\Override]
     protected function setUp(): void
@@ -46,7 +43,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
      * @param mixed $formData
      * @param bool  $setsUser
      */
-    public function testPostSet($formData, $setsUser)
+    public function testPostSet($formData, $setsUser): void
     {
         $events = $this->subscriber->getSubscribedEvents();
         $this->assertArrayHasKey(FormEvents::POST_SET_DATA, $events);
@@ -91,7 +88,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testPreSetWithUserDefaultOwnerType()
+    public function testPreSetWithUserDefaultOwnerType(): void
     {
         $integration = $this->createMock(Channel::class);
         $integration->expects($this->any())
@@ -128,7 +125,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->preSet($event);
     }
 
-    public function testPreSetWithBusinessUnitDefaultOwnerType()
+    public function testPreSetWithBusinessUnitDefaultOwnerType(): void
     {
         $integration = $this->createMock(Channel::class);
         $integration->expects($this->any())
@@ -165,7 +162,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->preSet($event);
     }
 
-    public function testPreSetWithUserDefaultOwnerTypeAndExistingOtherField()
+    public function testPreSetWithUserDefaultOwnerTypeAndExistingOtherField(): void
     {
         $integration = $this->createMock(Channel::class);
         $integration->expects($this->any())
@@ -205,7 +202,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->preSet($event);
     }
 
-    public function testPreSetWithBusinessUnitDefaultOwnerTypeAndExistingOtherField()
+    public function testPreSetWithBusinessUnitDefaultOwnerTypeAndExistingOtherField(): void
     {
         $integration = $this->createMock(Channel::class);
         $integration->expects($this->any())
@@ -245,7 +242,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->preSet($event);
     }
 
-    public function testPreSetWithUserDefaultOwnerTypeAndExistingSameField()
+    public function testPreSetWithUserDefaultOwnerTypeAndExistingSameField(): void
     {
         $integration = $this->createMock(Channel::class);
         $integration->expects($this->any())
@@ -271,7 +268,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->preSet($event);
     }
 
-    public function testPreSetWithBusinessUnitDefaultOwnerTypeAndExistingSameField()
+    public function testPreSetWithBusinessUnitDefaultOwnerTypeAndExistingSameField(): void
     {
         $integration = $this->createMock(Channel::class);
         $integration->expects($this->any())

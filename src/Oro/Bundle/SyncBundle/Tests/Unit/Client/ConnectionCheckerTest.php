@@ -14,12 +14,9 @@ class ConnectionCheckerTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private WebsocketClientInterface|MockObject $client;
-
-    private ApplicationState|MockObject $applicationState;
-
-    private WebsocketClientParametersProviderInterface|MockObject $websocketClientParametersProvider;
-
+    private WebsocketClientInterface&MockObject $client;
+    private ApplicationState&MockObject $applicationState;
+    private WebsocketClientParametersProviderInterface&MockObject $websocketClientParametersProvider;
     private ConnectionChecker $checker;
 
     #[\Override]
@@ -39,8 +36,7 @@ class ConnectionCheckerTest extends TestCase
 
     public function testCheckConnection(): void
     {
-        $this->websocketClientParametersProvider
-            ->expects(self::exactly(2))
+        $this->websocketClientParametersProvider->expects(self::exactly(2))
             ->method('getHost')
             ->willReturn('example.org');
         $this->client->expects(self::once())
@@ -57,8 +53,7 @@ class ConnectionCheckerTest extends TestCase
 
     public function testCheckConnectionWhenNotConfigured(): void
     {
-        $this->websocketClientParametersProvider
-            ->expects(self::once())
+        $this->websocketClientParametersProvider->expects(self::once())
             ->method('getHost')
             ->willReturn('');
         $this->client->expects(self::never())
@@ -71,8 +66,7 @@ class ConnectionCheckerTest extends TestCase
 
     public function testWsConnectedFail(): void
     {
-        $this->websocketClientParametersProvider
-            ->expects(self::exactly(2))
+        $this->websocketClientParametersProvider->expects(self::exactly(2))
             ->method('getHost')
             ->willReturn('example.org');
         $this->client->expects(self::once())
@@ -89,8 +83,7 @@ class ConnectionCheckerTest extends TestCase
 
     public function testReset(): void
     {
-        $this->websocketClientParametersProvider
-            ->expects(self::exactly(3))
+        $this->websocketClientParametersProvider->expects(self::exactly(3))
             ->method('getHost')
             ->willReturn('example.org');
         $this->client->expects(self::exactly(2))
@@ -111,8 +104,7 @@ class ConnectionCheckerTest extends TestCase
 
     public function testWsConnectedExceptionDuringInstallNoApplicationState(): void
     {
-        $this->websocketClientParametersProvider
-            ->expects(self::exactly(2))
+        $this->websocketClientParametersProvider->expects(self::exactly(2))
             ->method('getHost')
             ->willReturn('example.org');
         $exception = new \Exception('sample message');
@@ -132,8 +124,7 @@ class ConnectionCheckerTest extends TestCase
 
     public function testWsConnectedExceptionDuringInstall(): void
     {
-        $this->websocketClientParametersProvider
-            ->expects(self::exactly(2))
+        $this->websocketClientParametersProvider->expects(self::exactly(2))
             ->method('getHost')
             ->willReturn('example.org');
         $exception = new \Exception('sample message');
@@ -157,8 +148,7 @@ class ConnectionCheckerTest extends TestCase
 
     public function testWsConnectedException(): void
     {
-        $this->websocketClientParametersProvider
-            ->expects(self::exactly(2))
+        $this->websocketClientParametersProvider->expects(self::exactly(2))
             ->method('getHost')
             ->willReturn('example.org');
         $exception = new \Exception('sample message');
@@ -186,8 +176,7 @@ class ConnectionCheckerTest extends TestCase
 
     public function testIsConfiguredWhenHasHost(): void
     {
-        $this->websocketClientParametersProvider
-            ->expects(self::once())
+        $this->websocketClientParametersProvider->expects(self::once())
             ->method('getHost')
             ->willReturn('example.org');
 
@@ -196,8 +185,7 @@ class ConnectionCheckerTest extends TestCase
 
     public function testIsConfiguredWhenNoHost(): void
     {
-        $this->websocketClientParametersProvider
-            ->expects(self::once())
+        $this->websocketClientParametersProvider->expects(self::once())
             ->method('getHost')
             ->willReturn('');
 

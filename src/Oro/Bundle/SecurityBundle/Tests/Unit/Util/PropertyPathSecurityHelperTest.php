@@ -10,22 +10,17 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
 use Oro\Bundle\SecurityBundle\Util\PropertyPathSecurityHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class PropertyPathSecurityHelperTest extends \PHPUnit\Framework\TestCase
+class PropertyPathSecurityHelperTest extends TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigProvider;
-
-    /** @var PropertyPathSecurityHelper */
-    private $helper;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private ManagerRegistry&MockObject $managerRegistry;
+    private ConfigProvider&MockObject $entityConfigProvider;
+    private PropertyPathSecurityHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +36,7 @@ class PropertyPathSecurityHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsGrantedByPropertyPath()
+    public function testIsGrantedByPropertyPath(): void
     {
         $address = new CmsAddress();
         $address->city = 'test';
@@ -85,7 +80,7 @@ class PropertyPathSecurityHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($isGranted);
     }
 
-    public function testIisGrantedByPropertyPathOnWrongClass()
+    public function testIisGrantedByPropertyPathOnWrongClass(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("Can't get entity manager for class stdClass");

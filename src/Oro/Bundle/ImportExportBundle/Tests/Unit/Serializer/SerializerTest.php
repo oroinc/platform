@@ -3,11 +3,12 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer;
 
 use Oro\Bundle\ImportExportBundle\Serializer\Serializer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 
-class SerializerTest extends \PHPUnit\Framework\TestCase
+class SerializerTest extends TestCase
 {
     private Serializer $serializer;
 

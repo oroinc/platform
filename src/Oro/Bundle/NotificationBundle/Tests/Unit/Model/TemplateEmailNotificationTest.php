@@ -6,8 +6,9 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\TestCase;
 
-class TemplateEmailNotificationTest extends \PHPUnit\Framework\TestCase
+class TemplateEmailNotificationTest extends TestCase
 {
     use EntityTrait;
 

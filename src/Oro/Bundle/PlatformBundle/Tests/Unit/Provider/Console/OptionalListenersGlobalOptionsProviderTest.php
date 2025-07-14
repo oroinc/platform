@@ -4,17 +4,17 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\Provider\Console;
 
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 use Oro\Bundle\PlatformBundle\Provider\Console\OptionalListenersGlobalOptionsProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 
-class OptionalListenersGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCase
+class OptionalListenersGlobalOptionsProviderTest extends TestCase
 {
-    /** @var OptionalListenerManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $listenersManager;
-
+    private OptionalListenerManager&MockObject $listenersManager;
     private OptionalListenersGlobalOptionsProvider $provider;
 
     #[\Override]
@@ -24,7 +24,7 @@ class OptionalListenersGlobalOptionsProviderTest extends \PHPUnit\Framework\Test
         $this->provider = new OptionalListenersGlobalOptionsProvider($this->listenersManager);
     }
 
-    public function testAddGlobalOptions()
+    public function testAddGlobalOptions(): void
     {
         $inputDefinition = new InputDefinition();
         $application = $this->createMock(Application::class);
@@ -51,9 +51,8 @@ class OptionalListenersGlobalOptionsProviderTest extends \PHPUnit\Framework\Test
         );
     }
 
-    public function testResolveGlobalOptionsWhenNoListeners()
+    public function testResolveGlobalOptionsWhenNoListeners(): void
     {
-        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->once())
             ->method('getOption')
@@ -67,9 +66,8 @@ class OptionalListenersGlobalOptionsProviderTest extends \PHPUnit\Framework\Test
         $this->provider->resolveGlobalOptions($input);
     }
 
-    public function testResolveGlobalOptionsWhenAllListeners()
+    public function testResolveGlobalOptionsWhenAllListeners(): void
     {
-        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->once())
             ->method('getOption')
@@ -85,10 +83,9 @@ class OptionalListenersGlobalOptionsProviderTest extends \PHPUnit\Framework\Test
             ->with($listeners);
         $this->provider->resolveGlobalOptions($input);
     }
-    public function testResolveGlobalOptions()
+    public function testResolveGlobalOptions(): void
     {
         $listeners = ['some_listener_service'];
-        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->once())
             ->method('getOption')

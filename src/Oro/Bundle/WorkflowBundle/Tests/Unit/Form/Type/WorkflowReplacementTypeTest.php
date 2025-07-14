@@ -10,17 +10,15 @@ use Oro\Bundle\WorkflowBundle\Helper\WorkflowDeactivationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WorkflowReplacementTypeTest extends FormIntegrationTestCase
 {
-    /** @var WorkflowDeactivationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $helper;
-
-    /** @var WorkflowReplacementType */
-    private $formType;
+    private WorkflowDeactivationHelper&MockObject $helper;
+    private WorkflowReplacementType $formType;
 
     #[\Override]
     protected function setUp(): void

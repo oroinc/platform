@@ -10,20 +10,16 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormInterface;
 
 class EnumFilterTest extends OrmTestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var DictionaryEntityDataProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $dictionaryEntityDataProvider;
-
-    /** @var EnumFilter */
-    private $filter;
+    private FormFactoryInterface&MockObject $formFactory;
+    private DictionaryEntityDataProvider&MockObject $dictionaryEntityDataProvider;
+    private EnumFilter $filter;
 
     #[\Override]
     protected function setUp(): void

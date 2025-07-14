@@ -4,15 +4,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation;
 
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplateParametersResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class KeyTemplateParametersResolverTest extends \PHPUnit\Framework\TestCase
+class KeyTemplateParametersResolverTest extends TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var KeyTemplateParametersResolver */
-    private $resolver;
+    private TranslatorInterface&MockObject $translator;
+    private KeyTemplateParametersResolver $resolver;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class KeyTemplateParametersResolverTest extends \PHPUnit\Framework\TestCase
         $this->resolver = new KeyTemplateParametersResolver($this->translator);
     }
 
-    public function testResolveTemplateParametersWithoutParameters()
+    public function testResolveTemplateParametersWithoutParameters(): void
     {
         $this->translator->expects($this->never())
             ->method('trans');
@@ -29,7 +28,7 @@ class KeyTemplateParametersResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $this->resolver->resolveTemplateParameters([]));
     }
 
-    public function testResolveTemplateParameters()
+    public function testResolveTemplateParameters(): void
     {
         $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
 

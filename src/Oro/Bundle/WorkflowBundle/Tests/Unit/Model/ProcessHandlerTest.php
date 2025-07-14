@@ -13,21 +13,15 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessFactory;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 use Oro\Bundle\WorkflowBundle\Model\ProcessLogger;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
+class ProcessHandlerTest extends TestCase
 {
-    /** @var ProcessFactory|MockObject */
-    private $factory;
-
-    /** @var ProcessLogger|MockObject */
-    private $logger;
-
-    /** @var EventDispatcherInterface|MockObject */
-    private $eventDispatcher;
-
-    /** @var ProcessHandler */
-    private $handler;
+    private ProcessFactory&MockObject $factory;
+    private ProcessLogger&MockObject $logger;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private ProcessHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +33,7 @@ class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new ProcessHandler($this->factory, $this->logger, $this->eventDispatcher);
     }
 
-    public function testHandleTrigger()
+    public function testHandleTrigger(): void
     {
         $processData = new ProcessData([
             'data' => new \DateTime(),
@@ -106,7 +100,7 @@ class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider handleJobProvider
      */
-    public function testHandleJob($data)
+    public function testHandleJob($data): void
     {
         $processTrigger = $this->prepareHandleTrigger($data);
 
@@ -141,7 +135,7 @@ class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testFinishTrigger()
+    public function testFinishTrigger(): void
     {
         $processTrigger = $this->createMock(ProcessTrigger::class);
         $processData = $this->createMock(ProcessData::class);
@@ -163,7 +157,7 @@ class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->finishTrigger($processTrigger, $processData);
     }
 
-    public function testFinishJob()
+    public function testFinishJob(): void
     {
         $processTrigger = $this->createMock(ProcessTrigger::class);
         $processData = $this->createMock(ProcessData::class);

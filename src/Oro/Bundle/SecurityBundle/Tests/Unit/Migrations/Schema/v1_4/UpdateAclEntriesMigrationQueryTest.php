@@ -7,15 +7,17 @@ use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Migrations\Schema\v1_4\UpdateAclEntriesMigrationQuery;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 
-class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
+class UpdateAclEntriesMigrationQueryTest extends TestCase
 {
     private const MAX_NUMBER_OF_PERMISSIONS = 13;
 
-    private const ENTRIES_TABLE_NAME           = 'acl_entries';
+    private const ENTRIES_TABLE_NAME = 'acl_entries';
     private const OBJECT_IDENTITIES_TABLE_NAME = 'acl_object_identities';
-    private const ACL_CLASSES_TABLE_NAME       = 'acl_classes';
+    private const ACL_CLASSES_TABLE_NAME = 'acl_classes';
 
     private const UPDATE_QUERY = 'UPDATE acl_entries SET mask = :mask WHERE id = :id';
     private const DELETE_QUERY = 'DELETE FROM acl_entries WHERE id IN (:ids)';
@@ -26,14 +28,9 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
 
     private const UPDATE_ORDER_QUERY = 'UPDATE acl_entries SET ace_order = :ace_order WHERE id = :id';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Connection */
-    private $connection;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AclCacheInterface */
-    private $aclCache;
-
-    /** @var UpdateAclEntriesMigrationQuery */
-    private $query;
+    private Connection&MockObject $connection;
+    private AclCacheInterface&MockObject $aclCache;
+    private UpdateAclEntriesMigrationQuery $query;
 
     #[\Override]
     protected function setUp(): void
@@ -97,7 +94,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testExecute()
+    public function testExecute(): void
     {
         $rootClassId = 1;
         $sid1 = 101;
@@ -232,7 +229,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $this->query->execute(new ArrayLogger());
     }
 
-    public function testExecuteWhenAceMasksWereAlreadyUpdated()
+    public function testExecuteWhenAceMasksWereAlreadyUpdated(): void
     {
         $rootClassId = 1;
         $sid1 = 101;

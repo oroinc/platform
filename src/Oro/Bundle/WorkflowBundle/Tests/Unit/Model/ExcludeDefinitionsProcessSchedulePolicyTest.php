@@ -7,11 +7,11 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Event\ProcessHandleEvent;
 use Oro\Bundle\WorkflowBundle\Model\ExcludeDefinitionsProcessSchedulePolicy;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+use PHPUnit\Framework\TestCase;
 
-class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit\Framework\TestCase
+class ExcludeDefinitionsProcessSchedulePolicyTest extends TestCase
 {
-    /** @var ExcludeDefinitionsProcessSchedulePolicy */
-    private $schedulePolicy;
+    private ExcludeDefinitionsProcessSchedulePolicy $schedulePolicy;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +26,7 @@ class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit\Framework\Tes
         array $beforeEvents,
         array $afterEvents,
         array $expects
-    ) {
+    ): void {
         foreach ($beforeEvents as $event) {
             $this->schedulePolicy->onProcessHandleBefore($event);
         }

@@ -20,6 +20,7 @@ use Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -43,23 +44,12 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
     protected const CONFIG_SCOPE = 'abstract';
     protected const TREE_NAME = 'abstract';
 
-    /** @var FormRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formRegistry;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var ChainSearchProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $searchProvider;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
+    private FormRegistryInterface&MockObject $formRegistry;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TranslatorInterface&MockObject $translator;
+    private ChainSearchProvider&MockObject $searchProvider;
+    private FeatureChecker&MockObject $featureChecker;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
 
     abstract protected function getParentCheckboxLabel(): string;
 

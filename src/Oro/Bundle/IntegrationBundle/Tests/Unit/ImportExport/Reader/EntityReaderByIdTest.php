@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Reader;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\Entity\StepExecution;
@@ -12,23 +11,18 @@ use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Reader\EntityReaderById;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use Oro\Component\Testing\Unit\ORM\Mocks\EntityManagerMock;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class EntityReaderByIdTest extends OrmTestCase
 {
     private const TEST_ENTITY_ID = 11;
 
-    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextRegistry;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var EntityReaderById */
-    private $reader;
-
-    /** @var ExportQueryProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $exportQueryProvider;
+    private ContextRegistry&MockObject $contextRegistry;
+    private EntityManagerMock $em;
+    private EntityReaderById $reader;
+    private ExportQueryProvider&MockObject $exportQueryProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -49,7 +43,7 @@ class EntityReaderByIdTest extends OrmTestCase
         );
     }
 
-    public function testInitialization()
+    public function testInitialization(): void
     {
         $entityName = Channel::class;
         $qb = $this->em->createQueryBuilder()

@@ -7,11 +7,11 @@ use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
 use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
+use PHPUnit\Framework\TestCase;
 
-class AclPrivilegeEntityFilterTest extends \PHPUnit\Framework\TestCase
+class AclPrivilegeEntityFilterTest extends TestCase
 {
-    /** @var AclPrivilegeEntityFilter */
-    private $filter;
+    private AclPrivilegeEntityFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +22,7 @@ class AclPrivilegeEntityFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isSupportedAclPrivilegeProvider
      */
-    public function testIsSupported(AclPrivilege $aclPrivilege, bool $isSupported)
+    public function testIsSupported(AclPrivilege $aclPrivilege, bool $isSupported): void
     {
         $this->assertSame($isSupported, $this->filter->isSupported($aclPrivilege));
     }
@@ -41,7 +41,7 @@ class AclPrivilegeEntityFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testFilter()
+    public function testFilter(): void
     {
         $aclPrivilege1 = (new AclPrivilege())->setIdentity(new AclPrivilegeIdentity('entity:test1'));
         $aclPrivilege2 = (new AclPrivilege())->setIdentity(new AclPrivilegeIdentity('entity:test2'));

@@ -6,11 +6,11 @@ namespace Oro\Component\ConfigExpression\Tests\Unit;
 
 use Oro\Component\ConfigExpression\AbstractExpression;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class AbstractExpressionTest extends \PHPUnit\Framework\TestCase
+class AbstractExpressionTest extends TestCase
 {
-    /** @var AbstractExpression */
-    private $condition;
+    private AbstractExpression $condition;
 
     #[\Override]
     protected function setUp(): void
@@ -46,13 +46,13 @@ class AbstractExpressionTest extends \PHPUnit\Framework\TestCase
         };
     }
 
-    public function testSetMessage()
+    public function testSetMessage(): void
     {
         $result = $this->condition->setMessage('Test Message');
         self::assertSame($this->condition, $result);
     }
 
-    public function testEvaluate()
+    public function testEvaluate(): void
     {
         // check that evaluate:
         // 1) allows something to be done with the passed errors object but then un-attaches itself from it
@@ -75,7 +75,7 @@ class AbstractExpressionTest extends \PHPUnit\Framework\TestCase
         self::assertSame($context, $result);
     }
 
-    public function testAddError()
+    public function testAddError(): void
     {
         $errors = new \ArrayObject();
         $this->condition->setMessage('test message');

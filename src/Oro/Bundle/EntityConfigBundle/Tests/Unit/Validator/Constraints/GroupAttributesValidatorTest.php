@@ -10,13 +10,13 @@ use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Validator\Constraints\GroupAttributes;
 use Oro\Bundle\EntityConfigBundle\Validator\Constraints\GroupAttributesValidator;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class GroupAttributesValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeManager;
+    private AttributeManager&MockObject $attributeManager;
 
     #[\Override]
     protected function setUp(): void

@@ -4,15 +4,16 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
+use PHPUnit\Framework\TestCase;
 
-class RegionTest extends \PHPUnit\Framework\TestCase
+class RegionTest extends TestCase
 {
-    public function testGetRegionCombinedCode()
+    public function testGetRegionCombinedCode(): void
     {
         $this->assertEquals('US-CA', Region::getRegionCombinedCode('US', 'CA'));
     }
 
-    public function testConstructorData()
+    public function testConstructorData(): void
     {
         $combinedCode = 'combinedCode';
 
@@ -20,7 +21,7 @@ class RegionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($combinedCode, $obj->getCombinedCode());
     }
 
-    public function testCountrySetter()
+    public function testCountrySetter(): void
     {
         $countryMock = $this->createMock(Country::class);
 
@@ -33,7 +34,7 @@ class RegionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider settersAndGettersDataProvider
      */
-    public function testSettersAndGetters(string $property)
+    public function testSettersAndGetters(string $property): void
     {
         $obj = new Region('combinedCode');
         $value = 'testValue';
@@ -51,7 +52,7 @@ class RegionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $obj = new Region('combinedCode');
         $obj->setName('name');

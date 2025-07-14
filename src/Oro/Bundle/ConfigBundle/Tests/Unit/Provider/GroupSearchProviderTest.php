@@ -5,18 +5,15 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Provider;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Provider\GroupSearchProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class GroupSearchProviderTest extends \PHPUnit\Framework\TestCase
+class GroupSearchProviderTest extends TestCase
 {
-    /** @var ConfigBag|\PHPUnit\Framework\MockObject\MockObject */
-    private $configBag;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translate;
-
-    /** @var GroupSearchProvider */
-    private $provider;
+    private ConfigBag&MockObject $configBag;
+    private TranslatorInterface&MockObject $translate;
+    private GroupSearchProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +24,7 @@ class GroupSearchProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new GroupSearchProvider($this->configBag, $this->translate);
     }
 
-    public function testSupportsTrue()
+    public function testSupportsTrue(): void
     {
         $this->configBag->expects($this->once())
             ->method('getGroupsNode')
@@ -37,7 +34,7 @@ class GroupSearchProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->provider->supports('test'));
     }
 
-    public function testSupportsFalse()
+    public function testSupportsFalse(): void
     {
         $this->configBag->expects($this->once())
             ->method('getGroupsNode')
@@ -47,7 +44,7 @@ class GroupSearchProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->provider->supports('test'));
     }
 
-    public function testGetData()
+    public function testGetData(): void
     {
         $this->configBag->expects($this->once())
             ->method('getGroupsNode')
@@ -62,7 +59,7 @@ class GroupSearchProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['Group Title'], $this->provider->getData('test'));
     }
 
-    public function testGetDataEmpty()
+    public function testGetDataEmpty(): void
     {
         $this->configBag->expects($this->once())
             ->method('getGroupsNode')
@@ -72,7 +69,7 @@ class GroupSearchProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $this->provider->getData('test'));
     }
 
-    public function testGetDataItemNotFoundException()
+    public function testGetDataItemNotFoundException(): void
     {
         $this->configBag->expects($this->once())
             ->method('getGroupsNode')

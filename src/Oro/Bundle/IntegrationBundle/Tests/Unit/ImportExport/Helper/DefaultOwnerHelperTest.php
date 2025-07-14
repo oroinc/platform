@@ -12,24 +12,19 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DefaultOwnerHelperTest extends \PHPUnit\Framework\TestCase
+class DefaultOwnerHelperTest extends TestCase
 {
     private const USER_OWNER_FIELD_NAME = 'owner';
     private const USER_OWNER_COLUMN_NAME = 'owner';
     private const ORGANIZATION_FIELD_NAME = 'organization';
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadataProvider;
-
-    /** @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject */
-    private $uow;
-
-    /** @var DefaultOwnerHelper */
-    private $helper;
+    private EntityManager&MockObject $em;
+    private OwnershipMetadataProviderInterface&MockObject $metadataProvider;
+    private UnitOfWork&MockObject $uow;
+    private DefaultOwnerHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -59,7 +54,7 @@ class DefaultOwnerHelperTest extends \PHPUnit\Framework\TestCase
         bool $expectedReload,
         bool $expectedSet,
         bool $expectedSetOrganization = false
-    ) {
+    ): void {
         $entity = new \stdClass();
         $owner = $integration->getDefaultUserOwner();
         $organization = $integration->getOrganization();

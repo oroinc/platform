@@ -8,16 +8,15 @@ use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\DefaultLabelListener;
 use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\EntityConfigHelper;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DefaultLabelListenerTest extends \PHPUnit\Framework\TestCase
+class DefaultLabelListenerTest extends TestCase
 {
     private const ENTITY_CLASS = 'Namespace\Entity';
 
-    /** @var EntityConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigHelper;
-
-    /** @var DefaultLabelListener */
-    private $listener;
+    private EntityConfigHelper&MockObject $entityConfigHelper;
+    private DefaultLabelListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class DefaultLabelListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testOnCreateMetadata()
+    public function testOnCreateMetadata(): void
     {
         $entityMetadata = $this->createMock(EntityMetadata::class);
         $entityMetadata->expects($this->once())

@@ -3,9 +3,10 @@
 namespace Oro\Bundle\TagBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\TagBundle\DependencyInjection\OroTagExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroTagExtensionTest extends \PHPUnit\Framework\TestCase
+class OroTagExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

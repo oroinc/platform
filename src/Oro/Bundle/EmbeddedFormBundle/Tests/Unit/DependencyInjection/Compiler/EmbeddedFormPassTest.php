@@ -3,12 +3,12 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\EmbeddedFormBundle\DependencyInjection\Compiler\EmbeddedFormPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class EmbeddedFormPassTest extends \PHPUnit\Framework\TestCase
+class EmbeddedFormPassTest extends TestCase
 {
-    /** @var EmbeddedFormPass */
-    private $compiler;
+    private EmbeddedFormPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -16,13 +16,13 @@ class EmbeddedFormPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new EmbeddedFormPass();
     }
 
-    public function testShouldDoNothingWhenThereIsNoManagerDefinition()
+    public function testShouldDoNothingWhenThereIsNoManagerDefinition(): void
     {
         $container = new ContainerBuilder();
         $this->compiler->process($container);
     }
 
-    public function testShouldDoNothingWhenThereAreNoTags()
+    public function testShouldDoNothingWhenThereAreNoTags(): void
     {
         $container = new ContainerBuilder();
         $container->register('oro_embedded_form.manager');
@@ -31,7 +31,7 @@ class EmbeddedFormPassTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $container->getDefinition('oro_embedded_form.manager')->getMethodCalls());
     }
 
-    public function testShouldAddTaggedFormTypes()
+    public function testShouldAddTaggedFormTypes(): void
     {
         $container = new ContainerBuilder();
         $container->register('oro_embedded_form.manager');

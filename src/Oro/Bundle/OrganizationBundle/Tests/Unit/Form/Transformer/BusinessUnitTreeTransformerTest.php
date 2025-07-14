@@ -7,11 +7,11 @@ use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTreeTransformer;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
+use PHPUnit\Framework\TestCase;
 
-class BusinessUnitTreeTransformerTest extends \PHPUnit\Framework\TestCase
+class BusinessUnitTreeTransformerTest extends TestCase
 {
-    /** @var BusinessUnitTreeTransformer */
-    private $transformer;
+    private BusinessUnitTreeTransformer $transformer;
 
     private $buManager;
 
@@ -23,7 +23,7 @@ class BusinessUnitTreeTransformerTest extends \PHPUnit\Framework\TestCase
         $this->transformer = new BusinessUnitTreeTransformer($this->buManager);
     }
 
-    public function testTransform()
+    public function testTransform(): void
     {
         $this->assertEquals(0, $this->transformer->transform(null));
         $bu1 = new BusinessUnit();
@@ -33,29 +33,29 @@ class BusinessUnitTreeTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertContains(2, $this->transformer->transform([$bu1, $bu2]));
     }
 
-    public function testTransformNullValue()
+    public function testTransformNullValue(): void
     {
         $this->assertNull($this->transformer->transform(null));
     }
 
-    public function testTransformZerValue()
+    public function testTransformZerValue(): void
     {
         $this->assertNull($this->transformer->transform(0));
     }
 
-    public function testTransformEmptyArray()
+    public function testTransformEmptyArray(): void
     {
         $this->assertSame([], $this->transformer->transform([]));
     }
 
-    public function testPlainValueTransform()
+    public function testPlainValueTransform(): void
     {
         $bu = new BusinessUnit();
         $bu->setId(1);
         $this->assertEquals(1, $this->transformer->transform($bu));
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $testResult = new ArrayCollection();
         $bu1 = new BusinessUnit();
@@ -85,22 +85,22 @@ class BusinessUnitTreeTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($bu, $this->transformer->reverseTransform(1));
     }
 
-    public function testReverseTransformZeroValue()
+    public function testReverseTransformZeroValue(): void
     {
         $this->assertNull($this->transformer->reverseTransform(0));
     }
 
-    public function testReverseTransformNullValue()
+    public function testReverseTransformNullValue(): void
     {
         $this->assertNull($this->transformer->reverseTransform(null));
     }
 
-    public function testReverseTransformEmptyArray()
+    public function testReverseTransformEmptyArray(): void
     {
         $this->assertNull($this->transformer->reverseTransform([]));
     }
 
-    public function testReverseTransformEmptyInArray()
+    public function testReverseTransformEmptyInArray(): void
     {
         $buRepo = $this->createMock(BusinessUnitRepository::class);
         $this->buManager->expects($this->any())

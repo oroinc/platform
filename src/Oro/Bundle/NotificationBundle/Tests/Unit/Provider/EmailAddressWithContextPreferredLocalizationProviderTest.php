@@ -7,14 +7,13 @@ use Oro\Bundle\LocaleBundle\Provider\PreferredLocalizationProviderInterface;
 use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
 use Oro\Bundle\NotificationBundle\Provider\EmailAddressWithContextPreferredLocalizationProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmailAddressWithContextPreferredLocalizationProviderTest extends \PHPUnit\Framework\TestCase
+class EmailAddressWithContextPreferredLocalizationProviderTest extends TestCase
 {
-    /** @var PreferredLocalizationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerProvider;
-
-    /** @var EmailAddressWithContextPreferredLocalizationProvider */
-    private $provider;
+    private PreferredLocalizationProviderInterface&MockObject $innerProvider;
+    private EmailAddressWithContextPreferredLocalizationProvider $provider;
 
     #[\Override]
     protected function setUp(): void

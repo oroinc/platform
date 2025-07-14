@@ -7,30 +7,21 @@ use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker;
 use Oro\Bundle\SecurityBundle\Metadata\AclAttributeProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
+class AuthorizationCheckerTest extends TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerAuthorizationChecker;
-
-    /** @var ObjectIdentityFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $objectIdentityFactory;
-
-    /** @var AclAttributeProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeProvider;
-
-    /** @var AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $groupProvider;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var AuthorizationChecker */
-    private $authorizationChecker;
+    private AuthorizationCheckerInterface&MockObject $innerAuthorizationChecker;
+    private ObjectIdentityFactory&MockObject $objectIdentityFactory;
+    private AclAttributeProvider&MockObject $attributeProvider;
+    private AclGroupProviderInterface&MockObject $groupProvider;
+    private LoggerInterface&MockObject $logger;
+    private AuthorizationChecker $authorizationChecker;
 
     #[\Override]
     protected function setUp(): void

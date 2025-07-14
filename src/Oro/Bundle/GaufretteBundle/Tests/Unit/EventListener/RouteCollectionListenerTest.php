@@ -5,12 +5,13 @@ namespace Oro\Bundle\GaufretteBundle\Tests\Unit\EventListener;
 use Oro\Bundle\DistributionBundle\Event\RouteCollectionEvent;
 use Oro\Bundle\GaufretteBundle\Controller\PublicFileController;
 use Oro\Bundle\GaufretteBundle\EventListener\RouteCollectionListener;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-class RouteCollectionListenerTest extends \PHPUnit\Framework\TestCase
+class RouteCollectionListenerTest extends TestCase
 {
-    public function testOnCollectionAutoload()
+    public function testOnCollectionAutoload(): void
     {
         $collection = new RouteCollection();
         $existingRoute = new Route('test', ['_controller' => 'AcmeDemoBundle:Test:get']);

@@ -5,10 +5,11 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class NavigationItemTest extends \PHPUnit\Framework\TestCase
+class NavigationItemTest extends TestCase
 {
-    public function testNavigationItemEntity()
+    public function testNavigationItemEntity(): void
     {
         $organization = new Organization();
         $user = new User();
@@ -40,7 +41,7 @@ class NavigationItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($dateTime, $item->getCreatedAt());
     }
 
-    public function testDoPrePersist()
+    public function testDoPrePersist(): void
     {
         $item = new NavigationItem();
         $item->doPrePersist();
@@ -50,7 +51,7 @@ class NavigationItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($item->getCreatedAt(), $item->getUpdatedAt());
     }
 
-    public function testDoPreUpdate()
+    public function testDoPreUpdate(): void
     {
         $item = new NavigationItem();
         $item->doPreUpdate();

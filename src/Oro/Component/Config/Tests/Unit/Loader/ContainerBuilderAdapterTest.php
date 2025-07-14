@@ -3,16 +3,15 @@
 namespace Oro\Component\Config\Tests\Unit\Loader;
 
 use Oro\Component\Config\Loader\ContainerBuilderAdapter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class ContainerBuilderAdapterTest extends \PHPUnit\Framework\TestCase
+class ContainerBuilderAdapterTest extends TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var ContainerBuilderAdapter */
-    private $adapter;
+    private ContainerBuilder&MockObject $container;
+    private ContainerBuilderAdapter $adapter;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class ContainerBuilderAdapterTest extends \PHPUnit\Framework\TestCase
         $this->adapter = new ContainerBuilderAdapter($this->container);
     }
 
-    public function testGetResources()
+    public function testGetResources(): void
     {
         $resources = [$this->createMock(ResourceInterface::class)];
         $this->container->expects(self::once())
@@ -30,7 +29,7 @@ class ContainerBuilderAdapterTest extends \PHPUnit\Framework\TestCase
         self::assertSame($resources, $this->adapter->getResources());
     }
 
-    public function testAddResource()
+    public function testAddResource(): void
     {
         $resource = $this->createMock(ResourceInterface::class);
         $this->container->expects(self::once())

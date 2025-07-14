@@ -21,14 +21,9 @@ class AddressCountryAndRegionSubscriberTest extends TestCase
 {
     private const TEST_COUNTRY_NAME = 'testCountry';
 
-    /** @var ObjectManager|MockObject */
-    private $om;
-
-    /** @var FormFactoryInterface|MockObject */
-    private $formBuilder;
-
-    /** @var AddressCountryAndRegionSubscriber */
-    private $subscriber;
+    private ObjectManager&MockObject $om;
+    private FormFactoryInterface&MockObject $formBuilder;
+    private AddressCountryAndRegionSubscriber $subscriber;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +34,7 @@ class AddressCountryAndRegionSubscriberTest extends TestCase
         $this->subscriber = new AddressCountryAndRegionSubscriber($this->om, $this->formBuilder);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $result = $this->subscriber->getSubscribedEvents();
 
@@ -48,7 +43,7 @@ class AddressCountryAndRegionSubscriberTest extends TestCase
         $this->assertArrayHasKey(FormEvents::PRE_SUBMIT, $result);
     }
 
-    public function testPreSetDataEmptyAddress()
+    public function testPreSetDataEmptyAddress(): void
     {
         $eventMock = $this->createMock(FormEvent::class);
 
@@ -61,7 +56,7 @@ class AddressCountryAndRegionSubscriberTest extends TestCase
         $this->subscriber->preSetData($eventMock);
     }
 
-    public function testPreSetDataEmptyCountry()
+    public function testPreSetDataEmptyCountry(): void
     {
         $eventMock = $this->createMock(FormEvent::class);
 
@@ -79,7 +74,7 @@ class AddressCountryAndRegionSubscriberTest extends TestCase
         $this->subscriber->preSetData($eventMock);
     }
 
-    public function testPreSetDataHasRegion()
+    public function testPreSetDataHasRegion(): void
     {
         $eventMock = $this->createMock(FormEvent::class);
 
@@ -141,7 +136,7 @@ class AddressCountryAndRegionSubscriberTest extends TestCase
         $this->subscriber->preSetData($eventMock);
     }
 
-    public function testPreSetDataNoRegion()
+    public function testPreSetDataNoRegion(): void
     {
         $eventMock = $this->createMock(FormEvent::class);
 
@@ -183,7 +178,7 @@ class AddressCountryAndRegionSubscriberTest extends TestCase
         $this->subscriber->preSetData($eventMock);
     }
 
-    public function testPreSubmitData()
+    public function testPreSubmitData(): void
     {
         $eventMock = $this->createMock(FormEvent::class);
 
@@ -252,7 +247,7 @@ class AddressCountryAndRegionSubscriberTest extends TestCase
     /**
      * Cover scenario when country has not any stored region and region filled as text field
      */
-    public function testPreSubmitDataTextScenario()
+    public function testPreSubmitDataTextScenario(): void
     {
         $eventMock = $this->createMock(FormEvent::class);
 

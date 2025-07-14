@@ -7,13 +7,13 @@ use Oro\Bundle\OrganizationBundle\Validator\Constraints\ParentBusinessUnit;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\ParentBusinessUnitValidator;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class ParentBusinessUnitValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var OwnerTreeInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownerTree;
+    private OwnerTreeInterface&MockObject $ownerTree;
 
     #[\Override]
     protected function setUp(): void

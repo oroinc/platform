@@ -8,20 +8,15 @@ use Oro\Component\Action\Action\ActionAssembler;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ProcessTest extends \PHPUnit\Framework\TestCase
+class ProcessTest extends TestCase
 {
-    /** @var ProcessDefinition|\PHPUnit\Framework\MockObject\MockObject */
-    private $processDefinition;
-
-    /** @var ExpressionFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $conditionFactory;
-
-    /** @var ActionAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    private $actionAssembler;
-
-    /** @var Process */
-    private $process;
+    private ProcessDefinition&MockObject $processDefinition;
+    private ExpressionFactory&MockObject $conditionFactory;
+    private ActionAssembler&MockObject $actionAssembler;
+    private Process $process;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +28,7 @@ class ProcessTest extends \PHPUnit\Framework\TestCase
         $this->process = new Process($this->actionAssembler, $this->conditionFactory, $this->processDefinition);
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $context = ['context'];
         $configuration = ['config'];
@@ -54,7 +49,7 @@ class ProcessTest extends \PHPUnit\Framework\TestCase
         $this->process->execute($context);
     }
 
-    public function testIsApplicableNoPreConditionsSection()
+    public function testIsApplicableNoPreConditionsSection(): void
     {
         $expectedConditionConfiguration = [
             '@feature_resource_enabled' => [
@@ -69,7 +64,7 @@ class ProcessTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->process->isApplicable([]));
     }
 
-    public function testIsApplicableNoPreConditions()
+    public function testIsApplicableNoPreConditions(): void
     {
         $context = [];
         $conditionConfiguration = null;
@@ -91,7 +86,7 @@ class ProcessTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->process->isApplicable($context));
     }
 
-    public function testIsApplicable()
+    public function testIsApplicable(): void
     {
         $context = [];
         $conditionConfiguration = ['test' => []];
@@ -125,7 +120,7 @@ class ProcessTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->process->isApplicable($context));
     }
 
-    public function testExecutePreConditionsAreNotMet()
+    public function testExecutePreConditionsAreNotMet(): void
     {
         $context = [];
         $conditionConfiguration = ['test' => []];

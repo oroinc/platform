@@ -12,6 +12,8 @@ use Oro\Bundle\LocaleBundle\Form\EventSubscriber\LocalizedFallbackValueCollectio
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Stub\LocalizationStub;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Event\PreSetDataEvent;
 use Symfony\Component\Form\Event\SubmitEvent;
 use Symfony\Component\Form\FormEvents;
@@ -20,11 +22,10 @@ use Symfony\Component\Form\FormInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class LocalizedFallbackValueCollectionClearingSubscriberTest extends \PHPUnit\Framework\TestCase
+class LocalizedFallbackValueCollectionClearingSubscriberTest extends TestCase
 {
+    private EntityManagerInterface&MockObject $entityManager;
     private LocalizedFallbackValueCollectionClearingSubscriber $subscriber;
-
-    private EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     #[\Override]
     protected function setUp(): void
@@ -32,8 +33,7 @@ class LocalizedFallbackValueCollectionClearingSubscriberTest extends \PHPUnit\Fr
         $this->subscriber = new LocalizedFallbackValueCollectionClearingSubscriber();
 
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->entityManager
-            ->expects(self::any())
+        $this->entityManager->expects(self::any())
             ->method('getUnitOfWork')
             ->willReturn($this->createMock(UnitOfWork::class));
     }

@@ -16,35 +16,22 @@ use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationCache;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class TranslationManagerTest extends \PHPUnit\Framework\TestCase
+class TranslationManagerTest extends TestCase
 {
-    /** @var TranslationDomainProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $domainProvider;
-
-    /** @var DynamicTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $dynamicTranslationCache;
-
-    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $producer;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var TranslationKeyRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationKeyRepository;
-
-    /** @var TranslationRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationRepository;
-
-    /** @var LanguageRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $languageRepository;
-
-    /** @var TranslationManager */
-    private $translationManager;
+    private TranslationDomainProvider&MockObject $domainProvider;
+    private DynamicTranslationCache&MockObject $dynamicTranslationCache;
+    private MessageProducerInterface&MockObject $producer;
+    private EntityManager&MockObject $entityManager;
+    private TranslationKeyRepository&MockObject $translationKeyRepository;
+    private TranslationRepository&MockObject $translationRepository;
+    private LanguageRepository&MockObject $languageRepository;
+    private TranslationManager $translationManager;
 
     #[\Override]
     protected function setUp(): void
@@ -101,7 +88,7 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
         return $translation;
     }
 
-    public function testFindTranslationKey()
+    public function testFindTranslationKey(): void
     {
         $key = 'key';
         $domain = TranslationManager::DEFAULT_DOMAIN;
@@ -121,7 +108,7 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($translationKey1, $translationKey2);
     }
 
-    public function testSaveTranslation()
+    public function testSaveTranslation(): void
     {
         $key = 'key';
         $value = 'value';
@@ -150,7 +137,7 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($translation1, $translation2);
     }
 
-    public function testCreateTranslation()
+    public function testCreateTranslation(): void
     {
         $key = 'key';
         $value = 'value';
@@ -179,7 +166,7 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedTranslation, $translation);
     }
 
-    public function testFlush()
+    public function testFlush(): void
     {
         $translationKey = (new TranslationKey())->setKey('key')->setDomain('domain');
 
@@ -212,7 +199,7 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
         $this->translationManager->flush();
     }
 
-    public function testFlushWhenJsTranslationsChanged()
+    public function testFlushWhenJsTranslationsChanged(): void
     {
         $translationKey = (new TranslationKey())->setKey('key')->setDomain('jsmessages');
 
@@ -246,7 +233,7 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
         $this->translationManager->flush();
     }
 
-    public function testFlushTranslationWithoutValue()
+    public function testFlushTranslationWithoutValue(): void
     {
         $key = 'test.key';
         $value = null;
@@ -282,7 +269,7 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
         $this->translationManager->flush();
     }
 
-    public function testFlushWithoutChanges()
+    public function testFlushWithoutChanges(): void
     {
         $this->entityManager->expects($this->never())
             ->method($this->anything());
@@ -294,7 +281,7 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
         $this->translationManager->flush();
     }
 
-    public function testForceFlush()
+    public function testForceFlush(): void
     {
         $this->entityManager->expects($this->once())
             ->method('flush');
@@ -302,7 +289,7 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
         $this->translationManager->flush(true);
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $this->translationRepository->expects($this->any())
             ->method('findTranslation')
@@ -321,7 +308,7 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
         $this->translationManager->flush();
     }
 
-    public function testInvalidateCache()
+    public function testInvalidateCache(): void
     {
         $locale = 'en';
 
@@ -332,7 +319,7 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
         $this->translationManager->invalidateCache($locale);
     }
 
-    public function testRemoveMissingTranslationKey()
+    public function testRemoveMissingTranslationKey(): void
     {
         $nonExistingKey = uniqid('KEY_', true);
         $nonExistingDomain = uniqid('KEY_', true);

@@ -17,26 +17,19 @@ use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowDataNormalizer;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowDataSerializer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
+class WorkflowDataNormalizerTest extends TestCase
 {
-    /** @var AttributeNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeNormalizer;
-
-    /** @var WorkflowAwareSerializer|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializer;
-
-    /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflow;
-
-    /** @var Attribute|\PHPUnit\Framework\MockObject\MockObject */
-    private $attribute;
-
-    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeManager;
+    private AttributeNormalizer&MockObject $attributeNormalizer;
+    private WorkflowAwareSerializer&MockObject $serializer;
+    private Workflow&MockObject $workflow;
+    private Attribute&MockObject $attribute;
+    private AttributeManager&MockObject $attributeManager;
 
     #[\Override]
     protected function setUp(): void
@@ -83,7 +76,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeDirectionDataProvider
      */
-    public function testNormalizeExceptionCantGetWorkflow(string $direction)
+    public function testNormalizeExceptionCantGetWorkflow(string $direction): void
     {
         $this->expectException(SerializerException::class);
         $this->expectExceptionMessage(sprintf(
@@ -103,7 +96,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeDirectionDataProvider
      */
-    public function testNormalizeExceptionNoAttribute(string $direction)
+    public function testNormalizeExceptionNoAttribute(string $direction): void
     {
         $data = new WorkflowData(['foo' => 'bar']);
         $workflowName = 'test_workflow';
@@ -140,7 +133,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeDirectionDataProvider
      */
-    public function testNormalizeExceptionNoAttributeNormalizer(string $direction)
+    public function testNormalizeExceptionNoAttributeNormalizer(string $direction): void
     {
         $workflowName = 'test_workflow';
         $attributeName = 'test_attribute';
@@ -184,7 +177,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $denormalizedValue = ['denormalized_value'];
         $normalizedValue = ['normalized_value'];
@@ -220,7 +213,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNormalizeTriggersSerializer()
+    public function testNormalizeTriggersSerializer(): void
     {
         $denormalizedValue = 'denormalized_value';
         $normalizedValue = ['normalized_value'];
@@ -265,7 +258,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $attributeName = 'test_attribute';
         $data = [$attributeName => 'normalized_value'];
@@ -306,7 +299,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsNormalizationDataProvider
      */
-    public function testSupportsNormalization(mixed $data, bool $expected)
+    public function testSupportsNormalization(mixed $data, bool $expected): void
     {
         $normalizer = $this->getWorkflowDataNormalizer();
         $this->assertEquals($expected, $normalizer->supportsNormalization($data, 'any_value'));
@@ -326,7 +319,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization(?string $type, bool $expected)
+    public function testSupportsDenormalization(?string $type, bool $expected): void
     {
         $normalizer = $this->getWorkflowDataNormalizer();
         $this->assertEquals($expected, $normalizer->supportsDenormalization('any_value', $type));

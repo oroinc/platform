@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Type;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationSelectType;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\Testing\Unit\ORM\Mocks\EntityManagerMock;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
@@ -19,17 +20,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IntegrationSelectTypeTest extends OrmTestCase
 {
-    /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var Packages|\PHPUnit\Framework\MockObject\MockObject */
-    private $assetHelper;
-
-    /** @var IntegrationSelectType */
-    private $type;
+    private TypesRegistry&MockObject $registry;
+    private EntityManagerMock $em;
+    private Packages&MockObject $assetHelper;
+    private IntegrationSelectType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -49,17 +43,17 @@ class IntegrationSelectTypeTest extends OrmTestCase
         );
     }
 
-    public function testName()
+    public function testName(): void
     {
         $this->assertSame('oro_integration_select', $this->type->getName());
     }
 
-    public function testParent()
+    public function testParent(): void
     {
         $this->assertSame(Select2ChoiceType::class, $this->type->getParent());
     }
 
-    public function testFinishView()
+    public function testFinishView(): void
     {
         $this->registry->expects($this->once())
             ->method('getAvailableIntegrationTypesDetailedData')
@@ -104,7 +98,7 @@ class IntegrationSelectTypeTest extends OrmTestCase
         );
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = new OptionsResolver();
         $this->type->configureOptions($resolver);

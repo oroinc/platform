@@ -6,10 +6,11 @@ use Oro\Bundle\EntityConfigBundle\Async\Topic\AttributePreImportTopic;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\ImportExport\Configuration\AttributeImportExportConfigurationProvider;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfiguration as Config;
+use PHPUnit\Framework\TestCase;
 
-class AttributeImportExportConfigurationProviderTest extends \PHPUnit\Framework\TestCase
+class AttributeImportExportConfigurationProviderTest extends TestCase
 {
-    public function testGet()
+    public function testGet(): void
     {
         self::assertEquals(
             new Config([

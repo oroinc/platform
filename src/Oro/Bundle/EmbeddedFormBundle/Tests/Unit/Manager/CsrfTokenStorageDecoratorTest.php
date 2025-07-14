@@ -4,28 +4,23 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\EmbeddedFormBundle\Manager\CsrfTokenStorage;
 use Oro\Bundle\EmbeddedFormBundle\Manager\CsrfTokenStorageDecorator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
-class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
+class CsrfTokenStorageDecoratorTest extends TestCase
 {
     private const TEST_PHP_SESSION_NAME = 'test_php_sid';
     private const TEST_ROUTE_NAME = 'test_route';
     private const TEST_CSRF_TOKEN_ID = 'test_token_id';
 
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $mainTokenStorage;
-
-    /** @var CsrfTokenStorage|\PHPUnit\Framework\MockObject\MockObject */
-    private $embeddedFormTokenStorage;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var CsrfTokenStorageDecorator */
-    private $csrfTokenStorageDecorator;
+    private TokenStorageInterface&MockObject $mainTokenStorage;
+    private CsrfTokenStorage&MockObject $embeddedFormTokenStorage;
+    private RequestStack&MockObject $requestStack;
+    private CsrfTokenStorageDecorator $csrfTokenStorageDecorator;
 
     #[\Override]
     protected function setUp(): void

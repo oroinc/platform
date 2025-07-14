@@ -13,10 +13,11 @@ use PHPUnit\Framework\TestCase;
 
 class OperationAclResourceGuardListenerTest extends TestCase
 {
-    private ActionExecutor|MockObject $actionExecutor;
-    private OptionsResolver|MockObject $optionsResolver;
+    private ActionExecutor&MockObject $actionExecutor;
+    private OptionsResolver&MockObject $optionsResolver;
     private OperationAclResourceGuardListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->actionExecutor = $this->createMock(ActionExecutor::class);

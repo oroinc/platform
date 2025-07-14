@@ -6,15 +6,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\WorkflowBundle\Formatter\WorkflowVariableFormatter;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class WorkflowVariableFormatterTest extends \PHPUnit\Framework\TestCase
+class WorkflowVariableFormatterTest extends TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var WorkflowVariableFormatter */
-    private $formatter;
+    private TranslatorInterface&MockObject $translator;
+    private WorkflowVariableFormatter $formatter;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +31,7 @@ class WorkflowVariableFormatterTest extends \PHPUnit\Framework\TestCase
         ?string $type,
         string $expected,
         bool $expectedTranslate = false
-    ) {
+    ): void {
         $variable = $this->createMock(Variable::class);
         $variable->expects($this->once())
             ->method('getValue')

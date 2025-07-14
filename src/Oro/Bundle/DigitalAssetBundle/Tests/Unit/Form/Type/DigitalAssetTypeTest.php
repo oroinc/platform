@@ -17,6 +17,7 @@ use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizationCollectionType
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
@@ -28,11 +29,8 @@ class DigitalAssetTypeTest extends FormIntegrationTestCase
 {
     private const SAMPLE_TITLE = 'sample title';
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var DigitalAssetType */
-    private $formType;
+    private TranslatorInterface&MockObject $translator;
+    private DigitalAssetType $formType;
 
     #[\Override]
     protected function setUp(): void

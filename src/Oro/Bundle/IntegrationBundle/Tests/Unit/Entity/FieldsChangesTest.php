@@ -4,11 +4,11 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\IntegrationBundle\Entity\FieldsChanges;
+use PHPUnit\Framework\TestCase;
 
-class FieldsChangesTest extends \PHPUnit\Framework\TestCase
+class FieldsChangesTest extends TestCase
 {
-    /** @var FieldsChanges */
-    private $entity;
+    private FieldsChanges $entity;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class FieldsChangesTest extends \PHPUnit\Framework\TestCase
         $this->entity = new FieldsChanges([]);
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertNull($this->entity->getId());
     }
@@ -24,7 +24,7 @@ class FieldsChangesTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider entityDataProvider
      */
-    public function testSetGet(string $property, mixed $value)
+    public function testSetGet(string $property, mixed $value): void
     {
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
@@ -50,7 +50,7 @@ class FieldsChangesTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider constructDataProvider
      */
-    public function testConstruct(array $fields)
+    public function testConstruct(array $fields): void
     {
         $fieldsChanges = new FieldsChanges($fields);
         $this->assertEquals($fields, $fieldsChanges->getChangedFields());

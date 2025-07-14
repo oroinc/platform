@@ -14,19 +14,16 @@ use Oro\Bundle\ImportExportBundle\Writer\DoctrineClearWriter;
 use Oro\Bundle\ImportExportBundle\Writer\XlsxFileWriter;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
+class XlsxFileWriterTest extends TestCase
 {
     use TempDirExtension;
 
-    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextRegistry;
-
-    /** @var DoctrineClearWriter|\PHPUnit\Framework\MockObject\MockObject */
-    private $clearWriter;
-
-    /** @var XlsxFileWriter */
-    private $writer;
+    private ContextRegistry&MockObject $contextRegistry;
+    private DoctrineClearWriter&MockObject $clearWriter;
+    private XlsxFileWriter $writer;
 
     #[\Override]
     protected function setUp(): void
@@ -44,7 +41,7 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer->close();
     }
 
-    public function testSetStepExecutionNoFileException()
+    public function testSetStepExecutionNoFileException(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Configuration of XLSX writer must contain "filePath".');
@@ -52,7 +49,7 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer->setStepExecution($this->getStepExecution([]));
     }
 
-    public function testUnknownFileException()
+    public function testUnknownFileException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->writer->setStepExecution(
@@ -60,7 +57,7 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetStepExecution()
+    public function testSetStepExecution(): void
     {
         $options = [
             'filePath'          => $this->getFilePath(),
@@ -86,7 +83,7 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testWrite(array $options, array $data, string $expected)
+    public function testWrite(array $options, array $data, string $expected): void
     {
         $stepExecution = $this->getStepExecution($options);
         $this->writer->setStepExecution($stepExecution);
@@ -149,7 +146,7 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testWriteWithClearWriter(array $options, array $data, string $expected)
+    public function testWriteWithClearWriter(array $options, array $data, string $expected): void
     {
         $stepExecution = $this->getStepExecution($options);
         $this->writer->setStepExecution($stepExecution);

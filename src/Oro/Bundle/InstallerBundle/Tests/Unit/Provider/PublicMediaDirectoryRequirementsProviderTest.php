@@ -3,9 +3,10 @@
 namespace Oro\Bundle\InstallerBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\InstallerBundle\Provider\PublicMediaDirectoryRequirementsProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Requirements\RequirementCollection;
 
-class PublicMediaDirectoryRequirementsProviderTest extends \PHPUnit\Framework\TestCase
+class PublicMediaDirectoryRequirementsProviderTest extends TestCase
 {
     private string $mediaDirectory;
     private PublicMediaDirectoryRequirementsProvider $provider;

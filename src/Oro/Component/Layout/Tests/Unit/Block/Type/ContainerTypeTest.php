@@ -7,7 +7,7 @@ use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
 
 class ContainerTypeTest extends BaseBlockTypeTestCase
 {
-    public function testBuildViewWithoutOptions()
+    public function testBuildViewWithoutOptions(): void
     {
         $view = $this->getBlockBuilder(ContainerType::NAME, [])
             ->getBlockView();
@@ -38,7 +38,7 @@ class ContainerTypeTest extends BaseBlockTypeTestCase
         );
     }
 
-    public function testBuildView()
+    public function testBuildView(): void
     {
         $options = [
             'attr'               => ['test_attr' => 'test_attr_val'],

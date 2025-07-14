@@ -3,12 +3,12 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Form;
 
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsChoiceType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-class WidgetItemsChoiceTypeTest extends \PHPUnit\Framework\TestCase
+class WidgetItemsChoiceTypeTest extends TestCase
 {
-    /** @var WidgetItemsChoiceType */
-    private $formType;
+    private WidgetItemsChoiceType $formType;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class WidgetItemsChoiceTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType = new WidgetItemsChoiceType();
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(ChoiceType::class, $this->formType->getParent());
     }

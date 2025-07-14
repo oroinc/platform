@@ -7,8 +7,10 @@ use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionScopeListener;
 use Oro\Bundle\WorkflowBundle\Scope\WorkflowScopeManager;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowDefinitionScopeListenerTest extends \PHPUnit\Framework\TestCase
+class WorkflowDefinitionScopeListenerTest extends TestCase
 {
     use EntityTrait;
 
@@ -16,11 +18,8 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit\Framework\TestCase
     private const ENTITY_CLASS = 'stdClass';
     private const ENTITY_ID = 42;
 
-    /** @var WorkflowScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowScopeManager;
-
-    /** @var WorkflowDefinitionScopeListener */
-    private $listener;
+    private WorkflowScopeManager&MockObject $workflowScopeManager;
+    private WorkflowDefinitionScopeListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new WorkflowDefinitionScopeListener($this->workflowScopeManager);
     }
 
-    public function testOnActivationWorkflowDefinition()
+    public function testOnActivationWorkflowDefinition(): void
     {
         $event = new WorkflowChangesEvent($this->createWorkflowDefinition());
 
@@ -41,7 +40,7 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onActivationWorkflowDefinition($event);
     }
 
-    public function testOnDeactivationWorkflowDefinition()
+    public function testOnDeactivationWorkflowDefinition(): void
     {
         $event = new WorkflowChangesEvent($this->createWorkflowDefinition());
 
@@ -52,7 +51,7 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onDeactivationWorkflowDefinition($event);
     }
 
-    public function testOnCreateWorkflowDefinitionWithEmptyScopesConfig()
+    public function testOnCreateWorkflowDefinitionWithEmptyScopesConfig(): void
     {
         $event = new WorkflowChangesEvent($this->createWorkflowDefinition());
 
@@ -68,7 +67,7 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit\Framework\TestCase
      * @param WorkflowDefinition $definition
      * @param bool $expectedReset
      */
-    public function testOnCreateWorkflowDefinition(WorkflowDefinition $definition, $expectedReset)
+    public function testOnCreateWorkflowDefinition(WorkflowDefinition $definition, $expectedReset): void
     {
         $this->workflowScopeManager->expects($this->once())
             ->method('updateScopes')
@@ -77,7 +76,7 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onCreateWorkflowDefinition(new WorkflowChangesEvent($definition));
     }
 
-    public function testOnUpdateWorkflowDefinitionWithoutScopesConfigChanges()
+    public function testOnUpdateWorkflowDefinitionWithoutScopesConfigChanges(): void
     {
         $this->workflowScopeManager->expects($this->never())
             ->method($this->anything());
@@ -104,7 +103,7 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit\Framework\TestCase
      * @param WorkflowDefinition $definition
      * @param bool $expectedReset
      */
-    public function testOnUpdateWorkflowDefinition(WorkflowDefinition $definition, $expectedReset)
+    public function testOnUpdateWorkflowDefinition(WorkflowDefinition $definition, $expectedReset): void
     {
         $this->workflowScopeManager->expects($this->once())
             ->method('updateScopes')

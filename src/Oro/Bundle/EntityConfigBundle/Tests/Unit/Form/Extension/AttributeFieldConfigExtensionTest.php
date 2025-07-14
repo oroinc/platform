@@ -8,6 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeFieldConfigExtension;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -15,11 +16,8 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class AttributeFieldConfigExtensionTest extends TypeTestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeConfigProvider;
-
-    /** @var AttributeFieldConfigExtension */
-    private $extension;
+    private ConfigProvider&MockObject $attributeConfigProvider;
+    private AttributeFieldConfigExtension $extension;
 
     #[\Override]
     protected function setUp(): void

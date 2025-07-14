@@ -3,12 +3,12 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\EntityFallbackFieldsStoragePass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class EntityFallbackFieldsStoragePassTest extends \PHPUnit\Framework\TestCase
+class EntityFallbackFieldsStoragePassTest extends TestCase
 {
-    /** @var ContainerBuilder */
-    private $container;
+    private ContainerBuilder $container;
 
     #[\Override]
     protected function setUp(): void

@@ -6,14 +6,13 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Provider\SelectedFields\SelectedFieldsProvider;
 use Oro\Bundle\DataGridBundle\Provider\SelectedFields\SelectedFieldsProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SelectedFieldsProviderTest extends \PHPUnit\Framework\TestCase
+class SelectedFieldsProviderTest extends TestCase
 {
-    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagridConfiguration;
-
-    /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagridParameters;
+    private DatagridConfiguration&MockObject $datagridConfiguration;
+    private ParameterBag&MockObject $datagridParameters;
 
     #[\Override]
     protected function setUp(): void

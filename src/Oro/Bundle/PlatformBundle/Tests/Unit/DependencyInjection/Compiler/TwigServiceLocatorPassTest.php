@@ -6,6 +6,7 @@ use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\TwigServiceLocatorPas
 use Oro\Bundle\PlatformBundle\Tests\Unit\Stub\TwigExtensionStub1;
 use Oro\Bundle\PlatformBundle\Tests\Unit\Stub\TwigExtensionStub2;
 use Oro\Bundle\PlatformBundle\Twig\PlatformExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
@@ -13,10 +14,9 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\ExtensionInterface;
 
-class TwigServiceLocatorPassTest extends \PHPUnit\Framework\TestCase
+class TwigServiceLocatorPassTest extends TestCase
 {
-    /** @var TwigServiceLocatorPass */
-    private $compiler;
+    private TwigServiceLocatorPass $compiler;
 
     #[\Override]
     protected function setUp(): void

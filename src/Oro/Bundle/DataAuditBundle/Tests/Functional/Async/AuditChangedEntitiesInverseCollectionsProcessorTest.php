@@ -82,13 +82,17 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
 
         $logger->expects($this->once())->method('warning');
         $exception = new WrongDataAuditEntryStateException((new Audit())->setObjectName('ObjectName'));
-        $converter->method('convert')->willThrowException($exception);
+        $converter->expects(self::any())
+            ->method('convert')
+            ->willThrowException($exception);
 
         $processResult = $chunkProcessor->process($message, $session);
         $this->assertEquals(AuditChangedEntitiesInverseCollectionsChunkProcessor::REQUEUE, $processResult);
 
         $logger->expects($this->once())->method('error');
-        $converter->method('convert')->willThrowException(new \Exception('exception'));
+        $converter->expects(self::any())
+            ->method('convert')
+            ->willThrowException(new \Exception('exception'));
         $processResult = $chunkProcessor->process($message, $session);
         $this->assertEquals(AuditChangedEntitiesInverseCollectionsChunkProcessor::REJECT, $processResult);
     }

@@ -8,12 +8,12 @@ use Oro\Component\MessageQueue\Consumption\Extension\UniqueJobsProcessedExtensio
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class UniqueJobsProcessedExtensionTest extends \PHPUnit\Framework\TestCase
+class UniqueJobsProcessedExtensionTest extends TestCase
 {
     private MockObject $jobManager;
-
     private Context $context;
 
     #[\Override]
@@ -23,12 +23,13 @@ class UniqueJobsProcessedExtensionTest extends \PHPUnit\Framework\TestCase
         $this->context = $this->createContext();
     }
 
-    public function testThatConsumerIsInterruptedWhenUniqueJobsAreProcessed()
+    public function testThatConsumerIsInterruptedWhenUniqueJobsAreProcessed(): void
     {
-        $this->jobManager->method('getUniqueJobs')->willReturn([]);
+        $this->jobManager->expects(self::any())
+            ->method('getUniqueJobs')
+            ->willReturn([]);
 
-        $this->context->getLogger()
-            ->expects($this->once())
+        $this->context->getLogger()->expects($this->once())
             ->method('debug')
             ->with('Consumer has been stopped because all unique jobs have been processed');
 
@@ -43,11 +44,14 @@ class UniqueJobsProcessedExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Unique jobs are processed.', $this->context->getInterruptedReason());
     }
 
-    public function testThatConsumerIsNotInterruptedWhenUniqueJobsAreNotProcessed()
+    public function testThatConsumerIsNotInterruptedWhenUniqueJobsAreNotProcessed(): void
     {
-        $this->jobManager->method('getUniqueJobs')->willReturn(['test_root_job']);
+        $this->jobManager->expects(self::any())
+            ->method('getUniqueJobs')
+            ->willReturn(['test_root_job']);
 
-        $this->context->getLogger()->expects($this->never())->method('debug');
+        $this->context->getLogger()->expects($this->never())
+            ->method('debug');
 
         // guard
         $this->assertFalse($this->context->isExecutionInterrupted());

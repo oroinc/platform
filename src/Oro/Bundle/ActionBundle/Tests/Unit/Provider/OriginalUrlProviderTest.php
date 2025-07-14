@@ -5,19 +5,16 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\OriginalUrlProvider;
 use Oro\Bundle\DataGridBundle\Converter\UrlConverter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class OriginalUrlProviderTest extends \PHPUnit\Framework\TestCase
+class OriginalUrlProviderTest extends TestCase
 {
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var UrlConverter|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagridUrlConverter;
-
-    /** @var OriginalUrlProvider */
-    private $urlProvider;
+    private RequestStack&MockObject $requestStack;
+    private UrlConverter&MockObject $datagridUrlConverter;
+    private OriginalUrlProvider $urlProvider;
 
     #[\Override]
     protected function setUp(): void

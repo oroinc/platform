@@ -8,14 +8,14 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\LayoutDialogResultType;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Layout\LayoutDialogDataStartTransitionProcessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 
-class LayoutDialogDataStartTransitionProcessorTest extends \PHPUnit\Framework\TestCase
+class LayoutDialogDataStartTransitionProcessorTest extends TestCase
 {
-    /** @var LayoutDialogDataStartTransitionProcessor */
-    private $processor;
+    private LayoutDialogDataStartTransitionProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +23,7 @@ class LayoutDialogDataStartTransitionProcessorTest extends \PHPUnit\Framework\Te
         $this->processor = new LayoutDialogDataStartTransitionProcessor();
     }
 
-    public function testData()
+    public function testData(): void
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())

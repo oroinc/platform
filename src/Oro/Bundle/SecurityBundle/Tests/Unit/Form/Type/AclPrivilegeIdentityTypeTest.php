@@ -5,14 +5,14 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeIdentityType;
 use Oro\Bundle\SecurityBundle\Form\Type\ObjectLabelType;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class AclPrivilegeIdentityTypeTest extends \PHPUnit\Framework\TestCase
+class AclPrivilegeIdentityTypeTest extends TestCase
 {
-    /** @var AclPrivilegeIdentityType */
-    private $formType;
+    private AclPrivilegeIdentityType $formType;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class AclPrivilegeIdentityTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType = new AclPrivilegeIdentityType();
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->exactly(2))
@@ -32,7 +32,7 @@ class AclPrivilegeIdentityTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType->buildForm($builder, []);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())

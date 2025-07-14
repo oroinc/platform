@@ -4,14 +4,12 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\ContextDataCollection;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\TestCase;
 
-class ContextDataCollectionTest extends \PHPUnit\Framework\TestCase
+class ContextDataCollectionTest extends TestCase
 {
-    /** @var LayoutContext */
-    private $context;
-
-    /** @var ContextDataCollection */
-    private $collection;
+    private LayoutContext $context;
+    private ContextDataCollection $collection;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +22,7 @@ class ContextDataCollectionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider valueDataProvider
      */
-    public function testGetSetHasRemove(mixed $value)
+    public function testGetSetHasRemove(mixed $value): void
     {
         $this->assertFalse(
             $this->collection->has('test'),
@@ -60,7 +58,7 @@ class ContextDataCollectionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSetDefault()
+    public function testSetDefault(): void
     {
         $this->context['data'] = 'data';
 
@@ -110,7 +108,7 @@ class ContextDataCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetDefaultWhenDataCannotBeLoaded()
+    public function testSetDefaultWhenDataCannotBeLoaded(): void
     {
         $this->collection->setDefault(
             'test',
@@ -122,7 +120,7 @@ class ContextDataCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->collection->has('test'));
     }
 
-    public function testSetDefaultScalar()
+    public function testSetDefaultScalar(): void
     {
         $this->collection->setDefault('test', 'data');
         $this->assertSame(
@@ -132,7 +130,7 @@ class ContextDataCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetDefaultCallable()
+    public function testSetDefaultCallable(): void
     {
         $this->context['data'] = 'data';
 

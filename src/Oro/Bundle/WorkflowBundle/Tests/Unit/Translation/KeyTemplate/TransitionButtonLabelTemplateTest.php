@@ -12,24 +12,24 @@ class TransitionButtonLabelTemplateTest extends TemplateTestCase
         return new TransitionButtonLabelTemplate();
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertName(TransitionButtonLabelTemplate::NAME);
     }
 
     #[\Override]
-    public function testGetTemplate()
+    public function testGetTemplate(): void
     {
         $this->assertTemplate('oro.workflow.{{ workflow_name }}.transition.{{ transition_name }}.button_label');
     }
 
     #[\Override]
-    public function testGetRequiredKeys()
+    public function testGetRequiredKeys(): void
     {
         $this->assertRequiredKeys(['workflow_name', 'transition_name']);
     }
 
-    public function testGetKeyTemplates()
+    public function testGetKeyTemplates(): void
     {
         $this->assertKeyTemplates([
             'workflow_name' => '{{ workflow_name }}',

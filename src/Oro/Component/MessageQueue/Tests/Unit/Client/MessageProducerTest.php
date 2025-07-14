@@ -16,18 +16,16 @@ use Oro\Component\MessageQueue\Topic\TopicInterface;
 use Oro\Component\MessageQueue\Topic\TopicRegistry;
 use Oro\Component\MessageQueue\Transport\Queue;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MessageProducerTest extends \PHPUnit\Framework\TestCase
+class MessageProducerTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private DriverInterface|MockObject $driver;
-
-    private MessageRouterInterface|MockObject $messageRouter;
-
-    private MessageProducer $producer;
-
+    private DriverInterface&MockObject $driver;
+    private MessageRouterInterface&MockObject $messageRouter;
     private TopicInterface $topic;
+    private MessageProducer $producer;
 
     #[\Override]
     protected function setUp(): void
@@ -38,8 +36,7 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
         $topicRegistry = $this->createMock(TopicRegistry::class);
 
         $this->topic = new NullTopic();
-        $topicRegistry
-            ->expects(self::any())
+        $topicRegistry->expects(self::any())
             ->method('get')
             ->willReturnCallback(fn () => $this->topic);
 
@@ -54,8 +51,7 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
     public function testSend(mixed $message, Message $expectedMessage): void
     {
         $queue = new Queue('sample_queue');
-        $this->messageRouter
-            ->expects(self::once())
+        $this->messageRouter->expects(self::once())
             ->method('handle')
             ->with(
                 self::callback(function (Message $innerMessage) use ($expectedMessage) {
@@ -69,8 +65,7 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn([new Envelope($queue, $expectedMessage)]);
 
-        $this->driver
-            ->expects(self::once())
+        $this->driver->expects(self::once())
             ->method('send')
             ->with(
                 $queue,
@@ -145,8 +140,7 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
     {
         $this->topic = new TopicStub();
 
-        $this->messageRouter
-            ->expects(self::never())
+        $this->messageRouter->expects(self::never())
             ->method('handle');
 
         $this->expectException(InvalidArgumentException::class);
@@ -163,8 +157,7 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
         string $expectException,
         string $expectExceptionMessage
     ): void {
-        $this->messageRouter
-            ->expects(self::never())
+        $this->messageRouter->expects(self::never())
             ->method('handle');
 
         $this->expectException($expectException);

@@ -9,6 +9,7 @@ use Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer;
 use Oro\Bundle\ConfigBundle\Form\Type\ConfigFileType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use PHPUnit\Framework\Constraint\IsType;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\HttpFoundation\File\File as HttpFile;
@@ -18,11 +19,8 @@ class ConfigFileTypeTest extends FormIntegrationTestCase
 {
     private const FILE1_ID = 1;
 
-    /** @var ConfigFileDataTransformer|\PHPUnit\Framework\MockObject\MockObject */
-    private $transformer;
-
-    /** @var ConfigFileType */
-    private $formType;
+    private ConfigFileDataTransformer&MockObject $transformer;
+    private ConfigFileType $formType;
 
     #[\Override]
     protected function setUp(): void

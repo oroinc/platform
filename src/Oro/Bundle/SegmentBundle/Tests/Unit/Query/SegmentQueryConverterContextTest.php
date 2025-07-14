@@ -3,11 +3,11 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Query;
 
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterContext;
+use PHPUnit\Framework\TestCase;
 
-class SegmentQueryConverterContextTest extends \PHPUnit\Framework\TestCase
+class SegmentQueryConverterContextTest extends TestCase
 {
-    /** @var SegmentQueryConverterContext */
-    private $context;
+    private SegmentQueryConverterContext $context;
 
     #[\Override]
     protected function setUp(): void
@@ -15,7 +15,7 @@ class SegmentQueryConverterContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new SegmentQueryConverterContext();
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $initialContext = clone $this->context;
 
@@ -25,7 +25,7 @@ class SegmentQueryConverterContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($initialContext, $this->context);
     }
 
-    public function testAliasPrefix()
+    public function testAliasPrefix(): void
     {
         self::assertNull($this->context->getAliasPrefix());
 
@@ -34,13 +34,13 @@ class SegmentQueryConverterContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($prefix, $this->context->getAliasPrefix());
     }
 
-    public function testGenerateTableAliasWhenNoAliasPrefix()
+    public function testGenerateTableAliasWhenNoAliasPrefix(): void
     {
         self::assertEquals('t1', $this->context->generateTableAlias());
         self::assertEquals('t2', $this->context->generateTableAlias());
     }
 
-    public function testGenerateTableAliasWithAliasPrefix()
+    public function testGenerateTableAliasWithAliasPrefix(): void
     {
         $this->context->setAliasPrefix('test_prefix');
 

@@ -6,12 +6,13 @@ use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class ConsumeMessagesCommandTest extends \PHPUnit\Framework\TestCase
+class ConsumeMessagesCommandTest extends TestCase
 {
-    private QueueConsumer|\PHPUnit\Framework\MockObject\MockObject $consumer;
-
+    private QueueConsumer&MockObject $consumer;
     private ConsumeMessagesCommand $command;
 
     #[\Override]

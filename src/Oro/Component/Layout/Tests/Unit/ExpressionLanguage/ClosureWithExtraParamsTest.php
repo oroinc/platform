@@ -3,8 +3,9 @@
 namespace Oro\Component\Layout\Tests\Unit\ExpressionLanguage;
 
 use Oro\Component\Layout\ExpressionLanguage\ClosureWithExtraParams;
+use PHPUnit\Framework\TestCase;
 
-class ClosureWithExtraParamsTest extends \PHPUnit\Framework\TestCase
+class ClosureWithExtraParamsTest extends TestCase
 {
     public function testClosureWithExtraParams(): void
     {

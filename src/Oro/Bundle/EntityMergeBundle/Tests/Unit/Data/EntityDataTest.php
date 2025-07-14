@@ -8,26 +8,19 @@ use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\Exception\OutOfBoundsException;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityDataTest extends \PHPUnit\Framework\TestCase
+class EntityDataTest extends TestCase
 {
-    /** @var EntityMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityMetadata;
+    private EntityMetadata&MockObject $entityMetadata;
+    private FieldMetadata&MockObject $fieldMetadata;
+    private string $fieldName;
+    private EntityData $entityData;
 
-    /** @var FieldMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldMetadata;
+    private array $entities = [];
 
-    /** @var string */
-    private $fieldName;
-
-    /** @var EntityData */
-    private $entityData;
-
-    /** @var array */
-    private $entities = [];
-
-    /** @var array */
-    private $entityFieldsMetadata = [];
+    private array $entityFieldsMetadata = [];
 
     #[\Override]
     protected function setUp(): void
@@ -70,17 +63,17 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    public function testGetMetadata()
+    public function testGetMetadata(): void
     {
         $this->assertEquals($this->entityMetadata, $this->entityData->getMetadata());
     }
 
-    public function testGetEntities()
+    public function testGetEntities(): void
     {
         $this->assertEquals($this->entities, $this->entityData->getEntities());
     }
 
-    public function testAddEntity()
+    public function testAddEntity(): void
     {
         $fooEntity = $this->createTestEntity(1);
         $barEntity = $this->createTestEntity(2);
@@ -102,7 +95,7 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedEntities, $this->entityData->getEntities());
     }
 
-    public function testGetEntityByOffset()
+    public function testGetEntityByOffset(): void
     {
         $fooEntity = $this->createTestEntity(1);
         $barEntity = $this->createTestEntity(2);
@@ -114,7 +107,7 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($barEntity, $this->entityData->getEntityByOffset(1));
     }
 
-    public function testGetEntityByOffsetFails()
+    public function testGetEntityByOffsetFails(): void
     {
         $this->expectException(OutOfBoundsException::class);
         $this->expectExceptionMessage('"undefined" is illegal offset for getting entity.');
@@ -122,7 +115,7 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
         $this->entityData->getEntityByOffset('undefined');
     }
 
-    public function testSetGetMasterEntity()
+    public function testSetGetMasterEntity(): void
     {
         $this->assertEquals($this->entities[0], $this->entityData->getMasterEntity());
 
@@ -130,13 +123,13 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->entities[1], $this->entityData->getMasterEntity());
     }
 
-    public function testHasField()
+    public function testHasField(): void
     {
         $this->assertTrue($this->entityData->hasField($this->fieldName));
         $this->assertFalse($this->entityData->hasField('test'));
     }
 
-    public function testGetField()
+    public function testGetField(): void
     {
         $field = $this->entityData->getField($this->fieldName);
         $this->assertInstanceOf(FieldData::class, $field);
@@ -146,7 +139,7 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->entities[0], $field->getSourceEntity());
     }
 
-    public function testGetFieldFails()
+    public function testGetFieldFails(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Field "unknown" not exist.');
@@ -154,7 +147,7 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
         $this->entityData->getField('unknown');
     }
 
-    public function testGetFields()
+    public function testGetFields(): void
     {
         $fields = $this->entityData->getFields();
         $this->assertCount(1, $fields);

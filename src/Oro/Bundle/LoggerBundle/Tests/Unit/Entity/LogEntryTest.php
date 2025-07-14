@@ -4,12 +4,13 @@ namespace Oro\Bundle\LoggerBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\LoggerBundle\Entity\LogEntry;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class LogEntryTest extends \PHPUnit\Framework\TestCase
+class LogEntryTest extends TestCase
 {
     use EntityTestCaseTrait;
 
-    public function testProperties()
+    public function testProperties(): void
     {
         $properties = [
             ['id', 123, false],

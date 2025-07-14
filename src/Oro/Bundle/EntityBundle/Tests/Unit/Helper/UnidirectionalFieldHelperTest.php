@@ -4,13 +4,14 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\EntityBundle\Helper\UnidirectionalFieldHelper;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\TestEntity1;
+use PHPUnit\Framework\TestCase;
 
-class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
+class UnidirectionalFieldHelperTest extends TestCase
 {
     /**
      * @dataProvider isFieldUnidirectionalDataProvider
      */
-    public function testIsFieldUnidirectional(string $fieldName, bool $expected)
+    public function testIsFieldUnidirectional(string $fieldName, bool $expected): void
     {
         $this->assertEquals($expected, UnidirectionalFieldHelper::isFieldUnidirectional($fieldName));
     }
@@ -40,7 +41,7 @@ class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getRealFieldNameDataProvider
      */
-    public function testGetRealFieldName(string $fieldName, string $expected)
+    public function testGetRealFieldName(string $fieldName, string $expected): void
     {
         $this->assertEquals($expected, UnidirectionalFieldHelper::getRealFieldName($fieldName));
     }
@@ -70,7 +71,7 @@ class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getRealFieldClassDataProvider
      */
-    public function testGetRealFieldClass(string $fieldName, string $expected)
+    public function testGetRealFieldClass(string $fieldName, string $expected): void
     {
         $this->assertEquals($expected, UnidirectionalFieldHelper::getRealFieldClass($fieldName));
     }

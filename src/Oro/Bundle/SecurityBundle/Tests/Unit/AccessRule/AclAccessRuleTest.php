@@ -13,17 +13,14 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionDataBuilderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AclAccessRuleTest extends \PHPUnit\Framework\TestCase
+class AclAccessRuleTest extends TestCase
 {
-    /** @var AclConditionDataBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $builder;
-
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipMetadataProvider;
-
-    /** @var AclAccessRule */
-    private $accessRule;
+    private AclConditionDataBuilderInterface&MockObject $builder;
+    private OwnershipMetadataProviderInterface&MockObject $ownershipMetadataProvider;
+    private AclAccessRule $accessRule;
 
     #[\Override]
     protected function setUp(): void
