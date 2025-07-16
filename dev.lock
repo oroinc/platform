@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "47693a81d847382274d3d5c3e6a4dbfd",
+    "content-hash": "2fdfa6cccf7426a064e1d232dd109764",
     "packages": [
         {
             "name": "ass/xmlsecurity",
@@ -6050,16 +6050,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "2.1.0",
+            "version": "2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "9b30d6fd026b2c132b3985ce6b23bec09ab3aa68"
+                "reference": "b9e61a61e39e02dd90944e9115241c7f7e76bfd8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/9b30d6fd026b2c132b3985ce6b23bec09ab3aa68",
-                "reference": "9b30d6fd026b2c132b3985ce6b23bec09ab3aa68",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/b9e61a61e39e02dd90944e9115241c7f7e76bfd8",
+                "reference": "b9e61a61e39e02dd90944e9115241c7f7e76bfd8",
                 "shasum": ""
             },
             "require": {
@@ -6091,9 +6091,9 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.1.0"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.2.0"
             },
-            "time": "2025-02-19T13:28:12+00:00"
+            "time": "2025-07-13T07:04:09+00:00"
         },
         {
             "name": "predis/predis",
@@ -8780,16 +8780,16 @@
         },
         {
             "name": "symfony/form",
-            "version": "v6.4.23",
+            "version": "v6.4.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/form.git",
-                "reference": "6f60a2a9031c49fe92b8703764defa46481db155"
+                "reference": "2e2e32b7cc9e543a3f739b4968611a44ef17a2de"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/form/zipball/6f60a2a9031c49fe92b8703764defa46481db155",
-                "reference": "6f60a2a9031c49fe92b8703764defa46481db155",
+                "url": "https://api.github.com/repos/symfony/form/zipball/2e2e32b7cc9e543a3f739b4968611a44ef17a2de",
+                "reference": "2e2e32b7cc9e543a3f739b4968611a44ef17a2de",
                 "shasum": ""
             },
             "require": {
@@ -8857,7 +8857,7 @@
             "description": "Allows to easily create, process and reuse HTML forms",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/form/tree/v6.4.23"
+                "source": "https://github.com/symfony/form/tree/v6.4.22"
             },
             "funding": [
                 {
@@ -8873,7 +8873,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-06-05T16:22:31+00:00"
+            "time": "2025-05-04T06:52:29+00:00"
         },
         {
             "name": "symfony/framework-bundle",

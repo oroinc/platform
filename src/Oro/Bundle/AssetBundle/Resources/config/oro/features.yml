@@ -1,0 +1,5 @@
+features:
+    asset_subresource_integrity_enabled:
+        label: oro.asset.config.feature.subresource_integrity_enabled.label
+        description: oro.asset.config.feature.subresource_integrity_enabled.description
+        toggle: oro_asset.subresource_integrity_enabled

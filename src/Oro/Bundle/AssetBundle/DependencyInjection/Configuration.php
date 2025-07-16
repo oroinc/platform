@@ -3,17 +3,23 @@
 namespace Oro\Bundle\AssetBundle\DependencyInjection;
 
 use Oro\Bundle\AssetBundle\NodeJsExecutableFinder;
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $finder = new NodeJsExecutableFinder();
         $treeBuilder = new TreeBuilder('oro_asset');
-        $treeBuilder->getRootNode()
+        $rootNode = $treeBuilder->getRootNode();
+
+        $rootNode
             ->children()
                 ->booleanNode('with_babel')
                     ->info('Permanently enable Babel')
@@ -32,6 +38,18 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('npm_install_timeout')
                     ->defaultValue(null)
                     ->info('Npm installation timeout in seconds, null to disable timeout')
+                ->end()
+                ->arrayNode('external_resources')
+                    ->useAttributeAsKey('name')
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('link')
+                                ->isRequired()
+                                ->cannotBeEmpty()
+                                ->info('The link to the external resource')
+                            ->end()
+                        ->end()
+                    ->end()
                 ->end()
                 ->arrayNode('webpack_dev_server')
                     ->info('Webpack Dev Server configuration')
@@ -97,6 +115,11 @@ class Configuration implements ConfigurationInterface
                     }
                 )
             ->end();
+
+        SettingsBuilder::append(
+            $rootNode,
+            ['subresource_integrity_enabled' => ['value' => false, 'type' => 'boolean']]
+        );
 
         return $treeBuilder;
     }

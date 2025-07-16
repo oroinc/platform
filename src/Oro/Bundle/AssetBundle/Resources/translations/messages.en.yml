@@ -1,0 +1,7 @@
+oro:
+    asset:
+        config:
+            feature:
+                subresource_integrity_enabled:
+                    label: Subresource Integrity Setting
+                    description: If this feature is enabled, the application will allow you to enable integrity attributes for assets to increase security, ensuring that files are delivered without unexpected manipulation.

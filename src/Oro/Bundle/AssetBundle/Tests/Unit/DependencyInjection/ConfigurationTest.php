@@ -60,6 +60,14 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'port' => 8081,
                         'https' => false,
                     ],
+                    'external_resources' => [],
+                    'settings' => [
+                        'resolved' => true,
+                        'subresource_integrity_enabled' => [
+                            'value' => false,
+                            'scope' => 'app'
+                        ],
+                    ]
                 ],
             ],
             [
@@ -75,6 +83,18 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'port' => 65000,
                         'https' => true,
                     ],
+                    'external_resources' => [
+                        'test1' => [
+                            'link' => 'http://example.local/test1.js',
+                        ]
+                    ],
+                    'settings' => [
+                        'resolved' => true,
+                        'subresource_integrity_enabled' => [
+                            'value' => false,
+                            'scope' => 'app'
+                        ],
+                    ]
                 ],
                 'expects' => [
                     'with_babel' => false,
@@ -88,6 +108,18 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'port' => 65000,
                         'https' => true,
                     ],
+                    'external_resources' => [
+                        'test1' => [
+                            'link' => 'http://example.local/test1.js',
+                        ]
+                    ],
+                    'settings' => [
+                        'resolved' => true,
+                        'subresource_integrity_enabled' => [
+                            'value' => false,
+                            'scope' => 'app'
+                        ],
+                    ]
                 ],
             ],
         ];
