@@ -56,6 +56,6 @@ class ConnectionFactoryTest extends TestCase
 
     public function wrongTransportConnectionInstancesProvider(): array
     {
-        return ['scalar' => ['test string'], 'array' => [[]], 'object' => [new \StdClass()]];
+        return ['scalar' => ['test string'], 'array' => [[]], 'object' => [new \stdClass()]];
     }
 }

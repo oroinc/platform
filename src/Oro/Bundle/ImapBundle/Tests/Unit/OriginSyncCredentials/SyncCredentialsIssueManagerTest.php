@@ -115,12 +115,10 @@ class SyncCredentialsIssueManagerTest extends TestCase
 
         $this->credentialsDriver->expects($this->exactly(2))
             ->method('getAllOriginsByOwnerId')
-            ->willReturnMap(
-                [
-                    [456, [$origin]],
-                    [null, [$systemOrigin]]
-                ]
-            );
+            ->willReturnMap([
+                [456, [$origin]],
+                [null, [$systemOrigin]]
+            ]);
         $this->credentialsDriver->expects($this->exactly(2))
             ->method('deleteOrigin');
 

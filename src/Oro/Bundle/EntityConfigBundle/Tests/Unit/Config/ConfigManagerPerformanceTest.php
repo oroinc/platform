@@ -421,7 +421,9 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
         $lockObject = new LockObject();
         $applicationState = $this->createMock(ApplicationState::class);
 
-        $applicationState->method('isInstalled')->willReturn(true);
+        $applicationState->expects(self::any())
+            ->method('isInstalled')
+            ->willReturn(true);
 
         $databaseChecker = new ConfigDatabaseChecker($lockObject, $doctrine, [], $applicationState);
 

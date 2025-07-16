@@ -108,7 +108,8 @@ class WorkflowStartListenerTest extends WorkflowTestCase
          * One "postFlush" call for WorkflowTransitionRecord
          * One "postFlush" call for WorkflowItem
          */
-        $listenerMock->expects($this->exactly(3))->method('postFlush');
+        $listenerMock->expects($this->exactly(3))
+            ->method('postFlush');
 
         $entityManger = $this->getEntityManager(WorkflowAwareEntity::class);
         $eventManager = $entityManger->getEventManager();

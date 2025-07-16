@@ -22,7 +22,8 @@ class LocalizedValueExtractorTest extends TestCase
     public function testEmptyValues(): void
     {
         $localization = $this->createMock(Localization::class);
-        $localization->expects(self::never())->method(self::anything());
+        $localization->expects(self::never())
+            ->method(self::anything());
 
         $values = [];
 
@@ -32,7 +33,7 @@ class LocalizedValueExtractorTest extends TestCase
     public function testDefaultValueWithoutLocalization(): void
     {
         $values = [
-            "" => 'test',
+            '' => 'test',
             1 => new FallbackType('system'),
             2 => new FallbackType('parent_localization'),
             3 => 'overridden',
@@ -44,10 +45,12 @@ class LocalizedValueExtractorTest extends TestCase
     public function testValueForLocalization(): void
     {
         $localization = $this->createMock(Localization::class);
-        $localization->expects(self::once())->method('getId')->willReturn(3);
+        $localization->expects(self::once())
+            ->method('getId')
+            ->willReturn(3);
 
         $values = [
-            "" => 'test',
+            '' => 'test',
             1 => new FallbackType('system'),
             2 => new FallbackType('parent_localization'),
             3 => 'overridden',
@@ -59,10 +62,12 @@ class LocalizedValueExtractorTest extends TestCase
     public function testValueFallbackToSystemForLocalization(): void
     {
         $localization = $this->createMock(Localization::class);
-        $localization->expects(self::once())->method('getId')->willReturn(1);
+        $localization->expects(self::once())
+            ->method('getId')
+            ->willReturn(1);
 
         $values = [
-            "" => 'test',
+            '' => 'test',
             1 => new FallbackType('system'),
             2 => new FallbackType('parent_localization'),
             3 => 'overridden',
@@ -74,14 +79,20 @@ class LocalizedValueExtractorTest extends TestCase
     public function testValueFallbackToParentForLocalization(): void
     {
         $parentLocalization = $this->createMock(Localization::class);
-        $parentLocalization->expects(self::once())->method('getId')->willReturn(3);
+        $parentLocalization->expects(self::once())
+            ->method('getId')
+            ->willReturn(3);
 
         $localization = $this->createMock(Localization::class);
-        $localization->expects(self::once())->method('getId')->willReturn(2);
-        $localization->expects(self::once())->method('getParentLocalization')->willReturn($parentLocalization);
+        $localization->expects(self::once())
+            ->method('getId')
+            ->willReturn(2);
+        $localization->expects(self::once())
+            ->method('getParentLocalization')
+            ->willReturn($parentLocalization);
 
         $values = [
-            "" => 'test',
+            '' => 'test',
             1 => new FallbackType('system'),
             2 => new FallbackType('parent_localization'),
             3 => 'overridden',
@@ -93,10 +104,12 @@ class LocalizedValueExtractorTest extends TestCase
     public function testValueFallbackToDefaultForLocalization(): void
     {
         $localization = $this->createMock(Localization::class);
-        $localization->expects(self::once())->method('getId')->willReturn(5);
+        $localization->expects(self::once())
+            ->method('getId')
+            ->willReturn(5);
 
         $values = [
-            "" => 'test',
+            '' => 'test',
             1 => new FallbackType('system'),
             2 => new FallbackType('parent_localization'),
             3 => 'overridden',
