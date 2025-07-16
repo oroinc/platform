@@ -46,7 +46,8 @@ class DbPingPeriodicTest extends TestCase
             ->willReturn($statement1);
 
         $connection2 = $this->createMock(Connection::class);
-        $connection2->expects(self::never())->method('prepare');
+        $connection2->expects(self::never())
+            ->method('prepare');
 
         $this->doctrine->expects(self::once())
             ->method('getConnections')
