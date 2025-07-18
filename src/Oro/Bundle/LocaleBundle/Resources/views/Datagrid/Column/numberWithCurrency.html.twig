@@ -1,0 +1,3 @@
+{% if value is not empty %}
+    {{ value|oro_format_currency({currency: record.getValue('currency')}) }}
+{% endif %}

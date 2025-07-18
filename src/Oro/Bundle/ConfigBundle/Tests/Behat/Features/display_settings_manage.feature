@@ -3,6 +3,7 @@
 @automatically-ticket-tagged
 @fixture-OroConfigBundle:custom_report.yml
 @fixture-OroConfigBundle:activities.yml
+@fixture-OroDataGridBundle:DisplayInGridEntities.yml
 Feature: Display settings manage
   In order to control system display behavior
   As Administrator
@@ -192,7 +193,7 @@ Feature: Display settings manage
     Given I go to Reports & Segments/Calendar Events/Test Report
     Then I should not see "Show SQL Query"
     When I go to Reports & Segments/ Manage Segments
-    And I click view "Featured Products" in grid
+    And I click view "New Segment" in grid
     Then I should not see "Show SQL Query"
     When I proceed as the Config
     And fill "System Config Form" with:
@@ -202,5 +203,5 @@ Feature: Display settings manage
     And I go to Reports & Segments/Calendar Events/Test Report
     Then I should see "Show SQL Query"
     When I go to Reports & Segments/ Manage Segments
-    And I click view "Featured Products" in grid
+    And I click view "New Segment" in grid
     Then I should see "Show SQL Query"

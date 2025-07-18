@@ -16,6 +16,9 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ExtendConfigProcessorTest extends TestCase
 {
     private const CLASS_NAME = 'Test\ExtendConfigProcessorTestBundle\Entity\SomeClass';
@@ -393,6 +396,49 @@ class ExtendConfigProcessorTest extends TestCase
         $this->assertEquals(
             ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
             $datagridConfigField->all()
+        );
+    }
+
+    public function testEntityConfigItemMergedOptionsIsUnique(): void
+    {
+        $testClassName = ExtendHelper::ENTITY_NAMESPACE . 'TestEntity';
+        $configs = [
+            $testClassName => [
+                'configs' => [
+                    'extend' => [
+                        'activities' => [
+                            'call'
+                        ]
+                    ],
+                ],
+            ],
+        ];
+        $configs[ExtendConfigProcessor::APPEND_CONFIGS][$testClassName] = [
+            'configs' => [
+                'extend' => ['activities']
+            ]
+        ];
+        $extendConfigEntity = $this->createConfig('extend', self::CLASS_NAME);
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+            ]);
+        $extendConfigProvider
+            ->method('getConfig')
+            ->willReturnMap([
+                [$testClassName, null, $extendConfigEntity],
+            ]);
+
+        // process the same config twice to check is values is not duplicated
+        $this->generator->processConfigs($configs);
+        $this->generator->processConfigs($configs);
+
+        $this->assertEquals(
+            ['state' => ExtendScope::STATE_NEW, 'activities' => ['call']],
+            $extendConfigEntity->getValues()
         );
     }
 

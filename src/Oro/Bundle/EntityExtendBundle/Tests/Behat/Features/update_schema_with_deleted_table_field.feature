@@ -9,8 +9,8 @@ Feature: Update schema with deleted table field
   Scenario: Delete new field w/o update schema and check schema
     Given I login as administrator
     And I go to System/Entities/Entity Management
-    And filter Name as is equal to "Customer"
-    And click View Customer in grid
+    And filter Name as is equal to "User"
+    And click View User in grid
     And I click on "Create Field"
     And I fill form with:
       | Field name | Field1 |
@@ -31,8 +31,8 @@ Feature: Update schema with deleted table field
     And I should see "Update schema"
     When I click update schema
     Then I should see "Schema updated" flash message
-    And filter Name as is equal to "Customer"
-    And click View Customer in grid
+    And filter Name as is equal to "User"
+    And click View User in grid
     When I click remove "Field1" in grid
     And click "Yes"
     And I should see "Update schema"

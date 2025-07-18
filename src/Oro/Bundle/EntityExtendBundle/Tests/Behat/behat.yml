@@ -61,8 +61,3 @@ oro_behat_extension:
 
     Column Name Field:
       selector: 'input[data-name="field__header"]'
-
-    Enum Option Remove Button:
-      selector:
-        type: 'xpath'
-        locator: './/*[contains(concat(" ",normalize-space(@class)," ")," oro-collection-item ")][contains(@data-content,"0")]//*[contains(concat(" ",normalize-space(@class)," ")," removeRow ")]'

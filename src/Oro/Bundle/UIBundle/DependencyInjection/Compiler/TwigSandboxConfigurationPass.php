@@ -5,7 +5,9 @@ namespace Oro\Bundle\UIBundle\DependencyInjection\Compiler;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\AbstractTwigSandboxConfigurationPass;
 
 /**
- * Registers the "oro_html_strip_tags" Twig filter for the email templates rendering sandbox.
+ *  Registers Twig filters for the email templates rendering sandbox:
+ *   - oro_html_strip_tags
+ *   - oro_html_sanitize_basic
  */
 class TwigSandboxConfigurationPass extends AbstractTwigSandboxConfigurationPass
 {
@@ -19,7 +21,8 @@ class TwigSandboxConfigurationPass extends AbstractTwigSandboxConfigurationPass
     protected function getFilters(): array
     {
         return [
-            'oro_html_strip_tags'
+            'oro_html_strip_tags',
+            'oro_html_sanitize_basic'
         ];
     }
 

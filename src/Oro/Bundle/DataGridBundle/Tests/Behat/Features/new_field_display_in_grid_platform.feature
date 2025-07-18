@@ -33,7 +33,6 @@ Feature: New Field Display in Grid (Platform)
       | User                       | TestField | OroUserBundle          |
       | Report                     | TestField | OroReportBundle        |
 #      | Localization               | TestField | OroLocaleBundle        | Error in BB-19125
-      | DigitalAsset               | TestField | OroDigitalAssetBundle  |
       | EmailNotification          | TestField | OroNotificationBundle  |
       | EmbeddedForm               | TestField | OroEmbeddedFormBundle  |
       | Segment                    | TestField | OroSegmentBundle       |
@@ -61,7 +60,6 @@ Feature: New Field Display in Grid (Platform)
       | Role                       | TestField | OroUserBundle          |
       | User                       | TestField | OroUserBundle          |
 #      | Localization               | TestField | OroLocaleBundle        | Error in BB-19125
-      | DigitalAsset               | TestField | OroDigitalAssetBundle  |
       | EmailNotification          | TestField | OroNotificationBundle  |
       | EmbeddedForm               | TestField | OroEmbeddedFormBundle  |
       | Segment                    | TestField | OroSegmentBundle       |

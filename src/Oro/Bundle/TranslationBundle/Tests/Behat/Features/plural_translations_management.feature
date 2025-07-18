@@ -20,6 +20,6 @@ Feature: Plural translations management
     Then I should see "Configuration saved" flash message
 
   Scenario: I check that plural translations are displayed without errors in case when there are not all plural forms translated
-    Given I go to System/User Management/Roles
-    When I click on Administrator in grid
-    Then I should see "10 записей (множ. число 2 форма)"
+    Given I go to System/User Management/Groups
+    When I click on Administrators in grid
+    Then I should see "3 записи (множ. число 1 форма)"

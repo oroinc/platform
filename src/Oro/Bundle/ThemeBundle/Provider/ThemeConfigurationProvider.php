@@ -97,6 +97,17 @@ class ThemeConfigurationProvider implements ResetInterface
         return $this->optionsNamesCache[$type];
     }
 
+    public function getThemeProperty(string $propertyName, object|int|null $scopeIdentifier = null): mixed
+    {
+        $themeName = $this->getThemeName($scopeIdentifier);
+        if (!$themeName) {
+            return null;
+        }
+
+        $config = $this->configurationProvider->getThemeDefinition($themeName);
+        return $config[$propertyName] ?? null;
+    }
+
     private function getThemeConfigId(object|int|null $scopeIdentifier = null): ?int
     {
         return $this->configManager->get(

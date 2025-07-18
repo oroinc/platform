@@ -1,0 +1,41 @@
+parameters:
+    oro_pdf_generator.gotenberg_api_url_default: 'http://127.0.0.1:3000'
+
+services:
+    oro_pdf_generator.gotenberg.pdf_engine:
+        class: Oro\Bundle\PdfGeneratorBundle\Gotenberg\GotenbergPdfEngine
+        arguments:
+            - '@oro_pdf_generator.gotenberg.gotenberg_chromium_factory'
+            - '@psr18.http_client'
+            - '@oro_pdf_generator.pdf_template_renderer'
+            - '@oro_pdf_generator.gotenberg.gotenberg_asset_factory'
+            - '@oro_pdf_generator.gotenberg.pdf_file_factory'
+        calls:
+            - ['setLogger', ['@logger']]
+        tags:
+            - { name: oro_pdf_generator.pdf_engine }
+            - { name: monolog.logger, channel: oro_pdf_generator }
+
+    oro_pdf_generator.gotenberg.pdf_options_preset_configurator:
+        class: Oro\Bundle\PdfGeneratorBundle\Gotenberg\GotenbergPdfOptionsPresetConfigurator
+        arguments:
+            - '%oro_pdf_generator.gotenberg.api_url%'
+        tags:
+            - { name: oro_pdf_generator.pdf_options_preset_configurator }
+
+    oro_pdf_generator.gotenberg.gotenberg_chromium_factory:
+        class: Oro\Bundle\PdfGeneratorBundle\Gotenberg\GotenbergChromiumPdfFactory
+
+    oro_pdf_generator.gotenberg.gotenberg_asset_factory:
+        class: Oro\Bundle\PdfGeneratorBundle\Gotenberg\GotenbergAssetFactory
+
+    oro_pdf_generator.gotenberg.pdf_file_factory:
+        class: Oro\Bundle\PdfGeneratorBundle\Gotenberg\GotenbergPdfFileFactory
+
+    oro_pdf_generator.gotenberg.requirements_provider:
+        class: Oro\Bundle\PdfGeneratorBundle\Gotenberg\Provider\GotenbergRequirementsProvider
+        arguments:
+            - '@http_client'
+            - '%oro_pdf_generator.gotenberg.api_url%'
+        tags:
+            - {name: oro.requirements_provider}

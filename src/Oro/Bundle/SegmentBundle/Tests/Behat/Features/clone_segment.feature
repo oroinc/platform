@@ -9,7 +9,6 @@ Feature: Clone segment
   Scenario: Create segment
     Given I login as administrator
     And I go to Reports & Segments/ Manage Segments
-    And there are two records in grid
     When I click "Create Segment"
     And I fill "Segment Form" with:
       | Name         | Segment on clone |
@@ -57,7 +56,8 @@ Feature: Clone segment
 
   Scenario: Clone segment from grid
     Given I go to Reports & Segments/ Manage Segments
-    And there are 5 records in grid
+    When I check "User" in Entity filter
+    And there are 3 records in grid
     When I click clone "Segment on clone" in grid
     Then Name field should has "Copy of Segment on clone" value
     When I fill in "Name" with "Copy of Segment on clone from grid"
@@ -67,7 +67,8 @@ Feature: Clone segment
 
   Scenario: Check index page after clone
     Given I go to Reports & Segments/ Manage Segments
-    Then there are 6 records in grid
+    When I check "User" in Entity filter
+    Then there are 4 records in grid
     And I should see "Copy of Segment on clone" in grid
     And I should see "Copy of Segment on clone from edit page" in grid
     And I should see "Copy of Segment on clone from grid" in grid

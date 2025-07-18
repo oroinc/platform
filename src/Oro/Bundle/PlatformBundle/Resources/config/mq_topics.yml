@@ -4,3 +4,5 @@ services:
             - { name: oro_message_queue.topic }
 
     Oro\Bundle\PlatformBundle\Async\Topic\DeleteMaterializedViewTopic: ~
+    
+    Oro\Bundle\PlatformBundle\Async\Topic\DeleteOldNumberSequenceTopic: ~

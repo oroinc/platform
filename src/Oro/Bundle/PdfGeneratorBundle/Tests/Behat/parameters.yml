@@ -1,0 +1,7 @@
+services:
+
+    oro_pdf_generator.tests.behat.pdf_builder_factory_stub:
+        decorates: 'oro_pdf_generator.pdf_builder.factory'
+        class: 'Oro\Bundle\PdfGeneratorBundle\Tests\Behat\Stub\PdfBuilderFactoryStub'
+        arguments:
+            - '@oro_entity.entity_name_resolver'
