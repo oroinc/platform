@@ -193,6 +193,8 @@ class Select2Entity extends Element implements ClearableInterface
     public function getResultSet($failOnEmpty = true, $value = '')
     {
         $this->fillSearchField($value, $failOnEmpty);
+        // this line is needed when select2 has AJAX content and page also has other select2-results
+        $this->getDriver()->waitForAjax();
         $this->waitFor(60, function () {
             return null === $this->getPage()->find('css', '.select2-results li.select2-searching');
         });
