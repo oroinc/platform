@@ -1,85 +1,90 @@
 <?php
 
 use Oro\Bundle\SearchBundle\Query\Mode;
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\AbstractTask;
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\ConcreteCustomer;
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Customer;
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\RepeatableTask;
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\ScheduledTask;
 
-return array(
-    'Oro\Bundle\DataBundle\Entity\Product'                               => array(
+return [
+    'Oro\Bundle\DataBundle\Entity\Product'                               => [
         'alias'  => 'test_product',
         'mode'   => Mode::NORMAL,
         'label'  => 'test product',
-        'fields' => array(
-            array(
+        'fields' => [
+            [
                 'name'          => 'name',
                 'target_type'   => 'string',
-                'target_fields' => array('name', 'all_data')
-            ),
-            array(
+                'target_fields' => ['name', 'all_data']
+            ],
+            [
                 'name'          => 'description',
                 'target_type'   => 'string',
-                'target_fields' => array('description', 'all_data')
-            ),
-            array(
+                'target_fields' => ['description', 'all_data']
+            ],
+            [
                 'name'          => 'price',
                 'target_type'   => 'decimal',
-                'target_fields' => array('price')
-            ),
-            array(
+                'target_fields' => ['price']
+            ],
+            [
                 'name'          => 'count',
                 'target_type'   => 'integer',
-                'target_fields' => array('count')
-            ),
-            array(
+                'target_fields' => ['count']
+            ],
+            [
                 'name'          => 'createDate',
                 'target_type'   => 'datetime',
-                'target_fields' => array('create_date')
-            ),
-            array(
+                'target_fields' => ['create_date']
+            ],
+            [
                 'name'            => 'manufacturer',
                 'relation_type'   => 'to',
-                'relation_fields' => array(
-                    array(
+                'relation_fields' => [
+                    [
                         'name'          => 'name',
                         'target_type'   => 'string',
-                        'target_fields' => array('manufacturer', 'all_data')
-                    )
-                )
-            ),
-        )
-    ),
-    'Oro\Bundle\DataBundle\Entity\Customer'                              => array(
+                        'target_fields' => ['manufacturer', 'all_data']
+                    ]
+                ]
+            ],
+        ]
+    ],
+    'Oro\Bundle\DataBundle\Entity\Customer'                              => [
         'alias'  => 'test_customer',
         'label'  => 'test customer',
         'mode'   => Mode::NORMAL,
-        'fields' => array(),
-    ),
-    'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Customer'         => array(
+        'fields' => [],
+    ],
+    Customer::class         => [
         'alias'  => 'customer',
         'label'  => 'test customer',
         'mode'   => Mode::WITH_DESCENDANTS,
-        'fields' => array(),
-    ),
-    'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\ConcreteCustomer' => array(
+        'fields' => [],
+    ],
+    ConcreteCustomer::class => [
         'alias'  => 'concrete_customer',
         'label'  => 'test customer',
         'mode'   => Mode::NORMAL,
-        'fields' => array(),
-    ),
-    'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\AbstractTask'   => array(
+        'fields' => [],
+    ],
+    AbstractTask::class   => [
         'alias'  => 'task',
         'label'  => 'test task',
         'mode'   => Mode::ONLY_DESCENDANTS,
-        'fields' => array(),
-    ),
-    'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\RepeatableTask' => array(
+        'fields' => [],
+    ],
+    RepeatableTask::class => [
         'alias'  => 'repeatable_task',
         'label'  => 'repeatable_task',
         'mode'   => Mode::NORMAL,
-        'fields' => array(),
-    ),
-    'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\ScheduledTask'  => array(
+        'fields' => [],
+    ],
+    ScheduledTask::class  => [
         'alias'  => 'scheduled_task',
         'label'  => 'scheduled_task',
         'mode'   => Mode::NORMAL,
-        'fields' => array(),
-    )
-);
+        'fields' => [],
+    ]
+];

@@ -15,12 +15,11 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class DelegatingLoaderTest extends TestCase
 {
-    private LoaderInterface|MockObject $decoratedLoader;
-
-    private EventDispatcherInterface|MockObject $eventDispatcher;
-
+    private LoaderInterface&MockObject $decoratedLoader;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
     private DelegatingLoader $loader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->decoratedLoader = $this->createMock(LoaderInterface::class);
@@ -36,15 +35,13 @@ class DelegatingLoaderTest extends TestCase
 
         $routes = new RouteCollection();
 
-        $this->decoratedLoader
-            ->expects(self::once())
+        $this->decoratedLoader->expects(self::once())
             ->method('load')
             ->with($resource, $type)
             ->willReturn($routes);
 
         $newRoute = $this->createMock(Route::class);
-        $this->eventDispatcher
-            ->expects(self::once())
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with(self::isInstanceOf(RouteCollectionEvent::class), RouteCollectionEvent::ALL)
             ->willReturnCallback(function (RouteCollectionEvent $event) use ($newRoute) {
@@ -64,8 +61,7 @@ class DelegatingLoaderTest extends TestCase
         $resource = 'some_resource';
         $type = 'some_type';
 
-        $this->decoratedLoader
-            ->expects(self::once())
+        $this->decoratedLoader->expects(self::once())
             ->method('supports')
             ->with($resource, $type)
             ->willReturn(true);

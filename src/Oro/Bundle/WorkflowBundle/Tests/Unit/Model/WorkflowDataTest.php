@@ -5,15 +5,15 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\Persistence\Proxy;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class WorkflowDataTest extends \PHPUnit\Framework\TestCase
+class WorkflowDataTest extends TestCase
 {
-    /** @var WorkflowData */
-    private $data;
+    private WorkflowData $data;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +21,7 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         $this->data = new WorkflowData();
     }
 
-    public function testIsModified()
+    public function testIsModified(): void
     {
         $this->assertFalse($this->data->isModified());
         $this->data->set('foo', 'bar');
@@ -41,7 +41,7 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->data->isModified());
     }
 
-    public function testHasGetSetRemove()
+    public function testHasGetSetRemove(): void
     {
         $this->assertFalse($this->data->has('foo'));
         $this->assertNull($this->data->get('foo'));
@@ -55,7 +55,7 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->data->get('foo'));
     }
 
-    public function testIssetGetSetUnset()
+    public function testIssetGetSetUnset(): void
     {
         $this->assertTrue(isset($this->data->foo));
         $this->assertNull($this->data->foo);
@@ -69,7 +69,7 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->data->foo);
     }
 
-    public function testArrayAccess()
+    public function testArrayAccess(): void
     {
         $this->assertInstanceOf('ArrayAccess', $this->data);
 
@@ -85,7 +85,7 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->data['foo']);
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         $this->assertCount(0, $this->data);
 
@@ -102,7 +102,7 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $this->data);
     }
 
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $this->assertTrue($this->data->isEmpty());
 
@@ -110,7 +110,7 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->data->isEmpty());
     }
 
-    public function testIterable()
+    public function testIterable(): void
     {
         $this->data->set('foo', 'bar');
         $this->data->set('baz', 'qux');
@@ -123,7 +123,7 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $data);
     }
 
-    public function testGetValuesAll()
+    public function testGetValuesAll(): void
     {
         $this->data->set('foo', 'foo_value');
         $this->data->set('bar', 'bar_value');
@@ -141,7 +141,7 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetValuesWithNames()
+    public function testGetValuesWithNames(): void
     {
         $this->data->set('foo', 'foo_value');
         $this->data->set('bar', 'bar_value');
@@ -159,7 +159,7 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $this->data->set('foo', 'foo_value');
         $this->data->set('bar', 'bar_value');
@@ -191,7 +191,7 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetProxyValue()
+    public function testGetProxyValue(): void
     {
         $name = 'entity';
 
@@ -217,19 +217,19 @@ class WorkflowDataTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->data->get($name));
     }
 
-    public function testUnknownPathGet()
+    public function testUnknownPathGet(): void
     {
         $path = 'unknown_ppp.another';
         $this->assertNull($this->data->get($path));
     }
 
-    public function testUnknownPathSet()
+    public function testUnknownPathSet(): void
     {
         $path = 'unknown_ppp.another';
         $this->assertSame($this->data, $this->data->set($path, 'test'));
     }
 
-    public function testMappedField()
+    public function testMappedField(): void
     {
         $data = new \stdClass();
         $data->value = 'one';

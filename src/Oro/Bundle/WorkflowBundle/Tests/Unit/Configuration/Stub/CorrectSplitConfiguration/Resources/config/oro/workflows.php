@@ -1,6 +1,7 @@
 <?php
 
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -97,7 +98,7 @@ return [
                         'delete' => false
                     ],
                     'options' => [
-                        'class' => 'Oro\Bundle\UserBundle\Entity\User'
+                        'class' => User::class
                     ],
                     'value' => 1
                 ]

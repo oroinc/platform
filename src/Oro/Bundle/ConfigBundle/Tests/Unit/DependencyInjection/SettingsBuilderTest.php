@@ -4,9 +4,10 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
-class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
+class SettingsBuilderTest extends TestCase
 {
     public function testGetSettings(): void
     {

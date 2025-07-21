@@ -6,14 +6,14 @@ use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
 use Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimarySubscriber;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TypedAddress;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TypedAddressOwner;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
-class FixAddressesPrimarySubscriberTest extends \PHPUnit\Framework\TestCase
+class FixAddressesPrimarySubscriberTest extends TestCase
 {
-    /** @var FixAddressesPrimarySubscriber */
-    private $subscriber;
+    private FixAddressesPrimarySubscriber $subscriber;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +29,7 @@ class FixAddressesPrimarySubscriberTest extends \PHPUnit\Framework\TestCase
         return $address;
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
             [FormEvents::POST_SUBMIT => 'postSubmit'],
@@ -40,7 +40,7 @@ class FixAddressesPrimarySubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider postSubmitDataProvider
      */
-    public function testPostSubmit(array $allAddresses, $formAddressKey, array $expectedAddressesData)
+    public function testPostSubmit(array $allAddresses, $formAddressKey, array $expectedAddressesData): void
     {
         $owner = new TypedAddressOwner();
         foreach ($allAddresses as $address) {

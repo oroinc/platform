@@ -4,6 +4,8 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 use Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Manager\Stub\EmbeddedFormTypeStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -14,16 +16,11 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EmbeddedFormManagerTest extends \PHPUnit\Framework\TestCase
+class EmbeddedFormManagerTest extends TestCase
 {
-    /** @var FormRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formRegistry;
-
-    /** @var FormRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var EmbeddedFormManager */
-    private $manager;
+    private FormRegistryInterface&MockObject $formRegistry;
+    private FormFactoryInterface&MockObject $formFactory;
+    private EmbeddedFormManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,7 @@ class EmbeddedFormManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager = new EmbeddedFormManager($this->formRegistry, $this->formFactory);
     }
 
-    public function testShouldCreateForm()
+    public function testShouldCreateForm(): void
     {
         $type = 'type';
 
@@ -48,13 +45,13 @@ class EmbeddedFormManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($formInstance, $this->manager->createForm($type));
     }
 
-    public function testShouldReturnEmptyLabelForNotAddedType()
+    public function testShouldReturnEmptyLabelForNotAddedType(): void
     {
         $type = 'Test\Type';
         $this->assertNull($this->manager->getLabelByType($type));
     }
 
-    public function testShouldReturnLabelForAddedType()
+    public function testShouldReturnLabelForAddedType(): void
     {
         $type = 'Test\Type';
         $label = 'test_label';
@@ -62,14 +59,14 @@ class EmbeddedFormManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($label, $this->manager->getLabelByType($type));
     }
 
-    public function testShouldReturnTypeAsLabelForAddedTypeWithoutLabel()
+    public function testShouldReturnTypeAsLabelForAddedTypeWithoutLabel(): void
     {
         $type = 'Test\Type';
         $this->manager->addFormType($type);
         $this->assertEquals($type, $this->manager->getLabelByType($type));
     }
 
-    public function testShouldReturnAllAddedTypes()
+    public function testShouldReturnAllAddedTypes(): void
     {
         $types = [
             $type1 = 'Test\Type1' => 'test_label_1',
@@ -81,12 +78,12 @@ class EmbeddedFormManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($types, $this->manager->getAll());
     }
 
-    public function testShouldReturnEmptyDefaultCss()
+    public function testShouldReturnEmptyDefaultCss(): void
     {
         $this->assertEquals('', $this->manager->getDefaultCssByType('Test\Type'));
     }
 
-    public function testShouldReturnDefaultCss()
+    public function testShouldReturnDefaultCss(): void
     {
         $type = 'type';
         $typeInstance = $this->createMock(EmbeddedFormTypeStub::class);
@@ -107,7 +104,7 @@ class EmbeddedFormManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($defaultCss, $this->manager->getDefaultCssByType($type));
     }
 
-    public function testShouldReturnDefaultSuccessMessage()
+    public function testShouldReturnDefaultSuccessMessage(): void
     {
         $type = 'type';
         $typeInstance = $this->createMock(EmbeddedFormTypeStub::class);
@@ -128,12 +125,12 @@ class EmbeddedFormManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($defaultMessage, $this->manager->getDefaultSuccessMessageByType($type));
     }
 
-    public function testShouldReturnEmptyDefaultSuccessMessage()
+    public function testShouldReturnEmptyDefaultSuccessMessage(): void
     {
         $this->assertEquals('', $this->manager->getDefaultSuccessMessageByType('Test\Type'));
     }
 
-    public function testGetAllChoices()
+    public function testGetAllChoices(): void
     {
         $type1 = 'type1';
         $typeLabel1 = 'Type 1';
@@ -145,7 +142,7 @@ class EmbeddedFormManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$typeLabel1 => $type1, $typeLabel2 => $type2], $this->manager->getAllChoices());
     }
 
-    public function testGetTypeInstance()
+    public function testGetTypeInstance(): void
     {
         $innerType = $this->createMock(FormTypeInterface::class);
         $resolvedFormType = $this->createMock(ResolvedFormTypeInterface::class);

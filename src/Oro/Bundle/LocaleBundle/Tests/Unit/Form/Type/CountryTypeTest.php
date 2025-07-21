@@ -9,8 +9,7 @@ use Symfony\Component\Intl\Countries;
 
 class CountryTypeTest extends FormIntegrationTestCase
 {
-    /** @var CountryType */
-    private $formType;
+    private CountryType $formType;
 
     #[\Override]
     protected function setUp(): void

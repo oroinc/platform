@@ -11,17 +11,14 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LanguageProviderTest extends \PHPUnit\Framework\TestCase
+class LanguageProviderTest extends TestCase
 {
-    /** @var LanguageRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclHelper;
-
-    /** @var LanguageProvider */
-    private $provider;
+    private LanguageRepository&MockObject $repository;
+    private AclHelper&MockObject $aclHelper;
+    private LanguageProvider $provider;
 
     #[\Override]
     protected function setUp(): void

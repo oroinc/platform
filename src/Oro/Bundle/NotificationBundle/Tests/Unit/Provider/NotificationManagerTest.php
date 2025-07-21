@@ -10,19 +10,16 @@ use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\Handler\EventHandlerInterface;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Provider\NotificationManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class NotificationManagerTest extends \PHPUnit\Framework\TestCase
+class NotificationManagerTest extends TestCase
 {
-    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
+    private CacheInterface&MockObject $cache;
+    private EntityManagerInterface&MockObject $em;
+    private ManagerRegistry&MockObject $doctrine;
 
     #[\Override]
     protected function setUp(): void
@@ -76,7 +73,7 @@ class NotificationManagerTest extends \PHPUnit\Framework\TestCase
         return $rule;
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $eventName = 'test_event';
         $entity = $this->createMock(\stdClass::class);
@@ -105,7 +102,7 @@ class NotificationManagerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($notificationEvent->isPropagationStopped());
     }
 
-    public function testProcessWhenSomeHandlerStopsPropagation()
+    public function testProcessWhenSomeHandlerStopsPropagation(): void
     {
         $eventName = 'test_event';
         $entity = $this->createMock(\stdClass::class);
@@ -129,7 +126,7 @@ class NotificationManagerTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($notificationEvent->isPropagationStopped());
     }
 
-    public function testProcessNoRulesCache()
+    public function testProcessNoRulesCache(): void
     {
         $eventName = 'test_event';
         $entity = $this->createMock(\stdClass::class);

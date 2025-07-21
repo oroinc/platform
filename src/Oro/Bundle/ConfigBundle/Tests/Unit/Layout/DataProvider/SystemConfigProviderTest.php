@@ -4,14 +4,13 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Layout\DataProvider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Layout\DataProvider\SystemConfigProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SystemConfigProviderTest extends \PHPUnit\Framework\TestCase
+class SystemConfigProviderTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var SystemConfigProvider */
-    private $provider;
+    private ConfigManager&MockObject $configManager;
+    private SystemConfigProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class SystemConfigProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getValueDataProvider
      */
-    public function testGetValue(array $arguments)
+    public function testGetValue(array $arguments): void
     {
         $this->configManager->expects(self::once())
             ->method('get')

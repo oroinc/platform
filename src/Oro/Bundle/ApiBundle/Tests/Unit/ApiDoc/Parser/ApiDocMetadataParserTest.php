@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class ApiDocMetadataParserTest extends TestCase
 {
@@ -230,6 +231,39 @@ class ApiDocMetadataParserTest extends TestCase
         self::assertEquals(
             [
                 'property1' => [
+                    'required'    => false,
+                    'dataType'    => 'string',
+                    'actualType'  => 'guid',
+                    'description' => 'Property Description'
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testParseMetaPropertyWithResultName(): void
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata('Test\Entity');
+        $metadata->setIdentifierFieldNames(['id']);
+
+        $metadata->addMetaProperty(new MetaPropertyMetadata('property1', 'guid'))
+            ->setResultName('resultProperty1');
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('property1')->setDescription('Property Description');
+
+        $result = $this->parser->parse([
+            'options' => [
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        self::assertEquals(
+            [
+                'resultProperty1' => [
                     'required'    => false,
                     'dataType'    => 'string',
                     'actualType'  => 'guid',

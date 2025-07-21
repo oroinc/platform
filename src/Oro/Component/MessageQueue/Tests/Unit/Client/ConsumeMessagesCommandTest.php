@@ -8,15 +8,15 @@ use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class ConsumeMessagesCommandTest extends \PHPUnit\Framework\TestCase
+class ConsumeMessagesCommandTest extends TestCase
 {
+    private QueueConsumer&MockObject $consumer;
+    private DestinationMetaRegistry&MockObject $registry;
     private ConsumeMessagesCommand $command;
-
-    private QueueConsumer|\PHPUnit\Framework\MockObject\MockObject $consumer;
-
-    private DestinationMetaRegistry|\PHPUnit\Framework\MockObject\MockObject $registry;
 
     #[\Override]
     protected function setUp(): void

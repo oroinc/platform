@@ -7,11 +7,11 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
+use PHPUnit\Framework\TestCase;
 
-class DigitalAssetTest extends \PHPUnit\Framework\TestCase
+class DigitalAssetTest extends TestCase
 {
-    /** @var DigitalAsset */
-    private $entity;
+    private DigitalAsset $entity;
 
     #[\Override]
     protected function setUp(): void

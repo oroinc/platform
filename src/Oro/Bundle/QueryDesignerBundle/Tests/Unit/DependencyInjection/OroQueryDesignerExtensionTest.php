@@ -3,9 +3,10 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\QueryDesignerBundle\DependencyInjection\OroQueryDesignerExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroQueryDesignerExtensionTest extends \PHPUnit\Framework\TestCase
+class OroQueryDesignerExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

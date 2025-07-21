@@ -8,13 +8,13 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class RefreshGridTest extends \PHPUnit\Framework\TestCase
+class RefreshGridTest extends TestCase
 {
-    /** @var RefreshGrid */
-    private $action;
+    private RefreshGrid $action;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +23,7 @@ class RefreshGridTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $gridName = 'test_grid';
 
@@ -31,7 +31,7 @@ class RefreshGridTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([$gridName], ReflectionUtil::getPropertyValue($this->action, 'gridNames'));
     }
 
-    public function testInitializeException()
+    public function testInitializeException(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Gridname parameter must be specified');
@@ -42,7 +42,7 @@ class RefreshGridTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeMethodProvider
      */
-    public function testExecuteMethod(array $inputData, array $expectedData)
+    public function testExecuteMethod(array $inputData, array $expectedData): void
     {
         $context = new StubStorage($inputData['context']);
 

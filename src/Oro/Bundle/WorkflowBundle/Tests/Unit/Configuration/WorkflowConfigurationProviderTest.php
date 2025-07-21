@@ -14,6 +14,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationImportsProcesso
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowConfigurationImportException;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -24,10 +25,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class WorkflowConfigurationProviderTest extends \PHPUnit\Framework\TestCase
+class WorkflowConfigurationProviderTest extends TestCase
 {
-    /** @var WorkflowListConfiguration */
-    private $configuration;
+    private WorkflowListConfiguration $configuration;
     private KernelInterface $kernel;
 
     #[\Override]

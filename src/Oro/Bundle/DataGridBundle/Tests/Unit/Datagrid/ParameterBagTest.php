@@ -3,10 +3,11 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use PHPUnit\Framework\TestCase;
 
-class ParameterBagTest extends \PHPUnit\Framework\TestCase
+class ParameterBagTest extends TestCase
 {
-    public function testAll()
+    public function testAll(): void
     {
         $data = ['foo' => 'bar'];
 
@@ -15,7 +16,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($data, $parameters->all());
     }
 
-    public function testKeys()
+    public function testKeys(): void
     {
         $data = ['foo' => 'bar'];
 
@@ -24,7 +25,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['foo'], $parameters->keys());
     }
 
-    public function testReplace()
+    public function testReplace(): void
     {
         $data = ['foo' => 'bar'];
         $replaceData = ['bar' => 'baz'];
@@ -35,7 +36,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($replaceData, $parameters->all());
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $data = ['one' => ['one' => 'origin', 'two' => 'origin'], 'two' => 'origin'];
         $addData = ['one' => ['one' => 'new'], 'two' => 'new'];
@@ -47,7 +48,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedData, $parameters->all());
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $data = ['foo' => 'bar'];
 
@@ -57,7 +58,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('baz', $parameters->get('bar', 'baz'));
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $data = [];
 
@@ -67,7 +68,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['foo' => 'bar'], $parameters->all());
     }
 
-    public function testMergeKey()
+    public function testMergeKey(): void
     {
         $data = ['one' => ['one' => 'origin', 'two' => 'origin'], 'two' => 'origin'];
         $mergeKey = 'one';
@@ -80,7 +81,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedData, $parameters->all());
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $data = ['foo' => 'bar'];
 
@@ -90,7 +91,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($parameters->has('bar'));
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $data = ['foo' => 'bar'];
 

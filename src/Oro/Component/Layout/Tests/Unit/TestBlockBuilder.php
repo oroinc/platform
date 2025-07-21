@@ -8,17 +8,11 @@ use Oro\Component\Layout\LayoutBuilderInterface;
 
 class TestBlockBuilder
 {
-    /** @var string */
-    protected $id;
+    protected string $id;
+    protected LayoutBuilderInterface $layoutBuilder;
+    protected ContextInterface $context;
 
-    /** @var LayoutBuilderInterface */
-    protected $layoutBuilder;
-
-    /** @var ContextInterface */
-    protected $context;
-
-    /** @var int */
-    protected $childCount = 0;
+    protected int $childCount = 0;
 
     /**
      * @param LayoutBuilderInterface $layoutBuilder

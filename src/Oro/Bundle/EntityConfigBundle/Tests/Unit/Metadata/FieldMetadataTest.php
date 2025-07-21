@@ -5,11 +5,11 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Metadata;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
+use PHPUnit\Framework\TestCase;
 
-class FieldMetadataTest extends \PHPUnit\Framework\TestCase
+class FieldMetadataTest extends TestCase
 {
-    /** @var FieldMetadata */
-    private $fieldMetadata;
+    private FieldMetadata $fieldMetadata;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class FieldMetadataTest extends \PHPUnit\Framework\TestCase
         $this->fieldMetadata->mode = ConfigModel::MODE_DEFAULT;
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $this->assertEquals($this->fieldMetadata, unserialize(serialize($this->fieldMetadata)));
     }

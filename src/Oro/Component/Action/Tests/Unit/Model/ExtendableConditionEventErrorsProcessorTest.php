@@ -14,8 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExtendableConditionEventErrorsProcessorTest extends TestCase
 {
-    private RequestStack|MockObject $requestStack;
-
+    private RequestStack&MockObject $requestStack;
     private ExtendableConditionEventErrorsProcessor $errorsProcessor;
 
     #[\Override]

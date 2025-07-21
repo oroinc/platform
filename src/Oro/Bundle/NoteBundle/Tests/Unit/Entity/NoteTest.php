@@ -5,10 +5,11 @@ namespace Oro\Bundle\NoteBundle\Tests\Unit\Entity;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class NoteTest extends \PHPUnit\Framework\TestCase
+class NoteTest extends TestCase
 {
-    public function testGettersSetters()
+    public function testGettersSetters(): void
     {
         $note = new Note();
 
@@ -36,7 +37,7 @@ class NoteTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($organization, $note->getOrganization());
     }
 
-    public function testIsUpdatedFlags()
+    public function testIsUpdatedFlags(): void
     {
         $user = new User();
         $date = new \DateTime('2012-12-12 12:12:12');
@@ -48,7 +49,7 @@ class NoteTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($note->isUpdatedAtSet());
     }
 
-    public function testIsNotUpdatedFlags()
+    public function testIsNotUpdatedFlags(): void
     {
         $user = null;
         $date = null;

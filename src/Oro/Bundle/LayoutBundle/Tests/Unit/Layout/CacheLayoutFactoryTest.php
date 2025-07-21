@@ -15,12 +15,13 @@ use Oro\Component\Layout\LayoutFactoryInterface;
 use Oro\Component\Layout\LayoutRegistryInterface;
 use Oro\Component\Layout\LayoutRendererRegistryInterface;
 use Oro\Component\Layout\RawLayoutBuilderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class CacheLayoutFactoryTest extends \PHPUnit\Framework\TestCase
+class CacheLayoutFactoryTest extends TestCase
 {
-    private LayoutFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $baseLayoutFactory;
-
+    private LayoutFactoryInterface&MockObject $baseLayoutFactory;
     private CacheLayoutFactory $cacheLayoutFactory;
 
     #[\Override]

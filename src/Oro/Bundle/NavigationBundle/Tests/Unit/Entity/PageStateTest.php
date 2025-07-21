@@ -5,10 +5,11 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity;
 use Oro\Bundle\NavigationBundle\Entity\PageState;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class PageStateTest extends \PHPUnit\Framework\TestCase
+class PageStateTest extends TestCase
 {
-    public function testUser()
+    public function testUser(): void
     {
         $item = new PageState();
         $user = new User();
@@ -21,7 +22,7 @@ class PageStateTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($user, $item->getUser());
     }
 
-    public function testDateTime()
+    public function testDateTime(): void
     {
         $item = new PageState();
         $dateTime = new \DateTime();
@@ -33,7 +34,7 @@ class PageStateTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($dateTime, $item->getCreatedAt());
     }
 
-    public function testPageId()
+    public function testPageId(): void
     {
         $item = new PageState();
         $pageId = 'SomeId';
@@ -43,7 +44,7 @@ class PageStateTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($pageId, $item->getPageId());
     }
 
-    public function testData()
+    public function testData(): void
     {
         $item = new PageState();
         $data = 'test data';
@@ -53,7 +54,7 @@ class PageStateTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($data, $item->getData());
     }
 
-    public function testDoPrePersist()
+    public function testDoPrePersist(): void
     {
         $item = new PageState();
         $pageId = 'SomeId';
@@ -72,7 +73,7 @@ class PageStateTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(PageState::generateHash($pageId, $userId), $item->getPageHash());
     }
 
-    public function testDoPreUpdate()
+    public function testDoPreUpdate(): void
     {
         $item = new PageState();
 

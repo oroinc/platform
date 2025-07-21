@@ -4,10 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Event;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowChangesEventTest extends \PHPUnit\Framework\TestCase
+class WorkflowChangesEventTest extends TestCase
 {
-    public function testGetDefinition()
+    public function testGetDefinition(): void
     {
         $definition = new WorkflowDefinition();
 
@@ -16,7 +17,7 @@ class WorkflowChangesEventTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($definition, $event->getDefinition());
     }
 
-    public function testGetOriginalDefinition()
+    public function testGetOriginalDefinition(): void
     {
         $definition = new WorkflowDefinition();
         $original = new WorkflowDefinition();

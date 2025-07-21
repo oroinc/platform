@@ -3,9 +3,10 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\QueryDesignerBundle\DependencyInjection\Compiler\RegisterCollapsedAssociationsPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class RegisterCollapsedAssociationsPassTest extends \PHPUnit\Framework\TestCase
+class RegisterCollapsedAssociationsPassTest extends TestCase
 {
     public function testProcess(): void
     {

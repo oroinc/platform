@@ -11,14 +11,13 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Filter\WorkflowOperationFilter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowOperationFilterTest extends \PHPUnit\Framework\TestCase
+class WorkflowOperationFilterTest extends TestCase
 {
-    /** @var WorkflowDefinitionRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var WorkflowOperationFilter */
-    private $filter;
+    private WorkflowDefinitionRepository&MockObject $repository;
+    private WorkflowOperationFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -48,13 +47,13 @@ class WorkflowOperationFilterTest extends \PHPUnit\Framework\TestCase
         array $operationsToFilter,
         OperationFindCriteria $findCriteria,
         array $expected
-    ) {
+    ): void {
         $this->setUpWorkflowDefinitionRepository($disabledOperationsConfigs);
 
         $this->assertEquals($expected, $this->filter->filter($operationsToFilter, $findCriteria));
     }
 
-    public function testWontLoadConfigsTwice()
+    public function testWontLoadConfigsTwice(): void
     {
         $this->setUpWorkflowDefinitionRepository([['operation1' => []]]);
 

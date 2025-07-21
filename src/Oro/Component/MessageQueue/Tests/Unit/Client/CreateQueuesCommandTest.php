@@ -6,14 +6,14 @@ use Oro\Component\MessageQueue\Client\CreateQueuesCommand;
 use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMeta;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class CreateQueuesCommandTest extends \PHPUnit\Framework\TestCase
+class CreateQueuesCommandTest extends TestCase
 {
-    private DestinationMetaRegistry|\PHPUnit\Framework\MockObject\MockObject $registry;
-
-    private DriverInterface|\PHPUnit\Framework\MockObject\MockObject $driver;
-
+    private DestinationMetaRegistry&MockObject $registry;
+    private DriverInterface&MockObject $driver;
     private CreateQueuesCommand $command;
 
     #[\Override]

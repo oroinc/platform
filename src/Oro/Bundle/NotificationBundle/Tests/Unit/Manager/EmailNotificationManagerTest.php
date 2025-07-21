@@ -34,11 +34,8 @@ class EmailNotificationManagerTest extends TestCase
     private const CONTENT_FRENCH = 'French content';
 
     private MessageProducerInterface $messageProducer;
-
     private NotificationSettings $notificationSettings;
-
     private EmailModelFromEmailTemplateFactory $emailModelFromEmailTemplateFactory;
-
     private EmailNotificationManager $manager;
 
     #[\Override]
@@ -70,8 +67,7 @@ class EmailNotificationManagerTest extends TestCase
         );
 
         $sender = From::emailAddress('no-reply@example.com');
-        $this->notificationSettings
-            ->expects(self::once())
+        $this->notificationSettings->expects(self::once())
             ->method('getSenderByScopeEntity')
             ->willReturn($sender);
 
@@ -89,8 +85,7 @@ class EmailNotificationManagerTest extends TestCase
             ->setBody(self::CONTENT_FRENCH)
             ->setType(EmailTemplateInterface::TYPE_HTML);
 
-        $this->emailModelFromEmailTemplateFactory
-            ->expects(self::exactly(2))
+        $this->emailModelFromEmailTemplateFactory->expects(self::exactly(2))
             ->method('createEmailModel')
             ->withConsecutive(
                 [
@@ -152,8 +147,7 @@ class EmailNotificationManagerTest extends TestCase
             self::SUBJECT_CUSTOM
         );
 
-        $this->notificationSettings
-            ->expects(self::never())
+        $this->notificationSettings->expects(self::never())
             ->method('getSender');
 
         $englishEmailModel = (new EmailModel())
@@ -170,8 +164,7 @@ class EmailNotificationManagerTest extends TestCase
             ->setBody(self::CONTENT_FRENCH)
             ->setType(EmailTemplateInterface::TYPE_HTML);
 
-        $this->emailModelFromEmailTemplateFactory
-            ->expects(self::exactly(2))
+        $this->emailModelFromEmailTemplateFactory->expects(self::exactly(2))
             ->method('createEmailModel')
             ->withConsecutive(
                 [
@@ -231,15 +224,13 @@ class EmailNotificationManagerTest extends TestCase
         );
 
         $sender = From::emailAddress('no-reply@example.com');
-        $this->notificationSettings
-            ->expects(self::once())
+        $this->notificationSettings->expects(self::once())
             ->method('getSender')
             ->willReturn($sender);
 
         $exception = new EmailTemplateNotFoundException($notification->getTemplateCriteria());
 
-        $this->emailModelFromEmailTemplateFactory
-            ->expects(self::once())
+        $this->emailModelFromEmailTemplateFactory->expects(self::once())
             ->method('createEmailModel')
             ->with(
                 $sender,
@@ -277,8 +268,7 @@ class EmailNotificationManagerTest extends TestCase
             $sender
         );
 
-        $this->notificationSettings
-            ->expects(self::once())
+        $this->notificationSettings->expects(self::once())
             ->method('getSender')
             ->willReturn($sender);
 
@@ -296,8 +286,7 @@ class EmailNotificationManagerTest extends TestCase
             ->setBody(self::CONTENT_FRENCH)
             ->setType(EmailTemplateInterface::TYPE_HTML);
 
-        $this->emailModelFromEmailTemplateFactory
-            ->expects(self::exactly(2))
+        $this->emailModelFromEmailTemplateFactory->expects(self::exactly(2))
             ->method('createEmailModel')
             ->withConsecutive(
                 [
@@ -365,8 +354,7 @@ class EmailNotificationManagerTest extends TestCase
             $sender
         );
 
-        $this->notificationSettings
-            ->expects(self::once())
+        $this->notificationSettings->expects(self::once())
             ->method('getSender')
             ->willReturn($sender);
 
@@ -379,8 +367,7 @@ class EmailNotificationManagerTest extends TestCase
 
         $exception = new EmailTemplateNotFoundException($notification1->getTemplateCriteria());
 
-        $this->emailModelFromEmailTemplateFactory
-            ->expects(self::exactly(2))
+        $this->emailModelFromEmailTemplateFactory->expects(self::exactly(2))
             ->method('createEmailModel')
             ->withConsecutive(
                 [

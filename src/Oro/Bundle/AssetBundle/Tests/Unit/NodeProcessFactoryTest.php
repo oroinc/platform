@@ -8,7 +8,7 @@ use Symfony\Component\Process\Process;
 
 class NodeProcessFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $serverPath = $_SERVER['PATH'];
         $_SERVER['PATH'] = null;

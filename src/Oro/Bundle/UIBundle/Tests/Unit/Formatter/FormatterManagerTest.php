@@ -6,12 +6,12 @@ use Oro\Bundle\UIBundle\Exception\InvalidFormatterException;
 use Oro\Bundle\UIBundle\Formatter\FormatterManager;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\Formatter\TestDefaultFormatter;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\Formatter\TestFormatter;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class FormatterManagerTest extends \PHPUnit\Framework\TestCase
+class FormatterManagerTest extends TestCase
 {
-    /** @var FormatterManager */
-    private $manager;
+    private FormatterManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +31,7 @@ class FormatterManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormat()
+    public function testFormat(): void
     {
         $arguments = ['argument1', 'argument2'];
 
@@ -43,7 +43,7 @@ class FormatterManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test_value', $this->manager->format(null, 'test_format_name'));
     }
 
-    public function testFormatByNotExistingFormatter()
+    public function testFormatByNotExistingFormatter(): void
     {
         $this->expectException(InvalidFormatterException::class);
         $this->expectExceptionMessage('The formatter "not_existing_formatter" does not exist.');
@@ -54,7 +54,7 @@ class FormatterManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider guessFormatterDataProvider
      */
-    public function testGuessFormatter(string $type, ?string $expected)
+    public function testGuessFormatter(string $type, ?string $expected): void
     {
         self::assertSame(
             $expected,

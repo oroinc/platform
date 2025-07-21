@@ -6,13 +6,14 @@ use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\TestCase;
 
-class TransitionTriggerMessageTest extends \PHPUnit\Framework\TestCase
+class TransitionTriggerMessageTest extends TestCase
 {
     use EntityTrait;
     use EntityTestCaseTrait;
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $triggerId = 42;
         $mainEntityId = ['id' => 105];
@@ -26,7 +27,7 @@ class TransitionTriggerMessageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateFromArray()
+    public function testCreateFromArray(): void
     {
         $triggerId = 42;
         $mainEntityId = ['id' => 105];
@@ -41,7 +42,7 @@ class TransitionTriggerMessageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $triggerId = 42;
         $mainEntityId = ['id' => 105];

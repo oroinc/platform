@@ -11,6 +11,8 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TemplateResultType;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Template\CustomFormTemplateResponseProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,16 +21,11 @@ use Twig\Environment;
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class CustomFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCase
+class CustomFormTemplateResponseProcessorTest extends TestCase
 {
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $twig;
-
-    /** @var FormTemplateDataProviderRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $templateDataProviderRegistry;
-
-    /** @var CustomFormTemplateResponseProcessor */
-    private $processor;
+    private Environment&MockObject $twig;
+    private FormTemplateDataProviderRegistry&MockObject $templateDataProviderRegistry;
+    private CustomFormTemplateResponseProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -42,7 +39,7 @@ class CustomFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
         );
     }
 
-    public function testRenderedResponseResult()
+    public function testRenderedResponseResult(): void
     {
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())
@@ -105,7 +102,7 @@ class CustomFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
         $this->assertEquals('content', $context->getResult()->getContent());
     }
 
-    public function testSkipNonCustomFormContext()
+    public function testSkipNonCustomFormContext(): void
     {
         $context = $this->createMock(TransitionContext::class);
 
@@ -126,7 +123,7 @@ class CustomFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
         $this->processor->process($context);
     }
 
-    public function testSkipUnsupportedResultType()
+    public function testSkipUnsupportedResultType(): void
     {
         $context = $this->createMock(TransitionContext::class);
 
@@ -144,7 +141,7 @@ class CustomFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
         $this->processor->process($context);
     }
 
-    public function testSkipNotSaved()
+    public function testSkipNotSaved(): void
     {
         $context = $this->createMock(TransitionContext::class);
 

@@ -113,7 +113,7 @@ class RelatedEntityTransformerTest extends TestCase
 
     public function testReverseTransform(): void
     {
-        $value  = ['id' => 123, 'entity' => 'Test\Entity'];
+        $value = ['id' => 123, 'entity' => 'Test\Entity'];
         $entity = new \stdClass();
 
         $this->entityClassNameHelper->expects($this->once())
@@ -141,7 +141,7 @@ class RelatedEntityTransformerTest extends TestCase
 
     public function testReverseTransformByEntityAlias(): void
     {
-        $value  = ['id' => 123, 'entity' => 'alias'];
+        $value = ['id' => 123, 'entity' => 'alias'];
         $entity = new \stdClass();
 
         $this->entityClassNameHelper->expects($this->once())
@@ -214,7 +214,7 @@ class RelatedEntityTransformerTest extends TestCase
 
     public function testReverseTransformNoViewPermissions(): void
     {
-        $value  = ['id' => 123, 'entity' => 'Test\Entity'];
+        $value = ['id' => 123, 'entity' => 'Test\Entity'];
         $entity = new \stdClass();
 
         $this->entityClassNameHelper->expects($this->once())

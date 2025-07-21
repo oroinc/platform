@@ -8,8 +8,9 @@ use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Generator\PhpLayoutUpdateGenerator;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use Oro\Component\Layout\Tests\Unit\Loader\Stubs\StubConditionVisitor;
+use PHPUnit\Framework\TestCase;
 
-class PhpLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
+class PhpLayoutUpdateGeneratorTest extends TestCase
 {
     private PhpLayoutUpdateGenerator $generator;
 
@@ -23,7 +24,7 @@ class PhpLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider sourceCodeProvider
      */
-    public function testGenerate(string $code)
+    public function testGenerate(string $code): void
     {
         $data = new GeneratorData($code, 'testfilename.php');
 
@@ -62,7 +63,7 @@ CODE
     }
 
     // @codingStandardsIgnoreStart
-    public function testShouldCompileConditions()
+    public function testShouldCompileConditions(): void
     {
         self::assertSame(
             <<<'CODE'

@@ -3,10 +3,11 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
 use Oro\Component\MessageQueue\Client\CallbackMessageBuilder;
+use PHPUnit\Framework\TestCase;
 
-class CallbackMessageBuilderTest extends \PHPUnit\Framework\TestCase
+class CallbackMessageBuilderTest extends TestCase
 {
-    public function testGetMessage()
+    public function testGetMessage(): void
     {
         $builder = new CallbackMessageBuilder(function () {
             return 'test message';

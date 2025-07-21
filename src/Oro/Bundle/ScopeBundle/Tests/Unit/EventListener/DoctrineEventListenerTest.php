@@ -12,21 +12,16 @@ use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub as Entity;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\EventListener\DoctrineEventListener;
 use Oro\Bundle\ScopeBundle\Manager\ScopeCollection;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
 
-class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
+class DoctrineEventListenerTest extends TestCase
 {
-    /** @var ScopeCollection|\PHPUnit\Framework\MockObject\MockObject */
-    private $scheduledForInsertScopes;
-
-    /** @var CacheItemPoolInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $scopeCache;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var DoctrineEventListener */
-    private $listener;
+    private ScopeCollection&MockObject $scheduledForInsertScopes;
+    private CacheItemPoolInterface&MockObject $scopeCache;
+    private EntityManagerInterface&MockObject $em;
+    private DoctrineEventListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -44,7 +39,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new DoctrineEventListener($this->scheduledForInsertScopes, $this->scopeCache);
     }
 
-    public function testPreFlushForEmptyScheduledForInsertScopes()
+    public function testPreFlushForEmptyScheduledForInsertScopes(): void
     {
         $this->scheduledForInsertScopes->expects($this->once())
             ->method('isEmpty')
@@ -59,7 +54,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preFlush(new PreFlushEventArgs($this->em));
     }
 
-    public function testPreFlushForNotEmptyScheduledForInsertScopes()
+    public function testPreFlushForNotEmptyScheduledForInsertScopes(): void
     {
         $scope1 = new Scope();
         $scope2 = new Scope();
@@ -82,7 +77,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preFlush(new PreFlushEventArgs($this->em));
     }
 
-    public function testOnClear()
+    public function testOnClear(): void
     {
         $this->scheduledForInsertScopes->expects($this->once())
             ->method('clear');
@@ -90,7 +85,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onClear();
     }
 
-    public function testFlushWhenNoChangesRequireResetScopeCache()
+    public function testFlushWhenNoChangesRequireResetScopeCache(): void
     {
         $uow = $this->createMock(UnitOfWork::class);
         $scopeMetadata = $this->createMock(ClassMetadata::class);
@@ -127,7 +122,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postFlush();
     }
 
-    public function testNeedToResetScopeCacheFlag()
+    public function testNeedToResetScopeCacheFlag(): void
     {
         $uow = $this->createMock(UnitOfWork::class);
 
@@ -147,7 +142,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postFlush();
     }
 
-    public function testFlushWhenScopeEntityCreatedThatRequireResetScopeCache()
+    public function testFlushWhenScopeEntityCreatedThatRequireResetScopeCache(): void
     {
         $uow = $this->createMock(UnitOfWork::class);
 
@@ -173,7 +168,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postFlush();
     }
 
-    public function testFlushWhenScopeEntityUpdatedThatRequireResetScopeCache()
+    public function testFlushWhenScopeEntityUpdatedThatRequireResetScopeCache(): void
     {
         $uow = $this->createMock(UnitOfWork::class);
 
@@ -200,7 +195,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postFlush();
     }
 
-    public function testFlushWhenScopeEntityDeletedThatRequireResetScopeCache()
+    public function testFlushWhenScopeEntityDeletedThatRequireResetScopeCache(): void
     {
         $uow = $this->createMock(UnitOfWork::class);
         $scopeMetadata = $this->createMock(ClassMetadata::class);
@@ -237,7 +232,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postFlush();
     }
 
-    public function testFlushWhenScopeAssociationTargetEntityDeletedThatRequireResetScopeCache()
+    public function testFlushWhenScopeAssociationTargetEntityDeletedThatRequireResetScopeCache(): void
     {
         $uow = $this->createMock(UnitOfWork::class);
         $scopeMetadata = $this->createMock(ClassMetadata::class);

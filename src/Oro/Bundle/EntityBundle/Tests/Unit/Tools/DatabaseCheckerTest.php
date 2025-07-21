@@ -7,14 +7,13 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DatabaseCheckerTest extends \PHPUnit\Framework\TestCase
+class DatabaseCheckerTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var ApplicationState|\PHPUnit\Framework\MockObject\MockObject */
-    private $applicationState;
+    private ManagerRegistry&MockObject $doctrine;
+    private ApplicationState&MockObject $applicationState;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class DatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         $this->applicationState = $this->createMock(ApplicationState::class);
     }
 
-    public function testCheckDatabaseForInstalledApplication()
+    public function testCheckDatabaseForInstalledApplication(): void
     {
         $this->applicationState->expects(self::once())
             ->method('isInstalled')
@@ -37,7 +36,7 @@ class DatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($databaseChecker->checkDatabase());
     }
 
-    public function testCheckDatabaseForInstalledApplicationAfterCallClearCheckDatabase()
+    public function testCheckDatabaseForInstalledApplicationAfterCallClearCheckDatabase(): void
     {
         $connection = $this->setTablesExistExpectation(['test_table'], true);
         $this->doctrine->expects(self::once())
@@ -55,7 +54,7 @@ class DatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($databaseChecker->checkDatabase());
     }
 
-    public function testCheckDatabaseForNotInstalledApplication()
+    public function testCheckDatabaseForNotInstalledApplication(): void
     {
         $connection = $this->setTablesExistExpectation(['test_table'], true);
         $this->doctrine->expects(self::once())
@@ -73,7 +72,7 @@ class DatabaseCheckerTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($databaseChecker->checkDatabase());
     }
 
-    public function testCheckDatabaseForNotInstalledApplicationAndTablesDoNotExist()
+    public function testCheckDatabaseForNotInstalledApplicationAndTablesDoNotExist(): void
     {
         $connection = $this->setTablesExistExpectation(['test_table'], false);
         $this->doctrine->expects(self::once())

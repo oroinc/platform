@@ -95,7 +95,7 @@ class ApiDocMetadataParser implements ParserInterface
                 $metaPropertyMetadata,
                 $config->getField($metaPropertyName)
             );
-            $metaPropertiesData[$metaPropertyName] = $metaPropertyData;
+            $metaPropertiesData[$metaPropertyMetadata->getResultName() ?? $metaPropertyName] = $metaPropertyData;
         }
 
         $fields = $metadata->getFields();

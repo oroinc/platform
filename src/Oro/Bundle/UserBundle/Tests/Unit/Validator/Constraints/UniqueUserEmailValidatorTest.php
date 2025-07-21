@@ -7,14 +7,14 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Validator\Constraints\UniqueUserEmail;
 use Oro\Bundle\UserBundle\Validator\Constraints\UniqueUserEmailValidator;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class UniqueUserEmailValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $userManager;
+    private UserManager&MockObject $userManager;
 
     #[\Override]
     protected function setUp(): void

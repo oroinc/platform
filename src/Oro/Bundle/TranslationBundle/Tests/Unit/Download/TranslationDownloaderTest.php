@@ -18,6 +18,7 @@ use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
 use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
@@ -26,7 +27,7 @@ use Symfony\Component\Translation\Reader\TranslationReader;
 /**
  *  @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class TranslationDownloaderTest extends \PHPUnit\Framework\TestCase
+class TranslationDownloaderTest extends TestCase
 {
     use TempDirExtension;
 
@@ -59,33 +60,20 @@ YAML
         'escaping "double" quotes' => 'escaping "double" quotes',
     ];
 
-    /** @var TranslationServiceAdapterInterface|MockObject */
-    private $translationServiceAdapter;
-
-    /** @var TranslationMetricsProviderInterface|MockObject */
-    private $translationMetricsProvider;
-
-    /** @var JsTranslationDumper|MockObject */
-    private $jsTranslationDumper;
-
-    /** @var DatabasePersister|MockObject */
-    private $databasePersister;
-
-    /** @var ManagerRegistry|MockObject */
-    private $doctrine;
-
-    /** @var TranslationDownloader */
-    private $downloader;
-
-    /** @var EventDispatcherInterface|MockObject */
-    private $eventDispatcher;
+    private TranslationServiceAdapterInterface&MockObject $translationServiceAdapter;
+    private TranslationMetricsProviderInterface&MockObject $translationMetricsProvider;
+    private JsTranslationDumper&MockObject $jsTranslationDumper;
+    private DatabasePersister&MockObject $databasePersister;
+    private ManagerRegistry&MockObject $doctrine;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private TranslationDownloader $downloader;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->translationServiceAdapter = $this->createMock(TranslationServiceAdapterInterface::class);
         $this->translationMetricsProvider = $this->createMock(TranslationMetricsProviderInterface::class);
-        $this->jsTranslationDumper  = $this->createMock(JsTranslationDumper::class);
+        $this->jsTranslationDumper = $this->createMock(JsTranslationDumper::class);
         $this->databasePersister = $this->createMock(DatabasePersister::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
@@ -112,7 +100,6 @@ YAML
         if ($fs->exists($tmpDir)) {
             $fs->remove($tmpDir);
         }
-        parent::tearDown();
     }
 
     public function testFetchLanguageMetrics(): void

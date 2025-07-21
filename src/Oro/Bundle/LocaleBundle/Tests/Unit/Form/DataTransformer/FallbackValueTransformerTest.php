@@ -4,11 +4,11 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\FallbackValueTransformer;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
+use PHPUnit\Framework\TestCase;
 
-class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
+class FallbackValueTransformerTest extends TestCase
 {
-    /** @var FallbackValueTransformer */
-    private $transformer;
+    private FallbackValueTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void

@@ -3,10 +3,11 @@
 namespace Oro\Bundle\SoapBundle\Tests\Unit\Client\Settings;
 
 use Oro\Bundle\SoapBundle\Client\Settings\SoapClientSettings;
+use PHPUnit\Framework\TestCase;
 
-class SoapClientSettingsTest extends \PHPUnit\Framework\TestCase
+class SoapClientSettingsTest extends TestCase
 {
-    public function testAccessors()
+    public function testAccessors(): void
     {
         $wsdlFilePath = 'path';
         $methodName = 'method';

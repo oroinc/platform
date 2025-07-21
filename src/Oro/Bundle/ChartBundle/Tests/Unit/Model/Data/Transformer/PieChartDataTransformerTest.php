@@ -5,11 +5,11 @@ namespace Oro\Bundle\ChartBundle\Tests\Unit\Model\Data\Transformer;
 use Oro\Bundle\ChartBundle\Model\Data\ArrayData;
 use Oro\Bundle\ChartBundle\Model\Data\DataInterface;
 use Oro\Bundle\ChartBundle\Model\Data\Transformer\PieChartDataTransformer;
+use PHPUnit\Framework\TestCase;
 
-class PieChartDataTransformerTest extends \PHPUnit\Framework\TestCase
+class PieChartDataTransformerTest extends TestCase
 {
-    /** @var PieChartDataTransformer */
-    private $transformer;
+    private PieChartDataTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class PieChartDataTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformDataProvider
      */
-    public function testTransform(DataInterface $data, array $chartOptions, DataInterface $expectedData)
+    public function testTransform(DataInterface $data, array $chartOptions, DataInterface $expectedData): void
     {
         $this->assertEquals($expectedData->toArray(), $this->transformer->transform($data, $chartOptions)->toArray());
     }

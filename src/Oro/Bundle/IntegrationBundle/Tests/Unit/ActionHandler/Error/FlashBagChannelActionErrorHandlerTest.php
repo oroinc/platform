@@ -3,20 +3,17 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ActionHandler\Error;
 
 use Oro\Bundle\IntegrationBundle\ActionHandler\Error\FlashBagChannelActionErrorHandler;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class FlashBagChannelActionErrorHandlerTest extends \PHPUnit\Framework\TestCase
+class FlashBagChannelActionErrorHandlerTest extends TestCase
 {
-    /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
-    private $session;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var FlashBagChannelActionErrorHandler */
-    private $errorHandler;
+    private Session&MockObject $session;
+    private RequestStack&MockObject $requestStack;
+    private FlashBagChannelActionErrorHandler $errorHandler;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +27,7 @@ class FlashBagChannelActionErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $this->errorHandler = new FlashBagChannelActionErrorHandler($this->requestStack);
     }
 
-    public function testHandleErrors()
+    public function testHandleErrors(): void
     {
         $errors = ['error1', 'error2'];
 

@@ -14,6 +14,8 @@ use Oro\Bundle\UserBundle\Security\LoginSourceProviderForFailedRequestInterface;
 use Oro\Bundle\UserBundle\Security\LoginSourceProviderForSuccessRequestInterface;
 use Oro\Bundle\UserBundle\Security\SkippedLogAttemptsFirewallsProvider;
 use Oro\Bundle\UserBundle\Security\UserLoginAttemptLogger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -24,19 +26,12 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 
-class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
+class LoginAttemptsHandlerTest extends TestCase
 {
-    /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $userManager;
-
-    /** @var UserLoginAttemptLogger|\PHPUnit\Framework\MockObject\MockObject */
-    private $userLoginAttemptLogger;
-
-    /** @var SkippedLogAttemptsFirewallsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $skippedLogAttemptsFirewallsProvider;
-
-    /** @var LoginAttemptsHandler */
-    private $handler;
+    private UserManager&MockObject $userManager;
+    private UserLoginAttemptLogger&MockObject $userLoginAttemptLogger;
+    private SkippedLogAttemptsFirewallsProvider&MockObject $skippedLogAttemptsFirewallsProvider;
+    private LoginAttemptsHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -185,7 +180,7 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $username = 'john';
         $user = new User();
-        $request  = new Request();
+        $request = new Request();
         $request->attributes->set(Security::LAST_USERNAME, $username);
         $this->userManager->expects(self::once())
             ->method('findUserByUsernameOrEmail')
@@ -210,7 +205,7 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
     public function testOnAuthenticationFailureWithUserAsStringAndUserNotFound(): void
     {
         $username = 'john';
-        $request  = new Request();
+        $request = new Request();
         $request->attributes->set(Security::LAST_USERNAME, $username);
         $this->userManager->expects(self::once())
             ->method('findUserByUsernameOrEmail')

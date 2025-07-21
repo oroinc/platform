@@ -7,11 +7,12 @@ use Oro\Component\ExpressionLanguage\Node\CollectionMethodAnyNode;
 use Oro\Component\ExpressionLanguage\Node\CollectionMethodSumNode;
 use Oro\Component\ExpressionLanguage\Node\GetAttrNodeFactory;
 use Oro\Component\ExpressionLanguage\Node\GetPropertyNode;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 use Symfony\Component\ExpressionLanguage\Node\GetAttrNode as SymfonyGetAttrNode;
 use Symfony\Component\ExpressionLanguage\Node\Node;
 
-class GetAttrNodeFactoryTest extends \PHPUnit\Framework\TestCase
+class GetAttrNodeFactoryTest extends TestCase
 {
     public function testCreateNodeReturnsSymfonyGetAttrNodeWhenTypeArrayCall(): void
     {

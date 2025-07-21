@@ -13,7 +13,7 @@ use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 
 class StaticSegmentQueryBuilderTest extends SegmentDefinitionTestCase
 {
-    public function testBuild()
+    public function testBuild(): void
     {
         $segment = $this->getSegment();
 

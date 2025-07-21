@@ -7,14 +7,14 @@ use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
 use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
+use PHPUnit\Framework\TestCase;
 
-class AclPrivilegeEntityByConfigurableNameFilterTest extends \PHPUnit\Framework\TestCase
+class AclPrivilegeEntityByConfigurableNameFilterTest extends TestCase
 {
     private const CONFIGURABLE_NAME = 'default';
     private const ENTITY_CLASS = 'entity:Oro\Bundle\UserBundle\Entity\User';
 
-    /** @var AclPrivilegeEntityByConfigurableNameFilter */
-    private $filter;
+    private AclPrivilegeEntityByConfigurableNameFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +25,7 @@ class AclPrivilegeEntityByConfigurableNameFilterTest extends \PHPUnit\Framework\
     /**
      * @dataProvider isSupportedAclPrivilegeProvider
      */
-    public function testIsSupported(AclPrivilege $aclPrivilege, bool $isSupported)
+    public function testIsSupported(AclPrivilege $aclPrivilege, bool $isSupported): void
     {
         $this->assertSame($isSupported, $this->filter->isSupported($aclPrivilege));
     }

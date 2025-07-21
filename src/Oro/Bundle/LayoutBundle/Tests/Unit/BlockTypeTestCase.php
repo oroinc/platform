@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit;
 
-use Oro\Bundle\LayoutBundle\Layout\Block\Type;
+use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType;
+use Oro\Bundle\LayoutBundle\Layout\Block\Type\InputType;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
 
@@ -17,7 +18,7 @@ abstract class BlockTypeTestCase extends BaseBlockTypeTestCase
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);
 
         $layoutFactoryBuilder
-            ->addType(new Type\InputType())
-            ->addType(new Type\FormType());
+            ->addType(new InputType())
+            ->addType(new FormType());
     }
 }

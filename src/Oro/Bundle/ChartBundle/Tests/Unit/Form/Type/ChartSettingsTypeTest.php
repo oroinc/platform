@@ -5,6 +5,7 @@ namespace Oro\Bundle\ChartBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType;
 use Oro\Bundle\ChartBundle\Model\ConfigProvider;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
@@ -12,11 +13,8 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class ChartSettingsTypeTest extends FormIntegrationTestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var ChartSettingsType */
-    private $type;
+    private ConfigProvider&MockObject $configProvider;
+    private ChartSettingsType $type;
 
     #[\Override]
     protected function setUp(): void

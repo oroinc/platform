@@ -4,14 +4,13 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Layout\DataProvider;
 
 use Oro\Bundle\NavigationBundle\Layout\DataProvider\BreadcrumbProvider;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class BreadcrumbProviderTest extends \PHPUnit\Framework\TestCase
+class BreadcrumbProviderTest extends TestCase
 {
-    /** @var BreadcrumbManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $breadcrumbManager;
-
-    /** @var BreadcrumbProvider */
-    private $provider;
+    private BreadcrumbManagerInterface&MockObject $breadcrumbManager;
+    private BreadcrumbProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class BreadcrumbProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new BreadcrumbProvider($this->breadcrumbManager);
     }
 
-    public function testGetBreadcrumbs()
+    public function testGetBreadcrumbs(): void
     {
         $menuName = 'customer_usermenu';
         $breadcrumbs = [

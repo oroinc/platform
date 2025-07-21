@@ -8,10 +8,11 @@
 
 namespace Oro\Component\ExpressionLanguage\Tests\Unit\Node;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Compiler;
 use Symfony\Component\ExpressionLanguage\Node\Node;
 
-abstract class AbstractNodeTest extends \PHPUnit\Framework\TestCase
+abstract class AbstractNodeTest extends TestCase
 {
     /**
      * @dataProvider getEvaluateData

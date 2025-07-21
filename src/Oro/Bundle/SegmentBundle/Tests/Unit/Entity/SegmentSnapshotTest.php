@@ -4,14 +4,12 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
+use PHPUnit\Framework\TestCase;
 
-class SegmentSnapshotTest extends \PHPUnit\Framework\TestCase
+class SegmentSnapshotTest extends TestCase
 {
-    /** @var Segment */
-    private $segment;
-
-    /** @var SegmentSnapshot */
-    private $entity;
+    private Segment $segment;
+    private SegmentSnapshot $entity;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +18,7 @@ class SegmentSnapshotTest extends \PHPUnit\Framework\TestCase
         $this->entity = new SegmentSnapshot($this->segment);
     }
 
-    public function testSettersAndGetters()
+    public function testSettersAndGetters(): void
     {
         $this->assertNull($this->entity->getId());
         $this->assertNull($this->entity->getCreatedAt());

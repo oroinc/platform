@@ -5,16 +5,15 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Step;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Exception\ValidationException;
 use Oro\Bundle\EntityMergeBundle\Model\Step\ValidateStep;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ValidateStepTest extends \PHPUnit\Framework\TestCase
+class ValidateStepTest extends TestCase
 {
-    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $validator;
-
-    /** @var ValidateStep */
-    private $step;
+    private ValidatorInterface&MockObject $validator;
+    private ValidateStep $step;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class ValidateStepTest extends \PHPUnit\Framework\TestCase
         $this->step = new ValidateStep($this->validator);
     }
 
-    public function testRunWhenNoValidationConstraintViolations()
+    public function testRunWhenNoValidationConstraintViolations(): void
     {
         $data = $this->createMock(EntityData::class);
 
@@ -40,7 +39,7 @@ class ValidateStepTest extends \PHPUnit\Framework\TestCase
         $this->step->run($data);
     }
 
-    public function testRunWhenHasValidationConstraintViolations()
+    public function testRunWhenHasValidationConstraintViolations(): void
     {
         $this->expectException(ValidationException::class);
 

@@ -10,25 +10,20 @@ use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
 use Oro\Bundle\ReminderBundle\Twig\ReminderExtension;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class ReminderExtensionTest extends \PHPUnit\Framework\TestCase
+class ReminderExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var MessageParamsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $paramsProvider;
-
-    /** @var ReminderExtension */
-    private $extension;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private EntityManagerInterface&MockObject $entityManager;
+    private MessageParamsProvider&MockObject $paramsProvider;
+    private ReminderExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -52,7 +47,7 @@ class ReminderExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new ReminderExtension($container);
     }
 
-    public function testGetRequestedRemindersReturnAnEmptyArrayIfUserNotExist()
+    public function testGetRequestedRemindersReturnAnEmptyArrayIfUserNotExist(): void
     {
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
@@ -68,7 +63,7 @@ class ReminderExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetRequestedRemindersReturnAnEmptyArrayIfUserNotEqualType()
+    public function testGetRequestedRemindersReturnAnEmptyArrayIfUserNotEqualType(): void
     {
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
@@ -84,7 +79,7 @@ class ReminderExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetRequestedRemindersReturnCorrectData()
+    public function testGetRequestedRemindersReturnCorrectData(): void
     {
         $reminder = $this->createMock(Reminder::class);
         $reminder1 = $this->createMock(Reminder::class);

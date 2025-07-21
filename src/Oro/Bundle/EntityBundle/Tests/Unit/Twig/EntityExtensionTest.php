@@ -12,34 +12,23 @@ use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityBundle\Twig\EntityExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityExtensionTest extends \PHPUnit\Framework\TestCase
+class EntityExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var EntityIdAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityIdAccessor;
-
-    /** @var EntityRoutingHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityRoutingHelper;
-
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityNameResolver;
-
-    /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityAliasResolver;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EntityFallbackResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityFallbackResolver;
-
-    /** @var EntityExtension */
-    private $extension;
+    private EntityIdAccessor&MockObject $entityIdAccessor;
+    private EntityRoutingHelper&MockObject $entityRoutingHelper;
+    private EntityNameResolver&MockObject $entityNameResolver;
+    private EntityAliasResolver&MockObject $entityAliasResolver;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityFallbackResolver&MockObject $entityFallbackResolver;
+    private EntityExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -66,7 +55,7 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getClassNameDataProvider
      */
-    public function testGetClassName(?string $expectedClass, mixed $object)
+    public function testGetClassName(?string $expectedClass, mixed $object): void
     {
         $this->entityRoutingHelper->expects($this->never())
             ->method('getUrlSafeClassName');
@@ -99,7 +88,7 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetClassNameEscaped()
+    public function testGetClassNameEscaped(): void
     {
         $object = new ItemStub();
         $class = get_class($object);
@@ -116,7 +105,7 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetActionParamsNull()
+    public function testGetActionParamsNull(): void
     {
         $this->assertEquals(
             [],
@@ -124,7 +113,7 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetActionParamsNonObject()
+    public function testGetActionParamsNonObject(): void
     {
         $this->assertEquals(
             [],
@@ -132,7 +121,7 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetActionParams()
+    public function testGetActionParams(): void
     {
         $object = new ItemStub();
         $class = get_class($object);
@@ -162,7 +151,7 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityName()
+    public function testGetEntityName(): void
     {
         $entity = new \stdClass();
         $locale = 'fr_CA';
@@ -179,7 +168,7 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetUrlClassName()
+    public function testGetUrlClassName(): void
     {
         $originalClass = 'Test\\Class';
         $urlSafeClass = 'Test_Class';
@@ -195,7 +184,7 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFallbackValue()
+    public function testGetFallbackValue(): void
     {
         $className = ItemStub::class;
         $fieldName = 'test';
@@ -211,7 +200,7 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFallbackType()
+    public function testGetFallbackType(): void
     {
         $className = ItemStub::class;
         $fieldName = 'test';
@@ -227,7 +216,7 @@ class EntityExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityReference()
+    public function testGetEntityReference(): void
     {
         $className = ItemStub::class;
         $id = 1;

@@ -4,14 +4,12 @@ namespace Oro\Bundle\LoggerBundle\Tests\Unit\Cache;
 
 use Monolog\Handler\DeduplicationHandler;
 use Oro\Bundle\LoggerBundle\Cache\DeduplicationHandlerCacheWarmer;
+use PHPUnit\Framework\TestCase;
 
-class DeduplicationHandlerCacheWarmerTest extends \PHPUnit\Framework\TestCase
+class DeduplicationHandlerCacheWarmerTest extends TestCase
 {
-    /** @var DeduplicationHandlerCacheWarmer */
-    private $warmer;
-
-    /** @var DeduplicationHandler */
-    private $deduplicationHandler;
+    private DeduplicationHandlerCacheWarmer $warmer;
+    private DeduplicationHandler $deduplicationHandler;
 
     #[\Override]
     protected function setUp(): void

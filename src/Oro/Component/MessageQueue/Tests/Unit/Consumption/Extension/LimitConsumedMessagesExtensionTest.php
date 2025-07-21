@@ -6,27 +6,27 @@ use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumedMessagesExtension;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class LimitConsumedMessagesExtensionTest extends \PHPUnit\Framework\TestCase
+class LimitConsumedMessagesExtensionTest extends TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
+    public function testCouldBeConstructedWithRequiredArguments(): void
     {
         new LimitConsumedMessagesExtension(12345);
     }
 
-    public function testShouldThrowExceptionIfMessageLimitIsNotInt()
+    public function testShouldThrowExceptionIfMessageLimitIsNotInt(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected message limit is int but got: "double"');
         new LimitConsumedMessagesExtension(0.0);
     }
 
-    public function testOnBeforeReceiveShouldInterruptExecutionIfLimitIsZero()
+    public function testOnBeforeReceiveShouldInterruptExecutionIfLimitIsZero(): void
     {
         $context = $this->createContext();
-        $context->getLogger()
-            ->expects($this->once())
+        $context->getLogger()->expects($this->once())
             ->method('debug')
             ->with('Message consumption is interrupted since the message limit reached. limit: "0"');
 
@@ -41,11 +41,10 @@ class LimitConsumedMessagesExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($context->isExecutionInterrupted());
     }
 
-    public function testOnBeforeReceiveShouldInterruptExecutionIfLimitIsLessThatZero()
+    public function testOnBeforeReceiveShouldInterruptExecutionIfLimitIsLessThatZero(): void
     {
         $context = $this->createContext();
-        $context->getLogger()
-            ->expects($this->once())
+        $context->getLogger()->expects($this->once())
             ->method('debug')
             ->with('Message consumption is interrupted since the message limit reached. limit: "-1"');
 
@@ -60,11 +59,10 @@ class LimitConsumedMessagesExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($context->isExecutionInterrupted());
     }
 
-    public function testOnPostReceivedShouldInterruptExecutionIfMessageLimitExceeded()
+    public function testOnPostReceivedShouldInterruptExecutionIfMessageLimitExceeded(): void
     {
         $context = $this->createContext();
-        $context->getLogger()
-            ->expects($this->once())
+        $context->getLogger()->expects($this->once())
             ->method('debug')
             ->with('Message consumption is interrupted since the message limit reached. limit: "2"');
 

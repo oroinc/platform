@@ -20,9 +20,6 @@ class ThemeConfigurationSelectType extends AbstractType
                 'configs' => [
                     'placeholder' => 'oro.theme.themeconfiguration.form.choose',
                 ],
-                'attr' => [
-                    'class' => 'oro-theme-configuration-select',
-                ],
             ]
         );
     }

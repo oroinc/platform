@@ -11,13 +11,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class CurrentThemeProviderTest extends TestCase
 {
-    private Request|MockObject $requestStack;
+    private RequestStack&MockObject $requestStack;
     private CurrentThemeProvider $currentThemeProvider;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);
+
         $this->currentThemeProvider = new CurrentThemeProvider($this->requestStack);
     }
 
@@ -46,13 +47,17 @@ class CurrentThemeProviderTest extends TestCase
     {
         $request = new Request();
         $request->attributes->set('_theme', 'mainTheme');
-        $this->requestStack->method('getMainRequest')->willReturn($request);
+        $this->requestStack->expects(self::any())
+            ->method('getMainRequest')
+            ->willReturn($request);
         $this->assertEquals('mainTheme', $this->currentThemeProvider->getCurrentThemeId());
     }
 
     public function testGetCurrentThemeIdWithoutRequest(): void
     {
-        $this->requestStack->method('getMainRequest')->willReturn(null);
+        $this->requestStack->expects(self::any())
+            ->method('getMainRequest')
+            ->willReturn(null);
         $this->expectException(NotRequestContextRuntimeException::class);
         $this->currentThemeProvider->getCurrentThemeId();
     }

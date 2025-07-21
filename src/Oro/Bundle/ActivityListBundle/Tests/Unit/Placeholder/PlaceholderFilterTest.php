@@ -14,20 +14,15 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\UIBundle\Event\BeforeGroupingChainWidgetEvent;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
+class PlaceholderFilterTest extends TestCase
 {
-    /** @var ActivityListChainProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityListProvider;
-
-    /** @var ActivityListRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var PlaceholderFilter */
-    private $filter;
+    private ActivityListChainProvider&MockObject $activityListProvider;
+    private ActivityListRepository&MockObject $repository;
+    private ConfigManager&MockObject $configManager;
+    private PlaceholderFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -73,7 +68,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsApplicableNoSupportedActivities()
+    public function testIsApplicableNoSupportedActivities(): void
     {
         $testTarget = new TestTarget(1);
 
@@ -102,7 +97,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->filter->isApplicable($testTarget, ActivityScope::VIEW_PAGE));
     }
 
-    public function testIsApplicableWithSupportedActivities()
+    public function testIsApplicableWithSupportedActivities(): void
     {
         $testTarget = new TestTarget(1);
 
@@ -136,13 +131,13 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->filter->isApplicable($testTarget, ActivityScope::VIEW_PAGE));
     }
 
-    public function testIsApplicableWithNonManagedEntity()
+    public function testIsApplicableWithNonManagedEntity(): void
     {
         $testTarget = new TestNonManagedTarget(1);
         $this->assertFalse($this->filter->isApplicable($testTarget, ActivityScope::VIEW_PAGE));
     }
 
-    public function testIsApplicableForNotSupportedPage()
+    public function testIsApplicableForNotSupportedPage(): void
     {
         $testTarget = new TestTarget(1);
 
@@ -167,7 +162,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->filter->isApplicable($testTarget, ActivityScope::VIEW_PAGE));
     }
 
-    public function testIsApplicableOnNonSupportedTarget()
+    public function testIsApplicableOnNonSupportedTarget(): void
     {
         $entity = new TestNonActiveTarget(123);
 
@@ -201,7 +196,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->filter->isApplicable($entity, ActivityScope::VIEW_PAGE));
     }
 
-    public function testIsApplicableOnEmptyActivityList()
+    public function testIsApplicableOnEmptyActivityList(): void
     {
         $this->repository->expects($this->any())
             ->method('getRecordsCountForTargetClassAndId')
@@ -240,7 +235,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->filter->isApplicable($entity, ActivityScope::VIEW_PAGE));
     }
 
-    public function testIsApplicable()
+    public function testIsApplicable(): void
     {
         $this->repository->expects($this->any())
             ->method('getRecordsCountForTargetClassAndId')
@@ -288,7 +283,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         object $entity,
         ?int $configProviderSetting,
         array $expected
-    ) {
+    ): void {
         $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with(get_class($entity))
@@ -313,7 +308,8 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
     public function isAllowedButtonProvider(): array
     {
         $widgets = ['array' => 'of widgets'];
-        $entity  = new TestTarget(1);
+        $entity = new TestTarget(1);
+
         return [
             'entity with "update" activity entity config and "view" event' => [
                 'groupType'             => ActivityScope::VIEW_PAGE,

@@ -7,23 +7,20 @@ use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
 use Oro\Component\Layout\Extension\Theme\Model\CurrentThemeProvider;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
-class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
+class ImageTypeProviderTest extends TestCase
 {
     private const DIMENSION_ORIGINAL = 'product_original';
     private const DIMENSION_LARGE = 'product_large';
     private const DIMENSION_SMALL = 'product_small';
     private const DIMENSION_CUSTOM = 'product_custom';
 
-    /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $themeManager;
-
-    /** @var CurrentThemeProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $currentThemeProvider;
-
-    /** @var ImageTypeProvider */
-    private $provider;
+    private ThemeManager&MockObject $themeManager;
+    private CurrentThemeProvider&MockObject $currentThemeProvider;
+    private ImageTypeProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,7 @@ class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new ImageTypeProvider($this->themeManager, $this->currentThemeProvider);
     }
 
-    public function testGetImageTypes()
+    public function testGetImageTypes(): void
     {
         $theme1MainDimensions = [self::DIMENSION_ORIGINAL, self::DIMENSION_LARGE];
         $theme1ListingDimensions = [self::DIMENSION_ORIGINAL];
@@ -50,7 +47,7 @@ class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($imageTypes['main']->getDimensions()['product_large']->getOption('option1'));
     }
 
-    public function testInvalidConfig()
+    public function testInvalidConfig(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->themeManager->expects(self::any())
@@ -66,7 +63,7 @@ class ImageTypeProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->getImageTypes();
     }
 
-    public function testGetImageDimensions()
+    public function testGetImageDimensions(): void
     {
         $theme1MainDimensions = [self::DIMENSION_ORIGINAL, self::DIMENSION_LARGE];
         $theme1ListingDimensions = [self::DIMENSION_ORIGINAL];

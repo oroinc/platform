@@ -4,16 +4,16 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\MultipleValueTransformer;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
-class MultipleValueTransformerTest extends \PHPUnit\Framework\TestCase
+class MultipleValueTransformerTest extends TestCase
 {
     private const FIELD_DEFAULT = 'default';
     private const FIELD_VALUES = 'values';
 
-    /** @var MultipleValueTransformer */
-    private $transformer;
+    private MultipleValueTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +24,7 @@ class MultipleValueTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformDataProvider
      */
-    public function testTransform(mixed $input, mixed $expected)
+    public function testTransform(mixed $input, mixed $expected): void
     {
         $this->assertEquals($expected, $this->transformer->transform($input));
     }
@@ -66,7 +66,7 @@ class MultipleValueTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testTransformUnexpectedTypeException()
+    public function testTransformUnexpectedTypeException(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "array", "DateTime" given');
@@ -77,7 +77,7 @@ class MultipleValueTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformDataProvider
      */
-    public function testReverseTransform(mixed $input, mixed $expected)
+    public function testReverseTransform(mixed $input, mixed $expected): void
     {
         $this->assertEquals($expected, $this->transformer->reverseTransform($input));
     }
@@ -120,7 +120,7 @@ class MultipleValueTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testReverseTransformUnexpectedTypeException()
+    public function testReverseTransformUnexpectedTypeException(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "array", "DateTime" given');
@@ -128,7 +128,7 @@ class MultipleValueTransformerTest extends \PHPUnit\Framework\TestCase
         $this->transformer->reverseTransform(new \DateTime());
     }
 
-    public function testReverseTransformNoDefaultDataException()
+    public function testReverseTransformNoDefaultDataException(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Value does not contain default value');
@@ -136,7 +136,7 @@ class MultipleValueTransformerTest extends \PHPUnit\Framework\TestCase
         $this->transformer->reverseTransform([]);
     }
 
-    public function testReverseTransformNoCollectionDataException()
+    public function testReverseTransformNoCollectionDataException(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Value does not contain collection value');

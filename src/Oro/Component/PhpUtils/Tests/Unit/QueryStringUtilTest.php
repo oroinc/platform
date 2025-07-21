@@ -3,16 +3,17 @@
 namespace Oro\Component\PhpUtils\Tests\Unit;
 
 use Oro\Component\PhpUtils\QueryStringUtil;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class QueryStringUtilTest extends \PHPUnit\Framework\TestCase
+class QueryStringUtilTest extends TestCase
 {
     /**
      * @dataProvider buildQueryStringDataProvider
      */
-    public function testBuildQueryString($parameters, $expectedQueryString)
+    public function testBuildQueryString($parameters, $expectedQueryString): void
     {
         self::assertEquals(
             $expectedQueryString,
@@ -42,7 +43,7 @@ class QueryStringUtilTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testBuildQueryStringWithNullParameterValue()
+    public function testBuildQueryStringWithNullParameterValue(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected string value for the parameter "prm1", given "NULL".');
@@ -50,7 +51,7 @@ class QueryStringUtilTest extends \PHPUnit\Framework\TestCase
         QueryStringUtil::buildQueryString(['prm1' => null]);
     }
 
-    public function testBuildQueryStringWithNotStringScalarParameterValue()
+    public function testBuildQueryStringWithNotStringScalarParameterValue(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected string value for the parameter "prm1", given "integer".');
@@ -58,7 +59,7 @@ class QueryStringUtilTest extends \PHPUnit\Framework\TestCase
         QueryStringUtil::buildQueryString(['prm1' => 0]);
     }
 
-    public function testBuildQueryStringWithArrayParameterValue()
+    public function testBuildQueryStringWithArrayParameterValue(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected string value for the parameter "prm1", given "array".');
@@ -66,7 +67,7 @@ class QueryStringUtilTest extends \PHPUnit\Framework\TestCase
         QueryStringUtil::buildQueryString(['prm1' => []]);
     }
 
-    public function testBuildQueryStringWithObjectParameterValue()
+    public function testBuildQueryStringWithObjectParameterValue(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected string value for the parameter "prm1", given "stdClass".');
@@ -77,7 +78,7 @@ class QueryStringUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider addQueryStringDataProvider
      */
-    public function testAddQueryString($url, $queryString, $expectedUrl)
+    public function testAddQueryString($url, $queryString, $expectedUrl): void
     {
         self::assertEquals(
             $expectedUrl,
@@ -109,7 +110,7 @@ class QueryStringUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider addParameterDataProvider
      */
-    public function testAddParameter($queryString, $parameterName, $parameterValue, $expectedQueryString)
+    public function testAddParameter($queryString, $parameterName, $parameterValue, $expectedQueryString): void
     {
         self::assertEquals(
             $expectedQueryString,
@@ -231,7 +232,7 @@ class QueryStringUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider removeParameterDataProvider
      */
-    public function testRemoveParameter($queryString, $parameterName, $expectedQueryString)
+    public function testRemoveParameter($queryString, $parameterName, $expectedQueryString): void
     {
         self::assertEquals(
             $expectedQueryString,

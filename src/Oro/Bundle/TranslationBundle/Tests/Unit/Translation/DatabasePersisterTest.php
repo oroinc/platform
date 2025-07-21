@@ -15,8 +15,10 @@ use Oro\Bundle\TranslationBundle\Helper\FileBasedLanguageHelper;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DatabasePersisterTest extends \PHPUnit\Framework\TestCase
+class DatabasePersisterTest extends TestCase
 {
     private const TEST_LOCALE = 'en';
     private const TEST_DATA = [
@@ -31,26 +33,13 @@ class DatabasePersisterTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var TranslationRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationRepository;
-
-    /** @var TranslationKeyRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationKeyRepository;
-
-    /** @var TranslationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationManager;
-
-    /** @var FileBasedLanguageHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileBasedLanguageHelper;
-
-    /** @var Language */
-    private $language;
-
-    /** @var DatabasePersister */
-    private $persister;
+    private EntityManagerInterface&MockObject $em;
+    private TranslationRepository&MockObject $translationRepository;
+    private TranslationKeyRepository&MockObject $translationKeyRepository;
+    private TranslationManager&MockObject $translationManager;
+    private FileBasedLanguageHelper&MockObject $fileBasedLanguageHelper;
+    private Language $language;
+    private DatabasePersister $persister;
 
     #[\Override]
     protected function setUp(): void

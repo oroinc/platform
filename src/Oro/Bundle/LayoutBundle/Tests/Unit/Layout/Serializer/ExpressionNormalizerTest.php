@@ -4,17 +4,16 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Serializer;
 
 use Oro\Bundle\LayoutBundle\Layout\Serializer\ExpressionNormalizer;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCache;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use Symfony\Component\ExpressionLanguage\SerializedParsedExpression;
 
-class ExpressionNormalizerTest extends \PHPUnit\Framework\TestCase
+class ExpressionNormalizerTest extends TestCase
 {
-    /** @var ExpressionNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var ExpressionNormalizer */
-    private $normalizer;
+    private ExpressionLanguageCache&MockObject $cache;
+    private ExpressionNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void
@@ -24,19 +23,19 @@ class ExpressionNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->normalizer = new ExpressionNormalizer($this->cache);
     }
 
-    public function testGetShortTypeName()
+    public function testGetShortTypeName(): void
     {
         $this->assertEquals('e', $this->normalizer->getShortTypeName(ParsedExpression::class));
         $this->assertNull($this->normalizer->getShortTypeName(\stdClass::class));
     }
 
-    public function testGetTypeName()
+    public function testGetTypeName(): void
     {
         $this->assertEquals(ParsedExpression::class, $this->normalizer->getTypeName('e'));
         $this->assertNull($this->normalizer->getTypeName(ParsedExpression::class));
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $this->assertFalse($this->normalizer->supportsNormalization((object)[]));
         $this->assertTrue($this->normalizer->supportsNormalization(
@@ -44,7 +43,7 @@ class ExpressionNormalizerTest extends \PHPUnit\Framework\TestCase
         ));
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $expression = '5';
 
@@ -64,7 +63,7 @@ class ExpressionNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->normalizer->normalize($parsedExpression));
     }
 
-    public function testNormalizeCached()
+    public function testNormalizeCached(): void
     {
         $expression = '5';
 
@@ -84,13 +83,13 @@ class ExpressionNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSupportsDenormalization()
+    public function testSupportsDenormalization(): void
     {
         $this->assertFalse($this->normalizer->supportsDenormalization([], 'Object'));
         $this->assertTrue($this->normalizer->supportsDenormalization([], ParsedExpression::class));
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $nodes = $this->createMock(ConstantNode::class);
 
@@ -101,7 +100,7 @@ class ExpressionNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($parsedExpression, $this->normalizer->denormalize($data, ParsedExpression::class));
     }
 
-    public function testDenormalizeCached()
+    public function testDenormalizeCached(): void
     {
         $expression = '5';
         $data = ['e' => '5'];

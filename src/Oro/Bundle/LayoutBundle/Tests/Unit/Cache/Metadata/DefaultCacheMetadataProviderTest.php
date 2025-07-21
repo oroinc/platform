@@ -10,10 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class DefaultCacheMetadataProviderTest extends TestCase
 {
-    /**
-     * @var DefaultCacheMetadataProvider
-     */
-    private $provider;
+    private DefaultCacheMetadataProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -123,7 +120,7 @@ class DefaultCacheMetadataProviderTest extends TestCase
      * @dataProvider getCacheMetadataNullResultProvider
      * @param bool|null|array $cacheConfig
      */
-    public function testGetCacheMetadataNullResult($cacheConfig)
+    public function testGetCacheMetadataNullResult($cacheConfig): void
     {
         $blockView = new BlockView();
         $blockView->vars['cache'] = $cacheConfig;

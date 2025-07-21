@@ -7,22 +7,19 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Datagrid\AttributeFamilyActionsConfiguration;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class AttributeFamilyActionsConfigurationTest extends \PHPUnit\Framework\TestCase
+class AttributeFamilyActionsConfigurationTest extends TestCase
 {
     use EntityTrait;
 
     private const ENTITY_ID = 777;
 
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var AttributeFamilyActionsConfiguration */
-    private $attributeFamilyActionsConfiguration;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private EntityManager&MockObject $entityManager;
+    private AttributeFamilyActionsConfiguration $attributeFamilyActionsConfiguration;
 
     #[\Override]
     protected function setUp(): void
@@ -51,7 +48,7 @@ class AttributeFamilyActionsConfigurationTest extends \PHPUnit\Framework\TestCas
     /**
      * @dataProvider isGrantedDataProvider
      */
-    public function testConfigureActionsVisibility(bool $isGranted)
+    public function testConfigureActionsVisibility(bool $isGranted): void
     {
         $attributeFamily = $this->getEntity(AttributeFamily::class, ['id' => self::ENTITY_ID]);
 

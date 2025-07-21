@@ -4,16 +4,15 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Voter;
 
 use Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEditVoter;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-class WorkflowEditVoterTest extends \PHPUnit\Framework\TestCase
+class WorkflowEditVoterTest extends TestCase
 {
-    /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $token;
-
-    /** @var WorkflowEditVoter */
-    private $voter;
+    private TokenInterface&MockObject $token;
+    private WorkflowEditVoter $voter;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class WorkflowEditVoterTest extends \PHPUnit\Framework\TestCase
         $this->voter = new WorkflowEditVoter();
     }
 
-    public function testVoteWithUnsupportedAttribute()
+    public function testVoteWithUnsupportedAttribute(): void
     {
         $this->assertEquals(
             VoterInterface::ACCESS_ABSTAIN,
@@ -31,7 +30,7 @@ class WorkflowEditVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVoteWithUnsupportedSubject()
+    public function testVoteWithUnsupportedSubject(): void
     {
         $this->assertEquals(
             VoterInterface::ACCESS_ABSTAIN,
@@ -39,7 +38,7 @@ class WorkflowEditVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVoteWithActiveWorkflow()
+    public function testVoteWithActiveWorkflow(): void
     {
         $definition = new WorkflowDefinition();
         $definition->setActive(true);
@@ -50,7 +49,7 @@ class WorkflowEditVoterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVoteWithInactiveWorkflow()
+    public function testVoteWithInactiveWorkflow(): void
     {
         $definition = new WorkflowDefinition();
         $definition->setActive(false);

@@ -6,18 +6,15 @@ use Doctrine\DBAL\Connection;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQueryExecutor;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class MigrationQueryExecutorTest extends \PHPUnit\Framework\TestCase
+class MigrationQueryExecutorTest extends TestCase
 {
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var MigrationQueryExecutor */
-    private $executor;
+    private Connection&MockObject $connection;
+    private LoggerInterface&MockObject $logger;
+    private MigrationQueryExecutor $executor;
 
     #[\Override]
     protected function setUp(): void
@@ -29,12 +26,12 @@ class MigrationQueryExecutorTest extends \PHPUnit\Framework\TestCase
         $this->executor->setLogger($this->logger);
     }
 
-    public function testGetConnection()
+    public function testGetConnection(): void
     {
         $this->assertSame($this->connection, $this->executor->getConnection());
     }
 
-    public function testExecuteSql()
+    public function testExecuteSql(): void
     {
         $query = 'DELETE FROM some_table';
 
@@ -48,7 +45,7 @@ class MigrationQueryExecutorTest extends \PHPUnit\Framework\TestCase
         $this->executor->execute($query, false);
     }
 
-    public function testExecuteSqlDryRun()
+    public function testExecuteSqlDryRun(): void
     {
         $query = 'DELETE FROM some_table';
 
@@ -61,7 +58,7 @@ class MigrationQueryExecutorTest extends \PHPUnit\Framework\TestCase
         $this->executor->execute($query, true);
     }
 
-    public function testExecuteMigrationQuery()
+    public function testExecuteMigrationQuery(): void
     {
         $query = $this->createMock(MigrationQuery::class);
 
@@ -72,7 +69,7 @@ class MigrationQueryExecutorTest extends \PHPUnit\Framework\TestCase
         $this->executor->execute($query, false);
     }
 
-    public function testExecuteConnectionAwareMigrationQuery()
+    public function testExecuteConnectionAwareMigrationQuery(): void
     {
         $query = $this->createMock(ParametrizedMigrationQuery::class);
 
@@ -86,7 +83,7 @@ class MigrationQueryExecutorTest extends \PHPUnit\Framework\TestCase
         $this->executor->execute($query, false);
     }
 
-    public function testExecuteMigrationQueryDryRun()
+    public function testExecuteMigrationQueryDryRun(): void
     {
         $queryDescription = 'test query';
 
@@ -106,7 +103,7 @@ class MigrationQueryExecutorTest extends \PHPUnit\Framework\TestCase
         $this->executor->execute($query, true);
     }
 
-    public function testExecuteMigrationQueryDryRunArrayDescription()
+    public function testExecuteMigrationQueryDryRunArrayDescription(): void
     {
         $queryDescription = ['test query 1', 'test query 2'];
 
@@ -129,7 +126,7 @@ class MigrationQueryExecutorTest extends \PHPUnit\Framework\TestCase
         $this->executor->execute($query, true);
     }
 
-    public function testExecuteMigrationQueryDryRunEmptyDescription()
+    public function testExecuteMigrationQueryDryRunEmptyDescription(): void
     {
         $queryDescription = null;
 

@@ -19,7 +19,9 @@ use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Category;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -27,7 +29,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ObjectMapperTest extends \PHPUnit\Framework\TestCase
+class ObjectMapperTest extends TestCase
 {
     use SearchMappingTypeCastingHandlersTestTrait;
 
@@ -35,35 +37,17 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
     private const TEST_COUNT = 10;
     private const TEST_PRICE = 150;
 
-    /** @var ObjectMapper */
-    protected $mapper;
+    protected ObjectMapper $mapper;
+    protected Manufacturer $manufacturer;
+    protected Product $product;
+    protected ?Category $category = null;
+    protected EventDispatcherInterface&MockObject $dispatcher;
+    protected EntityNameResolver&MockObject $nameResolver;
+    protected DoctrineHelper&MockObject $doctrineHelper;
+    protected SearchMappingProvider $mappingProvider;
+    protected HtmlTagHelper&MockObject $htmlTagHelper;
 
-    /** @var Manufacturer */
-    protected $manufacturer;
-
-    /** @var Product */
-    protected $product;
-
-    /** @var Category */
-    protected $category;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $dispatcher;
-
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $nameResolver;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
-
-    /** @var SearchMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $mappingProvider;
-
-    /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $htmlTagHelper;
-
-    /** @var array */
-    private $mappingConfig = [
+    private array $mappingConfig = [
         Manufacturer::class => [
             'fields' => [
                 [
@@ -183,8 +167,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    /** @var array */
-    private $categories = ['<p>men</p>', '<p>women</p>'];
+    private array $categories = ['<p>men</p>', '<p>women</p>'];
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
@@ -223,21 +206,17 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         $this->nameResolver->expects($this->any())
             ->method('getName')
             ->with($this->isType('object'), EntityNameProviderInterface::FULL)
-            ->willReturnCallback(
-                function ($entity) {
-                    return $entity->getName();
-                }
-            );
+            ->willReturnCallback(function ($entity) {
+                return $entity->getName();
+            });
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifier')
             ->with($this->isType('object'))
-            ->willReturnCallback(
-                function ($entity) {
-                    return $entity->getId();
-                }
-            );
+            ->willReturnCallback(function ($entity) {
+                return $entity->getId();
+            });
 
         $configProvider = $this->createMock(MappingConfigurationProvider::class);
         $configProvider->expects($this->any())
@@ -302,7 +281,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
      * * mapping to several target fields
      * * many-to-one relation
      */
-    public function testMapObjectForProduct()
+    public function testMapObjectForProduct(): void
     {
         $productName = $this->product->getName();
         $productDescription = $this->product->getDescription();
@@ -333,7 +312,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
     }
 
-    public function testAllTextLimitation()
+    public function testAllTextLimitation(): void
     {
         // create a product name exceeding the 256 length limitation
         $productName = 'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234'
@@ -380,7 +359,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
     }
 
-    public function testNullFieldValues()
+    public function testNullFieldValues(): void
     {
         $this->product->setCount(null);
         $this->product->setPrice(null);
@@ -412,7 +391,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
     }
 
-    public function testZeroNumberAndEmptyStringFieldValues()
+    public function testZeroNumberAndEmptyStringFieldValues(): void
     {
         $this->product->setCount(0);
         $this->product->setPrice(0.0);
@@ -456,7 +435,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
      * * nested one-to-many relation
      * * nested one-to-many relation without 'target_fields' mappings
      */
-    public function testMapObjectForManufacturer()
+    public function testMapObjectForManufacturer(): void
     {
         $productName = $this->product->getName();
 
@@ -487,7 +466,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
      * * nested many-to-many relation
      * * nested many-to-many relation without 'target_fields' mappings
      */
-    public function testMapObjectForCategory()
+    public function testMapObjectForCategory(): void
     {
         $categoryName = $this->category->getName();
         $productName = $this->product->getName();
@@ -508,12 +487,12 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->category));
     }
 
-    public function testMapObjectForNull()
+    public function testMapObjectForNull(): void
     {
         $this->assertEquals([], $this->mapper->mapObject(null));
     }
 
-    public function testMapObjectForNullFieldsAndManyToOneRelation()
+    public function testMapObjectForNullFieldsAndManyToOneRelation(): void
     {
         $product = new Product();
         $product->setId(42);
@@ -533,7 +512,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedMapping, $this->mapper->mapObject($product));
     }
 
-    public function testMapObjectForNullManyToManyRelation()
+    public function testMapObjectForNullManyToManyRelation(): void
     {
         $category = new Category();
         $category->setId(777);
@@ -557,7 +536,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
      * * all_text virtual field must contain actual data even if fields have been changed in listener
      * * data that has been provided for all_text field in listeners is not lost during generation of "all_text" field
      */
-    public function testMapObjectWithListener()
+    public function testMapObjectWithListener(): void
     {
         $product = new Product();
         $product->setName('test product');
@@ -591,19 +570,19 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntitiesListAliases()
+    public function testGetEntitiesListAliases(): void
     {
         $data = $this->mapper->getEntitiesListAliases();
 
         $this->assertEquals('test_product', $data[Product::class]);
     }
 
-    public function testGetMappingConfig()
+    public function testGetMappingConfig(): void
     {
         $this->assertEquals($this->mappingConfig, $this->mapper->getMappingConfig());
     }
 
-    public function testGetEntityMapParameter()
+    public function testGetEntityMapParameter(): void
     {
         $this->assertEquals(
             'test_product',
@@ -616,18 +595,18 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntities()
+    public function testGetEntities(): void
     {
         $entities = $this->mapper->getEntities();
         $this->assertEquals(Product::class, $entities[1]);
     }
 
-    public function testNonExistsConfig()
+    public function testNonExistsConfig(): void
     {
         $this->assertEquals([], $this->mapper->getEntityConfig('non exists entity'));
     }
 
-    public function testSelectedData()
+    public function testSelectedData(): void
     {
         $query = $this->createMock(Query::class);
         $query->expects($this->once())
@@ -668,7 +647,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBuildAllDataField()
+    public function testBuildAllDataField(): void
     {
         $allData = '';
 

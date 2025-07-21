@@ -7,14 +7,14 @@ use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DashboardTest extends \PHPUnit\Framework\TestCase
+class DashboardTest extends TestCase
 {
-    /** @var Dashboard */
-    private $dashboard;
+    private Dashboard $dashboard;
 
     #[\Override]
     protected function setUp(): void
@@ -22,17 +22,17 @@ class DashboardTest extends \PHPUnit\Framework\TestCase
         $this->dashboard = new Dashboard();
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $this->assertInstanceOf(Collection::class, $this->dashboard->getWidgets());
     }
 
-    public function testId()
+    public function testId(): void
     {
         $this->assertNull($this->dashboard->getId());
     }
 
-    public function testLabel()
+    public function testLabel(): void
     {
         $this->assertNull($this->dashboard->getLabel());
         $value = 'test';
@@ -40,14 +40,14 @@ class DashboardTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->dashboard->getLabel());
     }
 
-    public function testGetIsDefault()
+    public function testGetIsDefault(): void
     {
         $this->assertFalse($this->dashboard->getIsDefault());
         $this->dashboard->setIsDefault(true);
         $this->assertTrue($this->dashboard->getIsDefault());
     }
 
-    public function testName()
+    public function testName(): void
     {
         $this->assertNull($this->dashboard->getName());
         $value = 'test';
@@ -55,7 +55,7 @@ class DashboardTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->dashboard->getName());
     }
 
-    public function testOwner()
+    public function testOwner(): void
     {
         $this->assertNull($this->dashboard->getOwner());
         $value = $this->createMock(User::class);
@@ -63,7 +63,7 @@ class DashboardTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->dashboard->getOwner());
     }
 
-    public function testOrganization()
+    public function testOrganization(): void
     {
         $this->assertNull($this->dashboard->getOrganization());
         $value = $this->createMock(Organization::class);
@@ -71,7 +71,7 @@ class DashboardTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->dashboard->getOrganization());
     }
 
-    public function testStartDashboard()
+    public function testStartDashboard(): void
     {
         $this->assertNull($this->dashboard->getOwner());
         $value = $this->createMock(Dashboard::class);
@@ -79,7 +79,7 @@ class DashboardTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->dashboard->getStartDashboard());
     }
 
-    public function testAddAndResetWidgets()
+    public function testAddAndResetWidgets(): void
     {
         $widget = $this->createMock(Widget::class);
         $widget->expects($this->once())
@@ -93,7 +93,7 @@ class DashboardTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $this->dashboard->getWidgets()->count());
     }
 
-    public function testHasWidget()
+    public function testHasWidget(): void
     {
         $widget = $this->createMock(Widget::class);
         $this->assertFalse($this->dashboard->hasWidget($widget));
@@ -101,7 +101,7 @@ class DashboardTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->dashboard->hasWidget($widget));
     }
 
-    public function testRemoveWidget()
+    public function testRemoveWidget(): void
     {
         $widget = $this->createMock(Widget::class);
         $this->assertFalse($this->dashboard->removeWidget($widget));
@@ -111,7 +111,7 @@ class DashboardTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->dashboard->hasWidget($widget));
     }
 
-    public function testCreatedAt()
+    public function testCreatedAt(): void
     {
         $this->assertNull($this->dashboard->getCreatedAt());
         $date = new \DateTime();
@@ -119,7 +119,7 @@ class DashboardTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($date, $this->dashboard->getCreatedAt());
     }
 
-    public function testUpdatedAt()
+    public function testUpdatedAt(): void
     {
         $this->assertNull($this->dashboard->getUpdatedAt());
         $date = new \DateTime();
@@ -127,14 +127,14 @@ class DashboardTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($date, $this->dashboard->getUpdatedAt());
     }
 
-    public function testPrePersist()
+    public function testPrePersist(): void
     {
         $this->assertNull($this->dashboard->getCreatedAt());
         $this->dashboard->prePersist();
         $this->assertInstanceOf(\DateTime::class, $this->dashboard->getCreatedAt());
     }
 
-    public function testPreUpdate()
+    public function testPreUpdate(): void
     {
         $this->assertNull($this->dashboard->getUpdatedAt());
         $this->dashboard->preUpdate();

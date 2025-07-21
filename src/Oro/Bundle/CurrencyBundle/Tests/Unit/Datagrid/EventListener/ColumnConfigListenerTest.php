@@ -9,16 +9,15 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ColumnConfigListenerTest extends \PHPUnit\Framework\TestCase
+class ColumnConfigListenerTest extends TestCase
 {
     private const ENTITY = 'Test:Entity';
 
-    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassResolver;
-
-    /** @var ColumnConfigListener */
-    private $columnListener;
+    private EntityClassResolver&MockObject $entityClassResolver;
+    private ColumnConfigListener $columnListener;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +30,7 @@ class ColumnConfigListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildBeforeEventDataProvider
      */
-    public function testBuildBeforeEvent(array $inputConfig, array $expectedConfig)
+    public function testBuildBeforeEvent(array $inputConfig, array $expectedConfig): void
     {
         $this->entityClassResolver->expects(self::once())
             ->method('getEntityClass')

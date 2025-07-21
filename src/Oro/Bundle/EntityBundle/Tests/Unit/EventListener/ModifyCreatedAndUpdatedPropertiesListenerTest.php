@@ -12,20 +12,17 @@ use Oro\Bundle\EntityBundle\EventListener\ModifyCreatedAndUpdatedPropertiesListe
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\TestCase
+class ModifyCreatedAndUpdatedPropertiesListenerTest extends TestCase
 {
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ModifyCreatedAndUpdatedPropertiesListener */
-    private $listener;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private ConfigManager&MockObject $configManager;
+    private ModifyCreatedAndUpdatedPropertiesListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -39,8 +36,10 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\T
     /**
      * @dataProvider userDataProvider
      */
-    public function testModifyCreatedAndUpdatedPropertiesForNewEntity(object $user, bool $expectedCallSetUpdatedBy)
-    {
+    public function testModifyCreatedAndUpdatedPropertiesForNewEntity(
+        object $user,
+        bool $expectedCallSetUpdatedBy
+    ): void {
         $datesAwareEntity = $this->createMock(DatesAwareInterface::class);
 
         $datesAwareEntity->expects(self::once())
@@ -109,8 +108,10 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\T
     /**
      * @dataProvider userDataProvider
      */
-    public function testModifyCreatedAndUpdatedPropertiesForExistingEntity(object $user, bool $expectedCallSetUpdatedBy)
-    {
+    public function testModifyCreatedAndUpdatedPropertiesForExistingEntity(
+        object $user,
+        bool $expectedCallSetUpdatedBy
+    ): void {
         $datesAwareEntity = $this->createMock(DatesAwareInterface::class);
 
         $datesAwareEntity->expects(self::once())
@@ -176,7 +177,7 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\T
         ];
     }
 
-    public function testModifyCreatedAndUpdatedPropertiesForOwningEntity()
+    public function testModifyCreatedAndUpdatedPropertiesForOwningEntity(): void
     {
         $datesAwareEntity = $this->createMock(DatesAwareInterface::class);
         $datesAwareEntity->expects($this->once())

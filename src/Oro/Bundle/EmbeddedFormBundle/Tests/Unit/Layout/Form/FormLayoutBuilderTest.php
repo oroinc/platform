@@ -9,6 +9,8 @@ use Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Form\Type\Stub\CompoundFormTypeStub
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -17,21 +19,16 @@ use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormType;
 
-class FormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
+class FormLayoutBuilderTest extends TestCase
 {
     private const ROOT_ID = 'rootId';
     private const FORM_NAME = 'testForm';
     private const FIELD_PREFIX = 'testForm_';
     private const GROUP_PREFIX = 'testForm:group_';
 
-    /** @var LayoutManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $layoutManipulator;
-
-    /** @var BlockBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $blockBuilder;
-
-    /** @var FormLayoutBuilder */
-    private $builder;
+    private LayoutManipulatorInterface&MockObject $layoutManipulator;
+    private BlockBuilderInterface&MockObject $blockBuilder;
+    private FormLayoutBuilder $builder;
 
     #[\Override]
     protected function setUp(): void
@@ -48,7 +45,7 @@ class FormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder = new FormLayoutBuilder();
     }
 
-    public function testEmptyForm()
+    public function testEmptyForm(): void
     {
         $options = $this->getOptions();
         $form = $this->getForm();
@@ -61,7 +58,7 @@ class FormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $formAccessor->getProcessedFields());
     }
 
-    public function testFlatForm()
+    public function testFlatForm(): void
     {
         $options = $this->getOptions();
         $form = $this->getForm();
@@ -97,7 +94,7 @@ class FormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCompoundChildForm()
+    public function testCompoundChildForm(): void
     {
         $options = $this->getOptions();
         $form = $this->getForm();
@@ -142,7 +139,7 @@ class FormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCompoundChildFormWhichMarkedAsSimpleForm()
+    public function testCompoundChildFormWhichMarkedAsSimpleForm(): void
     {
         $options = $this->getOptions();
         $form = $this->getForm();
@@ -181,7 +178,7 @@ class FormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPreferredFields()
+    public function testPreferredFields(): void
     {
         $options = $this->getOptions();
         $options['preferred_fields'] = ['field2'];
@@ -219,7 +216,7 @@ class FormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPreferredCompoundFields()
+    public function testPreferredCompoundFields(): void
     {
         $options = $this->getOptions();
         $options['preferred_fields'] = ['field2.field21'];

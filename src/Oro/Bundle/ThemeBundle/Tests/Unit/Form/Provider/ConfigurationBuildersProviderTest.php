@@ -10,7 +10,6 @@ use PHPUnit\Framework\TestCase;
 final class ConfigurationBuildersProviderTest extends TestCase
 {
     private ConfigurationBuildersProvider $configurationBuildersProvider;
-
     private ConfigurationChildBuilderStub $childBuilderStub;
 
     #[\Override]

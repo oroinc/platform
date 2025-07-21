@@ -50,12 +50,16 @@
 
 {% block link_widget -%}
     {% apply spaceless %}
-        <a {{ block('block_attributes') }} href="{{ path is defined ? path : path(route_name, route_parameters) }}">
+        {% set url = path is defined ? path : path(route_name, route_parameters) %}
+        <a {{ block('block_attributes') }} href="{{ url }}">
             {%- if icon is defined %}
                 {% import '@OroUI/layouts/renderIcon.html.twig' as renderIcon %}
                 {% set iconSizeClass = iconSize is defined ? iconSize : 'theme-icon--medium' %}
                 {{ renderIcon.icon({name: icon, extraClass: iconSizeClass }) }}
             {%- endif -%}
+            {%- if useLinkAsLabel is defined and useLinkAsLabel %}
+                {% set text = url %}
+            {% endif -%}
             {%- if text is defined %}
                 {% set renderLinkLabel %}
                     {{- text|block_text(translation_domain) -}}

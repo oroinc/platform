@@ -8,19 +8,16 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\SecurityBundle\Filter\EntitySerializerFieldFilter;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser as Entity;
 use Oro\Component\EntitySerializer\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class EntitySerializerFieldFilterTest extends \PHPUnit\Framework\TestCase
+class EntitySerializerFieldFilterTest extends TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private ConfigManager&MockObject $configManager;
+    private DoctrineHelper&MockObject $doctrineHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +37,7 @@ class EntitySerializerFieldFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testForIdentityFieldWhenItIsNotProtected()
+    public function testForIdentityFieldWhenItIsNotProtected(): void
     {
         $entity = new Entity();
         $entityClass = Entity::class;
@@ -62,7 +59,7 @@ class EntitySerializerFieldFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testForNotIdentityFieldWhenIdentityFieldIsNotProtected()
+    public function testForNotIdentityFieldWhenIdentityFieldIsNotProtected(): void
     {
         $entity = new Entity();
         $entityClass = Entity::class;
@@ -86,7 +83,7 @@ class EntitySerializerFieldFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testForNotConfigurableEntity()
+    public function testForNotConfigurableEntity(): void
     {
         $entity = new Entity();
         $entityClass = Entity::class;
@@ -108,7 +105,7 @@ class EntitySerializerFieldFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testForEntityThatDoesNotSupportFieldAcl()
+    public function testForEntityThatDoesNotSupportFieldAcl(): void
     {
         $entity = new Entity();
         $entityClass = Entity::class;
@@ -136,7 +133,7 @@ class EntitySerializerFieldFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testForEntityThatSupportsFieldAclButItIsDisabled()
+    public function testForEntityThatSupportsFieldAclButItIsDisabled(): void
     {
         $entity = new Entity();
         $entityClass = Entity::class;
@@ -164,7 +161,7 @@ class EntitySerializerFieldFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWhenAccessToFieldIsGranted()
+    public function testWhenAccessToFieldIsGranted(): void
     {
         $entity = new Entity();
         $entityClass = Entity::class;
@@ -194,7 +191,7 @@ class EntitySerializerFieldFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWhenAccessToFieldValueIsDenied()
+    public function testWhenAccessToFieldValueIsDenied(): void
     {
         $entity = new Entity();
         $entityClass = Entity::class;
@@ -224,7 +221,7 @@ class EntitySerializerFieldFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWhenAccessToFieldIsDenied()
+    public function testWhenAccessToFieldIsDenied(): void
     {
         $entity = new Entity();
         $entityClass = Entity::class;

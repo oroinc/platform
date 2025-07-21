@@ -9,23 +9,16 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface;
 use Oro\Bundle\DataGridBundle\Tools\DatagridParametersHelper;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-abstract class AbstractStateProviderTest extends \PHPUnit\Framework\TestCase
+abstract class AbstractStateProviderTest extends TestCase
 {
-    /** @var GridViewManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $gridViewManager;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
-
-    /** @var DatagridParametersHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $datagridParametersHelper;
-
-    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    protected $datagridConfiguration;
-
-    /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
-    protected $datagridParameters;
+    protected GridViewManager&MockObject $gridViewManager;
+    protected TokenAccessorInterface&MockObject $tokenAccessor;
+    protected DatagridParametersHelper&MockObject $datagridParametersHelper;
+    protected DatagridConfiguration&MockObject $datagridConfiguration;
+    protected ParameterBag&MockObject $datagridParameters;
 
     #[\Override]
     protected function setUp(): void

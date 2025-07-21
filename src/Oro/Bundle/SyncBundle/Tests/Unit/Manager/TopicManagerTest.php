@@ -3,17 +3,16 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\SyncBundle\Manager\TopicManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 use Ratchet\Wamp\WampServerInterface;
 
-class TopicManagerTest extends \PHPUnit\Framework\TestCase
+class TopicManagerTest extends TestCase
 {
-    /** @var WampServerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $app;
-
-    /** @var TopicManager */
-    private $manager;
+    private WampServerInterface&MockObject $app;
+    private TopicManager $manager;
 
     #[\Override]
     protected function setUp(): void

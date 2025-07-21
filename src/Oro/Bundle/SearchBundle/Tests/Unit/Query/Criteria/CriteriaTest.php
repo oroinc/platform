@@ -6,15 +6,16 @@ use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Criteria\ExpressionBuilder;
 use Oro\Bundle\SearchBundle\Query\Query;
+use PHPUnit\Framework\TestCase;
 
-class CriteriaTest extends \PHPUnit\Framework\TestCase
+class CriteriaTest extends TestCase
 {
-    public function testExpressionBuilder()
+    public function testExpressionBuilder(): void
     {
         $this->assertInstanceOf(ExpressionBuilder::class, Criteria::expr());
     }
 
-    public function testImplodeFieldType()
+    public function testImplodeFieldType(): void
     {
         $this->assertEquals('type.name', Criteria::implodeFieldTypeName('type', 'name'));
     }
@@ -22,7 +23,7 @@ class CriteriaTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProviderForExplodeFieldType
      */
-    public function testExplodeFieldType(string $field, array $expected)
+    public function testExplodeFieldType(string $field, array $expected): void
     {
         $this->assertEquals($expected, Criteria::explodeFieldTypeName($field));
     }
@@ -33,7 +34,7 @@ class CriteriaTest extends \PHPUnit\Framework\TestCase
     public function testGetSearchOperatorByComparisonOperator(
         string $comparisonOperator,
         string $expectedQueryOperator
-    ) {
+    ): void {
         $queryOperator = Criteria::getSearchOperatorByComparisonOperator($comparisonOperator);
         $this->assertEquals($expectedQueryOperator, strtolower($queryOperator));
     }

@@ -3,17 +3,16 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclGroupProvidersPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
-class AclGroupProvidersPassTest extends \PHPUnit\Framework\TestCase
+class AclGroupProvidersPassTest extends TestCase
 {
     private ContainerBuilder $container;
-
     private Definition $chainProvider;
-
     private AclGroupProvidersPass $compiler;
 
     #[\Override]

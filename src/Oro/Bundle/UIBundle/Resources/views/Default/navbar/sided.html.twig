@@ -10,16 +10,16 @@
                 toggleSelector: '#main-menu-toggler'
             }
         }) }}>
-        <header class="main-menu__header">
+        <div class="main-menu__header">
             {% set organization_name %}
                 {% apply spaceless %}
                     {% placeholder organization_name %}
                 {% endapply %}
             {% endset %}
             {{ UI.app_logo(organization_name) }}
-        </header>
+        </div>
 
-        <nav class="scroller" id="main-menu"
+        <nav class="scroller" id="main-menu" aria-label="{{ 'Primary navigation'|trans }}"
                 {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/main-menu-view'}) }}>
             {{ block('application_menu') }}
         </nav>

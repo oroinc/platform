@@ -22,6 +22,7 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -34,38 +35,17 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class OwnerValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipMetadataProvider;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var OwnerTreeProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownerTreeProvider;
-
-    /** @var AclVoter|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclVoter;
-
-    /** @var AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclGroupProvider;
-
-    /** @var BusinessUnitManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $businessUnitManager;
-
-    /** @var Entity */
-    private $testEntity;
-
-    /** @var User */
-    private $currentUser;
-
-    /** @var Organization */
-    private $currentOrg;
+    private ManagerRegistry&MockObject $doctrine;
+    private OwnershipMetadataProviderInterface&MockObject $ownershipMetadataProvider;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private OwnerTreeProviderInterface&MockObject $ownerTreeProvider;
+    private AclVoter&MockObject $aclVoter;
+    private AclGroupProviderInterface&MockObject $aclGroupProvider;
+    private BusinessUnitManager&MockObject $businessUnitManager;
+    private Entity $testEntity;
+    private User $currentUser;
+    private Organization $currentOrg;
 
     #[\Override]
     protected function setUp(): void

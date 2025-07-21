@@ -14,23 +14,18 @@ use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Resolver\OptionsResolver;
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class OperationButtonTest extends \PHPUnit\Framework\TestCase
+class OperationButtonTest extends TestCase
 {
-    /** @var string */
-    private $originOperationName;
-
-    /** @var Operation|\PHPUnit\Framework\MockObject\MockObject */
-    private $operation;
-
-    /** @var OperationDefinition|\PHPUnit\Framework\MockObject\MockObject */
-    private $definition;
-
-    /** @var OperationButton */
-    private $button;
+    private string $originOperationName;
+    private Operation $operation;
+    private OperationDefinition&MockObject $definition;
+    private OperationButton $button;
 
     #[\Override]
     protected function setUp(): void
@@ -47,12 +42,12 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals($this->originOperationName, $this->button->getName());
     }
 
-    public function testGetLabel()
+    public function testGetLabel(): void
     {
         $label = 'test_label';
         $this->definition->expects($this->once())
@@ -72,7 +67,7 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($label, $this->button->getAriaLabel());
     }
 
-    public function testGetIcon()
+    public function testGetIcon(): void
     {
         $this->assertNull($this->button->getIcon());
 
@@ -84,7 +79,7 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($icon, $this->button->getIcon());
     }
 
-    public function testGetOrder()
+    public function testGetOrder(): void
     {
         $order = 50;
         $this->definition->expects($this->once())
@@ -94,12 +89,12 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($order, $this->button->getOrder());
     }
 
-    public function testGetTemplate()
+    public function testGetTemplate(): void
     {
         $this->assertEquals(OperationButton::DEFAULT_TEMPLATE, $this->button->getTemplate());
     }
 
-    public function testGetTemplateData()
+    public function testGetTemplateData(): void
     {
         $defaultData = [
             'params' => $this->operation->getDefinition(),
@@ -128,12 +123,12 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($defaultData, $templateData);
     }
 
-    public function testGetButtonContext()
+    public function testGetButtonContext(): void
     {
         $this->assertInstanceOf(ButtonContext::class, $this->button->getButtonContext());
     }
 
-    public function testGetTemplateWithConfiguredFrontendOptions()
+    public function testGetTemplateWithConfiguredFrontendOptions(): void
     {
         $templateName = uniqid('test_template', true);
         $this->definition->expects($this->once())
@@ -145,12 +140,12 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($templateName, $this->button->getTemplate());
     }
 
-    public function testGetOperation()
+    public function testGetOperation(): void
     {
         $this->assertEquals($this->operation, $this->button->getOperation());
     }
 
-    public function testSetData()
+    public function testSetData(): void
     {
         $newData = new ActionData(['test_field' => 'test value']);
         $this->assertNotEquals($newData, $this->button->getTemplateData()['actionData']);
@@ -158,12 +153,12 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($newData, $this->button->getTemplateData()['actionData']);
     }
 
-    public function testGetTranslationDomain()
+    public function testGetTranslationDomain(): void
     {
         $this->assertNull($this->button->getTranslationDomain());
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $button = new OperationButton(
             $this->originOperationName,

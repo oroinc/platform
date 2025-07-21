@@ -6,18 +6,13 @@ use Oro\Bundle\DraftBundle\Helper\DraftHelper;
 use Oro\Bundle\DraftBundle\Manager\Publisher;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PublisherTest extends \PHPUnit\Framework\TestCase
+class PublisherTest extends TestCase
 {
-    /**
-     * @var DraftHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $draftHelper;
-
-    /**
-     * @var Publisher
-     */
-    private $publisher;
+    private DraftHelper&MockObject $draftHelper;
+    private Publisher $publisher;
 
     #[\Override]
     protected function setUp(): void

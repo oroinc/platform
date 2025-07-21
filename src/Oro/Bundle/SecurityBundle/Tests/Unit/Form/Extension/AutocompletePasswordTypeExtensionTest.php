@@ -3,13 +3,13 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\SecurityBundle\Form\Extension\AutocompletePasswordTypeExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class AutocompletePasswordTypeExtensionTest extends \PHPUnit\Framework\TestCase
+class AutocompletePasswordTypeExtensionTest extends TestCase
 {
-    /** @var AutocompletePasswordTypeExtension */
-    private $extension;
+    private AutocompletePasswordTypeExtension $extension;
 
     #[\Override]
     protected function setUp(): void

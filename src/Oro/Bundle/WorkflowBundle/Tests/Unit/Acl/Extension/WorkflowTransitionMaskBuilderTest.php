@@ -3,10 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Extension;
 
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowTransitionMaskBuilder;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowTransitionMaskBuilderTest extends \PHPUnit\Framework\TestCase
+class WorkflowTransitionMaskBuilderTest extends TestCase
 {
-    public function testPerformTransitionGroup()
+    public function testPerformTransitionGroup(): void
     {
         $this->assertEquals(
             WorkflowTransitionMaskBuilder::GROUP_PERFORM_TRANSITION,
@@ -18,7 +19,7 @@ class WorkflowTransitionMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAllGroup()
+    public function testAllGroup(): void
     {
         $this->assertEquals(
             WorkflowTransitionMaskBuilder::GROUP_ALL,
@@ -26,7 +27,7 @@ class WorkflowTransitionMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemoveServiceBits()
+    public function testRemoveServiceBits(): void
     {
         $this->assertEquals(
             WorkflowTransitionMaskBuilder::REMOVE_SERVICE_BITS,
@@ -34,7 +35,7 @@ class WorkflowTransitionMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testServiceBits()
+    public function testServiceBits(): void
     {
         $this->assertEquals(
             WorkflowTransitionMaskBuilder::SERVICE_BITS,
@@ -42,7 +43,7 @@ class WorkflowTransitionMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEmptyPattern()
+    public function testGetEmptyPattern(): void
     {
         $builder = new WorkflowTransitionMaskBuilder();
 
@@ -52,7 +53,7 @@ class WorkflowTransitionMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternBasic()
+    public function testGetPatternBasic(): void
     {
         $builder = new WorkflowTransitionMaskBuilder();
         $builder->add(WorkflowTransitionMaskBuilder::MASK_PERFORM_TRANSITION_BASIC);
@@ -63,7 +64,7 @@ class WorkflowTransitionMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternLocal()
+    public function testGetPatternLocal(): void
     {
         $builder = new WorkflowTransitionMaskBuilder();
         $builder->add(WorkflowTransitionMaskBuilder::MASK_PERFORM_TRANSITION_LOCAL);
@@ -74,7 +75,7 @@ class WorkflowTransitionMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternDeep()
+    public function testGetPatternDeep(): void
     {
         $builder = new WorkflowTransitionMaskBuilder();
         $builder->add(WorkflowTransitionMaskBuilder::MASK_PERFORM_TRANSITION_DEEP);
@@ -85,7 +86,7 @@ class WorkflowTransitionMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternGlobal()
+    public function testGetPatternGlobal(): void
     {
         $builder = new WorkflowTransitionMaskBuilder();
         $builder->add(WorkflowTransitionMaskBuilder::MASK_PERFORM_TRANSITION_GLOBAL);
@@ -96,7 +97,7 @@ class WorkflowTransitionMaskBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPatternSystem()
+    public function testGetPatternSystem(): void
     {
         $builder = new WorkflowTransitionMaskBuilder();
         $builder->add(WorkflowTransitionMaskBuilder::MASK_PERFORM_TRANSITION_SYSTEM);

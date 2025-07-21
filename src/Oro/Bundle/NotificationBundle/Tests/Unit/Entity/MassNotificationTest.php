@@ -3,8 +3,9 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\NotificationBundle\Entity\MassNotification;
+use PHPUnit\Framework\TestCase;
 
-class MassNotificationTest extends \PHPUnit\Framework\TestCase
+class MassNotificationTest extends TestCase
 {
     private MassNotification $massNotification;
 

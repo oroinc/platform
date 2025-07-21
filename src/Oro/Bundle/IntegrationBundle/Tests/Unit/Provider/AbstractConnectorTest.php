@@ -18,18 +18,15 @@ use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\LoggerAwareIteratorSource;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\TestConnector;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
-class AbstractConnectorTest extends \PHPUnit\Framework\TestCase
+class AbstractConnectorTest extends TestCase
 {
-    /** @var StepExecution|\PHPUnit\Framework\MockObject\MockObject */
-    private $stepExecution;
-
-    /** @var Transport|\PHPUnit\Framework\MockObject\MockObject */
-    private $transportSettings;
-
-    /** @var TransportInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $transport;
+    private StepExecution&MockObject $stepExecution;
+    private Transport&MockObject $transportSettings;
+    private TransportInterface&MockObject $transport;
 
     #[\Override]
     protected function setUp(): void
@@ -57,10 +54,10 @@ class AbstractConnectorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider initializationDataProvider
      */
     public function testInitialization(
-        TransportInterface|\PHPUnit\Framework\MockObject\MockObject|null $transport,
+        TransportInterface|MockObject|null $transport,
         ?object $source,
         ?string $expectedException = null
-    ) {
+    ): void {
         $logger = new LoggerStrategy(new NullLogger());
         $contextRegistry = new ContextRegistry();
         $contextMediator = $this->createMock(ConnectorContextMediator::class);
@@ -148,7 +145,7 @@ class AbstractConnectorTest extends \PHPUnit\Framework\TestCase
         return new TestConnector($contextRegistry, $logger, $contextMediator);
     }
 
-    public function testGetStatusData()
+    public function testGetStatusData(): void
     {
         $connector = $this->getConnector();
         $connector->setStepExecution($this->stepExecution);

@@ -18,16 +18,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EntityFieldWriterTest extends TestCase
 {
-    private ConfigManager|MockObject $configManager;
-
-    private ConfigTranslationHelper|MockObject $translationHelper;
-
-    private EnumSynchronizer|MockObject $enumSynchronizer;
-
-    private EntityFieldStateChecker|MockObject $stateChecker;
-
-    private EventDispatcherInterface|MockObject $eventDispatcher;
-
+    private ConfigManager&MockObject $configManager;
+    private ConfigTranslationHelper&MockObject $translationHelper;
+    private EnumSynchronizer&MockObject $enumSynchronizer;
+    private EntityFieldStateChecker&MockObject $stateChecker;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
     private EntityFieldWriter $writer;
 
     #[\Override]

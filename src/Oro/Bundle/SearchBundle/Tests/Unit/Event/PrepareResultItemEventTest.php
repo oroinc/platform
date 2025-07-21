@@ -4,14 +4,13 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Event;
 
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PrepareResultItemEventTest extends \PHPUnit\Framework\TestCase
+class PrepareResultItemEventTest extends TestCase
 {
-    /** @var Item|\PHPUnit\Framework\MockObject\MockObject */
-    private $resultItem;
-
-    /** @var PrepareResultItemEvent */
-    private $event;
+    private Item&MockObject $resultItem;
+    private PrepareResultItemEvent $event;
 
     #[\Override]
     protected function setUp(): void
@@ -21,12 +20,12 @@ class PrepareResultItemEventTest extends \PHPUnit\Framework\TestCase
         $this->event = new PrepareResultItemEvent($this->resultItem);
     }
 
-    public function testGetResultItem()
+    public function testGetResultItem(): void
     {
         $this->assertEquals($this->resultItem, $this->event->getResultItem());
     }
 
-    public function testGetEntityObject()
+    public function testGetEntityObject(): void
     {
         $testObject = new \stdClass();
 

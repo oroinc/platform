@@ -4,11 +4,12 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\DataConverter;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\IntegrationBundle\ImportExport\DataConverter\IntegrationAwareDataConverter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class IntegrationAwareDataConverterTest extends \PHPUnit\Framework\TestCase
+class IntegrationAwareDataConverterTest extends TestCase
 {
-    /** @var IntegrationAwareDataConverter|\PHPUnit\Framework\MockObject\MockObject */
-    private $dataConverter;
+    private IntegrationAwareDataConverter&MockObject $dataConverter;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +20,7 @@ class IntegrationAwareDataConverterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider inputDataProvider
      */
-    public function testConvertToImportFormat(array $input, array $expected, ?ContextInterface $context)
+    public function testConvertToImportFormat(array $input, array $expected, ?ContextInterface $context): void
     {
         $this->dataConverter->expects($this->once())
             ->method('getHeaderConversionRules')

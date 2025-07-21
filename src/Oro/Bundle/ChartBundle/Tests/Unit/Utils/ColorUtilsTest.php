@@ -3,13 +3,14 @@
 namespace Oro\Bundle\ChartBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\ChartBundle\Utils\ColorUtils;
+use PHPUnit\Framework\TestCase;
 
-class ColorUtilsTest extends \PHPUnit\Framework\TestCase
+class ColorUtilsTest extends TestCase
 {
     /**
      * @dataProvider shadeColorProvider
      */
-    public function testShadeColor(string $color, float $shade, string $expectedColor)
+    public function testShadeColor(string $color, float $shade, string $expectedColor): void
     {
         $this->assertEquals($expectedColor, ColorUtils::shadeColor($color, $shade));
     }
@@ -30,7 +31,7 @@ class ColorUtilsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider insertShadeColorsProvider
      */
-    public function testInsertShadeColors(array|string $colors, int $nbShades, array|string $expectedColors)
+    public function testInsertShadeColors(array|string $colors, int $nbShades, array|string $expectedColors): void
     {
         $shadeColors = ColorUtils::insertShadeColors($colors, $nbShades, 0.2);
         $this->assertEquals($expectedColors, $shadeColors);

@@ -2,28 +2,29 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Func;
 
-use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Condition\TrueCondition;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Oro\Component\ConfigExpression\Func;
+use Oro\Component\ConfigExpression\Func\GetValue;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class GetValueTest extends \PHPUnit\Framework\TestCase
+class GetValueTest extends TestCase
 {
-    /** @var Func\GetValue */
-    protected $function;
+    private Func\GetValue $function;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->function = new Func\GetValue();
+        $this->function = new GetValue();
         $this->function->setContextAccessor(new ContextAccessor());
     }
 
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, array $context, string|bool $expectedResult)
+    public function testEvaluate(array $options, array $context, string|bool $expectedResult): void
     {
         $this->assertSame($this->function, $this->function->initialize($options));
         $this->assertEquals($expectedResult, $this->function->evaluate($context));
@@ -53,7 +54,7 @@ class GetValueTest extends \PHPUnit\Framework\TestCase
                 'expectedResult' => 'baz'
             ],
             'get_with_expr'                               => [
-                'options'        => [new Condition\TrueCondition()],
+                'options'        => [new TrueCondition()],
                 'context'        => [],
                 'expectedResult' => true
             ],
@@ -70,7 +71,7 @@ class GetValueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testInitializeFailsWhenEmptyOptions()
+    public function testInitializeFailsWhenEmptyOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 or 2 elements, but 0 given.');
@@ -78,7 +79,7 @@ class GetValueTest extends \PHPUnit\Framework\TestCase
         $this->function->initialize([]);
     }
 
-    public function testInitializeFailsWhenTooManyOptions()
+    public function testInitializeFailsWhenTooManyOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 or 2 elements, but 3 given.');
@@ -89,7 +90,7 @@ class GetValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray(array $options, ?string $message, array $expected)
+    public function testToArray(array $options, ?string $message, array $expected): void
     {
         $this->function->initialize($options);
         if ($message !== null) {
@@ -155,7 +156,7 @@ class GetValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile(array $options, ?string $message, string $expected)
+    public function testCompile(array $options, ?string $message, string $expected): void
     {
         $this->function->initialize($options);
         if ($message !== null) {

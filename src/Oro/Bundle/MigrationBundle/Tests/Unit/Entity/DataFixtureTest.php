@@ -3,11 +3,11 @@
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\MigrationBundle\Entity\DataFixture;
+use PHPUnit\Framework\TestCase;
 
-class DataFixtureTest extends \PHPUnit\Framework\TestCase
+class DataFixtureTest extends TestCase
 {
-    /** @var DataFixture */
-    private $dataFixtureEntity;
+    private DataFixture $dataFixtureEntity;
 
     #[\Override]
     protected function setUp(): void
@@ -15,7 +15,7 @@ class DataFixtureTest extends \PHPUnit\Framework\TestCase
         $this->dataFixtureEntity = new DataFixture();
     }
 
-    public function testDataFixtureEntity()
+    public function testDataFixtureEntity(): void
     {
         $this->assertNull($this->dataFixtureEntity->getId());
         $this->assertNull($this->dataFixtureEntity->getClassName());

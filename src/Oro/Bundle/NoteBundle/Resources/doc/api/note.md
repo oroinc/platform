@@ -141,23 +141,6 @@ Retrieve a record of the attachment uploaded with a specific note.
 
 Retrieve the ID of the file attached to a specific note.
 
-#### update_relationship
-
-Replace the file attached to a specific note.
-
-{@request:json_api}
-Example:
-
-```JSON
-{
-  "data": {
-    "type": "files",
-    "id": "6"
-  }
-}
-```
-{@/request}
-
 ### organization
 
 #### get_subresource

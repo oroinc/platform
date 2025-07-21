@@ -3,15 +3,14 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\TranslationBundle\Formatter\TranslatorFormatter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TranslatorFormatterTest extends \PHPUnit\Framework\TestCase
+class TranslatorFormatterTest extends TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var TranslatorFormatter */
-    private $formatter;
+    private TranslatorInterface&MockObject $translator;
+    private TranslatorFormatter $formatter;
 
     #[\Override]
     protected function setUp(): void

@@ -4,8 +4,9 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Client\Meta;
 
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\Meta\TopicMeta;
+use PHPUnit\Framework\TestCase;
 
-class TopicMetaTest extends \PHPUnit\Framework\TestCase
+class TopicMetaTest extends TestCase
 {
     public function testGetName(): void
     {

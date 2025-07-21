@@ -14,26 +14,17 @@ use Oro\Component\MessageQueue\Job\RootJobStatusCalculator;
 use Oro\Component\MessageQueue\Job\Topic\RootJobStoppedTopic;
 use Oro\Component\MessageQueue\StatusCalculator\AbstractStatusCalculator;
 use Oro\Component\MessageQueue\StatusCalculator\StatusCalculatorResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
+class RootJobStatusCalculatorTest extends TestCase
 {
-    /** @var JobManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobManager;
-
-    /** @var JobStatusChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobStatusChecker;
-
-    /** @var StatusCalculatorResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $statusCalculatorResolver;
-
-    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $messageProducer;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var RootJobStatusCalculator */
-    private $rootJobStatusCalculator;
+    private JobManagerInterface&MockObject $jobManager;
+    private JobStatusChecker $jobStatusChecker;
+    private StatusCalculatorResolver&MockObject $statusCalculatorResolver;
+    private MessageProducerInterface&MockObject $messageProducer;
+    private ManagerRegistry&MockObject $doctrine;
+    private RootJobStatusCalculator $rootJobStatusCalculator;
 
     #[\Override]
     protected function setUp(): void

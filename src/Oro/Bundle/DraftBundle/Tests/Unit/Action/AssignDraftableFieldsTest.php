@@ -10,35 +10,18 @@ use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class AssignDraftableFieldsTest extends \PHPUnit\Framework\TestCase
+class AssignDraftableFieldsTest extends TestCase
 {
-    /**
-     * @var ContextAccessor
-     */
-    private $contextAccessor;
-
-    /**
-     * @var DraftHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $draftHelper;
-
-    /**
-     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var ChainDraftableFieldsExclusionProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $chainDraftableFieldsExclusionProvider;
-
-    /**
-     * @var AssignDraftableFields
-     */
-    private $action;
+    private ContextAccessor $contextAccessor;
+    private DraftHelper&MockObject $draftHelper;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private ChainDraftableFieldsExclusionProvider&MockObject $chainDraftableFieldsExclusionProvider;
+    private AssignDraftableFields $action;
 
     #[\Override]
     protected function setUp(): void

@@ -9,8 +9,8 @@ Feature: Mime types entity field admin configuration
   Scenario: Create field for entity with file type
     Given I login as administrator
     Given I go to System/ Entities/ Entity Management
-    And filter "Name" as is equal to "Product"
-    And I click view Product in grid
+    And filter "Name" as is equal to "User"
+    And I click view User in grid
     And I click "Create field"
     And I fill form with:
       | Field name    | FileType     |

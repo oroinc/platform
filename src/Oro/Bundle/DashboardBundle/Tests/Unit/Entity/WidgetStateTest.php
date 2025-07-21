@@ -5,11 +5,11 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Entity;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Entity\WidgetState;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class WidgetStateTest extends \PHPUnit\Framework\TestCase
+class WidgetStateTest extends TestCase
 {
-    /** @var WidgetState */
-    private $state;
+    private WidgetState $state;
 
     #[\Override]
     protected function setUp(): void
@@ -17,12 +17,12 @@ class WidgetStateTest extends \PHPUnit\Framework\TestCase
         $this->state = new WidgetState();
     }
 
-    public function testId()
+    public function testId(): void
     {
         $this->assertNull($this->state->getId());
     }
 
-    public function testOwner()
+    public function testOwner(): void
     {
         $this->assertNull($this->state->getOwner());
         $owner = $this->createMock(User::class);
@@ -30,7 +30,7 @@ class WidgetStateTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($owner, $this->state->getOwner());
     }
 
-    public function testWidget()
+    public function testWidget(): void
     {
         $widget = $this->createMock(Widget::class);
         $this->assertNull($this->state->getWidget());
@@ -38,7 +38,7 @@ class WidgetStateTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($widget, $this->state->getWidget());
     }
 
-    public function testExpanded()
+    public function testExpanded(): void
     {
         $this->assertTrue($this->state->isExpanded());
         $this->assertEquals($this->state, $this->state->setExpanded(false));

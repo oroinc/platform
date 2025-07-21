@@ -7,8 +7,9 @@ use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\BarBundl
 use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\FooBundle;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigurationProviderTest extends TestCase
 {
     use TempDirExtension;
 
@@ -22,7 +23,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->configurationProvider = new ConfigurationProvider($cacheFile, false);
     }
 
-    public function testEmptyConfig()
+    public function testEmptyConfig(): void
     {
         CumulativeResourceManager::getInstance()
             ->clear()
@@ -35,7 +36,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->configurationProvider->getTitle('test'));
     }
 
-    public function testMenuTree()
+    public function testMenuTree(): void
     {
         $bundle1 = new BarBundle();
         $bundle2 = new FooBundle();
@@ -118,7 +119,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMenuItems()
+    public function testMenuItems(): void
     {
         $bundle1 = new BarBundle();
         $bundle2 = new FooBundle();
@@ -156,7 +157,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMenuTemplates()
+    public function testMenuTemplates(): void
     {
         $bundle1 = new BarBundle();
         $bundle2 = new FooBundle();
@@ -173,7 +174,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNavigationElements()
+    public function testNavigationElements(): void
     {
         $bundle1 = new BarBundle();
         $bundle2 = new FooBundle();
@@ -205,7 +206,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTitles()
+    public function testTitles(): void
     {
         $bundle1 = new BarBundle();
         $bundle2 = new FooBundle();

@@ -9,24 +9,19 @@ use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class TransitActionProcessorTest extends \PHPUnit\Framework\TestCase
+class TransitActionProcessorTest extends TestCase
 {
-    /** @var ProcessorBagConfigBuilder */
-    private $processorBagConfigBuilder;
-
-    /** @var ProcessorRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $processorRegistry;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var TransitActionProcessor */
-    private $processor;
+    private ProcessorBagConfigBuilder $processorBagConfigBuilder;
+    private ProcessorRegistryInterface&MockObject $processorRegistry;
+    private LoggerInterface&MockObject $logger;
+    private TransitActionProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -41,12 +36,12 @@ class TransitActionProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateContext()
+    public function testCreateContext(): void
     {
         self::assertInstanceOf(TransitionContext::class, $this->processor->createContext());
     }
 
-    public function testExecuteProcessors()
+    public function testExecuteProcessors(): void
     {
         $processor1 = $this->createMock(ProcessorInterface::class);
         $processor2 = $this->createMock(ProcessorInterface::class);
@@ -80,7 +75,7 @@ class TransitActionProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testExecuteProcessorsFailure()
+    public function testExecuteProcessorsFailure(): void
     {
         $processor1 = $this->createMock(ProcessorInterface::class);
         $processor2 = $this->createMock(ProcessorInterface::class);

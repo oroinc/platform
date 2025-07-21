@@ -3,11 +3,12 @@
 namespace Oro\Bundle\CacheBundle\Tests\Unit\Serializer;
 
 use Oro\Bundle\CacheBundle\Serializer\Serializer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class SerializerTest extends \PHPUnit\Framework\TestCase
+class SerializerTest extends TestCase
 {
     public function testCreateWithoutParameters(): void
     {

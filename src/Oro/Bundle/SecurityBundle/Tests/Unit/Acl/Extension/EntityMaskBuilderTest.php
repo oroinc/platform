@@ -4,31 +4,29 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
+use PHPUnit\Framework\TestCase;
 
-class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
+class EntityMaskBuilderTest extends TestCase
 {
     private const PATTERN_ALL_OFF = '................................';
 
     private const OFF = '.';
-    private const ON  = '*';
+    private const ON = '*';
 
-    /** @var int */
-    private $identity;
-
-    /** @var EntityMaskBuilder */
-    private $builder;
+    private int $identity;
+    private EntityMaskBuilder $builder;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->identity = $this->getIdentity(rand(0, 20));
+        $this->identity = $this->getIdentity(random_int(0, 20));
         $this->builder = new EntityMaskBuilder($this->identity, ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']);
     }
 
     /**
      * @dataProvider maskConstantProvider
      */
-    public function testMaskConstant(string $mask)
+    public function testMaskConstant(string $mask): void
     {
         $count = 0;
         $bitmask = decbin($this->builder->getMask($mask) & EntityMaskBuilder::REMOVE_SERVICE_BITS);
@@ -44,7 +42,7 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider addAndRemoveProvider
      */
-    public function testAddAndRemove(string|int $maskName, int $mask)
+    public function testAddAndRemove(string|int $maskName, int $mask): void
     {
         $this->builder->add($maskName);
         $this->assertEquals($mask | $this->identity, $this->builder->get());
@@ -53,7 +51,7 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->identity, $this->builder->get());
     }
 
-    public function testGetPattern()
+    public function testGetPattern(): void
     {
         $builder = new EntityMaskBuilder(0, ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']);
         $this->assertEquals(self::PATTERN_ALL_OFF, $builder->getPattern());
@@ -82,14 +80,14 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $builder->getPattern());
     }
 
-    public function testGetPatternWithUndefinedMask()
+    public function testGetPatternWithUndefinedMask(): void
     {
         $expected = self::ON . substr(self::PATTERN_ALL_OFF, 1);
 
         $this->assertEquals($expected, EntityMaskBuilder::getPatternFor((int)2147483648));
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $this->assertEquals($this->identity, $this->builder->get());
 
@@ -103,7 +101,7 @@ class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider groupProvider
      */
-    public function testGroup(string $groupName, int $expectedMask)
+    public function testGroup(string $groupName, int $expectedMask): void
     {
         $groupMask = $this->builder->getMask($groupName);
 

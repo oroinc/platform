@@ -11,11 +11,12 @@ use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class IndexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class IndexEntityMessageProcessorTest extends TestCase
 {
-    public function testCouldBeConstructedWithRequiredAttributes()
+    public function testCouldBeConstructedWithRequiredAttributes(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -26,7 +27,7 @@ class IndexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldReturnSubscribedTopics()
+    public function testShouldReturnSubscribedTopics(): void
     {
         $expectedSubscribedTopics = [
             IndexEntityTopic::getName(),
@@ -35,7 +36,7 @@ class IndexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedSubscribedTopics, IndexEntityMessageProcessor::getSubscribedTopics());
     }
 
-    public function testShouldRejectMessageIfEntityMangerWasNotFoundForClass()
+    public function testShouldRejectMessageIfEntityMangerWasNotFoundForClass(): void
     {
         $indexer = $this->createMock(IndexerInterface::class);
 
@@ -60,7 +61,7 @@ class IndexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldIndexEntityIfItExists()
+    public function testShouldIndexEntityIfItExists(): void
     {
         $entity = new \stdClass();
 
@@ -102,7 +103,7 @@ class IndexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testShouldDeleteIndexForEntityIfEntityDoesNotExist()
+    public function testShouldDeleteIndexForEntityIfEntityDoesNotExist(): void
     {
         $entity = new \stdClass();
 

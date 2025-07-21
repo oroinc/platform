@@ -10,17 +10,16 @@ use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapte
 use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchNumberFilter;
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
 use Oro\Component\Exception\UnexpectedTypeException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
+class SearchNumberFilterTest extends TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var SearchNumberFilter */
-    private $filter;
+    private FormFactoryInterface&MockObject $formFactory;
+    private SearchNumberFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +32,7 @@ class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testThrowsExceptionForWrongFilterDatasourceAdapter()
+    public function testThrowsExceptionForWrongFilterDatasourceAdapter(): void
     {
         $this->expectException(UnexpectedTypeException::class);
 
@@ -46,7 +45,7 @@ class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider applyDataProvider
      */
-    public function testApply(int $filterType, string $comparisonOperator)
+    public function testApply(int $filterType, string $comparisonOperator): void
     {
         $fieldName = 'decimal.field';
         $fieldValue = 100;
@@ -92,7 +91,7 @@ class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testApplyEmpty()
+    public function testApplyEmpty(): void
     {
         $fieldName = 'decimal.field';
 
@@ -107,7 +106,7 @@ class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->filter->apply($ds, ['type' => FilterUtility::TYPE_EMPTY, 'value' => null]));
     }
 
-    public function testApplyNotEmpty()
+    public function testApplyNotEmpty(): void
     {
         $fieldName = 'decimal.field';
 
@@ -122,7 +121,7 @@ class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->filter->apply($ds, ['type' => FilterUtility::TYPE_NOT_EMPTY, 'value' => null]));
     }
 
-    public function testGetMetadata()
+    public function testGetMetadata(): void
     {
         $form = $this->createMock(FormInterface::class);
         $view = $this->createMock(FormView::class);
@@ -158,7 +157,7 @@ class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->filter->getMetadata());
     }
 
-    public function testPrepareData()
+    public function testPrepareData(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->filter->prepareData([]);

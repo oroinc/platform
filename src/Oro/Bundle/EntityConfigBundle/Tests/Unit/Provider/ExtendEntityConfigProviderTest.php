@@ -7,23 +7,16 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ExtendEntityConfigProviderTest extends \PHPUnit\Framework\TestCase
+class ExtendEntityConfigProviderTest extends TestCase
 {
-    /** @var ExtendEntityConfigProvider */
-    private $extendEntityConfigProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    private $configManager;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $enumProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendProvider;
+    private ExtendEntityConfigProvider $extendEntityConfigProvider;
+    private ConfigManager&MockObject $configManager;
+    private ConfigProvider&MockObject $attributeProvider;
+    private ConfigProvider&MockObject $enumProvider;
+    private ConfigProvider&MockObject $extendProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +33,7 @@ class ExtendEntityConfigProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->extendProvider);
     }
 
-    public function testGetExtendEntityConfigs()
+    public function testGetExtendEntityConfigs(): void
     {
         $configId = new EntityConfigId('extend', 'Class1');
         $extendConfig = new Config($configId, ['is_extend' => true]);
@@ -55,7 +48,7 @@ class ExtendEntityConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([$extendConfig], $returnedConfigs);
     }
 
-    public function testGetExtendEntityConfigsFilter()
+    public function testGetExtendEntityConfigsFilter(): void
     {
         $configId = new EntityConfigId('extend', 'Class1');
         $extendConfig = new Config($configId, ['is_extend' => true]);

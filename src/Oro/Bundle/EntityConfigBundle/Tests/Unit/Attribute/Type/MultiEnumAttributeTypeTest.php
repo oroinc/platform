@@ -22,7 +22,7 @@ class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
         ];
     }
 
-    public function testGetSearchableValue()
+    public function testGetSearchableValue(): void
     {
         $value1 = new TestEnumValue('test', 'name1', 'id1', 101);
         $value2 = new TestEnumValue('test', 'name2', 'id2', 102);
@@ -33,7 +33,7 @@ class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetSearchableValueTraversableException()
+    public function testGetSearchableValueTraversableException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Value must be an array or Traversable, [string] given');
@@ -41,7 +41,7 @@ class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
         $this->getAttributeType()->getSearchableValue($this->attribute, '', $this->localization);
     }
 
-    public function testGetSearchableValueValueException()
+    public function testGetSearchableValueValueException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -51,7 +51,7 @@ class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
         $this->getAttributeType()->getSearchableValue($this->attribute, [42], $this->localization);
     }
 
-    public function testGetFilterableValue()
+    public function testGetFilterableValue(): void
     {
         $value1 = new TestEnumValue('test', 'Test1', 'id1', 101);
         $value2 = new TestEnumValue('test', 'Test2', 'id2', 102);
@@ -65,7 +65,7 @@ class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetFilterableValueTraversableException()
+    public function testGetFilterableValueTraversableException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Value must be an array or Traversable, [string] given');
@@ -73,7 +73,7 @@ class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
         $this->getAttributeType()->getFilterableValue($this->attribute, '', $this->localization);
     }
 
-    public function testGetFilterableValueValueException()
+    public function testGetFilterableValueValueException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -83,7 +83,7 @@ class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
         $this->getAttributeType()->getFilterableValue($this->attribute, [42], $this->localization);
     }
 
-    public function testGetSortableValue()
+    public function testGetSortableValue(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not supported');

@@ -54,38 +54,17 @@ class SegmentFilterTest extends OrmTestCase
     private const TEST_FIELD_NAME = 't1.id';
     private const TEST_PARAM_VALUE = '%test%';
 
-    /** @var FormFactoryInterface|MockObject */
-    private $formFactory;
-
-    /** @var ManagerRegistry|MockObject */
-    private $doctrine;
-
-    /** @var DynamicSegmentQueryBuilder|MockObject */
-    private $dynamicSegmentQueryBuilder;
-
-    /** @var StaticSegmentQueryBuilder|MockObject */
-    private $staticSegmentQueryBuilder;
-
-    /** @var EntityNameProvider|MockObject */
-    private $entityNameProvider;
-
-    /** @var ConfigProvider|MockObject */
-    private $entityConfigProvider;
-
-    /** @var ConfigProvider|MockObject */
-    private $extendConfigProvider;
-
-    /** @var EntityManagerInterface|MockObject */
-    private $em;
-
-    /** @var SubQueryLimitHelper|MockObject */
-    private $subQueryLimitHelper;
-
-    /** @var LoggerInterface|MockObject */
-    private $logger;
-
-    /** @var SegmentFilter */
-    private $filter;
+    private FormFactoryInterface $formFactory;
+    private ManagerRegistry&MockObject $doctrine;
+    private DynamicSegmentQueryBuilder&MockObject $dynamicSegmentQueryBuilder;
+    private StaticSegmentQueryBuilder&MockObject $staticSegmentQueryBuilder;
+    private EntityNameProvider&MockObject $entityNameProvider;
+    private ConfigProvider&MockObject $entityConfigProvider;
+    private ConfigProvider&MockObject $extendConfigProvider;
+    private EntityManagerInterface&MockObject $em;
+    private SubQueryLimitHelper&MockObject $subQueryLimitHelper;
+    private LoggerInterface&MockObject $logger;
+    private SegmentFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -192,7 +171,7 @@ class SegmentFilterTest extends OrmTestCase
         return $classMetaData;
     }
 
-    public function testGetMetadata()
+    public function testGetMetadata(): void
     {
         $activeClassName = Segment::class;
         $newClassName = 'Test\NewEntity';
@@ -281,14 +260,14 @@ class SegmentFilterTest extends OrmTestCase
             ->willReturn($repo);
     }
 
-    public function testGetForm()
+    public function testGetForm(): void
     {
         $this->prepareRepo();
         $form = $this->filter->getForm();
         self::assertInstanceOf(FormInterface::class, $form);
     }
 
-    public function testApplyInvalidData()
+    public function testApplyInvalidData(): void
     {
         $dsMock = $this->createMock(FilterDatasourceAdapterInterface::class);
         $result = $this->filter->apply($dsMock, [null]);
@@ -296,7 +275,7 @@ class SegmentFilterTest extends OrmTestCase
         self::assertFalse($result);
     }
 
-    public function testStaticApply()
+    public function testStaticApply(): void
     {
         $staticSegmentStub = $this->getEntity(Segment::class, ['id' => 1]);
         $staticSegmentStub->setType(new SegmentType(SegmentType::TYPE_STATIC));
@@ -348,7 +327,7 @@ class SegmentFilterTest extends OrmTestCase
         return $em;
     }
 
-    public function testDynamicApplyWithoutLimit()
+    public function testDynamicApplyWithoutLimit(): void
     {
         $dynamicSegment = $this->getEntity(Segment::class, ['id' => 1]);
         $dynamicSegment->setType(new SegmentType(SegmentType::TYPE_DYNAMIC))
@@ -392,7 +371,7 @@ class SegmentFilterTest extends OrmTestCase
         self::assertEquals(self::TEST_PARAM_VALUE, $params[0]->getValue());
     }
 
-    public function testDynamicApplyWithLimit()
+    public function testDynamicApplyWithLimit(): void
     {
         $dynamicSegment = $this->getEntity(Segment::class, ['id' => 1]);
         $dynamicSegment->setType(new SegmentType(SegmentType::TYPE_DYNAMIC))
@@ -442,7 +421,7 @@ class SegmentFilterTest extends OrmTestCase
         self::assertEquals(self::TEST_PARAM_VALUE, $params[0]->getValue());
     }
 
-    public function testPrepareDataWithoutValue()
+    public function testPrepareDataWithoutValue(): void
     {
         $data = [];
 
@@ -452,7 +431,7 @@ class SegmentFilterTest extends OrmTestCase
         self::assertSame($data, $this->filter->prepareData($data));
     }
 
-    public function testPrepareDataWithNullValue()
+    public function testPrepareDataWithNullValue(): void
     {
         $data = ['value' => null];
 
@@ -462,7 +441,7 @@ class SegmentFilterTest extends OrmTestCase
         self::assertSame($data, $this->filter->prepareData($data));
     }
 
-    public function testPrepareDataWithSegmentIdValue()
+    public function testPrepareDataWithSegmentIdValue(): void
     {
         $data = ['value' => 123];
 

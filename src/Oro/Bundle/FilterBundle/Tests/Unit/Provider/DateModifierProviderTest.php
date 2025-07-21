@@ -3,11 +3,11 @@
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
+use PHPUnit\Framework\TestCase;
 
-class DateModifierProviderTest extends \PHPUnit\Framework\TestCase
+class DateModifierProviderTest extends TestCase
 {
-    /** @var DateModifierProvider */
-    private $dateModifierProvider;
+    private DateModifierProvider $dateModifierProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -15,14 +15,14 @@ class DateModifierProviderTest extends \PHPUnit\Framework\TestCase
         $this->dateModifierProvider = new DateModifierProvider();
     }
 
-    public function testDateParts()
+    public function testDateParts(): void
     {
         $parts = $this->dateModifierProvider->getDateParts();
         $this->assertNotEmpty($parts);
         $this->assertCount(8, $parts);
     }
 
-    public function testDateVariables()
+    public function testDateVariables(): void
     {
         $vars = $this->dateModifierProvider->getDateVariables();
         $this->assertNotEmpty($vars);

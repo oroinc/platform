@@ -13,30 +13,19 @@ use Oro\Component\MessageQueue\Job\Extension\ExtensionInterface;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Topic\TopicRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
+class PostponedRowsHandlerTest extends TestCase
 {
-    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $messageProducer;
-
-    /** @var Job|\PHPUnit\Framework\MockObject\MockObject */
-    private $currentJob;
-
-    /** @var JobRunner */
-    private $jobRunner;
-
-    /** @var JobProcessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobProcessor;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var TopicRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $topicRegistry;
-
-    /** @var PostponedRowsHandler */
-    private $handler;
+    private MessageProducerInterface&MockObject $messageProducer;
+    private Job&MockObject $currentJob;
+    private JobRunner $jobRunner;
+    private JobProcessor&MockObject $jobProcessor;
+    private TranslatorInterface&MockObject $translator;
+    private TopicRegistry&MockObject $topicRegistry;
+    private PostponedRowsHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -70,7 +59,7 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
         $this->jobRunner = new JobRunner($this->jobProcessor, $jobExtension, $this->topicRegistry, $this->currentJob);
     }
 
-    public function testItCreatesIncrementedJob()
+    public function testItCreatesIncrementedJob(): void
     {
         $this->jobProcessor->expects(self::any())
             ->method('findOrCreateChildJob')
@@ -103,7 +92,7 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->postpone($this->jobRunner, $this->currentJob, '', $body, $result);
     }
 
-    public function testItStopsAfterFifthAttempt()
+    public function testItStopsAfterFifthAttempt(): void
     {
         $this->jobProcessor->expects(self::any())
             ->method('findOrCreateChildJob')
@@ -116,7 +105,7 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->postpone($this->jobRunner, $this->currentJob, '', $body, $result);
     }
 
-    public function testItAddsErrorMessageWhenPostponeRowsPresent()
+    public function testItAddsErrorMessageWhenPostponeRowsPresent(): void
     {
         $this->jobProcessor->expects(self::any())
             ->method('findOrCreateChildJob')
@@ -138,7 +127,7 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->postpone($this->jobRunner, $this->currentJob, '', $body, $result);
     }
 
-    public function testPostponeWithIncrementedReadOption()
+    public function testPostponeWithIncrementedReadOption(): void
     {
         $this->jobProcessor->expects(self::any())
             ->method('findOrCreateChildJob')

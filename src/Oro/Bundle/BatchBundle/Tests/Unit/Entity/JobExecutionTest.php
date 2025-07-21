@@ -9,11 +9,12 @@ use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\BatchBundle\Item\ExecutionContext;
 use Oro\Bundle\BatchBundle\Job\BatchStatus;
 use Oro\Bundle\BatchBundle\Job\ExitStatus;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class JobExecutionTest extends \PHPUnit\Framework\TestCase
+class JobExecutionTest extends TestCase
 {
     private JobExecution $jobExecution;
 
@@ -230,7 +231,9 @@ class JobExecutionTest extends \PHPUnit\Framework\TestCase
         $jobInstance = $this->createMock(JobInstance::class);
         $this->jobExecution->setJobInstance($jobInstance);
 
-        $jobInstance->expects(self::any())->method('getLabel')->willReturn('foo');
+        $jobInstance->expects(self::any())
+            ->method('getLabel')
+            ->willReturn('foo');
 
         self::assertEquals('foo', $this->jobExecution->getLabel());
     }

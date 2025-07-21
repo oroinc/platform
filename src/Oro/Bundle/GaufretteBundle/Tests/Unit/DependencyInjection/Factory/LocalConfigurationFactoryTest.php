@@ -3,11 +3,11 @@
 namespace Oro\Bundle\GaufretteBundle\Tests\Unit\DependencyInjection\Factory;
 
 use Oro\Bundle\GaufretteBundle\DependencyInjection\Factory\LocalConfigurationFactory;
+use PHPUnit\Framework\TestCase;
 
-class LocalConfigurationFactoryTest extends \PHPUnit\Framework\TestCase
+class LocalConfigurationFactoryTest extends TestCase
 {
-    /** @var LocalConfigurationFactory */
-    private $factory;
+    private LocalConfigurationFactory $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -15,7 +15,7 @@ class LocalConfigurationFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory = new LocalConfigurationFactory();
     }
 
-    public function testGetAdapterConfiguration()
+    public function testGetAdapterConfiguration(): void
     {
         $configString = '/test';
         self::assertEquals(
@@ -28,12 +28,12 @@ class LocalConfigurationFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetKey()
+    public function testGetKey(): void
     {
         self::assertEquals('local', $this->factory->getKey());
     }
 
-    public function testGetHint()
+    public function testGetHint(): void
     {
         self::assertEquals(
             'The configuration string is "local:{directory}",'

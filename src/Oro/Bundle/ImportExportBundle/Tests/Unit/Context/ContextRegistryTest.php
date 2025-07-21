@@ -7,11 +7,11 @@ use Oro\Bundle\BatchBundle\Entity\JobInstance;
 use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
+use PHPUnit\Framework\TestCase;
 
-class ContextRegistryTest extends \PHPUnit\Framework\TestCase
+class ContextRegistryTest extends TestCase
 {
-    /** @var ContextRegistry */
-    private $registry;
+    private ContextRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class ContextRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry = new ContextRegistry();
     }
 
-    public function testGetByStepExecution()
+    public function testGetByStepExecution(): void
     {
         $fooStepExecution = $this->createStepExecution();
         $fooContext = $this->registry->getByStepExecution($fooStepExecution);

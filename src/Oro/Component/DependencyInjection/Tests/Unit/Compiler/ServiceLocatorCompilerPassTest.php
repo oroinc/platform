@@ -3,12 +3,13 @@
 namespace Oro\Component\DependencyInjection\Tests\Unit\Compiler;
 
 use Oro\Component\DependencyInjection\Compiler\ServiceLocatorCompilerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ServiceLocatorCompilerPassTest extends \PHPUnit\Framework\TestCase
+class ServiceLocatorCompilerPassTest extends TestCase
 {
     private const SERVICE_ID = 'test_service';
     private const TAG_NAME = 'test_tag';
@@ -21,7 +22,7 @@ class ServiceLocatorCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->container = new ContainerBuilder();
     }
 
-    public function testProcessWhenNoServiceAndItIsRequired()
+    public function testProcessWhenNoServiceAndItIsRequired(): void
     {
         $this->expectException(ServiceNotFoundException::class);
         $this->container->setDefinition('tagged_service_1', new Definition())
@@ -34,7 +35,7 @@ class ServiceLocatorCompilerPassTest extends \PHPUnit\Framework\TestCase
         $compiler->process($this->container);
     }
 
-    public function testProcessWhenNoServiceAndItIsOptional()
+    public function testProcessWhenNoServiceAndItIsOptional(): void
     {
         $this->container->setDefinition('tagged_service_1', new Definition())
             ->addTag(self::TAG_NAME);
@@ -48,7 +49,7 @@ class ServiceLocatorCompilerPassTest extends \PHPUnit\Framework\TestCase
         $compiler->process($this->container);
     }
 
-    public function testProcessWhenNoTaggedServices()
+    public function testProcessWhenNoTaggedServices(): void
     {
         $service = $this->container->setDefinition(self::SERVICE_ID, new Definition(\stdClass::class));
 
@@ -61,7 +62,7 @@ class ServiceLocatorCompilerPassTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $service->getArgument(0));
     }
 
-    public function testProcessWithoutNameAttribute()
+    public function testProcessWithoutNameAttribute(): void
     {
         $service = $this->container->setDefinition(self::SERVICE_ID, new Definition(\stdClass::class));
 
@@ -88,7 +89,7 @@ class ServiceLocatorCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithNameAttribute()
+    public function testProcessWithNameAttribute(): void
     {
         $service = $this->container->setDefinition(self::SERVICE_ID, new Definition(\stdClass::class));
 
@@ -116,7 +117,7 @@ class ServiceLocatorCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessOverrideByName()
+    public function testProcessOverrideByName(): void
     {
         $service = $this->container->setDefinition(self::SERVICE_ID, new Definition(\stdClass::class));
 
@@ -140,7 +141,7 @@ class ServiceLocatorCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessOverrideByServiceId()
+    public function testProcessOverrideByServiceId(): void
     {
         $service = $this->container->setDefinition(self::SERVICE_ID, new Definition(\stdClass::class));
 

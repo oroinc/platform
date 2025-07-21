@@ -5,14 +5,14 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Form\EventListener;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\ChangeRoleSubscriber;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class ChangeRoleSubscriberTest extends \PHPUnit\Framework\TestCase
+class ChangeRoleSubscriberTest extends TestCase
 {
-    /** @var ChangeRoleSubscriber */
-    private $changeRoleSubscriber;
+    private ChangeRoleSubscriber $changeRoleSubscriber;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class ChangeRoleSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->changeRoleSubscriber = new ChangeRoleSubscriber();
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
             [FormEvents::SUBMIT => ['onSubmit', 10]],
@@ -28,7 +28,7 @@ class ChangeRoleSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSubmit()
+    public function testSubmit(): void
     {
         $role = $this->createMock(Role::class);
         $user = $this->createMock(User::class);

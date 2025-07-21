@@ -4,14 +4,13 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Cache;
 
 use Oro\Bundle\WorkflowBundle\Cache\WorkflowAwareCacheClearer;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowAwareCacheClearerTest extends \PHPUnit\Framework\TestCase
+class WorkflowAwareCacheClearerTest extends TestCase
 {
-    /** @var WorkflowAwareCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowAwareCache;
-
-    /** @var WorkflowAwareCacheClearer */
-    private $clearer;
+    private WorkflowAwareCache&MockObject $workflowAwareCache;
+    private WorkflowAwareCacheClearer $clearer;
 
     #[\Override]
     protected function setUp(): void

@@ -15,17 +15,14 @@ use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\ORM\Mocks\UnitOfWorkMock;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
+class DeletedAttributeRelationListenerTest extends TestCase
 {
-    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $messageProducer;
-
-    /** @var DeletedAttributeProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $deletedAttributeProvider;
-
-    /** @var DeletedAttributeRelationListener */
-    private $listener;
+    private MessageProducerInterface&MockObject $messageProducer;
+    private DeletedAttributeProviderInterface&MockObject $deletedAttributeProvider;
+    private DeletedAttributeRelationListener $listener;
 
     #[\Override]
     protected function setUp(): void

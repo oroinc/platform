@@ -6,14 +6,13 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Layout\Extension\DatagridConfigContextConfigurator;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DatagridConfigContextConfiguratorTest extends \PHPUnit\Framework\TestCase
+class DatagridConfigContextConfiguratorTest extends TestCase
 {
-    /** @var ManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dataGridManager;
-
-    /** @var DatagridConfigContextConfigurator */
-    private $contextConfigurator;
+    private ManagerInterface&MockObject $dataGridManager;
+    private DatagridConfigContextConfigurator $contextConfigurator;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class DatagridConfigContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->contextConfigurator = new DatagridConfigContextConfigurator($this->dataGridManager);
     }
 
-    public function testConfigureContext()
+    public function testConfigureContext(): void
     {
         $context = new LayoutContext();
         $context['grid_config'] = ['grid_name'];
@@ -45,7 +44,7 @@ class DatagridConfigContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['grid_name' => ['config']], $context->get('grid_config'));
     }
 
-    public function testConfigureContextEmptyGridConfig()
+    public function testConfigureContextEmptyGridConfig(): void
     {
         $context = new LayoutContext();
         $context['grid_config'] = [];
@@ -58,7 +57,7 @@ class DatagridConfigContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $context->get('grid_config'));
     }
 
-    public function testConfigureContextNoGridConfig()
+    public function testConfigureContextNoGridConfig(): void
     {
         $context = new LayoutContext();
         $this->contextConfigurator->configureContext($context);
@@ -67,7 +66,7 @@ class DatagridConfigContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($context->has('grid_config'));
     }
 
-    public function testConfigureContextIfGridConfigNotArray()
+    public function testConfigureContextIfGridConfigNotArray(): void
     {
         $context = new LayoutContext();
         $context['grid_config'] = 123;
@@ -80,7 +79,7 @@ class DatagridConfigContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $context->resolve();
     }
 
-    public function testConfigureContextIfInvalidDataArray()
+    public function testConfigureContextIfInvalidDataArray(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "grid_config" value must be a string, but "array" given.');

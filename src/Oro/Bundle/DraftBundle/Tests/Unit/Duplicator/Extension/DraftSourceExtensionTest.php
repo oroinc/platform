@@ -6,16 +6,15 @@ use DeepCopy\Matcher\PropertyNameMatcher;
 use Oro\Bundle\DraftBundle\Duplicator\DraftContext;
 use Oro\Bundle\DraftBundle\Duplicator\Extension\DraftSourceExtension;
 use Oro\Bundle\DraftBundle\Duplicator\Filter\SourceFilter;
-use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\TestCase;
 
-class DraftSourceExtensionTest extends \PHPUnit\Framework\TestCase
+class DraftSourceExtensionTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var DraftSourceExtension */
-    private $extension;
+    private DraftSourceExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +39,6 @@ class DraftSourceExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testIsSupport(): void
     {
-        /** @var DraftableInterface $source */
         $source = $this->getEntity(DraftableEntityStub::class);
         $this->assertTrue($this->extension->isSupport($source));
     }

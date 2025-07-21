@@ -8,14 +8,13 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TranslationProcessorTest extends \PHPUnit\Framework\TestCase
+class TranslationProcessorTest extends TestCase
 {
-    /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationHelper;
-
-    /** @var TranslationProcessor */
-    private $processor;
+    private WorkflowTranslationHelper&MockObject $translationHelper;
+    private TranslationProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -25,13 +24,13 @@ class TranslationProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new TranslationProcessor($this->translationHelper);
     }
 
-    public function testImplementsInterfaces()
+    public function testImplementsInterfaces(): void
     {
         $this->assertInstanceOf(WorkflowDefinitionBuilderExtensionInterface::class, $this->processor);
         $this->assertInstanceOf(ConfigurationHandlerInterface::class, $this->processor);
     }
 
-    public function testPrepare()
+    public function testPrepare(): void
     {
         $config = ['label' => 24];
         $result = $this->processor->prepare('test_workflow', $config);
@@ -43,7 +42,7 @@ class TranslationProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandle()
+    public function testHandle(): void
     {
         $configuration = [
             'name' => 'test_workflow',
@@ -76,7 +75,7 @@ class TranslationProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($configuration, $this->processor->handle($configuration));
     }
 
-    public function testHandleIncorrectConfigFormatException()
+    public function testHandleIncorrectConfigFormatException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Workflow configuration for handler must contain valid `name` node.');
@@ -84,7 +83,7 @@ class TranslationProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->handle([]);
     }
 
-    public function testTranslateWorkflowDefinitionFieldsWithoutWorkflowName()
+    public function testTranslateWorkflowDefinitionFieldsWithoutWorkflowName(): void
     {
         $this->translationHelper->expects($this->never())
             ->method($this->anything());
@@ -108,7 +107,7 @@ class TranslationProcessorTest extends \PHPUnit\Framework\TestCase
         WorkflowDefinition $definition,
         array $values,
         bool $useKeyAsTranslation
-    ) {
+    ): void {
         $this->translationHelper->expects($this->any())
             ->method('findWorkflowTranslation')
             ->willReturnMap($values);

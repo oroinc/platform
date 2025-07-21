@@ -5,28 +5,25 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Query;
 use Oro\Bundle\SearchBundle\Query\LazyResult;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class LazyResultTest extends \PHPUnit\Framework\TestCase
+class LazyResultTest extends TestCase
 {
-    /** @var array */
-    private $elements = [];
+    private array $elements = [];
 
-    /** @var int */
-    private $count = 42;
+    private int $count = 42;
 
-    /** @var array */
-    private $aggregatedData = [
+    private array $aggregatedData = [
         'test_name' => [
             'field' => 'test_field_name',
             'function' => Query::AGGREGATE_FUNCTION_COUNT
         ]
     ];
 
-    /** @var LazyResult */
-    private $result;
+    private LazyResult $result;
 
     #[\Override]
     protected function setUp(): void
@@ -60,72 +57,72 @@ class LazyResultTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetElements()
+    public function testGetElements(): void
     {
         $this->assertSame($this->elements, $this->result->getElements());
     }
 
-    public function testGetRecordsCount()
+    public function testGetRecordsCount(): void
     {
         $this->assertEquals($this->count, $this->result->getRecordsCount());
     }
 
-    public function testGetAggregatedData()
+    public function testGetAggregatedData(): void
     {
         $this->assertEquals($this->aggregatedData, $this->result->getAggregatedData());
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $this->assertEquals($this->elements, $this->result->toArray());
     }
 
-    public function testFirst()
+    public function testFirst(): void
     {
         $this->assertEquals($this->elements[0], $this->result->first());
     }
 
-    public function testLast()
+    public function testLast(): void
     {
         $this->assertEquals($this->elements[2], $this->result->last());
     }
 
-    public function testKey()
+    public function testKey(): void
     {
         $this->assertEquals(0, $this->result->key());
     }
 
-    public function testNext()
+    public function testNext(): void
     {
         $this->assertEquals($this->elements[1], $this->result->next());
     }
 
-    public function testCurrent()
+    public function testCurrent(): void
     {
         $this->assertEquals($this->elements[0], $this->result->current());
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $this->assertEquals($this->elements[1], $this->result->remove(1));
     }
 
-    public function testRemoveElement()
+    public function testRemoveElement(): void
     {
         $this->assertTrue($this->result->removeElement($this->elements[1]));
     }
 
-    public function testContainsKey()
+    public function testContainsKey(): void
     {
         $this->assertTrue($this->result->containsKey(2));
     }
 
-    public function testContains()
+    public function testContains(): void
     {
         $this->assertTrue($this->result->contains($this->elements[2]));
     }
 
-    public function testExists()
+    public function testExists(): void
     {
         $this->assertTrue(
             $this->result->exists(
@@ -136,32 +133,32 @@ class LazyResultTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIndexOf()
+    public function testIndexOf(): void
     {
         $this->assertEquals(2, $this->result->indexOf($this->elements[2]));
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $this->assertEquals($this->elements[2], $this->result->get(2));
     }
 
-    public function testGetKeys()
+    public function testGetKeys(): void
     {
         $this->assertEquals([0, 1, 2], $this->result->getKeys());
     }
 
-    public function testGetValues()
+    public function testGetValues(): void
     {
         $this->assertEquals($this->elements, $this->result->getValues());
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         $this->assertEquals(3, $this->result->count());
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $item = new Item(
             'OroTestBundle:test',
@@ -175,7 +172,7 @@ class LazyResultTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($item, $this->result->get(4));
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $item = new Item(
             'OroTestBundle:test',
@@ -189,12 +186,12 @@ class LazyResultTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($item, $this->result->get(3));
     }
 
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $this->assertFalse($this->result->isEmpty());
     }
 
-    public function testGetIterator()
+    public function testGetIterator(): void
     {
         $items = [];
         foreach ($this->result->getIterator() as $item) {

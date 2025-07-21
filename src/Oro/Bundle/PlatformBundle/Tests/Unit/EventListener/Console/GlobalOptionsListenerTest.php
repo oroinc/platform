@@ -4,23 +4,18 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\EventListener\Console;
 
 use Oro\Bundle\PlatformBundle\EventListener\Console\GlobalOptionsListener;
 use Oro\Bundle\PlatformBundle\Provider\Console\GlobalOptionsProviderRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class GlobalOptionsListenerTest extends \PHPUnit\Framework\TestCase
+class GlobalOptionsListenerTest extends TestCase
 {
-    /**
-     * @var GlobalOptionsProviderRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $registry;
-
-    /**
-     * @var GlobalOptionsListener
-     */
-    private $listener;
+    private GlobalOptionsProviderRegistry&MockObject $registry;
+    private GlobalOptionsListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -29,13 +24,10 @@ class GlobalOptionsListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new GlobalOptionsListener($this->registry);
     }
 
-    public function testOnConsoleCommand()
+    public function testOnConsoleCommand(): void
     {
-        /** @var Command|\PHPUnit\Framework\MockObject\MockObject $command */
         $command = $this->createMock(Command::class);
-        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
-        /** @var OutputInterface $output */
         $output = $this->createMock(OutputInterface::class);
         $this->registry->expects($this->once())
             ->method('addGlobalOptions')

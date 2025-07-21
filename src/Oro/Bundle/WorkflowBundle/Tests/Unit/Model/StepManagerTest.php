@@ -6,12 +6,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\TestCase;
 
-class StepManagerTest extends \PHPUnit\Framework\TestCase
+class StepManagerTest extends TestCase
 {
     use EntityTrait;
 
-    public function testGetOrderedSteps()
+    public function testGetOrderedSteps(): void
     {
         $defaultStartStep = $this->getStep(StepManager::DEFAULT_START_STEP_NAME, -1);
         $stepOne = $this->getStep('step1', 1);
@@ -35,13 +36,13 @@ class StepManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($ordered->contains($defaultStartStep));
     }
 
-    public function testGetStepsEmpty()
+    public function testGetStepsEmpty(): void
     {
         $stepManager = new StepManager();
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $stepManager->getSteps());
     }
 
-    public function testSetSteps()
+    public function testSetSteps(): void
     {
         $stepOne = $this->getStep('step1');
         $stepTwo = $this->getStep('step2');
@@ -61,7 +62,7 @@ class StepManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $steps->toArray());
     }
 
-    public function testGetStep()
+    public function testGetStep(): void
     {
         $step1 = $this->getStep('step1');
         $step2 = $this->getStep('step2');
@@ -83,7 +84,7 @@ class StepManagerTest extends \PHPUnit\Framework\TestCase
         return $this->getEntity(Step::class, ['name' => $name, 'order' => $order]);
     }
 
-    public function testStartStep()
+    public function testStartStep(): void
     {
         $testStartStep = 'start_step';
 
@@ -99,7 +100,7 @@ class StepManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($stepManager->hasStartStep());
     }
 
-    public function testGetRelatedTransitionSteps()
+    public function testGetRelatedTransitionSteps(): void
     {
         $step1 = new Step();
         $step1->setName('step1');
@@ -118,7 +119,7 @@ class StepManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$step1, $step2], $steps->getValues());
     }
 
-    public function testGetDefaultStartTransition()
+    public function testGetDefaultStartTransition(): void
     {
         $stepManager = new StepManager();
         $this->assertNull($stepManager->getDefaultStartStep());

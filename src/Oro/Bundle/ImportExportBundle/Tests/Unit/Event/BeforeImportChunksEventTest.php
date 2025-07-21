@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class BeforeImportChunksEventTest extends TestCase
 {
-    public function testEvent()
+    public function testEvent(): void
     {
         $body = ['body'];
 

@@ -4,13 +4,13 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class ActionGroupDefinitionTest extends \PHPUnit\Framework\TestCase
+class ActionGroupDefinitionTest extends TestCase
 {
     use EntityTestCaseTrait;
 
-    /** @var ActionGroupDefinition */
-    private $actionGroupDefinition;
+    private ActionGroupDefinition $actionGroupDefinition;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class ActionGroupDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->actionGroupDefinition = new ActionGroupDefinition();
     }
 
-    public function testGettersAndSetters()
+    public function testGettersAndSetters(): void
     {
         self::assertPropertyAccessors(
             $this->actionGroupDefinition,

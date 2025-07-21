@@ -11,7 +11,6 @@ use PHPUnit\Framework\TestCase;
 final class SvgIconsSupportContextConfiguratorTest extends TestCase
 {
     private ThemeManagerInterface&MockObject $themeManager;
-
     private SvgIconsSupportContextConfigurator $contextConfigurator;
 
     #[\Override]
@@ -43,8 +42,7 @@ final class SvgIconsSupportContextConfiguratorTest extends TestCase
     {
         $themeName = 'test';
 
-        $this->themeManager
-            ->expects(self::once())
+        $this->themeManager->expects(self::once())
             ->method('getThemeOption')
             ->with($themeName, 'svg_icons_support')
             ->willReturn($themeSvgIconsSupport);

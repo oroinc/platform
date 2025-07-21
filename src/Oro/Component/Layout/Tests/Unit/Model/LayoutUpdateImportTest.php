@@ -5,10 +5,11 @@ namespace Oro\Component\Layout\Tests\Unit\Model;
 use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\ImportsAwareLayoutUpdateInterface;
 use Oro\Component\Layout\Model\LayoutUpdateImport;
+use PHPUnit\Framework\TestCase;
 
-class LayoutUpdateImportTest extends \PHPUnit\Framework\TestCase
+class LayoutUpdateImportTest extends TestCase
 {
-    public function testGetters()
+    public function testGetters(): void
     {
         $id = 'import_id';
         $root = 'root_block_id';
@@ -23,7 +24,7 @@ class LayoutUpdateImportTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($parent->getId(), $import->getParent()->getId());
     }
 
-    public function testCreateFromArray()
+    public function testCreateFromArray(): void
     {
         $id = 'import_id';
         $root = 'root_block_id';
@@ -38,7 +39,7 @@ class LayoutUpdateImportTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($namespace, $import->getNamespace());
     }
 
-    public function testCreateFromArrayException()
+    public function testCreateFromArrayException(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Import id should be provided, array with "root, namespace" keys given');
@@ -49,7 +50,7 @@ class LayoutUpdateImportTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $data = [
             ImportsAwareLayoutUpdateInterface::ID_KEY => 'import_id',

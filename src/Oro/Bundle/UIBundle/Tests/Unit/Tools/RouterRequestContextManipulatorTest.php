@@ -12,12 +12,11 @@ use Symfony\Component\Routing\RequestContext;
 
 final class RouterRequestContextManipulatorTest extends TestCase
 {
-    private RequestContext|MockObject $context;
-
-    private PropertyAccessorInterface|MockObject $propertyAccessor;
-
+    private RequestContext&MockObject $context;
+    private PropertyAccessorInterface&MockObject $propertyAccessor;
     private RouterRequestContextManipulator $manipulator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = $this->createMock(RequestContext::class);
@@ -30,28 +29,23 @@ final class RouterRequestContextManipulatorTest extends TestCase
     {
         $url = 'https://example.com:8443/path';
 
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('setScheme')
             ->with('https');
 
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('getScheme')
             ->willReturn('https');
 
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('setHost')
             ->with('example.com');
 
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('setHttpsPort')
             ->with(8443);
 
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('setBaseUrl')
             ->with('/path');
 
@@ -62,22 +56,18 @@ final class RouterRequestContextManipulatorTest extends TestCase
     {
         $url = '//example.com:8443/path';
 
-        $this->context
-            ->expects(self::never())
+        $this->context->expects(self::never())
             ->method('setScheme');
 
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('setHost')
             ->with('example.com');
 
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('setHttpPort')
             ->with(8443);
 
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('setBaseUrl')
             ->with('/path');
 
@@ -88,20 +78,16 @@ final class RouterRequestContextManipulatorTest extends TestCase
     {
         $url = '/path';
 
-        $this->context
-            ->expects(self::never())
+        $this->context->expects(self::never())
             ->method('setScheme');
 
-        $this->context
-            ->expects(self::never())
+        $this->context->expects(self::never())
             ->method('setHost');
 
-        $this->context
-            ->expects(self::never())
+        $this->context->expects(self::never())
             ->method('setHttpPort');
 
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('setBaseUrl')
             ->with('/path');
 
@@ -112,26 +98,21 @@ final class RouterRequestContextManipulatorTest extends TestCase
     {
         $url = 'https://example.com/path';
 
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('setScheme')
             ->with('https');
 
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('setHost')
             ->with('example.com');
 
-        $this->context
-            ->expects(self::never())
+        $this->context->expects(self::never())
             ->method('setHttpsPort');
 
-        $this->context
-            ->expects(self::never())
+        $this->context->expects(self::never())
             ->method('setHttpPort');
 
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('setBaseUrl')
             ->with('/path');
 
@@ -142,28 +123,23 @@ final class RouterRequestContextManipulatorTest extends TestCase
     {
         $url = 'https://example.com:8443';
 
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('setScheme')
             ->with('https');
 
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('getScheme')
             ->willReturn('https');
 
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('setHost')
             ->with('example.com');
 
-        $this->context
-            ->expects(self::once())
+        $this->context->expects(self::once())
             ->method('setHttpsPort')
             ->with(8443);
 
-        $this->context
-            ->expects(self::never())
+        $this->context->expects(self::never())
             ->method('setBaseUrl');
 
         $this->manipulator->setRouterContextFromUrl($url);
@@ -178,8 +154,7 @@ final class RouterRequestContextManipulatorTest extends TestCase
             'baseUrl' => '/path',
         ];
 
-        $this->propertyAccessor
-            ->expects(self::exactly(4))
+        $this->propertyAccessor->expects(self::exactly(4))
             ->method('setValue')
             ->withConsecutive(
                 [$this->context, 'scheme', 'https'],
@@ -193,16 +168,16 @@ final class RouterRequestContextManipulatorTest extends TestCase
 
     public function testGetRouterContextStateWithHttpsScheme(): void
     {
-        $this->context
+        $this->context->expects(self::any())
             ->method('getScheme')
             ->willReturn('https');
-        $this->context
+        $this->context->expects(self::any())
             ->method('getHost')
             ->willReturn('example.com');
-        $this->context
+        $this->context->expects(self::any())
             ->method('getBaseUrl')
             ->willReturn('/path');
-        $this->context
+        $this->context->expects(self::any())
             ->method('getHttpsPort')
             ->willReturn(8443);
 
@@ -218,16 +193,16 @@ final class RouterRequestContextManipulatorTest extends TestCase
 
     public function testGetRouterContextStateWithHttpScheme(): void
     {
-        $this->context
+        $this->context->expects(self::any())
             ->method('getScheme')
             ->willReturn('http');
-        $this->context
+        $this->context->expects(self::any())
             ->method('getHost')
             ->willReturn('example.com');
-        $this->context
+        $this->context->expects(self::any())
             ->method('getBaseUrl')
             ->willReturn('/path');
-        $this->context
+        $this->context->expects(self::any())
             ->method('getHttpPort')
             ->willReturn(8080);
 

@@ -11,25 +11,18 @@ use Oro\Bundle\ImportExportBundle\Writer\CsvFileWriter;
 use Oro\Bundle\ImportExportBundle\Writer\DoctrineClearWriter;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
+class CsvFileWriterTest extends TestCase
 {
     use TempDirExtension;
 
-    /** @var string */
-    private $filePath;
-
-    /** @var string */
-    private $tmpDir;
-
-    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextRegistry;
-
-    /** @var DoctrineClearWriter|\PHPUnit\Framework\MockObject\MockObject */
-    private $clearWriter;
-
-    /** @var CsvFileWriter */
-    private $writer;
+    private string $filePath;
+    private string $tmpDir;
+    private ContextRegistry&MockObject $contextRegistry;
+    private DoctrineClearWriter&MockObject $clearWriter;
+    private CsvFileWriter $writer;
 
     #[\Override]
     protected function setUp(): void
@@ -45,7 +38,7 @@ class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer = new CsvFileWriter($this->contextRegistry, $this->clearWriter);
     }
 
-    public function testSetStepExecutionNoFileException()
+    public function testSetStepExecutionNoFileException(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Configuration of CSV writer must contain "filePath".');
@@ -53,7 +46,7 @@ class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer->setStepExecution($this->getStepExecution([]));
     }
 
-    public function testUnknownFileException()
+    public function testUnknownFileException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->writer->setStepExecution(
@@ -61,7 +54,7 @@ class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetStepExecution()
+    public function testSetStepExecution(): void
     {
         $options = [
             'filePath'          => $this->filePath,
@@ -99,7 +92,7 @@ class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testWrite(array $options, array $data, string $expected)
+    public function testWrite(array $options, array $data, string $expected): void
     {
         $stepExecution = $this->getStepExecution($options);
         $this->writer->setStepExecution($stepExecution);
@@ -163,7 +156,7 @@ class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testWriteBackslashWhenBackslashes()
+    public function testWriteBackslashWhenBackslashes(): void
     {
         $options = [
             'filePath'          => $this->tmpDir . '/new_file.csv',
@@ -188,12 +181,11 @@ class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testWriteWithClearWriter(array $options, array $data, string $expected)
+    public function testWriteWithClearWriter(array $options, array $data, string $expected): void
     {
         $stepExecution = $this->getStepExecution($options);
         $this->writer->setStepExecution($stepExecution);
-        $this->clearWriter
-            ->expects($this->once())
+        $this->clearWriter->expects($this->once())
             ->method('write')
             ->with($data);
         $this->writer->write($data);

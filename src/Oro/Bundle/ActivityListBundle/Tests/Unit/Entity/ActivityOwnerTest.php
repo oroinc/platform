@@ -8,11 +8,11 @@ use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class ActivityOwnerTest extends \PHPUnit\Framework\TestCase
+class ActivityOwnerTest extends TestCase
 {
-    /** @var ActivityOwner */
-    private $entity;
+    private ActivityOwner $entity;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class ActivityOwnerTest extends \PHPUnit\Framework\TestCase
         $this->entity = new ActivityOwner();
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertNull($this->entity->getId());
 
@@ -32,7 +32,7 @@ class ActivityOwnerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider propertiesDataProvider
      */
-    public function testSettersAndGetters(string $property, mixed $value)
+    public function testSettersAndGetters(string $property, mixed $value): void
     {
         $accessor = PropertyAccess::createPropertyAccessor();
         $accessor->setValue($this->entity, $property, $value);
@@ -51,7 +51,7 @@ class ActivityOwnerTest extends \PHPUnit\Framework\TestCase
     /**
      * Test add and remove activity owner from ActivityList
      */
-    public function testAddRemoveActivityOwner()
+    public function testAddRemoveActivityOwner(): void
     {
         $activity = new ActivityList();
         $activity->setId(1);

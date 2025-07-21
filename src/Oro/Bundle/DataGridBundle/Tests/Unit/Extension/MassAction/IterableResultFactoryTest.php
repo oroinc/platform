@@ -10,14 +10,13 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\DTO\SelectedItems;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\IterableResultFactory;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class IterableResultFactoryTest extends \PHPUnit\Framework\TestCase
+class IterableResultFactoryTest extends TestCase
 {
-    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclHelper;
-
-    /** @var IterableResultFactory */
-    private $iterableResultFactory;
+    private AclHelper&MockObject $aclHelper;
+    private IterableResultFactory $iterableResultFactory;
 
     #[\Override]
     protected function setUp(): void
@@ -26,19 +25,19 @@ class IterableResultFactoryTest extends \PHPUnit\Framework\TestCase
         $this->iterableResultFactory = new IterableResultFactory($this->aclHelper);
     }
 
-    public function testIsApplicableWhenNotApplicable()
+    public function testIsApplicableWhenNotApplicable(): void
     {
         $this->assertFalse($this->iterableResultFactory->isApplicable(new ArrayDatasource()));
     }
 
-    public function testIsApplicable()
+    public function testIsApplicable(): void
     {
         $dataSource = $this->createMock(OrmDatasource::class);
 
         $this->assertTrue($this->iterableResultFactory->isApplicable($dataSource));
     }
 
-    public function testCreateIterableResultWithNotSupportedDatasource()
+    public function testCreateIterableResultWithNotSupportedDatasource(): void
     {
         $gridConfiguration = $this->createMock(DatagridConfiguration::class);
         $selectedItems = SelectedItems::createFromParameters([]);

@@ -9,17 +9,15 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchAggregationFilter;
 use Oro\Bundle\SearchBundle\Api\Processor\NormalizeSearchAggregatedData;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class NormalizeSearchAggregatedDataTest extends GetListProcessorTestCase
 {
-    /** @var ValueTransformer|\PHPUnit\Framework\MockObject\MockObject */
-    private $valueTransformer;
-
-    /** @var NormalizeSearchAggregatedData */
-    private $processor;
+    private ValueTransformer&MockObject $valueTransformer;
+    private NormalizeSearchAggregatedData $processor;
 
     #[\Override]
     protected function setUp(): void

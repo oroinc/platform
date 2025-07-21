@@ -4,10 +4,11 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Form;
 
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-abstract class RendererEngineTest extends \PHPUnit\Framework\TestCase
+abstract class RendererEngineTest extends TestCase
 {
-    public function testAddDefaultThemes()
+    public function testAddDefaultThemes(): void
     {
         $renderingEngine = $this->createRendererEngine();
 

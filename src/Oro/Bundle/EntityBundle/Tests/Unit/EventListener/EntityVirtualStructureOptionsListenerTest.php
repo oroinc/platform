@@ -9,16 +9,15 @@ use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
+class EntityVirtualStructureOptionsListenerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var EntityVirtualStructureOptionsListener */
-    private $listener;
-
-    /** @var VirtualFieldProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $virtualFieldProvider;
+    private EntityVirtualStructureOptionsListener $listener;
+    private VirtualFieldProviderInterface&MockObject $virtualFieldProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestC
         $this->listener = new EntityVirtualStructureOptionsListener($this->virtualFieldProvider);
     }
 
-    public function testOnOptionsRequest()
+    public function testOnOptionsRequest(): void
     {
         $fieldStructure = new EntityFieldStructure();
         $fieldStructure->setName('field1');
@@ -58,7 +57,7 @@ class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestC
         $this->assertEquals([$expectedEntityStructure], $event->getData());
     }
 
-    public function testOnOptionsRequestUnidirectional()
+    public function testOnOptionsRequestUnidirectional(): void
     {
         $fieldName = sprintf('class%sfield', UnidirectionalFieldHelper::DELIMITER);
         $fieldStructure = new EntityFieldStructure();

@@ -10,9 +10,10 @@ use Oro\Bundle\ImportExportBundle\Async\Topic\PreImportTopic;
 use Oro\Bundle\ImportExportBundle\Async\Topic\SaveImportExportResultTopic;
 use Oro\Bundle\ImportExportBundle\Async\Topic\SendImportNotificationTopic;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ConsumptionExtensionCompilerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class ConsumptionExtensionCompilerPassTest extends \PHPUnit\Framework\TestCase
+class ConsumptionExtensionCompilerPassTest extends TestCase
 {
     private ConsumptionExtensionCompilerPass $compiler;
 

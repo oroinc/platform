@@ -3,21 +3,17 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnerMetadataProvidersPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
-class OwnerMetadataProvidersPassTest extends \PHPUnit\Framework\TestCase
+class OwnerMetadataProvidersPassTest extends TestCase
 {
-    /** @var ContainerBuilder */
-    private $container;
-
-    /** @var Definition */
-    private $chainProvider;
-
-    /** @var OwnerMetadataProvidersPass */
-    private $compiler;
+    private ContainerBuilder $container;
+    private Definition $chainProvider;
+    private OwnerMetadataProvidersPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +24,7 @@ class OwnerMetadataProvidersPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new OwnerMetadataProvidersPass();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $this->container->register('provider1')
             ->addTag('oro_security.owner.metadata_provider', ['alias' => 'alias1']);
@@ -49,7 +45,7 @@ class OwnerMetadataProvidersPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithoutAlias()
+    public function testProcessWithoutAlias(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(

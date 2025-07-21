@@ -4,15 +4,15 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Persistence;
 
 use Oro\Bundle\SecurityBundle\Acl\Persistence\BaseAclManager;
 use Oro\Bundle\SecurityBundle\Model\Role;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class BaseAclManagerTest extends \PHPUnit\Framework\TestCase
+class BaseAclManagerTest extends TestCase
 {
-    /** @var BaseAclManager */
-    private $manager;
+    private BaseAclManager $manager;
 
     #[\Override]
     protected function setUp(): void

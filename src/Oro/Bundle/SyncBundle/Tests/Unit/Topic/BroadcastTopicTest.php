@@ -5,11 +5,12 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Topic;
 use Gos\Bundle\PubSubRouterBundle\Router\Route;
 use Gos\Bundle\WebSocketBundle\Router\WampRequest;
 use Oro\Bundle\SyncBundle\Topic\BroadcastTopic;
+use PHPUnit\Framework\TestCase;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class BroadcastTopicTest extends \PHPUnit\Framework\TestCase
+class BroadcastTopicTest extends TestCase
 {
     private BroadcastTopic $broadcast;
 

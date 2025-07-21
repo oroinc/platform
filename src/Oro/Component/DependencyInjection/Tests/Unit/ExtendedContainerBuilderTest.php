@@ -6,6 +6,7 @@ use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Component\DependencyInjection\Tests\Unit\Fixtures\CompilerPass1;
 use Oro\Component\DependencyInjection\Tests\Unit\Fixtures\CompilerPass2;
 use Oro\Component\DependencyInjection\Tests\Unit\Fixtures\CompilerPass3;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
@@ -13,7 +14,7 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
+class ExtendedContainerBuilderTest extends TestCase
 {
     private const EXTENSION = 'ext';
 

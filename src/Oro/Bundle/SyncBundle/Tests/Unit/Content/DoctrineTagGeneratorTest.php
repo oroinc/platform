@@ -76,7 +76,7 @@ class DoctrineTagGeneratorTest extends TestCase
     /**
      * @dataProvider supportsDataProvider
      */
-    public function testSupports(mixed $data, bool $expectedResult)
+    public function testSupports(mixed $data, bool $expectedResult): void
     {
         $this->assertSame($expectedResult, $this->generator->supports($data));
     }
@@ -101,7 +101,7 @@ class DoctrineTagGeneratorTest extends TestCase
         bool $includeCollectionTag,
         int $expectedCount,
         bool $isManaged = false
-    ) {
+    ): void {
         // only once if it's object
         $this->uow->expects($this->exactly(is_object($data) ? 1 : 0))
             ->method('getEntityState')
@@ -169,7 +169,7 @@ class DoctrineTagGeneratorTest extends TestCase
     /**
      * @dataProvider generateFromAliasDataProvider
      */
-    public function testGenerateFromAlias(string $data, array $expectedResult)
+    public function testGenerateFromAlias(string $data, array $expectedResult): void
     {
         $configuration = $this->createMock(Configuration::class);
         $configuration->expects(self::any())
@@ -202,7 +202,7 @@ class DoctrineTagGeneratorTest extends TestCase
     /**
      * @dataProvider collectNestingDataDataProvider
      */
-    public function testCollectNestingData(array $associations, array $mappings, int $expectedCount)
+    public function testCollectNestingData(array $associations, array $mappings, int $expectedCount): void
     {
         $testData = new EntityStub();
         $this->uow->expects($this->any())

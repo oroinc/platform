@@ -4,17 +4,16 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationGenerator;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 
-class JsTranslationGeneratorTest extends \PHPUnit\Framework\TestCase
+class JsTranslationGeneratorTest extends TestCase
 {
     private const TEMPLATE = '@OroTranslation/Translation/translation.js.twig';
 
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $twig;
+    private Translator&MockObject $translator;
+    private Environment&MockObject $twig;
 
     #[\Override]
     protected function setUp(): void

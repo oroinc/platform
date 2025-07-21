@@ -21,20 +21,15 @@ use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendTable;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
+class ExtendSchemaTest extends TestCase
 {
-    /** @var EntityMetadataHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityMetadataHelper;
-
-    /** @var ExtendOptionsManager */
-    private $extendOptionsManager;
-
-    /** @var ExtendOptionsParser */
-    private $extendOptionsParser;
-
-    /** @var ExtendDbIdentifierNameGenerator */
-    private $nameGenerator;
+    private EntityMetadataHelper&MockObject $entityMetadataHelper;
+    private ExtendOptionsManager $extendOptionsManager;
+    private ExtendOptionsParser $extendOptionsParser;
+    private ExtendDbIdentifierNameGenerator $nameGenerator;
 
     #[\Override]
     protected function setUp(): void
@@ -57,7 +52,7 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
             ->method('getUnderlyingTypes')
             ->willReturn(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany']);
 
-        $this->extendOptionsParser  = new ExtendOptionsParser(
+        $this->extendOptionsParser = new ExtendOptionsParser(
             $this->entityMetadataHelper,
             new FieldTypeHelper($entityExtendConfigurationProvider),
             $configManager
@@ -66,7 +61,7 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
         $this->nameGenerator = new ExtendDbIdentifierNameGenerator();
     }
 
-    public function testEmptySchema()
+    public function testEmptySchema(): void
     {
         $schema = new ExtendSchema(
             $this->extendOptionsManager,
@@ -78,7 +73,7 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
         $this->assertExtendOptions($schema, []);
     }
 
-    public function testSchemaConstructor()
+    public function testSchemaConstructor(): void
     {
         $table1 = new Table(
             'table1',
@@ -106,7 +101,7 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSchema()
+    public function testSchema(): void
     {
         $this->entityMetadataHelper->expects($this->exactly(3))
             ->method('isEntityClassContainsColumn')

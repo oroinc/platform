@@ -7,14 +7,13 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionChoicesGroupProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowDefinitionChoicesGroupProviderTest extends \PHPUnit\Framework\TestCase
+class WorkflowDefinitionChoicesGroupProviderTest extends TestCase
 {
-    /** @var WorkflowDefinitionRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowDefinitionRepo;
-
-    /** @var WorkflowDefinitionChoicesGroupProvider */
-    private $choicesProvider;
+    private WorkflowDefinitionRepository&MockObject $workflowDefinitionRepo;
+    private WorkflowDefinitionChoicesGroupProvider $choicesProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -37,7 +36,7 @@ class WorkflowDefinitionChoicesGroupProviderTest extends \PHPUnit\Framework\Test
     /**
      * @dataProvider activeGroupsProvider
      */
-    public function testGetActiveGroupsChoices(array $workflows, array $expected)
+    public function testGetActiveGroupsChoices(array $workflows, array $expected): void
     {
         $this->workflowDefinitionRepo->expects($this->any())
             ->method('findAll')
@@ -75,7 +74,7 @@ class WorkflowDefinitionChoicesGroupProviderTest extends \PHPUnit\Framework\Test
     /**
      * @dataProvider recordGroupsProvider
      */
-    public function testGetRecordGroupsChoices(array $workflows, array $expected)
+    public function testGetRecordGroupsChoices(array $workflows, array $expected): void
     {
         $this->workflowDefinitionRepo->expects($this->any())
             ->method('findAll')

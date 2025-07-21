@@ -101,7 +101,7 @@ Retrieve a record of an organization that a specific taxonomic unit record belon
 
 #### get_relationship
 
-Retrieve an ID of the organization that a specific taxonomic unit record belongs to.
+Retrieve the ID of the organization that a specific taxonomic unit record belongs to.
 
 #### update_relationship
 
@@ -128,7 +128,7 @@ Retrieve a record of the user who is the owner of a specific taxonomic unit reco
 
 #### get_relationship
 
-Retrieve an ID of the user who is the owner of a specific taxonomic unit record.
+Retrieve the ID of the user who is the owner of a specific taxonomic unit record.
 
 #### update_relationship
 

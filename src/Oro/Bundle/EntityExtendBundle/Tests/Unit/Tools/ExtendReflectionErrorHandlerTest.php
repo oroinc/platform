@@ -10,7 +10,7 @@ class ExtendReflectionErrorHandlerTest extends TestCase
     /**
      * @dataProvider collectorDataProvider
      */
-    public function testDataCollector(string $className, bool $expectedResult)
+    public function testDataCollector(string $className, bool $expectedResult): void
     {
         ExtendReflectionErrorHandler::dataCollector($className);
         $trace = ExtendReflectionErrorHandler::getTrace($className);
@@ -33,7 +33,7 @@ class ExtendReflectionErrorHandlerTest extends TestCase
     /**
      * @dataProvider isSupportedDataProvider
      */
-    public function testIsSupported(\Exception $exception, bool $expectedResult)
+    public function testIsSupported(\Exception $exception, bool $expectedResult): void
     {
         self::assertEquals($expectedResult, ExtendReflectionErrorHandler::isSupported($exception));
     }
@@ -54,7 +54,7 @@ class ExtendReflectionErrorHandlerTest extends TestCase
             ['class' => 'ReflectionProperty', 'method' => '__construct']]);
     }
 
-    public function testHandle()
+    public function testHandle(): void
     {
         $className = 'App\Bundle\Entity\Test';
         $exception = $this->createValidException();

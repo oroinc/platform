@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Event;
 
 use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
+use PHPUnit\Framework\TestCase;
 
-class LoadEntityRulesAndBackendHeadersEventTest extends \PHPUnit\Framework\TestCase
+class LoadEntityRulesAndBackendHeadersEventTest extends TestCase
 {
-    public function testEvent()
+    public function testEvent(): void
     {
         $event = new LoadEntityRulesAndBackendHeadersEvent(
             'entityName',

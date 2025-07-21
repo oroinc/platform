@@ -4,8 +4,9 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Utils\EditModeUtils;
+use PHPUnit\Framework\TestCase;
 
-class EditModeUtilsTest extends \PHPUnit\Framework\TestCase
+class EditModeUtilsTest extends TestCase
 {
     public function provideDataForIsEditAllowedTest()
     {
@@ -38,7 +39,7 @@ class EditModeUtilsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider provideDataForIsEditAllowedTest
      */
-    public function testIsEditAllowReturnExpectedResult($editMode, $expected)
+    public function testIsEditAllowReturnExpectedResult($editMode, $expected): void
     {
         $this->assertSame($expected, EditModeUtils::isEditAllowed($editMode));
     }
@@ -46,7 +47,7 @@ class EditModeUtilsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider provideDataForAttemptChangeEditModeTest
      */
-    public function testAttemptChangeEditModeWorksCorrectly($current, $newEditMode, $expected)
+    public function testAttemptChangeEditModeWorksCorrectly($current, $newEditMode, $expected): void
     {
         $channel = new Channel();
         $channel->setEditMode($current);
@@ -59,7 +60,7 @@ class EditModeUtilsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isSwitchEnableAllowedDataProvider
      */
-    public function testIsSwitchEnableAllowed($mode, $expected)
+    public function testIsSwitchEnableAllowed($mode, $expected): void
     {
         $this->assertEquals($expected, EditModeUtils::isSwitchEnableAllowed($mode));
     }

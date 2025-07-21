@@ -5,16 +5,15 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Twig;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\LocaleBundle\Twig\DateTimeExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
+class DateTimeExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $formatter;
-
-    /** @var DateTimeExtension */
-    private $extension;
+    private DateTimeFormatterInterface&MockObject $formatter;
+    private DateTimeExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new DateTimeExtension($container);
     }
 
-    public function testFormatDateTime()
+    public function testFormatDateTime(): void
     {
         $value = new \DateTime('2013-12-31 00:00:00');
         $dateType = 'short';
@@ -80,7 +79,7 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
         ?string $dateType = null,
         ?string $locale = null,
         ?string $timeZone = null
-    ) {
+    ): void {
         $options = [
             'dateType' => $dateType,
             'locale' => $locale,
@@ -116,7 +115,7 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider formatDayDataProvider
      */
-    public function testFormatDay(\DateTime $value, string $expected, ?string $locale = null)
+    public function testFormatDay(\DateTime $value, string $expected, ?string $locale = null): void
     {
         $timeZone = null;
         $dateType = null;
@@ -159,7 +158,7 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
         ?string $timeType = null,
         ?string $locale = null,
         ?string $timeZone = null
-    ) {
+    ): void {
         $options = [
             'timeType' => $timeType,
             'locale' => $locale,

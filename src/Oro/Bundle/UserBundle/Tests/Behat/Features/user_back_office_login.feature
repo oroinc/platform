@@ -17,7 +17,7 @@ Feature: User back office login
     When I click "Log in"
     Then I should be on Admin Dashboard page
 
-    When I go to the direct URL of the Login Check page
+    When I go to the direct URL of the "Login Check page"
     Then I should be on Admin Dashboard page
 
   Scenario: failing back office login using username with a wrong password

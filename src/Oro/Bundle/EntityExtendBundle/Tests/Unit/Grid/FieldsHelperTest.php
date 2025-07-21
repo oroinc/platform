@@ -10,32 +10,21 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Grid\FieldsHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FieldsHelperTest extends \PHPUnit\Framework\TestCase
+class FieldsHelperTest extends TestCase
 {
     private const ENTITY_CLASS = 'Test\Entity';
     private const FIELD_NAME = 'testFieldName';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var FieldsHelper */
-    private $helper;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendConfigProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagridConfigProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $viewConfigProvider;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
+    private ConfigManager&MockObject $configManager;
+    private FieldsHelper $helper;
+    private ConfigProvider&MockObject $entityConfigProvider;
+    private ConfigProvider&MockObject $extendConfigProvider;
+    private ConfigProvider&MockObject $datagridConfigProvider;
+    private ConfigProvider&MockObject $viewConfigProvider;
+    private FeatureChecker&MockObject $featureChecker;
 
     #[\Override]
     protected function setUp(): void
@@ -63,7 +52,7 @@ class FieldsHelperTest extends \PHPUnit\Framework\TestCase
             ]);
     }
 
-    public function testGetFieldsWithoutConfig()
+    public function testGetFieldsWithoutConfig(): void
     {
         $this->configManager->expects($this->once())
             ->method('hasConfig')
@@ -76,7 +65,7 @@ class FieldsHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->getFields(self::ENTITY_CLASS);
     }
 
-    public function testGetFields()
+    public function testGetFields(): void
     {
         $fieldId = new FieldConfigId('entity', self::ENTITY_CLASS, self::FIELD_NAME, 'string');
 
@@ -121,7 +110,7 @@ class FieldsHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$fieldId], $fields);
     }
 
-    public function testGetFieldsWithWrongExtendConfig()
+    public function testGetFieldsWithWrongExtendConfig(): void
     {
         $fieldId = new FieldConfigId('entity', self::ENTITY_CLASS, self::FIELD_NAME, 'string');
 
@@ -159,7 +148,7 @@ class FieldsHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $fields);
     }
 
-    public function testGetFieldsWhenFeatureCheckerFalse()
+    public function testGetFieldsWhenFeatureCheckerFalse(): void
     {
         $fieldId = new FieldConfigId('entity', self::ENTITY_CLASS, self::FIELD_NAME, 'string');
 

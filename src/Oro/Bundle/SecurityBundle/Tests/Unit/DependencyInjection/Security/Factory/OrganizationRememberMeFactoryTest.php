@@ -3,11 +3,11 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\DependencyInjection\Security\Factory;
 
 use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationRememberMeFactory;
+use PHPUnit\Framework\TestCase;
 
-class OrganizationRememberMeFactoryTest extends \PHPUnit\Framework\TestCase
+class OrganizationRememberMeFactoryTest extends TestCase
 {
-    /** @var OrganizationRememberMeFactory */
-    private $factory;
+    private OrganizationRememberMeFactory $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -15,7 +15,7 @@ class OrganizationRememberMeFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory = new OrganizationRememberMeFactory();
     }
 
-    public function testKey()
+    public function testKey(): void
     {
         $this->assertEquals('organization-remember-me', $this->factory->getKey());
     }

@@ -6,20 +6,18 @@ use Oro\Bundle\ChartBundle\Factory\ChartViewBuilderFactory;
 use Oro\Bundle\ChartBundle\Model\ChartViewBuilder;
 use Oro\Bundle\ChartBundle\Model\ConfigProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChartViewBuilderFactoryTest extends \PHPUnit\Framework\TestCase
+class ChartViewBuilderFactoryTest extends TestCase
 {
+    private ChartViewBuilder&MockObject $chartViewBuilder;
+    private ConfigProvider&MockObject $chartConfigProvider;
     private ChartViewBuilderFactory $chartViewBuilderFactory;
-
-    private ChartViewBuilder|MockObject $chartViewBuilder;
-
-    private ConfigProvider|MockObject $chartConfigProvider;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->chartViewBuilder = $this->createMock(ChartViewBuilder::class);
-
         $this->chartConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->chartViewBuilderFactory = new ChartViewBuilderFactory(
@@ -51,16 +49,12 @@ class ChartViewBuilderFactoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this
-            ->chartConfigProvider
-            ->expects(self::once())
+        $this->chartConfigProvider->expects(self::once())
             ->method('getChartConfig')
             ->with($chartName)
             ->willReturn($chartConfig);
 
-        $this
-            ->chartViewBuilder
-            ->expects(self::once())
+        $this->chartViewBuilder->expects(self::once())
             ->method('setOptions')
             ->with([
                 'name' => $chartType,

@@ -10,12 +10,13 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class AttributeFamilyTest extends \PHPUnit\Framework\TestCase
+class AttributeFamilyTest extends TestCase
 {
     use EntityTestCaseTrait;
 
-    public function testProperties()
+    public function testProperties(): void
     {
         $properties = [
             ['id', 777],
@@ -31,7 +32,7 @@ class AttributeFamilyTest extends \PHPUnit\Framework\TestCase
         $this->assertPropertyAccessors($entity, $properties);
     }
 
-    public function testCollections()
+    public function testCollections(): void
     {
         $collections = [
             ['labels', new LocalizedFallbackValue()]
@@ -41,7 +42,7 @@ class AttributeFamilyTest extends \PHPUnit\Framework\TestCase
         $this->assertPropertyCollections($entity, $collections);
     }
 
-    public function testAttributeGroupCollection()
+    public function testAttributeGroupCollection(): void
     {
         $entity = new AttributeFamily();
         $group = new AttributeGroup();
@@ -66,7 +67,7 @@ class AttributeFamilyTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($entity->getAttributeGroups()->contains($group));
     }
 
-    public function testGetNotExistedAttributeGroup()
+    public function testGetNotExistedAttributeGroup(): void
     {
         $entity = new AttributeFamily();
         $group = new AttributeGroup();
@@ -76,7 +77,7 @@ class AttributeFamilyTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($entity->getAttributeGroup('group_code_2'));
     }
 
-    public function testGetHash()
+    public function testGetHash(): void
     {
         $group1 = new AttributeGroup();
         ReflectionUtil::setId($group1, 1);
@@ -110,7 +111,7 @@ class AttributeFamilyTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(md5(serialize($result)), $entity->getHash());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $entity = new AttributeFamily();
         $entity->setCode('default_family');

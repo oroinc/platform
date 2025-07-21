@@ -8,10 +8,11 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class FormatStringTest extends \PHPUnit\Framework\TestCase
+class FormatStringTest extends TestCase
 {
     private const ATTRIBUTE_PATH = 'attribute';
     private const ARGUMENTS_PATH = 'arguments';
@@ -20,8 +21,7 @@ class FormatStringTest extends \PHPUnit\Framework\TestCase
     private array $testArguments = ['param1' => 'first', 'param2' => 'second'];
     private string $expectedString = 'some "first" test "second" string';
 
-    /** @var FormatString */
-    private $action;
+    private FormatString $action;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +33,7 @@ class FormatStringTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testInitialize(array $options)
+    public function testInitialize(array $options): void
     {
         $this->action->initialize($options);
 
@@ -82,7 +82,7 @@ class FormatStringTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage): void
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
@@ -126,7 +126,7 @@ class FormatStringTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testExecute(array $options, string $expected, mixed $arguments = null)
+    public function testExecute(array $options, string $expected, mixed $arguments = null): void
     {
         $context = new ItemStub();
         if (null !== $arguments) {
@@ -141,7 +141,7 @@ class FormatStringTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $context->{$attributePath});
     }
 
-    public function testNotTraversableArguments()
+    public function testNotTraversableArguments(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Argument parameter must be traversable');

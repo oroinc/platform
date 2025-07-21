@@ -3,10 +3,11 @@
 namespace Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\HelpBundle\DependencyInjection\Configuration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit\Framework\TestCase
+class ConfigurationTest extends TestCase
 {
     private function processConfiguration(array $config): array
     {

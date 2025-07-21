@@ -5,14 +5,13 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Client;
 use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
 use Oro\Bundle\MessageQueueBundle\Client\ProcessorWatcher;
 use Oro\Component\MessageQueue\Consumption\Context;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ProcessorWatcherTest extends \PHPUnit\Framework\TestCase
+class ProcessorWatcherTest extends TestCase
 {
-    /** @var BufferedMessageProducer|\PHPUnit\Framework\MockObject\MockObject */
-    private $bufferedProducer;
-
-    /** @var ProcessorWatcher */
-    private $processorWatcher;
+    private BufferedMessageProducer&MockObject $bufferedProducer;
+    private ProcessorWatcher $processorWatcher;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class ProcessorWatcherTest extends \PHPUnit\Framework\TestCase
         $this->processorWatcher = new ProcessorWatcher($this->bufferedProducer);
     }
 
-    public function testShouldEnableBufferingOnPreReceivedIfBufferingIsNotEnabledYet()
+    public function testShouldEnableBufferingOnPreReceivedIfBufferingIsNotEnabledYet(): void
     {
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
@@ -33,7 +32,7 @@ class ProcessorWatcherTest extends \PHPUnit\Framework\TestCase
         $this->processorWatcher->onPreReceived($this->createMock(Context::class));
     }
 
-    public function testShouldNotEnableBufferingOnPreReceivedIfBufferingIsAlreadyEnabled()
+    public function testShouldNotEnableBufferingOnPreReceivedIfBufferingIsAlreadyEnabled(): void
     {
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
@@ -44,7 +43,7 @@ class ProcessorWatcherTest extends \PHPUnit\Framework\TestCase
         $this->processorWatcher->onPreReceived($this->createMock(Context::class));
     }
 
-    public function testShouldFlushBufferOnPostReceivedIfBufferingIsEnabledAndHasMessagesInBuffer()
+    public function testShouldFlushBufferOnPostReceivedIfBufferingIsEnabledAndHasMessagesInBuffer(): void
     {
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
@@ -58,7 +57,7 @@ class ProcessorWatcherTest extends \PHPUnit\Framework\TestCase
         $this->processorWatcher->onPostReceived($this->createMock(Context::class));
     }
 
-    public function testShouldNotFlushBufferOnPostReceivedIfBufferingIsEnabledButNoMessagesInBuffer()
+    public function testShouldNotFlushBufferOnPostReceivedIfBufferingIsEnabledButNoMessagesInBuffer(): void
     {
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')
@@ -72,7 +71,7 @@ class ProcessorWatcherTest extends \PHPUnit\Framework\TestCase
         $this->processorWatcher->onPostReceived($this->createMock(Context::class));
     }
 
-    public function testShouldNotFlushBufferOnPostReceivedIfBufferingIsNotEnabled()
+    public function testShouldNotFlushBufferOnPostReceivedIfBufferingIsNotEnabled(): void
     {
         $this->bufferedProducer->expects(self::once())
             ->method('isBufferingEnabled')

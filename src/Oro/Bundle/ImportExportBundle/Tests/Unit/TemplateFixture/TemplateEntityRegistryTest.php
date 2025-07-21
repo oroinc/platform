@@ -7,11 +7,11 @@ use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 
-class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
+class TemplateEntityRegistryTest extends TestCase
 {
-    /** @var TemplateEntityRegistry */
-    private $entityRegistry;
+    private TemplateEntityRegistry $entityRegistry;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
         $this->entityRegistry = new TemplateEntityRegistry();
     }
 
-    public function testGettersAndSetters()
+    public function testGettersAndSetters(): void
     {
         $entity1 = new \stdClass();
         $entity2 = new \stdClass();
@@ -54,7 +54,7 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
         $this->entityRegistry->getEntity('Test\Entity', 'test3');
     }
 
-    public function testDuplicateAdd()
+    public function testDuplicateAdd(): void
     {
         $entity1 = new \stdClass();
         $entity2 = new \stdClass();
@@ -66,7 +66,7 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
         $this->entityRegistry->addEntity('Test\Entity', 'test1', $entity2);
     }
 
-    public function testGetDataForSingleEntity()
+    public function testGetDataForSingleEntity(): void
     {
         $entity1 = new \stdClass();
         $entity2 = new \stdClass();
@@ -102,7 +102,7 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($entity1, current($data));
     }
 
-    public function testGetDataForSeveralEntity()
+    public function testGetDataForSeveralEntity(): void
     {
         $entity1 = new \stdClass();
         $entity2 = new \stdClass();

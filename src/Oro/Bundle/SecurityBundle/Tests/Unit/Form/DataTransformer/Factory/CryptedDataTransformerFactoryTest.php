@@ -5,24 +5,15 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\DataTransformer\Factory;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Bundle\SecurityBundle\Form\DataTransformer\CryptedDataTransformer;
 use Oro\Bundle\SecurityBundle\Form\DataTransformer\Factory\CryptedDataTransformerFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class CryptedDataTransformerFactoryTest extends \PHPUnit\Framework\TestCase
+class CryptedDataTransformerFactoryTest extends TestCase
 {
-    /**
-     * @var CryptedDataTransformerFactory
-     */
-    private $factory;
-
-    /**
-     * @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $crypter;
-
-    /**
-     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $logger;
+    private SymmetricCrypterInterface&MockObject $crypter;
+    private LoggerInterface&MockObject $logger;
+    private CryptedDataTransformerFactory $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +23,7 @@ class CryptedDataTransformerFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory = new CryptedDataTransformerFactory($this->crypter, $this->logger);
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $transformer = new CryptedDataTransformer($this->crypter);
         $transformer->setLogger($this->logger);

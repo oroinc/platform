@@ -4,14 +4,13 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ButtonSearchContextProviderTest extends \PHPUnit\Framework\TestCase
+class ButtonSearchContextProviderTest extends TestCase
 {
-    /** @var ContextHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextHelper;
-
-    /** @var ButtonSearchContextProvider */
-    private $provider;
+    private ContextHelper&MockObject $contextHelper;
+    private ButtonSearchContextProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class ButtonSearchContextProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider contextProvider
      */
-    public function testGetButtonSearchContext(array $context)
+    public function testGetButtonSearchContext(array $context): void
     {
         $context = $this->normalizeContext($context);
 

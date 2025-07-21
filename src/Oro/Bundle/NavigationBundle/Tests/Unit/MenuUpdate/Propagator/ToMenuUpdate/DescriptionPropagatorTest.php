@@ -11,13 +11,14 @@ use Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuUpdate\DescriptionPr
 use Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuUpdate\MenuItemToMenuUpdatePropagatorInterface;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DescriptionPropagatorTest extends \PHPUnit\Framework\TestCase
+class DescriptionPropagatorTest extends TestCase
 {
     use MenuItemTestTrait;
 
-    private MenuUpdateHelper|\PHPUnit\Framework\MockObject\MockObject $menuUpdateHelper;
-
+    private MenuUpdateHelper&MockObject $menuUpdateHelper;
     private DescriptionPropagator $propagator;
 
     #[\Override]
@@ -69,8 +70,7 @@ class DescriptionPropagatorTest extends \PHPUnit\Framework\TestCase
         $menu = $this->createItem('sample_menu');
         $menuItem = $menu->addChild($menuUpdate->getKey(), ['extras' => ['description' => 'menu item description']]);
 
-        $this->menuUpdateHelper
-            ->expects(self::never())
+        $this->menuUpdateHelper->expects(self::never())
             ->method(self::anything());
 
         $expected = new ArrayCollection([(new LocalizedFallbackValue())->setText('sample description')]);
@@ -93,8 +93,7 @@ class DescriptionPropagatorTest extends \PHPUnit\Framework\TestCase
         $menu = $this->createItem('sample_menu');
         $menuItem = $menu->addChild($menuUpdate->getKey(), ['extras' => ['description' => 'menu item description']]);
 
-        $this->menuUpdateHelper
-            ->expects(self::once())
+        $this->menuUpdateHelper->expects(self::once())
             ->method('applyLocalizedFallbackValue')
             ->with($menuUpdate, $menuItem->getExtra('description'), 'description', 'text')
             ->willReturnCallback(function (MenuUpdateInterface $menuUpdate, $description) {

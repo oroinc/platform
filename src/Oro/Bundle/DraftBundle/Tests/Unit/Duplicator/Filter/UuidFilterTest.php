@@ -4,11 +4,11 @@ namespace Oro\Bundle\DraftBundle\Tests\Unit\Duplicator\Filter;
 
 use Oro\Bundle\DraftBundle\Duplicator\Filter\UuidFilter;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
+use PHPUnit\Framework\TestCase;
 
-class UuidFilterTest extends \PHPUnit\Framework\TestCase
+class UuidFilterTest extends TestCase
 {
-    /** @var UuidFilter */
-    private $filter;
+    private UuidFilter $filter;
 
     #[\Override]
     protected function setUp(): void

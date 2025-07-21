@@ -3,9 +3,10 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationCacheWarmerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class TranslationCacheWarmerPassTest extends \PHPUnit\Framework\TestCase
+class TranslationCacheWarmerPassTest extends TestCase
 {
     public function testProcess(): void
     {

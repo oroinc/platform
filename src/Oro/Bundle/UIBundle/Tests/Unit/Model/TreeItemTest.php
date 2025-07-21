@@ -3,22 +3,23 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Model;
 
 use Oro\Bundle\UIBundle\Model\TreeItem;
+use PHPUnit\Framework\TestCase;
 
-class TreeItemTest extends \PHPUnit\Framework\TestCase
+class TreeItemTest extends TestCase
 {
-    public function testKey()
+    public function testKey(): void
     {
         $treeItem = new Treeitem('key', 'Label');
         $this->assertEquals('key', $treeItem->getKey());
     }
 
-    public function testLabel()
+    public function testLabel(): void
     {
         $treeItem = new Treeitem('key', 'Label');
         $this->assertEquals('Label', $treeItem->getLabel());
     }
 
-    public function testParent()
+    public function testParent(): void
     {
         $parentTreeItem = new Treeitem('parent', 'Parent');
 
@@ -31,7 +32,7 @@ class TreeItemTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getParentsProvider
      */
-    public function testGetParents(TreeItem $item, bool $includeRoot, array $expectedParents)
+    public function testGetParents(TreeItem $item, bool $includeRoot, array $expectedParents): void
     {
         $this->assertEquals($expectedParents, $item->getParents($includeRoot));
     }
@@ -65,7 +66,7 @@ class TreeItemTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testChildren()
+    public function testChildren(): void
     {
         $parentTreeItem = new Treeitem('parent', 'Parent');
 
@@ -78,7 +79,7 @@ class TreeItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['key' => $treeItem, 'child' => $childTreeItem], $parentTreeItem->getChildren());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $treeItem = new Treeitem('key', 'Label');
         $this->assertEquals('Label', (string) $treeItem);

@@ -6,17 +6,14 @@ use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Converter\TemplateFixtureRelationCalculator;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TemplateFixtureRelationCalculatorTest extends \PHPUnit\Framework\TestCase
+class TemplateFixtureRelationCalculatorTest extends TestCase
 {
-    /** @var TemplateManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $templateManager;
-
-    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldHelper;
-
-    /** @var TemplateFixtureRelationCalculator */
-    private $calculator;
+    private TemplateManager&MockObject $templateManager;
+    private FieldHelper&MockObject $fieldHelper;
+    private TemplateFixtureRelationCalculator $calculator;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +27,7 @@ class TemplateFixtureRelationCalculatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider calculatorDataProvider
      */
-    public function testGetMaxRelatedEntities(\ArrayIterator $fixtureData, string $field, int $expected)
+    public function testGetMaxRelatedEntities(\ArrayIterator $fixtureData, string $field, int $expected): void
     {
         $entityName = 'stdClass';
 

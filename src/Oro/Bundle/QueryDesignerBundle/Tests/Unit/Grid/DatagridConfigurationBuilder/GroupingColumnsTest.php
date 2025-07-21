@@ -12,7 +12,7 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testGrouping()
+    public function testGrouping(): void
     {
         $en = 'Acme\Entity\TestEntity';
         $definition = [
@@ -140,7 +140,7 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testWithoutGrouping()
+    public function testWithoutGrouping(): void
     {
         $en = 'Acme\Entity\TestEntity';
         $definition = [
@@ -261,7 +261,7 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testInvalidGrouping()
+    public function testInvalidGrouping(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The grouping column "column2" must be declared in SELECT clause.');
@@ -302,15 +302,14 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
         );
 
         $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
-        $this
-            ->createDatagridConfigurationBuilder($model, $doctrine, $functionProvider)
+        $this->createDatagridConfigurationBuilder($model, $doctrine, $functionProvider)
             ->getConfiguration();
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testComplexQuery()
+    public function testComplexQuery(): void
     {
         $en = 'Acme\Entity\TestEntity';
         $en1 = 'Acme\Entity\TestEntity1';

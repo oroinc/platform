@@ -52,7 +52,7 @@ class EmailActivityListProviderTest extends TestCase
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
-        $this->configManager  = $this->createMock(ConfigManager::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $emailThreadProvider = $this->createMock(EmailThreadProvider::class);
         $htmlTagHelper = $this->createMock(HtmlTagHelper::class);

@@ -6,23 +6,22 @@ use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyFields)
  */
-abstract class AbstractCommonEntityOwnershipDecisionMakerTest extends \PHPUnit\Framework\TestCase
+abstract class AbstractCommonEntityOwnershipDecisionMakerTest extends TestCase
 {
     protected const ORG_ID = 10;
     protected const BU_ID = 100;
     protected const USER_ID = 10000;
 
     protected OwnerTree $tree;
-
     protected Organization $org1;
     protected Organization $org2;
     protected Organization $org3;
     protected Organization $org4;
-
     protected BusinessUnit $bu1;
     protected BusinessUnit $bu2;
     protected BusinessUnit $bu3;
@@ -30,7 +29,6 @@ abstract class AbstractCommonEntityOwnershipDecisionMakerTest extends \PHPUnit\F
     protected BusinessUnit $bu4;
     protected BusinessUnit $bu41;
     protected BusinessUnit $bu411;
-
     protected User $user1;
     protected User $user2;
     protected User $user3;

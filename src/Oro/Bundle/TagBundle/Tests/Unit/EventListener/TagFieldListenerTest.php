@@ -7,16 +7,14 @@ use Oro\Bundle\TagBundle\EventListener\TagFieldListener;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\UIBundle\Event\BeforeViewRenderEvent;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 
-class TagFieldListenerTest extends \PHPUnit\Framework\TestCase
+class TagFieldListenerTest extends TestCase
 {
     private BeforeViewRenderEvent&MockObject $event;
-
     private TagFieldListener $tagFieldListener;
-
     private TaggableHelper&MockObject $taggableHelper;
-
     private Environment $environment;
 
     #[\Override]
@@ -26,40 +24,55 @@ class TagFieldListenerTest extends \PHPUnit\Framework\TestCase
         $this->taggableHelper = $this->createMock(TaggableHelper::class);
         $this->environment = $this->createMock(Environment::class);
 
-        $this->event->method('getTwigEnvironment')->willReturn($this->environment);
+        $this->event->expects(self::any())
+            ->method('getTwigEnvironment')
+            ->willReturn($this->environment);
 
         $this->tagFieldListener = new TagFieldListener($this->taggableHelper);
     }
 
-    public function testThatTagsFieldIsNotAddedWhenEntityIsNotSet()
+    public function testThatTagsFieldIsNotAddedWhenEntityIsNotSet(): void
     {
         $env = $this->createMock(Environment::class);
 
-        $this->event->method('getTwigEnvironment')->willReturn($env);
+        $this->event->expects(self::any())
+            ->method('getTwigEnvironment')
+            ->willReturn($env);
 
-        $env->expects($this->never())->method('render');
-
-        $this->tagFieldListener->addTagField($this->event);
-    }
-
-    public function testThatTagsFieldIsNotAddedWhenVisibilityIsNotDefault()
-    {
-        $this->environment->expects($this->never())->method('render');
-
-        $this->event->method('getEntity')->willReturn($this->createMock(Tag::class));
-
-        $this->taggableHelper->method('shouldRenderDefault')->willReturn(false);
+        $env->expects($this->never())
+            ->method('render');
 
         $this->tagFieldListener->addTagField($this->event);
     }
 
-    public function testThatTagsFieldIsRendered()
+    public function testThatTagsFieldIsNotAddedWhenVisibilityIsNotDefault(): void
     {
-        $this->environment->expects($this->once())->method('render');
+        $this->environment->expects($this->never())
+            ->method('render');
 
-        $this->event->method('getEntity')->willReturn($this->createMock(Tag::class));
+        $this->event->expects(self::any())
+            ->method('getEntity')
+            ->willReturn($this->createMock(Tag::class));
 
-        $this->taggableHelper->method('shouldRenderDefault')->willReturn(true);
+        $this->taggableHelper->expects(self::any())
+            ->method('shouldRenderDefault')
+            ->willReturn(false);
+
+        $this->tagFieldListener->addTagField($this->event);
+    }
+
+    public function testThatTagsFieldIsRendered(): void
+    {
+        $this->environment->expects($this->once())
+            ->method('render');
+
+        $this->event->expects(self::any())
+            ->method('getEntity')
+            ->willReturn($this->createMock(Tag::class));
+
+        $this->taggableHelper->expects(self::any())
+            ->method('shouldRenderDefault')
+            ->willReturn(true);
 
         $this->tagFieldListener->addTagField($this->event);
     }
@@ -68,15 +81,19 @@ class TagFieldListenerTest extends \PHPUnit\Framework\TestCase
      * @dataProvider dataBlocksProvider
      * @return void
      */
-    public function testThatRenderedTagsFieldIsNotAdded(array $dataBlocks)
+    public function testThatRenderedTagsFieldIsNotAdded(array $dataBlocks): void
     {
-        $this->event->method('getEntity')->willReturn($this->createMock(Tag::class));
+        $this->event->expects(self::any())
+            ->method('getEntity')
+            ->willReturn($this->createMock(Tag::class));
 
-        $this->taggableHelper->method('shouldRenderDefault')->willReturn(true);
+        $this->taggableHelper->expects(self::any())
+            ->method('shouldRenderDefault')
+            ->willReturn(true);
 
-        $this->event->method('getData')->willReturn([
-            'dataBlocks' => $dataBlocks
-        ]);
+        $this->event->expects(self::any())
+            ->method('getData')
+            ->willReturn(['dataBlocks' => $dataBlocks]);
 
         $previousStateOfData = $this->event->getData();
 
@@ -89,42 +106,51 @@ class TagFieldListenerTest extends \PHPUnit\Framework\TestCase
      * @dataProvider dataBlocksKeyProvider
      * @return void
      */
-    public function testThatRenderedTagsFieldIsAddedToData(string|int $arrayKey)
+    public function testThatRenderedTagsFieldIsAddedToData(string|int $arrayKey): void
     {
-        $this->environment->expects($this->once())->method('render')
+        $this->environment->expects($this->once())
+            ->method('render')
             ->willReturn('tags block');
 
-        $this->event->method('getEntity')->willReturn($this->createMock(Tag::class));
+        $this->event->expects(self::any())
+            ->method('getEntity')
+            ->willReturn($this->createMock(Tag::class));
 
-        $this->event->method('getData')->willReturn([
-            'dataBlocks' => [
-                $arrayKey => [
-                    'subblocks' => [
-                        0 => [
-                            'data' => []
-                        ]
-                    ]
-                ]
-            ]
-        ]);
-
-        $this->taggableHelper->method('shouldRenderDefault')->willReturn(true);
-
-        $this->event->expects($this->once())->method('setData')->with(
-            [
+        $this->event->expects(self::any())
+            ->method('getData')
+            ->willReturn([
                 'dataBlocks' => [
                     $arrayKey => [
                         'subblocks' => [
                             0 => [
-                                'data' => [
-                                    'tags block'
+                                'data' => []
+                            ]
+                        ]
+                    ]
+                ]
+            ]);
+
+        $this->taggableHelper->expects(self::any())
+            ->method('shouldRenderDefault')
+            ->willReturn(true);
+
+        $this->event->expects($this->once())
+            ->method('setData')
+            ->with(
+                [
+                    'dataBlocks' => [
+                        $arrayKey => [
+                            'subblocks' => [
+                                0 => [
+                                    'data' => [
+                                        'tags block'
+                                    ]
                                 ]
                             ]
                         ]
                     ]
                 ]
-            ]
-        );
+            );
 
         $this->tagFieldListener->addTagField($this->event);
     }

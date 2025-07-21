@@ -11,9 +11,9 @@ use Symfony\Component\DependencyInjection\Container;
 final class SessionStorageOptionsManipulatorTest extends TestCase
 {
     private Container $container;
-
     private SessionStorageOptionsManipulator $manipulator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new ContainerStub([

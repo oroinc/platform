@@ -3,6 +3,7 @@
 namespace Oro\Component\DependencyInjection\Tests\Unit\Compiler;
 
 use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceWithHandlerCompilerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -10,7 +11,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class PriorityNamedTaggedServiceWithHandlerCompilerPassTest extends \PHPUnit\Framework\TestCase
+class PriorityNamedTaggedServiceWithHandlerCompilerPassTest extends TestCase
 {
     private const SERVICE_ID = 'test_service';
     private const TAG_NAME = 'test_tag';
@@ -23,7 +24,7 @@ class PriorityNamedTaggedServiceWithHandlerCompilerPassTest extends \PHPUnit\Fra
         $this->container = new ContainerBuilder();
     }
 
-    public function testProcessWhenNoServiceAndItIsRequired()
+    public function testProcessWhenNoServiceAndItIsRequired(): void
     {
         $this->expectException(ServiceNotFoundException::class);
         $this->container->setDefinition('tagged_service_1', new Definition())
@@ -39,7 +40,7 @@ class PriorityNamedTaggedServiceWithHandlerCompilerPassTest extends \PHPUnit\Fra
         $compiler->process($this->container);
     }
 
-    public function testProcessWhenNoServiceAndItIsOptional()
+    public function testProcessWhenNoServiceAndItIsOptional(): void
     {
         $this->container->setDefinition('tagged_service_1', new Definition())
             ->addTag(self::TAG_NAME);
@@ -55,7 +56,7 @@ class PriorityNamedTaggedServiceWithHandlerCompilerPassTest extends \PHPUnit\Fra
         $compiler->process($this->container);
     }
 
-    public function testProcessWhenNoTaggedServices()
+    public function testProcessWhenNoTaggedServices(): void
     {
         $service = $this->container->setDefinition(self::SERVICE_ID, new Definition(\stdClass::class, [[], null]));
 
@@ -77,7 +78,7 @@ class PriorityNamedTaggedServiceWithHandlerCompilerPassTest extends \PHPUnit\Fra
         self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $service = $this->container->setDefinition(self::SERVICE_ID, new Definition(\stdClass::class, [[], null]));
 

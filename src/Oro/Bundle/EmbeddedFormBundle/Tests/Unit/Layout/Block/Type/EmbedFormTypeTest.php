@@ -11,7 +11,7 @@ use Oro\Component\Layout\LayoutManipulatorInterface;
 
 class EmbedFormTypeTest extends BlockTypeTestCase
 {
-    public function testBuildBlock()
+    public function testBuildBlock(): void
     {
         $formName = 'test_form';
 
@@ -93,7 +93,7 @@ class EmbedFormTypeTest extends BlockTypeTestCase
         $type->buildBlock($builder, new Options($options));
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $type = $this->getBlockType(EmbedFormType::NAME);
 

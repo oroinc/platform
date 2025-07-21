@@ -106,7 +106,6 @@ class UpdateFactoryTest extends TestCase
 
         $update = $this->updateFactory->createUpdate($argData, $argForm, $argHandler, $argResultProvider);
 
-        /** @var Request $request */
         $request = $this->createMock(Request::class);
         self::assertTrue($update->handle($request));
         self::assertSame(['provider result'], $update->getTemplateData($request));

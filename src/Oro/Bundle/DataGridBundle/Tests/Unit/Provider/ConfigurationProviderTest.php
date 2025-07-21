@@ -13,10 +13,8 @@ use PHPUnit\Framework\TestCase;
 
 class ConfigurationProviderTest extends TestCase
 {
-    private RawConfigurationProviderInterface|MockObject $rawConfigurationProvider;
-
-    private SystemAwareResolver|MockObject $resolver;
-
+    private RawConfigurationProviderInterface&MockObject $rawConfigurationProvider;
+    private SystemAwareResolver&MockObject $resolver;
     private ConfigurationProvider $configurationProvider;
 
     #[\Override]
@@ -41,14 +39,12 @@ class ConfigurationProviderTest extends TestCase
             PropertyAccess::createPropertyAccessorWithDotSyntax()
         );
 
-        $this->rawConfigurationProvider
-            ->expects(self::once())
+        $this->rawConfigurationProvider->expects(self::once())
             ->method('getRawConfiguration')
             ->with($gridName)
             ->willReturn($rawConfig);
 
-        $this->resolver
-            ->expects(self::once())
+        $this->resolver->expects(self::once())
             ->method('resolve')
             ->with($gridName, $rawConfig)
             ->willReturn($rawConfig);
@@ -60,8 +56,7 @@ class ConfigurationProviderTest extends TestCase
     {
         $gridName = 'test_grid';
 
-        $this->rawConfigurationProvider
-            ->expects(self::once())
+        $this->rawConfigurationProvider->expects(self::once())
             ->method('getRawConfiguration')
             ->with($gridName)
             ->willReturn(null);
@@ -78,8 +73,7 @@ class ConfigurationProviderTest extends TestCase
     /** @dataProvider configDataProvider */
     public function testIsApplicable(string $gridName, ?array $rawConfiguration, bool $expected): void
     {
-        $this->rawConfigurationProvider
-            ->expects(self::once())
+        $this->rawConfigurationProvider->expects(self::once())
             ->method('getRawConfiguration')
             ->with($gridName)
             ->willReturn($rawConfiguration);
@@ -90,14 +84,12 @@ class ConfigurationProviderTest extends TestCase
     /** @dataProvider configDataProvider */
     public function testIsValidConfiguration(string $gridName, ?array $rawConfiguration, bool $expected): void
     {
-        $this->rawConfigurationProvider
-            ->expects(self::any())
+        $this->rawConfigurationProvider->expects(self::any())
             ->method('getRawConfiguration')
             ->with($gridName)
             ->willReturn($rawConfiguration);
 
-        $this->resolver
-            ->expects(self::any())
+        $this->resolver->expects(self::any())
             ->method('resolve')
             ->with($gridName, $rawConfiguration)
             ->willReturn($rawConfiguration);

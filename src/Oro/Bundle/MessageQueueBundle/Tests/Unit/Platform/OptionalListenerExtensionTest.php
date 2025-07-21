@@ -7,30 +7,40 @@ use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 use Oro\Bundle\PlatformBundle\Provider\Console\OptionalListenersGlobalOptionsProvider;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Consumption\Context;
+use PHPUnit\Framework\TestCase;
 
-class OptionalListenerExtensionTest extends \PHPUnit\Framework\TestCase
+class OptionalListenerExtensionTest extends TestCase
 {
-    public function testShouldAlwaysReEnableListeners()
+    public function testShouldAlwaysReEnableListeners(): void
     {
         $optionalListenerManager = $this->createMock(OptionalListenerManager::class);
-        $optionalListenerManager->expects($this->once())->method('getListeners')->willReturn([]);
-        $optionalListenerManager->expects($this->once())->method('enableListeners');
-        $optionalListenerManager->expects($this->never())->method('disableListener');
+        $optionalListenerManager->expects($this->once())
+            ->method('getListeners')
+            ->willReturn([]);
+        $optionalListenerManager->expects($this->once())
+            ->method('enableListeners');
+        $optionalListenerManager->expects($this->never())
+            ->method('disableListener');
 
         $message = new Message();
         $context = $this->createMock(Context::class);
-        $context->expects($this->once())->method('getMessage')->willReturn($message);
+        $context->expects($this->once())
+            ->method('getMessage')
+            ->willReturn($message);
 
         $extension = new OptionalListenerExtension($optionalListenerManager);
         $extension->onPreReceived($context);
     }
 
-    public function testInvalidJson()
+    public function testInvalidJson(): void
     {
         $optionalListenerManager = $this->createMock(OptionalListenerManager::class);
-        $optionalListenerManager->expects($this->once())->method('getListeners')->willReturn([]);
-        $optionalListenerManager->expects($this->once())->method('enableListeners');
-        $optionalListenerManager->expects($this->never())->method('disableListener');
+        $optionalListenerManager->expects($this->once())
+            ->method('getListeners')->willReturn([]);
+        $optionalListenerManager->expects($this->once())
+            ->method('enableListeners');
+        $optionalListenerManager->expects($this->never())
+            ->method('disableListener');
 
         $message = new Message();
         $message->setProperty(
@@ -38,19 +48,22 @@ class OptionalListenerExtensionTest extends \PHPUnit\Framework\TestCase
             '<s>{&quot;0&quot;:1,&quot;1&quot;:2}</s>'
         );
         $context = $this->createMock(Context::class);
-        $context->expects($this->once())->method('getMessage')->willReturn($message);
+        $context->expects($this->once())
+            ->method('getMessage')
+            ->willReturn($message);
 
         $extension = new OptionalListenerExtension($optionalListenerManager);
         $extension->onPreReceived($context);
     }
 
-    public function testDisableListeners()
+    public function testDisableListeners(): void
     {
         $optionalListenerManager = $this->createMock(OptionalListenerManager::class);
-        $optionalListenerManager->expects($this->once())->method('getListeners')->willReturn([]);
-        $optionalListenerManager->expects($this->once())->method('enableListeners');
-        $optionalListenerManager
-            ->expects($this->once())
+        $optionalListenerManager->expects($this->once())
+            ->method('getListeners')->willReturn([]);
+        $optionalListenerManager->expects($this->once())
+            ->method('enableListeners');
+        $optionalListenerManager->expects($this->once())
             ->method('disableListener')
             ->willReturn('oro_search.index_listener');
 
@@ -60,19 +73,23 @@ class OptionalListenerExtensionTest extends \PHPUnit\Framework\TestCase
             json_encode(['oro_search.index_listener'])
         );
         $context = $this->createMock(Context::class);
-        $context->expects($this->once())->method('getMessage')->willReturn($message);
+        $context->expects($this->once())
+            ->method('getMessage')
+            ->willReturn($message);
 
         $extension = new OptionalListenerExtension($optionalListenerManager);
         $extension->onPreReceived($context);
     }
 
-    public function testSuppressNotExistingListener()
+    public function testSuppressNotExistingListener(): void
     {
         $optionalListenerManager = $this->createMock(OptionalListenerManager::class);
-        $optionalListenerManager->expects($this->once())->method('getListeners')->willReturn([]);
-        $optionalListenerManager->expects($this->once())->method('enableListeners');
-        $optionalListenerManager
-            ->expects($this->once())
+        $optionalListenerManager->expects($this->once())
+            ->method('getListeners')
+            ->willReturn([]);
+        $optionalListenerManager->expects($this->once())
+            ->method('enableListeners');
+        $optionalListenerManager->expects($this->once())
             ->method('disableListener')
             ->willThrowException(new \InvalidArgumentException());
 
@@ -82,7 +99,9 @@ class OptionalListenerExtensionTest extends \PHPUnit\Framework\TestCase
             json_encode(['oro_search.index_listener'])
         );
         $context = $this->createMock(Context::class);
-        $context->expects($this->once())->method('getMessage')->willReturn($message);
+        $context->expects($this->once())
+            ->method('getMessage')
+            ->willReturn($message);
 
         $extension = new OptionalListenerExtension($optionalListenerManager);
         $extension->onPreReceived($context);

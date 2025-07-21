@@ -6,14 +6,14 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\CurrencyBundle\Exception\InvalidRoundingTypeException;
 use Oro\Bundle\CurrencyBundle\Rounding\AbstractRoundingService;
 use Oro\Bundle\CurrencyBundle\Rounding\RoundingServiceInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-abstract class AbstractRoundingServiceTest extends \PHPUnit\Framework\TestCase
+abstract class AbstractRoundingServiceTest extends TestCase
 {
     /** @var AbstractRoundingService */
     protected $service;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    protected ConfigManager&MockObject $configManager;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +28,7 @@ abstract class AbstractRoundingServiceTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider roundProvider
      */
-    public function testRound(int $roundingType, float|int $value, int $precision, float|int $expectedValue)
+    public function testRound(int $roundingType, float|int $value, int $precision, float|int $expectedValue): void
     {
         $this->prepareConfigManager($roundingType, $precision);
 
@@ -148,7 +148,7 @@ abstract class AbstractRoundingServiceTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testInvalidRoundingTypeException()
+    public function testInvalidRoundingTypeException(): void
     {
         $this->expectException(InvalidRoundingTypeException::class);
         $this->expectExceptionMessage('The type of the rounding is not valid "intl" rounding mode.');

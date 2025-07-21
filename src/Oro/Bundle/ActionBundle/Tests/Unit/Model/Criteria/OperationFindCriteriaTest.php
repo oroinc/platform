@@ -5,13 +5,14 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Criteria;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\TestFrameworkBundle\Test\Stub\ClassWithToString;
+use PHPUnit\Framework\TestCase;
 
-class OperationFindCriteriaTest extends \PHPUnit\Framework\TestCase
+class OperationFindCriteriaTest extends TestCase
 {
     /**
      * @dataProvider criteriaData
      */
-    public function testCriteriaSimpleGetters(?string $entityClass, ?string $route, ?string $datagrid)
+    public function testCriteriaSimpleGetters(?string $entityClass, ?string $route, ?string $datagrid): void
     {
         $criteria = new OperationFindCriteria($entityClass, $route, $datagrid);
 
@@ -39,7 +40,7 @@ class OperationFindCriteriaTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider criteriaGroupGetterNormalizationData
      */
-    public function testCriteriaGroupGetterNormalization(mixed $set, array $expected)
+    public function testCriteriaGroupGetterNormalization(mixed $set, array $expected): void
     {
         $criteria = new OperationFindCriteria(null, null, null, $set);
 

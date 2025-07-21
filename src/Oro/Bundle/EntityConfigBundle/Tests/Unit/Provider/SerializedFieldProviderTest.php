@@ -6,14 +6,13 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Provider\SerializedFieldProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SerializedFieldProviderTest extends \PHPUnit\Framework\TestCase
+class SerializedFieldProviderTest extends TestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $extendConfigProvider;
-
-    /** @var SerializedFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $serializedFieldProvider;
+    protected ConfigProvider&MockObject $extendConfigProvider;
+    protected SerializedFieldProvider $serializedFieldProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -32,13 +31,13 @@ class SerializedFieldProviderTest extends \PHPUnit\Framework\TestCase
         return $fieldConfigModel;
     }
 
-    public function testIsSerializedWrongType()
+    public function testIsSerializedWrongType(): void
     {
         $fieldConfigModel = $this->checkIsSerializedWrongType();
         $this->assertFalse($this->serializedFieldProvider->isSerialized($fieldConfigModel));
     }
 
-    public function testIsSerializedByDataWrongType()
+    public function testIsSerializedByDataWrongType(): void
     {
         $fieldConfigModel = $this->checkIsSerializedWrongType();
         $this->assertFalse($this->serializedFieldProvider->isSerializedByData($fieldConfigModel, []));
@@ -59,19 +58,19 @@ class SerializedFieldProviderTest extends \PHPUnit\Framework\TestCase
         return $fieldConfigModel;
     }
 
-    public function testIsSerializedException()
+    public function testIsSerializedException(): void
     {
         $fieldConfigModel = $this->expectsEmptyPropertiesValues();
         $this->assertFalse($this->serializedFieldProvider->isSerialized($fieldConfigModel));
     }
 
-    public function testIsSerializedByDataException()
+    public function testIsSerializedByDataException(): void
     {
         $fieldConfigModel = $this->expectsEmptyPropertiesValues();
         $this->assertFalse($this->serializedFieldProvider->isSerializedByData($fieldConfigModel, []));
     }
 
-    public function testIsSerializedByModelFalse()
+    public function testIsSerializedByModelFalse(): void
     {
         $fieldConfigModel = new FieldConfigModel('name', 'string');
         $fieldConfigModel->fromArray('attribute', ['sortable' => true]);
@@ -83,7 +82,7 @@ class SerializedFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($isSerialized);
     }
 
-    public function testIsSerializedByModelTrue()
+    public function testIsSerializedByModelTrue(): void
     {
         $fieldConfigModel = new FieldConfigModel('name', 'string');
         $fieldConfigModel->fromArray('attribute', ['sortable' => false, 'enabled' => true]);
@@ -95,7 +94,7 @@ class SerializedFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($isSerialized);
     }
 
-    public function testIsSerializedByDataFalse()
+    public function testIsSerializedByDataFalse(): void
     {
         $fieldConfigModel = new FieldConfigModel('name', 'string');
         $data = ['attribute' => ['sortable' => true]];
@@ -107,7 +106,7 @@ class SerializedFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($isSerialized);
     }
 
-    public function testIsSerializedByDataTrue()
+    public function testIsSerializedByDataTrue(): void
     {
         $fieldConfigModel = new FieldConfigModel('name', 'string');
         $data = ['attribute' => ['sortable' => false, 'enabled' => true]];

@@ -15,27 +15,20 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalkerContextFactory;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class AclHelperTest extends \PHPUnit\Framework\TestCase
+class AclHelperTest extends TestCase
 {
-    /** @var AclHelper */
-    private $helper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $accessRuleExecutor;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AdapterInterface  */
-    private $cache;
+    private AdapterInterface&MockObject $cache;
+    private EntityManagerInterface&MockObject $em;
+    private TokenStorageInterface $tokenStorage;
+    private AccessRuleExecutor&MockObject $accessRuleExecutor;
+    private AclHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -64,7 +57,7 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApplyToQueryWithDefaultConfiguration()
+    public function testApplyToQueryWithDefaultConfiguration(): void
     {
         $query = new Query($this->em);
 
@@ -79,7 +72,7 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->cache, $query->getQueryCacheDriver()->getPool());
     }
 
-    public function testApplyToQueryWithDefaultConfigurationAndToken()
+    public function testApplyToQueryWithDefaultConfigurationAndToken(): void
     {
         $user = new User(1);
         $org = new Organization(2);
@@ -105,7 +98,7 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->cache, $query->getQueryCacheDriver()->getPool());
     }
 
-    public function testApplyToQueryWithDefaultConfigurationAndTokenWithOrganizationButWithoutUserObject()
+    public function testApplyToQueryWithDefaultConfigurationAndTokenWithOrganizationButWithoutUserObject(): void
     {
         $org = new Organization(2);
         $token = $this->createMock(OrganizationAwareTokenInterface::class);
@@ -137,7 +130,7 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->cache, $query->getQueryCacheDriver()->getPool());
     }
 
-    public function testApplyToQueryWithCustomOptions()
+    public function testApplyToQueryWithCustomOptions(): void
     {
         $query = new Query($this->em);
         $this->helper->apply($query, 'VIEW', ['option1' => true, 'option2' => [3, 2, 1]]);

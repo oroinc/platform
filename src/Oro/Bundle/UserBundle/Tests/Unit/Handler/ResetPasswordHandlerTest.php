@@ -8,21 +8,16 @@ use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class ResetPasswordHandlerTest extends \PHPUnit\Framework\TestCase
+class ResetPasswordHandlerTest extends TestCase
 {
-    /** @var EmailNotificationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailNotificationManager;
-
-    /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $userManager;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var ResetPasswordHandler */
-    private $handler;
+    private EmailNotificationManager&MockObject $emailNotificationManager;
+    private UserManager&MockObject $userManager;
+    private LoggerInterface&MockObject $logger;
+    private ResetPasswordHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -92,17 +87,15 @@ class ResetPasswordHandlerTest extends \PHPUnit\Framework\TestCase
             ->with($user);
         $this->emailNotificationManager->expects(self::once())
             ->method('processSingle')
-            ->willReturnCallback(
-                function (TemplateEmailNotification $notification) use ($user) {
-                    self::assertSame($user, $notification->getEntity());
-                    self::assertInstanceOf(TemplateEmailNotification::class, $notification);
-                    self::assertEquals(
-                        new EmailTemplateCriteria('force_reset_password', User::class),
-                        $notification->getTemplateCriteria()
-                    );
-                    self::assertEquals([$user], $notification->getRecipients());
-                }
-            );
+            ->willReturnCallback(function (TemplateEmailNotification $notification) use ($user) {
+                self::assertSame($user, $notification->getEntity());
+                self::assertInstanceOf(TemplateEmailNotification::class, $notification);
+                self::assertEquals(
+                    new EmailTemplateCriteria('force_reset_password', User::class),
+                    $notification->getTemplateCriteria()
+                );
+                self::assertEquals([$user], $notification->getRecipients());
+            });
 
         self::assertEmpty($user->getConfirmationToken());
         $result = $this->handler->resetPasswordAndNotify($user);

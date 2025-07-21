@@ -6,10 +6,11 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\RoleStub;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class RoleTest extends \PHPUnit\Framework\TestCase
+class RoleTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $strRole = 'foo';
         $role = new Role($strRole);
@@ -18,7 +19,7 @@ class RoleTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($strRole, $role->getRole());
     }
 
-    public function testRole()
+    public function testRole(): void
     {
         $role = new Role();
 
@@ -33,7 +34,7 @@ class RoleTest extends \PHPUnit\Framework\TestCase
         $this->assertMatchesRegularExpression('/_[[:upper:]\d]{13}/', substr($role->getRole(), strrpos($role, '_')));
     }
 
-    public function testLabel()
+    public function testLabel(): void
     {
         $role = new Role();
         $label = 'Test role';
@@ -46,7 +47,7 @@ class RoleTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEquals($label, (string)$role);
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $role = new Role();
         ReflectionUtil::setId($role, 1);
@@ -55,11 +56,11 @@ class RoleTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($copy->getId());
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $organization = new Organization();
-        $isEnabled    = true;
-        $name         = 'Organization';
+        $isEnabled = true;
+        $name = 'Organization';
         $organization->setEnabled($isEnabled);
         $organization->setName($name);
 
@@ -78,11 +79,11 @@ class RoleTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($name, $unserializedOrganization->getName());
     }
 
-    public function testSerializationWithoutOrganization()
+    public function testSerializationWithoutOrganization(): void
     {
         $firstRole = new Role();
-        $label     = 'Label';
-        $role      = 'ROLE_ID';
+        $label = 'Label';
+        $role = 'ROLE_ID';
         $firstRole->setRole($role);
         $firstRole->setLabel($label);
 

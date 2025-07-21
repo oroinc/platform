@@ -7,16 +7,16 @@ use Oro\Bundle\MaintenanceBundle\Drivers\DriverFactory;
 use Oro\Bundle\MaintenanceBundle\Event\MaintenanceEvent;
 use Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceModeState;
 use Oro\Bundle\MaintenanceBundle\Maintenance\Mode;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class ModeTest extends \PHPUnit\Framework\TestCase
+class ModeTest extends TestCase
 {
-    private Mode $maintenanceMode;
+    private AbstractDriver&MockObject $driver;
+    private EventDispatcherInterface&MockObject $dispatcher;
     private MaintenanceModeState $maintenanceModeState;
-
-    private AbstractDriver|\PHPUnit\Framework\MockObject\MockObject $driver;
-
-    private EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private Mode $maintenanceMode;
 
     #[\Override]
     protected function setUp(): void

@@ -11,25 +11,18 @@ use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
-class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
+class OroTranslationLoadCommandTest extends TestCase
 {
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $languageProvider;
-
-    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $input;
-
-    /** @var OutputStub */
-    private $output;
-
-    /** @var OroTranslationLoadCommand */
-    private $command;
+    private Translator&MockObject $translator;
+    private LanguageProvider&MockObject $languageProvider;
+    private InputInterface&MockObject $input;
+    private OutputStub $output;
+    private OroTranslationLoadCommand $command;
 
     #[\Override]
     protected function setUp(): void
@@ -70,7 +63,7 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $this->assertNotEmpty($this->command->getDescription());
         $this->assertNotEmpty($this->command->getName());
@@ -78,7 +71,7 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->command->getDefinition()->hasOption('rebuild-cache'));
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $this->input->expects($this->exactly(3))
             ->method('getOption')
@@ -108,7 +101,7 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testExecuteWithLanguageAndRebuildCache()
+    public function testExecuteWithLanguageAndRebuildCache(): void
     {
         $this->input->expects($this->any())
             ->method('getOption')

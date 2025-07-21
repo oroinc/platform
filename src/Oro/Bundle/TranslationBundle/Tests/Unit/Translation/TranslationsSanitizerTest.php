@@ -5,14 +5,13 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 use Oro\Bundle\TranslationBundle\Translation\TranslationMessageSanitizationError;
 use Oro\Bundle\TranslationBundle\Translation\TranslationMessageSanitizerInterface;
 use Oro\Bundle\TranslationBundle\Translation\TranslationsSanitizer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TranslationsSanitizerTest extends \PHPUnit\Framework\TestCase
+class TranslationsSanitizerTest extends TestCase
 {
-    /** @var TranslationMessageSanitizerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationMessageSanitizer;
-
-    /** @var TranslationsSanitizer */
-    private $sanitizer;
+    private TranslationMessageSanitizerInterface&MockObject $translationMessageSanitizer;
+    private TranslationsSanitizer $sanitizer;
 
     #[\Override]
     protected function setUp(): void

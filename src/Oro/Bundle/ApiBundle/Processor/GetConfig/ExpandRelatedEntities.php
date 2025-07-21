@@ -259,6 +259,12 @@ class ExpandRelatedEntities implements ProcessorInterface
             if ($existingTargetEntity->hasOrderBy()) {
                 $targetEntity->setOrderBy($existingTargetEntity->getOrderBy());
             }
+            $existingFields = $existingTargetEntity->getFields();
+            foreach ($existingFields as $existingFieldName => $existingField) {
+                if ($existingField->isMetaProperty()) {
+                    $targetEntity->addField($existingFieldName, $existingField);
+                }
+            }
         }
         $field->setTargetEntity($targetEntity);
     }

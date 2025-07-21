@@ -7,23 +7,19 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\TriggerDriver\PdoMysql;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PdoMysqlTest extends \PHPUnit\Framework\TestCase
+class PdoMysqlTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private PdoMysql $testable;
 
-    /** @var PdoMysql */
-    private $testable;
+    private string $testEntityClass = 'testEntity';
 
-    /** @var string */
-    private $testEntityClass = 'testEntity';
+    private Connection&MockObject $connection;
 
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var string */
-    private $tableName = 'oro_test_entity';
+    private string $tableName = 'oro_test_entity';
 
     #[\Override]
     protected function setUp(): void
@@ -59,12 +55,12 @@ class PdoMysqlTest extends \PHPUnit\Framework\TestCase
             ->willReturn($entityManager);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals(PdoMysql::DRIVER_MYSQL, $this->testable->getName());
     }
 
-    public function testEnable()
+    public function testEnable(): void
     {
         $expectedSql = 'SET FOREIGN_KEY_CHECKS = 1';
 
@@ -75,7 +71,7 @@ class PdoMysqlTest extends \PHPUnit\Framework\TestCase
         $this->testable->enable();
     }
 
-    public function testDisable()
+    public function testDisable(): void
     {
         $expectedSql = 'SET FOREIGN_KEY_CHECKS = 0';
 

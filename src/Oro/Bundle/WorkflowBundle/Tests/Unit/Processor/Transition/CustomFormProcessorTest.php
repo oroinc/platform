@@ -9,16 +9,15 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\CustomFormProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class CustomFormProcessorTest extends \PHPUnit\Framework\TestCase
+class CustomFormProcessorTest extends TestCase
 {
-    /** @var FormHandlerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $formHandlerRegistry;
-
-    /** @var CustomFormProcessor */
-    private $processor;
+    private FormHandlerRegistry&MockObject $formHandlerRegistry;
+    private CustomFormProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class CustomFormProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new CustomFormProcessor($this->formHandlerRegistry);
     }
 
-    public function testSaved()
+    public function testSaved(): void
     {
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())

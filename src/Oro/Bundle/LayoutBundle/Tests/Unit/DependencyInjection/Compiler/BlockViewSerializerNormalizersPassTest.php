@@ -5,10 +5,11 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\BlockViewSerializerNormalizersPass;
 use Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewVarsNormalizer;
 use Oro\Bundle\LayoutBundle\Layout\Serializer\ExpressionNormalizer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class BlockViewSerializerNormalizersPassTest extends \PHPUnit\Framework\TestCase
+class BlockViewSerializerNormalizersPassTest extends TestCase
 {
     private BlockViewSerializerNormalizersPass $compiler;
 
@@ -18,7 +19,7 @@ class BlockViewSerializerNormalizersPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new BlockViewSerializerNormalizersPass();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $serializerDef = $container->register('oro_layout.block_view_serializer')

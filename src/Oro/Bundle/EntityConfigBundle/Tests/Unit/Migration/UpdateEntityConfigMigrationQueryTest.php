@@ -5,12 +5,13 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Migration;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigrationQuery;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class UpdateEntityConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
+class UpdateEntityConfigMigrationQueryTest extends TestCase
 {
-    /** @var CommandExecutor|\PHPUnit\Framework\MockObject\MockObject */
-    private $commandExecutor;
+    private CommandExecutor&MockObject $commandExecutor;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +19,7 @@ class UpdateEntityConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $this->commandExecutor = $this->createMock(CommandExecutor::class);
     }
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $migrationQuery = new UpdateEntityConfigMigrationQuery(
             $this->commandExecutor
@@ -27,7 +28,7 @@ class UpdateEntityConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Update entity configs', $migrationQuery->getDescription());
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $logger = new ArrayLogger();
 

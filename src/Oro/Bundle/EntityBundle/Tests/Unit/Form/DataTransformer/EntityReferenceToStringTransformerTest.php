@@ -5,13 +5,13 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\DataTransformer;
 use Oro\Bundle\EntityBundle\Form\DataTransformer\EntityReferenceToStringTransformer;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\TestEntity;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
-class EntityReferenceToStringTransformerTest extends \PHPUnit\Framework\TestCase
+class EntityReferenceToStringTransformerTest extends TestCase
 {
-    /** @var EntityReferenceToStringTransformer */
-    private $transformer;
+    private EntityReferenceToStringTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void

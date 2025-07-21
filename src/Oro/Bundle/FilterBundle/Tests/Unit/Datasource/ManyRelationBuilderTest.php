@@ -5,14 +5,13 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Datasource;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder;
 use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ManyRelationBuilderTest extends \PHPUnit\Framework\TestCase
+class ManyRelationBuilderTest extends TestCase
 {
-    /** @var ManyRelationBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $childBuilder1;
-
-    /** @var ManyRelationBuilder */
-    private $builder;
+    private ManyRelationBuilderInterface&MockObject $childBuilder1;
+    private ManyRelationBuilder $builder;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class ManyRelationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->addBuilder($this->childBuilder1);
     }
 
-    public function testBuildComparisonExpr()
+    public function testBuildComparisonExpr(): void
     {
         $ds = $this->createMock(FilterDatasourceAdapterInterface::class);
         $fieldName = 'o.testField';
@@ -42,7 +41,7 @@ class ManyRelationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->buildComparisonExpr($ds, $fieldName, $parameterName, $filterName, $inverse);
     }
 
-    public function testBuildComparisonExprNoAppropriateChildBuilder()
+    public function testBuildComparisonExprNoAppropriateChildBuilder(): void
     {
         $ds = $this->createMock(FilterDatasourceAdapterInterface::class);
         $fieldName = 'o.testField';
@@ -63,7 +62,7 @@ class ManyRelationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->buildComparisonExpr($ds, $fieldName, $parameterName, $filterName, $inverse);
     }
 
-    public function testBuildNullValueExpr()
+    public function testBuildNullValueExpr(): void
     {
         $ds = $this->createMock(FilterDatasourceAdapterInterface::class);
         $fieldName = 'o.testField';
@@ -81,7 +80,7 @@ class ManyRelationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->buildNullValueExpr($ds, $fieldName, $filterName, $inverse);
     }
 
-    public function testBuildNullValueExprNoAppropriateChildBuilder()
+    public function testBuildNullValueExprNoAppropriateChildBuilder(): void
     {
         $ds = $this->createMock(FilterDatasourceAdapterInterface::class);
         $fieldName = 'o.testField';

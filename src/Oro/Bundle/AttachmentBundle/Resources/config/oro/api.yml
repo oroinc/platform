@@ -36,3 +36,15 @@ api:
                     property_path: parentEntityFieldName
             actions:
                 get_list: false
+                update:
+                    fields:
+                        parent:
+                            form_options:
+                                mapped: false
+                        parentFieldName:
+                            form_options:
+                                mapped: false
+            subresources:
+                parent:
+                    actions:
+                        update_relationship: false

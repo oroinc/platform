@@ -8,11 +8,11 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowEntityAclTest extends \PHPUnit\Framework\TestCase
+class WorkflowEntityAclTest extends TestCase
 {
-    /** @var WorkflowEntityAcl */
-    private $entityAcl;
+    private WorkflowEntityAcl $entityAcl;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class WorkflowEntityAclTest extends \PHPUnit\Framework\TestCase
         $this->entityAcl = new WorkflowEntityAcl();
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertNull($this->entityAcl->getId());
 
@@ -34,7 +34,7 @@ class WorkflowEntityAclTest extends \PHPUnit\Framework\TestCase
      * @param string $property
      * @param mixed $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters($property, $value): void
     {
         $accessor = PropertyAccess::createPropertyAccessor();
         $accessor->setValue($this->entityAcl, $property, $value);
@@ -53,7 +53,7 @@ class WorkflowEntityAclTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testImport()
+    public function testImport(): void
     {
         $step = new WorkflowStep();
         $step->setName('step');
@@ -79,7 +79,7 @@ class WorkflowEntityAclTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->entityAcl->getAttributeStepKey(), $newEntityAcl->getAttributeStepKey());
     }
 
-    public function testGetAttributeStepKeyNoStepException()
+    public function testGetAttributeStepKeyNoStepException(): void
     {
         $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage("Workflow entity ACL with ID 1 doesn't have workflow step");

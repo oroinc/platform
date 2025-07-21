@@ -4,13 +4,13 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Button;
 
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class ButtonContextTest extends \PHPUnit\Framework\TestCase
+class ButtonContextTest extends TestCase
 {
     use EntityTestCaseTrait;
 
-    /** @var ButtonContext */
-    private $buttonContext;
+    private ButtonContext $buttonContext;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class ButtonContextTest extends \PHPUnit\Framework\TestCase
         $this->buttonContext = new ButtonContext();
     }
 
-    public function testGetSetButtonContext()
+    public function testGetSetButtonContext(): void
     {
         $this->assertPropertyAccessors(
             $this->buttonContext,
@@ -40,7 +40,7 @@ class ButtonContextTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getSetEntityDataProvider
      */
-    public function testSetGetEntity(mixed $entityId)
+    public function testSetGetEntity(mixed $entityId): void
     {
         $this->buttonContext->setEntity('Class', $entityId);
         $this->assertSame('Class', $this->buttonContext->getEntityClass());

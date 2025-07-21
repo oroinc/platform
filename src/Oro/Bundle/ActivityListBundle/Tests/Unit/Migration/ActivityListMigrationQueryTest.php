@@ -17,29 +17,18 @@ use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Validator\CustomEntityConfigValidatorService;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ActivityListMigrationQueryTest extends \PHPUnit\Framework\TestCase
+class ActivityListMigrationQueryTest extends TestCase
 {
-    /** @var ActivityListMigrationQuery */
-    private $migrationQuery;
-
-    /** @var Schema */
-    private $schema;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $provider;
-
-    /** @var ActivityListExtension */
-    private $activityListExtension;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $metadataHelper;
-
-    /** @var ExtendDbIdentifierNameGenerator */
-    private $nameGenerator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
+    private Schema $schema;
+    private ActivityListExtension $activityListExtension;
+    private ExtendDbIdentifierNameGenerator $nameGenerator;
+    private ActivityListChainProvider&MockObject $provider;
+    private EntityMetadataHelper&MockObject $metadataHelper;
+    private ConfigManager&MockObject $configManager;
+    private ActivityListMigrationQuery $migrationQuery;
 
     #[\Override]
     protected function setUp(): void
@@ -47,23 +36,19 @@ class ActivityListMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $this->schema = new Schema();
         $this->activityListExtension = new ActivityListExtension();
         $this->nameGenerator = new ExtendDbIdentifierNameGenerator();
-
         $this->provider = $this->createMock(ActivityListChainProvider::class);
         $this->metadataHelper = $this->createMock(EntityMetadataHelper::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->metadataHelper->expects($this->any())
             ->method('getEntityClassesByTableName')
-            ->willReturnCallback(
-                function ($tableName) {
-                    if ($tableName === 'acme_test') {
-                        return ['Acme\TestBundle\Entity\Test'];
-                    }
-
-                    return [ActivityList::class];
+            ->willReturnCallback(function ($tableName) {
+                if ($tableName === 'acme_test') {
+                    return ['Acme\TestBundle\Entity\Test'];
                 }
-            );
 
-        $this->configManager = $this->createMock(ConfigManager::class);
+                return [ActivityList::class];
+            });
 
         $this->migrationQuery = new ActivityListMigrationQuery(
             $this->schema,
@@ -75,7 +60,7 @@ class ActivityListMigrationQueryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRunActivityLists()
+    public function testRunActivityLists(): void
     {
         $connection = $this->createMock(Connection::class);
 
@@ -113,15 +98,13 @@ class ActivityListMigrationQueryTest extends \PHPUnit\Framework\TestCase
 
         $entityMetadataHelper->expects($this->any())
             ->method('getEntityClassesByTableName')
-            ->willReturnCallback(
-                function ($tableName) {
-                    if ($tableName === 'acme_test') {
-                        return ['Acme\TestBundle\Entity\Test'];
-                    }
-
-                    return [ActivityList::class];
+            ->willReturnCallback(function ($tableName) {
+                if ($tableName === 'acme_test') {
+                    return ['Acme\TestBundle\Entity\Test'];
                 }
-            );
+
+                return [ActivityList::class];
+            });
 
         $log = $this->migrationQuery->getDescription();
         $this->assertEquals(

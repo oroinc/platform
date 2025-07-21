@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Oro\Bundle\RedisConfigBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\RedisConfigBundle\Provider\RedisRequirementsProvider;
+use PHPUnit\Framework\TestCase;
 use Predis\Client;
 
-class RedisRequirementsProviderTest extends \PHPUnit\Framework\TestCase
+class RedisRequirementsProviderTest extends TestCase
 {
-    public function testNoAvailableClients()
+    public function testNoAvailableClients(): void
     {
         $provider = new RedisRequirementsProvider([]);
         $requirements = $provider->getOroRequirements();
@@ -18,7 +19,7 @@ class RedisRequirementsProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $requirements->all());
     }
 
-    public function testConnectionNotConfigured()
+    public function testConnectionNotConfigured(): void
     {
         $provider = new RedisRequirementsProvider([
             'id' => $this->getClient('1.0', false)
@@ -32,7 +33,7 @@ class RedisRequirementsProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVersionRequirementIsFulfilled()
+    public function testVersionRequirementIsFulfilled(): void
     {
         $version = RedisRequirementsProvider::REQUIRED_VERSION;
         $provider = new RedisRequirementsProvider([
@@ -47,7 +48,7 @@ class RedisRequirementsProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVersionRequirementNotFulfilled()
+    public function testVersionRequirementNotFulfilled(): void
     {
         $provider = new RedisRequirementsProvider([
             'id' => $this->getClient('1.0')
@@ -62,7 +63,7 @@ class RedisRequirementsProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMultipleClients()
+    public function testMultipleClients(): void
     {
         $provider = new RedisRequirementsProvider([
             'id1' => $this->getClient('1.0'),

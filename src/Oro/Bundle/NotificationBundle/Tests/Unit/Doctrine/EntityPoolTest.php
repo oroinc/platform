@@ -4,14 +4,13 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Doctrine;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityPoolTest extends \PHPUnit\Framework\TestCase
+class EntityPoolTest extends TestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var EntityPool */
-    private $entityPool;
+    private EntityManagerInterface&MockObject $entityManager;
+    private EntityPool $entityPool;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +19,7 @@ class EntityPoolTest extends \PHPUnit\Framework\TestCase
         $this->entityPool = new EntityPool();
     }
 
-    public function testPersistAndClearWithNoEntities()
+    public function testPersistAndClearWithNoEntities(): void
     {
         $this->entityManager->expects(self::never())
             ->method(self::anything());
@@ -28,7 +27,7 @@ class EntityPoolTest extends \PHPUnit\Framework\TestCase
         $this->entityPool->persistAndClear($this->entityManager);
     }
 
-    public function testAddPersistAndClear()
+    public function testAddPersistAndClear(): void
     {
         $fooEntity = $this->createMock(\ArrayObject::class);
         $barEntity = $this->createMock(\ArrayObject::class);
@@ -54,7 +53,7 @@ class EntityPoolTest extends \PHPUnit\Framework\TestCase
         $this->entityPool->persistAndClear($this->entityManager);
     }
 
-    public function testPersistAndFlushWithNoEntities()
+    public function testPersistAndFlushWithNoEntities(): void
     {
         $this->entityManager->expects(self::never())
             ->method(self::anything());
@@ -62,7 +61,7 @@ class EntityPoolTest extends \PHPUnit\Framework\TestCase
         $this->entityPool->persistAndFlush($this->entityManager);
     }
 
-    public function testAddPersistAndFlush()
+    public function testAddPersistAndFlush(): void
     {
         $fooEntity = $this->createMock(\ArrayObject::class);
         $barEntity = $this->createMock(\ArrayObject::class);

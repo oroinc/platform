@@ -5,11 +5,11 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\EventListener;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 use Oro\Bundle\UIBundle\EventListener\ConfigSettingsListener;
+use PHPUnit\Framework\TestCase;
 
-class ConfigSettingsListenerTest extends \PHPUnit\Framework\TestCase
+class ConfigSettingsListenerTest extends TestCase
 {
-    /** @var ConfigSettingsListener */
-    private $configSettingsListener;
+    private ConfigSettingsListener $configSettingsListener;
 
     #[\Override]
     protected function setUp(): void
@@ -20,9 +20,8 @@ class ConfigSettingsListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onBeforeDataProvider
      */
-    public function testOnBeforeMethod(string $given, string $expected)
+    public function testOnBeforeMethod(string $given, string $expected): void
     {
-        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManagerMock */
         $configManagerMock = $this->createMock(ConfigManager::class);
 
         $event = new ConfigSettingsUpdateEvent($configManagerMock, ['value' => $given]);

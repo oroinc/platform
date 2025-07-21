@@ -4,10 +4,11 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datasource;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Stub\ValueContainer;
+use PHPUnit\Framework\TestCase;
 
-class ResultRecordTest extends \PHPUnit\Framework\TestCase
+class ResultRecordTest extends TestCase
 {
-    public function testAddDataObject()
+    public function testAddDataObject(): void
     {
         $record = new ResultRecord(['key' => 'value']);
         $record->addData(new ValueContainer('other value'));
@@ -16,7 +17,7 @@ class ResultRecordTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('other value', $record->getValue('something'));
     }
 
-    public function testAddDataArrayOfObjectsWithNumericIndices()
+    public function testAddDataArrayOfObjectsWithNumericIndices(): void
     {
         $record = new ResultRecord(['key' => 'value']);
         $record->addData([new ValueContainer('other value')]);
@@ -28,7 +29,7 @@ class ResultRecordTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getValueProvider
      */
-    public function testGetValue(mixed $data, string $itemName, mixed $expectedValue)
+    public function testGetValue(mixed $data, string $itemName, mixed $expectedValue): void
     {
         $resultRecord = new ResultRecord($data);
 
@@ -94,7 +95,7 @@ class ResultRecordTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getRootEntityProvider
      */
-    public function testGetRootEntity(mixed $data, mixed $expectedValue)
+    public function testGetRootEntity(mixed $data, mixed $expectedValue): void
     {
         $resultRecord = new ResultRecord($data);
 
@@ -129,7 +130,7 @@ class ResultRecordTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setValueProvider
      */
-    public function testSetValue(mixed $data, string $itemName, mixed $itemValue)
+    public function testSetValue(mixed $data, string $itemName, mixed $itemValue): void
     {
         $resultRecord = new ResultRecord($data);
 

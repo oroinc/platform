@@ -6,11 +6,12 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ParametrizedSqlMigrationQueryTest extends \PHPUnit\Framework\TestCase
+class ParametrizedSqlMigrationQueryTest extends TestCase
 {
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
+    private Connection&MockObject $connection;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +22,7 @@ class ParametrizedSqlMigrationQueryTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new MySqlPlatform());
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $query = new ParametrizedSqlMigrationQuery(
             'INSERT INTO test_table (name) VALUES (:name)',
@@ -40,7 +41,7 @@ class ParametrizedSqlMigrationQueryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $query = new ParametrizedSqlMigrationQuery();
         $query->setConnection($this->connection);
@@ -56,7 +57,7 @@ class ParametrizedSqlMigrationQueryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $query = new ParametrizedSqlMigrationQuery();
         $query->setConnection($this->connection);

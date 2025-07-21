@@ -8,20 +8,17 @@ use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber;
 use Oro\Bundle\UserBundle\Form\Type\EmailSettingsType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Valid;
 
-class EmailSettingsTypeTest extends \PHPUnit\Framework\TestCase
+class EmailSettingsTypeTest extends TestCase
 {
-    /** @var UserImapConfigSubscriber|\PHPUnit\Framework\MockObject\MockObject */
-    private $subscriber;
-
-    /** @var OAuthManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $oauthManagerRegistry;
-
-    /** @var EmailSettingsType */
-    private $type;
+    private UserImapConfigSubscriber&MockObject $subscriber;
+    private OAuthManagerRegistry&MockObject $oauthManagerRegistry;
+    private EmailSettingsType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +29,7 @@ class EmailSettingsTypeTest extends \PHPUnit\Framework\TestCase
         $this->type = new EmailSettingsType($this->subscriber, $this->oauthManagerRegistry);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
@@ -47,7 +44,7 @@ class EmailSettingsTypeTest extends \PHPUnit\Framework\TestCase
         $this->type->configureOptions($resolver);
     }
 
-    public function testBuildFormImapAccount()
+    public function testBuildFormImapAccount(): void
     {
         $this->oauthManagerRegistry->expects($this->once())
             ->method('isOauthImapEnabled')
@@ -71,7 +68,7 @@ class EmailSettingsTypeTest extends \PHPUnit\Framework\TestCase
         $this->type->buildForm($builder, []);
     }
 
-    public function testBuildFormImapConfiguration()
+    public function testBuildFormImapConfiguration(): void
     {
         $this->oauthManagerRegistry->expects($this->once())
             ->method('isOauthImapEnabled')

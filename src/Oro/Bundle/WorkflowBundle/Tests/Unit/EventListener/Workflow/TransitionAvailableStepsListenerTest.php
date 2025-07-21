@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 
 class TransitionAvailableStepsListenerTest extends TestCase
 {
-    private ExpressionFactory|MockObject $expressionFactory;
+    private ExpressionFactory&MockObject $expressionFactory;
     private TransitionAvailableStepsListener $listener;
 
     #[\Override]
@@ -38,12 +38,20 @@ class TransitionAvailableStepsListenerTest extends TestCase
     public function testOnPreAnnounceWhenAllowedWithNoConditionalSteps(): void
     {
         $stepTo = $this->createMock(Step::class);
-        $stepTo->method('getName')->willReturn('step_to');
+        $stepTo->expects(self::any())
+            ->method('getName')
+            ->willReturn('step_to');
 
         $transition = $this->createMock(Transition::class);
-        $transition->method('getConditionalStepsTo')->willReturn([]);
-        $transition->method('getStepTo')->willReturn($stepTo);
-        $transition->method('getName')->willReturn('transition_name');
+        $transition->expects(self::any())
+            ->method('getConditionalStepsTo')
+            ->willReturn([]);
+        $transition->expects(self::any())
+            ->method('getStepTo')
+            ->willReturn($stepTo);
+        $transition->expects(self::any())
+            ->method('getName')
+            ->willReturn('transition_name');
 
         $workflowItem = $this->createMock(WorkflowItem::class);
         $event = new PreAnnounceEvent($workflowItem, $transition, true);
@@ -67,12 +75,20 @@ class TransitionAvailableStepsListenerTest extends TestCase
     public function testOnPreAnnounceWhenAllowedWithConditionalSteps(): void
     {
         $stepTo = $this->createMock(Step::class);
-        $stepTo->method('getName')->willReturn('step_to');
+        $stepTo->expects(self::any())
+            ->method('getName')
+            ->willReturn('step_to');
 
         $transition = $this->createMock(Transition::class);
-        $transition->method('getConditionalStepsTo')->willReturn(['conditional_step' => []]);
-        $transition->method('getStepTo')->willReturn($stepTo);
-        $transition->method('getName')->willReturn('transition_name');
+        $transition->expects(self::any())
+            ->method('getConditionalStepsTo')
+            ->willReturn(['conditional_step' => []]);
+        $transition->expects(self::any())
+            ->method('getStepTo')
+            ->willReturn($stepTo);
+        $transition->expects(self::any())
+            ->method('getName')
+            ->willReturn('transition_name');
 
         $workflowItem = $this->createMock(WorkflowItem::class);
         $event = new PreAnnounceEvent($workflowItem, $transition, true);
@@ -99,12 +115,20 @@ class TransitionAvailableStepsListenerTest extends TestCase
     public function testOnPreAnnounceWhenNotAllowedAfterEvaluation(): void
     {
         $stepTo = $this->createMock(Step::class);
-        $stepTo->method('getName')->willReturn('step_to');
+        $stepTo->expects(self::any())
+            ->method('getName')
+            ->willReturn('step_to');
 
         $transition = $this->createMock(Transition::class);
-        $transition->method('getConditionalStepsTo')->willReturn(['conditional_step' => []]);
-        $transition->method('getStepTo')->willReturn($stepTo);
-        $transition->method('getName')->willReturn('transition_name');
+        $transition->expects(self::any())
+            ->method('getConditionalStepsTo')
+            ->willReturn(['conditional_step' => []]);
+        $transition->expects(self::any())
+            ->method('getStepTo')
+            ->willReturn($stepTo);
+        $transition->expects(self::any())
+            ->method('getName')
+            ->willReturn('transition_name');
 
         $workflowItem = $this->createMock(WorkflowItem::class);
         $event = new PreAnnounceEvent($workflowItem, $transition, true);

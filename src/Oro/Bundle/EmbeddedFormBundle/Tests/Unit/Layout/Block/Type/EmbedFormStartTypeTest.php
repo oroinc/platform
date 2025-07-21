@@ -16,13 +16,13 @@ use Symfony\Component\Form\FormView;
  */
 class EmbedFormStartTypeTest extends BlockTypeTestCase
 {
-    public function testResolveOptionsWithoutFormName()
+    public function testResolveOptionsWithoutFormName(): void
     {
         $options = $this->resolveOptions(EmbedFormStartType::NAME, []);
         $this->assertEquals('form', $options['form_name']);
     }
 
-    public function testGetBlockView()
+    public function testGetBlockView(): void
     {
         $formName = 'test_form';
         $formActionPath = 'test_form_action_path';
@@ -59,7 +59,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
 
-    public function testGetBlockViewWithRoute()
+    public function testGetBlockViewWithRoute(): void
     {
         $formName = 'test_form';
         $formActionRoute = 'test_form_action_route';
@@ -97,7 +97,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
 
-    public function testGetBlockViewWithRouteWithoutParams()
+    public function testGetBlockViewWithRouteWithoutParams(): void
     {
         $formName = 'test_form';
         $formActionRoute = 'test_form_action_route';
@@ -134,7 +134,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
 
-    public function testGetBlockViewWithEmptyFormParams()
+    public function testGetBlockViewWithEmptyFormParams(): void
     {
         $formName = 'test_form';
         $formView = new FormView();
@@ -168,7 +168,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $this->assertArrayNotHasKey('enctype', $view->vars);
     }
 
-    public function testGetBlockViewWithOverrideOptions()
+    public function testGetBlockViewWithOverrideOptions(): void
     {
         $formName = 'test_form';
         $formActionPath = 'test_form_action_path';
@@ -210,7 +210,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
 
-    public function testGetBlockViewWithOverrideOptionsRoute()
+    public function testGetBlockViewWithOverrideOptionsRoute(): void
     {
         $formName = 'test_form';
         $formActionRoute = 'test_form_action_route';
@@ -254,7 +254,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
 
-    public function testGetBlockViewWithOverrideOptionsRouteWithoutParams()
+    public function testGetBlockViewWithOverrideOptionsRouteWithoutParams(): void
     {
         $formName = 'test_form';
         $formActionRoute = 'test_form_action_route';
@@ -296,7 +296,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         $this->assertSame($formEnctype, $view->vars['enctype']);
     }
 
-    public function testGetBlockViewWithoutForm()
+    public function testGetBlockViewWithoutForm(): void
     {
         $this->expectException(\OutOfBoundsException::class);
         $this->expectExceptionMessage('Undefined index: test_form.');
@@ -307,7 +307,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         );
     }
 
-    public function testGetBlockViewWithInvalidForm()
+    public function testGetBlockViewWithInvalidForm(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(sprintf(
@@ -325,7 +325,7 @@ class EmbedFormStartTypeTest extends BlockTypeTestCase
         );
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $type = $this->getBlockType(EmbedFormStartType::NAME);
 

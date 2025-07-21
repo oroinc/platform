@@ -19,6 +19,7 @@ class EntityDateGroupingFilterTest extends TestCase
     private ManagerRegistry&MockObject $doctrine;
     private EntityDateGroupingFilter $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);

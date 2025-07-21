@@ -13,7 +13,7 @@ class EntityConfigListenerCreateFieldTest extends EntityConfigListenerTestCase
 {
     private const ENTITY_CLASS_NAME = User::class;
 
-    public function testCreateNewField()
+    public function testCreateNewField(): void
     {
         $entityConfig = new Config(
             new EntityConfigId('extend', self::ENTITY_CLASS_NAME)
@@ -38,7 +38,7 @@ class EntityConfigListenerCreateFieldTest extends EntityConfigListenerTestCase
         );
     }
 
-    public function testUpdateNewField()
+    public function testUpdateNewField(): void
     {
         $entityConfig = new Config(
             new EntityConfigId('extend', self::ENTITY_CLASS_NAME)
@@ -73,7 +73,7 @@ class EntityConfigListenerCreateFieldTest extends EntityConfigListenerTestCase
     /**
      * Test new index created and old deleted when field renamed
      */
-    public function testRenameField()
+    public function testRenameField(): void
     {
         $entityConfig = new Config(
             new EntityConfigId('extend', self::ENTITY_CLASS_NAME)

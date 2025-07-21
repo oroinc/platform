@@ -6,17 +6,17 @@ use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\AbstractPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ActionPass;
 use Oro\Component\Action\Tests\Unit\Action\Stub\ArrayAction as NotDispatcherAwareAction;
 use Oro\Component\Action\Tests\Unit\Action\Stub\DispatcherAwareAction;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ActionPassTest extends \PHPUnit\Framework\TestCase
+class ActionPassTest extends TestCase
 {
     private const ACTION_FACTORY_SERVICE_ID = 'oro_action.action_factory';
     private const ACTION_TAG = 'oro_action.action';
 
-    /** @var AbstractPass */
-    private $compiler;
+    private AbstractPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -40,12 +40,12 @@ class ActionPassTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testProcessWithoutFactoryService()
+    public function testProcessWithoutFactoryService(): void
     {
         $this->compiler->process(new ContainerBuilder());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('action_service_2.class', DispatcherAwareAction::class);

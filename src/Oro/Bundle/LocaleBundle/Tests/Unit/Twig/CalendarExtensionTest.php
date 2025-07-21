@@ -6,19 +6,16 @@ use Oro\Bundle\LocaleBundle\Model\Calendar;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Twig\CalendarExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CalendarExtensionTest extends \PHPUnit\Framework\TestCase
+class CalendarExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
-
-    /** @var Calendar|\PHPUnit\Framework\MockObject\MockObject */
-    private $calendar;
-
-    /** @var CalendarExtension */
-    private $extension;
+    private LocaleSettings&MockObject $localeSettings;
+    private Calendar&MockObject $calendar;
+    private CalendarExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +30,7 @@ class CalendarExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new CalendarExtension($container);
     }
 
-    public function testGetMonthNames()
+    public function testGetMonthNames(): void
     {
         $width = Calendar::WIDTH_NARROW;
         $locale = 'en_US';
@@ -55,7 +52,7 @@ class CalendarExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDayOfWeekNames()
+    public function testGetDayOfWeekNames(): void
     {
         $width = Calendar::WIDTH_ABBREVIATED;
         $locale = 'en_US';
@@ -77,7 +74,7 @@ class CalendarExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFirstDayOfWeek()
+    public function testGetFirstDayOfWeek(): void
     {
         $locale = 'en_US';
         $expectedResult = Calendar::DOW_MONDAY;

@@ -23,7 +23,7 @@
         grid-column: 1;
         grid-row: 1 / 2;
         position: sticky;
-        top: calc(var(--datagrid-sticky-offset, 0));
+        top: var(--datagrid-sticky-offset, 0);
         transition: top 500ms;
         z-index: 1;
     }

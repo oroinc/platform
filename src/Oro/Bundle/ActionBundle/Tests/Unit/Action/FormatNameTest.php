@@ -7,19 +7,16 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class FormatNameTest extends \PHPUnit\Framework\TestCase
+class FormatNameTest extends TestCase
 {
-    /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextAccessor;
-
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityNameResolver;
-
-    /** @var FormatName */
-    private $action;
+    private ContextAccessor&MockObject $contextAccessor;
+    private EntityNameResolver&MockObject $entityNameResolver;
+    private FormatName $action;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +28,7 @@ class FormatNameTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
-    public function testInitializeExceptionNoObject()
+    public function testInitializeExceptionNoObject(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Object parameter is required');
@@ -39,7 +36,7 @@ class FormatNameTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize(['attribute' => $this->createMock(PropertyPath::class)]);
     }
 
-    public function testInitializeExceptionNoAttribute()
+    public function testInitializeExceptionNoAttribute(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Attribute name parameter is required');
@@ -47,14 +44,14 @@ class FormatNameTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize(['object' => new \stdClass()]);
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $options = ['object' => new \stdClass(), 'attribute' => $this->createMock(PropertyPath::class)];
         self::assertEquals($this->action, $this->action->initialize($options));
         self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $object = new \stdClass();
         $attribute = $this->createMock(PropertyPath::class);

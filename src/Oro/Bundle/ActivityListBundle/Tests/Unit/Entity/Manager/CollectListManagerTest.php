@@ -13,17 +13,16 @@ use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class CollectListManagerTest extends \PHPUnit\Framework\TestCase
+class CollectListManagerTest extends TestCase
 {
-    /** @var ActivityListChainProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $chainProvider;
-
-    /** @var CollectListManager */
-    private $manager;
+    private ActivityListChainProvider&MockObject $chainProvider;
+    private CollectListManager $manager;
 
     #[\Override]
     protected function setUp(): void

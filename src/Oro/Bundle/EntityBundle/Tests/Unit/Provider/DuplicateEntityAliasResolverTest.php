@@ -8,17 +8,16 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DuplicateEntityAliasResolverTest extends \PHPUnit\Framework\TestCase
+class DuplicateEntityAliasResolverTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var DuplicateEntityAliasResolver */
-    private $duplicateResolver;
+    private ConfigManager&MockObject $configManager;
+    private DuplicateEntityAliasResolver $duplicateResolver;
 
     #[\Override]
     protected function setUp(): void

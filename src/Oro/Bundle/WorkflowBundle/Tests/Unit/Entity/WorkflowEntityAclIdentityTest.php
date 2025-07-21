@@ -9,11 +9,11 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowEntityAclIdentityTest extends \PHPUnit\Framework\TestCase
+class WorkflowEntityAclIdentityTest extends TestCase
 {
-    /** @var WorkflowEntityAclIdentity */
-    private $aclIdentity;
+    private WorkflowEntityAclIdentity $aclIdentity;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +21,7 @@ class WorkflowEntityAclIdentityTest extends \PHPUnit\Framework\TestCase
         $this->aclIdentity = new WorkflowEntityAclIdentity();
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertNull($this->aclIdentity->getId());
 
@@ -35,7 +35,7 @@ class WorkflowEntityAclIdentityTest extends \PHPUnit\Framework\TestCase
      * @param string $property
      * @param mixed $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters($property, $value): void
     {
         $accessor = PropertyAccess::createPropertyAccessor();
         $accessor->setValue($this->aclIdentity, $property, $value);
@@ -52,7 +52,7 @@ class WorkflowEntityAclIdentityTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testImport()
+    public function testImport(): void
     {
         $step = new WorkflowStep();
         $step->setName('step');
@@ -72,7 +72,7 @@ class WorkflowEntityAclIdentityTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->aclIdentity->getAclAttributeStepKey(), $newAclIdentity->getAclAttributeStepKey());
     }
 
-    public function testGetAclAttributeStepKeyNoAclException()
+    public function testGetAclAttributeStepKeyNoAclException(): void
     {
         $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage("Workflow ACL identity with ID 1 doesn't have entity ACL");

@@ -69,6 +69,7 @@ oro_form:
                         - nowrap
                         - width
                         - height
+                        - scope
                 a:
                     attributes:
                         - "!href"
@@ -176,6 +177,25 @@ oro_form:
                         - src
                         - controls
                 aside: ~
+
+        # This mode is used for output of text with basic HTML formatting.
+        basic:
+            allowed_html_elements:
+                address: ~
+                b: ~
+                bdo: ~
+                br:
+                    hasClosingTag: false
+                em: ~
+                i: ~
+                pre: ~
+                q: ~
+                strike: ~
+                strong: ~
+                sub: ~
+                sup: ~
+                u: ~
+
 twig:
     paths:
         '%kernel.project_dir%/vendor/oro/platform/src/Oro/Bundle/FormBundle/Resources/public': 'OroFormBundlePublic'

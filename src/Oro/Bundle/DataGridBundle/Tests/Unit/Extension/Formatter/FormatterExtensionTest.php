@@ -8,19 +8,16 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\FormatterExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\FieldProperty;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormatterExtensionTest extends \PHPUnit\Framework\TestCase
+class FormatterExtensionTest extends TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $propertyContainer;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var FormatterExtension */
-    private $extension;
+    private ContainerInterface&MockObject $propertyContainer;
+    private TranslatorInterface&MockObject $translator;
+    private FormatterExtension $extension;
 
     #[\Override]
     protected function setUp(): void

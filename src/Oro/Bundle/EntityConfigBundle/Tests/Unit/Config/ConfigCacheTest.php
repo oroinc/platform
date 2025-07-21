@@ -7,6 +7,8 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigCache;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -17,32 +19,25 @@ use Psr\Cache\CacheItemPoolInterface;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class ConfigCacheTest extends \PHPUnit\Framework\TestCase
+class ConfigCacheTest extends TestCase
 {
     private const ENTITY_CLASSES_KEY = '_entities';
-    private const FIELD_NAMES_KEY    = '_fields_';
+    private const FIELD_NAMES_KEY = '_fields_';
 
-    private const SCOPE        = 'testScope';
+    private const SCOPE = 'testScope';
     private const ENTITY_CLASS = 'Test_Entity';
-    private const FIELD_NAME   = 'testField';
-    private const FIELD_TYPE   = 'integer';
+    private const FIELD_NAME = 'testField';
+    private const FIELD_TYPE = 'integer';
 
-    private const ANOTHER_SCOPE        = 'anotherScope';
+    private const ANOTHER_SCOPE = 'anotherScope';
     private const ANOTHER_ENTITY_CLASS = 'Test\AnotherEntity';
-    private const ANOTHER_FIELD_NAME   = 'anotherField';
-    private const ANOTHER_FIELD_TYPE   = 'boolean';
+    private const ANOTHER_FIELD_NAME = 'anotherField';
+    private const ANOTHER_FIELD_TYPE = 'boolean';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $modelCache;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $cacheItem;
-
-    /** @var ConfigCache */
-    private $configCache;
+    private CacheItemPoolInterface&MockObject $cache;
+    private CacheItemPoolInterface&MockObject $modelCache;
+    private CacheItemInterface&MockObject $cacheItem;
+    private ConfigCache $configCache;
 
     #[\Override]
     protected function setUp(): void
@@ -58,7 +53,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSaveEntities()
+    public function testSaveEntities(): void
     {
         $entities = ['Test\Entity1' => true, 'Test\Entity2' => true];
 
@@ -78,7 +73,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSaveFields()
+    public function testSaveFields(): void
     {
         $fields = ['field1' => ['t' => 'integer', 'h' => true], 'field2' => ['t' => 'string', 'h' => false]];
 
@@ -98,7 +93,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSaveEntitiesLocalOnly()
+    public function testSaveEntitiesLocalOnly(): void
     {
         $entities = ['Test\Entity1' => true, 'Test\Entity2' => true];
 
@@ -115,7 +110,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSaveFieldsLocalOnly()
+    public function testSaveFieldsLocalOnly(): void
     {
         $fields = ['field1' => ['t' => 'integer', 'h' => true], 'field2' => ['t' => 'string', 'h' => false]];
 
@@ -132,7 +127,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntities()
+    public function testGetEntities(): void
     {
         $entities = ['Test\Entity1' => true, 'Test\Entity2' => true];
 
@@ -158,7 +153,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFields()
+    public function testGetFields(): void
     {
         $fields = ['field1' => ['t' => 'integer', 'h' => true], 'field2' => ['t' => 'string', 'h' => false]];
 
@@ -184,7 +179,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntitiesLocalOnly()
+    public function testGetEntitiesLocalOnly(): void
     {
         $this->cache->expects($this->never())
             ->method('getItem');
@@ -194,7 +189,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsLocalOnly()
+    public function testGetFieldsLocalOnly(): void
     {
         $this->cache->expects($this->never())
             ->method('getItem');
@@ -204,7 +199,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntitiesNotCached()
+    public function testGetEntitiesNotCached(): void
     {
         $this->cache->expects($this->once())
             ->method('getItem')
@@ -223,7 +218,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldsNotCached()
+    public function testGetFieldsNotCached(): void
     {
         $this->cache->expects($this->once())
             ->method('getItem')
@@ -242,7 +237,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDeleteEntities()
+    public function testDeleteEntities(): void
     {
         $entities = ['Test\Entity1' => true, 'Test\Entity2' => true];
 
@@ -265,7 +260,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDeleteFields()
+    public function testDeleteFields(): void
     {
         $fields = ['field1' => ['t' => 'integer', 'h' => true], 'field2' => ['t' => 'string', 'h' => false]];
 
@@ -288,7 +283,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDeleteEntitiesLocalOnly()
+    public function testDeleteEntitiesLocalOnly(): void
     {
         $entities = ['Test\Entity1' => true, 'Test\Entity2' => true];
 
@@ -310,7 +305,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDeleteFieldsLocalOnly()
+    public function testDeleteFieldsLocalOnly(): void
     {
         $fields = ['field1' => ['t' => 'integer', 'h' => true], 'field2' => ['t' => 'string', 'h' => false]];
 
@@ -332,7 +327,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSaveEntityConfig()
+    public function testSaveEntityConfig(): void
     {
         $configId = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
         $config = new Config($configId, ['key1' => 'val1']);
@@ -363,7 +358,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSaveFieldConfig()
+    public function testSaveFieldConfig(): void
     {
         $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
         $config = new Config($configId, ['key1' => 'val1']);
@@ -400,7 +395,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSaveEntityConfigLocalOnly()
+    public function testSaveEntityConfigLocalOnly(): void
     {
         $configId = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
         $config = new Config($configId);
@@ -426,7 +421,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSaveFieldConfigLocalOnly()
+    public function testSaveFieldConfigLocalOnly(): void
     {
         $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
         $config = new Config($configId);
@@ -448,7 +443,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSaveEntityConfigWhenAnotherEntityConfigIsAlreadyCached()
+    public function testSaveEntityConfigWhenAnotherEntityConfigIsAlreadyCached(): void
     {
         $configId = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
         $config = new Config($configId, ['key1' => 'val1']);
@@ -494,7 +489,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSaveFieldConfigWhenAnotherFieldConfigIsAlreadyCached()
+    public function testSaveFieldConfigWhenAnotherFieldConfigIsAlreadyCached(): void
     {
         $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
         $config = new Config($configId, ['key1' => 'val1']);
@@ -558,7 +553,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSaveEntityConfigValues()
+    public function testSaveEntityConfigValues(): void
     {
         $config1 = new Config(
             new EntityConfigId(self::SCOPE, self::ENTITY_CLASS),
@@ -603,7 +598,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSaveFieldConfigValues()
+    public function testSaveFieldConfigValues(): void
     {
         $config1Id = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
         $config1 = new Config($config1Id, ['key1' => 'val1']);
@@ -657,7 +652,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityConfig()
+    public function testGetEntityConfig(): void
     {
         $configId = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
         $config = new Config($configId, ['key1' => 'val1']);
@@ -690,7 +685,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldConfig()
+    public function testGetFieldConfig(): void
     {
         $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME);
         $config = new Config(
@@ -733,7 +728,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityConfigNotCachedScope()
+    public function testGetEntityConfigNotCachedScope(): void
     {
         $configId = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
 
@@ -760,7 +755,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldConfigNotCached()
+    public function testGetFieldConfigNotCached(): void
     {
         $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
 
@@ -789,7 +784,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityConfigWhenRequestedEntityDoesNotExistInCache()
+    public function testGetEntityConfigWhenRequestedEntityDoesNotExistInCache(): void
     {
         $configId = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
         $anotherConfigId = new EntityConfigId(self::SCOPE, self::ANOTHER_ENTITY_CLASS);
@@ -828,7 +823,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFieldConfigWhenRequestedFieldDoesNotExistInCache()
+    public function testGetFieldConfigWhenRequestedFieldDoesNotExistInCache(): void
     {
         $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
         $anotherConfigId = new FieldConfigId(
@@ -880,7 +875,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDeleteEntityConfigWhenLocalCacheEmpty()
+    public function testDeleteEntityConfigWhenLocalCacheEmpty(): void
     {
         $configId = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
 
@@ -896,7 +891,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->deleteEntityConfig($configId->getClassName());
     }
 
-    public function testDeleteEntityConfigWhenConfigForLastEntityDeleted()
+    public function testDeleteEntityConfigWhenConfigForLastEntityDeleted(): void
     {
         $configId = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
 
@@ -922,7 +917,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->deleteEntityConfig($configId->getClassName());
     }
 
-    public function testDeleteEntityConfigWhenConfigsForAnotherEntitiesExist()
+    public function testDeleteEntityConfigWhenConfigsForAnotherEntitiesExist(): void
     {
         $configId = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
         $anotherConfigId = new EntityConfigId(self::SCOPE, self::ANOTHER_ENTITY_CLASS);
@@ -954,7 +949,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->deleteEntityConfig($configId->getClassName());
     }
 
-    public function testDeleteFieldConfigWhenLocalCacheEmpty()
+    public function testDeleteFieldConfigWhenLocalCacheEmpty(): void
     {
         $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
 
@@ -969,7 +964,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->deleteFieldConfig($configId->getClassName(), $configId->getFieldName());
     }
 
-    public function testDeleteFieldConfigWhenConfigForLastFieldDeleted()
+    public function testDeleteFieldConfigWhenConfigForLastFieldDeleted(): void
     {
         $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
 
@@ -988,7 +983,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->deleteFieldConfig($configId->getClassName(), $configId->getFieldName());
     }
 
-    public function testDeleteFieldConfigWhenConfigsForAnotherFieldsExist()
+    public function testDeleteFieldConfigWhenConfigsForAnotherFieldsExist(): void
     {
         $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
         $anotherConfigId = new FieldConfigId(
@@ -1029,7 +1024,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->deleteFieldConfig($configId->getClassName(), $configId->getFieldName());
     }
 
-    public function testDeleteAllConfigs()
+    public function testDeleteAllConfigs(): void
     {
         $config = new Config(
             new EntityConfigId(self::SCOPE, self::ENTITY_CLASS),
@@ -1051,7 +1046,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDeleteAllConfigsLocalCacheOnly()
+    public function testDeleteAllConfigsLocalCacheOnly(): void
     {
         $config = new Config(
             new EntityConfigId(self::SCOPE, self::ENTITY_CLASS),
@@ -1077,7 +1072,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider saveConfigurableProvider
      */
-    public function testSaveConfigurable(array|false $fetchVal, ?bool $flag, ?string $fieldName, array $saveValue)
+    public function testSaveConfigurable(array|false $fetchVal, ?bool $flag, ?string $fieldName, array $saveValue): void
     {
         $this->modelCache->expects($this->exactly(3))
             ->method('getItem')
@@ -1129,7 +1124,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getConfigurableProvider
      */
-    public function testGetConfigurable(array|false $fetchVal, ?string $fieldName, ?bool $expectedFlag)
+    public function testGetConfigurable(array|false $fetchVal, ?string $fieldName, ?bool $expectedFlag): void
     {
         $this->modelCache->expects($this->once())
             ->method('getItem')
@@ -1166,7 +1161,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testDeleteAllConfigurable()
+    public function testDeleteAllConfigurable(): void
     {
         $this->modelCache->expects($this->exactly(2))
             ->method('getItem')
@@ -1184,7 +1179,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDeleteAllConfigurableLocalCacheOnly()
+    public function testDeleteAllConfigurableLocalCacheOnly(): void
     {
         $this->modelCache->expects($this->exactly(2))
             ->method('getItem')
@@ -1202,7 +1197,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDeleteAll()
+    public function testDeleteAll(): void
     {
         $this->modelCache->expects($this->exactly(2))
             ->method('getItem')
@@ -1236,7 +1231,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDeleteAllLocalCacheOnly()
+    public function testDeleteAllLocalCacheOnly(): void
     {
         $this->modelCache->expects($this->exactly(2))
             ->method('getItem')
@@ -1270,7 +1265,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBeginBatchWhenBatchAlreadyStarted()
+    public function testBeginBatchWhenBatchAlreadyStarted(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('A batch already started. Nested batches are not supported.');
@@ -1279,7 +1274,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->beginBatch();
     }
 
-    public function testSaveBatchWhenBatchIsNotStarted()
+    public function testSaveBatchWhenBatchIsNotStarted(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('A batch is not started.');
@@ -1287,12 +1282,12 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->saveBatch();
     }
 
-    public function testCancelBatchShouldNotThrowExceptionWhenBatchIsNotStarted()
+    public function testCancelBatchShouldNotThrowExceptionWhenBatchIsNotStarted(): void
     {
         $this->configCache->cancelBatch();
     }
 
-    public function testDeleteAllConfigsInBatchShouldNotBeAllowed()
+    public function testDeleteAllConfigsInBatchShouldNotBeAllowed(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('deleteAllConfigs() is not allowed inside a batch.');
@@ -1301,7 +1296,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->deleteAllConfigs();
     }
 
-    public function testDeleteAllConfigurableInBatchShouldNotBeAllowed()
+    public function testDeleteAllConfigurableInBatchShouldNotBeAllowed(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('deleteAllConfigurable() is not allowed inside a batch.');
@@ -1310,7 +1305,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->deleteAllConfigurable();
     }
 
-    public function testDeleteAllInBatchShouldNotBeAllowed()
+    public function testDeleteAllInBatchShouldNotBeAllowed(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('deleteAllConfigurable() is not allowed inside a batch.');
@@ -1319,7 +1314,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->deleteAll();
     }
 
-    public function testSaveConfigurableInBatch()
+    public function testSaveConfigurableInBatch(): void
     {
         $this->modelCache->expects($this->exactly(2))
             ->method('getItem')
@@ -1349,7 +1344,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->saveBatch();
     }
 
-    public function testSaveEntitiesInBatch()
+    public function testSaveEntitiesInBatch(): void
     {
         $this->cache->expects($this->once())
             ->method('getItem')
@@ -1382,7 +1377,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->saveBatch();
     }
 
-    public function testSaveFieldsInBatch()
+    public function testSaveFieldsInBatch(): void
     {
         $this->cache->expects($this->once())
             ->method('getItem')
@@ -1417,7 +1412,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->saveBatch();
     }
 
-    public function testSaveConfigInBatch()
+    public function testSaveConfigInBatch(): void
     {
         $this->cache->expects($this->exactly(4))
             ->method('getItem')
@@ -1463,7 +1458,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->saveBatch();
     }
 
-    public function testDeleteConfigInBatch()
+    public function testDeleteConfigInBatch(): void
     {
         $this->cache->expects($this->once())
             ->method('deleteItems')
@@ -1490,7 +1485,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->saveBatch();
     }
 
-    public function testLastSaveOrDeleteOperationShouldWinInBatch()
+    public function testLastSaveOrDeleteOperationShouldWinInBatch(): void
     {
         $this->cache->expects($this->exactly(2))
             ->method('getItem')

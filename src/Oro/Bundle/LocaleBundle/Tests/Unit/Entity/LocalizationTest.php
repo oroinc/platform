@@ -8,11 +8,12 @@ use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub\Localization;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class LocalizationTest extends \PHPUnit\Framework\TestCase
+class LocalizationTest extends TestCase
 {
     use EntityTestCaseTrait;
 

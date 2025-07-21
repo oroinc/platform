@@ -23,12 +23,9 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class EntityManagementGridActionExtensionTest extends TestCase
 {
-    private AuthorizationCheckerInterface|MockObject $authorizationChecker;
-
-    private Registry|MockObject $doctrine;
-
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private Registry&MockObject $doctrine;
     private EntityManagementGridActionExtension $extension;
-
     private EntityManagementConfigVoter $voter;
 
     #[\Override]
@@ -101,8 +98,7 @@ class EntityManagementGridActionExtensionTest extends TestCase
 
         $repository = $this->createMock(EntityRepository::class);
 
-        $repository
-            ->expects(self::exactly(count($resultObjectData)))
+        $repository->expects(self::exactly(count($resultObjectData)))
             ->method('find')
             ->withConsecutive(...array_map(static fn (array $result) => [$result['id']], $resultObjectData))
             ->willReturnCallback(function (int $id) use ($rootEntity, $configModelsData) {
@@ -116,14 +112,12 @@ class EntityManagementGridActionExtensionTest extends TestCase
                 return null;
             });
 
-        $this->doctrine
-            ->expects(self::once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->with($rootEntity)
             ->willReturn($repository);
 
-        $this->authorizationChecker
-            ->expects(self::exactly(count($resultObjectData)))
+        $this->authorizationChecker->expects(self::exactly(count($resultObjectData)))
             ->method('isGranted')
             ->willReturnCallback(function (string $attribute, ConfigModel $subject): bool {
                 return $this->voter->vote($this->createMock(TokenInterface::class), $subject, [$attribute])

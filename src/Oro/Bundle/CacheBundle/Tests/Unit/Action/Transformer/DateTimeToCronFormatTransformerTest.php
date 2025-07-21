@@ -3,10 +3,11 @@
 namespace Oro\Bundle\CacheBundle\Tests\Unit\Action\Transformer;
 
 use Oro\Bundle\CacheBundle\Action\Transformer\DateTimeToCronFormatTransformer;
+use PHPUnit\Framework\TestCase;
 
-class DateTimeToCronFormatTransformerTest extends \PHPUnit\Framework\TestCase
+class DateTimeToCronFormatTransformerTest extends TestCase
 {
-    public function testTransform()
+    public function testTransform(): void
     {
         $transformer = new DateTimeToCronFormatTransformer();
         $cronDefinition = '05 15 01 09 *';
@@ -15,7 +16,7 @@ class DateTimeToCronFormatTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($cronDefinition, $transformer->transform($dateTime));
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $transformer = new DateTimeToCronFormatTransformer();
         $cronDefinition = '05 15 01 09 *';
@@ -24,7 +25,7 @@ class DateTimeToCronFormatTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $transformer->reverseTransform($cronDefinition));
     }
 
-    public function testReverseTransformWrongString()
+    public function testReverseTransformWrongString(): void
     {
         $transformer = new DateTimeToCronFormatTransformer();
         $cronDefinition = '70 15 1';

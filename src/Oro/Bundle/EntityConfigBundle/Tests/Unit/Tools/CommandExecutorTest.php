@@ -5,20 +5,17 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Tools;
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Component\PhpUtils\Tools\CommandExecutor\CommandExecutor as BaseCommandExecutor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CommandExecutorTest extends \PHPUnit\Framework\TestCase
+class CommandExecutorTest extends TestCase
 {
     private const NON_DEFAULT_OPTION_NAME = 'non_default_option_name';
     private const DEFAULT_OPTION_NAME = 'default_option_name';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|BaseCommandExecutor */
-    private $baseCommandExecutor;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OroDataCacheManager */
-    private $dataCacheManager;
-
-    /** @var CommandExecutor */
-    private $commandExecutor;
+    private BaseCommandExecutor&MockObject $baseCommandExecutor;
+    private OroDataCacheManager&MockObject $dataCacheManager;
+    private CommandExecutor $commandExecutor;
 
     #[\Override]
     protected function setUp(): void

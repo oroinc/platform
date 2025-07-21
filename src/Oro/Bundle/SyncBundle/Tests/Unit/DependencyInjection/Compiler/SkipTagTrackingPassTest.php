@@ -15,12 +15,12 @@ use Oro\Bundle\SearchBundle\Entity\IndexInteger;
 use Oro\Bundle\SearchBundle\Entity\IndexText;
 use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\SkipTagTrackingPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class SkipTagTrackingPassTest extends \PHPUnit\Framework\TestCase
+class SkipTagTrackingPassTest extends TestCase
 {
-    /** @var SkipTagTrackingPass */
-    private $compiler;
+    private SkipTagTrackingPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -28,14 +28,14 @@ class SkipTagTrackingPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new SkipTagTrackingPass();
     }
 
-    public function testProcessWithoutService()
+    public function testProcessWithoutService(): void
     {
         $container = new ContainerBuilder();
 
         $this->compiler->process($container);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $listenerDef = $container->register('oro_sync.event_listener.doctrine_tag');

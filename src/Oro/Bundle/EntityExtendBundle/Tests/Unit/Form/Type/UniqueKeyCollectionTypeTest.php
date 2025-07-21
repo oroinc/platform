@@ -11,6 +11,7 @@ use Oro\Bundle\TranslationBundle\Translation\IdentityTranslator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
@@ -23,11 +24,8 @@ class UniqueKeyCollectionTypeTest extends FormIntegrationTestCase
 {
     private const ENTITY = 'Namespace\Entity';
 
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $provider;
-
-    /** @var UniqueKeyCollectionType */
-    private $type;
+    private ConfigProvider&MockObject $provider;
+    private UniqueKeyCollectionType $type;
 
     #[\Override]
     protected function setUp(): void

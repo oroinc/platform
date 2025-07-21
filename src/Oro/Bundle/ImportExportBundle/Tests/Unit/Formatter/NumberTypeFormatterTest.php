@@ -5,11 +5,11 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Formatter;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Formatter\NumberTypeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use PHPUnit\Framework\TestCase;
 
-class NumberTypeFormatterTest extends \PHPUnit\Framework\TestCase
+class NumberTypeFormatterTest extends TestCase
 {
-    /** @var NumberTypeFormatter */
-    private $formatter;
+    private NumberTypeFormatter $formatter;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +22,7 @@ class NumberTypeFormatterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider formatTypeProvider
      */
-    public function testFormatType(int $value, string $type, ?\Exception $exception = null)
+    public function testFormatType(int $value, string $type, ?\Exception $exception = null): void
     {
         if (null !== $exception) {
             $this->expectException(get_class($exception));

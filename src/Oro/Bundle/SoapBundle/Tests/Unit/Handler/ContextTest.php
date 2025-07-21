@@ -3,28 +3,20 @@
 namespace Oro\Bundle\SoapBundle\Tests\Unit\Handler;
 
 use Oro\Bundle\SoapBundle\Handler\Context;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ContextTest extends \PHPUnit\Framework\TestCase
+class ContextTest extends TestCase
 {
-    /** @var Request */
-    private $request;
+    private Request $request;
+    private Response $response;
+    private string $action;
+    private object $controllerObject;
 
-    /** @var Response */
-    private $response;
+    private array $values = ['testKey' => 'testValue'];
 
-    /** @var string */
-    private $action;
-
-    /** @var object */
-    private $controllerObject;
-
-    /** @var array */
-    private $values = ['testKey' => 'testValue'];
-
-    /** @var Context */
-    private $context;
+    private Context $context;
 
     #[\Override]
     protected function setUp(): void
@@ -43,23 +35,23 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetRequest()
+    public function testGetRequest(): void
     {
         $this->assertSame($this->request, $this->context->getRequest());
     }
 
-    public function testGetResponse()
+    public function testGetResponse(): void
     {
         $this->assertSame($this->response, $this->context->getResponse());
     }
 
-    public function testGetAction()
+    public function testGetAction(): void
     {
         $this->assertSame($this->action, $this->context->getAction());
         $this->assertTrue($this->context->isAction($this->action));
     }
 
-    public function testValuesAccessor()
+    public function testValuesAccessor(): void
     {
         $this->assertTrue($this->context->has('testKey'));
         $this->assertEquals('testValue', $this->context->get('testKey'));

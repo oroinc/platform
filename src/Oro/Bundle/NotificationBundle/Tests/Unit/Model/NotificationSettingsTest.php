@@ -6,15 +6,16 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class NotificationSettingsTest extends \PHPUnit\Framework\TestCase
+class NotificationSettingsTest extends TestCase
 {
     private const SENDER_NAME = 'Sender';
     private const SENDER_EMAIL = 'some@mail.com';
     private const TEMPLATE_NAME = 'templateName';
 
-    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
-
+    private ConfigManager&MockObject $configManager;
     private NotificationSettings $notificationSettings;
 
     #[\Override]

@@ -6,16 +6,17 @@ use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ConsumerHeartbeatExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class ConsumerHeartbeatExtensionTest extends \PHPUnit\Framework\TestCase
+class ConsumerHeartbeatExtensionTest extends TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject|ConsumerHeartbeat $consumerHeartbeat;
+    private MockObject|ConsumerHeartbeat $consumerHeartbeat;
 
-    private \PHPUnit\Framework\MockObject\MockObject|LoggerInterface $logger;
+    private MockObject|LoggerInterface $logger;
 
     private ConsumerHeartbeatExtension $extension;
-
     private Context $context;
 
     #[\Override]
@@ -31,15 +32,12 @@ class ConsumerHeartbeatExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testOnBeforeReceiveOnStartConsumption(): void
     {
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects($this->once())
             ->method('info')
             ->with('Update the consumer state time.');
-        $this->consumerHeartbeat
-            ->expects($this->once())
+        $this->consumerHeartbeat->expects($this->once())
             ->method('tick');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $context = new Context($session);
         $context->setLogger($this->logger);
@@ -50,15 +48,12 @@ class ConsumerHeartbeatExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testOnBeforeReceiveWithNonExpiredPeriod(): void
     {
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects($this->once())
             ->method('info')
             ->with('Update the consumer state time.');
-        $this->consumerHeartbeat
-            ->expects($this->once())
+        $this->consumerHeartbeat->expects($this->once())
             ->method('tick');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $context = new Context($session);
         $context->setLogger($this->logger);
@@ -72,14 +67,11 @@ class ConsumerHeartbeatExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $extension = new ConsumerHeartbeatExtension(0, $this->consumerHeartbeat);
 
-        $this->logger
-            ->expects($this->never())
+        $this->logger->expects($this->never())
             ->method('info');
-        $this->consumerHeartbeat
-            ->expects($this->never())
+        $this->consumerHeartbeat->expects($this->never())
             ->method('tick');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $context = new Context($session);
         $context->setLogger($this->logger);

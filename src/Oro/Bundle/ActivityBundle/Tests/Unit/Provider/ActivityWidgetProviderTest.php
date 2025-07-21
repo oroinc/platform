@@ -6,25 +6,18 @@ use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Provider\ActivityWidgetProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityIdAccessor;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
+class ActivityWidgetProviderTest extends TestCase
 {
-    /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityManager;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var EntityIdAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityIdAccessor;
-
-    /** @var EntityRoutingHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityRoutingHelper;
-
-    /** @var ActivityWidgetProvider */
-    private $provider;
+    private ActivityManager&MockObject $activityManager;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private EntityIdAccessor&MockObject $entityIdAccessor;
+    private EntityRoutingHelper&MockObject $entityRoutingHelper;
+    private ActivityWidgetProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -50,7 +43,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldReturnTrueOnSupportsIfActivityHasAssociations()
+    public function testShouldReturnTrueOnSupportsIfActivityHasAssociations(): void
     {
         $entity = new \stdClass();
 
@@ -62,7 +55,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->provider->supports($entity));
     }
 
-    public function testShouldReturnFalseOnSupportsIfActivityHasNoAssociations()
+    public function testShouldReturnFalseOnSupportsIfActivityHasNoAssociations(): void
     {
         $entity = new \stdClass();
 
@@ -74,7 +67,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->provider->supports($entity));
     }
 
-    public function testShouldFindActivitiesAssociatedWithEntityClassAndConvertThemToWidgets()
+    public function testShouldFindActivitiesAssociatedWithEntityClassAndConvertThemToWidgets(): void
     {
         $entity = new \stdClass();
 
@@ -110,7 +103,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(3, $widgets);
     }
 
-    public function testShouldKeepWidgetsWithAclIfAccessGranted()
+    public function testShouldKeepWidgetsWithAclIfAccessGranted(): void
     {
         $entity = new \stdClass();
 
@@ -148,7 +141,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(2, $widgets);
     }
 
-    public function testShouldSkipWidgetsWithAclIfAccessDenied()
+    public function testShouldSkipWidgetsWithAclIfAccessDenied(): void
     {
         $entity = new \stdClass();
 
@@ -186,7 +179,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $widgets);
     }
 
-    public function testShouldGenerateEntityUrlAndSetItToEachWidget()
+    public function testShouldGenerateEntityUrlAndSetItToEachWidget(): void
     {
         $entity = new \stdClass();
 
@@ -230,7 +223,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('theBarUrl', $widgets[1]['url']);
     }
 
-    public function testShouldTranslateActivityLabelAndSetItToEachWidget()
+    public function testShouldTranslateActivityLabelAndSetItToEachWidget(): void
     {
         $entity = new \stdClass();
 
@@ -263,7 +256,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('theBarLabel_translated', $widgets[1]['label']);
     }
 
-    public function testMustAlwaysSetBlockWidgetTypeToEachWidget()
+    public function testMustAlwaysSetBlockWidgetTypeToEachWidget(): void
     {
         $entity = new \stdClass();
 
@@ -296,7 +289,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('block', $widgets[1]['widgetType']);
     }
 
-    public function testShouldAddPriorityToWidgetIfSetInActivity()
+    public function testShouldAddPriorityToWidgetIfSetInActivity(): void
     {
         $entity = new \stdClass();
 
@@ -332,7 +325,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(12, $widgets[1]['priority']);
     }
 
-    public function testShouldAddWidgetAliasBasedOnEntityClassAndAssociationNameToEachWidget()
+    public function testShouldAddWidgetAliasBasedOnEntityClassAndAssociationNameToEachWidget(): void
     {
         $entity = new \stdClass();
 

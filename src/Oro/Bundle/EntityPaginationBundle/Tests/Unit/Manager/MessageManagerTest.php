@@ -6,27 +6,20 @@ use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityPaginationBundle\Manager\MessageManager;
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MessageManagerTest extends \PHPUnit\Framework\TestCase
+class MessageManagerTest extends TestCase
 {
-    /** @var Session */
-    private $session;
-
-    /** @var RequestStack */
-    private $requestStack;
-
-    /** @var EntityPaginationNavigation|\PHPUnit\Framework\MockObject\MockObject */
-    private $navigation;
-
-    /** @var EntityPaginationStorage|\PHPUnit\Framework\MockObject\MockObject */
-    private $storage;
-
-    /** @var MessageManager */
-    private $manager;
+    private Session $session;
+    private RequestStack $requestStack;
+    private EntityPaginationNavigation&MockObject $navigation;
+    private EntityPaginationStorage&MockObject $storage;
+    private MessageManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -48,7 +41,7 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager = new MessageManager($this->requestStack, $translator, $this->navigation, $this->storage);
     }
 
-    public function testAddFlashMessage()
+    public function testAddFlashMessage(): void
     {
         $type = 'test_type';
         $message = 'Test Message';
@@ -61,7 +54,7 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getNotAvailableMessageDataProvider
      */
-    public function testGetNotAvailableMessage(string $expected, string $scope, ?int $count = null)
+    public function testGetNotAvailableMessage(string $expected, string $scope, ?int $count = null): void
     {
         $entity = new \stdClass();
 
@@ -97,7 +90,7 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetStatsMessageForInvalidScope()
+    public function testGetStatsMessageForInvalidScope(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Scope "invalid" is not available.');
@@ -116,7 +109,7 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getNotAccessibleMessageDataProvider
      */
-    public function testGetNotAccessibleMessage(string $expected, string $scope, ?int $count = null)
+    public function testGetNotAccessibleMessage(string $expected, string $scope, ?int $count = null): void
     {
         $entity = new \stdClass();
 
@@ -161,7 +154,7 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
         bool $shown,
         ?int $viewCount = null,
         ?int $editCount = null
-    ) {
+    ): void {
         $entity = new \stdClass();
         $entityName = get_class($entity);
 

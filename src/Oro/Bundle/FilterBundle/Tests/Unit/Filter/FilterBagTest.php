@@ -4,15 +4,14 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\FilterBundle\Filter\FilterBag;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class FilterBagTest extends \PHPUnit\Framework\TestCase
+class FilterBagTest extends TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $filterContainer;
-
-    /** @var FilterBag */
-    private $filterBag;
+    private ContainerInterface&MockObject $filterContainer;
+    private FilterBag $filterBag;
 
     #[\Override]
     protected function setUp(): void
@@ -25,12 +24,12 @@ class FilterBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFilterNames()
+    public function testGetFilterNames(): void
     {
         self::assertEquals(['filter1', 'filter2'], $this->filterBag->getFilterNames());
     }
 
-    public function testHasFilter()
+    public function testHasFilter(): void
     {
         $filterName = 'filter1';
 
@@ -42,7 +41,7 @@ class FilterBagTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->filterBag->hasFilter($filterName));
     }
 
-    public function testGetFilter()
+    public function testGetFilter(): void
     {
         $filterName = 'filter1';
         $filter = $this->createMock(FilterInterface::class);

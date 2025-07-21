@@ -1,5 +1,7 @@
 <?php
 
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+
 return [
     'change' => [
         'entity' => 'MyOwn\\SuperCustom\\Entity',
@@ -39,7 +41,7 @@ return [
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
                 'acl_message' => null,
-                'form_type' => 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType',
+                'form_type' => WorkflowTransitionType::class,
                 'display_type' => 'dialog',
                 'destination_page' => '',
                 'form_options' => [],
@@ -107,7 +109,7 @@ return [
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
                 'acl_message' => null,
-                'form_type' => 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType',
+                'form_type' => WorkflowTransitionType::class,
                 'display_type' => 'dialog',
                 'destination_page' => '',
                 'form_options' => [],
@@ -167,7 +169,7 @@ return [
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
                 'acl_message' => null,
-                'form_type' => 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType',
+                'form_type' => WorkflowTransitionType::class,
                 'display_type' => 'dialog',
                 'destination_page' => '',
                 'form_options' => [],

@@ -11,15 +11,14 @@ use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\EventListener\RoleListener;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\RoleStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
-class RoleListenerTest extends \PHPUnit\Framework\TestCase
+class RoleListenerTest extends TestCase
 {
-    /** @var AclSidManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclSidManager;
-
-    /** @var RoleListener */
-    private $listener;
+    private AclSidManager&MockObject $aclSidManager;
+    private RoleListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +28,7 @@ class RoleListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new RoleListener($this->aclSidManager);
     }
 
-    public function testPreUpdate()
+    public function testPreUpdate(): void
     {
         $role = new RoleStub();
         $sid = $this->createMock(SecurityIdentityInterface::class);
@@ -48,7 +47,7 @@ class RoleListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPreUpdateWhenRoleFieldNotChanged()
+    public function testPreUpdateWhenRoleFieldNotChanged(): void
     {
         $role = new RoleStub();
 
@@ -66,7 +65,7 @@ class RoleListenerTest extends \PHPUnit\Framework\TestCase
         return new PreUpdateEventArgs($role, $this->createMock(EntityManagerInterface::class), $changeSet);
     }
 
-    public function testPrePersistWhenRoleFieldIsNotEmpty()
+    public function testPrePersistWhenRoleFieldIsNotEmpty(): void
     {
         $roleName = 'ROLE_123';
         $role = new RoleStub();
@@ -81,7 +80,7 @@ class RoleListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($roleName, $role->getRole());
     }
 
-    public function testPrePersistWhenRoleFieldIsEmpty()
+    public function testPrePersistWhenRoleFieldIsEmpty(): void
     {
         $role = new RoleStub();
 
@@ -100,7 +99,7 @@ class RoleListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($role->getRole());
     }
 
-    public function testPrePersistWhenRoleFieldIsEmptyAndWhenFirstAttemptToGenerateUniqueRoleNameFailed()
+    public function testPrePersistWhenRoleFieldIsEmptyAndWhenFirstAttemptToGenerateUniqueRoleNameFailed(): void
     {
         $role = new RoleStub();
 
@@ -119,7 +118,7 @@ class RoleListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($role->getRole());
     }
 
-    public function testPrePersistWhenRoleFieldIsEmptyAndWhenAttemptsToGenerateUniqueRoleNameExceeded()
+    public function testPrePersistWhenRoleFieldIsEmptyAndWhenAttemptsToGenerateUniqueRoleNameExceeded(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('10 attempts to generate unique role are failed.');

@@ -8,17 +8,14 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Security\UserLoader;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class UserLoaderTest extends \PHPUnit\Framework\TestCase
+class UserLoaderTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var UserLoader */
-    private $userLoader;
+    private ManagerRegistry&MockObject $doctrine;
+    private ConfigManager&MockObject $configManager;
+    private UserLoader $userLoader;
 
     #[\Override]
     protected function setUp(): void
@@ -29,10 +26,7 @@ class UserLoaderTest extends \PHPUnit\Framework\TestCase
         $this->userLoader = new UserLoader($this->doctrine, $this->configManager);
     }
 
-    /**
-     * @return UserRepository|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function expectGetRepository()
+    private function expectGetRepository(): UserRepository&MockObject
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $this->doctrine->expects(self::atLeastOnce())
@@ -57,7 +51,7 @@ class UserLoaderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetUserClass()
+    public function testGetUserClass(): void
     {
         self::assertEquals(User::class, $this->userLoader->getUserClass());
     }
@@ -65,7 +59,7 @@ class UserLoaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider findUserDataProvider
      */
-    public function testLoadUserByUsername(?User $user)
+    public function testLoadUserByUsername(?User $user): void
     {
         $username = 'test';
 
@@ -81,7 +75,7 @@ class UserLoaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider findUserDataProvider
      */
-    public function testLoadUserByEmail(?User $user)
+    public function testLoadUserByEmail(?User $user): void
     {
         $email = 'test@example.com';
         $caseInsensitiveEmailAddressesEnabled = true;
@@ -100,7 +94,7 @@ class UserLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertSame($user, $this->userLoader->loadUserByEmail($email));
     }
 
-    public function testLoadUserWhenUserFoundByUsername()
+    public function testLoadUserWhenUserFoundByUsername(): void
     {
         $login = 'test@example.com';
         $user = $this->createMock(User::class);
@@ -114,7 +108,7 @@ class UserLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertSame($user, $this->userLoader->loadUser($login));
     }
 
-    public function testLoadUserWhenUserFoundByEmail()
+    public function testLoadUserWhenUserFoundByEmail(): void
     {
         $login = 'test@example.com';
         $caseInsensitiveEmailAddressesEnabled = false;
@@ -139,7 +133,7 @@ class UserLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertSame($user, $this->userLoader->loadUser($login));
     }
 
-    public function testLoadUserWhenUserNotFoundByUsernameAndLoginIsNotEmail()
+    public function testLoadUserWhenUserNotFoundByUsernameAndLoginIsNotEmail(): void
     {
         $login = 'test';
 
@@ -152,7 +146,7 @@ class UserLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->userLoader->loadUser($login));
     }
 
-    public function testLoadUserWhenUserNotFoundByUsernameAndEmail()
+    public function testLoadUserWhenUserNotFoundByUsernameAndEmail(): void
     {
         $login = 'test@example.com';
         $caseInsensitiveEmailAddressesEnabled = false;

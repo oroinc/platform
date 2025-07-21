@@ -15,11 +15,10 @@ use Symfony\Component\Yaml\Yaml;
 
 class DumpWorkflowTranslationsCommandTest extends TestCase
 {
-    private WorkflowManager|MockObject $workflowManager;
-    private InputInterface|MockObject $input;
-    private OutputInterface|MockObject $output;
-    private WorkflowTranslationHelper|MockObject $workflowTranslationHelper;
-
+    private WorkflowManager&MockObject $workflowManager;
+    private InputInterface&MockObject $input;
+    private OutputInterface&MockObject $output;
+    private WorkflowTranslationHelper&MockObject $workflowTranslationHelper;
     private DumpWorkflowTranslationsCommand $command;
 
     #[\Override]
@@ -36,12 +35,12 @@ class DumpWorkflowTranslationsCommandTest extends TestCase
         );
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals('oro:workflow:translations:dump', $this->command->getName());
     }
 
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $this->assertNotEmpty($this->command->getDescription());
         $this->assertNotEmpty($this->command->getName());
@@ -49,7 +48,7 @@ class DumpWorkflowTranslationsCommandTest extends TestCase
         $this->assertTrue($this->command->getDefinition()->hasOption('locale'));
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $definition = $this->createMock(WorkflowDefinition::class);
         $this->input->expects($this->once())
@@ -130,7 +129,7 @@ class DumpWorkflowTranslationsCommandTest extends TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testExecuteWithParentWorkflow()
+    public function testExecuteWithParentWorkflow(): void
     {
         $this->input->expects($this->once())
             ->method('getArgument')

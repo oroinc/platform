@@ -24,24 +24,16 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 
 class AssociationManagerTest extends OrmTestCase
 {
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclHelper;
-
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityNameResolver;
-
-    /** @var AssociationManager */
-    private $associationManager;
+    private EntityManagerInterface $em;
+    private ConfigManager&MockObject $configManager;
+    private AclHelper&MockObject $aclHelper;
+    private EntityNameResolver&MockObject $entityNameResolver;
+    private AssociationManager $associationManager;
 
     #[\Override]
     protected function setUp(): void
@@ -129,24 +121,20 @@ class AssociationManagerTest extends OrmTestCase
         $scopeProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->willReturnMap(
-                [
-                    ['extend', $extendProvider],
-                    [$scope, $scopeProvider]
-                ]
-            );
+            ->willReturnMap([
+                ['extend', $extendProvider],
+                [$scope, $scopeProvider]
+            ]);
         $extendProvider->expects($this->once())
             ->method('getConfig')
             ->with($associationOwnerClass)
             ->willReturn($ownerExtendConfig);
         $scopeProvider->expects($this->any())
             ->method('getConfig')
-            ->willReturnMap(
-                [
-                    ['TargetClass1', null, $target1Config],
-                    ['TargetClass2', null, $target2Config]
-                ]
-            );
+            ->willReturnMap([
+                ['TargetClass1', null, $target1Config],
+                ['TargetClass2', null, $target2Config]
+            ]);
 
         $result = $this->associationManager->getAssociationTargets(
             $associationOwnerClass,
@@ -216,24 +204,20 @@ class AssociationManagerTest extends OrmTestCase
         $scopeProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->willReturnMap(
-                [
-                    ['extend', $extendProvider],
-                    [$scope, $scopeProvider]
-                ]
-            );
+            ->willReturnMap([
+                ['extend', $extendProvider],
+                [$scope, $scopeProvider]
+            ]);
         $extendProvider->expects($this->once())
             ->method('getConfig')
             ->with($associationOwnerClass)
             ->willReturn($ownerExtendConfig);
         $scopeProvider->expects($this->any())
             ->method('getConfig')
-            ->willReturnMap(
-                [
-                    ['TargetClass1', null, $target1Config],
-                    ['TargetClass2', null, $target2Config]
-                ]
-            );
+            ->willReturnMap([
+                ['TargetClass1', null, $target1Config],
+                ['TargetClass2', null, $target2Config]
+            ]);
 
         $result = $this->associationManager->getAssociationTargets(
             $associationOwnerClass,
@@ -303,24 +287,20 @@ class AssociationManagerTest extends OrmTestCase
         $scopeProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->willReturnMap(
-                [
-                    ['extend', $extendProvider],
-                    [$scope, $scopeProvider]
-                ]
-            );
+            ->willReturnMap([
+                ['extend', $extendProvider],
+                [$scope, $scopeProvider]
+            ]);
         $extendProvider->expects($this->once())
             ->method('getConfig')
             ->with($associationOwnerClass)
             ->willReturn($ownerExtendConfig);
         $scopeProvider->expects($this->any())
             ->method('getConfig')
-            ->willReturnMap(
-                [
-                    ['TargetClass1', null, $target1Config],
-                    ['TargetClass2', null, $target2Config]
-                ]
-            );
+            ->willReturnMap([
+                ['TargetClass1', null, $target1Config],
+                ['TargetClass2', null, $target2Config]
+            ]);
 
         $result = $this->associationManager->getAssociationTargets(
             $associationOwnerClass,
@@ -365,15 +345,13 @@ class AssociationManagerTest extends OrmTestCase
             ]);
         $this->entityNameResolver->expects($this->any())
             ->method('prepareNameDQL')
-            ->willReturnCallback(
-                function ($expr, $castToString) {
-                    self::assertTrue($castToString);
+            ->willReturnCallback(function ($expr, $castToString) {
+                self::assertTrue($castToString);
 
-                    return $expr
-                        ? sprintf('CAST(%s AS string)', $expr)
-                        : '\'\'';
-                }
-            );
+                return $expr
+                    ? sprintf('CAST(%s AS string)', $expr)
+                    : '\'\'';
+            });
 
         $result = $this->associationManager->getMultiAssociationsQueryBuilder(
             $ownerClass,
@@ -444,15 +422,13 @@ class AssociationManagerTest extends OrmTestCase
             ]);
         $this->entityNameResolver->expects($this->any())
             ->method('prepareNameDQL')
-            ->willReturnCallback(
-                function ($expr, $castToString) {
-                    self::assertTrue($castToString);
+            ->willReturnCallback(function ($expr, $castToString) {
+                self::assertTrue($castToString);
 
-                    return $expr
-                        ? sprintf('CAST(%s AS string)', $expr)
-                        : '\'\'';
-                }
-            );
+                return $expr
+                    ? sprintf('CAST(%s AS string)', $expr)
+                    : '\'\'';
+            });
 
         $result = $this->associationManager->getMultiAssociationOwnersQueryBuilder(
             $targetClass,

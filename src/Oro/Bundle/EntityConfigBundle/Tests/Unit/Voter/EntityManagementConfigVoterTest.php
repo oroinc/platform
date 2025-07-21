@@ -16,7 +16,6 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 class EntityManagementConfigVoterTest extends TestCase
 {
     private EntityManagementConfigVoter $voter;
-
     private TokenInterface $token;
 
     #[\Override]

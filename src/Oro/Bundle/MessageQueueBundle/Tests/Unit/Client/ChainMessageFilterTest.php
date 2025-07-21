@@ -5,11 +5,12 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Client;
 use Oro\Bundle\MessageQueueBundle\Client\ChainMessageFilter;
 use Oro\Bundle\MessageQueueBundle\Client\MessageBuffer;
 use Oro\Bundle\MessageQueueBundle\Client\MessageFilterInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class ChainMessageFilterTest extends \PHPUnit\Framework\TestCase
+class ChainMessageFilterTest extends TestCase
 {
-    public function testApply()
+    public function testApply(): void
     {
         $container = $this->createMock(ContainerInterface::class);
         $chainFilter = new ChainMessageFilter(

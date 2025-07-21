@@ -5,18 +5,15 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\UrlProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 
-class UrlProviderTest extends \PHPUnit\Framework\TestCase
+class UrlProviderTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var UrlProvider */
-    private $urlProvider;
+    private ConfigManager&MockObject $configManager;
+    private RouterInterface&MockObject $router;
+    private UrlProvider $urlProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +24,7 @@ class UrlProviderTest extends \PHPUnit\Framework\TestCase
         $this->urlProvider = new UrlProvider($this->configManager, $this->router);
     }
 
-    public function testGetUrlReturnEmptyStringIfMetadataNotExist()
+    public function testGetUrlReturnEmptyStringIfMetadataNotExist(): void
     {
         $reminder = $this->createMock(Reminder::class);
         $expected = '';
@@ -38,7 +35,7 @@ class UrlProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testGetUrlForView()
+    public function testGetUrlForView(): void
     {
         $reminder = $this->createMock(Reminder::class);
         $expected = '/fake/path/for/view';
@@ -59,7 +56,7 @@ class UrlProviderTest extends \PHPUnit\Framework\TestCase
         $this->urlProvider->getUrl($reminder);
     }
 
-    public function testGetUrlForIndex()
+    public function testGetUrlForIndex(): void
     {
         $reminder = $this->createMock(Reminder::class);
         $expected = '/fake/path/for/view';

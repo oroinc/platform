@@ -4,13 +4,13 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Button;
 
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class ButtonSearchContextTest extends \PHPUnit\Framework\TestCase
+class ButtonSearchContextTest extends TestCase
 {
     use EntityTestCaseTrait;
 
-    /** @var ButtonSearchContext */
-    private $buttonSearchContext;
+    private ButtonSearchContext $buttonSearchContext;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class ButtonSearchContextTest extends \PHPUnit\Framework\TestCase
         $this->buttonSearchContext = new ButtonSearchContext();
     }
 
-    public function testProperties()
+    public function testProperties(): void
     {
         $this->assertPropertyAccessors(
             $this->buttonSearchContext,
@@ -34,7 +34,7 @@ class ButtonSearchContextTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getSetEntityDataProvider
      */
-    public function testGetSetEntity(mixed $entityId)
+    public function testGetSetEntity(mixed $entityId): void
     {
         $this->buttonSearchContext->setEntity('Class', $entityId);
         $this->assertSame('Class', $this->buttonSearchContext->getEntityClass());
@@ -50,7 +50,7 @@ class ButtonSearchContextTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetHash()
+    public function testGetHash(): void
     {
         $this->buttonSearchContext->setEntity('Class', ['id' => 42])
             ->setRouteName('test_route')

@@ -6,8 +6,9 @@ use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Form\DataTransformer\AddressSameTransformer;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class AddressSameTransformerTest extends \PHPUnit\Framework\TestCase
+class AddressSameTransformerTest extends TestCase
 {
     private AddressSameTransformer $transformer;
 
@@ -29,7 +30,7 @@ class AddressSameTransformerTest extends \PHPUnit\Framework\TestCase
         return $address;
     }
 
-    public function testTransformWithSameId()
+    public function testTransformWithSameId(): void
     {
         $address = $this->getAddress(1, 'Test Address');
 
@@ -44,7 +45,7 @@ class AddressSameTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($result, $this->transformer->transform($multiAddress));
     }
 
-    public function testTransformWithDifferentId()
+    public function testTransformWithDifferentId(): void
     {
         $address1 = $this->getAddress(1, 'Test Address 1');
         $address2 = $this->getAddress(2, 'Test Address 2');
@@ -56,19 +57,19 @@ class AddressSameTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($multiAddress, $this->transformer->transform($multiAddress));
     }
 
-    public function testTransformNull()
+    public function testTransformNull(): void
     {
         $multiAddress = null;
         $this->assertNull($this->transformer->transform($multiAddress));
     }
 
-    public function testTransformInvalidArgument()
+    public function testTransformInvalidArgument(): void
     {
         $multiAddress = new MultiAddressMock();
         $this->assertEquals($multiAddress, $this->transformer->transform($multiAddress));
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $this->assertEquals('value', $this->transformer->reverseTransform('value'));
     }

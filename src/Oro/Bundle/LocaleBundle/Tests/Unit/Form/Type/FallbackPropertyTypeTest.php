@@ -13,8 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FallbackPropertyTypeTest extends FormIntegrationTestCase
 {
-    /** @var FallbackPropertyType */
-    private $formType;
+    private FallbackPropertyType $formType;
 
     #[\Override]
     protected function setUp(): void

@@ -10,21 +10,18 @@ use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
 use Oro\Bundle\SecurityBundle\Request\ParamConverter\DoctrineParamConverter;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
+class DoctrineParamConverterTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var RequestAuthorizationChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestAuthorizationChecker;
-
-    /** @var DoctrineParamConverter */
-    private $converter;
+    private ManagerRegistry&MockObject $registry;
+    private RequestAuthorizationChecker&MockObject $requestAuthorizationChecker;
+    private DoctrineParamConverter $converter;
 
     #[\Override]
     protected function setUp(): void
@@ -42,7 +39,7 @@ class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider idsProvider
      */
-    public function testApply(CmsAddress $object, int $isGranted, string $class, bool $isCorrectClass)
+    public function testApply(CmsAddress $object, int $isGranted, string $class, bool $isCorrectClass): void
     {
         $manager = $this->createMock(ObjectManager::class);
         $objectRepository = $this->createMock(ObjectRepository::class);
@@ -108,7 +105,7 @@ class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSupportsWithoutClass()
+    public function testSupportsWithoutClass(): void
     {
         $config = new ParamConverter([]);
 
@@ -120,7 +117,7 @@ class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->converter->supports($config));
     }
 
-    public function testSupportsWithoutConfiguredEntityManager()
+    public function testSupportsWithoutConfiguredEntityManager(): void
     {
         $config = new ParamConverter(['class' => 'stdClass']);
 
@@ -134,7 +131,7 @@ class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->converter->supports($config));
     }
 
-    public function testSupportsWithoutConfiguredEntityManagerAndNotManageableClass()
+    public function testSupportsWithoutConfiguredEntityManagerAndNotManageableClass(): void
     {
         $config = new ParamConverter(['class' => 'stdClass']);
 
@@ -146,7 +143,7 @@ class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->converter->supports($config));
     }
 
-    public function testSupportsWithConfiguredEntityManager()
+    public function testSupportsWithConfiguredEntityManager(): void
     {
         $config = new ParamConverter(['class' => 'stdClass']);
         $config->setOptions(['entity_manager' => 'foo']);
@@ -170,7 +167,7 @@ class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->converter->supports($config));
     }
 
-    public function testSupportsWithConfiguredEntityManagerAndTransientClass()
+    public function testSupportsWithConfiguredEntityManagerAndTransientClass(): void
     {
         $config = new ParamConverter(['class' => 'stdClass']);
         $config->setOptions(['entity_manager' => 'foo']);

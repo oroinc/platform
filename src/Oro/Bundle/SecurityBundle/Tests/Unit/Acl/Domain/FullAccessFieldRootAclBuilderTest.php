@@ -9,6 +9,8 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\FieldMaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Extension\NullAclExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\FieldEntry;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
@@ -16,13 +18,10 @@ use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 
-class FullAccessFieldRootAclBuilderTest extends \PHPUnit\Framework\TestCase
+class FullAccessFieldRootAclBuilderTest extends TestCase
 {
-    /** @var AclExtensionSelector|\PHPUnit\Framework\MockObject\MockObject */
-    private $extensionSelector;
-
-    /** @var FullAccessFieldRootAclBuilder */
-    private $fullAccessFieldRootAclBuilder;
+    private AclExtensionSelector&MockObject $extensionSelector;
+    private FullAccessFieldRootAclBuilder $fullAccessFieldRootAclBuilder;
 
     #[\Override]
     protected function setUp(): void

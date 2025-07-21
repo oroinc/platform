@@ -6,11 +6,12 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureDecisionManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\Voter\VoterInterface;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FeatureDecisionManagerTest extends \PHPUnit\Framework\TestCase
+class FeatureDecisionManagerTest extends TestCase
 {
     private function getVoter(int $vote): VoterInterface
     {

@@ -14,7 +14,7 @@ use Oro\Component\Layout\LayoutManipulatorInterface;
  */
 class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTestCase
 {
-    public function testSimpleLayoutWithAliases()
+    public function testSimpleLayoutWithAliases(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -44,7 +44,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testAddByAliasTwoChildren()
+    public function testAddByAliasTwoChildren(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -76,7 +76,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testAddWithSiblingAsAlias()
+    public function testAddWithSiblingAsAlias(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -115,7 +115,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testAddWithSiblingAsUnknownAlias()
+    public function testAddWithSiblingAsUnknownAlias(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -155,7 +155,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
     }
 
     /** It is expected that children are added in the same order as they are registered */
-    public function testAddByAliasTwoChildrenButTheFirstChildIsAddedBeforeContainer()
+    public function testAddByAliasTwoChildrenButTheFirstChildIsAddedBeforeContainer(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -188,7 +188,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
     }
 
     /** It is expected that children are added in the same order as they are registered */
-    public function testAddByAliasTwoChildrenButTheFirstChildAndAliasAreAddedBeforeContainer()
+    public function testAddByAliasTwoChildrenButTheFirstChildAndAliasAreAddedBeforeContainer(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -220,7 +220,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testAddByAliasAndThenRemoveAlias()
+    public function testAddByAliasAndThenRemoveAlias(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -249,7 +249,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testAddToRemovedAlias()
+    public function testAddToRemovedAlias(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -278,7 +278,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testRemoveNotExistAlias()
+    public function testRemoveNotExistAlias(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -294,7 +294,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testRedefineAlias()
+    public function testRedefineAlias(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -312,7 +312,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         $this->getLayoutView();
     }
 
-    public function testDuplicateAddAlias()
+    public function testDuplicateAddAlias(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -335,7 +335,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testMoveChildByAliasAndThenRemoveParentById()
+    public function testMoveChildByAliasAndThenRemoveParentById(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -369,7 +369,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testMoveChildByAliasOfRemovedByIdParent()
+    public function testMoveChildByAliasOfRemovedByIdParent(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -403,7 +403,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testReplaceItemWhenOldItemIsRemovedByAlias()
+    public function testReplaceItemWhenOldItemIsRemovedByAlias(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -433,7 +433,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testReplaceItemWhenNewItemIsAddedInAnotherBatchAndOldItemIsRemovedByAlias()
+    public function testReplaceItemWhenNewItemIsAddedInAnotherBatchAndOldItemIsRemovedByAlias(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -465,7 +465,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testReplaceItemAfterRemoveParentByAlias()
+    public function testReplaceItemAfterRemoveParentByAlias(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -490,7 +490,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testSetOptionByAlias()
+    public function testSetOptionByAlias(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -519,7 +519,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testRemoveOptionByAlias()
+    public function testRemoveOptionByAlias(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -548,7 +548,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testSetOptionByRemovedAlias()
+    public function testSetOptionByRemovedAlias(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -578,7 +578,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testRemoveOptionByRemovedAlias()
+    public function testRemoveOptionByRemovedAlias(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -608,7 +608,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testSetBlockThemeByAlias()
+    public function testSetBlockThemeByAlias(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -645,7 +645,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testLayoutUpdatesWithAliases()
+    public function testLayoutUpdatesWithAliases(): void
     {
         $this->registry->addExtension(
             new PreloadedExtension(
@@ -697,7 +697,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testLayoutItemPassedToLayoutUpdate()
+    public function testLayoutItemPassedToLayoutUpdate(): void
     {
         $this->registry->addExtension(
             new PreloadedExtension(
@@ -758,7 +758,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
-    public function testLayoutUpdatesWhenParentIsAddedByAliasInUpdate()
+    public function testLayoutUpdatesWhenParentIsAddedByAliasInUpdate(): void
     {
         $this->registry->addExtension(
             new PreloadedExtension(

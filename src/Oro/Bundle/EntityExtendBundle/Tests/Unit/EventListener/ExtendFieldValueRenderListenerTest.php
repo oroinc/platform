@@ -16,31 +16,20 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityExtendBundle\EventListener\ExtendFieldValueRenderListener;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class ExtendFieldValueRenderListenerTest extends \PHPUnit\Framework\TestCase
+class ExtendFieldValueRenderListenerTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManger;
-
-    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassNameHelper;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendProvider;
-
-    /** @var ExtendFieldValueRenderListener */
-    private $listener;
+    private ConfigManager&MockObject $configManger;
+    private UrlGeneratorInterface&MockObject $router;
+    private ManagerRegistry&MockObject $registry;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private EntityClassNameHelper&MockObject $entityClassNameHelper;
+    private ConfigProvider&MockObject $extendProvider;
+    private ExtendFieldValueRenderListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -68,7 +57,7 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider collectionDataProvider
      */
-    public function testBeforeValueRenderProceedCollection(array $data, array $expected)
+    public function testBeforeValueRenderProceedCollection(array $data, array $expected): void
     {
         $entity = $this->createMock(\stdClass::class);
         $value = $this->getCollectionValue($data['shownFields'], $data['entities']);
@@ -115,7 +104,7 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider relationsDataProvider
      */
-    public function testBeforeValueRenderProceedSingleRelations(array $data, array $expected)
+    public function testBeforeValueRenderProceedSingleRelations(array $data, array $expected): void
     {
         $entity = $this->createMock(\stdClass::class);
         $value = $this->getMockBuilder(\stdClass::class)

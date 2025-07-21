@@ -3,21 +3,22 @@
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\CurrencyBundle\Entity\Price;
-use Oro\Bundle\CurrencyBundle\Validator\Constraints;
+use Oro\Bundle\CurrencyBundle\Validator\Constraints\OptionalPrice;
+use Oro\Bundle\CurrencyBundle\Validator\Constraints\OptionalPriceValidator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class OptionalPriceValidatorTest extends ConstraintValidatorTestCase
 {
     #[\Override]
-    protected function createValidator(): Constraints\OptionalPriceValidator
+    protected function createValidator(): OptionalPriceValidator
     {
-        return new Constraints\OptionalPriceValidator();
+        return new OptionalPriceValidator();
     }
 
     public function testGetTargets()
     {
-        $constraint = new Constraints\OptionalPrice();
+        $constraint = new OptionalPrice();
         $this->assertEquals([Constraint::CLASS_CONSTRAINT], $constraint->getTargets());
     }
 
@@ -26,7 +27,7 @@ class OptionalPriceValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidateValidValue(Price $value)
     {
-        $constraint = new Constraints\OptionalPrice();
+        $constraint = new OptionalPrice();
         $this->validator->validate($value, $constraint);
         $this->assertNoViolation();
     }
@@ -44,7 +45,7 @@ class OptionalPriceValidatorTest extends ConstraintValidatorTestCase
     {
         $value = Price::create(11, null);
 
-        $constraint = new Constraints\OptionalPrice();
+        $constraint = new OptionalPrice();
         $this->validator->validate($value, $constraint);
 
         $this->buildViolation($constraint->message)

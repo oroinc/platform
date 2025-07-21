@@ -6,16 +6,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\CollectionNormalizer;
 use Oro\Bundle\ImportExportBundle\Serializer\Serializer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class CollectionNormalizerTest extends \PHPUnit\Framework\TestCase
+class CollectionNormalizerTest extends TestCase
 {
-    /** @var Serializer|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializer;
-
-    /** @var CollectionNormalizer */
-    private $normalizer;
+    private Serializer&MockObject $serializer;
+    private CollectionNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class CollectionNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->normalizer->setSerializer($this->serializer);
     }
 
-    public function testSetInvalidSerializer()
+    public function testSetInvalidSerializer(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Serializer must implement');
@@ -33,7 +32,7 @@ class CollectionNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->normalizer->setSerializer($this->createMock(SerializerInterface::class));
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
 
@@ -44,7 +43,7 @@ class CollectionNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization(string $type, bool $expectedResult)
+    public function testSupportsDenormalization(string $type, bool $expectedResult): void
     {
         $this->assertEquals($expectedResult, $this->normalizer->supportsDenormalization([], $type));
     }
@@ -61,7 +60,7 @@ class CollectionNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $format = null;
         $context = ['context'];
@@ -83,7 +82,7 @@ class CollectionNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDenormalizeNotArray()
+    public function testDenormalizeNotArray(): void
     {
         $this->serializer->expects($this->never())
             ->method($this->anything());
@@ -93,7 +92,7 @@ class CollectionNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDenormalizeSimple()
+    public function testDenormalizeSimple(): void
     {
         $this->serializer->expects($this->never())
             ->method($this->anything());
@@ -104,7 +103,7 @@ class CollectionNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDenormalizeWithItemType()
+    public function testDenormalizeWithItemType(): void
     {
         $format = null;
         $context = [];

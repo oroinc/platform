@@ -11,14 +11,15 @@ use Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuUpdate\MenuItemToMen
 use Oro\Bundle\NavigationBundle\MenuUpdate\Propagator\ToMenuUpdate\TitlePropagator;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class TitlePropagatorTest extends \PHPUnit\Framework\TestCase
+class TitlePropagatorTest extends TestCase
 {
     use MenuItemTestTrait;
 
-    private MenuUpdateHelper|\PHPUnit\Framework\MockObject\MockObject $menuUpdateHelper;
-
+    private MenuUpdateHelper&MockObject $menuUpdateHelper;
     private TitlePropagator $propagator;
 
     #[\Override]
@@ -77,8 +78,7 @@ class TitlePropagatorTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->menuUpdateHelper
-            ->expects(self::never())
+        $this->menuUpdateHelper->expects(self::never())
             ->method(self::anything());
 
         $expected = new ArrayCollection([(new LocalizedFallbackValue())->setString('sample title')]);
@@ -108,8 +108,7 @@ class TitlePropagatorTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->menuUpdateHelper
-            ->expects(self::never())
+        $this->menuUpdateHelper->expects(self::never())
             ->method('applyLocalizedFallbackValue');
 
         self::assertEquals(new ArrayCollection(), $menuUpdate->getTitles());
@@ -139,8 +138,7 @@ class TitlePropagatorTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->menuUpdateHelper
-            ->expects(self::once())
+        $this->menuUpdateHelper->expects(self::once())
             ->method('applyLocalizedFallbackValue')
             ->with($menuUpdate, $menuItem->getLabel(), 'title', 'string')
             ->willReturnCallback(function (MenuUpdateInterface $menuUpdate, $description) {
@@ -177,8 +175,7 @@ class TitlePropagatorTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->menuUpdateHelper
-            ->expects(self::never())
+        $this->menuUpdateHelper->expects(self::never())
             ->method('applyLocalizedFallbackValue');
 
         self::assertEquals(new ArrayCollection(), $menuUpdate->getTitles());

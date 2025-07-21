@@ -3,14 +3,12 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
+use PHPUnit\Framework\TestCase;
 
-class NotificationEventTest extends \PHPUnit\Framework\TestCase
+class NotificationEventTest extends TestCase
 {
-    /** @var \stdClass */
-    private $entity;
-
-    /** @var NotificationEvent */
-    private $event;
+    private \stdClass $entity;
+    private NotificationEvent $event;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +17,7 @@ class NotificationEventTest extends \PHPUnit\Framework\TestCase
         $this->event = new NotificationEvent($this->entity);
     }
 
-    public function testGetEntity()
+    public function testGetEntity(): void
     {
         $this->assertEquals($this->entity, $this->event->getEntity());
         $this->event->setEntity(null);

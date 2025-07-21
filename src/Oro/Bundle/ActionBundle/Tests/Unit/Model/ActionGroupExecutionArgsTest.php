@@ -7,10 +7,11 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
+use PHPUnit\Framework\TestCase;
 
-class ActionGroupExecutionArgsTest extends \PHPUnit\Framework\TestCase
+class ActionGroupExecutionArgsTest extends TestCase
 {
-    public function testNameConstruction()
+    public function testNameConstruction(): void
     {
         $expected = 'nameOfActionGroup';
 
@@ -19,7 +20,7 @@ class ActionGroupExecutionArgsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $instance->getActionGroupName());
     }
 
-    public function testGetParametersCreateNewInstanceOfActionData()
+    public function testGetParametersCreateNewInstanceOfActionData(): void
     {
         $instance = new ActionGroupExecutionArgs('name');
 
@@ -29,7 +30,7 @@ class ActionGroupExecutionArgsTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider provideParameters
      */
-    public function testAddParameters(ActionData $expected, array $parameters)
+    public function testAddParameters(ActionData $expected, array $parameters): void
     {
         $instance = new ActionGroupExecutionArgs('someName');
 
@@ -41,7 +42,7 @@ class ActionGroupExecutionArgsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $instance->getActionData());
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $instance = new ActionGroupExecutionArgs('test_action_group', ['arg1' => 'val1']);
         $registry = $this->createMock(ActionGroupRegistry::class);

@@ -4,12 +4,12 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Transition;
 
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\ErrorResponseProcessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class ErrorResponseProcessorTest extends \PHPUnit\Framework\TestCase
+class ErrorResponseProcessorTest extends TestCase
 {
-    /** @var ErrorResponseProcessor */
-    private $processor;
+    private ErrorResponseProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +17,7 @@ class ErrorResponseProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new ErrorResponseProcessor();
     }
 
-    public function testBuildResponseFromDefinedFields()
+    public function testBuildResponseFromDefinedFields(): void
     {
         $context = $this->createMock(TransitionContext::class);
 
@@ -48,7 +48,7 @@ class ErrorResponseProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testBuildResponseFromError()
+    public function testBuildResponseFromError(): void
     {
         $context = $this->createMock(TransitionContext::class);
         $context->expects(self::once())
@@ -82,7 +82,7 @@ class ErrorResponseProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testSkipHasNoErrors()
+    public function testSkipHasNoErrors(): void
     {
         $context = $this->createMock(TransitionContext::class);
         $context->expects(self::once())

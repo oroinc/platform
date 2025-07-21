@@ -147,7 +147,7 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
 
         foreach ($entities as $key => $entity) {
             $className = ClassUtils::getClass($entity);
-            $metadata  = $doctrine->getManager()->getClassMetadata($className);
+            $metadata = $doctrine->getManager()->getClassMetadata($className);
             $entityIds = $metadata->getIdentifierValues($entity);
 
             if (!isset($deleteParams[$className])) {

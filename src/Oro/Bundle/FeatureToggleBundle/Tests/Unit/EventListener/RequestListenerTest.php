@@ -4,17 +4,16 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\EventListener\RequestListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class RequestListenerTest extends \PHPUnit\Framework\TestCase
+class RequestListenerTest extends TestCase
 {
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var RequestListener */
-    private $listener;
+    private FeatureChecker&MockObject $featureChecker;
+    private RequestListener $listener;
 
     #[\Override]
     protected function setUp(): void

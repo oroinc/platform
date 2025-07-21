@@ -23,7 +23,7 @@ class QuarterTypeTest extends FormIntegrationTestCase
 
     public function testBuildForm()
     {
-        $form    = $this->factory->create(QuarterType::class);
+        $form = $this->factory->create(QuarterType::class);
         $options = $form->getConfig()->getOptions();
 
         $this->assertTrue(isset($options['format']));

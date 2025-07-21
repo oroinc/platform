@@ -10,23 +10,18 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
+class WorkflowTranslationHelperTest extends TestCase
 {
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var TranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationHelper;
-
-    /** @var TranslationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var WorkflowTranslationHelper */
-    private $helper;
+    private Translator&MockObject $translator;
+    private TranslationHelper&MockObject $translationHelper;
+    private TranslationManager&MockObject $manager;
+    private WorkflowTranslationHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +33,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper = new WorkflowTranslationHelper($this->translator, $this->manager, $this->translationHelper);
     }
 
-    public function testFindWorkflowTranslations()
+    public function testFindWorkflowTranslations(): void
     {
         $workflowName = 'test_workflow';
         $locale = 'fr';
@@ -59,7 +54,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider findTranslationProvider
      */
-    public function testFindWorkflowTranslation(?string $locale, ?string $value)
+    public function testFindWorkflowTranslation(?string $locale, ?string $value): void
     {
         $key = 'oro.workflow.test_workflow.test.key';
         $workflowName = 'test_workflow';
@@ -99,7 +94,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSaveTranslation()
+    public function testSaveTranslation(): void
     {
         $this->translator->expects($this->exactly(2))
             ->method('getLocale')
@@ -117,7 +112,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->saveTranslation('test_key', 'test_value');
     }
 
-    public function testSaveTranslationWithNotDefaultLocale()
+    public function testSaveTranslationWithNotDefaultLocale(): void
     {
         $this->translator->expects($this->once())
             ->method('getLocale')
@@ -144,7 +139,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->saveTranslation('test_key', 'test_value');
     }
 
-    public function testSaveTranslationAsSystem()
+    public function testSaveTranslationAsSystem(): void
     {
         $this->translator->expects($this->once())
             ->method('getLocale')
@@ -164,7 +159,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider findTranslationProvider
      */
-    public function testFindTranslation(?string $locale, ?string $value)
+    public function testFindTranslation(?string $locale, ?string $value): void
     {
         $key = 'oro.workflow.test_workflow.test.key';
         $translatorLocale = 'jp';
@@ -218,7 +213,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testFlushTranslations()
+    public function testFlushTranslations(): void
     {
         $this->manager->expects($this->once())
             ->method('flush');
@@ -229,7 +224,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider findValueDataProvider
      */
-    public function testFindValue(?string $expected)
+    public function testFindValue(?string $expected): void
     {
         $key = 'key';
         $locale = null;
@@ -250,7 +245,7 @@ class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGenerateDefinitionTranslationKeys()
+    public function testGenerateDefinitionTranslationKeys(): void
     {
         $definition = new WorkflowDefinition();
         $definition->setLabel('test.definition')

@@ -8,21 +8,18 @@ use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowConfigurationImportException;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Import\Stub\StubWorkflowImportCallbackProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
+class WorkflowImportProcessorTest extends TestCase
 {
-    /** @var WorkflowConfigFinderBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $finderBuilder;
-
-    /** @var ConfigFileReaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $reader;
-
-    /** @var WorkflowImportProcessor */
-    private $processor;
+    private WorkflowConfigFinderBuilder&MockObject $finderBuilder;
+    private ConfigFileReaderInterface&MockObject $reader;
+    private WorkflowImportProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +37,7 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->setReplacements($replacements);
     }
 
-    public function testParentChangesAccepted()
+    public function testParentChangesAccepted(): void
     {
         $content = [
             'workflows' => [
@@ -127,7 +124,7 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessOuterSearch()
+    public function testProcessOuterSearch(): void
     {
         $this->configureProcessor('workflow_to_import', 'one', ['steps']);
 
@@ -191,7 +188,7 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($result, $processed);
     }
 
-    public function testImplementsWorkflowImportTrait()
+    public function testImplementsWorkflowImportTrait(): void
     {
         $accessors = [
             [
@@ -219,7 +216,7 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider propertiesToConfigure
      */
-    public function testMustBeConfiguredBeforeUsage(string $property, string $type)
+    public function testMustBeConfiguredBeforeUsage(string $property, string $type): void
     {
         $getter = 'get' . ucfirst($property);
 
@@ -249,7 +246,7 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testExceptionWorkflowForImportNotFound()
+    public function testExceptionWorkflowForImportNotFound(): void
     {
         $this->configureProcessor('workflow_to_import', 'one', ['steps']);
 
@@ -297,7 +294,7 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($currentContext, $currentFile);
     }
 
-    public function testInProgress()
+    public function testInProgress(): void
     {
         $stubCbParentProcessor = new StubWorkflowImportCallbackProcessor(function (array $content) {
             $this->assertTrue($this->processor->inProgress());

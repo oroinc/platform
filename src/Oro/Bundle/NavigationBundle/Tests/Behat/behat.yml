@@ -10,6 +10,9 @@ oro_behat_extension:
     SideMenuOverlayCloseButton:
       selector: 'div.side-menu-overlay button[data-role="overlay-close"]'
 
+    Sidebar Menu Tree:
+      selector: 'div[data-role="sidebar-content"] div[data-role="jstree-wrapper"]'
+
     MenuSearch:
       selector: 'input.side-menu-overlay__field'
       class: Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu

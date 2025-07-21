@@ -12,9 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class MenuUpdateTreeHandlerTest extends TestCase
 {
     private MenuFactory $factory;
-
-    private TranslatorInterface|MockObject $translator;
-
+    private TranslatorInterface&MockObject $translator;
     private MenuUpdateTreeHandler $handler;
 
     #[\Override]

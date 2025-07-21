@@ -5,12 +5,14 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 use Oro\Bundle\UIBundle\Twig\PlaceholderExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Twig\Environment;
 
-class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
+class PlaceholderExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
@@ -20,20 +22,11 @@ class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
     private const ACTION_NAME = 'Foo\Bundle\BarBundle\Controller\TestController::testAction';
     private const DELIMITER = '<br/>';
 
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $environment;
-
-    /** @var PlaceholderProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $placeholderProvider;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var FragmentHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $fragmentHandler;
-
-    /** @var PlaceholderExtension */
-    private $extension;
+    private Environment&MockObject $environment;
+    private PlaceholderProvider&MockObject $placeholderProvider;
+    private RequestStack&MockObject $requestStack;
+    private FragmentHandler&MockObject $fragmentHandler;
+    private PlaceholderExtension $extension;
 
     private array $placeholders = [
         self::PLACEHOLDER_NAME => [
@@ -66,7 +59,7 @@ class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new PlaceholderExtension($container);
     }
 
-    public function testRenderPlaceholder()
+    public function testRenderPlaceholder(): void
     {
         $variables = ['variables' => 'test'];
         $query = ['key' => 'value'];
@@ -108,7 +101,7 @@ class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    public function testRenderPlaceholderFails()
+    public function testRenderPlaceholderFails(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(

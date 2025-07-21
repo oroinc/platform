@@ -22,7 +22,7 @@ class TextAttributeTypeTest extends AttributeTypeTestCase
         ];
     }
 
-    public function testGetSearchableValue()
+    public function testGetSearchableValue(): void
     {
         $string = 'test';
 
@@ -37,7 +37,7 @@ class TextAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetFilterableValue()
+    public function testGetFilterableValue(): void
     {
         $string = 'test';
 
@@ -52,7 +52,7 @@ class TextAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetSortableValue()
+    public function testGetSortableValue(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not supported');

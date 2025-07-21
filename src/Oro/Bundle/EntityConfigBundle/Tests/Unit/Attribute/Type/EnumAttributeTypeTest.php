@@ -22,7 +22,7 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
         ];
     }
 
-    public function testGetSearchableValue()
+    public function testGetSearchableValue(): void
     {
         $value = new TestEnumValue('test', 'name', 'id', 100);
 
@@ -32,12 +32,12 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetSearchableValueForNull()
+    public function testGetSearchableValueForNull(): void
     {
         $this->assertNull($this->getAttributeType()->getSearchableValue($this->attribute, null, $this->localization));
     }
 
-    public function testGetSearchableValueException()
+    public function testGetSearchableValueException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -47,7 +47,7 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
         $this->getAttributeType()->getSearchableValue($this->attribute, true, $this->localization);
     }
 
-    public function testGetFilterableValue()
+    public function testGetFilterableValue(): void
     {
         $value = new TestEnumValue('id', 'test', 'name', 100);
 
@@ -57,7 +57,7 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetFilterableValueForNull()
+    public function testGetFilterableValueForNull(): void
     {
         $this->assertSame(
             [],
@@ -65,7 +65,7 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetFilterableValueException()
+    public function testGetFilterableValueException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -75,7 +75,7 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
         $this->getAttributeType()->getFilterableValue($this->attribute, true, $this->localization);
     }
 
-    public function testGetSortableValue()
+    public function testGetSortableValue(): void
     {
         $value = new TestEnumValue('id', 'test', 'name', 100);
 
@@ -85,12 +85,12 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetSortableValueForNull()
+    public function testGetSortableValueForNull(): void
     {
         $this->assertNull($this->getAttributeType()->getSortableValue($this->attribute, null, $this->localization));
     }
 
-    public function testGetSortableValueException()
+    public function testGetSortableValueException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(

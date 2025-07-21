@@ -6,10 +6,11 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DashboardBundle\Filter\WidgetProviderFilterInterface;
 use Oro\Bundle\DashboardBundle\Filter\WidgetProviderFilterManager;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
+use PHPUnit\Framework\TestCase;
 
-class WidgetProviderFilterTest extends \PHPUnit\Framework\TestCase
+class WidgetProviderFilterTest extends TestCase
 {
-    public function testFilter()
+    public function testFilter(): void
     {
         $filter = $this->createMock(WidgetProviderFilterInterface::class);
         $filter->expects($this->once())

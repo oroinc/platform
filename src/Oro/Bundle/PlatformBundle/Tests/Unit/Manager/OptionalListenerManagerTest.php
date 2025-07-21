@@ -4,18 +4,15 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 use Oro\Bundle\PlatformBundle\Tests\Unit\Fixtures\TestListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 
-class OptionalListenerManagerTest extends \PHPUnit\Framework\TestCase
+class OptionalListenerManagerTest extends TestCase
 {
-    /** @var array */
-    private $testListeners;
-
-    /** @var Container|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var OptionalListenerManager */
-    private $manager;
+    private array $testListeners;
+    private Container&MockObject $container;
+    private OptionalListenerManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -30,12 +27,12 @@ class OptionalListenerManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager = new OptionalListenerManager($this->testListeners, $this->container);
     }
 
-    public function testGetListeners()
+    public function testGetListeners(): void
     {
         $this->assertEquals($this->testListeners, $this->manager->getListeners());
     }
 
-    public function testDisableListener()
+    public function testDisableListener(): void
     {
         $testListener = new TestListener();
         $testListener->resetEnabled();
@@ -48,7 +45,7 @@ class OptionalListenerManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($testListener->getEnabled());
     }
 
-    public function testDisableNonExistsListener()
+    public function testDisableNonExistsListener(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Listener "test.bad_listener" does not exist or not optional');
@@ -56,7 +53,7 @@ class OptionalListenerManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->disableListener('test.bad_listener');
     }
 
-    public function testDisableOneListener()
+    public function testDisableOneListener(): void
     {
         $testListener = new TestListener();
         $testListener->resetEnabled();

@@ -7,15 +7,14 @@ use Oro\Bundle\DataGridBundle\Provider\RawConfigurationProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Provider\FiltersMetadataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FiltersMetadataProviderTest extends \PHPUnit\Framework\TestCase
+class FiltersMetadataProviderTest extends TestCase
 {
-    /** @var RawConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurationProvider;
-
-    /** @var FiltersMetadataProvider */
-    private $provider;
+    private RawConfigurationProvider&MockObject $configurationProvider;
+    private FiltersMetadataProvider $provider;
 
     #[\Override]
     protected function setUp(): void

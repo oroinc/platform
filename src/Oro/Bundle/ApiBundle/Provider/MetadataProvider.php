@@ -68,7 +68,7 @@ class MetadataProvider implements ResetInterface
             $requestType,
             $extras,
             $withExcludedProperties,
-            $configKey
+            $config
         );
         if (\array_key_exists($cacheKey, $this->cache)) {
             $metadata = $this->cache[$cacheKey];
@@ -142,7 +142,7 @@ class MetadataProvider implements ResetInterface
      * @param RequestType              $requestType
      * @param MetadataExtraInterface[] $extras
      * @param bool                     $withExcludedProperties
-     * @param string                   $configKey
+     * @param EntityDefinitionConfig   $config
      *
      * @return string
      */
@@ -152,7 +152,7 @@ class MetadataProvider implements ResetInterface
         RequestType $requestType,
         array $extras,
         bool $withExcludedProperties,
-        string $configKey
+        EntityDefinitionConfig $config
     ): string {
         $cacheKey = (string)$requestType
             . self::KEY_DELIMITER . $version
@@ -164,7 +164,13 @@ class MetadataProvider implements ResetInterface
                 $cacheKey .= self::KEY_DELIMITER . $part;
             }
         }
-        $cacheKey .= self::KEY_DELIMITER . $configKey;
+        $configKey = $config->getKey();
+        if ($configKey) {
+            $cacheKey .= self::KEY_DELIMITER . $config->getKey();
+        }
+
+        $cacheKey .= self::KEY_DELIMITER
+            . \sprintf('allFields(%s)', implode(',', array_keys($config->getFields())));
 
         return $cacheKey;
     }

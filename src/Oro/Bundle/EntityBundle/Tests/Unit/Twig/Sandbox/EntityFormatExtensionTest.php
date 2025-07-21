@@ -8,28 +8,21 @@ use Oro\Bundle\EntityBundle\Twig\Sandbox\EntityFormatExtension;
 use Oro\Bundle\UIBundle\Twig\FormatExtension;
 use Oro\Bundle\UIBundle\Twig\HtmlTagExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 use Twig\Node\Node;
 use Twig\TwigFunction;
 
-class EntityFormatExtensionTest extends \PHPUnit\Framework\TestCase
+class EntityFormatExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $environment;
-
-    /** @var EntityExtension|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityExtension;
-
-    /** @var FormatExtension|\PHPUnit\Framework\MockObject\MockObject */
-    private $formatExtension;
-
-    /** @var HtmlTagExtension|\PHPUnit\Framework\MockObject\MockObject */
-    private $htmlTagExtension;
-
-    /** @var EntityFormatExtension */
-    private $extension;
+    private Environment&MockObject $environment;
+    private EntityExtension&MockObject $entityExtension;
+    private FormatExtension&MockObject $formatExtension;
+    private HtmlTagExtension&MockObject $htmlTagExtension;
+    private EntityFormatExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -57,7 +50,7 @@ class EntityFormatExtensionTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testGetFunctions()
+    public function testGetFunctions(): void
     {
         $functions = $this->extension->getFunctions();
         self::assertCount(1, $functions);
@@ -70,7 +63,7 @@ class EntityFormatExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['html'], $formatFunction->getSafe($this->createMock(Node::class)));
     }
 
-    public function testGetSafeFormatExpressionWithoutNotDefinedMessage()
+    public function testGetSafeFormatExpressionWithoutNotDefinedMessage(): void
     {
         self::assertEquals(
             '{% if entity.someEntity.field1 is defined %}'
@@ -84,7 +77,7 @@ class EntityFormatExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSafeFormatExpressionWithNotDefinedMessage()
+    public function testGetSafeFormatExpressionWithNotDefinedMessage(): void
     {
         self::assertEquals(
             '{% if entity.someEntity.field1 is defined %}'
@@ -101,7 +94,7 @@ class EntityFormatExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormatForValueWithFormatterAsString()
+    public function testFormatForValueWithFormatterAsString(): void
     {
         $value = 'testValue';
         $formattedValue = 'formattedValue';
@@ -126,7 +119,7 @@ class EntityFormatExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormatForValueWithFormatterAsArrayButWithoutArguments()
+    public function testFormatForValueWithFormatterAsArrayButWithoutArguments(): void
     {
         $value = 'testValue';
         $formattedValue = 'formattedValue';
@@ -151,7 +144,7 @@ class EntityFormatExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormatForValueWithFormatterAsArrayWithArguments()
+    public function testFormatForValueWithFormatterAsArrayWithArguments(): void
     {
         $value = 'testValue';
         $formattedValue = 'formattedValue';
@@ -176,7 +169,7 @@ class EntityFormatExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormatForObjectValueWithoutFormatter()
+    public function testFormatForObjectValueWithoutFormatter(): void
     {
         $value = new SomeEntity();
         $formattedValue = 'formattedEntityName';
@@ -201,7 +194,7 @@ class EntityFormatExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormatForScalarValueWithoutFormatter()
+    public function testFormatForScalarValueWithoutFormatter(): void
     {
         $value = 'testValue';
         $formattedValue = 'htmlSanitizeValue';

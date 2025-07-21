@@ -5,11 +5,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Checker;
 use Oro\Bundle\WorkflowBundle\Configuration\Checker\ConfigurationChecker;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\TestCase;
 
-class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
+class ConfigurationCheckerTest extends TestCase
 {
-    /** @var ConfigurationChecker */
-    private $checker;
+    private ConfigurationChecker $checker;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class ConfigurationCheckerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isCleanDataProvider
      */
-    public function testIsClean(array $config, $expected)
+    public function testIsClean(array $config, $expected): void
     {
         $this->assertEquals($expected, $this->checker->isClean($config));
     }

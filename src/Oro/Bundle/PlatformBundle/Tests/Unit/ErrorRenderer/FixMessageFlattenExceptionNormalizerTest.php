@@ -3,17 +3,16 @@
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\ErrorRenderer;
 
 use Oro\Bundle\PlatformBundle\ErrorRenderer\FixMessageFlattenExceptionNormalizer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class FixMessageFlattenExceptionNormalizerTest extends \PHPUnit\Framework\TestCase
+class FixMessageFlattenExceptionNormalizerTest extends TestCase
 {
-    /** @var NormalizerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerNormalizer;
-
-    /** @var FixMessageFlattenExceptionNormalizer */
-    private $normalizer;
+    private NormalizerInterface&MockObject $innerNormalizer;
+    private FixMessageFlattenExceptionNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void

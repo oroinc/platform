@@ -15,33 +15,22 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowNotificationEvent;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowNotificationHandler;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\EmailNotificationStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
+class WorkflowNotificationHandlerTest extends TestCase
 {
     private const WORKFLOW_NAME = 'test_workflow_name';
     private const TRANSITION_NAME = 'transition_name';
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var EmailNotificationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var ChainAdditionalEmailAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $additionalEmailAssociationProvider;
-
-    /** @var \stdClass */
-    private $entity;
-
-    /** @var WorkflowNotificationEvent|\PHPUnit\Framework\MockObject\MockObject */
-    private $event;
-
-    /** @var WorkflowNotificationHandler */
-    private $handler;
+    private ManagerRegistry&MockObject $doctrine;
+    private EmailNotificationManager&MockObject $manager;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private ChainAdditionalEmailAssociationProvider&MockObject $additionalEmailAssociationProvider;
+    private \stdClass $entity;
+    private WorkflowNotificationEvent&MockObject $event;
+    private WorkflowNotificationHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -69,7 +58,7 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider handleDataProvider
      */
-    public function testHandle(array $notifications, array $expected)
+    public function testHandle(array $notifications, array $expected): void
     {
         $expected = array_map(
             function (EmailNotification $notification) {
@@ -128,7 +117,7 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testHandleNotSupportedNotification()
+    public function testHandleNotSupportedNotification(): void
     {
         $this->manager->expects($this->never())
             ->method('process');
@@ -140,7 +129,7 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->handle($event, []);
     }
 
-    public function testHandleInvalidTransitionRecord()
+    public function testHandleInvalidTransitionRecord(): void
     {
         $this->manager->expects($this->never())
             ->method('process')

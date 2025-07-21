@@ -2,24 +2,22 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
-use Oro\Bundle\LayoutBundle\Layout\Extension\RouteContextConfigurator;
 use Oro\Bundle\LayoutBundle\Layout\Extension\XmlHttpRequestConfigurator;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class XmlHttpRequestConfiguratorTest extends \PHPUnit\Framework\TestCase
+class XmlHttpRequestConfiguratorTest extends TestCase
 {
-    /** @var RequestStack */
-    private $requestStack;
-
-    /** @var RouteContextConfigurator */
-    private $configurator;
+    private RequestStack $requestStack;
+    private XmlHttpRequestConfigurator $configurator;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->requestStack = new RequestStack();
+
         $this->configurator = new XmlHttpRequestConfigurator($this->requestStack);
     }
 

@@ -26,7 +26,11 @@ use Oro\Component\Layout\LayoutUpdateInterface;
 use Oro\Component\Layout\OptionValueBag;
 use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\Tests\Unit\Fixtures\AbstractExtensionStub;
-use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type;
+use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\HeaderType;
+use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\LogoType;
+use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\LogoWithRequiredTitleType;
+use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\RootType;
+use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\TestSelfBuildingContainerType;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 /**
@@ -34,23 +38,12 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
  */
 class BlockFactoryTest extends LayoutTestCase
 {
-    /** @var LayoutContext */
-    private $context;
-
-    /** @var RawLayoutBuilder */
-    private $rawLayoutBuilder;
-
-    /** @var DeferredLayoutManipulator */
-    private $layoutManipulator;
-
-    /** @var LayoutRegistry */
-    private $registry;
-
-    /** @var ExpressionLanguage */
-    private $expressionLanguage;
-
-    /** @var BlockFactory */
-    private $blockFactory;
+    private LayoutContext $context;
+    private RawLayoutBuilder $rawLayoutBuilder;
+    private DeferredLayoutManipulator $layoutManipulator;
+    private LayoutRegistry $registry;
+    private ExpressionLanguage $expressionLanguage;
+    private BlockFactory $blockFactory;
 
     #[\Override]
     protected function setUp(): void
@@ -60,11 +53,11 @@ class BlockFactoryTest extends LayoutTestCase
         $this->registry->addExtension(
             new PreloadedExtension(
                 [
-                    'root'                         => new Type\RootType(),
-                    'header'                       => new Type\HeaderType(),
-                    'logo'                         => new Type\LogoType(),
-                    'logo_with_required_title'     => new Type\LogoWithRequiredTitleType(),
-                    'test_self_building_container' => new Type\TestSelfBuildingContainerType()
+                    'root'                         => new RootType(),
+                    'header'                       => new HeaderType(),
+                    'logo'                         => new LogoType(),
+                    'logo_with_required_title'     => new LogoWithRequiredTitleType(),
+                    'test_self_building_container' => new TestSelfBuildingContainerType()
                 ]
             )
         );
@@ -92,7 +85,7 @@ class BlockFactoryTest extends LayoutTestCase
         return $this->blockFactory->createBlockView($rawLayout, $this->context);
     }
 
-    public function testSimpleLayout()
+    public function testSimpleLayout(): void
     {
         $this->context->resolve();
 
@@ -121,7 +114,7 @@ class BlockFactoryTest extends LayoutTestCase
         );
     }
 
-    public function testCoreVariablesForRootItemOnly()
+    public function testCoreVariablesForRootItemOnly(): void
     {
         $this->context->resolve();
 
@@ -153,7 +146,7 @@ class BlockFactoryTest extends LayoutTestCase
         );
     }
 
-    public function testCoreVariables()
+    public function testCoreVariables(): void
     {
         $this->context->resolve();
 
@@ -222,7 +215,7 @@ class BlockFactoryTest extends LayoutTestCase
         );
     }
 
-    public function testAddChildToNotContainer()
+    public function testAddChildToNotContainer(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -243,7 +236,7 @@ class BlockFactoryTest extends LayoutTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testExtensions()
+    public function testExtensions(): void
     {
         $testBlockType = $this->createMock(AbstractType::class);
         $testBlockType->expects($this->any())
@@ -351,7 +344,7 @@ class BlockFactoryTest extends LayoutTestCase
     /**
      * @dataProvider expressionsProvider
      */
-    public function testProcessingExpressionsInBuildView(bool $deferred)
+    public function testProcessingExpressionsInBuildView(bool $deferred): void
     {
         $this->context = new LayoutContext(
             ['expressions_evaluate' => true, 'expressions_evaluate_deferred' => $deferred, 'title' => 'test title'],
@@ -394,7 +387,7 @@ class BlockFactoryTest extends LayoutTestCase
         ];
     }
 
-    public function testBuildViewShouldFailWhenUsingNonProcessedExpressions()
+    public function testBuildViewShouldFailWhenUsingNonProcessedExpressions(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->context = new LayoutContext(
@@ -413,7 +406,7 @@ class BlockFactoryTest extends LayoutTestCase
         $this->getLayoutView();
     }
 
-    public function testBuildViewShouldFailWhenUsingDataInExpressionsInDeferredMode()
+    public function testBuildViewShouldFailWhenUsingDataInExpressionsInDeferredMode(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->context = new LayoutContext(
@@ -432,7 +425,7 @@ class BlockFactoryTest extends LayoutTestCase
         $this->getLayoutView();
     }
 
-    public function testResolvingValueBags()
+    public function testResolvingValueBags(): void
     {
         $valueBag = new OptionValueBag();
         $valueBag->add('one');
@@ -466,7 +459,7 @@ class BlockFactoryTest extends LayoutTestCase
         );
     }
 
-    public function testExceptionDuringResolveBlockOptions()
+    public function testExceptionDuringResolveBlockOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(

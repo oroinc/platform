@@ -7,26 +7,19 @@ use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Navigation\NavigationResult;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
+class EntityPaginationNavigationTest extends TestCase
 {
     private const FIELD_NAME = 'id';
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var EntityPaginationStorage|\PHPUnit\Framework\MockObject\MockObject */
-    private $storage;
-
-    /** @var \stdClass */
-    private $entity;
-
-    /** @var EntityPaginationNavigation */
-    private $navigation;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private EntityPaginationStorage&MockObject $storage;
+    private \stdClass $entity;
+    private EntityPaginationNavigation $navigation;
 
     #[\Override]
     protected function setUp(): void
@@ -46,7 +39,7 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getTotalCountDataProvider
      */
-    public function testGetTotalCount(bool $isValid, bool $inStorage, array $entityIds, ?int $expected)
+    public function testGetTotalCount(bool $isValid, bool $inStorage, array $entityIds, ?int $expected): void
     {
         $this->assertPrepareNavigation($isValid, $inStorage, $entityIds);
         $result = $this->navigation->getTotalCount($this->entity);
@@ -102,7 +95,7 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
         int $position,
         array $entityIds,
         ?int $expected
-    ) {
+    ): void {
         $this->assertPrepareNavigation($isValid, $inStorage, $entityIds);
 
         $this->storage->expects($this->any())
@@ -145,7 +138,7 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFirstIdentifierDataProvider
      */
-    public function testGetFirstIdentifier(array $source, array $expected)
+    public function testGetFirstIdentifier(array $source, array $expected): void
     {
         $this->assertPrepareResult(
             $source['isValid'],
@@ -210,7 +203,7 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getLastIdentifierDataProvider
      */
-    public function testGetLastIdentifier(array $source, array $expected)
+    public function testGetLastIdentifier(array $source, array $expected): void
     {
         $this->assertPrepareResult(
             $source['isValid'],
@@ -274,7 +267,7 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPreviousIdentifierDataProvider
      */
-    public function testGetPreviousIdentifier(array $source, array $expected)
+    public function testGetPreviousIdentifier(array $source, array $expected): void
     {
         $this->assertPrepareResult(
             $source['isValid'],
@@ -363,7 +356,7 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getNextIdentifierDataProvider
      */
-    public function testGetNextIdentifier(array $source, array $expected)
+    public function testGetNextIdentifier(array $source, array $expected): void
     {
         $this->assertPrepareResult(
             $source['isValid'],

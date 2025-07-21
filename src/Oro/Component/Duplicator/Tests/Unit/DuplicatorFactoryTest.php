@@ -7,10 +7,11 @@ use DeepCopy\Matcher\PropertyNameMatcher;
 use Oro\Component\Duplicator\DuplicatorFactory;
 use Oro\Component\Duplicator\Filter\FilterFactory;
 use Oro\Component\Duplicator\Matcher\MatcherFactory;
+use PHPUnit\Framework\TestCase;
 
-class DuplicatorFactoryTest extends \PHPUnit\Framework\TestCase
+class DuplicatorFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $filter = new SetNullFilter();
         $matcher = new PropertyNameMatcher('firstField');

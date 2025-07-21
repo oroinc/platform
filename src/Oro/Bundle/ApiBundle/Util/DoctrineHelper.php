@@ -141,9 +141,7 @@ class DoctrineHelper extends BaseHelper
 
         $idFieldNames = $metadata->getIdentifierFieldNames();
         if (\count($idFieldNames) > 0) {
-            $mapping = $metadata->getFieldMapping(reset($idFieldNames));
-
-            $indexedColumns[$mapping['columnName']] = true;
+            $indexedColumns[$metadata->fieldMappings[reset($idFieldNames)]['columnName']] = true;
         }
 
         if (isset($metadata->table['indexes'])) {
@@ -158,7 +156,7 @@ class DoctrineHelper extends BaseHelper
         $fields = [];
         $fieldNames = $metadata->getFieldNames();
         foreach ($fieldNames as $fieldName) {
-            $mapping = $metadata->getFieldMapping($fieldName);
+            $mapping = $metadata->fieldMappings[$fieldName];
             $hasIndex = false;
             if (isset($mapping['unique']) && true === $mapping['unique']) {
                 $hasIndex = true;

@@ -24,6 +24,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Type\UserAclSelectType;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Form;
@@ -39,49 +41,22 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
+class OwnerFormExtensionTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
-    private $doctrine;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface */
-    private $ownershipMetadataProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|BusinessUnitManager */
-    private $businessUnitManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
-    private $authorizationChecker;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
-    private $tokenAccessor;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FormBuilder */
-    private $builder;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|User */
-    private $user;
-
-    /** @var array */
-    private $organizations;
-
-    /** @var string */
-    private $fieldName;
-
-    /** @var string */
-    private $fieldLabel;
-
-    /** @var string */
-    private $entityClassName;
-
-    /** @var OwnerFormExtension */
-    private $extension;
-
-    /** @var Organization */
-    private $organization;
-
-    /** @var EntityOwnerAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityOwnerAccessor;
+    private ManagerRegistry&MockObject $doctrine;
+    private OwnershipMetadataProviderInterface&MockObject $ownershipMetadataProvider;
+    private BusinessUnitManager&MockObject $businessUnitManager;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private FormBuilder&MockObject $builder;
+    private User&MockObject $user;
+    private array $organizations;
+    private string $fieldName;
+    private string $fieldLabel;
+    private string $entityClassName;
+    private OwnerFormExtension $extension;
+    private Organization $organization;
+    private EntityOwnerAccessor&MockObject $entityOwnerAccessor;
 
     #[\Override]
     protected function setUp(): void

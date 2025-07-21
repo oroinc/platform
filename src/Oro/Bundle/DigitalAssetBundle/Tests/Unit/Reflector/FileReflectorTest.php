@@ -7,18 +7,15 @@ use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Reflector\FileReflector;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class FileReflectorTest extends \PHPUnit\Framework\TestCase
+class FileReflectorTest extends TestCase
 {
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var File|\PHPUnit\Framework\MockObject\MockObject */
-    private $file;
-
-    /** @var FileReflector */
-    private $reflector;
+    private LoggerInterface&MockObject $logger;
+    private File $file;
+    private FileReflector $reflector;
 
     #[\Override]
     protected function setUp(): void

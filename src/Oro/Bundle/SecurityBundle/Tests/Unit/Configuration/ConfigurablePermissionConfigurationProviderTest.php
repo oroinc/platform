@@ -7,16 +7,17 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class ConfigurablePermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigurablePermissionConfigurationProviderTest extends TestCase
 {
     use TempDirExtension;
 
     /**
      * @dataProvider bundlesProvider
      */
-    public function testGetConfiguration(array $bundles, array $expected)
+    public function testGetConfiguration(array $bundles, array $expected): void
     {
         $resourceBundles = [];
         /** @var Bundle $bundle */

@@ -3,9 +3,10 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\NavigationBundle\DependencyInjection\OroNavigationExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroNavigationExtensionTest extends \PHPUnit\Framework\TestCase
+class OroNavigationExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

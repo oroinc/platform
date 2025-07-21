@@ -9,19 +9,16 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Provider\RunningWorkflowProvider;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class HasRunningWorkflowFromRecordGroupTest extends \PHPUnit\Framework\TestCase
+class HasRunningWorkflowFromRecordGroupTest extends TestCase
 {
     private const GROUP_NAME = 'test_group_name';
 
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var RunningWorkflowProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $runningWorkflowProvider;
-
-    /** @var HasRunningWorkflowFromRecordGroup */
-    private $condition;
+    private WorkflowManager&MockObject $workflowManager;
+    private RunningWorkflowProvider&MockObject $runningWorkflowProvider;
+    private HasRunningWorkflowFromRecordGroup $condition;
 
     #[\Override]
     protected function setUp(): void

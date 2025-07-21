@@ -4,13 +4,13 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Form;
 
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetDateType;
 use Oro\Bundle\FormBundle\Form\Type\OroDateType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilder;
 
-class WidgetDateTypeTest extends \PHPUnit\Framework\TestCase
+class WidgetDateTypeTest extends TestCase
 {
-    /** @var WidgetDateType */
-    private $formType;
+    private WidgetDateType $formType;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class WidgetDateTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType = new WidgetDateType();
     }
 
-    public function testBuildFormWithDate()
+    public function testBuildFormWithDate(): void
     {
         $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->exactly(2))
@@ -31,7 +31,7 @@ class WidgetDateTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType->buildForm($builder, ['enable_date' => true]);
     }
 
-    public function testBuildFormWithoutDate()
+    public function testBuildFormWithoutDate(): void
     {
         $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->once())

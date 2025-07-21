@@ -5,10 +5,11 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\ImportExport\Configuration;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\ImportExport\Configuration\FieldConfigModelImportExportConfigurationProvider;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfiguration;
+use PHPUnit\Framework\TestCase;
 
-class FieldConfigModelImportExportConfigurationProviderTest extends \PHPUnit\Framework\TestCase
+class FieldConfigModelImportExportConfigurationProviderTest extends TestCase
 {
-    public function testGet()
+    public function testGet(): void
     {
         self::assertEquals(
             new ImportExportConfiguration([

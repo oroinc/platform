@@ -7,12 +7,14 @@ use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
+class MenuUpdateUtilsTest extends TestCase
 {
     use MenuItemTestTrait;
 
-    private MenuUpdateHelper|\PHPUnit\Framework\MockObject\MockObject $menuUpdateHelper;
+    private MenuUpdateHelper&MockObject $menuUpdateHelper;
 
     #[\Override]
     protected function setUp(): void

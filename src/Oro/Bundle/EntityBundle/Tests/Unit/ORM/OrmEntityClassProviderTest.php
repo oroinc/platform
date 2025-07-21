@@ -7,10 +7,11 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\ManagerBagInterface;
 use Oro\Bundle\EntityBundle\ORM\OrmEntityClassProvider;
 use Oro\Bundle\EntityBundle\ORM\ShortClassMetadata;
+use PHPUnit\Framework\TestCase;
 
-class OrmEntityClassProviderTest extends \PHPUnit\Framework\TestCase
+class OrmEntityClassProviderTest extends TestCase
 {
-    public function testGetClassNames()
+    public function testGetClassNames(): void
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $em = $this->createMock(ObjectManager::class);

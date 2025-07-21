@@ -3,12 +3,13 @@
 namespace Oro\Bundle\SoapBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\SoapBundle\EventListener\ApiSubRequestListener;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class ApiSubRequestListenerTest extends \PHPUnit\Framework\TestCase
+class ApiSubRequestListenerTest extends TestCase
 {
     private ApiSubRequestListener $listener;
 

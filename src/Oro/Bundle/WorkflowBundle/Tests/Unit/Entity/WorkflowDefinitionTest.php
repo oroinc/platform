@@ -11,16 +11,16 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
+class WorkflowDefinitionTest extends TestCase
 {
     use EntityTestCaseTrait;
 
-    /** @var WorkflowDefinition */
-    private $workflowDefinition;
+    private WorkflowDefinition $workflowDefinition;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +28,7 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->workflowDefinition = new WorkflowDefinition();
     }
 
-    public function testGetVirtualAttributes()
+    public function testGetVirtualAttributes(): void
     {
         $this->workflowDefinition->setConfiguration([
             'attributes' => [
@@ -53,7 +53,7 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAccessors()
+    public function testAccessors(): void
     {
         $this->assertPropertyCollections($this->workflowDefinition, [
             ['scopes', new Scope()],
@@ -62,7 +62,7 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertPropertyAccessors($this->workflowDefinition, [['applications', ['some_application'], true]]);
     }
 
-    public function testSetScopesConfig()
+    public function testSetScopesConfig(): void
     {
         $this->assertEquals([], $this->workflowDefinition->getScopesConfig());
 
@@ -71,7 +71,7 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['data'], $this->workflowDefinition->getScopesConfig());
     }
 
-    public function testGetScopesConfig()
+    public function testGetScopesConfig(): void
     {
         $this->assertEquals([], $this->workflowDefinition->getScopesConfig());
 
@@ -80,7 +80,7 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['data'], $this->workflowDefinition->getScopesConfig());
     }
 
-    public function testHasScopeConfig()
+    public function testHasScopeConfig(): void
     {
         $this->assertFalse($this->workflowDefinition->hasScopesConfig());
 
@@ -89,7 +89,7 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->workflowDefinition->hasScopesConfig());
     }
 
-    public function testGetDatagrids()
+    public function testGetDatagrids(): void
     {
         $datagridsConfig = ['grid1', 'grid2'];
         $this->workflowDefinition->setConfiguration(['datagrids' => $datagridsConfig]);
@@ -97,7 +97,7 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($datagridsConfig, $this->workflowDefinition->getDatagrids());
     }
 
-    public function testGetHasDisabledOperations()
+    public function testGetHasDisabledOperations(): void
     {
         $definition = new WorkflowDefinition();
 
@@ -115,7 +115,7 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($definition->hasDisabledOperations());
     }
 
-    public function testName()
+    public function testName(): void
     {
         $this->assertNull($this->workflowDefinition->getName());
         $value = 'example_workflow';
@@ -123,7 +123,7 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->workflowDefinition->getName());
     }
 
-    public function testLabel()
+    public function testLabel(): void
     {
         $this->assertNull($this->workflowDefinition->getLabel());
         $value = 'Example Workflow';
@@ -131,7 +131,7 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->workflowDefinition->getLabel());
     }
 
-    public function testStartStep()
+    public function testStartStep(): void
     {
         $this->assertNull($this->workflowDefinition->getStartStep());
         $startStep = new WorkflowStep();
@@ -143,21 +143,21 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->workflowDefinition->getStartStep());
     }
 
-    public function testActive()
+    public function testActive(): void
     {
         $this->assertFalse($this->workflowDefinition->isActive());
         $this->workflowDefinition->setActive(true);
         $this->assertTrue($this->workflowDefinition->isActive());
     }
 
-    public function testPriority()
+    public function testPriority(): void
     {
         $this->assertEquals(0, $this->workflowDefinition->getPriority());
         $this->workflowDefinition->setPriority(42);
         $this->assertEquals(42, $this->workflowDefinition->getPriority());
     }
 
-    public function testActiveGroups()
+    public function testActiveGroups(): void
     {
         $this->assertEquals([], $this->workflowDefinition->getExclusiveActiveGroups());
         $this->assertFalse($this->workflowDefinition->hasExclusiveActiveGroups());
@@ -169,7 +169,7 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->workflowDefinition->hasExclusiveActiveGroups());
     }
 
-    public function testRecordGroups()
+    public function testRecordGroups(): void
     {
         $this->assertEquals([], $this->workflowDefinition->getExclusiveRecordGroups());
         $this->assertFalse($this->workflowDefinition->hasExclusiveRecordGroups());
@@ -181,14 +181,14 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->workflowDefinition->hasExclusiveRecordGroups());
     }
 
-    public function testIsForceAutostart()
+    public function testIsForceAutostart(): void
     {
         $this->assertFalse($this->workflowDefinition->isForceAutostart());
         $this->workflowDefinition->setConfiguration([WorkflowDefinition::CONFIG_FORCE_AUTOSTART => true]);
         $this->assertTrue($this->workflowDefinition->isForceAutostart());
     }
 
-    public function testStartStepNoStep()
+    public function testStartStepNoStep(): void
     {
         $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage('Workflow "test" does not contain step "start_step"');
@@ -201,7 +201,7 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($startStep, $this->workflowDefinition->getStartStep());
     }
 
-    public function testConfiguration()
+    public function testConfiguration(): void
     {
         $this->assertEmpty($this->workflowDefinition->getConfiguration());
         $value = ['some', 'configuration', 'array'];
@@ -209,7 +209,7 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->workflowDefinition->getConfiguration());
     }
 
-    public function testSetSteps()
+    public function testSetSteps(): void
     {
         $stepOne = new WorkflowStep();
         $stepOne->setName('step1');
@@ -236,7 +236,7 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($stepOne, $actualSteps[0]);
     }
 
-    public function testSetGetAclIdentities()
+    public function testSetGetAclIdentities(): void
     {
         $firstStep = new WorkflowStep();
         $firstStep->setName('first_step');
@@ -274,7 +274,7 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($this->workflowDefinition->getEntityAcls()->toArray());
     }
 
-    public function testSetGetEntityRestrictions()
+    public function testSetGetEntityRestrictions(): void
     {
         $firstStep = new WorkflowStep();
         $firstStep->setName('first_step');
@@ -312,7 +312,7 @@ class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($this->workflowDefinition->getRestrictions()->toArray());
     }
 
-    public function testGetDisabledOperations()
+    public function testGetDisabledOperations(): void
     {
         $configuration = [
             WorkflowConfiguration::NODE_DISABLE_OPERATIONS => [

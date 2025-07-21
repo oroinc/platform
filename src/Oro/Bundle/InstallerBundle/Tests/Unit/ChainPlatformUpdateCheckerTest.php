@@ -4,20 +4,15 @@ namespace Oro\Bundle\InstallerBundle\Tests\Unit;
 
 use Oro\Bundle\InstallerBundle\ChainPlatformUpdateChecker;
 use Oro\Bundle\InstallerBundle\PlatformUpdateCheckerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChainPlatformUpdateCheckerTest extends \PHPUnit\Framework\TestCase
+class ChainPlatformUpdateCheckerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|PlatformUpdateCheckerInterface */
-    private $checker1;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|PlatformUpdateCheckerInterface */
-    private $checker2;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|PlatformUpdateCheckerInterface */
-    private $checker3;
-
-    /** @var ChainPlatformUpdateChecker */
-    private $chainChecker;
+    private PlatformUpdateCheckerInterface&MockObject $checker1;
+    private PlatformUpdateCheckerInterface&MockObject $checker2;
+    private PlatformUpdateCheckerInterface&MockObject $checker3;
+    private ChainPlatformUpdateChecker $chainChecker;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +24,7 @@ class ChainPlatformUpdateCheckerTest extends \PHPUnit\Framework\TestCase
         $this->chainChecker = new ChainPlatformUpdateChecker([$this->checker1, $this->checker2, $this->checker3]);
     }
 
-    public function testWhenAllCheckersAllowUpdate()
+    public function testWhenAllCheckersAllowUpdate(): void
     {
         $this->checker1->expects(self::once())
             ->method('checkReadyToUpdate')
@@ -46,7 +41,7 @@ class ChainPlatformUpdateCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWhenThereAreSeveralCheckersThatDenyUpdate()
+    public function testWhenThereAreSeveralCheckersThatDenyUpdate(): void
     {
         $this->checker1->expects(self::once())
             ->method('checkReadyToUpdate')

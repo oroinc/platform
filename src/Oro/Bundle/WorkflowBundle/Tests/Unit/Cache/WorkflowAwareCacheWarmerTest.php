@@ -4,14 +4,13 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Cache;
 
 use Oro\Bundle\WorkflowBundle\Cache\WorkflowAwareCacheWarmer;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowAwareCacheWarmerTest extends \PHPUnit\Framework\TestCase
+class WorkflowAwareCacheWarmerTest extends TestCase
 {
-    /** @var WorkflowAwareCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowAwareCache;
-
-    /** @var WorkflowAwareCacheWarmer */
-    private $warmer;
+    private WorkflowAwareCache&MockObject $workflowAwareCache;
+    private WorkflowAwareCacheWarmer $warmer;
 
     #[\Override]
     protected function setUp(): void

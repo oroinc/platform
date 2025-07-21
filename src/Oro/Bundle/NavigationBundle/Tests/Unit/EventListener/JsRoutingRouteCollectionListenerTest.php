@@ -4,10 +4,11 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\DistributionBundle\Event\RouteCollectionEvent;
 use Oro\Bundle\NavigationBundle\EventListener\JsRoutingRouteCollectionListener;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-class JsRoutingRouteCollectionListenerTest extends \PHPUnit\Framework\TestCase
+class JsRoutingRouteCollectionListenerTest extends TestCase
 {
     public function testOnCollectionAutoload(): void
     {

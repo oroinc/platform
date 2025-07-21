@@ -11,7 +11,7 @@ class EngineParametersTest extends TestCase
     /**
      * @dataProvider invalidSearchEngineDsnProvider
      */
-    public function testInvalidSearchEngineDsnProcessing($dsn)
+    public function testInvalidSearchEngineDsnProcessing($dsn): void
     {
         $this->expectException(InvalidArgumentException::class);
         new EngineParameters($dsn);
@@ -20,7 +20,7 @@ class EngineParametersTest extends TestCase
     /**
      * @dataProvider properSearchEngineDsnProvider
      */
-    public function testProperSearchEngineDsnProcessing(string $dsn, array $expectedProcessedDsnResults)
+    public function testProperSearchEngineDsnProcessing(string $dsn, array $expectedProcessedDsnResults): void
     {
         $engineParametersBag = new EngineParameters($dsn);
 
@@ -41,7 +41,7 @@ class EngineParametersTest extends TestCase
     /**
      * @dataProvider engineNameAliasProvider
      */
-    public function testEngineNameAlias(string $dsn, string $expectedEngineName)
+    public function testEngineNameAlias(string $dsn, string $expectedEngineName): void
     {
         $engineParametersBag = new EngineParameters($dsn);
         $engineParametersBag->addEngineNameAlias('elastic_search', 'http');

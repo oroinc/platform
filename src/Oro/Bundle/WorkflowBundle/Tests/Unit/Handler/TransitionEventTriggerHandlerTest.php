@@ -14,8 +14,10 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Handler\TransitionEventTriggerHandler;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TransitionEventTriggerHandlerTest extends \PHPUnit\Framework\TestCase
+class TransitionEventTriggerHandlerTest extends TestCase
 {
     use EntityTrait;
 
@@ -23,20 +25,11 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit\Framework\TestCase
     private const WORKFLOW_NAME = 'test_workflow';
     private const TRANSITION_NAME = 'test_transition';
 
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $objectManager;
-
-    /** @var TransitionEventTriggerHandler */
-    private $handler;
-
-    /** @var TransitionEventTrigger */
-    private $trigger;
+    private FeatureChecker&MockObject $featureChecker;
+    private WorkflowManager&MockObject $workflowManager;
+    private ObjectManager&MockObject $objectManager;
+    private TransitionEventTriggerHandler $handler;
+    private TransitionEventTrigger $trigger;
 
     #[\Override]
     protected function setUp(): void
@@ -69,7 +62,7 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithWorkflowItem()
+    public function testProcessWithWorkflowItem(): void
     {
         $entityClass = self::ENTITY_CLASS;
         $entityId = 42;
@@ -100,7 +93,7 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithoutWorkflowItem()
+    public function testProcessWithoutWorkflowItem(): void
     {
         $entityClass = self::ENTITY_CLASS;
         $entityId = 42;
@@ -137,7 +130,7 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit\Framework\TestCase
      * @param string $expectedException
      * @param string $expectedMessage
      */
-    public function testProcessException($entityId, $expectedException, $expectedMessage)
+    public function testProcessException($entityId, $expectedException, $expectedMessage): void
     {
         $message = TransitionTriggerMessage::create($this->trigger, $entityId);
 
@@ -152,7 +145,7 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->process($this->trigger, $message);
     }
 
-    public function testProcessDisabledFeature()
+    public function testProcessDisabledFeature(): void
     {
         $entityId = 42;
 

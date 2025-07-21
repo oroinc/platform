@@ -155,3 +155,29 @@ services:
             - '@oro_locale.helper.localization'
         tags:
             - { name: layout.block_type, alias: attribute_group_rest }
+
+    oro_entity_config.block_type.file:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        value: {required: true}
+                        showIcon: {default: true}
+            - [setName, ['file']]
+        tags:
+             - { name: layout.block_type, alias: file }
+
+    oro_entity_config.block_type.multi_file:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        value: {required: true}
+                        showIcon: {default: true}
+            - [setName, ['multi_file']]
+        tags:
+             - { name: layout.block_type, alias: multi_file }

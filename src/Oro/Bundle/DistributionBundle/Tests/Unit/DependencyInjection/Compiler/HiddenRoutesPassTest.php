@@ -4,13 +4,14 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\DistributionBundle\DependencyInjection\Compiler\HiddenRoutesPass;
 use Oro\Component\Routing\Matcher\PhpMatcherDumper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 
-class HiddenRoutesPassTest extends \PHPUnit\Framework\TestCase
+class HiddenRoutesPassTest extends TestCase
 {
     /**
      * @dataProvider processDataProvider

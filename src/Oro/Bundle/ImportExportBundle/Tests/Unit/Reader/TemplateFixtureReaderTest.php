@@ -9,17 +9,14 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Reader\TemplateFixtureReader;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TemplateFixtureReaderTest extends \PHPUnit\Framework\TestCase
+class TemplateFixtureReaderTest extends TestCase
 {
-    /** @var TemplateManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $templateManager;
-
-    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextRegistry;
-
-    /** @var TemplateFixtureReader */
-    private $reader;
+    private TemplateManager&MockObject $templateManager;
+    private ContextRegistry&MockObject $contextRegistry;
+    private TemplateFixtureReader $reader;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +27,7 @@ class TemplateFixtureReaderTest extends \PHPUnit\Framework\TestCase
         $this->reader = new TemplateFixtureReader($this->contextRegistry, $this->templateManager);
     }
 
-    public function testInitializeFromContextExceptionNoOption()
+    public function testInitializeFromContextExceptionNoOption(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Configuration of fixture reader must contain "entityName".');
@@ -51,7 +48,7 @@ class TemplateFixtureReaderTest extends \PHPUnit\Framework\TestCase
         $this->reader->setStepExecution($stepExecution);
     }
 
-    public function testInitializeFromContext()
+    public function testInitializeFromContext(): void
     {
         $context = $this->createMock(ContextInterface::class);
         $context->expects(self::once())

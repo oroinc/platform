@@ -6,12 +6,13 @@ use Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeIdentityType;
 use Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeType;
 use Oro\Bundle\SecurityBundle\Form\Type\PermissionCollectionType;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class AclPrivilegeTypeTest extends \PHPUnit\Framework\TestCase
+class AclPrivilegeTypeTest extends TestCase
 {
     public function testBuildForm(): void
     {

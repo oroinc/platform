@@ -4,23 +4,24 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Condition\Type;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class TypeTest extends \PHPUnit\Framework\TestCase
+class TypeTest extends TestCase
 {
-    /** @var Condition\Type */
-    private $condition;
+    private Condition\Type $condition;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->condition = new Condition\Type();
+        $this->condition = new Type();
         $this->condition->setContextAccessor(new ContextAccessor());
     }
 
-    public function testInitializeWithException()
+    public function testInitializeWithException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Option "left" must be property path');
@@ -31,7 +32,7 @@ class TypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, array $context, bool $expectedResult)
+    public function testEvaluate(array $options, array $context, bool $expectedResult): void
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -117,7 +118,7 @@ class TypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider errorMessagesProvider
      */
-    public function testErrorMessages(array $inputData, array $expectedData)
+    public function testErrorMessages(array $inputData, array $expectedData): void
     {
         $options = [new PropertyPath('prop'), $inputData['type']];
         $context = ['prop' => $inputData['value']];

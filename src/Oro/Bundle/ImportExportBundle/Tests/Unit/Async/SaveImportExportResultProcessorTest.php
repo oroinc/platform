@@ -14,16 +14,15 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class SaveImportExportResultProcessorTest extends \PHPUnit\Framework\TestCase
+class SaveImportExportResultProcessorTest extends TestCase
 {
-    private JobRepository|\PHPUnit\Framework\MockObject\MockObject $jobRepository;
-
-    private ImportExportResultManager|\PHPUnit\Framework\MockObject\MockObject $importExportResultManager;
-
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
-
+    private JobRepository&MockObject $jobRepository;
+    private ImportExportResultManager&MockObject $importExportResultManager;
+    private LoggerInterface&MockObject $logger;
     private SaveImportExportResultProcessor $saveExportResultProcessor;
 
     #[\Override]

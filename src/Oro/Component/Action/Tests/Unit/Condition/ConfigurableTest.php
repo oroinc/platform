@@ -7,14 +7,13 @@ use Oro\Component\Action\Condition\Configurable;
 use Oro\Component\ConfigExpression\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ExpressionAssembler;
 use Oro\Component\ConfigExpression\ExpressionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigurableTest extends \PHPUnit\Framework\TestCase
+class ConfigurableTest extends TestCase
 {
-    /** @var ExpressionAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    private $assembler;
-
-    /** @var Configurable */
-    private $condition;
+    private ExpressionAssembler&MockObject $assembler;
+    private Configurable $condition;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class ConfigurableTest extends \PHPUnit\Framework\TestCase
         $this->condition = new Configurable($this->assembler);
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $this->assertInstanceOf(
             AbstractCondition::class,
@@ -32,7 +31,7 @@ class ConfigurableTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEvaluate()
+    public function testEvaluate(): void
     {
         $options = [];
         $context = new \stdClass();

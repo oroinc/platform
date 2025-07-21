@@ -3,18 +3,17 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclConfigurationPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class AclConfigurationPassTest extends \PHPUnit\Framework\TestCase
+class AclConfigurationPassTest extends TestCase
 {
     private ContainerBuilder $container;
-
     private Definition $extensionSelector;
-
     private AclConfigurationPass $compiler;
 
     #[\Override]

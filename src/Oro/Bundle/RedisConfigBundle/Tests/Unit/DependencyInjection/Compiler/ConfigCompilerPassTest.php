@@ -3,11 +3,12 @@
 namespace Oro\Bundle\RedisConfigBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\RedisConfigBundle\DependencyInjection\Compiler\ConfigCompilerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class ConfigCompilerPassTest extends \PHPUnit\Framework\TestCase
+class ConfigCompilerPassTest extends TestCase
 {
-    public function testConfigSlugCacheWithoutEnabledRedisCache()
+    public function testConfigSlugCacheWithoutEnabledRedisCache(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('oro_redirect.url_cache_type', 'storage');
@@ -18,7 +19,7 @@ class ConfigCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('storage', $container->getParameter('oro_redirect.url_cache_type'));
     }
 
-    public function testConfigSlugCacheWithEnabledRedisCache()
+    public function testConfigSlugCacheWithEnabledRedisCache(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('oro_redirect.url_cache_type', 'storage');

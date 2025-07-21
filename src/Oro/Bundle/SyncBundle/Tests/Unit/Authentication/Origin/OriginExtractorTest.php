@@ -3,11 +3,11 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Authentication\Origin;
 
 use Oro\Bundle\SyncBundle\Authentication\Origin\OriginExtractor;
+use PHPUnit\Framework\TestCase;
 
-class OriginExtractorTest extends \PHPUnit\Framework\TestCase
+class OriginExtractorTest extends TestCase
 {
-    /** @var OriginExtractor */
-    private $extractor;
+    private OriginExtractor $extractor;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class OriginExtractorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider urlDataProvider
      */
-    public function testFromUrl(?string $url, ?string $expectedOrigin)
+    public function testFromUrl(?string $url, ?string $expectedOrigin): void
     {
         self::assertEquals($expectedOrigin, $this->extractor->fromUrl($url));
     }

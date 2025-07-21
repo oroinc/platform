@@ -3,8 +3,9 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Client\Meta;
 
 use Oro\Component\MessageQueue\Client\Meta\DestinationMeta;
+use PHPUnit\Framework\TestCase;
 
-class DestinationMetaTest extends \PHPUnit\Framework\TestCase
+class DestinationMetaTest extends TestCase
 {
     public function testCouldBeConstructedWithExpectedArguments(): void
     {

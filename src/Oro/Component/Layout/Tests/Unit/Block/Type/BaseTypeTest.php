@@ -7,7 +7,7 @@ use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
 
 class BaseTypeTest extends BaseBlockTypeTestCase
 {
-    public function testConfigureOptionsWithEmptyOptions()
+    public function testConfigureOptionsWithEmptyOptions(): void
     {
         $this->assertEquals(
             ['visible' => true],
@@ -15,7 +15,7 @@ class BaseTypeTest extends BaseBlockTypeTestCase
         );
     }
 
-    public function testConfigureOptionsWithValidOptions()
+    public function testConfigureOptionsWithValidOptions(): void
     {
         $this->assertEquals(
             [
@@ -39,7 +39,7 @@ class BaseTypeTest extends BaseBlockTypeTestCase
         );
     }
 
-    public function testBuildViewWithoutOptions()
+    public function testBuildViewWithoutOptions(): void
     {
         $view = $this->getBlockBuilder(BaseType::NAME, [], 'test:block--1')
             ->getBlockView();
@@ -70,7 +70,7 @@ class BaseTypeTest extends BaseBlockTypeTestCase
         );
     }
 
-    public function testBuildView()
+    public function testBuildView(): void
     {
         $options = [
             'vars'               => ['test_var' => 'test_var_val'],

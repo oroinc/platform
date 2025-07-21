@@ -6,17 +6,17 @@ use Monolog\Handler\HandlerInterface;
 use Oro\Bundle\LoggerBundle\Monolog\ErrorLogNotificationHandlerWrapper;
 use Oro\Bundle\LoggerBundle\Provider\ErrorLogNotificationRecipientsProvider;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 
-class ErrorLogNotificationHandlerWrapperTest extends \PHPUnit\Framework\TestCase
+class ErrorLogNotificationHandlerWrapperTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
     private HandlerInterface $innerHandler;
-
-    private ErrorLogNotificationRecipientsProvider|\PHPUnit\Framework\MockObject\MockObject $recipientsProvider;
-
+    private ErrorLogNotificationRecipientsProvider&MockObject $recipientsProvider;
     private ErrorLogNotificationHandlerWrapper $handlerWrapper;
 
     #[\Override]
@@ -32,13 +32,11 @@ class ErrorLogNotificationHandlerWrapperTest extends \PHPUnit\Framework\TestCase
 
     public function testHandleBatchWhenNoRecipients(): void
     {
-        $this->recipientsProvider
-            ->expects(self::once())
+        $this->recipientsProvider->expects(self::once())
             ->method('getRecipientsEmailAddresses')
             ->willReturn([]);
 
-        $this->innerHandler
-            ->expects(self::never())
+        $this->innerHandler->expects(self::never())
             ->method(self::anything());
 
         $this->handlerWrapper->handleBatch([]);
@@ -49,14 +47,12 @@ class ErrorLogNotificationHandlerWrapperTest extends \PHPUnit\Framework\TestCase
 
     public function testHandleBatchWhenHasRecipients(): void
     {
-        $this->recipientsProvider
-            ->expects(self::once())
+        $this->recipientsProvider->expects(self::once())
             ->method('getRecipientsEmailAddresses')
             ->willReturn(['to@example.org']);
 
         $records = ['sample_record'];
-        $this->innerHandler
-            ->expects(self::atLeastOnce())
+        $this->innerHandler->expects(self::atLeastOnce())
             ->method('handleBatch')
             ->with($records);
 
@@ -71,20 +67,17 @@ class ErrorLogNotificationHandlerWrapperTest extends \PHPUnit\Framework\TestCase
      */
     public function testHandleBatchLogsWarningWhenCannotSendEmail(\Throwable $throwable): void
     {
-        $this->recipientsProvider
-            ->expects(self::once())
+        $this->recipientsProvider->expects(self::once())
             ->method('getRecipientsEmailAddresses')
             ->willReturn(['to@example.org']);
 
         $records = ['sample_record'];
-        $this->innerHandler
-            ->expects(self::atLeastOnce())
+        $this->innerHandler->expects(self::atLeastOnce())
             ->method('handleBatch')
             ->with($records)
             ->willThrowException($throwable);
 
-        $this->loggerMock
-            ->expects(self::exactly(2))
+        $this->loggerMock->expects(self::exactly(2))
             ->method('warning')
             ->with(
                 self::stringStartsWith('Failed to send error log email notification:'),
@@ -107,13 +100,11 @@ class ErrorLogNotificationHandlerWrapperTest extends \PHPUnit\Framework\TestCase
 
     public function testHandleWhenNoRecipients(): void
     {
-        $this->recipientsProvider
-            ->expects(self::once())
+        $this->recipientsProvider->expects(self::once())
             ->method('getRecipientsEmailAddresses')
             ->willReturn([]);
 
-        $this->innerHandler
-            ->expects(self::never())
+        $this->innerHandler->expects(self::never())
             ->method(self::anything());
 
         $this->handlerWrapper->handle([]);
@@ -124,14 +115,12 @@ class ErrorLogNotificationHandlerWrapperTest extends \PHPUnit\Framework\TestCase
 
     public function testHandleWhenHasRecipients(): void
     {
-        $this->recipientsProvider
-            ->expects(self::once())
+        $this->recipientsProvider->expects(self::once())
             ->method('getRecipientsEmailAddresses')
             ->willReturn(['to@example.org']);
 
         $record = ['sample_record'];
-        $this->innerHandler
-            ->expects(self::atLeastOnce())
+        $this->innerHandler->expects(self::atLeastOnce())
             ->method('handle')
             ->with($record);
 
@@ -146,20 +135,17 @@ class ErrorLogNotificationHandlerWrapperTest extends \PHPUnit\Framework\TestCase
      */
     public function testHandleLogsWarningWhenCannotSendEmail(\Throwable $throwable): void
     {
-        $this->recipientsProvider
-            ->expects(self::once())
+        $this->recipientsProvider->expects(self::once())
             ->method('getRecipientsEmailAddresses')
             ->willReturn(['to@example.org']);
 
         $record = ['sample_record'];
-        $this->innerHandler
-            ->expects(self::atLeastOnce())
+        $this->innerHandler->expects(self::atLeastOnce())
             ->method('handle')
             ->with($record)
             ->willThrowException($throwable);
 
-        $this->loggerMock
-            ->expects(self::exactly(2))
+        $this->loggerMock->expects(self::exactly(2))
             ->method('warning')
             ->with(
                 self::stringStartsWith('Failed to send error log email notification:'),
@@ -174,14 +160,12 @@ class ErrorLogNotificationHandlerWrapperTest extends \PHPUnit\Framework\TestCase
 
     public function testIsHandlingWhenHandleAndNoRecipients(): void
     {
-        $this->recipientsProvider
-            ->expects(self::once())
+        $this->recipientsProvider->expects(self::once())
             ->method('getRecipientsEmailAddresses')
             ->willReturn([]);
 
         $record = ['sample_record'];
-        $this->innerHandler
-            ->expects(self::atLeastOnce())
+        $this->innerHandler->expects(self::atLeastOnce())
             ->method('isHandling')
             ->with($record)
             ->willReturn(true);
@@ -194,14 +178,12 @@ class ErrorLogNotificationHandlerWrapperTest extends \PHPUnit\Framework\TestCase
 
     public function testIsHandlingWhenHandleAndHasRecipients(): void
     {
-        $this->recipientsProvider
-            ->expects(self::once())
+        $this->recipientsProvider->expects(self::once())
             ->method('getRecipientsEmailAddresses')
             ->willReturn(['to@example.org']);
 
         $record = ['sample_record'];
-        $this->innerHandler
-            ->expects(self::atLeastOnce())
+        $this->innerHandler->expects(self::atLeastOnce())
             ->method('isHandling')
             ->with($record)
             ->willReturn(true);
@@ -214,13 +196,11 @@ class ErrorLogNotificationHandlerWrapperTest extends \PHPUnit\Framework\TestCase
 
     public function testIsHandlingWhenNotHandle(): void
     {
-        $this->recipientsProvider
-            ->expects(self::never())
+        $this->recipientsProvider->expects(self::never())
             ->method('getRecipientsEmailAddresses');
 
         $record = ['sample_record'];
-        $this->innerHandler
-            ->expects(self::once())
+        $this->innerHandler->expects(self::once())
             ->method('isHandling')
             ->with($record)
             ->willReturn(false);

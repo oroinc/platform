@@ -36,6 +36,7 @@ use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
 use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -46,11 +47,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OrmDatasourceExtensionTest extends OrmTestCase
 {
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
-
-    /** @var FormFactoryInterface */
-    private $formFactory;
+    private LocaleSettings&MockObject $localeSettings;
+    private FormFactoryInterface $formFactory;
 
     #[\Override]
     protected function setUp(): void

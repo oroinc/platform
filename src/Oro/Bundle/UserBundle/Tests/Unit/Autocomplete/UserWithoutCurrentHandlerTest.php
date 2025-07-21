@@ -26,20 +26,11 @@ class UserWithoutCurrentHandlerTest extends TestCase
 {
     private const NAME = User::class;
 
-    /** @var TokenAccessorInterface|MockObject */
-    private $tokenAccessor;
-
-    /** @var Indexer|MockObject */
-    private $indexer;
-
-    /** @var EntityRepository|MockObject */
-    private $repository;
-
-    /** @var AclHelper|MockObject */
-    private $aclHelper;
-
-    /** @var UserWithoutCurrentHandler */
-    private $handler;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private Indexer&MockObject $indexer;
+    private EntityRepository&MockObject $repository;
+    private AclHelper&MockObject $aclHelper;
+    private UserWithoutCurrentHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -91,7 +82,7 @@ class UserWithoutCurrentHandlerTest extends TestCase
     /**
      * @dataProvider searchIdsDataProvider
      */
-    public function testSearchIds(int $pageSize, int $currentUserId, array $foundUsers, array $expectedUsers)
+    public function testSearchIds(int $pageSize, int $currentUserId, array $foundUsers, array $expectedUsers): void
     {
         $string = 'qwerty';
         $page = 0;

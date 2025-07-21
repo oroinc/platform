@@ -76,19 +76,26 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
         );
         $chunkProcessor->setLogger($logger);
 
-        $logger->expects($this->never())->method('log');
+        $logger->expects($this->never())
+            ->method('log');
         $processResult = $chunkProcessor->process($message, $session);
         $this->assertEquals(AuditChangedEntitiesInverseCollectionsChunkProcessor::ACK, $processResult);
 
-        $logger->expects($this->once())->method('warning');
+        $logger->expects($this->once())
+            ->method('warning');
         $exception = new WrongDataAuditEntryStateException((new Audit())->setObjectName('ObjectName'));
-        $converter->method('convert')->willThrowException($exception);
+        $converter->expects(self::any())
+            ->method('convert')
+            ->willThrowException($exception);
 
         $processResult = $chunkProcessor->process($message, $session);
         $this->assertEquals(AuditChangedEntitiesInverseCollectionsChunkProcessor::REQUEUE, $processResult);
 
-        $logger->expects($this->once())->method('error');
-        $converter->method('convert')->willThrowException(new \Exception('exception'));
+        $logger->expects($this->once())
+            ->method('error');
+        $converter->expects(self::any())
+            ->method('convert')
+            ->willThrowException(new \Exception('exception'));
         $processResult = $chunkProcessor->process($message, $session);
         $this->assertEquals(AuditChangedEntitiesInverseCollectionsChunkProcessor::REJECT, $processResult);
     }

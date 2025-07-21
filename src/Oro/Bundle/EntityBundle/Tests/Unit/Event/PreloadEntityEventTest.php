@@ -3,8 +3,9 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityBundle\Event\PreloadEntityEvent;
+use PHPUnit\Framework\TestCase;
 
-class PreloadEntityEventTest extends \PHPUnit\Framework\TestCase
+class PreloadEntityEventTest extends TestCase
 {
     public function testAccessors(): void
     {

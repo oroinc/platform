@@ -5,11 +5,11 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\ConfigExpression;
 use Oro\Bundle\LayoutBundle\ConfigExpression\GetContextValue;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
-class GetContextValueTest extends \PHPUnit\Framework\TestCase
+class GetContextValueTest extends TestCase
 {
-    /** @var GetContextValue */
-    private $function;
+    private GetContextValue $function;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +21,7 @@ class GetContextValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, array $context, string $expectedResult)
+    public function testEvaluate(array $options, array $context, string $expectedResult): void
     {
         $this->assertSame($this->function, $this->function->initialize($options));
         $this->assertEquals($expectedResult, $this->function->evaluate($context));
@@ -53,7 +53,7 @@ class GetContextValueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testInitializeFailsWhenEmptyOptions()
+    public function testInitializeFailsWhenEmptyOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 or 2 elements, but 0 given.');
@@ -61,7 +61,7 @@ class GetContextValueTest extends \PHPUnit\Framework\TestCase
         $this->function->initialize([]);
     }
 
-    public function testInitializeFailsWhenTooManyOptions()
+    public function testInitializeFailsWhenTooManyOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 or 2 elements, but 3 given.');
@@ -69,7 +69,7 @@ class GetContextValueTest extends \PHPUnit\Framework\TestCase
         $this->function->initialize([1, 2, 3]);
     }
 
-    public function testInitializeFailsWhenFirstOptionIsNotString()
+    public function testInitializeFailsWhenFirstOptionIsNotString(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The first option should be a string, but integer given.');
@@ -80,7 +80,7 @@ class GetContextValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray(array $options, ?string $message, array $expected)
+    public function testToArray(array $options, ?string $message, array $expected): void
     {
         $this->function->initialize($options);
         if ($message !== null) {
@@ -134,7 +134,7 @@ class GetContextValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile(array $options, ?string $message, string $expected)
+    public function testCompile(array $options, ?string $message, string $expected): void
     {
         $this->function->initialize($options);
         if ($message !== null) {

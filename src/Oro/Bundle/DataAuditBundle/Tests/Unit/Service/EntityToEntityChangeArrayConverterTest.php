@@ -11,14 +11,13 @@ use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 use Oro\Bundle\DataAuditBundle\Provider\AuditFieldTypeProvider;
 use Oro\Bundle\DataAuditBundle\Service\EntityToEntityChangeArrayConverter;
 use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\EntityAdditionalFields;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
+class EntityToEntityChangeArrayConverterTest extends TestCase
 {
-    /** @var AuditFieldTypeProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $provider;
-
-    /** @var EntityToEntityChangeArrayConverter */
-    private $converter;
+    private AuditFieldTypeProvider&MockObject $provider;
+    private EntityToEntityChangeArrayConverter $converter;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +34,7 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider entityConversionDataProvider
      */
-    public function testEntityConversionToArray(array $changeSet, array $expectedChangeSet)
+    public function testEntityConversionToArray(array $changeSet, array $expectedChangeSet): void
     {
         $metadataFactory = $this->createMock(ClassMetadataFactory::class);
         $metadataFactory->expects($this->any())
@@ -68,7 +67,7 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider additionalFieldsDataProvider
      */
-    public function testAdditionalFieldsAddedIfEntityHasThem(array $fields, array $expectedFields)
+    public function testAdditionalFieldsAddedIfEntityHasThem(array $fields, array $expectedFields): void
     {
         $metadataFactory = $this->createMock(ClassMetadataFactory::class);
         $metadataFactory->expects($this->any())
@@ -86,7 +85,7 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedFields, $converted['additional_fields']);
     }
 
-    public function testConvertCollection()
+    public function testConvertCollection(): void
     {
         $metadataFactory = $this->createMock(ClassMetadataFactory::class);
         $metadataFactory->expects($this->any())
@@ -131,7 +130,7 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEmptyAdditionalFieldsWhenEntityDoesNotHaveAny()
+    public function testEmptyAdditionalFieldsWhenEntityDoesNotHaveAny(): void
     {
         $em = $this->getEntityManager();
 
@@ -140,7 +139,7 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayNotHasKey('additional_fields', $converted);
     }
 
-    public function testEmptyAdditionalFieldsWhenEntityDoesNotImplementInterface()
+    public function testEmptyAdditionalFieldsWhenEntityDoesNotImplementInterface(): void
     {
         $em = $this->getEntityManager();
 
@@ -191,10 +190,7 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getEntityManager()
+    private function getEntityManager(): EntityManagerInterface&MockObject
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->any())

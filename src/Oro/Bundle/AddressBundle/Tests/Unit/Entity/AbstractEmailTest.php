@@ -3,11 +3,11 @@
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractEmail;
+use PHPUnit\Framework\TestCase;
 
-class AbstractEmailTest extends \PHPUnit\Framework\TestCase
+class AbstractEmailTest extends TestCase
 {
-    /** @var AbstractEmail */
-    private $email;
+    private AbstractEmail $email;
 
     #[\Override]
     protected function setUp(): void
@@ -15,42 +15,42 @@ class AbstractEmailTest extends \PHPUnit\Framework\TestCase
         $this->email = $this->createEmail();
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $this->email = $this->createEmail('email@example.com');
 
         $this->assertEquals('email@example.com', $this->email->getEmail());
     }
 
-    public function testId()
+    public function testId(): void
     {
         $this->assertNull($this->email->getId());
         $this->email->setId(100);
         $this->assertEquals(100, $this->email->getId());
     }
 
-    public function testEmail()
+    public function testEmail(): void
     {
         $this->assertNull($this->email->getEmail());
         $this->email->setEmail('email@example.com');
         $this->assertEquals('email@example.com', $this->email->getEmail());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertEquals('', (string)$this->email);
         $this->email->setEmail('email@example.com');
         $this->assertEquals('email@example.com', (string)$this->email);
     }
 
-    public function testPrimary()
+    public function testPrimary(): void
     {
         $this->assertFalse($this->email->isPrimary());
         $this->email->setPrimary(true);
         $this->assertTrue($this->email->isPrimary());
     }
 
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $this->assertTrue($this->createEmail()->isEmpty());
         $this->assertFalse($this->createEmail('foo@example.com')->isEmpty());
@@ -59,7 +59,7 @@ class AbstractEmailTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isEqualDataProvider
      */
-    public function testIsEqual(AbstractEmail $first, ?AbstractEmail $second, bool $expectedResult)
+    public function testIsEqual(AbstractEmail $first, ?AbstractEmail $second, bool $expectedResult): void
     {
         $this->assertEquals($expectedResult, $first->isEqual($second));
     }

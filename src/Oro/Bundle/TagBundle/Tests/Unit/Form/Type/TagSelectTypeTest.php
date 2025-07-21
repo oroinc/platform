@@ -5,23 +5,18 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber;
 use Oro\Bundle\TagBundle\Form\Transformer\TagTransformer;
 use Oro\Bundle\TagBundle\Form\Type\TagSelectType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class TagSelectTypeTest extends \PHPUnit\Framework\TestCase
+class TagSelectTypeTest extends TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TagTransformer|\PHPUnit\Framework\MockObject\MockObject */
-    private $transformer;
-
-    /** @var TagSubscriber|\PHPUnit\Framework\MockObject\MockObject */
-    private $subscriber;
-
-    /** @var TagSelectType */
-    private $type;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TagTransformer&MockObject $transformer;
+    private TagSubscriber&MockObject $subscriber;
+    private TagSelectType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +28,7 @@ class TagSelectTypeTest extends \PHPUnit\Framework\TestCase
         $this->type = new TagSelectType($this->authorizationChecker, $this->transformer, $this->subscriber);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
@@ -43,7 +38,7 @@ class TagSelectTypeTest extends \PHPUnit\Framework\TestCase
         $this->type->configureOptions($resolver);
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->once())

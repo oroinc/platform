@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class ActionGroupEventTest extends TestCase
 {
-    public function testEventMinimal()
+    public function testEventMinimal(): void
     {
         $data = new ActionData();
         $definition = new ActionGroupDefinition();
@@ -21,7 +21,7 @@ class ActionGroupEventTest extends TestCase
         $this->assertNull($event->getErrors());
     }
 
-    public function testEventFull()
+    public function testEventFull(): void
     {
         $errors = new ArrayCollection();
         $data = new ActionData();

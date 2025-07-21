@@ -21,7 +21,7 @@ class ChainConfigurationProviderTest extends TestCase
         $this->chainConfigurationProvider = new ChainConfigurationProvider([$this->configurationProvider]);
     }
 
-    public function testIsApplicable()
+    public function testIsApplicable(): void
     {
         self::assertTrue($this->chainConfigurationProvider->isApplicable('test_grid'));
     }
@@ -41,14 +41,12 @@ class ChainConfigurationProviderTest extends TestCase
             PropertyAccess::createPropertyAccessorWithDotSyntax()
         );
 
-        $this->configurationProvider
-            ->expects(self::once())
+        $this->configurationProvider->expects(self::once())
             ->method('isApplicable')
             ->with($gridName)
             ->willReturn(true);
 
-        $this->configurationProvider
-            ->expects(self::once())
+        $this->configurationProvider->expects(self::once())
             ->method('getConfiguration')
             ->with($gridName)
             ->willReturn($config);
@@ -66,14 +64,12 @@ class ChainConfigurationProviderTest extends TestCase
             PropertyAccess::createPropertyAccessorWithDotSyntax()
         );
 
-        $this->configurationProvider
-            ->expects(self::once())
+        $this->configurationProvider->expects(self::once())
             ->method('isApplicable')
             ->with($gridName)
             ->willReturn(false);
 
-        $this->configurationProvider
-            ->expects(self::never())
+        $this->configurationProvider->expects(self::never())
             ->method('getConfiguration')
             ->with($gridName)
             ->willReturn($config);
@@ -87,14 +83,12 @@ class ChainConfigurationProviderTest extends TestCase
     /** @dataProvider configDataProvider */
     public function testIsValidConfiguration(string $gridName, bool $isApplicable, bool $isValid, bool $expected): void
     {
-        $this->configurationProvider
-            ->expects(self::any())
+        $this->configurationProvider->expects(self::any())
             ->method('isApplicable')
             ->with($gridName)
             ->willReturn($isApplicable);
 
-        $this->configurationProvider
-            ->expects(self::any())
+        $this->configurationProvider->expects(self::any())
             ->method('isValidConfiguration')
             ->with($gridName)
             ->willReturn($isValid);

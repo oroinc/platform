@@ -7,11 +7,12 @@ use Oro\Bundle\NavigationBundle\MenuUpdate\Applier\Model\MenuUpdateApplierContex
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MenuUpdateApplierContextTest extends \PHPUnit\Framework\TestCase
+class MenuUpdateApplierContextTest extends TestCase
 {
     use MenuItemTestTrait;
 

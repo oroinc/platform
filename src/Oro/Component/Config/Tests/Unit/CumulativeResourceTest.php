@@ -10,10 +10,11 @@ use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle2\TestBundle2;
+use PHPUnit\Framework\TestCase;
 
-class CumulativeResourceTest extends \PHPUnit\Framework\TestCase
+class CumulativeResourceTest extends TestCase
 {
-    public function testResource()
+    public function testResource(): void
     {
         $resource = new CumulativeResource('test', new CumulativeResourceLoaderCollection());
         $resource->addFound('bundle', 'path');
@@ -24,7 +25,7 @@ class CumulativeResourceTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($resource->isFound('bundle1', 'path'));
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $resource = new CumulativeResource(
             'test',
@@ -49,7 +50,7 @@ class CumulativeResourceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($resource, $unserializedResource);
     }
 
-    public function testIsFreshShouldBeCachedIfTimestampWasNotChanged()
+    public function testIsFreshShouldBeCachedIfTimestampWasNotChanged(): void
     {
         $bundle = new TestBundle1();
 
@@ -72,7 +73,7 @@ class CumulativeResourceTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($resource->isFresh(100));
     }
 
-    public function testIsFreshShouldBeRecheckedIfTimestampChanged()
+    public function testIsFreshShouldBeRecheckedIfTimestampChanged(): void
     {
         $bundle = new TestBundle1();
 
@@ -95,7 +96,7 @@ class CumulativeResourceTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($resource->isFresh(200));
     }
 
-    public function testIsFreshAllResourcesAreUpToDate()
+    public function testIsFreshAllResourcesAreUpToDate(): void
     {
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();
@@ -128,7 +129,7 @@ class CumulativeResourceTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($resource2->isFresh(100));
     }
 
-    public function testIsFreshResource1ForBundle2IsNotUpToDate()
+    public function testIsFreshResource1ForBundle2IsNotUpToDate(): void
     {
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();

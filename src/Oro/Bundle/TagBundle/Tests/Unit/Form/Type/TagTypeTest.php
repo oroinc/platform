@@ -3,13 +3,13 @@
 namespace Oro\Bundle\TagBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\TagBundle\Form\Type\TagType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class TagTypeTest extends \PHPUnit\Framework\TestCase
+class TagTypeTest extends TestCase
 {
-    /** @var TagType */
-    private $type;
+    private TagType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +17,7 @@ class TagTypeTest extends \PHPUnit\Framework\TestCase
         $this->type = new TagType();
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
@@ -27,7 +27,7 @@ class TagTypeTest extends \PHPUnit\Framework\TestCase
         $this->type->configureOptions($resolver);
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->exactly(2))

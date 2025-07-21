@@ -7,14 +7,13 @@ use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DQLNameFormatterTest extends \PHPUnit\Framework\TestCase
+class DQLNameFormatterTest extends TestCase
 {
-    /** @var NameFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    private $nameFormatter;
-
-    /** @var DQLNameFormatter */
-    private $formatter;
+    private NameFormatter&MockObject $nameFormatter;
+    private DQLNameFormatter $formatter;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class DQLNameFormatterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider metadataProvider
      */
-    public function testGetFormattedNameDQL(string $expectedDQL, string $nameFormat, object $className)
+    public function testGetFormattedNameDQL(string $expectedDQL, string $nameFormat, object $className): void
     {
         $this->nameFormatter->expects($this->once())
             ->method('getNameFormat')
@@ -104,7 +103,7 @@ class DQLNameFormatterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider suggestedFieldNamesDataProvider
      */
-    public function testGetSuggestedFieldNames(string|object $class, array $expected)
+    public function testGetSuggestedFieldNames(string|object $class, array $expected): void
     {
         $this->assertEquals($expected, $this->formatter->getSuggestedFieldNames($class));
     }

@@ -9,20 +9,15 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\UIBundle\Provider\UserAgent;
 use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class RestrictionManagerTest extends \PHPUnit\Framework\TestCase
+class RestrictionManagerTest extends TestCase
 {
-    /** @var UserAgentProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $userAgentProvider;
-
-    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowRegistry;
-
-    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassResolver;
-
-    /** @var RestrictionManager */
-    private $manager;
+    private UserAgentProvider&MockObject $userAgentProvider;
+    private WorkflowRegistry&MockObject $workflowRegistry;
+    private EntityClassResolver&MockObject $entityClassResolver;
+    private RestrictionManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +33,7 @@ class RestrictionManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBoardViewEnabledDesktopAndNoWorkflow()
+    public function testBoardViewEnabledDesktopAndNoWorkflow(): void
     {
         $config = DatagridConfiguration::create([
             'source' => [
@@ -71,7 +66,7 @@ class RestrictionManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->manager->boardViewEnabled($config));
     }
 
-    public function testBoardViewEnabledMobile()
+    public function testBoardViewEnabledMobile(): void
     {
         $config = DatagridConfiguration::create([
             'source' => [

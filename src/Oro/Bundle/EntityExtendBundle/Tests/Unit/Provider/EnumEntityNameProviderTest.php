@@ -6,11 +6,11 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumEntityNameProvider;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
+use PHPUnit\Framework\TestCase;
 
-class EnumEntityNameProviderTest extends \PHPUnit\Framework\TestCase
+class EnumEntityNameProviderTest extends TestCase
 {
-    /** @var EnumEntityNameProvider */
-    private $enumEntityNameProvider;
+    private EnumEntityNameProvider $enumEntityNameProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +21,7 @@ class EnumEntityNameProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getNameProvider
      */
-    public function testGetName(array $args, $expectedValue)
+    public function testGetName(array $args, $expectedValue): void
     {
         $this->assertSame(
             $expectedValue,
@@ -70,7 +70,7 @@ class EnumEntityNameProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getNameDQLProvider
      */
-    public function testGetNameDQL(array $args, $expectedValue)
+    public function testGetNameDQL(array $args, $expectedValue): void
     {
         $this->assertSame(
             $expectedValue,

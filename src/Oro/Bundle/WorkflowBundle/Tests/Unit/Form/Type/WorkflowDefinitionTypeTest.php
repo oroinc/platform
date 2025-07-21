@@ -13,17 +13,15 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type\Stub\ApplicableEntitiesTypeSt
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type\Stub\OroIconTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
 {
-    /** @var WorkflowDefinitionChoicesGroupProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $choicesProvider;
-
-    /** @var WorkflowDefinitionType */
-    private $formType;
+    private WorkflowDefinitionChoicesGroupProvider&MockObject $choicesProvider;
+    private WorkflowDefinitionType $formType;
 
     #[\Override]
     protected function setUp(): void

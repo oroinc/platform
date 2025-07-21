@@ -6,20 +6,17 @@ use Oro\Component\Action\Action\ActionAssembler;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\Configurable;
 use Oro\Component\ConfigExpression\ExpressionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigurableTest extends \PHPUnit\Framework\TestCase
+class ConfigurableTest extends TestCase
 {
     private array $testConfiguration = ['key' => 'value'];
     private array $testContext = [1, 2, 3];
 
-    /** @var ActionAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    private $assembler;
-
-    /** @var ActionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dummyAction;
-
-    /** @var Configurable */
-    private $configurableAction;
+    private ActionAssembler&MockObject $assembler;
+    private ActionInterface&MockObject $dummyAction;
+    private Configurable $configurableAction;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +30,7 @@ class ConfigurableTest extends \PHPUnit\Framework\TestCase
         $this->configurableAction = new Configurable($this->assembler);
     }
 
-    public function testWithoutInitializeUsedEmptyConfigurationForAssembling()
+    public function testWithoutInitializeUsedEmptyConfigurationForAssembling(): void
     {
         $this->assembler->expects(self::once())
             ->method('assemble')
@@ -42,7 +39,7 @@ class ConfigurableTest extends \PHPUnit\Framework\TestCase
 
         $this->configurableAction->execute($this->testContext);
     }
-    public function testInitializeSetsConfigurationUsedForAssembling()
+    public function testInitializeSetsConfigurationUsedForAssembling(): void
     {
         $this->assembler->expects(self::once())
             ->method('assemble')
@@ -53,7 +50,7 @@ class ConfigurableTest extends \PHPUnit\Framework\TestCase
         $this->configurableAction->execute($this->testContext);
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $this->dummyAction->expects(self::exactly(2))
             ->method('execute')

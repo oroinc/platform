@@ -6,9 +6,10 @@ use Oro\Bundle\LayoutBundle\Cache\PlaceholderRenderer;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Bundle\LayoutBundle\Layout\TwigLayoutRenderer;
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
+use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 
-class TwigLayoutRendererTest extends \PHPUnit\Framework\TestCase
+class TwigLayoutRendererTest extends TestCase
 {
     public function testEnvironmentSet(): void
     {

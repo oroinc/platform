@@ -5,17 +5,15 @@ namespace Oro\Bundle\SoapBundle\Tests\Unit\Handler;
 use Oro\Bundle\SoapBundle\Handler\Context;
 use Oro\Bundle\SoapBundle\Handler\DelegateIncludeHandler;
 use Oro\Bundle\SoapBundle\Handler\IncludeHandlerInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class DelegateIncludeHandlerTest extends \PHPUnit\Framework\TestCase
+class DelegateIncludeHandlerTest extends TestCase
 {
-    /** @var Container */
-    private $container;
-
-    /** @var DelegateIncludeHandler */
-    private $handler;
+    private Container $container;
+    private DelegateIncludeHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -30,12 +28,12 @@ class DelegateIncludeHandlerTest extends \PHPUnit\Framework\TestCase
         return new Context(new \stdClass(), new Request(), new Response(), 'test_action', []);
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $this->assertTrue($this->handler->supports($this->createContext()));
     }
 
-    public function testUnknownIncludes()
+    public function testUnknownIncludes(): void
     {
         $testUnsupported = implode(IncludeHandlerInterface::DELIMITER, ['include1', 'include2']);
 
@@ -51,7 +49,7 @@ class DelegateIncludeHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($testUnsupported, $response->headers->get(IncludeHandlerInterface::HEADER_UNKNOWN));
     }
 
-    public function testUnsupportedIncludes()
+    public function testUnsupportedIncludes(): void
     {
         $includeName = 'lastModified';
         $context = $this->createContext();
@@ -76,7 +74,7 @@ class DelegateIncludeHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($includeName, $response->headers->get(IncludeHandlerInterface::HEADER_UNSUPPORTED));
     }
 
-    public function testSupportedIncludes()
+    public function testSupportedIncludes(): void
     {
         $includeName = 'lastModified';
         $context = $this->createContext();

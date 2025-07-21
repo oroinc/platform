@@ -5,17 +5,13 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Event;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
+use PHPUnit\Framework\TestCase;
 
-class StrategyEventTest extends \PHPUnit\Framework\TestCase
+class StrategyEventTest extends TestCase
 {
-    /** @var StrategyInterface */
-    private $strategy;
-
-    /** @var \stdClass */
-    private $entity;
-
-    /** @var StrategyEvent */
-    private $event;
+    private StrategyInterface $strategy;
+    private \stdClass $entity;
+    private StrategyEvent $event;
 
     #[\Override]
     protected function setUp(): void
@@ -29,12 +25,12 @@ class StrategyEventTest extends \PHPUnit\Framework\TestCase
         $this->event = new StrategyEvent($this->strategy, $this->entity, $context);
     }
 
-    public function testGetStrategy()
+    public function testGetStrategy(): void
     {
         $this->assertEquals($this->strategy, $this->event->getStrategy());
     }
 
-    public function testSetGetEntity()
+    public function testSetGetEntity(): void
     {
         $this->assertEquals($this->entity, $this->event->getEntity());
 

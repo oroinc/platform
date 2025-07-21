@@ -6,11 +6,11 @@ use Oro\Bundle\AddressBundle\Entity\AddressType;
 use Oro\Bundle\AddressBundle\ImportExport\TemplateFixture\AddressTypeFixture;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
+use PHPUnit\Framework\TestCase;
 
-class AddressTypeFixtureTest extends \PHPUnit\Framework\TestCase
+class AddressTypeFixtureTest extends TestCase
 {
-    /** @var AddressTypeFixture */
-    private $fixture;
+    private AddressTypeFixture $fixture;
 
     #[\Override]
     protected function setUp(): void
@@ -18,12 +18,12 @@ class AddressTypeFixtureTest extends \PHPUnit\Framework\TestCase
         $this->fixture = new AddressTypeFixture();
     }
 
-    public function testGetEntityClass()
+    public function testGetEntityClass(): void
     {
         $this->assertEquals(AddressType::class, $this->fixture->getEntityClass());
     }
 
-    public function testCreateEntity()
+    public function testCreateEntity(): void
     {
         $entityRegistry = new TemplateEntityRegistry();
         $templateManager = new TemplateManager($entityRegistry);
@@ -33,7 +33,7 @@ class AddressTypeFixtureTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(new AddressType($type), $this->fixture->getEntity($type));
     }
 
-    public function testFillEntityData()
+    public function testFillEntityData(): void
     {
         $type = AddressType::TYPE_BILLING;
         $addressType = new AddressType($type);

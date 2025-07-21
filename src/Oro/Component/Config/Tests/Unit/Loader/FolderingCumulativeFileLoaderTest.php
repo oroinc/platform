@@ -9,8 +9,9 @@ use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
+class FolderingCumulativeFileLoaderTest extends TestCase
 {
     use TempDirExtension;
 
@@ -28,7 +29,7 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $bundleClass = TestBundle1::class;
         $bundleDir = $this->bundleDir;
@@ -62,7 +63,7 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRegisterResource()
+    public function testRegisterResource(): void
     {
         $bundleClass = TestBundle1::class;
         $bundleDir = $this->bundleDir;
@@ -84,7 +85,7 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsResourceFreshNoChanges()
+    public function testIsResourceFreshNoChanges(): void
     {
         $bundleClass = TestBundle1::class;
         $bundleDir = $this->bundleDir;
@@ -101,7 +102,7 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
     }
 
-    public function testIsResourceFreshNoChangesWithFewLoaders()
+    public function testIsResourceFreshNoChangesWithFewLoaders(): void
     {
         $bundleClass = TestBundle1::class;
         $bundleDir = $this->bundleDir;
@@ -128,7 +129,7 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($loader2->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
     }
 
-    public function testIsResourceFreshExistingFileWasChanged()
+    public function testIsResourceFreshExistingFileWasChanged(): void
     {
         $bundleClass = TestBundle1::class;
         $bundleDir = $this->bundleDir;
@@ -145,7 +146,7 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
     }
 
-    public function testIsResourceFreshNewFileWasAdded()
+    public function testIsResourceFreshNewFileWasAdded(): void
     {
         $relativeFilePath = 'Resources/config/tmp/test.yml';
 
@@ -170,7 +171,7 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($result);
     }
 
-    public function testIsResourceFreshNewFileWasDeleted()
+    public function testIsResourceFreshNewFileWasDeleted(): void
     {
         $relativeFilePath = 'Resources/config/tmp/test.yml';
 
@@ -194,7 +195,7 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
     }
 
-    public function testIsResourceFreshException()
+    public function testIsResourceFreshException(): void
     {
         $bundleClass = TestBundle1::class;
         $bundleDir = $this->bundleDir;

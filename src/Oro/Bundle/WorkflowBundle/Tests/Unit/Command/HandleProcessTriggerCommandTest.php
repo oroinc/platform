@@ -14,25 +14,15 @@ use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Input\Input;
 use Symfony\Component\Console\Input\InputInterface;
 
 class HandleProcessTriggerCommandTest extends TestCase
 {
-    /** @var ProcessHandler|MockObject */
-    private $processHandler;
-
-    /** @var EntityRepository|MockObject */
-    private $repo;
-
-    /** @var Input|MockObject */
-    private $input;
-
-    /** @var OutputStub */
-    private $output;
-
-    /** @var HandleProcessTriggerCommand */
-    private $command;
+    private ProcessHandler&MockObject $processHandler;
+    private EntityRepository&MockObject $repo;
+    private InputInterface&MockObject $input;
+    private OutputStub $output;
+    private HandleProcessTriggerCommand $command;
 
     #[\Override]
     protected function setUp(): void
@@ -54,7 +44,7 @@ class HandleProcessTriggerCommandTest extends TestCase
         $this->command = new HandleProcessTriggerCommand($doctrine, $this->processHandler);
     }
 
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $this->command->configure();
 
@@ -65,7 +55,7 @@ class HandleProcessTriggerCommandTest extends TestCase
     /**
      * @dataProvider executeProvider
      */
-    public function testExecute(int $id, array $expectedOutput, ?\Exception $exception = null)
+    public function testExecute(int $id, array $expectedOutput, ?\Exception $exception = null): void
     {
         $this->input->expects($this->exactly(2))
             ->method('getOption')
@@ -150,7 +140,7 @@ class HandleProcessTriggerCommandTest extends TestCase
         ];
     }
 
-    public function testExecuteEmptyIdError()
+    public function testExecuteEmptyIdError(): void
     {
         $this->input->expects($this->exactly(2))
             ->method('getOption')
@@ -167,7 +157,7 @@ class HandleProcessTriggerCommandTest extends TestCase
         self::assertEquals("Process trigger not found\n", $this->output->getOutput());
     }
 
-    public function testExecuteEmptyNoIdSpecified()
+    public function testExecuteEmptyNoIdSpecified(): void
     {
         $this->input->expects($this->exactly(2))
             ->method('getOption')
@@ -184,7 +174,7 @@ class HandleProcessTriggerCommandTest extends TestCase
         self::assertEquals("No process trigger identifier defined\n", $this->output->getOutput());
     }
 
-    public function testExecuteWrongNameSpecified()
+    public function testExecuteWrongNameSpecified(): void
     {
         $id = 1;
         $this->input->expects($this->exactly(2))

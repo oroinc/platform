@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Event;
 
 use Oro\Bundle\ActivityListBundle\Event\ActivityListPreQueryBuildEvent;
+use PHPUnit\Framework\TestCase;
 
-class ActivityListPreQueryBuildEventTest extends \PHPUnit\Framework\TestCase
+class ActivityListPreQueryBuildEventTest extends TestCase
 {
-    public function testEvent()
+    public function testEvent(): void
     {
         $targetClass = 'testClass';
         $targetId = 1;

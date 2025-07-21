@@ -5,8 +5,9 @@ namespace Oro\Bundle\DraftBundle\Tests\Unit\Duplicator\Filter;
 use Oro\Bundle\DraftBundle\Duplicator\Filter\DateTimeFilter;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\TestCase;
 
-class DateTimeFilterTest extends \PHPUnit\Framework\TestCase
+class DateTimeFilterTest extends TestCase
 {
     use EntityTrait;
 

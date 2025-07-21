@@ -13,26 +13,21 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class AuditManagerTest extends \PHPUnit\Framework\TestCase
+class AuditManagerTest extends TestCase
 {
     private const SCOPE = 'testScope';
     private const ENTITY_CLASS = 'Test\Entity';
 
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var AuditManager */
-    private $auditManager;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private ConfigManager&MockObject $configManager;
+    private EntityManagerInterface&MockObject $em;
+    private AuditManager $auditManager;
 
     #[\Override]
     protected function setUp(): void
@@ -50,7 +45,7 @@ class AuditManagerTest extends \PHPUnit\Framework\TestCase
         $this->auditManager = new AuditManager($this->tokenStorage, $doctrine);
     }
 
-    public function testBuildEntity()
+    public function testBuildEntity(): void
     {
         $user = $this->initSecurityContext();
 
@@ -78,7 +73,7 @@ class AuditManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(2, $result->getDiffs());
     }
 
-    public function testBuildEntityNoChanges()
+    public function testBuildEntityNoChanges(): void
     {
         $this->initSecurityContext();
 
@@ -89,7 +84,7 @@ class AuditManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->auditManager->buildEntity($this->configManager));
     }
 
-    public function testBuildEntityWithoutSecurityToken()
+    public function testBuildEntityWithoutSecurityToken(): void
     {
         $this->tokenStorage->expects($this->any())
             ->method('getToken')
@@ -100,7 +95,7 @@ class AuditManagerTest extends \PHPUnit\Framework\TestCase
         $this->auditManager->buildEntity($this->configManager);
     }
 
-    public function testBuildEntityWithUnsupportedSecurityToken()
+    public function testBuildEntityWithUnsupportedSecurityToken(): void
     {
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())

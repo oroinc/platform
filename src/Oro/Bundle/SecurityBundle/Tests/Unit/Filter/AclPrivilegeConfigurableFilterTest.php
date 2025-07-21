@@ -8,10 +8,11 @@ use Oro\Bundle\SecurityBundle\Filter\AclPrivilegeConfigurableFilter;
 use Oro\Bundle\SecurityBundle\Filter\AclPrivilegeConfigurableFilterInterface;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
+use PHPUnit\Framework\TestCase;
 
-class AclPrivilegeConfigurableFilterTest extends \PHPUnit\Framework\TestCase
+class AclPrivilegeConfigurableFilterTest extends TestCase
 {
-    public function testFilterWhenNoFilters()
+    public function testFilterWhenNoFilters(): void
     {
         $configurableName = 'test';
         $configurablePermission = $this->createMock(ConfigurablePermission::class);
@@ -33,7 +34,7 @@ class AclPrivilegeConfigurableFilterTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($aclPrivileges, $result);
     }
 
-    public function testFilterWhenNoFiltersThatSupportFiltering()
+    public function testFilterWhenNoFiltersThatSupportFiltering(): void
     {
         $configurableName = 'test';
         $configurablePermission = $this->createMock(ConfigurablePermission::class);
@@ -63,7 +64,7 @@ class AclPrivilegeConfigurableFilterTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($aclPrivileges, $result);
     }
 
-    public function testFilterWhenFiltersThatSupportFilteringExist()
+    public function testFilterWhenFiltersThatSupportFilteringExist(): void
     {
         $configurableName = 'test';
         $configurablePermission = $this->createMock(ConfigurablePermission::class);
@@ -95,7 +96,7 @@ class AclPrivilegeConfigurableFilterTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($aclPrivileges, $result);
     }
 
-    public function testFilterWhenFiltersThatSupportFilteringExistAndFilterReturnsFalse()
+    public function testFilterWhenFiltersThatSupportFilteringExistAndFilterReturnsFalse(): void
     {
         $configurableName = 'test';
         $configurablePermission = $this->createMock(ConfigurablePermission::class);

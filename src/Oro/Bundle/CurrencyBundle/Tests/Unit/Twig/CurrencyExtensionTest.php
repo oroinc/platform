@@ -8,16 +8,15 @@ use Oro\Bundle\CurrencyBundle\Tests\Unit\Utils\CurrencyNameHelperStub;
 use Oro\Bundle\CurrencyBundle\Twig\CurrencyExtension;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CurrencyExtensionTest extends \PHPUnit\Framework\TestCase
+class CurrencyExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|NumberFormatter */
-    private $formatter;
-
-    /** @var CurrencyExtension */
-    private $extension;
+    private NumberFormatter&MockObject $formatter;
+    private CurrencyExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +37,7 @@ class CurrencyExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider formatCurrencyDataProvider
      */
-    public function testFormatCurrency(Price $price, array $options, string $expected)
+    public function testFormatCurrency(Price $price, array $options, string $expected): void
     {
         $this->formatter->expects($this->once())
             ->method('formatCurrency')
@@ -74,7 +73,7 @@ class CurrencyExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetSymbolCollection()
+    public function testGetSymbolCollection(): void
     {
         $this->assertEquals(
             ['USD' => ['symbol' => '$'], 'EUR' => ['symbol' => '€']],

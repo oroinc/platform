@@ -4,8 +4,9 @@ namespace Oro\Bundle\DraftBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\DraftBundle\Provider\ChainDraftableFieldsExclusionProvider;
 use Oro\Bundle\DraftBundle\Provider\DraftableFieldsExclusionProviderInterface;
+use PHPUnit\Framework\TestCase;
 
-class ChainDraftableFieldsExclusionProviderTest extends \PHPUnit\Framework\TestCase
+class ChainDraftableFieldsExclusionProviderTest extends TestCase
 {
     public function testGetExcludedFieldsNoProviders(): void
     {

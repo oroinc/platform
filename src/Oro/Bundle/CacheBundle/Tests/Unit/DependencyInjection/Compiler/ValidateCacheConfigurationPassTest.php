@@ -4,12 +4,13 @@ namespace Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CacheConfigurationPass;
 use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\ValidateCacheConfigurationPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ValidateCacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
+class ValidateCacheConfigurationPassTest extends TestCase
 {
-    public function testAllCachesHaveNamespaces()
+    public function testAllCachesHaveNamespaces(): void
     {
         $container = new ContainerBuilder();
         $container->register('cache_provider_1')->addTag('cache.pool', ['namespace' => 'namespace1']);
@@ -22,7 +23,7 @@ class ValidateCacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $compiler->process($container);
     }
 
-    public function testSomeCacheDoesNotHaveNamespace()
+    public function testSomeCacheDoesNotHaveNamespace(): void
     {
         $container = new ContainerBuilder();
         $container->register('cache_provider_1')->addTag('cache.pool', ['namespace' => 'namespace1']);

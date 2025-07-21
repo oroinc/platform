@@ -6,17 +6,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\IntegrationBundle\ActionHandler\ChannelActionHandlerInterface;
 use Oro\Bundle\IntegrationBundle\ActionHandler\Decorator\ChannelActionHandlerTransactionDecorator;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChannelActionHandlerTransactionDecoratorTest extends \PHPUnit\Framework\TestCase
+class ChannelActionHandlerTransactionDecoratorTest extends TestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var ChannelActionHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $actionHandler;
-
-    /** @var ChannelActionHandlerTransactionDecorator */
-    private $decorator;
+    private EntityManagerInterface&MockObject $entityManager;
+    private ChannelActionHandlerInterface&MockObject $actionHandler;
+    private ChannelActionHandlerTransactionDecorator $decorator;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +27,7 @@ class ChannelActionHandlerTransactionDecoratorTest extends \PHPUnit\Framework\Te
         );
     }
 
-    public function testHandleActionWithError()
+    public function testHandleActionWithError(): void
     {
         $this->entityManager->expects(self::once())
             ->method('beginTransaction');
@@ -46,7 +43,7 @@ class ChannelActionHandlerTransactionDecoratorTest extends \PHPUnit\Framework\Te
         self::assertFalse($this->decorator->handleAction(new Channel()));
     }
 
-    public function testHandleActionWithNoError()
+    public function testHandleActionWithNoError(): void
     {
         $this->entityManager->expects(self::once())
             ->method('beginTransaction');

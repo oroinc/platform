@@ -15,6 +15,7 @@ use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethod
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodNameValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
@@ -25,11 +26,8 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
 {
     private const TEST_FIELD_NAME = 'testField';
 
-    /** @var ClassMethodNameChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $classMethodNameChecker;
-
-    /** @var FieldTypeHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldTypeHelper;
+    private ClassMethodNameChecker&MockObject $classMethodNameChecker;
+    private FieldTypeHelper&MockObject $fieldTypeHelper;
 
     #[\Override]
     protected function setUp(): void

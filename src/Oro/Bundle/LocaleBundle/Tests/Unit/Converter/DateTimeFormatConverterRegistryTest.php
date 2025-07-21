@@ -5,17 +5,14 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Converter;
 use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterInterface;
 use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterRegistry;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DateTimeFormatConverterRegistryTest extends \PHPUnit\Framework\TestCase
+class DateTimeFormatConverterRegistryTest extends TestCase
 {
-    /** @var DateTimeFormatConverterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $converter1;
-
-    /** @var DateTimeFormatConverterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $converter2;
-
-    /** @var DateTimeFormatConverterRegistry */
-    private $registry;
+    private DateTimeFormatConverterInterface&MockObject $converter1;
+    private DateTimeFormatConverterInterface&MockObject $converter2;
+    private DateTimeFormatConverterRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -34,13 +31,13 @@ class DateTimeFormatConverterRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFormatConverter()
+    public function testGetFormatConverter(): void
     {
         $this->assertSame($this->converter1, $this->registry->getFormatConverter('test1'));
         $this->assertSame($this->converter2, $this->registry->getFormatConverter('test2'));
     }
 
-    public function testGetFormatConverterWhenConverterNotExists()
+    public function testGetFormatConverterWhenConverterNotExists(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Format converter with name "not_existing" is not exist');
@@ -48,7 +45,7 @@ class DateTimeFormatConverterRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->getFormatConverter('not_existing');
     }
 
-    public function testGetFormatConverterWhenConverterNotExistsAndExistingConverterWasRequestedBefore()
+    public function testGetFormatConverterWhenConverterNotExistsAndExistingConverterWasRequestedBefore(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Format converter with name "not_existing" is not exist');

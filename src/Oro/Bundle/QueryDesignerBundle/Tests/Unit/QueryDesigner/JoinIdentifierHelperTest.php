@@ -3,16 +3,16 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\QueryDesigner;
 
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
+class JoinIdentifierHelperTest extends TestCase
 {
     private const ROOT_ENTITY = 'Acme\RootEntity';
 
-    /** @var JoinIdentifierHelper */
-    private $helper;
+    private JoinIdentifierHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +30,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         $conditionType,
         $condition,
         $expected
-    ) {
+    ): void {
         $result = $this->helper->buildJoinIdentifier(
             $join,
             $parentJoinId,
@@ -44,15 +44,18 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildColumnJoinIdentifierProvider
      */
-    public function testBuildColumnJoinIdentifier(string $expected, string $columnName, ?string $entityClass = null)
-    {
+    public function testBuildColumnJoinIdentifier(
+        string $expected,
+        string $columnName,
+        ?string $entityClass = null
+    ): void {
         $this->assertEquals(
             $expected,
             $this->helper->buildColumnJoinIdentifier($columnName, $entityClass)
         );
     }
 
-    public function testBuildColumnJoinIdentifierWithDefaultParameters()
+    public function testBuildColumnJoinIdentifierWithDefaultParameters(): void
     {
         $this->assertEquals(
             self::ROOT_ENTITY . '::column1',
@@ -63,7 +66,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider explodeColumnNameProvider
      */
-    public function testExplodeColumnName($columnName, $expected)
+    public function testExplodeColumnName($columnName, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -74,7 +77,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider explodeJoinIdentifierProvider
      */
-    public function testExplodeJoinIdentifier($joinId, $expected)
+    public function testExplodeJoinIdentifier($joinId, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -85,7 +88,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider splitJoinIdentifierProvider
      */
-    public function testSplitJoinIdentifier($joinId, $expected)
+    public function testSplitJoinIdentifier($joinId, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -96,7 +99,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider splitJoinIdentifierProvider
      */
-    public function testMergeJoinIdentifier($expected, $parts)
+    public function testMergeJoinIdentifier($expected, $parts): void
     {
         $this->assertEquals(
             $expected,
@@ -104,7 +107,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetParentJoinIdentifierForRootJoinId()
+    public function testGetParentJoinIdentifierForRootJoinId(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot get parent join identifier for root table.');
@@ -115,7 +118,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getParentJoinIdentifierProvider
      */
-    public function testGetParentJoinIdentifier($joinId, $expected)
+    public function testGetParentJoinIdentifier($joinId, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -126,7 +129,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildSiblingJoinIdentifierProvider
      */
-    public function testBuildSiblingJoinIdentifier($joinId, $joinByFieldName, $expected)
+    public function testBuildSiblingJoinIdentifier($joinId, $joinByFieldName, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -137,7 +140,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getEntityClassNameProvider
      */
-    public function testGetEntityClassName($columnNameOrJoinId, $expected)
+    public function testGetEntityClassName($columnNameOrJoinId, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -148,7 +151,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFieldNameProvider
      */
-    public function testGetFieldName($columnNameOrJoinId, $expected)
+    public function testGetFieldName($columnNameOrJoinId, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -159,7 +162,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isUnidirectionalJoinProvider
      */
-    public function testIsUnidirectionalJoin($joinId, $expected)
+    public function testIsUnidirectionalJoin($joinId, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -170,7 +173,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getJoinProvider
      */
-    public function testGetJoin($joinId, $expected)
+    public function testGetJoin($joinId, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -181,7 +184,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getJoinTypeProvider
      */
-    public function testGetJoinType($joinId, $expected)
+    public function testGetJoinType($joinId, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -192,7 +195,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getJoinConditionTypeProvider
      */
-    public function testGetJoinConditionType($joinId, $expected)
+    public function testGetJoinConditionType($joinId, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -203,7 +206,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getJoinConditionProvider
      */
-    public function testGetJoinCondition($joinId, $expected)
+    public function testGetJoinCondition($joinId, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -214,7 +217,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isUnidirectionalJoinWithConditionProvider
      */
-    public function testIsUnidirectionalJoinWithCondition($joinId, $expected)
+    public function testIsUnidirectionalJoinWithCondition($joinId, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -225,7 +228,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getUnidirectionalJoinEntityNameProvider
      */
-    public function testGetUnidirectionalJoinEntityName($joinId, $expected)
+    public function testGetUnidirectionalJoinEntityName($joinId, $expected): void
     {
         $this->assertEquals(
             $expected,

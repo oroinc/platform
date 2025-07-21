@@ -6,10 +6,11 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class AuthenticatedTokenTraitTest extends \PHPUnit\Framework\TestCase
+class AuthenticatedTokenTraitTest extends TestCase
 {
-    public function testSetUserWithUpdatedListOfRoles()
+    public function testSetUserWithUpdatedListOfRoles(): void
     {
         $role1 = new Role('ROLE_1');
         $role2 = new Role('ROLE_2');

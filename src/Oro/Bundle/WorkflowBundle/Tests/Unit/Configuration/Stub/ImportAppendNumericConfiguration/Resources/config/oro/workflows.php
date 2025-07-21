@@ -1,5 +1,7 @@
 <?php
 
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+
 return [
     'workflow_with_numeric_array' => [
             'entity' => 'Some\\Another\\Entity',
@@ -50,7 +52,7 @@ return [
                     'is_hidden' => false,
                     'is_unavailable_hidden' => false,
                     'acl_message' => null,
-                    'form_type' => 'Oro\\Bundle\\WorkflowBundle\\Form\\Type\\WorkflowTransitionType',
+                    'form_type' => WorkflowTransitionType::class,
                     'display_type' => 'dialog',
                     'destination_page' => '',
                     'form_options' => [],

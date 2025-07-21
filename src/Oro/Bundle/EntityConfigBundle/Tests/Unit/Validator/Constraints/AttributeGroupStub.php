@@ -6,11 +6,8 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 
 class AttributeGroupStub extends AttributeGroup
 {
-    /** @var int */
-    private $id;
-
-    /** @var string */
-    private $label;
+    private int $id;
+    private string $label;
 
     /**
      * @param int         $id

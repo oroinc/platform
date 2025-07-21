@@ -8,6 +8,8 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -16,16 +18,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
+class EntityRoutingHelperTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $urlGenerator;
-
-    /** @var EntityRoutingHelper */
-    private $entityRoutingHelper;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
+    private EntityRoutingHelper $entityRoutingHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -43,7 +40,7 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getUrlSafeClassNameProvider
      */
-    public function testGetUrlSafeClassName(string $src, string $expected)
+    public function testGetUrlSafeClassName(string $src, string $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -54,7 +51,7 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider resolveEntityClassProvider
      */
-    public function testResolveEntityClass(string $src, string $expected)
+    public function testResolveEntityClass(string $src, string $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -87,9 +84,9 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetAction()
+    public function testGetAction(): void
     {
-        $action  = 'test';
+        $action = 'test';
         $request = new Request([EntityRoutingHelper::PARAM_ACTION => $action]);
         $this->assertEquals(
             $action,
@@ -97,13 +94,13 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetActionNotSpecified()
+    public function testGetActionNotSpecified(): void
     {
         $request = new Request();
         $this->assertNull($this->entityRoutingHelper->getAction($request));
     }
 
-    public function testGetEntityClassName()
+    public function testGetEntityClassName(): void
     {
         $request = new Request([EntityRoutingHelper::PARAM_ENTITY_CLASS => 'Acme_Bundle_TestClass']);
         $this->assertEquals(
@@ -112,7 +109,7 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityClassNameWithOtherParamName()
+    public function testGetEntityClassNameWithOtherParamName(): void
     {
         $paramName = 'some_entity';
         $request = new Request([$paramName => 'Acme_Bundle_TestClass']);
@@ -122,13 +119,13 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityClassNameNotSpecified()
+    public function testGetEntityClassNameNotSpecified(): void
     {
         $request = new Request();
         $this->assertNull($this->entityRoutingHelper->getEntityClassName($request));
     }
 
-    public function testGetEntityId()
+    public function testGetEntityId(): void
     {
         $request = new Request([EntityRoutingHelper::PARAM_ENTITY_ID => '123']);
         $this->assertEquals(
@@ -137,7 +134,7 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityIdWithOtherParamName()
+    public function testGetEntityIdWithOtherParamName(): void
     {
         $paramName = 'some_entity';
         $request = new Request([$paramName => '123']);
@@ -147,13 +144,13 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityIdNotSpecified()
+    public function testGetEntityIdNotSpecified(): void
     {
         $request = new Request();
         $this->assertNull($this->entityRoutingHelper->getEntityId($request));
     }
 
-    public function testGetRouteParameters()
+    public function testGetRouteParameters(): void
     {
         $this->assertEquals(
             [
@@ -165,7 +162,7 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetRouteParametersWithoutAction()
+    public function testGetRouteParametersWithoutAction(): void
     {
         $this->assertEquals(
             [
@@ -176,7 +173,7 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGenerateUrl()
+    public function testGenerateUrl(): void
     {
         $this->urlGenerator->expects($this->once())
             ->method('generate')
@@ -196,7 +193,7 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGenerateUrlByRequest()
+    public function testGenerateUrlByRequest(): void
     {
         $request = new Request(
             [
@@ -223,7 +220,7 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGenerateUrlByRequestNoEntityClass()
+    public function testGenerateUrlByRequestNoEntityClass(): void
     {
         $request = new Request();
 
@@ -243,7 +240,7 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntity()
+    public function testGetEntity(): void
     {
         $entity = new \stdClass();
 
@@ -258,7 +255,7 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityForNotManageableEntity()
+    public function testGetEntityForNotManageableEntity(): void
     {
         $this->expectException(BadRequestHttpException::class);
         $this->expectExceptionMessage('Entity class "Acme\Bundle\TestClass" is not manageable.');
@@ -271,7 +268,7 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         $this->entityRoutingHelper->getEntity('Acme_Bundle_TestClass', 123);
     }
 
-    public function testGetEntityForNotExistingEntity()
+    public function testGetEntityForNotExistingEntity(): void
     {
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage("Record doesn't exist");
@@ -284,7 +281,7 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         $this->entityRoutingHelper->getEntity('Acme_Bundle_TestClass', 123);
     }
 
-    public function testGetEntityReference()
+    public function testGetEntityReference(): void
     {
         $entityReference = new \stdClass();
 
@@ -299,7 +296,7 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityReferenceForNewEntity()
+    public function testGetEntityReferenceForNewEntity(): void
     {
         $entityReference = new \stdClass();
 
@@ -314,7 +311,7 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityReferenceForNotManageableEntity()
+    public function testGetEntityReferenceForNotManageableEntity(): void
     {
         $this->expectException(BadRequestHttpException::class);
         $this->expectExceptionMessage('Entity class "Acme\Bundle\TestClass" is not manageable.');
@@ -327,7 +324,7 @@ class EntityRoutingHelperTest extends \PHPUnit\Framework\TestCase
         $this->entityRoutingHelper->getEntityReference('Acme_Bundle_TestClass', 123);
     }
 
-    public function testGetEntityReferenceForNewNotManageableEntity()
+    public function testGetEntityReferenceForNewNotManageableEntity(): void
     {
         $this->expectException(BadRequestHttpException::class);
         $this->expectExceptionMessage('Entity class "Acme\Bundle\TestClass" is not manageable.');

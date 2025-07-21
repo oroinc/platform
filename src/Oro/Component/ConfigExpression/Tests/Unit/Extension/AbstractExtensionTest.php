@@ -6,17 +6,18 @@ use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Oro\Component\ConfigExpression\Exception\UnexpectedTypeException;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\AbstractExtensionStub;
+use PHPUnit\Framework\TestCase;
 
-class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
+class AbstractExtensionTest extends TestCase
 {
-    public function testHasExpression()
+    public function testHasExpression(): void
     {
         $extension = $this->getAbstractExtension();
         $this->assertTrue($extension->hasExpression('test'));
         $this->assertFalse($extension->hasExpression('unknown'));
     }
 
-    public function testGetExpression()
+    public function testGetExpression(): void
     {
         $extension = $this->getAbstractExtension();
         $this->assertInstanceOf(
@@ -25,7 +26,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetUnknownExpression()
+    public function testGetUnknownExpression(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The expression "unknown" can not be loaded by this extension.');
@@ -34,7 +35,7 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->getExpression('unknown');
     }
 
-    public function testLoadInvalidExpressions()
+    public function testLoadInvalidExpressions(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(sprintf(

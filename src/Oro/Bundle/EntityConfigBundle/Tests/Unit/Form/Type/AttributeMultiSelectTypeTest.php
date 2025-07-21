@@ -11,17 +11,15 @@ use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
 {
     use EntityTrait;
 
-    /** @var AttributeMultiSelectType */
-    private $formType;
-
-    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerMock;
+    private AttributeMultiSelectType $formType;
+    private AttributeManager&MockObject $managerMock;
 
     #[\Override]
     protected function setUp(): void
@@ -121,7 +119,8 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
                 return $fieldsData[$field->getId()]['label'];
             });
 
-        $this->managerMock->method('isSystem')
+        $this->managerMock->expects(self::any())
+            ->method('isSystem')
             ->willReturnCallback(function (FieldConfigModel $field) use ($fieldsData) {
                 return $fieldsData[$field->getId()]['isSystem'];
             });
@@ -134,16 +133,12 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
 
     public function formChoicesDataProvider(): array
     {
-        /** @var FieldConfigModel $field1 */
         $field1 = $this->getEntity(FieldConfigModel::class, ['id' => 1]);
         $field1->fromArray('attribute', ['field_name' => 'color_custom_1']);
-        /** @var FieldConfigModel $field2 */
         $field2 = $this->getEntity(FieldConfigModel::class, ['id' => 2]);
         $field2->fromArray('attribute', ['field_name' => 'size_custom']);
-        /** @var FieldConfigModel $field3 */
         $field3 = $this->getEntity(FieldConfigModel::class, ['id' => 3]);
         $field3->fromArray('attribute', ['field_name' => 'color']);
-        /** @var FieldConfigModel $field4 */
         $field4 = $this->getEntity(FieldConfigModel::class, ['id' => 4]);
         $field4->fromArray('attribute', ['field_name' => 'color_custom_2']);
 
@@ -211,7 +206,6 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
 
     public function formChoicesWithFieldsWithoutFieldNameAttributeDataProvider(): array
     {
-        /** @var FieldConfigModel $field1 */
         $field1 = $this->getEntity(FieldConfigModel::class, ['id' => 1]);
         $field1->setFieldName('field1');
         $field1->fromArray('attribute', ['field_name' => 'color_custom_1']);

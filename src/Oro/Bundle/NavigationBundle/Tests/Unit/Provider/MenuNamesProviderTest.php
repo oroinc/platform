@@ -10,8 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class MenuNamesProviderTest extends TestCase
 {
-    private ConfigurationProvider|MockObject $configurationProvider;
-
+    private ConfigurationProvider&MockObject $configurationProvider;
     private MenuNamesProvider $provider;
 
     #[\Override]
@@ -27,8 +26,7 @@ class MenuNamesProviderTest extends TestCase
      */
     public function testGetMenuNames(array $menusTree, string $scopeType, array $expected): void
     {
-        $this->configurationProvider
-            ->expects(self::once())
+        $this->configurationProvider->expects(self::once())
             ->method('getMenuTree')
             ->willReturn($menusTree);
 

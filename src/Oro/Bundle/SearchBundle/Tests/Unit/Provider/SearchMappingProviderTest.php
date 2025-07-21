@@ -6,6 +6,8 @@ use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Oro\Bundle\SearchBundle\Configuration\MappingConfigurationProvider;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -13,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
+class SearchMappingProviderTest extends TestCase
 {
     private array $testMapping = [
         'Oro\TestBundle\Entity\TestEntity' => [
@@ -33,17 +35,10 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    /** @var CacheItemPoolInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var CacheItemInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cacheItem;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var MappingConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
+    private CacheItemPoolInterface&MockObject $cache;
+    private CacheItemInterface&MockObject $cacheItem;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private MappingConfigurationProvider&MockObject $configProvider;
 
     #[\Override]
     protected function setUp(): void

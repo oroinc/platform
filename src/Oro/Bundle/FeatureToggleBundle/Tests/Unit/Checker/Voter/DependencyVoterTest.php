@@ -5,17 +5,14 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Checker\Voter;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Checker\Voter\DependencyVoter;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DependencyVoterTest extends \PHPUnit\Framework\TestCase
+class DependencyVoterTest extends TestCase
 {
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var ConfigurationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureConfigManager;
-
-    /** @var DependencyVoter */
-    private $dependencyVoter;
+    private FeatureChecker&MockObject $featureChecker;
+    private ConfigurationManager&MockObject $featureConfigManager;
+    private DependencyVoter $dependencyVoter;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +26,7 @@ class DependencyVoterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider voteDataProvider
      */
-    public function testVote(bool $enabled, int $expectedVote)
+    public function testVote(bool $enabled, int $expectedVote): void
     {
         $feature = 'feature1';
         $dependent = 'feature2';
@@ -55,7 +52,7 @@ class DependencyVoterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testVoteAbstain()
+    public function testVoteAbstain(): void
     {
         $feature = 'feature1';
 

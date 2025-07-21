@@ -8,8 +8,9 @@ use Oro\Bundle\UIBundle\Tests\Unit\Fixture\BazBundle\BazBundle;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\FooBundle\FooBundle;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class PlaceholderConfigurationProviderTest extends \PHPUnit\Framework\TestCase
+class PlaceholderConfigurationProviderTest extends TestCase
 {
     use TempDirExtension;
 
@@ -26,7 +27,7 @@ class PlaceholderConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testGetConfiguration()
+    public function testGetConfiguration(): void
     {
         $bundle1 = new BarBundle();
         $bundle2 = new FooBundle();

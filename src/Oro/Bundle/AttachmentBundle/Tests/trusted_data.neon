@@ -7,6 +7,10 @@ trusted_data:
         Oro\Bundle\AttachmentBundle\Command\CleanupAttachmentFilesCommand:
             loadExistingAttachments:
                 params: true
+        Oro\Bundle\AttachmentBundle\Api\Processor\BuildMultiFileSubresourceQuery:
+            process:
+                parentEntityClass: true
+                associationName: true
     safe_methods:
         Oro\Bundle\AttachmentBundle\Command\CleanupAttachmentFilesCommand:
             getTemporaryTableName: true

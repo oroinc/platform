@@ -5,23 +5,21 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Mapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\CacheItem;
 
-class ExtendClassMetadataFactoryTest extends \PHPUnit\Framework\TestCase
+class ExtendClassMetadataFactoryTest extends TestCase
 {
-    /** @var ExtendClassMetadataFactory */
-    private $cmf;
+    private ExtendClassMetadataFactory $cmf;
 
     #[\Override]
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->cmf = new ExtendClassMetadataFactory();
     }
 
-    public function testSetMetadataFor()
+    public function testSetMetadataFor(): void
     {
         $classMetadata = new ClassMetadata(User::class);
         $cache = $this->createMock(ArrayAdapter::class);
@@ -38,7 +36,7 @@ class ExtendClassMetadataFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($classMetadata, $this->cmf->getMetadataFor(User::class));
     }
 
-    public function testSetMetadataForWithoutCacheDriver()
+    public function testSetMetadataForWithoutCacheDriver(): void
     {
         $metadata = new ClassMetadata(User::class);
         $this->cmf->setMetadataFor(

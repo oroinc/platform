@@ -9,15 +9,16 @@ use Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByIdTopic;
 use Oro\Bundle\SearchBundle\Async\Topic\ReindexTopic;
 use Oro\Bundle\SearchBundle\Transformer\MessageTransformer;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class IndexerTest extends \PHPUnit\Framework\TestCase
+class IndexerTest extends TestCase
 {
     use MessageQueueExtension;
 
-    public function testCouldBeConstructedWithRequiredArguments()
+    public function testCouldBeConstructedWithRequiredArguments(): void
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         new Indexer(
@@ -27,7 +28,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testResetIndexShouldThrowExceptionMethodIsNotImplemented()
+    public function testResetIndexShouldThrowExceptionMethodIsNotImplemented(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Method is not implemented');
@@ -42,7 +43,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         $indexer->resetIndex();
     }
 
-    public function testGetClassesForReindexShouldThrowExceptionMethodIsNotImplemented()
+    public function testGetClassesForReindexShouldThrowExceptionMethodIsNotImplemented(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Method is not implemented');
@@ -57,7 +58,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         $indexer->getClassesForReindex();
     }
 
-    public function testSaveShouldReturnFalseIfEntityIsNull()
+    public function testSaveShouldReturnFalseIfEntityIsNull(): void
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $doctrineHelper->expects($this->never())
@@ -74,7 +75,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         self::assertMessagesEmpty(IndexEntitiesByIdTopic::getName());
     }
 
-    public function testDeleteShouldReturnFalseIfEntityIsNull()
+    public function testDeleteShouldReturnFalseIfEntityIsNull(): void
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $doctrineHelper->expects($this->never())
@@ -91,7 +92,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         self::assertMessagesEmpty(IndexEntitiesByIdTopic::getName());
     }
 
-    public function testSaveShouldAcceptSingleEntityAndSendMessageToProducer()
+    public function testSaveShouldAcceptSingleEntityAndSendMessageToProducer(): void
     {
         $entity = new \stdClass();
 
@@ -119,7 +120,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSaveShouldAcceptArrayOfEntitiesAndSendMessageToProducer()
+    public function testSaveShouldAcceptArrayOfEntitiesAndSendMessageToProducer(): void
     {
         $entities = [new \stdClass()];
 
@@ -147,7 +148,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDeleteShouldAcceptSingleEntityAndSendMessageToProducer()
+    public function testDeleteShouldAcceptSingleEntityAndSendMessageToProducer(): void
     {
         $entity = new \stdClass();
 
@@ -175,7 +176,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDeleteShouldAcceptArrayOfEntitiesAndSendMessageToProducer()
+    public function testDeleteShouldAcceptArrayOfEntitiesAndSendMessageToProducer(): void
     {
         $entities = [new \stdClass()];
 
@@ -203,7 +204,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testReindexShouldAcceptSingleEntityClassAndSendMessageToProducer()
+    public function testReindexShouldAcceptSingleEntityClassAndSendMessageToProducer(): void
     {
         $class = 'class-name';
 
@@ -218,7 +219,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         self::assertMessageSent(ReindexTopic::getName(), ['class-name']);
     }
 
-    public function testReindexShouldAcceptArrayOfEntityClassesAndSendMessageToProducer()
+    public function testReindexShouldAcceptArrayOfEntityClassesAndSendMessageToProducer(): void
     {
         $classes = ['class-name'];
 
@@ -233,7 +234,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         self::assertMessageSent(ReindexTopic::getName(), ['class-name']);
     }
 
-    public function testReindexShouldAcceptNullAndSendMessageToProducer()
+    public function testReindexShouldAcceptNullAndSendMessageToProducer(): void
     {
         $classes = null;
 
@@ -248,7 +249,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         self::assertMessageSent(ReindexTopic::getName(), []);
     }
 
-    public function testReindexShouldNotAcceptInvalidEntity()
+    public function testReindexShouldNotAcceptInvalidEntity(): void
     {
         $this->expectException(\ReflectionException::class);
         $entities = [new \stdClass()];

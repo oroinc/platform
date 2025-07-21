@@ -4,17 +4,16 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class CurrentApplicationProviderTest extends \PHPUnit\Framework\TestCase
+class CurrentApplicationProviderTest extends TestCase
 {
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var CurrentApplicationProvider */
-    private $provider;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private CurrentApplicationProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -37,7 +36,7 @@ class CurrentApplicationProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isApplicationsValidDataProvider
      */
-    public function testIsApplicationsValid(array $applications, ?TokenInterface $token, bool $expectedResult)
+    public function testIsApplicationsValid(array $applications, ?TokenInterface $token, bool $expectedResult): void
     {
         $this->tokenStorage->expects($this->any())
             ->method('getToken')
@@ -49,7 +48,7 @@ class CurrentApplicationProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getCurrentApplicationProvider
      */
-    public function testGetCurrentApplication(?TokenInterface $token, ?string $expectedResult)
+    public function testGetCurrentApplication(?TokenInterface $token, ?string $expectedResult): void
     {
         $this->tokenStorage->expects($this->any())
             ->method('getToken')

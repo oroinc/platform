@@ -213,7 +213,7 @@
             {% set propertyHtml %}
                 <div class="control-label collapse-overflow collapse no-transition" data-toggle="false" data-check-overflow="true"
                       id="{{ collapseId }}" data-state-id="{{ collapseKey }}" data-collapsed-text="{{ moreText|trans }}" data-expanded-text="{{ lessText|trans }}">
-                    {{ data|default('oro.ui.empty'|trans) }}
+                    {{ data|default('oro.ui.empty'|trans)|raw }}
                 </div>
                 <a href="#" role="button" class="control-label collapse-toggle" data-toggle="collapse" data-target="#{{ collapseId }}" aria-expanded="false" aria-controls="{{ collapseId }}">
                     <span data-text>{{ moreText|trans }}</span>
@@ -1263,7 +1263,7 @@
 
     {% if not isMobileVersion() %}
         <div id="{{ dataTarget }}" class="navbar navbar-static scrollspy-nav">
-            <nav class="nav">
+            <nav class="nav" aria-label="{{ 'Page navigation'|trans }}">
                 {% for navElement in dataBlocks %}
                     <a class="nav-link{% if loop.first %} active {% endif %}{{ navElement.class|default('') }}"
                        href="#scroll-{{ loop.index }}"

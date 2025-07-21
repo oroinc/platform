@@ -6,17 +6,16 @@ use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSubscriber;
 use Oro\Bundle\NotificationBundle\Provider\ContactInformationEmailsProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 
-class ContactInformationEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
+class ContactInformationEmailsSubscriberTest extends TestCase
 {
-    /** @var ContactInformationEmailsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $contactInformationEmailsProvider;
-
-    /** @var ContactInformationEmailsSubscriber */
-    private $subscriber;
+    private ContactInformationEmailsProvider&MockObject $contactInformationEmailsProvider;
+    private ContactInformationEmailsSubscriber $subscriber;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class ContactInformationEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber = new ContactInformationEmailsSubscriber($this->contactInformationEmailsProvider);
     }
 
-    public function testPreSetData()
+    public function testPreSetData(): void
     {
         $emailFields = ['emailAddress', 'secondaryEmail', 'thirdEmail'];
 
@@ -77,7 +76,7 @@ class ContactInformationEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->preSetData($event);
     }
 
-    public function testPreSubmitData()
+    public function testPreSubmitData(): void
     {
         $emailFields = ['emailAddress', 'secondaryEmail', 'thirdEmail'];
 

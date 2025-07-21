@@ -7,11 +7,12 @@ namespace Oro\Component\Layout\Tests\Unit\Loader\Generator\Extension;
 use Oro\Component\Layout\Loader\Generator\Extension\ImportLayoutUpdateVisitor;
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 use Oro\Component\PhpUtils\ClassGenerator;
+use PHPUnit\Framework\TestCase;
 
-class ImportLayoutUpdateVisitorTest extends \PHPUnit\Framework\TestCase
+class ImportLayoutUpdateVisitorTest extends TestCase
 {
     // @codingStandardsIgnoreStart
-    public function testVisit()
+    public function testVisit(): void
     {
         $condition = new ImportLayoutUpdateVisitor();
         $phpClass = new ClassGenerator('ImportedLayoutUpdate');

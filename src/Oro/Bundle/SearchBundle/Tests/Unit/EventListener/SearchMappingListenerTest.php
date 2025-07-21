@@ -4,13 +4,14 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\SearchBundle\EventListener\SearchMappingListener;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SearchMappingListenerTest extends \PHPUnit\Framework\TestCase
+class SearchMappingListenerTest extends TestCase
 {
     private $searchMappingListener;
 
-    /** @var SearchMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $searchMappingProvider;
+    private SearchMappingProvider&MockObject $searchMappingProvider;
 
     #[\Override]
     protected function setUp(): void

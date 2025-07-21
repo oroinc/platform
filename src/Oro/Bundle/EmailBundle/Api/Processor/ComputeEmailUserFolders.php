@@ -20,9 +20,18 @@ class ComputeEmailUserFolders implements ProcessorInterface
 
         $data = $context->getData();
         if ($context->isFieldRequested(self::FOLDERS_FIELD_NAME)) {
+            $foldersFieldName = $context->getResultFieldName('folders');
+            $foldersConfig = $context->getConfig()->getField($foldersFieldName)->getTargetEntity();
+            $typeFieldName = $context->getResultFieldName('type', $foldersConfig);
+            $nameFieldName = $context->getResultFieldName('name', $foldersConfig);
+            $fullNameFieldName = $context->getResultFieldName('fullName', $foldersConfig);
             $folders = [];
-            foreach ($data['_folders'] as $item) {
-                $folders[] = ['type' => $item['type'], 'name' => $item['name'], 'path' => $item['fullName']];
+            foreach ($data[$foldersFieldName] as $item) {
+                $folders[] = [
+                    'type' => $item[$typeFieldName],
+                    'name' => $item[$nameFieldName],
+                    'path' => $item[$fullNameFieldName]
+                ];
             }
             $data[self::FOLDERS_FIELD_NAME] = $folders;
             $context->setData($data);

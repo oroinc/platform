@@ -4,17 +4,14 @@ namespace Oro\Component\DoctrineUtils\Tests\Unit\DBAL;
 
 use Oro\Component\DoctrineUtils\DBAL\ChainTransactionWatcher;
 use Oro\Component\DoctrineUtils\DBAL\TransactionWatcherInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChainTransactionWatcherTest extends \PHPUnit\Framework\TestCase
+class ChainTransactionWatcherTest extends TestCase
 {
-    /** @var TransactionWatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $watcher1;
-
-    /** @var TransactionWatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $watcher2;
-
-    /** @var ChainTransactionWatcher */
-    private $chainWatcher;
+    private TransactionWatcherInterface&MockObject $watcher1;
+    private TransactionWatcherInterface&MockObject $watcher2;
+    private ChainTransactionWatcher $chainWatcher;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +22,7 @@ class ChainTransactionWatcherTest extends \PHPUnit\Framework\TestCase
         $this->chainWatcher = new ChainTransactionWatcher([$this->watcher1, $this->watcher2]);
     }
 
-    public function testOnTransactionStarted()
+    public function testOnTransactionStarted(): void
     {
         $this->watcher1->expects(self::once())
             ->method('onTransactionStarted');
@@ -35,7 +32,7 @@ class ChainTransactionWatcherTest extends \PHPUnit\Framework\TestCase
         $this->chainWatcher->onTransactionStarted();
     }
 
-    public function testOnTransactionCommitted()
+    public function testOnTransactionCommitted(): void
     {
         $this->watcher1->expects(self::once())
             ->method('onTransactionCommitted');
@@ -45,7 +42,7 @@ class ChainTransactionWatcherTest extends \PHPUnit\Framework\TestCase
         $this->chainWatcher->onTransactionCommitted();
     }
 
-    public function testOnTransactionRolledback()
+    public function testOnTransactionRolledback(): void
     {
         $this->watcher1->expects(self::once())
             ->method('onTransactionRolledback');

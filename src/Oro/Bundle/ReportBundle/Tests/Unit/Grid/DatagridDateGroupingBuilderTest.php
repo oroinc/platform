@@ -13,25 +13,20 @@ use Oro\Bundle\ReportBundle\Exception\InvalidDatagridConfigException;
 use Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings("PMD.ExcessiveMethodLength")
  */
-class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
+class DatagridDateGroupingBuilderTest extends TestCase
 {
     private string $calendarDateEntity = CalendarDate::class;
 
-    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    private $config;
-
-    /** @var JoinIdentifierHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $joinIdHelper;
-
-    /** @var DateHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $dateHelper;
-
-    /** @var DatagridDateGroupingBuilder */
-    private $datagridDateGroupingBuilder;
+    private DatagridConfiguration $config;
+    private JoinIdentifierHelper&MockObject $joinIdHelper;
+    private DateHelper&MockObject $dateHelper;
+    private DatagridDateGroupingBuilder $datagridDateGroupingBuilder;
 
     #[\Override]
     protected function setUp(): void
@@ -47,7 +42,7 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIgnoreIfGroupingNotRequired()
+    public function testIgnoreIfGroupingNotRequired(): void
     {
         $report = new Report();
         $this->joinIdHelper->expects($this->never())
@@ -73,7 +68,7 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider exceptionTestProvider
      */
-    public function testThrowsIfInvalidGrid(array $params)
+    public function testThrowsIfInvalidGrid(array $params): void
     {
         $this->expectException(InvalidDatagridConfigException::class);
         $this->joinIdHelper->expects($this->never())
@@ -106,7 +101,7 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testConfigPassesButTableAliasThrows()
+    public function testConfigPassesButTableAliasThrows(): void
     {
         $this->joinIdHelper->expects($this->once())
             ->method('getFieldName');
@@ -124,7 +119,7 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validConfigurationProvider
      */
-    public function testValidDateGroupingConfiguration(Report $report, array $inputConfig, array $expectedConfig)
+    public function testValidDateGroupingConfiguration(Report $report, array $inputConfig, array $expectedConfig): void
     {
         $this->joinIdHelper->expects($this->once())
             ->method('getFieldName')

@@ -5,13 +5,14 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Job;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
+use PHPUnit\Framework\TestCase;
 
-class JobResultTest extends \PHPUnit\Framework\TestCase
+class JobResultTest extends TestCase
 {
     /**
      * @dataProvider propertiesDataProvider
      */
-    public function testSettersAndGetters(string $property, mixed $value)
+    public function testSettersAndGetters(string $property, mixed $value): void
     {
         $obj = new JobResult();
 
@@ -30,7 +31,7 @@ class JobResultTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testFailureExceptions()
+    public function testFailureExceptions(): void
     {
         $obj = new JobResult();
         $obj->addFailureException('Error 1');

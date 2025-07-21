@@ -3,10 +3,11 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ExpressionCompilerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ExpressionCompilerPassTest extends \PHPUnit\Framework\TestCase
+class ExpressionCompilerPassTest extends TestCase
 {
     private ExpressionCompilerPass $compiler;
 
@@ -16,7 +17,7 @@ class ExpressionCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new ExpressionCompilerPass();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $encoderRegistryDef = $container->register('oro_layout.expression.encoder_registry')

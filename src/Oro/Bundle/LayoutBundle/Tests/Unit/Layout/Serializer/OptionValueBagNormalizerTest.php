@@ -4,10 +4,11 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Serializer;
 
 use Oro\Bundle\LayoutBundle\Layout\Serializer\OptionValueBagNormalizer;
 use Oro\Component\Layout\OptionValueBag;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
 
-class OptionValueBagNormalizerTest extends \PHPUnit\Framework\TestCase
+class OptionValueBagNormalizerTest extends TestCase
 {
     private OptionValueBagNormalizer $normalizer;
 
@@ -18,7 +19,7 @@ class OptionValueBagNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->normalizer->setSerializer(new Serializer([$this->normalizer], [new JsonEncoder()]));
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
 
@@ -27,7 +28,7 @@ class OptionValueBagNormalizerTest extends \PHPUnit\Framework\TestCase
         ));
     }
 
-    public function testSupportsDenormalization()
+    public function testSupportsDenormalization(): void
     {
         $this->assertFalse($this->normalizer->supportsDenormalization([], \stdClass::class));
         $this->assertTrue($this->normalizer->supportsDenormalization([], OptionValueBag::class));
@@ -36,7 +37,7 @@ class OptionValueBagNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testNormalizeDenormalize(OptionValueBag $bag)
+    public function testNormalizeDenormalize(OptionValueBag $bag): void
     {
         $normalized = $this->normalizer->normalize($bag);
         $denormalized = $this->normalizer->denormalize($normalized, OptionValueBag::class);

@@ -16,23 +16,18 @@ use Oro\Component\MessageQueue\Transport\Exception\InvalidMessageException;
 use Oro\Component\MessageQueue\Transport\Exception\RuntimeException;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\Queue;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
+class DbalMessageConsumerTest extends TestCase
 {
-    /** @var DbalSessionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $session;
-
-    /** @var DbalConnection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $dbal;
-
-    /** @var DbalMessageConsumer */
-    private $consumer;
+    private DbalSessionInterface&MockObject $session;
+    private DbalConnection&MockObject $connection;
+    private Connection&MockObject $dbal;
+    private DbalMessageConsumer $consumer;
 
     #[\Override]
     protected function setUp(): void

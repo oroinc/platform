@@ -5,14 +5,13 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Metadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataBuilder;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MetadataRegistryTest extends \PHPUnit\Framework\TestCase
+class MetadataRegistryTest extends TestCase
 {
-    /** @var MetadataBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadataBuilder;
-
-    /** @var MetadataRegistry */
-    private $metadataRegistry;
+    private MetadataBuilder&MockObject $metadataBuilder;
+    private MetadataRegistry $metadataRegistry;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class MetadataRegistryTest extends \PHPUnit\Framework\TestCase
         $this->metadataRegistry = new MetadataRegistry($this->metadataBuilder);
     }
 
-    public function testGetEntityMetadata()
+    public function testGetEntityMetadata(): void
     {
         $className = 'TestEntity';
 

@@ -8,11 +8,12 @@ use Oro\Component\Layout\LayoutBuilderInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 use Oro\Component\Layout\LayoutFactoryInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LayoutManagerTest extends \PHPUnit\Framework\TestCase
+class LayoutManagerTest extends TestCase
 {
-    private LayoutBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder;
-
+    private LayoutBuilderInterface&MockObject $builder;
     private LayoutManager $manager;
 
     #[\Override]

@@ -4,11 +4,12 @@ namespace Oro\Bundle\LoggerBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\ErrorLogNotificationMailerHandlerPass;
 use Oro\Bundle\LoggerBundle\Monolog\ErrorLogNotificationHandlerWrapper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\MonologBundle\DependencyInjection\MonologExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ErrorLogNotificationMailerHandlerPassTest extends \PHPUnit\Framework\TestCase
+class ErrorLogNotificationMailerHandlerPassTest extends TestCase
 {
     public function testProcessDoesNothingWhenNoHandlers(): void
     {

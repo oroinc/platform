@@ -4,10 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestBackedEnumInt;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestBackedEnumString;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 /**
- *
  * @SuppressWarnings(PHPMD.TooManyFields)
  */
 #[ORM\Entity]
@@ -43,35 +44,20 @@ class TestAllDataTypes implements TestFrameworkEntityInterface
     #[ORM\Column(name: 'field_decimal_default', type: Types::DECIMAL, nullable: true)]
     public ?string $fieldDecimalDefault = null;
 
-    /**
-     * @return float|null
-     */
     #[ORM\Column(name: 'field_float', type: Types::FLOAT, nullable: true)]
-    public $fieldFloat;
+    public ?float $fieldFloat = null;
 
-    /**
-     * @var array
-     */
     #[ORM\Column(name: 'field_array', type: Types::ARRAY, nullable: true)]
-    public $fieldArray;
+    public ?array $fieldArray = null;
 
-    /**
-     * @var array
-     */
     #[ORM\Column(name: 'field_simple_array', type: Types::SIMPLE_ARRAY, nullable: true)]
-    public $fieldSimpleArray;
+    public ?array $fieldSimpleArray = null;
 
-    /**
-     * @var array
-     */
     #[ORM\Column(name: 'field_json_array', type: 'json_array', nullable: true)]
-    public $fieldJsonArray;
+    public ?array $fieldJsonArray = null;
 
-    /**
-     * @var array
-     */
     #[ORM\Column(name: 'field_json', type: Types::JSON, nullable: true)]
-    public $fieldJson;
+    public ?array $fieldJson = null;
 
     #[ORM\Column(name: 'field_datetime', type: Types::DATETIME_MUTABLE, nullable: true)]
     public ?\DateTimeInterface $fieldDateTime = null;
@@ -82,57 +68,47 @@ class TestAllDataTypes implements TestFrameworkEntityInterface
     #[ORM\Column(name: 'field_time', type: Types::TIME_MUTABLE, nullable: true)]
     public ?\DateTimeInterface $fieldTime = null;
 
-    /**
-     * @var string
-     */
     #[ORM\Column(name: 'field_guid', type: Types::GUID, nullable: true)]
-    public $fieldGuid;
+    public ?string $fieldGuid = null;
 
-    /**
-     * @var float
-     */
     #[ORM\Column(name: 'field_percent', type: 'percent', nullable: true)]
-    public $fieldPercent;
+    public ?float $fieldPercent = null;
 
-    /**
-     * @var float
-     */
     #[ORM\Column(name: 'field_percent_100', type: 'percent', nullable: true)]
-    public $fieldPercent100;
+    public ?float $fieldPercent100 = null;
 
-    /**
-     * @var float
-     */
     #[ORM\Column(name: 'field_percent_round', type: 'percent', nullable: true)]
-    public $fieldPercentRound;
+    public ?float $fieldPercentRound = null;
 
-    /**
-     * @var float
-     */
     #[ORM\Column(name: 'field_percent_100_round', type: 'percent', nullable: true)]
-    public $fieldPercent100Round;
+    public ?float $fieldPercent100Round = null;
 
-    /**
-     * @var string
-     */
     #[ORM\Column(name: 'field_money', type: 'money', nullable: true)]
-    public $fieldMoney;
+    public ?string $fieldMoney = null;
 
-    /**
-     * @var integer
-     */
     #[ORM\Column(name: 'field_duration', type: 'duration', nullable: true)]
-    public $fieldDuration;
+    public ?int $fieldDuration = null;
 
-    /**
-     * @var string
-     */
     #[ORM\Column(name: 'field_money_value', type: 'money_value', nullable: true)]
-    public $fieldMoneyValue;
+    public ?string $fieldMoneyValue = null;
 
-    /**
-     * @var string
-     */
     #[ORM\Column(name: 'field_currency', type: 'currency', nullable: true)]
-    public $fieldCurrency;
+    public ?string $fieldCurrency = null;
+
+    #[ORM\Column(
+        name: 'field_backed_enum_int',
+        type: Types::INTEGER,
+        nullable: true,
+        enumType: TestBackedEnumInt::class
+    )]
+    public ?TestBackedEnumInt $fieldBackedEnumInt = null;
+
+    #[ORM\Column(
+        name: 'field_backed_enum_str',
+        type: Types::STRING,
+        length: 6,
+        nullable: true,
+        enumType: TestBackedEnumString::class
+    )]
+    public ?TestBackedEnumString $fieldBackedEnumStr = null;
 }

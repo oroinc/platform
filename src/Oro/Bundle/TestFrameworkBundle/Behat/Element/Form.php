@@ -308,6 +308,10 @@ class Form extends Element
             }
         }
 
+        if (!$field) {
+            $field = $label->find('css', 'input');
+        }
+
         if ($field) {
             return $this->autoWrapField($field);
         }

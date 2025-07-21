@@ -4,9 +4,10 @@ namespace Oro\Bundle\BatchBundle\Tests\Unit\Job;
 
 use Oro\Bundle\BatchBundle\Job\JobFactory;
 use Oro\Bundle\BatchBundle\Job\JobRepositoryInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class JobFactoryTest extends \PHPUnit\Framework\TestCase
+class JobFactoryTest extends TestCase
 {
     public function testCreateJob(): void
     {

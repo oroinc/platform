@@ -3,10 +3,11 @@
 namespace Oro\Bundle\SoapBundle\Tests\Unit\Client\Factory;
 
 use Oro\Bundle\SoapBundle\Client\Factory\NativeSoapClientFactory;
+use PHPUnit\Framework\TestCase;
 
-class NativeSoapClientFactoryTest extends \PHPUnit\Framework\TestCase
+class NativeSoapClientFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $options = [
             'uri' => 'uri',

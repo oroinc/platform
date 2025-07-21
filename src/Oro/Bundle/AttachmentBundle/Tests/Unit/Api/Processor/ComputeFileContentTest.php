@@ -28,7 +28,7 @@ class ComputeFileContentTest extends CustomizeLoadedDataProcessorTestCase
         $this->processor = new ComputeFileContent($this->fileManager, $this->logger);
     }
 
-    public function testProcessWhenNoConfigForContentField()
+    public function testProcessWhenNoConfigForContentField(): void
     {
         $config = new EntityDefinitionConfig();
 
@@ -41,7 +41,7 @@ class ComputeFileContentTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessWhenContentFieldIsExcluded()
+    public function testProcessWhenContentFieldIsExcluded(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('content')->setExcluded();
@@ -56,7 +56,7 @@ class ComputeFileContentTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessWhenFileNameFieldDoesNotExist()
+    public function testProcessWhenFileNameFieldDoesNotExist(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('content')->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
@@ -71,7 +71,7 @@ class ComputeFileContentTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessWhenContentFieldShouldBeSet()
+    public function testProcessWhenContentFieldShouldBeSet(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('content')->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
@@ -91,7 +91,7 @@ class ComputeFileContentTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessWhenFileNameIsEmpty()
+    public function testProcessWhenFileNameIsEmpty(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('content')->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
@@ -109,7 +109,7 @@ class ComputeFileContentTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessWhenFileIsEmpty()
+    public function testProcessWhenFileIsEmpty(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('content')->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
@@ -129,7 +129,7 @@ class ComputeFileContentTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessWhenFileIsNotFound()
+    public function testProcessWhenFileIsNotFound(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('content')->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
@@ -153,7 +153,7 @@ class ComputeFileContentTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessWhenUnexpectedExceptionOccurred()
+    public function testProcessWhenUnexpectedExceptionOccurred(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('some error');
@@ -175,7 +175,7 @@ class ComputeFileContentTest extends CustomizeLoadedDataProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenFileHasExternalUrl()
+    public function testProcessWhenFileHasExternalUrl(): void
     {
         $externalUrl = 'http://example.org/test.txt';
         $config = new EntityDefinitionConfig();

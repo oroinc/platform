@@ -3,13 +3,14 @@
 namespace Oro\Component\Routing\Tests\Unit;
 
 use Oro\Component\Routing\UrlUtil;
+use PHPUnit\Framework\TestCase;
 
-class UrlUtilTest extends \PHPUnit\Framework\TestCase
+class UrlUtilTest extends TestCase
 {
     /**
      * @dataProvider getAbsolutePathDataProvider
      */
-    public function testGetAbsolutePath(string $path, string $baseUrl, string $result)
+    public function testGetAbsolutePath(string $path, string $baseUrl, string $result): void
     {
         self::assertEquals($result, UrlUtil::getAbsolutePath($path, $baseUrl));
     }
@@ -17,7 +18,7 @@ class UrlUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPathInfoDataProvider
      */
-    public function testGetPathInfo(string $path, string $baseUrl, string $result)
+    public function testGetPathInfo(string $path, string $baseUrl, string $result): void
     {
         self::assertEquals($result, UrlUtil::getPathInfo($path, $baseUrl));
     }
@@ -25,7 +26,7 @@ class UrlUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider joinDataProvider
      */
-    public function testJoin(string $path1, string $path2, string $result)
+    public function testJoin(string $path1, string $path2, string $result): void
     {
         self::assertEquals($result, UrlUtil::join($path1, $path2));
     }

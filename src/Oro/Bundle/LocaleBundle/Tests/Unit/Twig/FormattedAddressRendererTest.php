@@ -18,9 +18,9 @@ final class FormattedAddressRendererTest extends TestCase
     use LoggerAwareTraitTestTrait;
 
     private TwigEnvironment&MockObject $twigEnvironment;
-
     private FormattedAddressRenderer $renderer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->twigEnvironment = $this->createMock(TwigEnvironment::class);
@@ -40,25 +40,23 @@ final class FormattedAddressRendererTest extends TestCase
         string $newLineSeparator,
         string $expectedResult
     ): void {
-        $this->twigEnvironment
+        $this->twigEnvironment->expects(self::any())
             ->method('mergeGlobals')
             ->willReturnArgument(0);
 
         $template = $this->createMock(Template::class);
-        $this->twigEnvironment
-            ->expects(self::once())
+        $this->twigEnvironment->expects(self::once())
             ->method('load')
             ->with('@OroLocale/Twig/address.html.twig')
             ->willReturn(new TemplateWrapper($this->twigEnvironment, $template));
 
-        $template
+        $template->expects(self::any())
             ->method('hasBlock')
-            ->willReturnCallback(
-                static fn (string $blockName) => $blockName === 'address_part' || $blockName === 'address_part_phone'
-            );
+            ->willReturnCallback(static function (string $blockName) {
+                return $blockName === 'address_part' || $blockName === 'address_part_phone';
+            });
 
-        $template
-            ->expects(self::any())
+        $template->expects(self::any())
             ->method('renderBlock')
             ->willReturnCallback(function (string $blockName, array $context) {
                 return implode(
@@ -161,12 +159,11 @@ final class FormattedAddressRendererTest extends TestCase
         $addressFormat = "%country%";
 
         $exception = new \RuntimeException('Twig template not found');
-        $this->twigEnvironment
+        $this->twigEnvironment->expects(self::any())
             ->method('load')
             ->willThrowException($exception);
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('error')
             ->with(
                 'Rendering of an address failed: {message}',

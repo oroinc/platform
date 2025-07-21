@@ -10,9 +10,10 @@ use Oro\Bundle\BatchBundle\Step\ItemStep;
 use Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub\ProcessorStub;
 use Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub\ReaderStub;
 use Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub\WriterStub;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ItemStepTest extends \PHPUnit\Framework\TestCase
+class ItemStepTest extends TestCase
 {
     private const STEP_NAME = 'test_step_name';
 

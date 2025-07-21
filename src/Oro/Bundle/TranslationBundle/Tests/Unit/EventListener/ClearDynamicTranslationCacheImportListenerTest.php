@@ -8,16 +8,15 @@ use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\TranslationBundle\EventListener\ClearDynamicTranslationCacheImportListener;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationCache;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ClearDynamicTranslationCacheImportListenerTest extends \PHPUnit\Framework\TestCase
+class ClearDynamicTranslationCacheImportListenerTest extends TestCase
 {
     private const JOB_NAME = 'test_job_name';
 
-    /** @var DynamicTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $dynamicTranslationCache;
-
-    /** @var ClearDynamicTranslationCacheImportListener */
-    private $listener;
+    private DynamicTranslationCache&MockObject $dynamicTranslationCache;
+    private ClearDynamicTranslationCacheImportListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class ClearDynamicTranslationCacheImportListenerTest extends \PHPUnit\Framework\
         );
     }
 
-    public function testOnAfterImportTranslationsJobFailed()
+    public function testOnAfterImportTranslationsJobFailed(): void
     {
         $event = $this->getAfterJobExecutionEvent();
 
@@ -40,7 +39,7 @@ class ClearDynamicTranslationCacheImportListenerTest extends \PHPUnit\Framework\
         $this->listener->onAfterImportTranslations($event);
     }
 
-    public function testOnAfterImportTranslationsJobSuccessfulUnknownJob()
+    public function testOnAfterImportTranslationsJobSuccessfulUnknownJob(): void
     {
         $event = $this->getAfterJobExecutionEvent(true, 'unknown');
 
@@ -50,7 +49,7 @@ class ClearDynamicTranslationCacheImportListenerTest extends \PHPUnit\Framework\
         $this->listener->onAfterImportTranslations($event);
     }
 
-    public function testOnAfterImportTranslationsJobSuccessfulWithoutLanguageCode()
+    public function testOnAfterImportTranslationsJobSuccessfulWithoutLanguageCode(): void
     {
         $event = $this->getAfterJobExecutionEvent(true, self::JOB_NAME);
 
@@ -60,7 +59,7 @@ class ClearDynamicTranslationCacheImportListenerTest extends \PHPUnit\Framework\
         $this->listener->onAfterImportTranslations($event);
     }
 
-    public function testOnAfterImportTranslationsJobSuccessfulWithLanguageCode()
+    public function testOnAfterImportTranslationsJobSuccessfulWithLanguageCode(): void
     {
         $locale = 'en';
 

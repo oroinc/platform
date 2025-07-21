@@ -13,13 +13,10 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class RequestListenerTest extends TestCase
 {
-    private RequestListener $listener;
-
-    private ApplicationState|MockObject $applicationState;
-
-    private Request|MockObject $request;
-
     private string $templatePath = __DIR__ . '/data/notinstalled.html';
+    private ApplicationState&MockObject $applicationState;
+    private Request&MockObject $request;
+    private RequestListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +26,7 @@ class RequestListenerTest extends TestCase
         $this->listener = new RequestListener($this->applicationState, $this->templatePath);
     }
 
-    public function testApplicationIsNotInstalled()
+    public function testApplicationIsNotInstalled(): void
     {
         $event = new RequestEvent(
             $this->createMock(HttpKernelInterface::class),
@@ -49,7 +46,7 @@ class RequestListenerTest extends TestCase
         self::assertEquals('Application not installed', trim($response->getContent()));
     }
 
-    public function testApplicationIsInstalled()
+    public function testApplicationIsInstalled(): void
     {
         $event = new RequestEvent(
             $this->createMock(HttpKernelInterface::class),

@@ -8,8 +8,9 @@ use Oro\Component\Config\Loader\CumulativeFileLoader;
 use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
+class CumulativeFileLoaderTest extends TestCase
 {
     use TempDirExtension;
 
@@ -27,7 +28,7 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
 
-    public function testLoader()
+    public function testLoader(): void
     {
         $relativeFilePath = 'Resources/config/test.yml';
 
@@ -63,14 +64,14 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         string $relativeFilePath,
         string $expectedRelativeFilePath,
         string $expectedResource
-    ) {
+    ): void {
         $loader = $this->getMockForAbstractClass(CumulativeFileLoader::class, [$relativeFilePath]);
 
         $this->assertEquals($expectedRelativeFilePath, $loader->getRelativeFilePath());
         $this->assertEquals($expectedResource, $loader->getResource());
     }
 
-    public function testRegisterFoundResource()
+    public function testRegisterFoundResource(): void
     {
         $relativeFilePath = 'Resources/config/test.yml';
 
@@ -90,7 +91,7 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResource, $resource);
     }
 
-    public function testIsResourceFreshNoChanges()
+    public function testIsResourceFreshNoChanges(): void
     {
         $relativeFilePath = 'Resources/config/test.yml';
 
@@ -106,7 +107,7 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
     }
 
-    public function testIsResourceFreshNoFile()
+    public function testIsResourceFreshNoFile(): void
     {
         $relativeFilePath = 'Resources/config/none.tmp';
 
@@ -122,7 +123,7 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
     }
 
-    public function testIsResourceFreshExistingFileWasChanged()
+    public function testIsResourceFreshExistingFileWasChanged(): void
     {
         $relativeFilePath = 'Resources/config/test.yml';
 
@@ -138,7 +139,7 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
     }
 
-    public function testIsResourceFreshNewFileWasAdded()
+    public function testIsResourceFreshNewFileWasAdded(): void
     {
         $relativeFilePath = 'Resources/config/test.tmp';
 
@@ -158,7 +159,7 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function testIsResourceFreshNewFileWasDeleted()
+    public function testIsResourceFreshNewFileWasDeleted(): void
     {
         $relativeFilePath = 'Resources/config/test.tmp';
 

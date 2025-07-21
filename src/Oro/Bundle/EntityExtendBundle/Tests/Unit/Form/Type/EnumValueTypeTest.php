@@ -25,8 +25,7 @@ use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 class EnumValueTypeTest extends FormIntegrationTestCase
 {
-    /** @var EnumValueType */
-    private $type;
+    private EnumValueType $type;
 
     #[\Override]
     protected function setUp(): void

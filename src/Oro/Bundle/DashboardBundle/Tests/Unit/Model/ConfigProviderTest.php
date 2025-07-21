@@ -10,12 +10,13 @@ use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\FirstTestBund
 use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\SecondTestBundle\SecondTestBundle;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ConfigProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigProviderTest extends TestCase
 {
     use TempDirExtension;
 
@@ -104,50 +105,50 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetDashboardConfigs()
+    public function testGetDashboardConfigs(): void
     {
         self::assertEquals($this->expectedDashboardConfigs, $this->configurationProvider->getDashboardConfigs());
     }
 
-    public function testHasDashboardConfig()
+    public function testHasDashboardConfig(): void
     {
         foreach (\array_keys($this->expectedDashboardConfigs) as $name) {
             self::assertTrue($this->configurationProvider->hasDashboardConfig($name), $name);
         }
     }
 
-    public function testGetDashboardConfig()
+    public function testGetDashboardConfig(): void
     {
         foreach ($this->expectedDashboardConfigs as $name => $config) {
             self::assertEquals($config, $this->configurationProvider->getDashboardConfig($name), $name);
         }
     }
 
-    public function testGetWidgetConfigs()
+    public function testGetWidgetConfigs(): void
     {
         self::assertEquals($this->expectedWidgetConfigs, $this->configurationProvider->getWidgetConfigs());
     }
 
-    public function testHasWidgetConfig()
+    public function testHasWidgetConfig(): void
     {
         foreach (\array_keys($this->expectedWidgetConfigs) as $name) {
             self::assertTrue($this->configurationProvider->hasWidgetConfig($name), $name);
         }
     }
 
-    public function testGetWidgetConfig()
+    public function testGetWidgetConfig(): void
     {
         foreach ($this->expectedWidgetConfigs as $name => $config) {
             self::assertEquals($config, $this->configurationProvider->getWidgetConfig($name), $name);
         }
     }
 
-    public function testHasWidgetConfigForUnknownWidget()
+    public function testHasWidgetConfigForUnknownWidget(): void
     {
         self::assertFalse($this->configurationProvider->hasWidgetConfig('unknown'));
     }
 
-    public function testGetWidgetConfigForUnknownWidget()
+    public function testGetWidgetConfigForUnknownWidget(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage("Can't find configuration for: unknown");
@@ -155,17 +156,17 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->configurationProvider->getWidgetConfig('unknown');
     }
 
-    public function testGetWidgetConfigForUnknownWidgetIfExceptioNotAllowed()
+    public function testGetWidgetConfigForUnknownWidgetIfExceptioNotAllowed(): void
     {
         self::assertNull($this->configurationProvider->getWidgetConfig('unknown', false));
     }
 
-    public function testHasDashboardConfigForUnknownDashboard()
+    public function testHasDashboardConfigForUnknownDashboard(): void
     {
         self::assertFalse($this->configurationProvider->hasDashboardConfig('unknown'));
     }
 
-    public function testGetDashboardConfigForUnknownDashboard()
+    public function testGetDashboardConfigForUnknownDashboard(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage("Can't find configuration for: unknown");

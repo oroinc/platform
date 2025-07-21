@@ -4,13 +4,13 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\DataCollector;
 
 use Doctrine\DBAL\Logging\DebugStack;
 use Oro\Bundle\EntityBundle\DataCollector\DuplicateQueriesDataCollector;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class DuplicateQueriesDataCollectorTest extends \PHPUnit\Framework\TestCase
+class DuplicateQueriesDataCollectorTest extends TestCase
 {
-    /** @var DuplicateQueriesDataCollector */
-    private $collector;
+    private DuplicateQueriesDataCollector $collector;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class DuplicateQueriesDataCollectorTest extends \PHPUnit\Framework\TestCase
         $this->collector = new DuplicateQueriesDataCollector();
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals('duplicate_queries', $this->collector->getName());
     }
@@ -26,8 +26,12 @@ class DuplicateQueriesDataCollectorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider collectDataProvider
      */
-    public function testCollect(array $loggers, int $expectedCount, array $expectedIdentical, array $expectedSimilar)
-    {
+    public function testCollect(
+        array $loggers,
+        int $expectedCount,
+        array $expectedIdentical,
+        array $expectedSimilar
+    ): void {
         foreach ($loggers as $loggerName => $queries) {
             $logger = new DebugStack();
             $logger->queries = $queries;
@@ -128,7 +132,7 @@ class DuplicateQueriesDataCollectorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $this->assertEquals(0, $this->collector->getQueriesCount());
         $this->assertEquals(0, $this->collector->getIdenticalQueriesCount());

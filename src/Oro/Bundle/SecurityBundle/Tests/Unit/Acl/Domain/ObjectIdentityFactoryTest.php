@@ -8,16 +8,16 @@ use Oro\Bundle\SecurityBundle\Attribute\Acl as AclAttribute;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntityImplementsDomainObjectInterface;
 use Oro\Bundle\SecurityBundle\Tests\Unit\TestHelper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
+class ObjectIdentityFactoryTest extends TestCase
 {
-    /** @var ObjectIdentityFactory */
-    private $factory;
+    private ObjectIdentityFactory $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +27,7 @@ class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRoot()
+    public function testRoot(): void
     {
         $id = $this->factory->root('entity');
         $this->assertEquals('entity', $id->getIdentifier());
@@ -58,7 +58,7 @@ class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(ObjectIdentityFactory::ROOT_IDENTITY_TYPE, $id->getType());
     }
 
-    public function testUnderlyingForObjectLevelObjectIdentity()
+    public function testUnderlyingForObjectLevelObjectIdentity(): void
     {
         $id = $this->createMock(ObjectIdentityInterface::class);
         $id->expects(self::any())
@@ -73,7 +73,7 @@ class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(TestEntity::class, $underlyingId->getType());
     }
 
-    public function testUnderlyingForRootObjectIdentity()
+    public function testUnderlyingForRootObjectIdentity(): void
     {
         $this->expectException(InvalidAclException::class);
         $this->expectExceptionMessage(sprintf(
@@ -84,7 +84,7 @@ class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory->underlying($this->factory->root('entity'));
     }
 
-    public function testUnderlyingForClassLevelObjectIdentity()
+    public function testUnderlyingForClassLevelObjectIdentity(): void
     {
         $this->expectException(InvalidAclException::class);
         $this->expectExceptionMessage(sprintf(
@@ -95,7 +95,7 @@ class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory->underlying($this->factory->get('entity:' . TestEntity::class));
     }
 
-    public function testUnderlyingForClassLevelObjectIdentityThatDoesNotHaveToStringMethod()
+    public function testUnderlyingForClassLevelObjectIdentityThatDoesNotHaveToStringMethod(): void
     {
         $id = $this->createMock(ObjectIdentityInterface::class);
         $id->expects(self::any())
@@ -115,7 +115,7 @@ class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory->underlying($id);
     }
 
-    public function testFromDomainObjectPrefersInterfaceOverGetId()
+    public function testFromDomainObjectPrefersInterfaceOverGetId(): void
     {
         $obj = new TestEntityImplementsDomainObjectInterface('getObjectIdentifier()');
         $id = $this->factory->get($obj);
@@ -123,7 +123,7 @@ class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(get_class($obj), $id->getType());
     }
 
-    public function testFromDomainObjectWithoutDomainObjectInterface()
+    public function testFromDomainObjectWithoutDomainObjectInterface(): void
     {
         $obj = new TestEntity('getId()');
         $id = $this->factory->get($obj);
@@ -131,13 +131,13 @@ class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(get_class($obj), $id->getType());
     }
 
-    public function testFromDomainObjectNull()
+    public function testFromDomainObjectNull(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $this->factory->get(null);
     }
 
-    public function testGetShouldCatchInvalidArgumentException()
+    public function testGetShouldCatchInvalidArgumentException(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $this->factory->get(new TestEntityImplementsDomainObjectInterface());
@@ -146,38 +146,38 @@ class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getProvider
      */
-    public function testGet($descriptor, $expectedId, $expectedType)
+    public function testGet($descriptor, $expectedId, $expectedType): void
     {
         $id = $this->factory->get($descriptor);
         $this->assertEquals($expectedType, $id->getType());
         $this->assertEquals($expectedId, $id->getIdentifier());
     }
 
-    public function testGetIncorrectClassDescriptor()
+    public function testGetIncorrectClassDescriptor(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $this->factory->get('AcmeBundle\SomeClass');
     }
 
-    public function testGetIncorrectEntityDescriptor()
+    public function testGetIncorrectEntityDescriptor(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $this->factory->get('AcmeBundle:SomeEntity');
     }
 
-    public function testGetWithInvalidEntityName()
+    public function testGetWithInvalidEntityName(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $this->factory->get('entity:AcmeBundle:Entity:SomeEntity');
     }
 
-    public function testGetIncorrectActionDescriptor()
+    public function testGetIncorrectActionDescriptor(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $this->factory->get('Some Action');
     }
 
-    public function testFromEntityAclAttribute()
+    public function testFromEntityAclAttribute(): void
     {
         $obj = AclAttribute::fromArray(['id' => 'test', 'type' => 'entity', 'class' => 'Acme\SomeEntity']);
         $id = $this->factory->get($obj);
@@ -185,7 +185,7 @@ class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Acme\SomeEntity', $id->getType());
     }
 
-    public function testFromActionAclAttribute()
+    public function testFromActionAclAttribute(): void
     {
         $obj = AclAttribute::fromArray(['id' => 'test_action', 'type' => 'action']);
         $id = $this->factory->get($obj);

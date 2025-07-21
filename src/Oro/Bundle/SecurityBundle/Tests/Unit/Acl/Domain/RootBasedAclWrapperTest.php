@@ -8,6 +8,8 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\RootAclWrapper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclWrapper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityToStringConverter;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
@@ -17,13 +19,10 @@ use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RootBasedAclWrapperTest extends \PHPUnit\Framework\TestCase
+class RootBasedAclWrapperTest extends TestCase
 {
-    /** @var Acl|\PHPUnit\Framework\MockObject\MockObject */
-    private $acl;
-
-    /** @var Acl|\PHPUnit\Framework\MockObject\MockObject */
-    private $rootAcl;
+    private Acl&MockObject $acl;
+    private Acl&MockObject $rootAcl;
 
     #[\Override]
     protected function setUp(): void

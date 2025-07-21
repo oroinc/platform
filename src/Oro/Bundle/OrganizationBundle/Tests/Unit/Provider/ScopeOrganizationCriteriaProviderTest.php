@@ -5,16 +5,15 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Provider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class ScopeOrganizationCriteriaProviderTest extends \PHPUnit\Framework\TestCase
+class ScopeOrganizationCriteriaProviderTest extends TestCase
 {
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var ScopeOrganizationCriteriaProvider */
-    private $provider;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private ScopeOrganizationCriteriaProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -24,12 +23,12 @@ class ScopeOrganizationCriteriaProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new ScopeOrganizationCriteriaProvider($this->tokenStorage);
     }
 
-    public function testGetCriteriaField()
+    public function testGetCriteriaField(): void
     {
         $this->assertEquals(ScopeOrganizationCriteriaProvider::ORGANIZATION, $this->provider->getCriteriaField());
     }
 
-    public function testGetCriteriaValue()
+    public function testGetCriteriaValue(): void
     {
         $organization = new Organization();
 
@@ -45,7 +44,7 @@ class ScopeOrganizationCriteriaProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($organization, $this->provider->getCriteriaValue());
     }
 
-    public function testGetCriteriaValueWithoutToken()
+    public function testGetCriteriaValueWithoutToken(): void
     {
         $this->tokenStorage->expects($this->once())
             ->method('getToken')
@@ -54,7 +53,7 @@ class ScopeOrganizationCriteriaProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->provider->getCriteriaValue());
     }
 
-    public function testGetCriteriaValueWithoutOrganizationAwareToken()
+    public function testGetCriteriaValueWithoutOrganizationAwareToken(): void
     {
         $token = $this->createMock(TokenInterface::class);
 
@@ -65,7 +64,7 @@ class ScopeOrganizationCriteriaProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->provider->getCriteriaValue());
     }
 
-    public function testGetCriteriaValueType()
+    public function testGetCriteriaValueType(): void
     {
         $this->assertEquals(Organization::class, $this->provider->getCriteriaValueType());
     }

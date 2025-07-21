@@ -9,8 +9,7 @@ use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 
 class ConfigurableTypeExtensionTest extends ConfigurableBlockTestCase
 {
-    /** @var ConfigurableTypeExtension */
-    private $extension;
+    private ConfigurableTypeExtension $extension;
 
     #[\Override]
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
@@ -25,7 +24,7 @@ class ConfigurableTypeExtensionTest extends ConfigurableBlockTestCase
         $layoutFactoryBuilder->addTypeExtension($this->extension);
     }
 
-    public function testGetNameException()
+    public function testGetNameException(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Name of extended type should be provided for block type extension');
@@ -33,12 +32,12 @@ class ConfigurableTypeExtensionTest extends ConfigurableBlockTestCase
         (new ConfigurableTypeExtension())->getExtendedType();
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals(self::TYPE_NAME, $this->extension->getExtendedType());
     }
 
-    public function testSetNameExceptionType()
+    public function testSetNameExceptionType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Name of extended type should be a string, array given');

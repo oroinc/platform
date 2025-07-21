@@ -14,9 +14,9 @@ use Symfony\Component\Form\FormView;
 
 final class SelectBuilderTest extends TestCase
 {
+    private Packages&MockObject $packages;
+    private FormBuilderInterface&MockObject $formBuilder;
     private SelectBuilder $selectBuilder;
-    private Packages|MockObject $packages;
-    private FormBuilderInterface|MockObject $formBuilder;
 
     #[\Override]
     protected function setUp(): void
@@ -50,8 +50,7 @@ final class SelectBuilderTest extends TestCase
      */
     public function testThatOptionBuiltCorrectly(array $option, array $expected): void
     {
-        $this->formBuilder
-            ->expects(self::once())
+        $this->formBuilder->expects(self::once())
             ->method('add')
             ->with(
                 $expected['name'],
@@ -82,14 +81,12 @@ final class SelectBuilderTest extends TestCase
             ->willReturn($data);
 
         if ($assets['count'] > 0) {
-            $this->packages
-                ->expects(self::exactly($assets['count']))
+            $this->packages->expects(self::exactly($assets['count']))
                 ->method('getUrl')
                 ->withConsecutive(...$assets['url'])
                 ->willReturnOnConsecutiveCalls(...$assets['fullUrl']);
         } else {
-            $this->packages
-                ->expects(self::never())
+            $this->packages->expects(self::never())
                 ->method('getUrl');
         }
 

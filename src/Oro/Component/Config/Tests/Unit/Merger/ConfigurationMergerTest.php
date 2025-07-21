@@ -3,16 +3,16 @@
 namespace Oro\Component\Config\Tests\Unit\Merger;
 
 use Oro\Component\Config\Merger\ConfigurationMerger;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
-class ConfigurationMergerTest extends \PHPUnit\Framework\TestCase
+class ConfigurationMergerTest extends TestCase
 {
     private const BUNDLE1 = 'Oro\Bundle\TestBundle1\TestBundle1';
     private const BUNDLE2 = 'Oro\Bundle\TestBundle1\TestBundle2';
     private const BUNDLE3 = 'Oro\Bundle\TestBundle1\TestBundle3';
 
-    /** @var ConfigurationMerger */
-    private $merger;
+    private ConfigurationMerger $merger;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +23,7 @@ class ConfigurationMergerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider mergeConfigurationDataProvider
      */
-    public function testMergeConfiguration(array $rawConfig, array $expected)
+    public function testMergeConfiguration(array $rawConfig, array $expected): void
     {
         $configs = $this->merger->mergeConfiguration($rawConfig);
 
@@ -263,7 +263,7 @@ class ConfigurationMergerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider mergeConfigurationExceptionDataProvider
      */
-    public function testMergeConfigurationException(array $rawConfig, string $expectedMessage)
+    public function testMergeConfigurationException(array $rawConfig, string $expectedMessage): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expectedMessage);

@@ -16,26 +16,19 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class IsGrantedWorkflowTransitionTest extends \PHPUnit\Framework\TestCase
+class IsGrantedWorkflowTransitionTest extends TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclGroupProvider;
-
-    /** @var IsGrantedWorkflowTransition */
-    private $condition;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private WorkflowManager&MockObject $workflowManager;
+    private AclGroupProviderInterface&MockObject $aclGroupProvider;
+    private IsGrantedWorkflowTransition $condition;
 
     #[\Override]
     protected function setUp(): void
@@ -54,7 +47,7 @@ class IsGrantedWorkflowTransitionTest extends \PHPUnit\Framework\TestCase
         $this->condition->setContextAccessor(new ContextAccessor());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertSame(IsGrantedWorkflowTransition::NAME, $this->condition->getName());
     }
@@ -62,7 +55,7 @@ class IsGrantedWorkflowTransitionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider wrongOptionsDataProvider
      */
-    public function testInitializeFail(array $options, string $exceptionMessage)
+    public function testInitializeFail(array $options, string $exceptionMessage): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($exceptionMessage);
@@ -81,7 +74,7 @@ class IsGrantedWorkflowTransitionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $options = ['transition', 'step'];
 
@@ -90,7 +83,7 @@ class IsGrantedWorkflowTransitionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('step', ReflectionUtil::getPropertyValue($this->condition, 'targetStepName'));
     }
 
-    public function testEvaluateNoUser()
+    public function testEvaluateNoUser(): void
     {
         $context = new WorkflowItem();
         $context->setEntity(new \stdClass());
@@ -104,7 +97,7 @@ class IsGrantedWorkflowTransitionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->condition->evaluate($context));
     }
 
-    public function testEvaluatePerformTransitionsDenied()
+    public function testEvaluatePerformTransitionsDenied(): void
     {
         $entity = new \stdClass();
         $context = new WorkflowItem();
@@ -135,7 +128,7 @@ class IsGrantedWorkflowTransitionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->condition->evaluate($context));
     }
 
-    public function testEvaluatePerformTransitionDenied()
+    public function testEvaluatePerformTransitionDenied(): void
     {
         $entity = new \stdClass();
         $context = new WorkflowItem();
@@ -179,7 +172,7 @@ class IsGrantedWorkflowTransitionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->condition->evaluate($context));
     }
 
-    public function testEvaluatePerformTransitionsDeniedForStartTransition()
+    public function testEvaluatePerformTransitionsDeniedForStartTransition(): void
     {
         $entity = new \stdClass();
         $context = new WorkflowItem();
@@ -227,7 +220,7 @@ class IsGrantedWorkflowTransitionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->condition->evaluate($context));
     }
 
-    public function testEvaluate()
+    public function testEvaluate(): void
     {
         $entity = new \stdClass();
         $context = new WorkflowItem();
@@ -271,7 +264,7 @@ class IsGrantedWorkflowTransitionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->condition->evaluate($context));
     }
 
-    public function testEvaluateWithCustomGroup()
+    public function testEvaluateWithCustomGroup(): void
     {
         $entity = new \stdClass();
         $context = new WorkflowItem();

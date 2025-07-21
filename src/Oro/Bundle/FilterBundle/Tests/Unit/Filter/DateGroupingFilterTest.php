@@ -8,18 +8,15 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\FilterBundle\Filter\DateGroupingFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 
-class DateGroupingFilterTest extends \PHPUnit\Framework\TestCase
+class DateGroupingFilterTest extends TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var DateGroupingFilter */
-    private $filter;
+    private FormFactoryInterface&MockObject $formFactory;
+    private ManagerRegistry&MockObject $doctrine;
+    private DateGroupingFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,7 @@ class DateGroupingFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApplyOrderByWhenNoAdded()
+    public function testApplyOrderByWhenNoAdded(): void
     {
         $datasource = $this->createMock(OrmDatasource::class);
         $sortKey = 'someKey';
@@ -59,7 +56,7 @@ class DateGroupingFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->applyOrderBy($datasource, $sortKey, $direction);
     }
 
-    public function testApplyOrderBy()
+    public function testApplyOrderBy(): void
     {
         $datasource = $this->createMock(OrmDatasource::class);
         $sortKey = 'someKey';

@@ -9,16 +9,15 @@ use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\EventListener\EntityExtendedStructureOptionsListener;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityExtendedStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
+class EntityExtendedStructureOptionsListenerTest extends TestCase
 {
     private const CURRENT_RELATION_TYPE = 'CurrentType';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var EntityExtendedStructureOptionsListener */
-    private $listener;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityExtendedStructureOptionsListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -51,7 +50,7 @@ class EntityExtendedStructureOptionsListenerTest extends \PHPUnit\Framework\Test
         string $fieldName,
         string|int $type,
         bool $hasAssociation
-    ) {
+    ): void {
         $entityMetadata = $this->createMock(ClassMetadata::class);
 
         $entityMetadata->expects($this->once())
@@ -138,7 +137,7 @@ class EntityExtendedStructureOptionsListenerTest extends \PHPUnit\Framework\Test
         ];
     }
 
-    public function testOnOptionsRequestForNotManageableEntity()
+    public function testOnOptionsRequestForNotManageableEntity(): void
     {
         $entityMetadata = $this->createMock(ClassMetadata::class);
         $entityMetadata->expects($this->never())

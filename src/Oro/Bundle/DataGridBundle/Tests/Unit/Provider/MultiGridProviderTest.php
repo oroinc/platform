@@ -10,9 +10,10 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class MultiGridProviderTest extends \PHPUnit\Framework\TestCase
+class MultiGridProviderTest extends TestCase
 {
     private const GRID_NAME = 'mygrig1';
 
@@ -26,8 +27,7 @@ class MultiGridProviderTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /** @var MultiGridProvider */
-    private $multiGridProvider;
+    private MultiGridProvider $multiGridProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -79,7 +79,7 @@ class MultiGridProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetContextGridByEntity()
+    public function testGetContextGridByEntity(): void
     {
         $gridName = $this->multiGridProvider->getContextGridByEntity(User::class);
         $this->assertEquals(self::GRID_NAME, $gridName);
@@ -93,7 +93,7 @@ class MultiGridProviderTest extends \PHPUnit\Framework\TestCase
         array $classNames,
         array $expectedArray,
         int $expectedCount
-    ) {
+    ): void {
         $this->permissions = $permissions;
 
         $entitiesData = $this->multiGridProvider->getEntitiesData($classNames);

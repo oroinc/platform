@@ -8,21 +8,16 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
 use Oro\Bundle\WorkflowBundle\Model\FormOptionsConfigurationAssembler;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\CustomFormType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormRegistryInterface;
 
-class FormOptionsConfigurationAssemblerTest extends \PHPUnit\Framework\TestCase
+class FormOptionsConfigurationAssemblerTest extends TestCase
 {
-    /** @var FormRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formRegistry;
-
-    /** @var FormHandlerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $formHandlerRegistry;
-
-    /** @var FormTemplateDataProviderRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $formTemplateDataProviderRegistry;
-
-    /** @var FormOptionsConfigurationAssembler */
-    private $assembler;
+    private FormRegistryInterface&MockObject $formRegistry;
+    private FormHandlerRegistry&MockObject $formHandlerRegistry;
+    private FormTemplateDataProviderRegistry&MockObject $formTemplateDataProviderRegistry;
+    private FormOptionsConfigurationAssembler $assembler;
 
     private static array $transitionConfiguration = [
         'form_type' => CustomFormType::class,
@@ -50,7 +45,7 @@ class FormOptionsConfigurationAssemblerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAssembleUnregisteredFormTypeException()
+    public function testAssembleUnregisteredFormTypeException(): void
     {
         $transitionConfiguration = self::$transitionConfiguration;
         $transitionConfiguration['form_type'] = 'UnknownFormType';
@@ -64,7 +59,7 @@ class FormOptionsConfigurationAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assembler->assemble($transitionConfiguration);
     }
 
-    public function testAssembleRequiredFormTypeException()
+    public function testAssembleRequiredFormTypeException(): void
     {
         $expectedExceptionMessage = sprintf(
             'Unable to resolve form type "%s"',
@@ -78,7 +73,7 @@ class FormOptionsConfigurationAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assembler->assemble(self::$transitionConfiguration);
     }
 
-    public function testAssembleRequiredHandlerException()
+    public function testAssembleRequiredHandlerException(): void
     {
         $formOptions = self::$transitionConfiguration['form_options'];
         $expectedExceptionMessage = sprintf(
@@ -96,7 +91,7 @@ class FormOptionsConfigurationAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assembler->assemble(self::$transitionConfiguration);
     }
 
-    public function testAssembleRequiredDataProviderException()
+    public function testAssembleRequiredDataProviderException(): void
     {
         $formOptions = self::$transitionConfiguration['form_options'];
         $expectedExceptionMessage = sprintf(
@@ -117,7 +112,7 @@ class FormOptionsConfigurationAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assembler->assemble(self::$transitionConfiguration);
     }
 
-    public function testAssemble()
+    public function testAssemble(): void
     {
         $this->formRegistry->expects($this->once())
             ->method('hasType')

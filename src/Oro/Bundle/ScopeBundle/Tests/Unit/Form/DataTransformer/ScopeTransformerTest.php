@@ -6,18 +6,17 @@ use Oro\Bundle\ScopeBundle\Form\DataTransformer\ScopeTransformer;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\ScopeBundle\Tests\Unit\Stub\StubScope;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ScopeTransformerTest extends \PHPUnit\Framework\TestCase
+class ScopeTransformerTest extends TestCase
 {
     use EntityTrait;
 
     private const SCOPE_TYPE = 'test_scope_type';
 
-    /** @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $scopeManager;
-
-    /** @var ScopeTransformer */
-    private $transformer;
+    private ScopeManager&MockObject $scopeManager;
+    private ScopeTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class ScopeTransformerTest extends \PHPUnit\Framework\TestCase
         $this->transformer = new ScopeTransformer($this->scopeManager, self::SCOPE_TYPE);
     }
 
-    public function testTransform()
+    public function testTransform(): void
     {
         $scopeValue = new \stdClass();
         $scope = new StubScope();
@@ -43,7 +42,7 @@ class ScopeTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['scopeField' => $scopeValue], $result);
     }
 
-    public function testTransformForNull()
+    public function testTransformForNull(): void
     {
         $this->scopeManager->expects($this->never())
             ->method('getScopeEntities');
@@ -51,7 +50,7 @@ class ScopeTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->transformer->transform(null));
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $scopeValue = new \stdClass();
         $scope = new StubScope();
@@ -71,7 +70,7 @@ class ScopeTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($scope, $result);
     }
 
-    public function testReverseTransformForNull()
+    public function testReverseTransformForNull(): void
     {
         $this->scopeManager->expects($this->never())
             ->method('findOrCreate');

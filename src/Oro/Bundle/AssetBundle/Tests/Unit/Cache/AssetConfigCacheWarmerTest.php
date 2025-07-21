@@ -8,15 +8,8 @@ use PHPUnit\Framework\TestCase;
 
 class AssetConfigCacheWarmerTest extends TestCase
 {
-    /**
-     * @var AssetConfigCache
-     */
-    private $cache;
-
-    /**
-     * @var AssetConfigCacheWarmer
-     */
-    private $warmer;
+    private AssetConfigCache $cache;
+    private AssetConfigCacheWarmer $warmer;
 
     #[\Override]
     protected function setUp(): void
@@ -25,12 +18,12 @@ class AssetConfigCacheWarmerTest extends TestCase
         $this->warmer = new AssetConfigCacheWarmer($this->cache);
     }
 
-    public function testIsOptional()
+    public function testIsOptional(): void
     {
         $this->assertFalse($this->warmer->isOptional());
     }
 
-    public function testWarmUp()
+    public function testWarmUp(): void
     {
         $this->cache->expects($this->once())
             ->method('warmup');

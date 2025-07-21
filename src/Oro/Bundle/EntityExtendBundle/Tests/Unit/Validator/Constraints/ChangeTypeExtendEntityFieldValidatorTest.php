@@ -7,14 +7,14 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\ChangeTypeExtendEntityField;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\ChangeTypeExtendEntityFieldValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class ChangeTypeExtendEntityFieldValidatorTest extends ConstraintValidatorTestCase
 {
     private const ENTITY_CLASS = 'Test\Entity';
 
-    /** @var FieldNameValidationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldNameValidationHelper;
+    private FieldNameValidationHelper&MockObject $fieldNameValidationHelper;
 
     #[\Override]
     protected function setUp(): void

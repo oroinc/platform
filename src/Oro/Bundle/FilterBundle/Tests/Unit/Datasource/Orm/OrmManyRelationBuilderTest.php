@@ -35,7 +35,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
         $this->builder = new OrmManyRelationBuilder($doctrine);
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $this->assertTrue(
             $this->builder->supports(
@@ -52,7 +52,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
     /**
      * @dataProvider inverseProvider
      */
-    public function testBuildComparisonExprSimple(bool $inverse)
+    public function testBuildComparisonExprSimple(bool $inverse): void
     {
         $qb = $this->em->createQueryBuilder()
             ->select('o.id')
@@ -79,7 +79,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
     /**
      * @dataProvider inverseProvider
      */
-    public function testBuildNullValueExprSimple(bool $inverse)
+    public function testBuildNullValueExprSimple(bool $inverse): void
     {
         $qb = $this->em->createQueryBuilder()
             ->select('o.id')
@@ -106,7 +106,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
     /**
      * @dataProvider inverseProvider
      */
-    public function testBuildComparisonExprWithSimpleJoin(bool $inverse)
+    public function testBuildComparisonExprWithSimpleJoin(bool $inverse): void
     {
         $qb = $this->em->createQueryBuilder()
             ->select('o.id, p1.id')
@@ -135,7 +135,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
     /**
      * @dataProvider inverseProvider
      */
-    public function testBuildComparisonExprWithUnidirectionalJoin(bool $inverse)
+    public function testBuildComparisonExprWithUnidirectionalJoin(bool $inverse): void
     {
         $qb = $this->em->createQueryBuilder()
             ->select('o.id, p1.id')

@@ -12,19 +12,18 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class MassActionHelperTest extends \PHPUnit\Framework\TestCase
+class MassActionHelperTest extends TestCase
 {
     private const MASS_ACTION_NAME = 'massActionName';
     private const HANDLER_SERVICE_ID = 'handlerServiceId';
 
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var MassActionHelper */
-    private $massActionHelper;
+    private ContainerInterface&MockObject $container;
+    private MassActionHelper $massActionHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +32,7 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
         $this->massActionHelper = new MassActionHelper($this->container);
     }
 
-    public function testGetHandlerWhenNoHandlerOptionExists()
+    public function testGetHandlerWhenNoHandlerOptionExists(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(sprintf('There is no handler for mass action "%s"', self::MASS_ACTION_NAME));
@@ -43,7 +42,7 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
         $this->massActionHelper->getHandler($massAction);
     }
 
-    public function testGetHandlerWhenNoHandlerServiceExists()
+    public function testGetHandlerWhenNoHandlerServiceExists(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(sprintf('Mass action handler service "%s" not exist', self::HANDLER_SERVICE_ID));
@@ -58,7 +57,7 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
         $this->massActionHelper->getHandler($massAction);
     }
 
-    public function testGetHandlerWhenHandlerIsOfBadInterface()
+    public function testGetHandlerWhenHandlerIsOfBadInterface(): void
     {
         $this->expectException(UnexpectedTypeException::class);
 
@@ -77,7 +76,7 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
         $this->massActionHelper->getHandler($massAction);
     }
 
-    public function testGetHandlerWhenHandler()
+    public function testGetHandlerWhenHandler(): void
     {
         $massAction = $this->creatMassAction(ActionConfiguration::create(['handler' => self::HANDLER_SERVICE_ID]));
 
@@ -95,7 +94,7 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($handler, $this->massActionHelper->getHandler($massAction));
     }
 
-    public function testGetMassActionByNameWhenNoMassActionExtension()
+    public function testGetMassActionByNameWhenNoMassActionExtension(): void
     {
         $dataGrid = $this->createMock(DatagridInterface::class);
 
@@ -109,7 +108,7 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
         $this->massActionHelper->getMassActionByName(self::MASS_ACTION_NAME, $dataGrid);
     }
 
-    public function testGetMassActionByNameWhenNoMassAction()
+    public function testGetMassActionByNameWhenNoMassAction(): void
     {
         $dataGrid = $this->createMock(DatagridInterface::class);
 
@@ -127,7 +126,7 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
         $this->massActionHelper->getMassActionByName(self::MASS_ACTION_NAME, $dataGrid);
     }
 
-    public function testGetMassActionByName()
+    public function testGetMassActionByName(): void
     {
         $dataGrid = $this->createMock(DatagridInterface::class);
 
@@ -144,7 +143,7 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($massAction, $this->massActionHelper->getMassActionByName(self::MASS_ACTION_NAME, $dataGrid));
     }
 
-    public function testIsRequestMethodAllowed()
+    public function testIsRequestMethodAllowed(): void
     {
         $massAction = $this->createMock(MassActionInterface::class);
         $massAction->expects($this->any())
@@ -161,10 +160,8 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->massActionHelper->isRequestMethodAllowed($massAction, Request::METHOD_DELETE));
     }
 
-    private function setDatagridExtensions(
-        DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $datagrid,
-        array $extensions
-    ): void {
+    private function setDatagridExtensions(DatagridInterface&MockObject $datagrid, array $extensions): void
+    {
         $acceptor = $this->createMock(Acceptor::class);
         $acceptor->expects($this->once())
             ->method('getExtensions')

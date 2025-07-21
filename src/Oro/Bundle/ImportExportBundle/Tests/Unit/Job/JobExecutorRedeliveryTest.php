@@ -22,35 +22,20 @@ use Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorRegistry;
 use Oro\Bundle\ImportExportBundle\Job\Context\SimpleContextAggregator;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class JobExecutorRedeliveryTest extends \PHPUnit\Framework\TestCase
+class JobExecutorRedeliveryTest extends TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var ConnectorRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $batchJobRegistry;
-
-    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextRegistry;
-
-    /** @var DoctrineJobRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $batchJobRepository;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $batchJobManager;
-
-    /** @var ContextAggregatorRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextAggregatorRegistry;
-
-    /** @var JobExecutor */
-    private $executor;
+    private EntityManager&MockObject $entityManager;
+    private Connection&MockObject $connection;
+    private ManagerRegistry&MockObject $doctrine;
+    private ConnectorRegistry&MockObject $batchJobRegistry;
+    private ContextRegistry&MockObject $contextRegistry;
+    private DoctrineJobRepository&MockObject $batchJobRepository;
+    private EntityManager&MockObject $batchJobManager;
+    private ContextAggregatorRegistry&MockObject $contextAggregatorRegistry;
+    private JobExecutor $executor;
 
     #[\Override]
     protected function setUp(): void

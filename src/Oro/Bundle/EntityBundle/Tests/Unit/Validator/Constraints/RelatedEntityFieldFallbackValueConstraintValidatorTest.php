@@ -7,6 +7,7 @@ use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 use Oro\Bundle\EntityBundle\Validator\Constraints\RelatedEntityFieldFallbackValueConstraint;
 use Oro\Bundle\EntityBundle\Validator\Constraints\RelatedEntityFieldFallbackValueConstraintValidator;
 use Oro\Component\DoctrineUtils\Tests\Unit\Stub\DummyEntity;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -17,11 +18,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class RelatedEntityFieldFallbackValueConstraintValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var EntityFallbackResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $resolver;
-
-    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextualValidator;
+    private EntityFallbackResolver&MockObject $resolver;
+    private ContextualValidatorInterface&MockObject $contextualValidator;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +39,7 @@ class RelatedEntityFieldFallbackValueConstraintValidatorTest extends ConstraintV
     protected function createContext(): ExecutionContext
     {
         $context = parent::createContext();
-        /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject $validator */
+        /** @var ValidatorInterface&MockObject $validator */
         $validator = $context->getValidator();
         $validator->expects($this->any())
             ->method('startContext')

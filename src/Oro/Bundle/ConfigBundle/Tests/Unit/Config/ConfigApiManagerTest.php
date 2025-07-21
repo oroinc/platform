@@ -9,20 +9,17 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\DataTransformerInterface;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Provider\ProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
+class ConfigApiManagerTest extends TestCase
 {
-    /** @var ProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ConfigApiManager */
-    private $manager;
+    private ProviderInterface&MockObject $configProvider;
+    private ConfigManager&MockObject $configManager;
+    private ConfigApiManager $manager;
 
     #[\Override]
     protected function setUp(): void

@@ -5,13 +5,13 @@ namespace Oro\Component\Action\Tests\Unit\Action;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\TreeExecutor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class TreeExecutorTest extends \PHPUnit\Framework\TestCase
+class TreeExecutorTest extends TestCase
 {
-    /** @var TreeExecutor */
-    private $listAction;
+    private TreeExecutor $listAction;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class TreeExecutorTest extends \PHPUnit\Framework\TestCase
         $this->listAction = new TreeExecutor();
     }
 
-    public function testAddAction()
+    public function testAddAction(): void
     {
         $expectedActions = [];
         for ($i = 0; $i < 3; $i++) {
@@ -35,7 +35,7 @@ class TreeExecutorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedActions, ReflectionUtil::getPropertyValue($this->listAction, 'actions'));
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $context = [1, 2, 3];
 
@@ -52,7 +52,7 @@ class TreeExecutorTest extends \PHPUnit\Framework\TestCase
         $this->listAction->execute($context);
     }
 
-    public function testBreakOnFailureEnabledException()
+    public function testBreakOnFailureEnabledException(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('TEST');
@@ -69,7 +69,7 @@ class TreeExecutorTest extends \PHPUnit\Framework\TestCase
         $this->listAction->execute([]);
     }
 
-    public function testBreakOnFailureDisabledException()
+    public function testBreakOnFailureDisabledException(): void
     {
         $actionError = $this->createExceptionAction();
         $action = $this->createMock(ActionInterface::class);
@@ -83,7 +83,7 @@ class TreeExecutorTest extends \PHPUnit\Framework\TestCase
         $this->listAction->execute([]);
     }
 
-    public function testBreakOnFailureDisabledLogException()
+    public function testBreakOnFailureDisabledLogException(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects(self::once())
@@ -108,7 +108,7 @@ class TreeExecutorTest extends \PHPUnit\Framework\TestCase
         return $action;
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         self::assertEquals($this->listAction, $this->listAction->initialize([]));
     }

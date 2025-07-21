@@ -4,30 +4,31 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Condition\HasProperty;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class HasPropertyTest extends \PHPUnit\Framework\TestCase
+class HasPropertyTest extends TestCase
 {
-    /** @var Condition\HasProperty */
-    private $condition;
+    private Condition\HasProperty $condition;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->condition = new Condition\HasProperty();
+        $this->condition = new HasProperty();
         $this->condition->setContextAccessor(new ContextAccessor());
         $this->condition->setPropertyAccesor(PropertyAccess::createPropertyAccessor());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals('has_property', $this->condition->getName());
     }
 
-    public function testEvaluate()
+    public function testEvaluate(): void
     {
         $options = [new PropertyPath('object'), new PropertyPath('property')];
         $object = new ItemStub(['foo' => 'fooValue']);
@@ -35,7 +36,7 @@ class HasPropertyTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->condition->evaluate(['object' => $object, 'property' => 'foo']));
     }
 
-    public function testEvaluateWithErrors()
+    public function testEvaluateWithErrors(): void
     {
         $options = [new PropertyPath('object'), new PropertyPath('property')];
         $object = new \stdClass();
@@ -43,7 +44,7 @@ class HasPropertyTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->condition->evaluate(['object' => $object, 'property' => 'foo']));
     }
 
-    public function testInitializeFailsWhenOptionOneNotDefined()
+    public function testInitializeFailsWhenOptionOneNotDefined(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Option "object" is required.');
@@ -51,7 +52,7 @@ class HasPropertyTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize([2 => 'anything', 3 => 'anything']);
     }
 
-    public function testInitializeFailsWhenOptionTwoNotDefined()
+    public function testInitializeFailsWhenOptionTwoNotDefined(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Option "property" is required.');
@@ -59,7 +60,7 @@ class HasPropertyTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize([0 => 'anything', 3 => 'anything']);
     }
 
-    public function testInitializeFailsWhenEmptyOptions()
+    public function testInitializeFailsWhenEmptyOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 2 elements, but 0 given.');
@@ -67,7 +68,7 @@ class HasPropertyTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize([]);
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $options = ['one', 'two'];
         $expected = [
@@ -82,7 +83,7 @@ class HasPropertyTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testCompile()
+    public function testCompile(): void
     {
         $result = $this->condition->compile('$factoryAccessor');
 

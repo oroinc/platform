@@ -4,15 +4,13 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Configuration\Definition;
 
 use Oro\Bundle\NavigationBundle\Configuration\Definition\MenuNodeDefinition;
 use Oro\Bundle\NavigationBundle\Configuration\Definition\MenuTreeBuilder;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
-class MenuNodeDefinitionTest extends \PHPUnit\Framework\TestCase
+class MenuNodeDefinitionTest extends TestCase
 {
-    /** @var MenuTreeBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $builder;
-
-    /** @var MenuNodeDefinition */
-    private $definition;
+    private MenuTreeBuilder $builder;
+    private MenuNodeDefinition $definition;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +21,7 @@ class MenuNodeDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->definition->setBuilder($this->builder);
     }
 
-    public function testMenuNodeHierarchyZeroDepth()
+    public function testMenuNodeHierarchyZeroDepth(): void
     {
         $this->assertInstanceOf(
             MenuNodeDefinition::class,
@@ -31,7 +29,7 @@ class MenuNodeDefinitionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMenuNodeHierarchyNonZeroDepth()
+    public function testMenuNodeHierarchyNonZeroDepth(): void
     {
         $result = $this->definition->menuNodeHierarchy();
 

@@ -4,26 +4,22 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\DBAL;
 
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalPidFileManager;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-class DbalPidFileManagerTest extends \PHPUnit\Framework\TestCase
+class DbalPidFileManagerTest extends TestCase
 {
     use TempDirExtension;
 
-    /**
-     * @var string
-     */
-    private $pidDir;
+    private string $pidDir;
 
     #[\Override]
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->pidDir = $this->getTempDir('test-mq-dbal', false);
     }
 
-    public function testCouldCreatePidFile()
+    public function testCouldCreatePidFile(): void
     {
         $expectedFile = $this->pidDir.'/CONSUMER.ID.pid';
 
@@ -34,7 +30,7 @@ class DbalPidFileManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(is_numeric(file_get_contents($expectedFile)));
     }
 
-    public function testShouldThrowIfPidFileAlreadyExists()
+    public function testShouldThrowIfPidFileAlreadyExists(): void
     {
         $processManager = new DbalPidFileManager($this->pidDir);
 
@@ -45,7 +41,7 @@ class DbalPidFileManagerTest extends \PHPUnit\Framework\TestCase
         $processManager->createPidFile('CONSUMER.ID');
     }
 
-    public function testShouldReturnListOfPidsFileInfo()
+    public function testShouldReturnListOfPidsFileInfo(): void
     {
         $fs = new Filesystem();
         $fs->dumpFile($this->pidDir.'/pid1.pid', '12345');
@@ -69,7 +65,7 @@ class DbalPidFileManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    public function testShouldThrowIfPidFileContainsNonNumericValue()
+    public function testShouldThrowIfPidFileContainsNonNumericValue(): void
     {
         $fs = new Filesystem();
         $fs->dumpFile($this->pidDir.'/pid1.pid', 'non numeric value');
@@ -82,7 +78,7 @@ class DbalPidFileManagerTest extends \PHPUnit\Framework\TestCase
         $processManager->getListOfPidsFileInfo();
     }
 
-    public function testShouldRemovePidFile()
+    public function testShouldRemovePidFile(): void
     {
         $filename = $this->pidDir.'/consumer-id.pid';
 
@@ -97,7 +93,7 @@ class DbalPidFileManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertFileDoesNotExist($filename);
     }
 
-    public function testShouldNotThrowAnyErrorIfFileDoesNotExistWhenRemovindPids()
+    public function testShouldNotThrowAnyErrorIfFileDoesNotExistWhenRemovindPids(): void
     {
         $processManager = new DbalPidFileManager($this->pidDir);
         $processManager->createPidFile('consumer-id');

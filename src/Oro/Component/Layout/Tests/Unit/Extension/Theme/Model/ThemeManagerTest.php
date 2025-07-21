@@ -397,18 +397,30 @@ final class ThemeManagerTest extends TestCase
         array $parentThemesToCheck
     ): void {
         $base = $this->createMock(Theme::class);
-        $base->method('getName')->willReturn('base');
-        $base->method('getPageTemplates')->willReturn([]);
-        $base->method('getPageTemplateTitles')->willReturn([]);
+        $base->expects(self::any())
+            ->method('getName')
+            ->willReturn('base');
+        $base->expects(self::any())
+            ->method('getPageTemplates')
+            ->willReturn([]);
+        $base->expects(self::any())
+            ->method('getPageTemplateTitles')
+            ->willReturn([]);
 
         $theme1 = $this->createMock(Theme::class);
-        $theme1->method('getName')->willReturn('theme1');
-        $theme1->method('getParentTheme')->willReturn('base');
+        $theme1->expects(self::any())
+            ->method('getName')
+            ->willReturn('theme1');
+        $theme1->expects(self::any())
+            ->method('getParentTheme')
+            ->willReturn('base');
 
         $theme2 = $this->createMock(Theme::class);
-        $theme2->method('getName')->willReturn('theme2');
+        $theme2->expects(self::any())
+            ->method('getName')
+            ->willReturn('theme2');
 
-        $this->factory
+        $this->factory->expects(self::any())
             ->method('create')
             ->willReturnCallback(function ($name) use ($base, $theme1, $theme2) {
                 switch ($name) {

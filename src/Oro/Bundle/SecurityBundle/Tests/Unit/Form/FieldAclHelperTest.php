@@ -12,6 +12,7 @@ use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
@@ -24,20 +25,11 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class FieldAclHelperTest extends FormIntegrationTestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var FieldAclExtension|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldAclExtension;
-
-    /** @var FieldAclHelper */
-    private $fieldAclHelper;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ConfigManager&MockObject $configManager;
+    private FieldAclExtension&MockObject $fieldAclExtension;
+    private FieldAclHelper $fieldAclHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -251,8 +243,7 @@ class FieldAclHelperTest extends FormIntegrationTestCase
         $fieldName = 'city';
 
         $this->assertFieldAclEnabled(CmsAddress::class, $fieldName);
-        $this->authorizationChecker
-            ->expects(self::once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with('VIEW', new FieldVote($entity, $fieldName))
             ->willReturn(false);
@@ -353,19 +344,16 @@ class FieldAclHelperTest extends FormIntegrationTestCase
             ]
         );
 
-        $this->doctrineHelper
-            ->expects(self::any())
+        $this->doctrineHelper->expects(self::any())
             ->method('isManageableEntityClass')
             ->with($entityClass)
             ->willReturn(true);
 
-        $this->configManager
-            ->expects(self::once())
+        $this->configManager->expects(self::once())
             ->method('hasConfig')
             ->with($entityClass)
             ->willReturn(true);
-        $this->configManager
-            ->expects(self::once())
+        $this->configManager->expects(self::once())
             ->method('getEntityConfig')
             ->with('security', $entityClass)
             ->willReturn($entityConfig);
@@ -386,19 +374,16 @@ class FieldAclHelperTest extends FormIntegrationTestCase
             ]
         );
 
-        $this->doctrineHelper
-            ->expects(self::any())
+        $this->doctrineHelper->expects(self::any())
             ->method('isManageableEntityClass')
             ->with($entityClass)
             ->willReturn(true);
 
-        $this->configManager
-            ->expects(self::any())
+        $this->configManager->expects(self::any())
             ->method('hasConfig')
             ->with($entityClass)
             ->willReturn(true);
-        $this->configManager
-            ->expects(self::any())
+        $this->configManager->expects(self::any())
             ->method('getEntityConfig')
             ->with('security', $entityClass)
             ->willReturn($entityConfig);
@@ -421,25 +406,21 @@ class FieldAclHelperTest extends FormIntegrationTestCase
             ]
         );
 
-        $this->doctrineHelper
-            ->expects(self::any())
+        $this->doctrineHelper->expects(self::any())
             ->method('isManageableEntityClass')
             ->with($entityClass)
             ->willReturn(true);
 
-        $this->configManager
-            ->expects(self::any())
+        $this->configManager->expects(self::any())
             ->method('hasConfig')
             ->with($entityClass)
             ->willReturn(true);
-        $this->configManager
-            ->expects(self::any())
+        $this->configManager->expects(self::any())
             ->method('getEntityConfig')
             ->with('security', $entityClass)
             ->willReturn($entityConfig);
 
-        $this->fieldAclExtension
-            ->expects($this->any())
+        $this->fieldAclExtension->expects($this->any())
             ->method('getAllowedPermissions')
             ->willReturn([BasicPermission::VIEW]);
     }

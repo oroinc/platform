@@ -5,10 +5,11 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Layout\DataProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Layout\DataProvider\ConfigProvider as DataProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use PHPUnit\Framework\TestCase;
 
-class ConfigProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigProviderTest extends TestCase
 {
-    public function testGetConfig()
+    public function testGetConfig(): void
     {
         $configProvider = $this->createMock(ConfigProvider::class);
         $config = $this->createMock(ConfigInterface::class);

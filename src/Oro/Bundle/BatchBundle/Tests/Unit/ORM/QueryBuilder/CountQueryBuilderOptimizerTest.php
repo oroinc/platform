@@ -28,15 +28,13 @@ use Oro\Bundle\BatchBundle\Tests\Unit\Fixtures\Entity\UserEmail;
 use Oro\Bundle\EntityBundle\Helper\RelationHelper;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Oro\ORM\Query\AST\Functions;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CountQueryBuilderOptimizerTest extends OrmTestCase
 {
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var RelationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $relationHelper;
+    private EntityManagerInterface $em;
+    private RelationHelper&MockObject $relationHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -65,8 +63,11 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
     /**
      * @dataProvider getCountQueryBuilderDataProvider
      */
-    public function testGetCountQueryBuilder(callable $queryBuilder, string $expectedDql, ?string $platformClass = null)
-    {
+    public function testGetCountQueryBuilder(
+        callable $queryBuilder,
+        string $expectedDql,
+        ?string $platformClass = null
+    ): void {
         if (null !== $platformClass) {
             $this->em->getConnection()->setDatabasePlatform(new $platformClass());
         }
@@ -82,7 +83,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
         $this->assertNotEmpty($countQb->getQuery()->getSQL());
     }
 
-    public function testGetCountMultiFieldQueryBuilder()
+    public function testGetCountMultiFieldQueryBuilder(): void
     {
         $expectedDql = 'SELECT t1.id FROM ' . JobExecution::class
             . ' t1 LEFT JOIN t1.jobInstance t2 WHERE t2 IN('
@@ -92,7 +93,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
             . 'filter__gpnpmultiEnum3_rel IN(:?1))';
 
         $queryBuilder = (new QueryBuilder($this->em))
-            ->select(array('t1.email as c1', 't1.id'))
+            ->select(['t1.email as c1', 't1.id'])
             ->from(JobExecution::class, 't1')
             ->leftJoin('t1.jobInstance', 't2')
             ->where(
@@ -672,7 +673,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
         callable $queryBuilder,
         array $joinsToDelete,
         string $expectedDql
-    ) {
+    ): void {
         $optimizer = new CountQueryBuilderOptimizer();
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcher->expects($this->once())

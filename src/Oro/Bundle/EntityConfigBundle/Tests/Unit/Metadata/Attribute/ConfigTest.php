@@ -5,10 +5,11 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Metadata\Attribute;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Exception\AttributeException;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
+use PHPUnit\Framework\TestCase;
 
-class ConfigTest extends \PHPUnit\Framework\TestCase
+class ConfigTest extends TestCase
 {
-    public function testConstructorDefaultValues()
+    public function testConstructorDefaultValues(): void
     {
         $expectedMode = ConfigModel::MODE_DEFAULT;
         $expectedRouteName = '';
@@ -26,7 +27,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedRoutes, $config->routes);
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $expectedMode = ConfigModel::MODE_READONLY;
         $expectedRouteName = 'test_route_name';
@@ -51,7 +52,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedRoutes, $config->routes);
     }
 
-    public function testConstructorWithCustomRouteArgument()
+    public function testConstructorWithCustomRouteArgument(): void
     {
         $expectedMode = ConfigModel::MODE_READONLY;
         $expectedRouteName = 'test_route_name';
@@ -77,7 +78,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedRoutes, $config->routes);
     }
 
-    public function testConstructorWithValueValue()
+    public function testConstructorWithValueValue(): void
     {
         $expectedMode = ConfigModel::MODE_HIDDEN;
         $expectedRouteName = '';
@@ -99,7 +100,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedRoutes, $config->routes);
     }
 
-    public function testAttributeExceptionInvalidMode()
+    public function testAttributeExceptionInvalidMode(): void
     {
         $this->expectException(AttributeException::class);
         $this->expectExceptionMessage('Attribute "Config" has an invalid value parameter "mode" : "some mode"');
@@ -107,7 +108,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         new Config(mode: 'some mode');
     }
 
-    public function testAttributeExceptionNonSupportedArgument()
+    public function testAttributeExceptionNonSupportedArgument(): void
     {
         $this->expectException(AttributeException::class);
         $this->expectExceptionMessage(
@@ -120,7 +121,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider arraysDataProvider
      */
-    public function testAttributeExceptionArrayAsArgument($data)
+    public function testAttributeExceptionArrayAsArgument($data): void
     {
         $this->expectException(AttributeException::class);
         $this->expectExceptionMessage(

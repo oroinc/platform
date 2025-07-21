@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AssetBundle\DependencyInjection;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -13,6 +14,7 @@ class OroAssetExtension extends Extension
     public function load(array $configs, ContainerBuilder $container): void
     {
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+        $container->prependExtensionConfig($this->getAlias(), SettingsBuilder::getSettings($config));
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
@@ -23,5 +25,6 @@ class OroAssetExtension extends Extension
         $container->setParameter('oro_asset.build_timeout', $config['build_timeout']);
         $container->setParameter('oro_asset.npm_install_timeout', $config['npm_install_timeout']);
         $container->setParameter('oro_asset.webpack_dev_server_options', $config['webpack_dev_server']);
+        $container->setParameter('oro_asset.external_resources', $config['external_resources']);
     }
 }

@@ -5,9 +5,10 @@ namespace Oro\Bundle\CronBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\CronBundle\DependencyInjection\Compiler\ConsoleCommandListenerPass;
 use Oro\Bundle\CronBundle\EventListener\ConsoleCommandListener;
 use Oro\Bundle\FeatureToggleBundle\EventListener\ConsoleCommandListener as BaseListener;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class ConsoleCommandListenerPassTest extends \PHPUnit\Framework\TestCase
+class ConsoleCommandListenerPassTest extends TestCase
 {
     public function testProcess(): void
     {

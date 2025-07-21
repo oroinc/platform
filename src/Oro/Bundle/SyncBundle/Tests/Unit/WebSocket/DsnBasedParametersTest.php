@@ -3,8 +3,9 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\WebSocket;
 
 use Oro\Bundle\SyncBundle\WebSocket\DsnBasedParameters;
+use PHPUnit\Framework\TestCase;
 
-class DsnBasedParametersTest extends \PHPUnit\Framework\TestCase
+class DsnBasedParametersTest extends TestCase
 {
     /**
      * @dataProvider invalidDsnProvider

@@ -4,16 +4,15 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\ContentProvider;
 
 use Oro\Bundle\NavigationBundle\ContentProvider\MenuContentProvider;
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MenuContentProviderTest extends \PHPUnit\Framework\TestCase
+class MenuContentProviderTest extends TestCase
 {
     private const MENU = 'test';
 
-    /** @var MenuExtension|\PHPUnit\Framework\MockObject\MockObject */
-    private $menuExtension;
-
-    /** @var MenuContentProvider */
-    private $provider;
+    private MenuExtension&MockObject $menuExtension;
+    private MenuContentProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class MenuContentProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new MenuContentProvider($this->menuExtension, self::MENU);
     }
 
-    public function testGetContent()
+    public function testGetContent(): void
     {
         $this->menuExtension->expects($this->once())
             ->method('render')

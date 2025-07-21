@@ -4,8 +4,9 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config\ApiTree;
 
 use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
+use PHPUnit\Framework\TestCase;
 
-class SectionDefinitionTest extends \PHPUnit\Framework\TestCase
+class SectionDefinitionTest extends TestCase
 {
     public function testGetName(): void
     {

@@ -9,23 +9,18 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowNotificationEvent;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowTransitionRecordListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class WorkflowTransitionRecordListenerTest extends \PHPUnit\Framework\TestCase
+class WorkflowTransitionRecordListenerTest extends TestCase
 {
-    /** @var LifecycleEventArgs|\PHPUnit\Framework\MockObject\MockObject */
-    private $args;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var WorkflowTransitionRecordListener */
-    private $listener;
+    private LifecycleEventArgs&MockObject $args;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private WorkflowTransitionRecordListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -37,7 +32,7 @@ class WorkflowTransitionRecordListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new WorkflowTransitionRecordListener($this->eventDispatcher, $this->tokenStorage);
     }
 
-    public function testPostPersistDisabledListener()
+    public function testPostPersistDisabledListener(): void
     {
         $this->listener->setEnabled(false);
 
@@ -54,7 +49,7 @@ class WorkflowTransitionRecordListenerTest extends \PHPUnit\Framework\TestCase
         WorkflowTransitionRecord $transitionRecord,
         ?TokenInterface $token,
         WorkflowNotificationEvent $expected
-    ) {
+    ): void {
         $this->listener->setEnabled(true);
 
         $this->tokenStorage->expects($this->any())

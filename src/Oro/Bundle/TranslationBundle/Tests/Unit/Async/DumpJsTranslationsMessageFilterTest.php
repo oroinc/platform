@@ -5,8 +5,9 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Async;
 use Oro\Bundle\MessageQueueBundle\Client\MessageBuffer;
 use Oro\Bundle\TranslationBundle\Async\DumpJsTranslationsMessageFilter;
 use Oro\Bundle\TranslationBundle\Async\Topic\DumpJsTranslationsTopic;
+use PHPUnit\Framework\TestCase;
 
-class DumpJsTranslationsMessageFilterTest extends \PHPUnit\Framework\TestCase
+class DumpJsTranslationsMessageFilterTest extends TestCase
 {
     private DumpJsTranslationsMessageFilter $filter;
 

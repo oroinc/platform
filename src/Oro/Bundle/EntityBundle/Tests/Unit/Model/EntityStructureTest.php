@@ -4,13 +4,14 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Model;
 
 use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityStructureTest extends \PHPUnit\Framework\TestCase
+class EntityStructureTest extends TestCase
 {
-    public function testId()
+    public function testId(): void
     {
         $entity = new EntityStructure();
         self::assertNull($entity->getId());
@@ -20,7 +21,7 @@ class EntityStructureTest extends \PHPUnit\Framework\TestCase
         self::assertSame($value, $entity->getId());
     }
 
-    public function testLabel()
+    public function testLabel(): void
     {
         $entity = new EntityStructure();
         self::assertNull($entity->getLabel());
@@ -30,7 +31,7 @@ class EntityStructureTest extends \PHPUnit\Framework\TestCase
         self::assertSame($value, $entity->getLabel());
     }
 
-    public function testPluralLabel()
+    public function testPluralLabel(): void
     {
         $entity = new EntityStructure();
         self::assertNull($entity->getPluralLabel());
@@ -40,7 +41,7 @@ class EntityStructureTest extends \PHPUnit\Framework\TestCase
         self::assertSame($value, $entity->getPluralLabel());
     }
 
-    public function testAlias()
+    public function testAlias(): void
     {
         $entity = new EntityStructure();
         self::assertNull($entity->getAlias());
@@ -50,7 +51,7 @@ class EntityStructureTest extends \PHPUnit\Framework\TestCase
         self::assertSame($value, $entity->getAlias());
     }
 
-    public function testPluralAlias()
+    public function testPluralAlias(): void
     {
         $entity = new EntityStructure();
         self::assertNull($entity->getPluralAlias());
@@ -60,7 +61,7 @@ class EntityStructureTest extends \PHPUnit\Framework\TestCase
         self::assertSame($value, $entity->getPluralAlias());
     }
 
-    public function testClassName()
+    public function testClassName(): void
     {
         $entity = new EntityStructure();
         self::assertNull($entity->getClassName());
@@ -70,7 +71,7 @@ class EntityStructureTest extends \PHPUnit\Framework\TestCase
         self::assertSame($value, $entity->getClassName());
     }
 
-    public function testIcon()
+    public function testIcon(): void
     {
         $entity = new EntityStructure();
         self::assertNull($entity->getIcon());
@@ -80,7 +81,7 @@ class EntityStructureTest extends \PHPUnit\Framework\TestCase
         self::assertSame($value, $entity->getIcon());
     }
 
-    public function testFields()
+    public function testFields(): void
     {
         $entity = new EntityStructure();
         self::assertSame([], $entity->getFields());
@@ -96,7 +97,7 @@ class EntityStructureTest extends \PHPUnit\Framework\TestCase
         self::assertSame([$field1, $field2], $entity->getFields());
     }
 
-    public function testOptions()
+    public function testOptions(): void
     {
         $entity = new EntityStructure();
         self::assertSame([], $entity->getOptions());
@@ -109,7 +110,7 @@ class EntityStructureTest extends \PHPUnit\Framework\TestCase
         self::assertSame(['option1' => 'value1'], $entity->getOptions());
     }
 
-    public function testRoutes()
+    public function testRoutes(): void
     {
         $entity = new EntityStructure();
         self::assertSame([], $entity->getRoutes());
@@ -119,7 +120,7 @@ class EntityStructureTest extends \PHPUnit\Framework\TestCase
         self::assertSame($value, $entity->getRoutes());
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $entity = new EntityStructure();
         $entity->setId('entity1');

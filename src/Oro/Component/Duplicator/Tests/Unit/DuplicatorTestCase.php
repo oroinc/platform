@@ -15,8 +15,9 @@ use Oro\Component\Duplicator\Filter\ReplaceValueFilter;
 use Oro\Component\Duplicator\Filter\ShallowCopyFilter;
 use Oro\Component\Duplicator\Matcher\MatcherFactory;
 use Oro\Component\Duplicator\ObjectType;
+use PHPUnit\Framework\TestCase;
 
-abstract class DuplicatorTestCase extends \PHPUnit\Framework\TestCase
+abstract class DuplicatorTestCase extends TestCase
 {
     protected function createMatcherFactory(): MatcherFactory
     {

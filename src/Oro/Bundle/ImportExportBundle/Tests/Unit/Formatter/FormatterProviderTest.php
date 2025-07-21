@@ -4,18 +4,17 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class FormatterProviderTest extends \PHPUnit\Framework\TestCase
+class FormatterProviderTest extends TestCase
 {
     private array $formatters = ['exist_alias' => 'exist_formatter'];
     private array $typeFormatters = ['test_format_type' => ['test_type' => 'test_formatter']];
 
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var FormatterProvider */
-    private $formatter;
+    private ContainerInterface&MockObject $container;
+    private FormatterProvider $formatter;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class FormatterProviderTest extends \PHPUnit\Framework\TestCase
         $this->formatter = new FormatterProvider($this->container, $this->formatters, $this->typeFormatters);
     }
 
-    public function testGetFormatterByAlias()
+    public function testGetFormatterByAlias(): void
     {
         $testTypeFormatter = new \stdClass();
         $this->setContainerMock('exist_formatter', $testTypeFormatter);
@@ -36,7 +35,7 @@ class FormatterProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($testTypeFormatter, $this->formatter->getFormatterByAlias('exist_alias'));
     }
 
-    public function testGetFormatterByAliasWithNotExistsAlias()
+    public function testGetFormatterByAliasWithNotExistsAlias(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The formatter is not found by "non_exist_alias" alias.');
@@ -44,7 +43,7 @@ class FormatterProviderTest extends \PHPUnit\Framework\TestCase
         $this->formatter->getFormatterByAlias('non_exist_alias');
     }
 
-    public function testGetFormatterFor()
+    public function testGetFormatterFor(): void
     {
         $testTypeFormatter = new \stdClass();
         $this->setContainerMock('test_formatter', $testTypeFormatter);

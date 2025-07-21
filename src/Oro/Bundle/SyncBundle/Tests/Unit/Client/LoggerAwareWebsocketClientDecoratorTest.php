@@ -8,19 +8,18 @@ use Oro\Bundle\SyncBundle\Client\LoggerAwareWebsocketClientDecorator;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\SyncBundle\Exception\ValidationFailedException;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCase
+class LoggerAwareWebsocketClientDecoratorTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    /** @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $decoratedClient;
-
-    /** @var LoggerAwareWebsocketClientDecorator */
-    private $loggerAwareClientDecorator;
+    private WebsocketClientInterface&MockObject $decoratedClient;
+    private LoggerAwareWebsocketClientDecorator $loggerAwareClientDecorator;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +30,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         $this->setUpLoggerMock($this->loggerAwareClientDecorator);
     }
 
-    public function testConnect()
+    public function testConnect(): void
     {
         $connectionSession = 'sampleSession';
 
@@ -44,7 +43,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         self::assertSame($connectionSession, $this->loggerAwareClientDecorator->connect());
     }
 
-    public function testConnectWithException()
+    public function testConnectWithException(): void
     {
         $this->decoratedClient->expects(self::once())
             ->method('connect')
@@ -55,7 +54,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         self::assertNull($this->loggerAwareClientDecorator->connect());
     }
 
-    public function testDisconnect()
+    public function testDisconnect(): void
     {
         $this->decoratedClient->expects(self::once())
             ->method('disconnect')
@@ -66,7 +65,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         self::assertTrue($this->loggerAwareClientDecorator->disconnect());
     }
 
-    public function testDisconnectFailed()
+    public function testDisconnectFailed(): void
     {
         $this->decoratedClient->expects(self::once())
             ->method('disconnect')
@@ -77,7 +76,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         self::assertFalse($this->loggerAwareClientDecorator->disconnect());
     }
 
-    public function testIsConnected()
+    public function testIsConnected(): void
     {
         $this->decoratedClient->expects(self::once())
             ->method('isConnected')
@@ -86,7 +85,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         self::assertTrue($this->loggerAwareClientDecorator->isConnected());
     }
 
-    public function testPublish()
+    public function testPublish(): void
     {
         $topicUri = 'sampleUri';
         $payload = 'samplePayload';
@@ -106,7 +105,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
     /**
      * @dataProvider exceptionDataProvider
      */
-    public function testPublishWithException(\Exception $exception)
+    public function testPublishWithException(\Exception $exception): void
     {
         $topicUri = 'sampleUri';
         $payload = 'samplePayload';
@@ -123,7 +122,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         self::assertFalse($this->loggerAwareClientDecorator->publish($topicUri, $payload, $exclude, $eligible));
     }
 
-    public function testPrefix()
+    public function testPrefix(): void
     {
         $prefix = 'samplePrefix';
         $uri = 'sampleUri';
@@ -138,7 +137,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         self::assertTrue($this->loggerAwareClientDecorator->prefix($prefix, $uri));
     }
 
-    public function testPrefixWithException()
+    public function testPrefixWithException(): void
     {
         $prefix = 'samplePrefix';
         $uri = 'sampleUri';
@@ -153,7 +152,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         self::assertFalse($this->loggerAwareClientDecorator->prefix($prefix, $uri));
     }
 
-    public function testPrefixWithBadResponseException()
+    public function testPrefixWithBadResponseException(): void
     {
         $exception = new BadResponseException();
 
@@ -168,7 +167,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         self::assertFalse($this->loggerAwareClientDecorator->prefix('samplePrefix', 'sampleUrl'));
     }
 
-    public function testCall()
+    public function testCall(): void
     {
         $procUri = 'sampleUri';
         $arguments = ['sampleArgument'];
@@ -183,7 +182,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         self::assertTrue($this->loggerAwareClientDecorator->call($procUri, $arguments));
     }
 
-    public function testCallWithException()
+    public function testCallWithException(): void
     {
         $procUri = 'sampleUri';
         $arguments = ['sampleArgument'];
@@ -198,7 +197,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
         self::assertFalse($this->loggerAwareClientDecorator->call($procUri, $arguments));
     }
 
-    public function testEvent()
+    public function testEvent(): void
     {
         $topicUri = 'sampleUri';
         $payload = 'samplePayload';
@@ -216,7 +215,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit\Framework\TestCas
     /**
      * @dataProvider exceptionDataProvider
      */
-    public function testEventWithException(\Exception $exception)
+    public function testEventWithException(\Exception $exception): void
     {
         $topicUri = 'sampleUri';
         $payload = 'samplePayload';

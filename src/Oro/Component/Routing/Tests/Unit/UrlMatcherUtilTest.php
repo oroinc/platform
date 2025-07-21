@@ -3,14 +3,15 @@
 namespace Oro\Component\Routing\Tests\Unit;
 
 use Oro\Component\Routing\UrlMatcherUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 
-class UrlMatcherUtilTest extends \PHPUnit\Framework\TestCase
+class UrlMatcherUtilTest extends TestCase
 {
-    public function testMatchForGetMethod()
+    public function testMatchForGetMethod(): void
     {
         $pathInfo = '/pathInfo';
         $contextPathInfo = '/contextPathInfo';
@@ -43,7 +44,7 @@ class UrlMatcherUtilTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($contextMethod, $context->getMethod());
     }
 
-    public function testMatchForGetMethodWhenExceptionOccurred()
+    public function testMatchForGetMethodWhenExceptionOccurred(): void
     {
         $this->expectException(ResourceNotFoundException::class);
         $pathInfo = '/pathInfo';

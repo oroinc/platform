@@ -3,11 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessScalarNormalizer;
+use PHPUnit\Framework\TestCase;
 
-class ProcessScalarNormalizerTest extends \PHPUnit\Framework\TestCase
+class ProcessScalarNormalizerTest extends TestCase
 {
-    /** @var ProcessScalarNormalizer */
-    private $normalizer;
+    private ProcessScalarNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void
@@ -15,13 +15,13 @@ class ProcessScalarNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->normalizer = new ProcessScalarNormalizer();
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $value = 'scalar';
         $this->assertEquals($value, $this->normalizer->normalize($value));
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $value = 'scalar';
         $this->assertEquals($value, $this->normalizer->denormalize($value, ''));
@@ -30,7 +30,7 @@ class ProcessScalarNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDataProvider
      */
-    public function testSupportsNormalization(mixed $data, bool $expected)
+    public function testSupportsNormalization(mixed $data, bool $expected): void
     {
         $this->assertEquals($expected, $this->normalizer->supportsNormalization($data));
     }
@@ -38,7 +38,7 @@ class ProcessScalarNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDataProvider
      */
-    public function testSupportsDenormalization(mixed $data, bool $expected)
+    public function testSupportsDenormalization(mixed $data, bool $expected): void
     {
         $this->assertEquals($expected, $this->normalizer->supportsDenormalization($data, ''));
     }

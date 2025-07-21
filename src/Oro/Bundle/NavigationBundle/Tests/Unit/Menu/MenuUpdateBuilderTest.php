@@ -9,18 +9,17 @@ use Oro\Bundle\NavigationBundle\MenuUpdate\Applier\MenuUpdateApplierInterface;
 use Oro\Bundle\NavigationBundle\MenuUpdate\Applier\Model\MenuUpdateApplierContext;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProviderInterface;
 use Oro\Bundle\NavigationBundle\Tests\Unit\MenuItemTestTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class MenuUpdateBuilderTest extends \PHPUnit\Framework\TestCase
+class MenuUpdateBuilderTest extends TestCase
 {
     use MenuItemTestTrait;
 
-    private MenuUpdateProviderInterface|\PHPUnit\Framework\MockObject\MockObject $menuUpdateProvider;
-
-    private MenuUpdateApplierInterface|\PHPUnit\Framework\MockObject\MockObject $menuUpdateApplier;
-
-    private EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
-
+    private MenuUpdateProviderInterface&MockObject $menuUpdateProvider;
+    private MenuUpdateApplierInterface&MockObject $menuUpdateApplier;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
     private MenuUpdateBuilder $builder;
 
     #[\Override]
@@ -42,8 +41,7 @@ class MenuUpdateBuilderTest extends \PHPUnit\Framework\TestCase
         $menu = $this->createItem('sample_menu')
             ->setDisplay(false);
 
-        $this->menuUpdateProvider
-            ->expects(self::never())
+        $this->menuUpdateProvider->expects(self::never())
             ->method('getMenuUpdatesForMenuItem');
 
         $this->builder->build($menu);
@@ -52,18 +50,15 @@ class MenuUpdateBuilderTest extends \PHPUnit\Framework\TestCase
     public function testBuildWhenNoMenuUpdates(): void
     {
         $menu = $this->createItem('sample_menu');
-        $this->menuUpdateProvider
-            ->expects(self::once())
+        $this->menuUpdateProvider->expects(self::once())
             ->method('getMenuUpdatesForMenuItem')
             ->with($menu)
             ->willReturn([]);
 
-        $this->menuUpdateApplier
-            ->expects(self::never())
+        $this->menuUpdateApplier->expects(self::never())
             ->method(self::anything());
 
-        $this->eventDispatcher
-            ->expects(self::never())
+        $this->eventDispatcher->expects(self::never())
             ->method(self::anything());
 
         $this->builder->build($menu);
@@ -77,15 +72,13 @@ class MenuUpdateBuilderTest extends \PHPUnit\Framework\TestCase
         $menuUpdate2 = $this->createMock(MenuUpdateInterface::class);
 
         $options = ['sample_key' => 'sample_value'];
-        $this->menuUpdateProvider
-            ->expects(self::once())
+        $this->menuUpdateProvider->expects(self::once())
             ->method('getMenuUpdatesForMenuItem')
             ->with($menu)
             ->willReturn([$menuUpdate1, $menuUpdate2]);
 
         $context = new MenuUpdateApplierContext($menu);
-        $this->menuUpdateApplier
-            ->expects(self::exactly(2))
+        $this->menuUpdateApplier->expects(self::exactly(2))
             ->method('applyMenuUpdate')
             ->withConsecutive(
                 [$menuUpdate1, $menu, $options, $context],
@@ -93,8 +86,7 @@ class MenuUpdateBuilderTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn(MenuUpdateApplierInterface::RESULT_ITEM_CREATED);
 
-        $this->eventDispatcher
-            ->expects(self::once())
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with(new MenuUpdatesApplyAfterEvent($context));
 

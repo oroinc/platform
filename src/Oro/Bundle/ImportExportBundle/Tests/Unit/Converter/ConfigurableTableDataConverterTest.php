@@ -14,8 +14,10 @@ use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
 use Oro\Bundle\ImportExportBundle\Converter\RelationCalculator;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
+class ConfigurableTableDataConverterTest extends TestCase
 {
     private array $fields = [
         'ScalarEntity' => [
@@ -211,20 +213,11 @@ class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldHelper;
-
-    /** @var RelationCalculator|\PHPUnit\Framework\MockObject\MockObject */
-    private $relationCalculator;
-
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
-
-    /** @var AttributeConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeConfigHelper;
-
-    /** @var ConfigurableTableDataConverter */
-    private $converter;
+    private FieldHelper&MockObject $fieldHelper;
+    private RelationCalculator&MockObject $relationCalculator;
+    private LocaleSettings&MockObject $localeSettings;
+    private AttributeConfigHelper&MockObject $attributeConfigHelper;
+    private ConfigurableTableDataConverter $converter;
 
     #[\Override]
     protected function setUp(): void

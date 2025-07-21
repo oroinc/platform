@@ -8,10 +8,11 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Handler\Helper\WorkflowDefinitionCloner;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowDefinitionClonerTest extends \PHPUnit\Framework\TestCase
+class WorkflowDefinitionClonerTest extends TestCase
 {
-    public function testCloneDefinition()
+    public function testCloneDefinition(): void
     {
         $definition = $this->createDefinition();
 
@@ -28,7 +29,7 @@ class WorkflowDefinitionClonerTest extends \PHPUnit\Framework\TestCase
         $this->assertObjectsDefinitions($definition, $clonedDefinition, true);
     }
 
-    public function testMergeDefinition()
+    public function testMergeDefinition(): void
     {
         $sourceDefinition = $this->createDefinition();
 

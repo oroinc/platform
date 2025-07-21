@@ -57,6 +57,7 @@ class ObjectMetadataFactory
         if ($resultName) {
             $metaPropertyMetadata->setResultName($resultName);
         }
+        $metaPropertyMetadata->setAssociationLevel($field->isAssociationLevelMetaProperty());
 
         return $metaPropertyMetadata;
     }

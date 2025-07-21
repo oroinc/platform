@@ -7,11 +7,11 @@ use Knp\Menu\MenuItem;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\EventListener\NavigationItemsListener;
+use PHPUnit\Framework\TestCase;
 
-class NavigationItemsListenerTest extends \PHPUnit\Framework\TestCase
+class NavigationItemsListenerTest extends TestCase
 {
-    /** @var NavigationItemsListener */
-    private $navigationListener;
+    private NavigationItemsListener $navigationListener;
 
     #[\Override]
     protected function setUp(): void
@@ -44,7 +44,7 @@ class NavigationItemsListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onNavigationConfigureProvider
      */
-    public function testOnNavigationConfigure(ConfigureMenuEvent $event, MenuItem $expected)
+    public function testOnNavigationConfigure(ConfigureMenuEvent $event, MenuItem $expected): void
     {
         $this->navigationListener->onNavigationConfigure($event);
         $this->assertEquals($expected, $event->getMenu());

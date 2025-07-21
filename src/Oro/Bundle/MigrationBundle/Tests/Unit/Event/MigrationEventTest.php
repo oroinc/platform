@@ -5,11 +5,11 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Event;
 use Doctrine\DBAL\Connection;
 use Oro\Bundle\MigrationBundle\Event\MigrationEvent;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use PHPUnit\Framework\TestCase;
 
-class MigrationEventTest extends \PHPUnit\Framework\TestCase
+class MigrationEventTest extends TestCase
 {
-    /** @var MigrationEvent */
-    private $migrationEvent;
+    private MigrationEvent $migrationEvent;
 
     private $connection;
 
@@ -21,7 +21,7 @@ class MigrationEventTest extends \PHPUnit\Framework\TestCase
         $this->migrationEvent = new MigrationEvent($this->connection);
     }
 
-    public function testMigrationData()
+    public function testMigrationData(): void
     {
         $middleMigration = $this->getMockForAbstractClass(Migration::class);
         $this->migrationEvent->addMigration($middleMigration);
@@ -37,7 +37,7 @@ class MigrationEventTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($lastMigration, $migrations[2]);
     }
 
-    public function testGetData()
+    public function testGetData(): void
     {
         $sql = 'select * from test_table';
         $params = [];

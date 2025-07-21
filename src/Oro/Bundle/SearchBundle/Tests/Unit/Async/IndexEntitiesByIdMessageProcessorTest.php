@@ -11,16 +11,16 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class IndexEntitiesByIdMessageProcessorTest extends TestCase
 {
     use MessageQueueExtension;
 
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
-
-    private JobRunner|\PHPUnit\Framework\MockObject\MockObject $jobRunner;
-
+    private LoggerInterface&MockObject $logger;
+    private JobRunner&MockObject $jobRunner;
     private IndexEntitiesByIdMessageProcessor $processor;
 
     #[\Override]
@@ -39,14 +39,14 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->setLogger($this->logger);
     }
 
-    public function testShouldReturnSubscribedTopics()
+    public function testShouldReturnSubscribedTopics(): void
     {
         $expectedSubscribedTopics = [IndexEntitiesByIdTopic::getName()];
 
         $this->assertEquals($expectedSubscribedTopics, IndexEntitiesByIdMessageProcessor::getSubscribedTopics());
     }
 
-    public function testBuildJobNameForMessage()
+    public function testBuildJobNameForMessage(): void
     {
         $message = new Message();
         $message->setMessageId('message id');

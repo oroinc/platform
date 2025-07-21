@@ -21,7 +21,7 @@ class BooleanAttributeTypeTest extends AttributeTypeTestCase
         ];
     }
 
-    public function testGetSearchableValue()
+    public function testGetSearchableValue(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not supported');
@@ -29,7 +29,7 @@ class BooleanAttributeTypeTest extends AttributeTypeTestCase
         $this->getAttributeType()->getSearchableValue($this->attribute, true, $this->localization);
     }
 
-    public function testGetFilterableValue()
+    public function testGetFilterableValue(): void
     {
         $type = $this->getAttributeType();
 
@@ -43,7 +43,7 @@ class BooleanAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetFilterableNull()
+    public function testGetFilterableNull(): void
     {
         $this->assertSame(
             BooleanAttributeType::FALSE_VALUE,
@@ -51,7 +51,7 @@ class BooleanAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    public function testGetSortableValue()
+    public function testGetSortableValue(): void
     {
         $type = $this->getAttributeType();
 

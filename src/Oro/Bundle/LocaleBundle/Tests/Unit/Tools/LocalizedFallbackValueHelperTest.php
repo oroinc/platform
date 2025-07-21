@@ -10,8 +10,9 @@ use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\CustomLocalizedFallbackValueStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Stub\LocalizationStub;
 use Oro\Bundle\LocaleBundle\Tools\LocalizedFallbackValueHelper;
+use PHPUnit\Framework\TestCase;
 
-class LocalizedFallbackValueHelperTest extends \PHPUnit\Framework\TestCase
+class LocalizedFallbackValueHelperTest extends TestCase
 {
     public function testCloneCollectionWhenInvalidClass(): void
     {

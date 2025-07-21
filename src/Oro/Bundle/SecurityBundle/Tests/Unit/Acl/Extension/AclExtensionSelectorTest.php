@@ -8,6 +8,8 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\NullAclExtension;
 use Oro\Bundle\SecurityBundle\Attribute\Acl as AclAttribute;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
@@ -15,22 +17,13 @@ use Symfony\Component\Security\Acl\Voter\FieldVote;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
+class AclExtensionSelectorTest extends TestCase
 {
-    /** @var ObjectIdAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $objectIdAccessor;
-
-    /** @var AclExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityExtension;
-
-    /** @var AclExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldExtension;
-
-    /** @var AclExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $actionExtension;
-
-    /** @var AclExtensionSelector */
-    private $selector;
+    private ObjectIdAccessor&MockObject $objectIdAccessor;
+    private AclExtensionInterface&MockObject $entityExtension;
+    private AclExtensionInterface&MockObject $fieldExtension;
+    private AclExtensionInterface&MockObject $actionExtension;
+    private AclExtensionSelector $selector;
 
     #[\Override]
     protected function setUp(): void
@@ -56,11 +49,10 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return AclExtensionInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getMockExtension(string $supportedType, bool $setSupportsExpectation = true)
-    {
+    private function getMockExtension(
+        string $supportedType,
+        bool $setSupportsExpectation = true
+    ): AclExtensionInterface&MockObject {
         $extension = $this->createMock(AclExtensionInterface::class);
         if ($setSupportsExpectation) {
             $extension->expects($this->any())
@@ -76,33 +68,33 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         return $extension;
     }
 
-    public function testSelectByExtensionKeyForExistingExtension()
+    public function testSelectByExtensionKeyForExistingExtension(): void
     {
         $this->assertSame($this->actionExtension, $this->selector->selectByExtensionKey('action'));
     }
 
-    public function testSelectByExtensionKeyForNotExistingExtension()
+    public function testSelectByExtensionKeyForNotExistingExtension(): void
     {
         $this->assertNull($this->selector->selectByExtensionKey('not existing'));
     }
 
-    public function testSelectWthNullValue()
+    public function testSelectWthNullValue(): void
     {
         $result = $this->selector->select(null);
         $this->assertInstanceOf(NullAclExtension::class, $result);
     }
 
-    public function testSelectEntityExtensionByStringValue()
+    public function testSelectEntityExtensionByStringValue(): void
     {
         $this->assertSame($this->entityExtension, $this->selector->select('entity:Test\Entity'));
     }
 
-    public function testSelectActionExtensionByStringValue()
+    public function testSelectActionExtensionByStringValue(): void
     {
         $this->assertSame($this->actionExtension, $this->selector->select('action:testAction'));
     }
 
-    public function testSelectNotExistingExtensionByStringValue()
+    public function testSelectNotExistingExtensionByStringValue(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $this->expectExceptionMessage(
@@ -112,12 +104,12 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         $this->selector->select('wrong:testAction');
     }
 
-    public function testSelectNotExistingExtensionByStringValueAndThrowExceptionIsNotRequested()
+    public function testSelectNotExistingExtensionByStringValueAndThrowExceptionIsNotRequested(): void
     {
         self::assertNull($this->selector->select('wrong:testAction', false));
     }
 
-    public function testSelectEntityExtensionByObjectIdentity()
+    public function testSelectEntityExtensionByObjectIdentity(): void
     {
         $this->assertSame(
             $this->entityExtension,
@@ -125,12 +117,12 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSelectActionExtensionByObjectIdentity()
+    public function testSelectActionExtensionByObjectIdentity(): void
     {
         $this->assertSame($this->actionExtension, $this->selector->select(new ObjectIdentity('action', 'testAction')));
     }
 
-    public function testSelectByWrongObjectIdentity()
+    public function testSelectByWrongObjectIdentity(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $this->expectExceptionMessage(
@@ -140,12 +132,12 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         $this->selector->select(new ObjectIdentity('wrong', 'testAction'));
     }
 
-    public function testSelectByWrongObjectIdentityAndThrowExceptionIsNotRequested()
+    public function testSelectByWrongObjectIdentityAndThrowExceptionIsNotRequested(): void
     {
         self::assertNull($this->selector->select(new ObjectIdentity('wrong', 'testAction'), false));
     }
 
-    public function testSelectEntityExtensionByAclAttribute()
+    public function testSelectEntityExtensionByAclAttribute(): void
     {
         $this->assertSame(
             $this->entityExtension,
@@ -153,7 +145,7 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSelectActionExtensionByAclAttribute()
+    public function testSelectActionExtensionByAclAttribute(): void
     {
         $this->assertSame(
             $this->actionExtension,
@@ -161,7 +153,7 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSelectByWrongAclAttribute()
+    public function testSelectByWrongAclAttribute(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $this->expectExceptionMessage(
@@ -171,14 +163,14 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         $this->selector->select(AclAttribute::fromArray(['id' => 'wrong', 'type' => 'testAction']));
     }
 
-    public function testSelectByWrongAclAttributeAndThrowExceptionIsNotRequested()
+    public function testSelectByWrongAclAttributeAndThrowExceptionIsNotRequested(): void
     {
         self::assertNull(
             $this->selector->select(AclAttribute::fromArray(['id' => 'wrong', 'type' => 'testAction']), false)
         );
     }
 
-    public function testSelectByFieldVote()
+    public function testSelectByFieldVote(): void
     {
         $this->fieldExtension->expects(self::once())
             ->method('supports')
@@ -191,7 +183,7 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSelectByFieldVoteWhenFieldAclIsNotSupported()
+    public function testSelectByFieldVoteWhenFieldAclIsNotSupported(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $this->expectExceptionMessage(
@@ -210,7 +202,7 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSelectByFieldVoteWhenFieldAclIsNotSupportedAndThrowExceptionIsNotRequested()
+    public function testSelectByFieldVoteWhenFieldAclIsNotSupportedAndThrowExceptionIsNotRequested(): void
     {
         $this->fieldExtension->expects(self::once())
             ->method('supports')
@@ -222,7 +214,7 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSelectByInvalidDomainObject()
+    public function testSelectByInvalidDomainObject(): void
     {
         $this->expectException(InvalidDomainObjectException::class);
         $this->expectExceptionMessage('An ACL extension was not found for: stdClass. Type: . Id: .');
@@ -237,7 +229,7 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         $this->selector->select($val);
     }
 
-    public function testSelectByInvalidDomainObjectAndThrowExceptionIsNotRequested()
+    public function testSelectByInvalidDomainObjectAndThrowExceptionIsNotRequested(): void
     {
         $val = new \stdClass();
 
@@ -249,7 +241,7 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->selector->select($val, false));
     }
 
-    public function testSelectByInvalidDomainObjectAndThrowExceptionIsNotRequestedWhenPhpErrorOccurred()
+    public function testSelectByInvalidDomainObjectAndThrowExceptionIsNotRequestedWhenPhpErrorOccurred(): void
     {
         $val = new \stdClass();
 
@@ -263,7 +255,7 @@ class AclExtensionSelectorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->selector->select($val, false));
     }
 
-    public function testAll()
+    public function testAll(): void
     {
         $result = $this->selector->all();
         $this->assertCount(2, $result);

@@ -6,11 +6,12 @@ use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
+class DbIdentifierNameGeneratorTest extends TestCase
 {
     /**
      * @dataProvider generateIndexNameProvider
@@ -20,13 +21,13 @@ class DbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
         array $columnNames,
         bool $uniqueIndex,
         string $expectedName
-    ) {
+    ): void {
         $generator = new DbIdentifierNameGenerator();
         $result = $generator->generateIndexName($tableName, $columnNames, $uniqueIndex);
         $this->assertEquals($expectedName, $result);
     }
 
-    public function testEncodedIndexNameIsTheSameAsDoctrineDefault()
+    public function testEncodedIndexNameIsTheSameAsDoctrineDefault(): void
     {
         $tableName = 'tbl123456789012345';
         $columnName = 'clmn1234567890';
@@ -42,9 +43,9 @@ class DbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($doctrineResult, $result);
     }
 
-    public function testEncodedUniqueIndexNameIsTheSameAsDoctrineDefault()
+    public function testEncodedUniqueIndexNameIsTheSameAsDoctrineDefault(): void
     {
-        $tableName  = 'tbl123456789012345';
+        $tableName = 'tbl123456789012345';
         $columnName = 'clmn1234567890';
 
         $table = new Table($tableName, [new Column($columnName, Type::getType('string'))]);
@@ -65,13 +66,13 @@ class DbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
         string $tableName,
         array $columnNames,
         string $expectedName
-    ) {
+    ): void {
         $generator = new DbIdentifierNameGenerator();
         $result = $generator->generateForeignKeyConstraintName($tableName, $columnNames);
         $this->assertEquals($expectedName, $result);
     }
 
-    public function testEncodedForeignKeyConstraintNameIsTheSameAsDoctrineDefault()
+    public function testEncodedForeignKeyConstraintNameIsTheSameAsDoctrineDefault(): void
     {
         $tableName1 = 'tbl123456789012345';
         $columnName1 = 'clmn1234567890';
@@ -103,7 +104,7 @@ class DbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
         string $prefix,
         string $expectedName,
         ?bool $upperCase
-    ) {
+    ): void {
         $generator = new DbIdentifierNameGenerator();
         $result = $generator->generateIdentifierName($tableNames, $columnNames, $prefix, $upperCase);
         $this->assertEquals($expectedName, $result);
@@ -112,7 +113,7 @@ class DbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider emptyTableNameProvider
      */
-    public function testGenerateIdentifierNameWithEmptyTableName(array|string|null $tableNames)
+    public function testGenerateIdentifierNameWithEmptyTableName(array|string|null $tableNames): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('A table name must not be empty.');

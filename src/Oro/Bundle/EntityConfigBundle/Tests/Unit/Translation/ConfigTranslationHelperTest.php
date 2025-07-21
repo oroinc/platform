@@ -6,19 +6,16 @@ use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigTranslationHelperTest extends \PHPUnit\Framework\TestCase
+class ConfigTranslationHelperTest extends TestCase
 {
     private const LOCALE = 'en';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslationManager */
-    private $translationManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Translator */
-    private $translator;
-
-    /** @var ConfigTranslationHelper */
-    private $helper;
+    private TranslationManager&MockObject $translationManager;
+    private Translator&MockObject $translator;
+    private ConfigTranslationHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +32,7 @@ class ConfigTranslationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isTranslationEqualDataProvider
      */
-    public function testIsTranslationEqual(string $translation, string $key, string $value, bool $expected)
+    public function testIsTranslationEqual(string $translation, string $key, string $value, bool $expected): void
     {
         $this->translator->expects($this->once())
             ->method('trans')
@@ -63,7 +60,7 @@ class ConfigTranslationHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testInvalidateCache()
+    public function testInvalidateCache(): void
     {
         $locale = 'en';
 
@@ -77,7 +74,7 @@ class ConfigTranslationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider saveTranslationsDataProvider
      */
-    public function testSaveTranslations(array $translations, ?string $key = null, ?string $value = null)
+    public function testSaveTranslations(array $translations, ?string $key = null, ?string $value = null): void
     {
         if ($translations) {
             $this->assertTranslationManagerCalled($key, $value);
@@ -131,7 +128,7 @@ class ConfigTranslationHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn(self::LOCALE);
     }
 
-    public function testTranslateWithFallbackTranslationExists()
+    public function testTranslateWithFallbackTranslationExists(): void
     {
         $id = 'string';
         $translation = 'translation';
@@ -150,7 +147,7 @@ class ConfigTranslationHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($translation, $this->helper->translateWithFallback($id, $fallback));
     }
 
-    public function testTranslateWithFallbackTranslationDoesntExist()
+    public function testTranslateWithFallbackTranslationDoesntExist(): void
     {
         $id = 'string';
         $fallback = 'fallback';

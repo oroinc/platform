@@ -5,12 +5,12 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\SecurityBundle\Form\Type\ObjectLabelType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
-class ObjectLabelTypeTest extends \PHPUnit\Framework\TestCase
+class ObjectLabelTypeTest extends TestCase
 {
-    /** @var ObjectLabelType */
-    private $formType;
+    private ObjectLabelType $formType;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class ObjectLabelTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType = new ObjectLabelType(new EntityClassNameHelper($entityAliasResolver));
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(HiddenType::class, $this->formType->getParent());
     }

@@ -17,10 +17,11 @@ Feature: Entity Fields on Datagrid
       | Storage Type | Table column  |
       | Type         | Select        |
     And I click "Continue"
-    And set Options with:
-      | Label               |
-      | CustomSelectOption1 |
-      | CustomSelectOption2 |
+    And click "Add"
+    And click "Add"
+    And I fill "Entity Config Form" with:
+      | Option First  | CustomSelectOption1 |
+      | Option Second | CustomSelectOption2 |
     And I fill form with:
       | Label                | Custom Select          |
       | Add To Grid Settings | Yes and do not display |

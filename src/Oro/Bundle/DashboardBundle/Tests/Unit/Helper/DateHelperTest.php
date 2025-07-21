@@ -22,10 +22,8 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 class DateHelperTest extends OrmTestCase
 {
-    private ManagerRegistry|MockObject $doctrine;
-
-    private AclHelper|MockObject $aclHelper;
-
+    private ManagerRegistry&MockObject $doctrine;
+    private AclHelper&MockObject $aclHelper;
     private DateHelper $helper;
 
     #[\Override]
@@ -47,7 +45,7 @@ class DateHelperTest extends OrmTestCase
     public function testGetDatePeriod(string $start, string $end, ?string $scaleType, array $expects): void
     {
         $start = new \DateTime($start, new \DateTimeZone('UTC'));
-        $end   = new \DateTime($end, new \DateTimeZone('UTC'));
+        $end = new \DateTime($end, new \DateTimeZone('UTC'));
 
         self::assertEquals($expects, $this->helper->getDatePeriod($start, $end, $scaleType));
     }
@@ -234,7 +232,7 @@ class DateHelperTest extends OrmTestCase
     public function testGetKey(string $start, string $end, ?string $scaleType, string $expects): void
     {
         $start = new \DateTime($start, new \DateTimeZone('UTC'));
-        $end   = new \DateTime($end, new \DateTimeZone('UTC'));
+        $end = new \DateTime($end, new \DateTimeZone('UTC'));
 
         $row = [
             'yearCreated'  => '2000',
@@ -320,7 +318,7 @@ class DateHelperTest extends OrmTestCase
     public function testAddDatePartsSelect(string $start, string $end, ?string $scaleType, string $expects): void
     {
         $start = new \DateTime($start, new \DateTimeZone('UTC'));
-        $end   = new \DateTime($end, new \DateTimeZone('UTC'));
+        $end = new \DateTime($end, new \DateTimeZone('UTC'));
 
         $queryBuilder = new QueryBuilder($this->getTestEntityManager());
         $queryBuilder->select('id')
@@ -469,9 +467,9 @@ class DateHelperTest extends OrmTestCase
     public function testConvertToCurrentPeriod(?string $scaleType): void
     {
         $from = new \DateTime('2015-05-10');
-        $to   = new \DateTime('2015-05-15');
+        $to = new \DateTime('2015-05-15');
 
-        $data         = [
+        $data = [
             [
                 'yearCreated'  => '2015',
                 'monthCreated' => '05',

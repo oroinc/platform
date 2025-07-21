@@ -11,13 +11,14 @@ use Oro\Component\Action\Tests\Unit\Action\Stub\ArrayCondition;
 use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class ActionAssemblerTest extends \PHPUnit\Framework\TestCase
+class ActionAssemblerTest extends TestCase
 {
     /**
      * @dataProvider assembleDataProvider
      */
-    public function testAssemble(array $source, array $expected)
+    public function testAssemble(array $source, array $expected): void
     {
         $actionFactory = $this->createMock(ActionFactoryInterface::class);
         $actionFactory->expects($this->any())

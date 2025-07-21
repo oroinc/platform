@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Http\Firewall;
 
 use Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -16,7 +17,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 
-class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
+class ExceptionListenerTest extends TestCase
 {
     private const EXCLUDED_ROUTE_1 = 'excluded_route_1';
     private const EXCLUDED_ROUTE_2 = 'excluded_route_2';

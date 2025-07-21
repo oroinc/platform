@@ -3,11 +3,11 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\SearchBundle\Utils\IndexationEntitiesContainer;
+use PHPUnit\Framework\TestCase;
 
-class IndexationEntitiesContainerTest extends \PHPUnit\Framework\TestCase
+class IndexationEntitiesContainerTest extends TestCase
 {
-    /** @var IndexationEntitiesContainer */
-    private $container;
+    private IndexationEntitiesContainer $container;
 
     #[\Override]
     protected function setUp(): void
@@ -15,7 +15,7 @@ class IndexationEntitiesContainerTest extends \PHPUnit\Framework\TestCase
         $this->container = new IndexationEntitiesContainer();
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $obj1 = new \stdClass();
         $obj2 = new \stdClass();
@@ -30,7 +30,7 @@ class IndexationEntitiesContainerTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($this->container->getEntities());
     }
 
-    public function testGetEntities()
+    public function testGetEntities(): void
     {
         $obj1 = new \stdClass();
         $obj2 = new \stdClass();
@@ -50,7 +50,7 @@ class IndexationEntitiesContainerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddEntity()
+    public function testAddEntity(): void
     {
         $obj = new \stdClass();
 
@@ -59,7 +59,7 @@ class IndexationEntitiesContainerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([\stdClass::class => [spl_object_hash($obj) => $obj]], $this->container->getEntities());
     }
 
-    public function testRemoveEntities()
+    public function testRemoveEntities(): void
     {
         $obj1 = new \stdClass();
         $obj2 = new \stdClass();

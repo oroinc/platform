@@ -8,20 +8,15 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\EventListener\DatasourceBindParametersListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DatasourceBindParametersListenerTest extends \PHPUnit\Framework\TestCase
+class DatasourceBindParametersListenerTest extends TestCase
 {
-    /** @var BuildAfter|\PHPUnit\Framework\MockObject\MockObject */
-    private $event;
-
-    /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagrid;
-
-    /** @var OrmDatasource|\PHPUnit\Framework\MockObject\MockObject */
-    private $datasource;
-
-    /** @var DatasourceBindParametersListener */
-    private $listener;
+    private BuildAfter&MockObject $event;
+    private DatagridInterface&MockObject $datagrid;
+    private OrmDatasource&MockObject $datasource;
+    private DatasourceBindParametersListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +31,7 @@ class DatasourceBindParametersListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onBuildAfterDataProvider
      */
-    public function testOnBuildAfterWorks(array $config, ?array $expectedBindParameters = null)
+    public function testOnBuildAfterWorks(array $config, ?array $expectedBindParameters = null): void
     {
         $config = DatagridConfiguration::create($config);
 
@@ -94,7 +89,7 @@ class DatasourceBindParametersListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testOnBuildAfterWorksSkippedForNotApplicableDatasource()
+    public function testOnBuildAfterWorksSkippedForNotApplicableDatasource(): void
     {
         $this->event->expects($this->once())
             ->method('getDatagrid')

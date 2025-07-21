@@ -6,18 +6,15 @@ use Oro\Component\Layout\Extension\Theme\Manager\PageTemplatesManager;
 use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PageTemplatesManagerTest extends \PHPUnit\Framework\TestCase
+class PageTemplatesManagerTest extends TestCase
 {
-    /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $themeManager;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var PageTemplatesManager */
-    private $pageTemplatesManager;
+    private ThemeManager&MockObject $themeManager;
+    private TranslatorInterface&MockObject $translator;
+    private PageTemplatesManager $pageTemplatesManager;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +28,7 @@ class PageTemplatesManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider routePageTemplatesDataProvider
      */
-    public function testGetRoutePageTemplates(array $themes, array $expected)
+    public function testGetRoutePageTemplates(array $themes, array $expected): void
     {
         $this->themeManager->expects($this->once())
             ->method('getAllThemes')

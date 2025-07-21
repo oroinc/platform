@@ -8,11 +8,12 @@ use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\UserScopeCacheKeyBuilder;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class UserScopeCacheKeyBuilderTest extends \PHPUnit\Framework\TestCase
+class UserScopeCacheKeyBuilderTest extends TestCase
 {
     private function getInnerBuilder(ScopeCriteria $criteria, ?string $cacheKey): ScopeCacheKeyBuilderInterface
     {
@@ -25,7 +26,7 @@ class UserScopeCacheKeyBuilderTest extends \PHPUnit\Framework\TestCase
         return $innerBuilder;
     }
 
-    public function testGetCacheKeyWhenNoToken()
+    public function testGetCacheKeyWhenNoToken(): void
     {
         $criteria = $this->createMock(ScopeCriteria::class);
 
@@ -41,7 +42,7 @@ class UserScopeCacheKeyBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('data', $builder->getCacheKey($criteria));
     }
 
-    public function testGetCacheKeyForUnsupportedUserType()
+    public function testGetCacheKeyForUnsupportedUserType(): void
     {
         $criteria = $this->createMock(ScopeCriteria::class);
 
@@ -62,7 +63,7 @@ class UserScopeCacheKeyBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('data', $builder->getCacheKey($criteria));
     }
 
-    public function testGetCacheKeyForUser()
+    public function testGetCacheKeyForUser(): void
     {
         $criteria = $this->createMock(ScopeCriteria::class);
 
@@ -96,7 +97,7 @@ class UserScopeCacheKeyBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('data;user=1;organization=100', $builder->getCacheKey($criteria));
     }
 
-    public function testGetCacheKeyForUserWithoutOrganization()
+    public function testGetCacheKeyForUserWithoutOrganization(): void
     {
         $criteria = $this->createMock(ScopeCriteria::class);
 

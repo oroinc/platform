@@ -5,21 +5,18 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension;
 use Oro\Bundle\SecurityBundle\Form\Extension\AclFormExtension;
 use Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension;
 use Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 
-class AclFormExtensionTest extends \PHPUnit\Framework\TestCase
+class AclFormExtensionTest extends TestCase
 {
-    /** @var AclProtectedFieldTypeExtension|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclFieldExtension;
-
-    /** @var FormExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerExtension;
-
-    /** @var AclFormExtension */
-    private $extension;
+    private AclProtectedFieldTypeExtension&MockObject $aclFieldExtension;
+    private FormExtensionInterface&MockObject $innerExtension;
+    private AclFormExtension $extension;
 
     #[\Override]
     protected function setUp(): void

@@ -3,12 +3,12 @@
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\Serializer\Normalizer;
 
 use Oro\Bundle\PlatformBundle\Serializer\Normalizer\FixSkipNullValuesArrayNormalizer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Serializer;
 
-class FixSkipNullValuesArrayNormalizerTest extends \PHPUnit\Framework\TestCase
+class FixSkipNullValuesArrayNormalizerTest extends TestCase
 {
-    /** @var FixSkipNullValuesArrayNormalizer */
-    private $normalizer;
+    private FixSkipNullValuesArrayNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void

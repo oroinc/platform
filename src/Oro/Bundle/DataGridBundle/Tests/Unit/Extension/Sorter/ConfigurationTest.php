@@ -3,14 +3,15 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Sorter;
 
 use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit\Framework\TestCase
+class ConfigurationTest extends TestCase
 {
     /**
      * @dataProvider processConfigurationDataProvider
      */
-    public function testProcessConfiguration(array $configs, array $expected)
+    public function testProcessConfiguration(array $configs, array $expected): void
     {
         $this->assertEquals($expected, (new Processor())->processConfiguration(new Configuration(), $configs));
     }

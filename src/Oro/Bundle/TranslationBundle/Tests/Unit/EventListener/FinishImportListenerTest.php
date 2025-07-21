@@ -12,15 +12,15 @@ use PHPUnit\Framework\TestCase;
 
 class FinishImportListenerTest extends TestCase
 {
+    private JsTranslationDumper&MockObject $translationDumper;
+    private DynamicAssetVersionManager&MockObject $dynamicAssetVersionManager;
     private FinishImportListener $listener;
-    private JsTranslationDumper|MockObject $translationDumper;
-    private DynamicAssetVersionManager|MockObject $dynamicAssetVersionManager;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->translationDumper = self::createMock(JsTranslationDumper::class);
-        $this->dynamicAssetVersionManager = self::createMock(DynamicAssetVersionManager::class);
+        $this->translationDumper = $this->createMock(JsTranslationDumper::class);
+        $this->dynamicAssetVersionManager = $this->createMock(DynamicAssetVersionManager::class);
 
         $this->listener = new FinishImportListener($this->translationDumper, $this->dynamicAssetVersionManager);
     }
@@ -30,13 +30,11 @@ class FinishImportListenerTest extends TestCase
      */
     public function testOnFinishImport(int $jobId, string $alias, string $type, array $options): void
     {
-        $this->translationDumper
-            ->expects(self::once())
+        $this->translationDumper->expects(self::once())
             ->method('dumpTranslations')
             ->with(['en']);
 
-        $this->dynamicAssetVersionManager
-            ->expects(self::once())
+        $this->dynamicAssetVersionManager->expects(self::once())
             ->method('updateAssetVersion')
             ->with('translations');
 
@@ -68,12 +66,10 @@ class FinishImportListenerTest extends TestCase
      */
     public function testOnFinishImportWithUnsupportedData(int $jobId, string $alias, string $type, array $options): void
     {
-        $this->translationDumper
-            ->expects(self::never())
+        $this->translationDumper->expects(self::never())
             ->method('dumpTranslations');
 
-        $this->dynamicAssetVersionManager
-            ->expects(self::never())
+        $this->dynamicAssetVersionManager->expects(self::never())
             ->method('updateAssetVersion');
 
         $event = new FinishImportEvent($jobId, $alias, $type, $options);

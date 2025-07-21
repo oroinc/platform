@@ -7,19 +7,16 @@ use Oro\Bundle\TranslationBundle\Command\OroTranslationRebuildCacheCommand;
 use Oro\Bundle\TranslationBundle\Translation\TranslationMessageSanitizationError;
 use Oro\Bundle\TranslationBundle\Translation\TranslationMessageSanitizationErrorCollection;
 use Oro\Component\Testing\Command\CommandTestingTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class OroTranslationRebuildCacheCommandTest extends \PHPUnit\Framework\TestCase
+class OroTranslationRebuildCacheCommandTest extends TestCase
 {
     use CommandTestingTrait;
 
-    /** @var RebuildTranslationCacheProcessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $rebuildTranslationCacheProcessor;
-
-    /** @var TranslationMessageSanitizationErrorCollection|\PHPUnit\Framework\MockObject\MockObject */
-    private $sanitizationErrorCollection;
-
-    /** @var OroTranslationRebuildCacheCommand */
-    private $command;
+    private RebuildTranslationCacheProcessor&MockObject $rebuildTranslationCacheProcessor;
+    private TranslationMessageSanitizationErrorCollection&MockObject $sanitizationErrorCollection;
+    private OroTranslationRebuildCacheCommand $command;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +30,7 @@ class OroTranslationRebuildCacheCommandTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testExecuteSuccess()
+    public function testExecuteSuccess(): void
     {
         $this->rebuildTranslationCacheProcessor->expects(self::once())
             ->method('rebuildCache')
@@ -48,7 +45,7 @@ class OroTranslationRebuildCacheCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertOutputContains($commandTester, 'The rebuild complete.');
     }
 
-    public function testExecuteSuccessWithSanitizationWarnings()
+    public function testExecuteSuccessWithSanitizationWarnings(): void
     {
         $this->rebuildTranslationCacheProcessor->expects(self::once())
             ->method('rebuildCache')
@@ -90,7 +87,7 @@ class OroTranslationRebuildCacheCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertOutputContains($commandTester, $sanitizationErrors);
     }
 
-    public function testExecuteFailed()
+    public function testExecuteFailed(): void
     {
         $this->rebuildTranslationCacheProcessor->expects(self::once())
             ->method('rebuildCache')

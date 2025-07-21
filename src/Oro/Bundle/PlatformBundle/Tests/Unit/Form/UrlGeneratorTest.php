@@ -4,19 +4,16 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\Form;
 
 use Oro\Bundle\PlatformBundle\Form\UrlGenerator;
 use Oro\Bundle\PlatformBundle\Provider\PackageProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class UrlGeneratorTest extends \PHPUnit\Framework\TestCase
+class UrlGeneratorTest extends TestCase
 {
-    /** @var PackageProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $packageProvider;
-
-    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cacheProvider;
-
-    /** @var UrlGenerator */
-    private $generator;
+    private PackageProvider&MockObject $packageProvider;
+    private CacheInterface&MockObject $cacheProvider;
+    private UrlGenerator $generator;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +23,7 @@ class UrlGeneratorTest extends \PHPUnit\Framework\TestCase
         $this->generator = new UrlGenerator($this->packageProvider, $this->cacheProvider);
     }
 
-    public function testGetFormUrlCacheHit()
+    public function testGetFormUrlCacheHit(): void
     {
         $this->cacheProvider->expects($this->once())
             ->method('get')
@@ -39,7 +36,7 @@ class UrlGeneratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider urlDataProvider
      */
-    public function testGetFormUrl(string $expectedUrl, array $packages = [])
+    public function testGetFormUrl(string $expectedUrl, array $packages = []): void
     {
         $this->cacheProvider->expects($this->once())
             ->method('get')

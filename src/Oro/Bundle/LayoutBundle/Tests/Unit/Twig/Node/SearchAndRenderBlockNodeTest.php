@@ -5,6 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig\Node;
 use Oro\Bundle\LayoutBundle\Twig\Node\SearchAndRenderBlockNode;
 use Oro\Bundle\LayoutBundle\Twig\TwigRenderer;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 use Twig\Compiler;
 use Twig\Environment;
 use Twig\Node\Expression\ArrayExpression;
@@ -16,7 +17,7 @@ use Twig\Node\Node;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
+class SearchAndRenderBlockNodeTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
@@ -49,7 +50,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
     /**
      * block_widget(block, {'foo' => 'bar'})
      */
-    public function testCompileWidgetWithVariables()
+    public function testCompileWidgetWithVariables(): void
     {
         $arguments = new Node(
             [
@@ -80,7 +81,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
     /**
      * block_label(block, 'my label')
      */
-    public function testCompileLabelWithLabel()
+    public function testCompileLabelWithLabel(): void
     {
         $arguments = new Node(
             [
@@ -105,7 +106,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
     /**
      * block_label(block, null)
      */
-    public function testCompileLabelWithNullLabel()
+    public function testCompileLabelWithNullLabel(): void
     {
         $arguments = new Node(
             [
@@ -132,7 +133,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
     /**
      * block_label(block, '')
      */
-    public function testCompileLabelWithEmptyStringLabel()
+    public function testCompileLabelWithEmptyStringLabel(): void
     {
         $arguments = new Node(
             [
@@ -159,7 +160,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
     /**
      * block_label(block)
      */
-    public function testCompileLabelWithDefaultLabel()
+    public function testCompileLabelWithDefaultLabel(): void
     {
         $arguments = new Node(
             [
@@ -183,7 +184,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
     /**
      * block_label(block, null, {'foo' => 'bar'})
      */
-    public function testCompileLabelWithAttributes()
+    public function testCompileLabelWithAttributes(): void
     {
         $arguments = new Node(
             [
@@ -218,7 +219,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
     /**
      * block_label(block, 'value in argument', {'foo' => 'bar', 'label' => value in attributes})
      */
-    public function testCompileLabelWithLabelAndAttributes()
+    public function testCompileLabelWithLabelAndAttributes(): void
     {
         $arguments = new Node(
             [
@@ -252,7 +253,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
     /**
      * block_label(block, true ? null : null)
      */
-    public function testCompileLabelWithLabelThatEvaluatesToNull()
+    public function testCompileLabelWithLabelThatEvaluatesToNull(): void
     {
         $arguments = new Node(
             [
@@ -286,7 +287,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
     /**
      * block_label(block, true ? null : null, {'foo' => 'bar', 'label' => value in attributes})
      */
-    public function testCompileLabelWithLabelThatEvaluatesToNullAndAttributes()
+    public function testCompileLabelWithLabelThatEvaluatesToNullAndAttributes(): void
     {
         $arguments = new Node(
             [
@@ -327,7 +328,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCompileParentBlockWidget()
+    public function testCompileParentBlockWidget(): void
     {
         $arguments = new Node(
             [

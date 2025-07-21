@@ -5,6 +5,10 @@ parameters:
         dataType: 'array'
     fieldBigInt:
         dataType: 'bigint'
+    fieldBackedEnumInt:
+        dataType: 'string'
+    fieldBackedEnumStr:
+        dataType: 'string'
     fieldBoolean:
         dataType: 'boolean'
     fieldCurrency:
@@ -56,6 +60,10 @@ response:
         dataType: 'integer'
     fieldArray:
         dataType: 'array'
+    fieldBackedEnumInt:
+        dataType: 'string'
+    fieldBackedEnumStr:
+        dataType: 'string'
     fieldBigInt:
         dataType: 'bigint'
     fieldBoolean:

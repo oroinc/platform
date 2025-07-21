@@ -8,17 +8,14 @@ use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\EventListener\TagListener;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TagListenerTest extends \PHPUnit\Framework\TestCase
+class TagListenerTest extends TestCase
 {
-    /** @var TaggableHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $taggableHelper;
-
-    /** @var TagManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $tagManager;
-
-    /** @var TagListener */
-    private $listener;
+    private TaggableHelper&MockObject $taggableHelper;
+    private TagManager&MockObject $tagManager;
+    private TagListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,7 @@ class TagListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new TagListener($container);
     }
 
-    public function testPreRemoveForTaggableEntity()
+    public function testPreRemoveForTaggableEntity(): void
     {
         $entity = new \stdClass();
 
@@ -51,7 +48,7 @@ class TagListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPreRemoveForNotTaggableEntity()
+    public function testPreRemoveForNotTaggableEntity(): void
     {
         $entity = new \stdClass();
 

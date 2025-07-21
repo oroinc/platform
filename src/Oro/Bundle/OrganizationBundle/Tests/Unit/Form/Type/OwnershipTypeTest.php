@@ -3,13 +3,13 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class OwnershipTypeTest extends \PHPUnit\Framework\TestCase
+class OwnershipTypeTest extends TestCase
 {
-    /** @var OwnershipType */
-    private $type;
+    private OwnershipType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +17,7 @@ class OwnershipTypeTest extends \PHPUnit\Framework\TestCase
         $this->type = new OwnershipType();
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $optionResolver = $this->createMock(OptionsResolver::class);
 
@@ -27,7 +27,7 @@ class OwnershipTypeTest extends \PHPUnit\Framework\TestCase
         $this->type->configureOptions($optionResolver);
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(ChoiceType::class, $this->type->getParent());
     }

@@ -5,13 +5,14 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Helper;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LocalizationQueryTraitTest extends \PHPUnit\Framework\TestCase
+class LocalizationQueryTraitTest extends TestCase
 {
     use LocalizationQueryTrait;
 
-    /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryBuilder;
+    private QueryBuilder&MockObject $queryBuilder;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +21,7 @@ class LocalizationQueryTraitTest extends \PHPUnit\Framework\TestCase
     }
 
     // joinDefaultLocalizedValue call tested implicitly
-    public function testJoinDefaultLocalizedValue()
+    public function testJoinDefaultLocalizedValue(): void
     {
         $this->queryBuilder->expects($this->once())
             ->method('addSelect')
@@ -38,7 +39,7 @@ class LocalizationQueryTraitTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLeftJoinDefaultLocalizedValue()
+    public function testLeftJoinDefaultLocalizedValue(): void
     {
         $this->queryBuilder->expects($this->once())
             ->method('addSelect')

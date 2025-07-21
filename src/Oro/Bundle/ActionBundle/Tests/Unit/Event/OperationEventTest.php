@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class OperationEventTest extends TestCase
 {
-    public function testEventMinimal()
+    public function testEventMinimal(): void
     {
         $data = new ActionData();
         $definition = new OperationDefinition();
@@ -21,7 +21,7 @@ class OperationEventTest extends TestCase
         $this->assertNull($event->getErrors());
     }
 
-    public function testEventFull()
+    public function testEventFull(): void
     {
         $errors = new ArrayCollection();
         $data = new ActionData();

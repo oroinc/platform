@@ -7,10 +7,11 @@ use Oro\Bundle\SearchBundle\Query\Expression\Parser;
 use Oro\Bundle\SearchBundle\Query\Expression\Token;
 use Oro\Bundle\SearchBundle\Query\Expression\TokenStream;
 use Oro\Bundle\SearchBundle\Query\Query;
+use PHPUnit\Framework\TestCase;
 
-class ParserTest extends \PHPUnit\Framework\TestCase
+class ParserTest extends TestCase
 {
-    public function testParsesSelectKeyword()
+    public function testParsesSelectKeyword(): void
     {
         $tokens = $this->generateTokens([
             [Token::KEYWORD_TYPE, 'select'],
@@ -40,7 +41,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    public function testParseAggregateExpression()
+    public function testParseAggregateExpression(): void
     {
         $tokens = $this->generateTokens([
             [Token::KEYWORD_TYPE, Query::KEYWORD_AGGREGATE],
@@ -62,7 +63,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseAggregateExpressionFieldException()
+    public function testParseAggregateExpressionFieldException(): void
     {
         $this->expectException(ExpressionSyntaxError::class);
         $this->expectExceptionMessage(
@@ -79,7 +80,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $parser->parse(new TokenStream($tokens));
     }
 
-    public function testParseAggregateExpressionFunctionException()
+    public function testParseAggregateExpressionFunctionException(): void
     {
         $this->expectException(ExpressionSyntaxError::class);
         $this->expectExceptionMessage(
@@ -98,7 +99,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $parser->parse(new TokenStream($tokens));
     }
 
-    public function testParseAggregateExpressionNameException()
+    public function testParseAggregateExpressionNameException(): void
     {
         $this->expectException(ExpressionSyntaxError::class);
         $this->expectExceptionMessage(
@@ -117,7 +118,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $parser->parse(new TokenStream($tokens));
     }
 
-    public function testParseAggregateExpressionUnsupportedFunctionException()
+    public function testParseAggregateExpressionUnsupportedFunctionException(): void
     {
         $this->expectException(ExpressionSyntaxError::class);
         $this->expectExceptionMessage(

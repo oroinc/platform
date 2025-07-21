@@ -6,10 +6,11 @@ use Oro\Bundle\SecurityBundle\Exception\UnsupportedOwnerTreeProviderException;
 use Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
+use PHPUnit\Framework\TestCase;
 
-class ChainOwnerTreeProviderTest extends \PHPUnit\Framework\TestCase
+class ChainOwnerTreeProviderTest extends TestCase
 {
-    public function testSupportsTrue()
+    public function testSupportsTrue(): void
     {
         $provider1 = $this->createMock(OwnerTreeProviderInterface::class);
         $provider1->expects($this->once())
@@ -24,7 +25,7 @@ class ChainOwnerTreeProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($chainProvider->supports());
     }
 
-    public function testSupportsFalse()
+    public function testSupportsFalse(): void
     {
         $provider = $this->createMock(OwnerTreeProviderInterface::class);
         $provider->expects($this->once())
@@ -35,7 +36,7 @@ class ChainOwnerTreeProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($chainProvider->supports());
     }
 
-    public function testGetTree()
+    public function testGetTree(): void
     {
         $tree = $this->createMock(OwnerTreeInterface::class);
 
@@ -57,7 +58,7 @@ class ChainOwnerTreeProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($tree, $chainProvider->getTree());
     }
 
-    public function testGetTreeFailed()
+    public function testGetTreeFailed(): void
     {
         $this->expectException(UnsupportedOwnerTreeProviderException::class);
         $this->expectExceptionMessage('Supported provider not found in chain');
@@ -73,7 +74,7 @@ class ChainOwnerTreeProviderTest extends \PHPUnit\Framework\TestCase
         $chainProvider->getTree();
     }
 
-    public function testClearCache()
+    public function testClearCache(): void
     {
         $provider1 = $this->createMock(OwnerTreeProviderInterface::class);
         $provider1->expects($this->once())
@@ -87,7 +88,7 @@ class ChainOwnerTreeProviderTest extends \PHPUnit\Framework\TestCase
         $chainProvider->clearCache();
     }
 
-    public function testWarmUpCache()
+    public function testWarmUpCache(): void
     {
         $provider1 = $this->createMock(OwnerTreeProviderInterface::class);
         $provider1->expects($this->once())

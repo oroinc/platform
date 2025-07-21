@@ -4,14 +4,13 @@ namespace Oro\Component\Layout\Tests\Unit\ExpressionLanguage\Encoder;
 
 use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderInterface;
 use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ExpressionEncoderRegistryTest extends \PHPUnit\Framework\TestCase
+class ExpressionEncoderRegistryTest extends TestCase
 {
-    /** @var ExpressionEncoderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $encoder;
-
-    /** @var ExpressionEncoderRegistry */
-    private $encoderRegistry;
+    private ExpressionEncoderInterface&MockObject $encoder;
+    private ExpressionEncoderRegistry $encoderRegistry;
 
     #[\Override]
     protected function setUp(): void
@@ -23,12 +22,12 @@ class ExpressionEncoderRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEncoder()
+    public function testGetEncoder(): void
     {
         $this->assertSame($this->encoder, $this->encoderRegistry->get('test'));
     }
 
-    public function testGetEncoderThrowsExceptionIfEncoderDoesNotExist()
+    public function testGetEncoderThrowsExceptionIfEncoderDoesNotExist(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The expression encoder for "unknown" formatting was not found.');

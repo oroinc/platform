@@ -3,8 +3,11 @@
 namespace Oro\Component\PhpUtils\Tests\Unit;
 
 use Oro\Component\PhpUtils\ClassLoader;
+use PHPUnit\Framework\TestCase;
+use PhpUtilsTestNamespace\Baz;
+use PhpUtilsTestNamespace\Foo;
 
-class ClassLoaderTest extends \PHPUnit\Framework\TestCase
+class ClassLoaderTest extends TestCase
 {
     private function getClassLoader(string $namespacePrefix = 'PhpUtilsTestNamespace\\'): ClassLoader
     {
@@ -14,36 +17,36 @@ class ClassLoaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadClass()
+    public function testLoadClass(): void
     {
-        $className = 'PhpUtilsTestNamespace\Foo';
+        $className = Foo::class;
         $loader = $this->getClassLoader();
         self::assertTrue($loader->loadClass($className), 'loader->loadClass() result');
         self::assertTrue(class_exists($className), 'class_exists() after loader->loadClass()');
     }
 
-    public function testLoadNonexistentClass()
+    public function testLoadNonexistentClass(): void
     {
         $loader = $this->getClassLoader();
         self::assertFalse($loader->loadClass('PhpUtilsTestNamespace\Bar'));
     }
 
-    public function testLoadClassFromNotRegisteredNamespace()
+    public function testLoadClassFromNotRegisteredNamespace(): void
     {
         $loader = $this->getClassLoader();
         self::assertFalse($loader->loadClass('AnotherTestNamespace\Foo'));
     }
 
-    public function testLoadClassWhenNamespaceIsNotEqualToDirectory()
+    public function testLoadClassWhenNamespaceIsNotEqualToDirectory(): void
     {
         $loader = $this->getClassLoader('AnotherTestNamespace\\');
         self::assertFalse($loader->loadClass('AnotherTestNamespace\Foo'));
     }
 
-    public function testRegister()
+    public function testRegister(): void
     {
         $loader = $this->getClassLoader();
         $loader->register();
-        self::assertTrue(class_exists('PhpUtilsTestNamespace\Baz'), 'class_exists after loader->register()');
+        self::assertTrue(class_exists(Baz::class), 'class_exists after loader->register()');
     }
 }

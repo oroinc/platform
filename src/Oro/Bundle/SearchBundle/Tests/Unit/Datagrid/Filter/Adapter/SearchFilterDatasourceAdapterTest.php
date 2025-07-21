@@ -9,15 +9,16 @@ use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchStringFilter;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
+class SearchFilterDatasourceAdapterTest extends TestCase
 {
-    /** @var SearchQueryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $searchQuery;
+    private SearchQueryInterface&MockObject $searchQuery;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +26,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
         $this->searchQuery = $this->createMock(SearchQueryInterface::class);
     }
 
-    public function testAddRestrictionAndCondition()
+    public function testAddRestrictionAndCondition(): void
     {
         $restriction = Criteria::expr()->eq('foo', 'bar');
 
@@ -47,7 +48,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
         $adapter->addRestriction($restriction, FilterUtility::CONDITION_AND);
     }
 
-    public function testAddRestrictionOrCondition()
+    public function testAddRestrictionOrCondition(): void
     {
         $restriction = Criteria::expr()->eq('foo', 'bar');
 
@@ -69,7 +70,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
         $adapter->addRestriction($restriction, FilterUtility::CONDITION_OR);
     }
 
-    public function testAddRestrictionInvalidCondition()
+    public function testAddRestrictionInvalidCondition(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Restriction not supported.');
@@ -78,7 +79,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
         $adapter->addRestriction(Criteria::expr()->eq('foo', 'bar'), 'invalid_condition');
     }
 
-    public function testAddRestrictionInvalidRestriction()
+    public function testAddRestrictionInvalidRestriction(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Restriction not supported.');
@@ -87,7 +88,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
         $adapter->addRestriction('foo = bar', FilterUtility::CONDITION_OR);
     }
 
-    public function testInApplyFromStringFilter()
+    public function testInApplyFromStringFilter(): void
     {
         $criteria = $this->createMock(Criteria::class);
         $criteria->expects($this->once())
@@ -117,7 +118,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
         $stringFilter->apply($ds, ['type' => TextFilterType::TYPE_CONTAINS, 'value' => 'bar']);
     }
 
-    public function testGroupBy()
+    public function testGroupBy(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Method currently not supported.');
@@ -126,7 +127,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
         $ds->groupBy('name');
     }
 
-    public function testAddGroupBy()
+    public function testAddGroupBy(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Method currently not supported.');
@@ -135,7 +136,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
         $ds->addGroupBy('name');
     }
 
-    public function testSetParameter()
+    public function testSetParameter(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Method currently not supported.');
@@ -144,7 +145,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
         $ds->setParameter('key', 'value');
     }
 
-    public function testGetFieldByAlias()
+    public function testGetFieldByAlias(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Method currently not supported.');
@@ -153,7 +154,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
         $ds->getFieldByAlias('name');
     }
 
-    public function testGetWrappedSearchQueryNotInitialized()
+    public function testGetWrappedSearchQueryNotInitialized(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Query not initialized properly');
@@ -162,7 +163,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
         $ds->getWrappedSearchQuery();
     }
 
-    public function testGetWrappedSearchQuery()
+    public function testGetWrappedSearchQuery(): void
     {
         $query = $this->createMock(Query::class);
         $this->searchQuery->expects($this->any())
@@ -173,7 +174,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($ds->getWrappedSearchQuery(), $query);
     }
 
-    public function testExpr()
+    public function testExpr(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Use Criteria::expr() instead.');
@@ -182,7 +183,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
         $ds->expr();
     }
 
-    public function testGetDatabasePlatform()
+    public function testGetDatabasePlatform(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Method currently not supported.');
@@ -191,7 +192,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
         $ds->getDatabasePlatform();
     }
 
-    public function testGenerateParameterName()
+    public function testGenerateParameterName(): void
     {
         $name = 'testName';
 
@@ -199,7 +200,7 @@ class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($name, $ds->generateParameterName($name));
     }
 
-    public function testGetQuery()
+    public function testGetQuery(): void
     {
         $ds = new SearchFilterDatasourceAdapter($this->searchQuery);
         $this->assertEquals($this->searchQuery, $ds->getSearchQuery());

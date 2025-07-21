@@ -10,21 +10,18 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowActivationException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowRemoveException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
+class WorkflowDefinitionEntityListenerTest extends TestCase
 {
-    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowRegistry;
-
-    /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
-    private $entitiesWithWorkflowsCache;
-
-    /** @var WorkflowDefinitionEntityListener */
-    private $listener;
+    private WorkflowRegistry&MockObject $workflowRegistry;
+    private AbstractAdapter&MockObject $entitiesWithWorkflowsCache;
+    private WorkflowDefinitionEntityListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +35,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrePersistNonActiveSkip()
+    public function testPrePersistNonActiveSkip(): void
     {
         $definitionMock = $this->createMock(WorkflowDefinition::class);
 
@@ -53,7 +50,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->prePersist($definitionMock);
     }
 
-    public function testPrePersistNoConflicts()
+    public function testPrePersistNoConflicts(): void
     {
         $definitionMock = $this->createMock(WorkflowDefinition::class);
 
@@ -76,7 +73,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->prePersist($definitionMock);
     }
 
-    public function testPrePersistConflictException()
+    public function testPrePersistConflictException(): void
     {
         $definitionMock = $this->createMock(WorkflowDefinition::class);
 
@@ -118,7 +115,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->prePersist($definitionMock);
     }
 
-    public function testPrePersistSeveralConflictsException()
+    public function testPrePersistSeveralConflictsException(): void
     {
         $definitionMock = $this->createMock(WorkflowDefinition::class);
 
@@ -154,7 +151,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->prePersist($definitionMock);
     }
 
-    public function testPreUpdateChangedRelatedEntity()
+    public function testPreUpdateChangedRelatedEntity(): void
     {
         $event = $this->createMock(PreUpdateEventArgs::class);
 
@@ -173,7 +170,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preUpdate($workflow->getDefinition(), $event);
     }
 
-    public function testPreUpdateChangedIsActive()
+    public function testPreUpdateChangedIsActive(): void
     {
         $event = $this->createMock(PreUpdateEventArgs::class);
 
@@ -200,7 +197,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preUpdate($workflow->getDefinition(), $event);
     }
 
-    public function testPreUpdateChangedNotTrackedProperty()
+    public function testPreUpdateChangedNotTrackedProperty(): void
     {
         $event = $this->createMock(PreUpdateEventArgs::class);
 
@@ -219,7 +216,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preUpdate($workflow->getDefinition(), $event);
     }
 
-    public function testPreUpdateConflictsException()
+    public function testPreUpdateConflictsException(): void
     {
         $eventMock = $this->createMock(PreUpdateEventArgs::class);
 
@@ -253,7 +250,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preUpdate($workflow->getDefinition(), $eventMock);
     }
 
-    public function testPreRemoveSystemWorkflowException()
+    public function testPreRemoveSystemWorkflowException(): void
     {
         $this->expectException(WorkflowRemoveException::class);
         $this->expectExceptionMessage("Workflow 'workflow1' can't be removed due its System workflow");
@@ -269,7 +266,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preRemove($definitionMock);
     }
 
-    public function testPreRemoveSystemWorkflow()
+    public function testPreRemoveSystemWorkflow(): void
     {
         $definitionMock = $this->createMock(WorkflowDefinition::class);
         $definitionMock->expects($this->once())

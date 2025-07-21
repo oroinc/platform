@@ -7,18 +7,17 @@ use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
 use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Fixtures\Entity\EmailHolderTestEntity;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Fixtures\Entity\NotEmailHolderTestEntity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
-class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
+class AdditionalEmailsSubscriberTest extends TestCase
 {
-    /** @var ChainAdditionalEmailAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $associationProvider;
-
-    /** @var AdditionalEmailsSubscriber */
-    private $subscriber;
+    private ChainAdditionalEmailAssociationProvider&MockObject $associationProvider;
+    private AdditionalEmailsSubscriber $subscriber;
 
     #[\Override]
     protected function setUp(): void
@@ -28,14 +27,14 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber = new AdditionalEmailsSubscriber($this->associationProvider);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $events = AdditionalEmailsSubscriber::getSubscribedEvents();
         $this->assertArrayHasKey(FormEvents::PRE_SET_DATA, $events);
         $this->assertArrayHasKey(FormEvents::PRE_SUBMIT, $events);
     }
 
-    public function testPreSetData()
+    public function testPreSetData(): void
     {
         $form = $this->createMock(FormInterface::class);
         $recipientListForm = $this->createMock(FormInterface::class);
@@ -109,7 +108,7 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->preSetData($event);
     }
 
-    public function testPreSetDataWithEmptyEventObject()
+    public function testPreSetDataWithEmptyEventObject(): void
     {
         $form = $this->createMock(FormInterface::class);
         $recipientListForm = $this->createMock(FormInterface::class);
@@ -140,7 +139,7 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->preSetData($event);
     }
 
-    public function testPreSetDataWithEmptyEntityNameInNotification()
+    public function testPreSetDataWithEmptyEntityNameInNotification(): void
     {
         $form = $this->createMock(FormInterface::class);
         $recipientListForm = $this->createMock(FormInterface::class);
@@ -172,7 +171,7 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->preSetData($event);
     }
 
-    public function testPreSubmit()
+    public function testPreSubmit(): void
     {
         $form = $this->createMock(FormInterface::class);
         $recipientListForm = $this->createMock(FormInterface::class);
@@ -244,7 +243,7 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->preSubmit($event);
     }
 
-    public function testPreSubmitWithEmptyData()
+    public function testPreSubmitWithEmptyData(): void
     {
         $form = $this->createMock(FormInterface::class);
         $recipientListForm = $this->createMock(FormInterface::class);

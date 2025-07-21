@@ -46,7 +46,7 @@ class EmailQueryFactoryTest extends OrmTestCase
         );
     }
 
-    public function testAddFromEmailAddressWithoutProviders()
+    public function testAddFromEmailAddressWithoutProviders(): void
     {
         $em = $this->getTestEntityManager();
         $qb = $em->createQueryBuilder();
@@ -63,7 +63,7 @@ class EmailQueryFactoryTest extends OrmTestCase
         );
     }
 
-    public function testAddFromEmailAddressOneProviderGiven()
+    public function testAddFromEmailAddressOneProviderGiven(): void
     {
         $provider = $this->createMock(EmailOwnerProviderInterface::class);
         $provider->expects($this->any())
@@ -98,7 +98,7 @@ class EmailQueryFactoryTest extends OrmTestCase
         );
     }
 
-    public function testFilterQueryByUserIdWhenMailboxesAreFound()
+    public function testFilterQueryByUserIdWhenMailboxesAreFound(): void
     {
         $user = new User();
         $organization = new Organization();
@@ -131,7 +131,7 @@ class EmailQueryFactoryTest extends OrmTestCase
         );
     }
 
-    public function testFilterQueryByUserIdWhenNoMailboxesFound()
+    public function testFilterQueryByUserIdWhenNoMailboxesFound(): void
     {
         $user = new User();
         $organization = new Organization();

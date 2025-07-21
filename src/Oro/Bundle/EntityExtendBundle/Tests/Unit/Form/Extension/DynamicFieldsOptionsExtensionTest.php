@@ -3,10 +3,11 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\EntityExtendBundle\Form\Extension\DynamicFieldsOptionsExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class DynamicFieldsOptionsExtensionTest extends \PHPUnit\Framework\TestCase
+class DynamicFieldsOptionsExtensionTest extends TestCase
 {
     public function testConfigureOptions(): void
     {

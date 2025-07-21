@@ -7,25 +7,23 @@ use Oro\Bundle\GaufretteBundle\Adapter\LocalAdapter;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Finder\Finder;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class LocalFileManagerTest extends \PHPUnit\Framework\TestCase
+class LocalFileManagerTest extends TestCase
 {
     use TempDirExtension;
 
-    private const TEST_FILE_SYSTEM_NAME  = 'testFileSystem';
-    private const TEST_PROTOCOL          = 'testProtocol';
+    private const TEST_FILE_SYSTEM_NAME = 'testFileSystem';
+    private const TEST_PROTOCOL = 'testProtocol';
     private const TEST_READONLY_PROTOCOL = 'testReadonlyProtocol';
 
-    /** @var string */
-    private $rootDirectory;
-
-    /** @var SymfonyFilesystem */
-    private $fileSystem;
+    private string $rootDirectory;
+    private SymfonyFilesystem $fileSystem;
 
     #[\Override]
     protected function setUp(): void
@@ -95,7 +93,7 @@ class LocalFileManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fileManagerDataProvider
      */
-    public function testGetAdapterDescription(bool $useSubDir, ?string $subDir, string $resultSubDir)
+    public function testGetAdapterDescription(bool $useSubDir, ?string $subDir, string $resultSubDir): void
     {
         $fileManager = $this->getFileManager($useSubDir, $subDir);
 
@@ -108,7 +106,7 @@ class LocalFileManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fileManagerDataProvider
      */
-    public function testFindFiles(bool $useSubDir, ?string $subDir, string $resultSubDir)
+    public function testFindFiles(bool $useSubDir, ?string $subDir, string $resultSubDir): void
     {
         $rootDirectory = $this->rootDirectory . $resultSubDir;
         $this->fileSystem->mkdir($rootDirectory . '/dir1');
@@ -153,7 +151,7 @@ class LocalFileManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fileManagerDataProvider
      */
-    public function testDeleteAllFiles(bool $useSubDir, ?string $subDir, string $resultSubDir)
+    public function testDeleteAllFiles(bool $useSubDir, ?string $subDir, string $resultSubDir): void
     {
         $rootDirectory = $this->rootDirectory . $resultSubDir;
         $this->fileSystem->mkdir($rootDirectory . '/dir1');
@@ -172,7 +170,7 @@ class LocalFileManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fileManagerDataProvider
      */
-    public function testDeleteAllFilesBySlashPrefix(bool $useSubDir, ?string $subDir, string $resultSubDir)
+    public function testDeleteAllFilesBySlashPrefix(bool $useSubDir, ?string $subDir, string $resultSubDir): void
     {
         $rootDirectory = $this->rootDirectory . $resultSubDir;
         $this->fileSystem->mkdir($rootDirectory . '/dir1');
@@ -192,7 +190,7 @@ class LocalFileManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fileManagerDataProvider
      */
-    public function testDeleteAllFilesByPrefix(bool $useSubDir, ?string $subDir, string $resultSubDir)
+    public function testDeleteAllFilesByPrefix(bool $useSubDir, ?string $subDir, string $resultSubDir): void
     {
         $rootDirectory = $this->rootDirectory . $resultSubDir;
         $this->fileSystem->mkdir($rootDirectory . '/dir1');
@@ -212,8 +210,11 @@ class LocalFileManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fileManagerDataProvider
      */
-    public function testDeleteAllFilesByPrefixWithLeadingSlash(bool $useSubDir, ?string $subDir, string $resultSubDir)
-    {
+    public function testDeleteAllFilesByPrefixWithLeadingSlash(
+        bool $useSubDir,
+        ?string $subDir,
+        string $resultSubDir
+    ): void {
         $rootDirectory = $this->rootDirectory . $resultSubDir;
         $this->fileSystem->mkdir($rootDirectory . '/dir1');
         $this->fileSystem->touch($rootDirectory . '/file1.txt');
@@ -232,8 +233,11 @@ class LocalFileManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fileManagerDataProvider
      */
-    public function testDeleteAllFilesByPrefixWithTailingSlash(bool $useSubDir, ?string $subDir, string $resultSubDir)
-    {
+    public function testDeleteAllFilesByPrefixWithTailingSlash(
+        bool $useSubDir,
+        ?string $subDir,
+        string $resultSubDir
+    ): void {
         $rootDirectory = $this->rootDirectory . $resultSubDir;
         $this->fileSystem->mkdir($rootDirectory . '/dir1');
         $this->fileSystem->touch($rootDirectory . '/file1.txt');
@@ -256,7 +260,7 @@ class LocalFileManagerTest extends \PHPUnit\Framework\TestCase
         bool $useSubDir,
         ?string $subDir,
         string $resultSubDir
-    ) {
+    ): void {
         $rootDirectory = $this->rootDirectory . $resultSubDir;
         $this->fileSystem->mkdir($rootDirectory . '/dir1');
         $this->fileSystem->touch($rootDirectory . '/file1.txt');
@@ -275,7 +279,7 @@ class LocalFileManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fileManagerDataProvider
      */
-    public function testDeleteFile(bool $useSubDir, ?string $subDir, string $resultSubDir)
+    public function testDeleteFile(bool $useSubDir, ?string $subDir, string $resultSubDir): void
     {
         $rootDirectory = $this->rootDirectory . $resultSubDir;
         $this->fileSystem->mkdir($rootDirectory . '/dir1');
@@ -292,8 +296,11 @@ class LocalFileManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fileManagerDataProvider
      */
-    public function testDeleteFileFromSubDirAndNoOtherFiles(bool $useSubDir, ?string $subDir, string $resultSubDir)
-    {
+    public function testDeleteFileFromSubDirAndNoOtherFiles(
+        bool $useSubDir,
+        ?string $subDir,
+        string $resultSubDir
+    ): void {
         $rootDirectory = $this->rootDirectory . $resultSubDir;
         $this->fileSystem->mkdir($rootDirectory . '/dir1');
         $this->fileSystem->touch($rootDirectory . '/file1.txt');
@@ -314,7 +321,7 @@ class LocalFileManagerTest extends \PHPUnit\Framework\TestCase
         bool $useSubDir,
         ?string $subDir,
         string $resultSubDir
-    ) {
+    ): void {
         $rootDirectory = $this->rootDirectory . $resultSubDir;
         $this->fileSystem->mkdir($rootDirectory . '/dir1');
         $this->fileSystem->touch($rootDirectory . '/file1.txt');

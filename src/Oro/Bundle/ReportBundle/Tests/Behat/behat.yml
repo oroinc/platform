@@ -8,6 +8,10 @@ oro_behat_extension:
           Name: oro_report_form[name]
           Entity: oro_report_form[entity]
           Report Type: oro_report_form[type]
+          Columns Name:
+              type: 'css'
+              locator: 'input[name="oro_report_form[column][name]"]'
+              element: Select2Entity
           Grouping Columns:
               type: 'css'
               locator: 'input[name="oro_report_form[grouping][columnNames]"]'

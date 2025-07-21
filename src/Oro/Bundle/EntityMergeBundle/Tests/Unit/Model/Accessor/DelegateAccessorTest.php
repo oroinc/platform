@@ -7,11 +7,12 @@ use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\DelegateAccessor;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
+class DelegateAccessorTest extends TestCase
 {
-    /** @var FieldMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadata;
+    private FieldMetadata&MockObject $metadata;
 
     #[\Override]
     protected function setUp(): void
@@ -19,10 +20,7 @@ class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
         $this->metadata = $this->createMock(FieldMetadata::class);
     }
 
-    /**
-     * @return AccessorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createAccessor(string $name)
+    private function createAccessor(string $name): AccessorInterface&MockObject
     {
         $accessor = $this->createMock(AccessorInterface::class);
         $accessor->expects($this->any())
@@ -32,13 +30,13 @@ class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
         return $accessor;
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $accessor = new DelegateAccessor([]);
         self::assertEquals('delegate', $accessor->getName());
     }
 
-    public function testSupportsTrueLast()
+    public function testSupportsTrueLast(): void
     {
         $entity = new EntityStub(1);
 
@@ -64,7 +62,7 @@ class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($accessor->supports($entity, $this->metadata));
     }
 
-    public function testSupportsTrueFirst()
+    public function testSupportsTrueFirst(): void
     {
         $entity = new EntityStub(1);
 
@@ -82,7 +80,7 @@ class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($accessor->supports($entity, $this->metadata));
     }
 
-    public function testSupportsFalse()
+    public function testSupportsFalse(): void
     {
         $entity = new EntityStub(1);
 
@@ -102,7 +100,7 @@ class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($accessor->supports($entity, $this->metadata));
     }
 
-    public function testGetValue()
+    public function testGetValue(): void
     {
         $entity = new EntityStub(1);
 
@@ -122,7 +120,7 @@ class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedResult, $accessor->getValue($entity, $this->metadata));
     }
 
-    public function testGetValueFails()
+    public function testGetValueFails(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot find accessor for "test" field.');
@@ -143,7 +141,7 @@ class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getValue($entity, $this->metadata);
     }
 
-    public function testSetValue()
+    public function testSetValue(): void
     {
         $entity = new EntityStub(1);
 

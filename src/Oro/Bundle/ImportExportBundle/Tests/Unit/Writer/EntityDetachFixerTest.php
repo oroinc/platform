@@ -12,17 +12,14 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Writer\Stub\EntityStub;
 use Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityDetachFixerTest extends \PHPUnit\Framework\TestCase
+class EntityDetachFixerTest extends TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldHelper;
-
-    /** @var EntityDetachFixer */
-    private $fixer;
+    private EntityManager&MockObject $entityManager;
+    private FieldHelper&MockObject $fieldHelper;
+    private EntityDetachFixer $fixer;
 
     #[\Override]
     protected function setUp(): void
@@ -42,7 +39,7 @@ class EntityDetachFixerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFixEntityAssociationFieldsLevel()
+    public function testFixEntityAssociationFieldsLevel(): void
     {
         $entity = new \stdClass();
 
@@ -51,7 +48,7 @@ class EntityDetachFixerTest extends \PHPUnit\Framework\TestCase
         $this->fixer->fixEntityAssociationFields($entity, -1);
     }
 
-    public function testEntityWithoutRelations()
+    public function testEntityWithoutRelations(): void
     {
         $entity = new \stdClass();
 
@@ -66,7 +63,7 @@ class EntityDetachFixerTest extends \PHPUnit\Framework\TestCase
         $this->fixer->fixEntityAssociationFields($entity);
     }
 
-    public function testFixEntityAssociationFields()
+    public function testFixEntityAssociationFields(): void
     {
         $entity = new EntityStub();
         $entity->setEntity(new EntityStub())

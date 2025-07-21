@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension;
 use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -25,14 +25,9 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
 {
     use EntityTrait;
 
-    /** @var FieldAclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldAclHelper;
-
-    /** DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var AclProtectedFieldTypeExtension */
-    private $extension;
+    private FieldAclHelper&MockObject $fieldAclHelper;
+    private LoggerInterface&MockObject $logger;
+    private AclProtectedFieldTypeExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -91,8 +86,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         [$view, $form, $options, $entity] = $this->getTestFormAndFormView();
         $view->children['broken'] = new \stdClass();
 
-        $this->fieldAclHelper
-            ->expects(self::exactly(3))
+        $this->fieldAclHelper->expects(self::exactly(3))
             ->method('isFieldModificationGranted')
             ->willReturn(true);
 
@@ -111,8 +105,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
     public function testFinishViewWithShowRestricted(): void
     {
         [$view, $form, $options, $entity] = $this->getTestFormAndFormView();
-        $this->fieldAclHelper
-            ->expects(self::exactly(3))
+        $this->fieldAclHelper->expects(self::exactly(3))
             ->method('isFieldModificationGranted')
             ->willReturn(false);
 
@@ -164,8 +157,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $builder->setMapped(true);
         $form->add($builder->getForm());
 
-        $this->fieldAclHelper
-            ->expects(self::any())
+        $this->fieldAclHelper->expects(self::any())
             ->method('isFieldModificationGranted')
             ->willReturnMap([
                 [$entity, 'city', true],
@@ -211,13 +203,11 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
 
     private function prepareCorrectOptions(string $className, bool $showRestricted = true): array
     {
-        $this->fieldAclHelper
-            ->expects(self::any())
+        $this->fieldAclHelper->expects(self::any())
             ->method('isFieldAclEnabled')
             ->with($className)
             ->willReturn(true);
-        $this->fieldAclHelper
-            ->expects(self::any())
+        $this->fieldAclHelper->expects(self::any())
             ->method('isRestrictedFieldsVisible')
             ->with($className)
             ->willReturn($showRestricted);

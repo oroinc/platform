@@ -14,8 +14,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class EntityStateCheckerTest extends TestCase
 {
-    private DoctrineHelper|MockObject $doctrineHelper;
-
+    private DoctrineHelper&MockObject $doctrineHelper;
     private EntityStateChecker $checker;
 
     #[\Override]
@@ -31,8 +30,7 @@ class EntityStateCheckerTest extends TestCase
     {
         $entity = new \stdClass();
 
-        $this->doctrineHelper
-            ->expects(self::once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isNewEntity')
             ->with($entity)
             ->willReturn(true);
@@ -44,8 +42,7 @@ class EntityStateCheckerTest extends TestCase
     {
         $entity = new \stdClass();
 
-        $this->doctrineHelper
-            ->expects(self::never())
+        $this->doctrineHelper->expects(self::never())
             ->method(self::anything());
 
         $this->expectExceptionObject(
@@ -60,20 +57,17 @@ class EntityStateCheckerTest extends TestCase
         $entity = new \stdClass();
 
         $entityManager = $this->createMock(EntityManager::class);
-        $this->doctrineHelper
-            ->expects(self::once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
             ->with($entity)
             ->willReturn($entityManager);
 
         $unitOfWork = $this->createMock(UnitOfWork::class);
-        $entityManager
-            ->expects(self::once())
+        $entityManager->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($unitOfWork);
 
-        $unitOfWork
-            ->expects(self::once())
+        $unitOfWork->expects(self::once())
             ->method('getOriginalEntityData')
             ->with($entity)
             ->willReturn([]);
@@ -88,20 +82,17 @@ class EntityStateCheckerTest extends TestCase
         $entity->sampleField2 = 'sample_value2';
 
         $entityManager = $this->createMock(EntityManager::class);
-        $this->doctrineHelper
-            ->expects(self::once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
             ->with($entity)
             ->willReturn($entityManager);
 
         $unitOfWork = $this->createMock(UnitOfWork::class);
-        $entityManager
-            ->expects(self::once())
+        $entityManager->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($unitOfWork);
 
-        $unitOfWork
-            ->expects(self::once())
+        $unitOfWork->expects(self::once())
             ->method('getOriginalEntityData')
             ->with($entity)
             ->willReturn(['sampleField1' => 'sample_value1', 'sampleField2' => 'sample_value2']);
@@ -116,20 +107,17 @@ class EntityStateCheckerTest extends TestCase
         $entity->sampleField2 = 'sample_value2';
 
         $entityManager = $this->createMock(EntityManager::class);
-        $this->doctrineHelper
-            ->expects(self::once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
             ->with($entity)
             ->willReturn($entityManager);
 
         $unitOfWork = $this->createMock(UnitOfWork::class);
-        $entityManager
-            ->expects(self::once())
+        $entityManager->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($unitOfWork);
 
-        $unitOfWork
-            ->expects(self::once())
+        $unitOfWork->expects(self::once())
             ->method('getOriginalEntityData')
             ->with($entity)
             ->willReturn(['sampleField1' => 'sample_value1', 'sampleField2' => 'sample_value2']);

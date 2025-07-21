@@ -3,13 +3,13 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\NotificationBundle\Form\Type\RecipientListType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class RecipientListTypeTest extends \PHPUnit\Framework\TestCase
+class RecipientListTypeTest extends TestCase
 {
-    /** @var RecipientListType */
-    private $type;
+    private RecipientListType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +17,7 @@ class RecipientListTypeTest extends \PHPUnit\Framework\TestCase
         $this->type = new RecipientListType();
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->exactly(3))
@@ -26,7 +26,7 @@ class RecipientListTypeTest extends \PHPUnit\Framework\TestCase
         $this->type->buildForm($builder, []);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())

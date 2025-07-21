@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config\ApiTree;
 
 use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
+use PHPUnit\Framework\TestCase;
 
-class VariableDefinitionTest extends \PHPUnit\Framework\TestCase
+class VariableDefinitionTest extends TestCase
 {
     public function testVariableDefinition(): void
     {

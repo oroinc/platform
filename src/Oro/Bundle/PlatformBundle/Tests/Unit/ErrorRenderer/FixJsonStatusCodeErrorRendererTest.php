@@ -3,18 +3,17 @@
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\ErrorRenderer;
 
 use Oro\Bundle\PlatformBundle\ErrorRenderer\FixJsonStatusCodeErrorRenderer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class FixJsonStatusCodeErrorRendererTest extends \PHPUnit\Framework\TestCase
+class FixJsonStatusCodeErrorRendererTest extends TestCase
 {
-    /** @var ErrorRendererInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerErrorRenderer;
-
-    /** @var FixJsonStatusCodeErrorRenderer */
-    private $errorRenderer;
+    private ErrorRendererInterface&MockObject $innerErrorRenderer;
+    private FixJsonStatusCodeErrorRenderer $errorRenderer;
 
     #[\Override]
     protected function setUp(): void

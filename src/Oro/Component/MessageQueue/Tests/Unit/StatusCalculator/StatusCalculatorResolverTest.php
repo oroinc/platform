@@ -11,17 +11,14 @@ use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\StatusCalculator\CollectionCalculator;
 use Oro\Component\MessageQueue\StatusCalculator\QueryCalculator;
 use Oro\Component\MessageQueue\StatusCalculator\StatusCalculatorResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class StatusCalculatorResolverTest extends \PHPUnit\Framework\TestCase
+class StatusCalculatorResolverTest extends TestCase
 {
-    /** @var QueryCalculator|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryCalculator;
-
-    /** @var CollectionCalculator|\PHPUnit\Framework\MockObject\MockObject */
-    private $collectionCalculator;
-
-    /** @var StatusCalculatorResolver */
-    private $statusCalculatorResolver;
+    private QueryCalculator&MockObject $queryCalculator;
+    private CollectionCalculator&MockObject $collectionCalculator;
+    private StatusCalculatorResolver $statusCalculatorResolver;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +32,7 @@ class StatusCalculatorResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetQueryCalculatorForPersistentCollection()
+    public function testGetQueryCalculatorForPersistentCollection(): void
     {
         $childJobCollection = new PersistentCollection(
             $this->createMock(EntityManagerInterface::class),
@@ -49,7 +46,7 @@ class StatusCalculatorResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->queryCalculator, $calculator);
     }
 
-    public function testGetCollectionCalculatorForArrayCollection()
+    public function testGetCollectionCalculatorForArrayCollection(): void
     {
         $childJobCollection = new ArrayCollection();
 
@@ -59,7 +56,7 @@ class StatusCalculatorResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->collectionCalculator, $calculator);
     }
 
-    public function testGetCalculatorForRootJobCollection()
+    public function testGetCalculatorForRootJobCollection(): void
     {
         $rootJob = $this->getRootJobWithChildCollection(new ArrayCollection());
         $calculator = $this->statusCalculatorResolver->getCalculatorForRootJob($rootJob);
@@ -67,7 +64,7 @@ class StatusCalculatorResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->collectionCalculator, $calculator);
     }
 
-    public function testGetCalculatorForRootJobIncorrectType()
+    public function testGetCalculatorForRootJobIncorrectType(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(

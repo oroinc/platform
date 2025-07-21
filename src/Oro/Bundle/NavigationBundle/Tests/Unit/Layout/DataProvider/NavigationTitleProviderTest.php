@@ -5,17 +5,14 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Layout\DataProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NavigationBundle\Layout\DataProvider\NavigationTitleProvider;
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class NavigationTitleProviderTest extends \PHPUnit\Framework\TestCase
+class NavigationTitleProviderTest extends TestCase
 {
-    /** @var TitleService|\PHPUnit\Framework\MockObject\MockObject */
-    private $titleService;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $userConfigManager;
-
-    /** @var NavigationTitleProvider */
-    private $provider;
+    private TitleService&MockObject $titleService;
+    private ConfigManager&MockObject $userConfigManager;
+    private NavigationTitleProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +26,7 @@ class NavigationTitleProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getDataDataProvider
      */
-    public function testGetTitle(string $routeName, array $params, string $title, string $expected)
+    public function testGetTitle(string $routeName, array $params, string $title, string $expected): void
     {
         $this->titleService->expects($this->once())
             ->method('loadByRoute')

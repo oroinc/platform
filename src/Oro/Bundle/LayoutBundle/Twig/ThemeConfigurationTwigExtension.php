@@ -20,11 +20,17 @@ class ThemeConfigurationTwigExtension extends AbstractExtension
     {
         return [
             new TwigFunction('oro_theme_configuration_value', [$this, 'getThemeConfigurationValue']),
+            new TwigFunction('oro_theme_definition_value', [$this, 'getThemeDefinitionValue']),
         ];
     }
 
     public function getThemeConfigurationValue(string $option): mixed
     {
         return $this->themeConfigurationProvider->getThemeConfigurationOption($option);
+    }
+
+    public function getThemeDefinitionValue(string $key): mixed
+    {
+        return $this->themeConfigurationProvider->getThemeProperty($key);
     }
 }

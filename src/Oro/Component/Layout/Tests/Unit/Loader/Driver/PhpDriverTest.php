@@ -8,8 +8,9 @@ use Oro\Component\Layout\Loader\Driver\PhpDriver;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class PhpDriverTest extends \PHPUnit\Framework\TestCase
+class PhpDriverTest extends TestCase
 {
     use TempDirExtension;
 
@@ -18,8 +19,6 @@ class PhpDriverTest extends \PHPUnit\Framework\TestCase
     #[\Override]
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->cacheDir = $this->getTempDir('layouts', false);
     }
 
@@ -28,14 +27,14 @@ class PhpDriverTest extends \PHPUnit\Framework\TestCase
         return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
 
-    public function testEmptyCacheDirException()
+    public function testEmptyCacheDirException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $generator = $this->createMock(LayoutUpdateGeneratorInterface::class);
         $this->getLoader($generator);
     }
 
-    public function testLoadInDebugMode()
+    public function testLoadInDebugMode(): void
     {
         $generator = $this->createMock(LayoutUpdateGeneratorInterface::class);
         $loader = $this->getLoader($generator, true, $this->cacheDir);
@@ -51,7 +50,7 @@ class PhpDriverTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(LayoutUpdateInterface::class, $update);
     }
 
-    public function testLoadInProductionMode()
+    public function testLoadInProductionMode(): void
     {
         $generator = $this->createMock(LayoutUpdateGeneratorInterface::class);
         $loader = $this->getLoader($generator, false, $this->cacheDir);
@@ -65,10 +64,10 @@ class PhpDriverTest extends \PHPUnit\Framework\TestCase
 
         $update = $loader->load($path);
         $this->assertInstanceOf(LayoutUpdateInterface::class, $update);
-        $this->assertCount(1, $files = iterator_to_array(new \FilesystemIterator($this->cacheDir)));
+        $this->assertCount(1, iterator_to_array(new \FilesystemIterator($this->cacheDir)));
     }
 
-    public function testProcessSyntaxExceptions()
+    public function testProcessSyntaxExceptions(): void
     {
         $generator = $this->createMock(LayoutUpdateGeneratorInterface::class);
         $loader = $this->getLoader($generator, true, $this->cacheDir);
@@ -99,7 +98,7 @@ MESSAGE;
         $this->assertInstanceOf(LayoutUpdateInterface::class, $update);
     }
 
-    public function testGetUpdateFilenamePattern()
+    public function testGetUpdateFilenamePattern(): void
     {
         $loader = $this->getLoader(null, false, $this->cacheDir);
         $this->assertEquals('/^(?!.*html\.php$).*\.php$/', $loader->getUpdateFilenamePattern('php'));

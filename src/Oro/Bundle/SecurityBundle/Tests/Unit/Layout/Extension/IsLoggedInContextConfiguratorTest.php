@@ -5,14 +5,13 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Layout\Extension;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Layout\Extension\IsLoggedInContextConfigurator;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class IsLoggedInContextConfiguratorTest extends \PHPUnit\Framework\TestCase
+class IsLoggedInContextConfiguratorTest extends TestCase
 {
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var IsLoggedInContextConfigurator */
-    private $contextConfigurator;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private IsLoggedInContextConfigurator $contextConfigurator;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class IsLoggedInContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->contextConfigurator = new IsLoggedInContextConfigurator($this->tokenAccessor);
     }
 
-    public function testConfigureContextLoggedIn()
+    public function testConfigureContextLoggedIn(): void
     {
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
@@ -35,7 +34,7 @@ class IsLoggedInContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($context->get('is_logged_in'));
     }
 
-    public function testConfigureContextLoggedOut()
+    public function testConfigureContextLoggedOut(): void
     {
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')

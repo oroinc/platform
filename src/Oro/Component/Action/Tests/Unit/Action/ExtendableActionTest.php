@@ -11,18 +11,17 @@ use Oro\Component\Action\Model\AbstractStorage;
 use Oro\Component\Action\Model\ActionDataStorageAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
-class ExtendableActionTest extends \PHPUnit\Framework\TestCase
+class ExtendableActionTest extends TestCase
 {
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dispatcher;
-
-    /** @var ExtendableAction */
-    private $action;
+    private EventDispatcherInterface&MockObject $dispatcher;
+    private ExtendableAction $action;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +39,7 @@ class ExtendableActionTest extends \PHPUnit\Framework\TestCase
         array $options,
         string $expectedException,
         string $exceptionMessage
-    ) {
+    ): void {
         $this->expectException($expectedException);
         $this->expectExceptionMessage($exceptionMessage);
         $this->action->initialize($options);
@@ -63,7 +62,7 @@ class ExtendableActionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $events = ['some_event_name'];
         $result = $this->action->initialize(['events' => $events]);
@@ -71,7 +70,7 @@ class ExtendableActionTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(ActionInterface::class, $result);
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $context = new ExtendableEventData([]);
         $eventWithoutListeners = 'some_event_without_listeners';
@@ -97,7 +96,7 @@ class ExtendableActionTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    public function testExecuteWithPassedEventData()
+    public function testExecuteWithPassedEventData(): void
     {
         $context = new ExtendableEventData([]);
         $eventWithoutListeners = 'some_event_without_listeners';
@@ -127,7 +126,7 @@ class ExtendableActionTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    public function testExecuteWithActionDataStorageAwareInterface()
+    public function testExecuteWithActionDataStorageAwareInterface(): void
     {
         $context = $this->createMock(ActionDataStorageAwareInterface::class);
         $dataStorage = $this->createMock(AbstractStorage::class);
@@ -159,7 +158,7 @@ class ExtendableActionTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
     }
 
-    public function testExecuteWithArray()
+    public function testExecuteWithArray(): void
     {
         $context = ['key' => 'value'];
         $eventWithoutListeners = 'some_event_without_listeners';

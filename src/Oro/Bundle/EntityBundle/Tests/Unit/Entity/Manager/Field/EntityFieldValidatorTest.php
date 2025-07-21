@@ -10,18 +10,15 @@ use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldValidator;
 use Oro\Bundle\EntityBundle\Exception\EntityHasFieldException;
 use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
+class EntityFieldValidatorTest extends TestCase
 {
-    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $classMetadata;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translation;
-
-    /** @var EntityFieldValidator */
-    private $validator;
+    private ClassMetadata&MockObject $classMetadata;
+    private TranslatorInterface&MockObject $translation;
+    private EntityFieldValidator $validator;
 
     #[\Override]
     protected function setUp(): void
@@ -43,7 +40,7 @@ class EntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator = new EntityFieldValidator($doctrine, $this->translation, $fieldHalper);
     }
 
-    public function testPositiveValidate()
+    public function testPositiveValidate(): void
     {
         $this->classMetadata->expects(self::once())
             ->method('hasField')
@@ -59,7 +56,7 @@ class EntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($entity, $content);
     }
 
-    public function testValidateWithFieldException()
+    public function testValidateWithFieldException(): void
     {
         $this->expectException(EntityHasFieldException::class);
         $this->expectExceptionMessage('oro.entity.controller.message.field_not_found');
@@ -79,7 +76,7 @@ class EntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($entity, $content);
     }
 
-    public function testValidateWithAccessException()
+    public function testValidateWithAccessException(): void
     {
         $this->expectException(FieldUpdateAccessException::class);
         $this->expectExceptionMessage('oro.entity.controller.message.access_denied');
@@ -98,7 +95,7 @@ class EntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($entity, $content);
     }
 
-    public function testPositiveCustomValidate()
+    public function testPositiveCustomValidate(): void
     {
         $this->classMetadata->expects(self::once())
             ->method('hasField')
@@ -120,7 +117,7 @@ class EntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($entity, $content);
     }
 
-    public function testFailCustomValidate()
+    public function testFailCustomValidate(): void
     {
         $this->expectException(FieldUpdateAccessException::class);
         $this->expectExceptionMessage('right message');

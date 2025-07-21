@@ -21,7 +21,7 @@ use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\HeaderType;
  */
 class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 {
-    public function testClear()
+    public function testClear(): void
     {
         // prepare data
         $this->layoutManipulator
@@ -36,7 +36,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         $this->assertSame(0, $this->layoutManipulator->getNumberOfAddedItems());
     }
 
-    public function testSimpleLayout()
+    public function testSimpleLayout(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -63,7 +63,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testSimpleLayoutWhenSomeBlocksCreatedDirectly()
+    public function testSimpleLayoutWhenSomeBlocksCreatedDirectly(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -90,7 +90,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testAddWhenRootIsAddedAtTheEnd()
+    public function testAddWhenRootIsAddedAtTheEnd(): void
     {
         $this->layoutManipulator
             ->add('logo', 'header', 'logo', ['title' => 'test'])
@@ -117,7 +117,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testAddTwoChildren()
+    public function testAddTwoChildren(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -149,7 +149,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
     }
 
     /** It is expected that children are added in the same order as they are registered */
-    public function testAddTwoChildrenButTheFirstChildIsAddedBeforeContainer()
+    public function testAddTwoChildrenButTheFirstChildIsAddedBeforeContainer(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -180,7 +180,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testRemoveBeforeAdd()
+    public function testRemoveBeforeAdd(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -197,7 +197,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testRemoveAfterAdd()
+    public function testRemoveAfterAdd(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -215,7 +215,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testAddToRemovedItem()
+    public function testAddToRemovedItem(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -233,7 +233,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testRemoveNotExistItem()
+    public function testRemoveNotExistItem(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -249,7 +249,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testRemoveAlreadyRemovedItem()
+    public function testRemoveAlreadyRemovedItem(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -267,7 +267,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testMoveChildAndThenRemoveParent()
+    public function testMoveChildAndThenRemoveParent(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -299,7 +299,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testMoveChildOfRemovedParent()
+    public function testMoveChildOfRemovedParent(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -331,7 +331,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testReplaceItem()
+    public function testReplaceItem(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -360,7 +360,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testReplaceItemWhenNewItemIsAddedInAnotherBatch()
+    public function testReplaceItemWhenNewItemIsAddedInAnotherBatch(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -391,7 +391,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testReplaceItemAfterRemoveParent()
+    public function testReplaceItemAfterRemoveParent(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -415,7 +415,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testDuplicateAdd()
+    public function testDuplicateAdd(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -432,7 +432,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         $this->getLayoutView();
     }
 
-    public function testAddWithSibling()
+    public function testAddWithSibling(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -467,7 +467,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testAddWithUnknownSibling()
+    public function testAddWithUnknownSibling(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -502,7 +502,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testAddWithSiblingAndMoveToUnknownSiblingAfterAdd()
+    public function testAddWithSiblingAndMoveToUnknownSiblingAfterAdd(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -543,7 +543,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testAddWithSiblingAndMoveToUnknownSiblingBeforeAdd()
+    public function testAddWithSiblingAndMoveToUnknownSiblingBeforeAdd(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -584,7 +584,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testSetOption()
+    public function testSetOption(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -612,7 +612,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testSetOptionByPath()
+    public function testSetOptionByPath(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -640,7 +640,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testAppendOption()
+    public function testAppendOption(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -672,7 +672,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testAppendOptionWhenNoPrevOption()
+    public function testAppendOptionWhenNoPrevOption(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -704,7 +704,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testSubtractOption()
+    public function testSubtractOption(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -736,7 +736,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testSubtractOptionWhenNoPrevOption()
+    public function testSubtractOptionWhenNoPrevOption(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -767,7 +767,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testReplaceOption()
+    public function testReplaceOption(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -799,7 +799,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testReplaceOptionForUnknownValue()
+    public function testReplaceOptionForUnknownValue(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -831,7 +831,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testRemoveOption()
+    public function testRemoveOption(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -859,7 +859,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testRemoveOptionByPath()
+    public function testRemoveOptionByPath(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -887,7 +887,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testSetOptionForRemovedItem()
+    public function testSetOptionForRemovedItem(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -906,7 +906,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testAppendOptionForRemovedItem()
+    public function testAppendOptionForRemovedItem(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -925,7 +925,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testSubtractOptionForRemovedItem()
+    public function testSubtractOptionForRemovedItem(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -944,7 +944,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testReplaceOptionForRemovedItem()
+    public function testReplaceOptionForRemovedItem(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -963,7 +963,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testRemoveOptionForRemovedItem()
+    public function testRemoveOptionForRemovedItem(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -982,7 +982,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testOptionManipulations()
+    public function testOptionManipulations(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -1019,7 +1019,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testSubtractAndThenAppendOption()
+    public function testSubtractAndThenAppendOption(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -1052,7 +1052,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testChangeBlockType()
+    public function testChangeBlockType(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -1082,7 +1082,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testMoveUnknownItem()
+    public function testMoveUnknownItem(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -1110,7 +1110,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testMoveToUnknownParent()
+    public function testMoveToUnknownParent(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -1138,7 +1138,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testMoveToParent()
+    public function testMoveToParent(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -1186,7 +1186,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testMoveToAnotherContainer()
+    public function testMoveToAnotherContainer(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -1234,7 +1234,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testMoveToAnotherContainerBeforeSibling()
+    public function testMoveToAnotherContainerBeforeSibling(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -1292,7 +1292,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testMoveToAnotherContainerAfterSibling()
+    public function testMoveToAnotherContainerAfterSibling(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -1350,7 +1350,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testMoveToAnotherContainerBeforeUnknownSibling()
+    public function testMoveToAnotherContainerBeforeUnknownSibling(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -1408,7 +1408,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testMoveToAnotherContainerAfterUnknownSibling()
+    public function testMoveToAnotherContainerAfterUnknownSibling(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -1470,7 +1470,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
      * tests 'move' item within the same parent when the target item is added only in second iteration
      * and as result it is expected that this 'move' action is executed in the second iteration as well
      */
-    public function testMoveWithinSameParentBeforeButInSecondIteration()
+    public function testMoveWithinSameParentBeforeButInSecondIteration(): void
     {
         // first iteration
         $this->layoutManipulator
@@ -1506,7 +1506,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testLayoutChangedByBlockType()
+    public function testLayoutChangedByBlockType(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -1542,7 +1542,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testSetBlockTheme()
+    public function testSetBlockTheme(): void
     {
         $this->layoutManipulator
             ->setBlockTheme(['@My/Layout/theme1.html.twig', '@My/Layout/theme2.html.twig'])
@@ -1587,7 +1587,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testSetFormTheme()
+    public function testSetFormTheme(): void
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -1602,7 +1602,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testLayoutUpdates()
+    public function testLayoutUpdates(): void
     {
         $this->registry->addExtension(
             new PreloadedExtension(
@@ -1652,7 +1652,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testLayoutUpdatesWhenParentIsAddedInUpdate()
+    public function testLayoutUpdatesWhenParentIsAddedInUpdate(): void
     {
         $this->registry->addExtension(
             new PreloadedExtension(
@@ -1711,7 +1711,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
     /**
      * test the case when removing siblingId for 'add' does not help and siblingId must be restored
      */
-    public function testLayoutUpdatesWhenUpdateLinkedWithAddToUndefinedSiblingAndAddDependsToUpdate()
+    public function testLayoutUpdatesWhenUpdateLinkedWithAddToUndefinedSiblingAndAddDependsToUpdate(): void
     {
         $this->registry->addExtension(
             new PreloadedExtension(
@@ -1768,7 +1768,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
     /**
      * test the case when removing siblingId for 'move' does not help and siblingId must be restored
      */
-    public function testLayoutUpdatesWhenUpdateLinkedWithAddToUndefinedSiblingAndMoveDependsToUpdate()
+    public function testLayoutUpdatesWhenUpdateLinkedWithAddToUndefinedSiblingAndMoveDependsToUpdate(): void
     {
         $this->registry->addExtension(
             new PreloadedExtension(
@@ -1823,7 +1823,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    public function testGetNotAppliedActions()
+    public function testGetNotAppliedActions(): void
     {
         $this->layoutManipulator->add('add_action_id', 'parent_action_id', 'blockType');
         $this->layoutManipulator->remove('remove_action_id');

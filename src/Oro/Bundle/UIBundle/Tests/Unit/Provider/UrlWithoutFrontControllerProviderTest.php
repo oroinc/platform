@@ -3,16 +3,15 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\UIBundle\Provider\UrlWithoutFrontControllerProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 
-class UrlWithoutFrontControllerProviderTest extends \PHPUnit\Framework\TestCase
+class UrlWithoutFrontControllerProviderTest extends TestCase
 {
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var UrlWithoutFrontControllerProvider */
-    private $provider;
+    private RouterInterface&MockObject $router;
+    private UrlWithoutFrontControllerProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class UrlWithoutFrontControllerProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new UrlWithoutFrontControllerProvider($this->router);
     }
 
-    public function testGenerate()
+    public function testGenerate(): void
     {
         $name = 'some_route_name';
         $parameters = ['any_route_parameter'];

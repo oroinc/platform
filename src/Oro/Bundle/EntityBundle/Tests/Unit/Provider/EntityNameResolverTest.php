@@ -6,20 +6,17 @@ use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
 use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
+class EntityNameResolverTest extends TestCase
 {
-    /** @var EntityNameProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $provider1;
-
-    /** @var EntityNameProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $provider2;
-
-    /** @var EntityNameResolver */
-    private $entityNameResolver;
+    private EntityNameProviderInterface&MockObject $provider1;
+    private EntityNameProviderInterface&MockObject $provider2;
+    private EntityNameResolver $entityNameResolver;
 
     #[\Override]
     protected function setUp(): void
@@ -48,7 +45,7 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
         return new EntityNameResolver($providers, $defaultFormat, $configProvider);
     }
 
-    public function testGetNameForUndefinedFormat()
+    public function testGetNameForUndefinedFormat(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The unknown representation format "other".');
@@ -56,7 +53,7 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
         $this->entityNameResolver->getName(new \stdClass(), 'other');
     }
 
-    public function testGetNameForNullEntity()
+    public function testGetNameForNullEntity(): void
     {
         $this->provider1->expects($this->never())
             ->method('getName');
@@ -66,7 +63,7 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->entityNameResolver->getName(null, 'full'));
     }
 
-    public function testGetNameWhenRequestedFormatImplementedByRegisteredProviders()
+    public function testGetNameWhenRequestedFormatImplementedByRegisteredProviders(): void
     {
         $entity = new \stdClass();
         $format = 'full';
@@ -87,7 +84,7 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testGetNameWhenTheNameIsNull()
+    public function testGetNameWhenTheNameIsNull(): void
     {
         $entity = new \stdClass();
         $format = 'full';
@@ -105,7 +102,7 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($result);
     }
 
-    public function testGetNameByFallbackFormat()
+    public function testGetNameByFallbackFormat(): void
     {
         $entity = new \stdClass();
         $format = 'full';
@@ -132,13 +129,13 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testGetNameWithoutChildProviders()
+    public function testGetNameWithoutChildProviders(): void
     {
         $entityNameResolver = $this->getEntityNameResolver([], 'full', ['full' => ['fallback' => null]]);
         $this->assertNull($entityNameResolver->getName(new \stdClass(), 'full', 'en_US'));
     }
 
-    public function testGetNameDQLForUndefinedFormat()
+    public function testGetNameDQLForUndefinedFormat(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The unknown representation format "other".');
@@ -146,7 +143,7 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
         $this->entityNameResolver->getNameDQL('Test\Entity', 'alias', 'other');
     }
 
-    public function testGetNameDQLWhenRequestedFormatImplementedByRegisteredProviders()
+    public function testGetNameDQLWhenRequestedFormatImplementedByRegisteredProviders(): void
     {
         $className = 'Test\Entity';
         $alias = 'entity_alias';
@@ -168,7 +165,7 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testGetNameDQLByFallbackFormat()
+    public function testGetNameDQLByFallbackFormat(): void
     {
         $className = 'Test\Entity';
         $alias = 'entity_alias';
@@ -196,13 +193,13 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testGetNameDQLWithoutChildProviders()
+    public function testGetNameDQLWithoutChildProviders(): void
     {
         $entityNameResolver = $this->getEntityNameResolver([], 'full', ['full' => ['fallback' => null]]);
         $this->assertNull($entityNameResolver->getNameDQL('Test\Entity', 'entity_alias', 'full', 'en_US'));
     }
 
-    public function testPrepareNameDQLForEmptyExpr()
+    public function testPrepareNameDQLForEmptyExpr(): void
     {
         self::assertEquals(
             '\'\'',
@@ -210,7 +207,7 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareNameDQLWithoutCastToString()
+    public function testPrepareNameDQLWithoutCastToString(): void
     {
         self::assertEquals(
             'e.name',
@@ -218,7 +215,7 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareNameDQLWithCastToString()
+    public function testPrepareNameDQLWithCastToString(): void
     {
         self::assertEquals(
             'CAST(e.name AS string)',

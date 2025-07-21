@@ -5,11 +5,11 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\EventListener;
 use Oro\Bundle\DashboardBundle\Event\WidgetItemsLoadDataEvent;
 use Oro\Bundle\DashboardBundle\EventListener\WidgetItemsLoadDataListener;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
+use PHPUnit\Framework\TestCase;
 
-class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
+class WidgetItemsLoadDataListenerTest extends TestCase
 {
-    /** @var WidgetItemsLoadDataListener */
-    private $widgetItemsLoadDataListener;
+    private WidgetItemsLoadDataListener $widgetItemsLoadDataListener;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +17,7 @@ class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
         $this->widgetItemsLoadDataListener = new WidgetItemsLoadDataListener();
     }
 
-    public function testFilterItemsByItemsChoice()
+    public function testFilterItemsByItemsChoice(): void
     {
         $expectedItems = [
             'revenue' => [
@@ -55,7 +55,7 @@ class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider filterItemsProvider
      */
-    public function testFilterItems(array $items, array $config, array $expectedItems)
+    public function testFilterItems(array $items, array $config, array $expectedItems): void
     {
         $widgetConfig = [
             'configuration' => [

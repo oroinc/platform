@@ -13,19 +13,16 @@ use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class RequestEntityTest extends \PHPUnit\Framework\TestCase
+class RequestEntityTest extends TestCase
 {
-    /** @var ContextAccessor */
-    private $contextAccessor;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var RequestEntity */
-    private $action;
+    private ContextAccessor $contextAccessor;
+    private ManagerRegistry&MockObject $registry;
+    private RequestEntity $action;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +37,7 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, string $expectedMessage)
+    public function testInitializeException(array $options, string $expectedMessage): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage($expectedMessage);
@@ -97,7 +94,7 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testExecuteNotManageableEntity()
+    public function testExecuteNotManageableEntity(): void
     {
         $this->expectException(NotManageableEntityException::class);
         $this->expectExceptionMessage('Entity class "stdClass" is not manageable.');
@@ -121,7 +118,7 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeDataProvider
      */
-    public function testInitialize(array $source, array $expected)
+    public function testInitialize(array $source, array $expected): void
     {
         self::assertSame($this->action, $this->action->initialize($source));
         self::assertEquals($expected, ReflectionUtil::getPropertyValue($this->action, 'options'));
@@ -167,7 +164,7 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeDataProvider
      */
-    public function testExecute(array $options, array $data = [])
+    public function testExecute(array $options, array $data = []): void
     {
         $context = new ItemStub($data);
         $entity = new \stdClass();
@@ -278,7 +275,7 @@ class RequestEntityTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeWithConditionsDataProvider
      */
-    public function testExecuteWithWhereAndOrderBy(bool $caseInsensitive)
+    public function testExecuteWithWhereAndOrderBy(bool $caseInsensitive): void
     {
         $options = [
             'class' => \stdClass::class,

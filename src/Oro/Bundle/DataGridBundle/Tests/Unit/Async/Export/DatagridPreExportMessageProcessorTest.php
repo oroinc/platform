@@ -15,17 +15,15 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DatagridPreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class DatagridPreExportMessageProcessorTest extends TestCase
 {
-    private JobRunner|\PHPUnit\Framework\MockObject\MockObject $jobRunner;
-
-    private DatagridPreExportExecutorInterface|\PHPUnit\Framework\MockObject\MockObject $datagridPreExportExecutor;
-
-    private DatagridManager|\PHPUnit\Framework\MockObject\MockObject $datagridManager;
-
-    private TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject $tokenAccessor;
-
+    private JobRunner&MockObject $jobRunner;
+    private DatagridPreExportExecutorInterface&MockObject $datagridPreExportExecutor;
+    private DatagridManager&MockObject $datagridManager;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
     private DatagridPreExportMessageProcessor $processor;
 
     #[\Override]
@@ -68,8 +66,7 @@ class DatagridPreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         ];
         $message->setBody($messageBody);
 
-        $this->datagridManager
-            ->expects(self::once())
+        $this->datagridManager->expects(self::once())
             ->method('getDatagrid')
             ->with($datagrid->getName(), $gridParameters)
             ->willReturn($datagrid);
@@ -77,27 +74,22 @@ class DatagridPreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $rootJobRunner = $this->createMock(JobRunner::class);
         $job = new Job();
 
-        $this->datagridPreExportExecutor
-            ->expects(self::once())
+        $this->datagridPreExportExecutor->expects(self::once())
             ->method('run')
             ->with($rootJobRunner, $job, $datagrid, $message->getBody())
             ->willReturn(true);
 
         $userId = 42;
-        $this->tokenAccessor
-            ->expects(self::any())
+        $this->tokenAccessor->expects(self::any())
             ->method('getUserId')
             ->willReturn($userId);
 
-        $this->jobRunner
-            ->expects(self::once())
+        $this->jobRunner->expects(self::once())
             ->method('runUniqueByMessage')
             ->with($message, self::isType('callable'))
-            ->willReturnCallback(
-                function (Message $message, callable $callback) use ($rootJobRunner, $job) {
-                    return $callback($rootJobRunner, $job);
-                }
-            );
+            ->willReturnCallback(function (Message $message, callable $callback) use ($rootJobRunner, $job) {
+                return $callback($rootJobRunner, $job);
+            });
 
         self::assertEquals(
             MessageProcessorInterface::ACK,

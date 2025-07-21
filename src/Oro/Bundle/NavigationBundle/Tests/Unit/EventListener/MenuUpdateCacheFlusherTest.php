@@ -8,23 +8,18 @@ use Oro\Bundle\NavigationBundle\Event\MenuUpdateWithScopeChangeEvent;
 use Oro\Bundle\NavigationBundle\EventListener\MenuUpdateCacheFlusher;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Cache\CacheInterface;
 
-class MenuUpdateCacheFlusherTest extends \PHPUnit\Framework\TestCase
+class MenuUpdateCacheFlusherTest extends TestCase
 {
     private const SCOPE_TYPE = 'custom_scope_type';
 
-    /** @var MenuUpdateRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $scopeManager;
-
-    /** @var MenuUpdateCacheFlusher */
-    private $flusher;
+    private MenuUpdateRepository&MockObject $repository;
+    private CacheInterface&MockObject $cache;
+    private ScopeManager&MockObject $scopeManager;
+    private MenuUpdateCacheFlusher $flusher;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +36,7 @@ class MenuUpdateCacheFlusherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnMenuUpdateScopeChange()
+    public function testOnMenuUpdateScopeChange(): void
     {
         $context = ['foo' => 'bar'];
         $event = new MenuUpdateChangeEvent('application_menu', $context);
@@ -61,7 +56,7 @@ class MenuUpdateCacheFlusherTest extends \PHPUnit\Framework\TestCase
         $this->flusher->onMenuUpdateScopeChange($event);
     }
 
-    public function testOnMenuUpdateWithScopeChange()
+    public function testOnMenuUpdateWithScopeChange(): void
     {
         $scope = new Scope();
         $event = new MenuUpdateWithScopeChangeEvent('application_menu', $scope);

@@ -17,6 +17,7 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -27,11 +28,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class DateTimeRangeFilterTest extends OrmTestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var DateTimeRangeFilter */
-    private $filter;
+    private FormFactoryInterface&MockObject $formFactory;
+    private DateTimeRangeFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -164,13 +162,13 @@ class DateTimeRangeFilterTest extends OrmTestCase
         $this->filter->apply($ds, $data);
     }
 
-    public function testPrepareDataWhenNoValue()
+    public function testPrepareDataWhenNoValue(): void
     {
         $data = [];
         self::assertSame(['part' => null], $this->filter->prepareData($data));
     }
 
-    public function testPrepareDataWithNullValue()
+    public function testPrepareDataWithNullValue(): void
     {
         $data = ['value' => null];
         self::assertSame(
@@ -179,7 +177,7 @@ class DateTimeRangeFilterTest extends OrmTestCase
         );
     }
 
-    public function testPrepareDataWithEmptyValue()
+    public function testPrepareDataWithEmptyValue(): void
     {
         $data = ['value' => []];
         self::assertSame(
@@ -188,7 +186,7 @@ class DateTimeRangeFilterTest extends OrmTestCase
         );
     }
 
-    public function testPrepareDataWithStartValueOnly()
+    public function testPrepareDataWithStartValueOnly(): void
     {
         $data = ['value' => ['start' => '2018-01-20 00:15']];
         self::assertEquals(
@@ -203,7 +201,7 @@ class DateTimeRangeFilterTest extends OrmTestCase
         );
     }
 
-    public function testPrepareDataWithEndValueOnly()
+    public function testPrepareDataWithEndValueOnly(): void
     {
         $data = ['value' => ['end' => '2018-01-20 00:15']];
         self::assertEquals(
@@ -218,7 +216,7 @@ class DateTimeRangeFilterTest extends OrmTestCase
         );
     }
 
-    public function testPrepareDataWithStartAndEndValues()
+    public function testPrepareDataWithStartAndEndValues(): void
     {
         $data = ['value' => ['start' => '2018-01-20 00:15', 'end' => '2018-01-21 00:15']];
         self::assertEquals(
@@ -235,7 +233,7 @@ class DateTimeRangeFilterTest extends OrmTestCase
         );
     }
 
-    public function testPrepareDataWithStartAndEndValuesWithVariables()
+    public function testPrepareDataWithStartAndEndValuesWithVariables(): void
     {
         $data = ['value' => ['start' => '2018-01-20 00:15', 'end' => '2018-01-21 00:15']];
         self::assertEquals(
@@ -252,7 +250,7 @@ class DateTimeRangeFilterTest extends OrmTestCase
         );
     }
 
-    public function testPrepareDataWhenValueNormalizationIsNotRequiredAndWithStartValueOnly()
+    public function testPrepareDataWhenValueNormalizationIsNotRequiredAndWithStartValueOnly(): void
     {
         $data = [
             'value' => ['start' => '2018'],
@@ -270,7 +268,7 @@ class DateTimeRangeFilterTest extends OrmTestCase
         );
     }
 
-    public function testPrepareDataWhenValueNormalizationIsNotRequiredAndWithEndValueOnly()
+    public function testPrepareDataWhenValueNormalizationIsNotRequiredAndWithEndValueOnly(): void
     {
         $data = [
             'value' => ['end' => '2018'],
@@ -288,7 +286,7 @@ class DateTimeRangeFilterTest extends OrmTestCase
         );
     }
 
-    public function testPrepareDataWhenValueNormalizationIsNotRequired()
+    public function testPrepareDataWhenValueNormalizationIsNotRequired(): void
     {
         $data = [
             'value' => ['start' => '2018', 'end' => '{{' . DateModifierInterface::VAR_THIS_YEAR . '}} - 1'],

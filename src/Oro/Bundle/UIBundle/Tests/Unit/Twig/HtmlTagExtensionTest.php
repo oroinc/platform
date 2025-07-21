@@ -5,16 +5,15 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UIBundle\Twig\HtmlTagExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
+class HtmlTagExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $htmlTagHelper;
-
-    /* @var HtmlTagExtension */
-    private $extension;
+    private HtmlTagHelper&MockObject $htmlTagHelper;
+    private HtmlTagExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new HtmlTagExtension($container);
     }
 
-    public function testHtmlSanitize()
+    public function testHtmlSanitize(): void
     {
         $html = '<html>HTML</html>';
 
@@ -43,7 +42,34 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHtmlStripTags()
+    public function testHtmlSanitizeBasicReturnsEmptyStringWhenNullInput(): void
+    {
+        $this->htmlTagHelper->expects(self::never())
+            ->method('sanitize');
+
+        self::assertEquals(
+            '',
+            self::callTwigFilter($this->extension, 'oro_html_sanitize_basic', [null])
+        );
+    }
+
+    public function testHtmlSanitizeBasic(): void
+    {
+        $html = '<div><b>sample text</b></div>';
+        $htmlSanitized = '<b>sample text</b>';
+
+        $this->htmlTagHelper->expects(self::once())
+            ->method('sanitize')
+            ->with($html, 'basic', false)
+            ->willReturn($htmlSanitized);
+
+        self::assertEquals(
+            $htmlSanitized,
+            self::callTwigFilter($this->extension, 'oro_html_sanitize_basic', [$html])
+        );
+    }
+
+    public function testHtmlStripTags(): void
     {
         $html = '<html>HTML</html>';
 
@@ -58,7 +84,7 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHtmlEscape()
+    public function testHtmlEscape(): void
     {
         $html = '<div>HTML</div><script type="text/javascript"></script>';
 
@@ -75,7 +101,7 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider attributeDataProvider
      */
-    public function testAttributeNamePurify(string $string, string $expected)
+    public function testAttributeNamePurify(string $string, string $expected): void
     {
         $this->assertSame(
             $expected,

@@ -138,7 +138,10 @@ class ConfigProvider implements ResetInterface
         $config = $this->buildResult($context);
 
         if ($identifierFieldsOnly || !$this->fullConfigsCacheDisabled) {
-            $config->getDefinition()?->setKey($this->buildConfigKey($className, $extras));
+            $definition = $config->getDefinition();
+            if (null !== $definition) {
+                $definition->setKey($this->buildConfigKey($className, $extras));
+            }
         }
 
         return $config;

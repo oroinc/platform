@@ -3,17 +3,18 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\SearchBundle\Configuration\MappingConfiguration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Yaml;
 
-class MappingConfigurationTest extends \PHPUnit\Framework\TestCase
+class MappingConfigurationTest extends TestCase
 {
     /**
      * @dataProvider processConfigurationDataProvider
      */
-    public function testProcessConfiguration(array $configs, array $expected)
+    public function testProcessConfiguration(array $configs, array $expected): void
     {
         $processor = new Processor();
 

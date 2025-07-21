@@ -7,27 +7,20 @@ use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
 use Oro\Bundle\EntityPaginationBundle\Twig\EntityPaginationExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
+class EntityPaginationExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var EntityPaginationNavigation|\PHPUnit\Framework\MockObject\MockObject */
-    private $navigation;
-
-    /** @var StorageDataCollector|\PHPUnit\Framework\MockObject\MockObject */
-    private $dataCollector;
-
-    /** @var MessageManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $messageManager;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var EntityPaginationExtension */
-    private $extension;
+    private EntityPaginationNavigation&MockObject $navigation;
+    private StorageDataCollector&MockObject $dataCollector;
+    private MessageManager&MockObject $messageManager;
+    private RequestStack&MockObject $requestStack;
+    private EntityPaginationExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -50,7 +43,7 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPagerDataProvider
      */
-    public function testGetPager(?array $expected, ?int $totalCount = null, ?int $currentNumber = null)
+    public function testGetPager(?array $expected, ?int $totalCount = null, ?int $currentNumber = null): void
     {
         $entity = new \stdClass();
         $scope = 'test';
@@ -70,7 +63,7 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCollectData()
+    public function testCollectData(): void
     {
         $request = new Request();
         $scope = 'test';
@@ -111,7 +104,7 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider showInfoMessageDataProvider
      */
-    public function testShowInfoMessage(bool $hasMessage)
+    public function testShowInfoMessage(bool $hasMessage): void
     {
         $entity = new \stdClass();
         $scope = 'test';

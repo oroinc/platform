@@ -6,18 +6,15 @@ use Oro\Bundle\TranslationBundle\Translation\MessageCatalogueSanitizer;
 use Oro\Bundle\TranslationBundle\Translation\TranslationMessageSanitizationError;
 use Oro\Bundle\TranslationBundle\Translation\TranslationMessageSanitizationErrorCollection;
 use Oro\Bundle\TranslationBundle\Translation\TranslationsSanitizer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\MessageCatalogueInterface;
 
-class MessageCatalogueSanitizerTest extends \PHPUnit\Framework\TestCase
+class MessageCatalogueSanitizerTest extends TestCase
 {
-    /** @var TranslationsSanitizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationsSanitizer;
-
-    /** @var TranslationMessageSanitizationErrorCollection */
-    private $sanitizationErrorCollection;
-
-    /** @var MessageCatalogueSanitizer */
-    private $sanitizer;
+    private TranslationsSanitizer&MockObject $translationsSanitizer;
+    private TranslationMessageSanitizationErrorCollection $sanitizationErrorCollection;
+    private MessageCatalogueSanitizer $sanitizer;
 
     #[\Override]
     protected function setUp(): void

@@ -9,14 +9,13 @@ use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\OrganizationBundle\Event\EntityConfigListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
+class EntityConfigListenerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var EntityConfigListener */
-    private $listener;
+    private ConfigManager&MockObject $configManager;
+    private EntityConfigListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new EntityConfigListener();
     }
 
-    public function testPrePersistEntityConfigForSystemEntityWithNotNoneOwnership()
+    public function testPrePersistEntityConfigForSystemEntityWithNotNoneOwnership(): void
     {
         $config = new Config(new EntityConfigId('ownership', 'Test\Entity1'));
         $config->set('owner_type', 'USER');
@@ -53,7 +52,7 @@ class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preFlush(new PreFlushConfigEvent(['ownership' => $config], $this->configManager));
     }
 
-    public function testPrePersistEntityConfigForCustomEntityDoesNotRequireUpdate()
+    public function testPrePersistEntityConfigForCustomEntityDoesNotRequireUpdate(): void
     {
         $config = new Config(new EntityConfigId('ownership', 'Test\Entity1'));
         $config->set('owner_type', 'USER');
@@ -84,7 +83,7 @@ class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preFlush(new PreFlushConfigEvent(['ownership' => $config], $this->configManager));
     }
 
-    public function testPrePersistEntityConfigForCustomEntityWithNotNoneOwnership()
+    public function testPrePersistEntityConfigForCustomEntityWithNotNoneOwnership(): void
     {
         $config = new Config(new EntityConfigId('ownership', 'Test\Entity1'));
         $config->set('owner_type', 'USER');
@@ -119,7 +118,7 @@ class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preFlush(new PreFlushConfigEvent(['ownership' => $config], $this->configManager));
     }
 
-    public function testPrePersistEntityConfigWithNoneOwnership()
+    public function testPrePersistEntityConfigWithNoneOwnership(): void
     {
         $config = new Config(new EntityConfigId('ownership', 'Test\Entity1'));
         $config->set('owner_type', 'NONE');
@@ -136,7 +135,7 @@ class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preFlush(new PreFlushConfigEvent(['ownership' => $config], $this->configManager));
     }
 
-    public function testPrePersistEntityConfigNotOwnershipScope()
+    public function testPrePersistEntityConfigNotOwnershipScope(): void
     {
         $config = new Config(new EntityConfigId('test', 'Test\Entity1'));
 

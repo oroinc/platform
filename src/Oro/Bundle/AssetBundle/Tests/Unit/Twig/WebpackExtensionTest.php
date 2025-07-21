@@ -4,18 +4,16 @@ namespace Oro\Bundle\AssetBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\AssetBundle\Twig\WebpackExtension;
 use Oro\Bundle\AssetBundle\Webpack\WebpackServer;
-use Oro\Bundle\UIBundle\Twig\UiExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WebpackExtensionTest extends \PHPUnit\Framework\TestCase
+class WebpackExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var WebpackServer|\PHPUnit\Framework\MockObject\MockObject */
-    private $webpackServer;
-
-    /** @var UiExtension */
-    private $extension;
+    private WebpackServer&MockObject $webpackServer;
+    private WebpackExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +30,7 @@ class WebpackExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider webpackHmrEnabledDataProvider
      */
-    public function testWebpackHmrEnabled(bool $enabled)
+    public function testWebpackHmrEnabled(bool $enabled): void
     {
         $this->webpackServer->expects(self::once())
             ->method('isRunning')
@@ -52,7 +50,7 @@ class WebpackExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testWebpackAsset()
+    public function testWebpackAsset(): void
     {
         $url = 'src-url';
         $serverUrl = 'server-url';
@@ -68,7 +66,7 @@ class WebpackExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWebpackAssetWhenUrlIsNotSpecified()
+    public function testWebpackAssetWhenUrlIsNotSpecified(): void
     {
         $serverUrl = 'server-url';
 

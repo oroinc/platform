@@ -3,11 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionConfiguration;
+use PHPUnit\Framework\TestCase;
 
-class ProcessDefinitionConfigurationTest extends \PHPUnit\Framework\TestCase
+class ProcessDefinitionConfigurationTest extends TestCase
 {
-    /** @var ProcessDefinitionConfiguration */
-    private $configuration;
+    private ProcessDefinitionConfiguration $configuration;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class ProcessDefinitionConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processDataProvider
      */
-    public function testProcess(array $input, array $expected)
+    public function testProcess(array $input, array $expected): void
     {
         $this->assertEquals($expected, $this->configuration->processConfiguration($input));
     }

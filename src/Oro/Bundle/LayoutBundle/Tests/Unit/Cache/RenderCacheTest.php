@@ -8,6 +8,7 @@ use Oro\Bundle\LayoutBundle\Cache\Metadata\LayoutCacheMetadata;
 use Oro\Bundle\LayoutBundle\Cache\RenderCache;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\CacheItem;
@@ -16,12 +17,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class RenderCacheTest extends TestCase
 {
-    private TagAwareAdapterInterface|\PHPUnit\Framework\MockObject\MockObject $cache;
-
-    private CacheMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject $metadataProvider;
-
-    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
-
+    private TagAwareAdapterInterface&MockObject $cache;
+    private CacheMetadataProviderInterface&MockObject $metadataProvider;
+    private RequestStack $requestStack;
     private RenderCache $renderCache;
 
     #[\Override]

@@ -11,15 +11,13 @@ use Oro\Bundle\BatchBundle\Step\StepFactory;
 use Oro\Bundle\BatchBundle\Tests\Unit\Item\ItemProcessorTestHelper;
 use Oro\Bundle\BatchBundle\Tests\Unit\Item\ItemReaderTestHelper;
 use Oro\Bundle\BatchBundle\Tests\Unit\Item\ItemWriterTestHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConnectorRegistryTest extends \PHPUnit\Framework\TestCase
+class ConnectorRegistryTest extends TestCase
 {
-    /** @var JobFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobFactory;
-
-    /** @var StepFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $stepFactory;
-
+    private JobFactory&MockObject $jobFactory;
+    private StepFactory&MockObject $stepFactory;
     private ConnectorRegistry $registry;
 
     #[\Override]
@@ -39,14 +37,12 @@ class ConnectorRegistryTest extends \PHPUnit\Framework\TestCase
         $processor = $this->createMock(ItemProcessorTestHelper::class);
         $writer = $this->createMock(ItemWriterTestHelper::class);
 
-        $this->jobFactory
-            ->expects(self::once())
+        $this->jobFactory->expects(self::once())
             ->method('createJob')
             ->with('Export some stuff')
             ->willReturn($job);
 
-        $this->stepFactory
-            ->expects(self::once())
+        $this->stepFactory->expects(self::once())
             ->method('createStep')
             ->with(
                 'Export',
@@ -98,14 +94,12 @@ class ConnectorRegistryTest extends \PHPUnit\Framework\TestCase
         $processor = $this->createMock(ItemProcessorTestHelper::class);
         $writer = $this->createMock(ItemWriterTestHelper::class);
 
-        $this->jobFactory
-            ->expects(self::once())
+        $this->jobFactory->expects(self::once())
             ->method('createJob')
             ->with('Export some stuff')
             ->willReturn($job);
 
-        $this->stepFactory
-            ->expects(self::exactly(2))
+        $this->stepFactory->expects(self::exactly(2))
             ->method('createStep')
             ->willReturnOnConsecutiveCalls($step0, $step1);
 

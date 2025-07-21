@@ -5,18 +5,15 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Resolver;
 use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 
-class DestinationPageResolverTest extends \PHPUnit\Framework\TestCase
+class DestinationPageResolverTest extends TestCase
 {
-    /** @var EntityConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigHelper;
-
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var DestinationPageResolver */
-    private $resolver;
+    private EntityConfigHelper&MockObject $entityConfigHelper;
+    private RouterInterface&MockObject $router;
+    private DestinationPageResolver $resolver;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +24,7 @@ class DestinationPageResolverTest extends \PHPUnit\Framework\TestCase
         $this->resolver = new DestinationPageResolver($this->entityConfigHelper, $this->router);
     }
 
-    public function testGetAvailableDestinationsForEntity()
+    public function testGetAvailableDestinationsForEntity(): void
     {
         $this->entityConfigHelper->expects($this->once())
             ->method('getRoutes')
@@ -37,7 +34,7 @@ class DestinationPageResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([null, 'name', 'view'], $this->resolver->getAvailableDestinationsForEntity('TestClass'));
     }
 
-    public function testGetAvailableDestinationsForEntityWithoutRoutes()
+    public function testGetAvailableDestinationsForEntityWithoutRoutes(): void
     {
         $this->entityConfigHelper->expects($this->once())
             ->method('getRoutes')
@@ -47,7 +44,7 @@ class DestinationPageResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([null, 'custom'], $this->resolver->getAvailableDestinationsForEntity('TestClass'));
     }
 
-    public function testResolveDestinationUrl()
+    public function testResolveDestinationUrl(): void
     {
         $entity = new Item();
         $entity->id = 10;

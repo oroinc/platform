@@ -4,14 +4,13 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider\Rest\Client;
 
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\AbstractRestIterator;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AbstractRestIteratorTest extends \PHPUnit\Framework\TestCase
+class AbstractRestIteratorTest extends TestCase
 {
-    /** @var RestClientInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $client;
-
-    /** @var AbstractRestIterator|\PHPUnit\Framework\MockObject\MockObject */
-    private $iterator;
+    private RestClientInterface&MockObject $client;
+    private AbstractRestIterator&MockObject $iterator;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class AbstractRestIteratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider iteratorDataProvider
      */
-    public function testIteratorForeach(array $expectations, array $expectedItems)
+    public function testIteratorForeach(array $expectations, array $expectedItems): void
     {
         $this->expectIteratorCalls($expectations, count($expectedItems) > 0);
 
@@ -40,7 +39,7 @@ class AbstractRestIteratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider iteratorDataProvider
      */
-    public function testIteratorWhile(array $expectations, array $expectedItems)
+    public function testIteratorWhile(array $expectations, array $expectedItems): void
     {
         $this->expectIteratorCalls($expectations, count($expectedItems) > 0);
 
@@ -57,7 +56,7 @@ class AbstractRestIteratorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider iteratorDataProvider
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function testIterateTwice(array $expectations, array $expectedItems)
+    public function testIterateTwice(array $expectations, array $expectedItems): void
     {
         $loadPageReturns = [];
         $rowsDataParameters = [];
@@ -163,7 +162,7 @@ class AbstractRestIteratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider countDataProvider
      */
-    public function testCount(array $expectations, $expectedCount)
+    public function testCount(array $expectations, $expectedCount): void
     {
         $this->expectIteratorCalls($expectations);
 

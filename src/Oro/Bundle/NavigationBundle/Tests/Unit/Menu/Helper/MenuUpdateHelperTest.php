@@ -9,15 +9,15 @@ use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\TranslationBundle\Entity\Language;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
+class MenuUpdateHelperTest extends TestCase
 {
-    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
-
-    private LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject $localizationHelper;
-
+    private TranslatorInterface&MockObject $translator;
+    private LocalizationHelper&MockObject $localizationHelper;
     private MenuUpdateHelper $helper;
 
     #[\Override]

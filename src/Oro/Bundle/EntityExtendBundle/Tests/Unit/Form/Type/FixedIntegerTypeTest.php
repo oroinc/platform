@@ -11,8 +11,7 @@ use Symfony\Component\Validator\Validation;
 
 class FixedIntegerTypeTest extends TypeTestCase
 {
-    /** @var FixedIntegerType */
-    private $type;
+    private FixedIntegerType $type;
 
     #[\Override]
     protected function setUp(): void

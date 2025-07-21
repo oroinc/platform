@@ -13,23 +13,16 @@ use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\ImportExportBundle\Job\Step\PostProcessStepExecutor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PostProcessStepExecutorTest extends \PHPUnit\Framework\TestCase
+class PostProcessStepExecutorTest extends TestCase
 {
-    /** @var JobExecutor|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobExecutor;
-
-    /** @var ItemReaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $reader;
-
-    /** @var ItemProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $processor;
-
-    /** @var ItemWriterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $writer;
-
-    /** @var PostProcessStepExecutor */
-    private $executor;
+    private JobExecutor&MockObject $jobExecutor;
+    private ItemReaderInterface&MockObject $reader;
+    private ItemProcessorInterface&MockObject $processor;
+    private ItemWriterInterface&MockObject $writer;
+    private PostProcessStepExecutor $executor;
 
     #[\Override]
     protected function setUp(): void
@@ -57,7 +50,7 @@ class PostProcessStepExecutorTest extends \PHPUnit\Framework\TestCase
         bool $isJobSuccess = true,
         int $jobExecutions = 0,
         array $expectedContext = []
-    ) {
+    ): void {
         if ($job) {
             [$jobType, $jobName] = $job;
 

@@ -3,15 +3,16 @@
 namespace Oro\Bundle\HelpBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\HelpBundle\Configuration\HelpConfiguration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
-class HelpConfigurationTest extends \PHPUnit\Framework\TestCase
+class HelpConfigurationTest extends TestCase
 {
     /**
      * @dataProvider processConfigurationDataProvider
      */
-    public function testProcessConfiguration($options, $expects)
+    public function testProcessConfiguration($options, $expects): void
     {
         $processor = new Processor();
         $configuration = new HelpConfiguration();
@@ -99,7 +100,7 @@ class HelpConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processConfigurationFailsDataProvider
      */
-    public function testProcessConfigurationFails($options, $expectedException, $expectedExceptionMessage)
+    public function testProcessConfigurationFails($options, $expectedException, $expectedExceptionMessage): void
     {
         $processor = new Processor();
         $configuration = new HelpConfiguration();

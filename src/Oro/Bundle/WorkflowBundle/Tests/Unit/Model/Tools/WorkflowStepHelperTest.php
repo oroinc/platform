@@ -13,8 +13,9 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowStepHelperTest extends \PHPUnit\Framework\TestCase
+class WorkflowStepHelperTest extends TestCase
 {
     use EntityTrait;
 
@@ -23,7 +24,7 @@ class WorkflowStepHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getStepsAfterDataProvider
      */
-    public function testGetStepsAfter(Step $step, array $expected, bool $withTree = false)
+    public function testGetStepsAfter(Step $step, array $expected, bool $withTree = false): void
     {
         $helper = new WorkflowStepHelper($this->getWorkflow());
 
@@ -72,7 +73,7 @@ class WorkflowStepHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetStepsBefore()
+    public function testGetStepsBefore(): void
     {
         $workflowItem = $this->getWorkflowItem(['step6', 'step1', 'step2', 'step3', 'step1', 'step5', 'step4']);
         $startSteps = ['step6', 'step1'];

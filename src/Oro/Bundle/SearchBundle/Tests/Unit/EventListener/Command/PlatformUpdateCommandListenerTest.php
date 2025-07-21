@@ -7,28 +7,21 @@ use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Oro\Bundle\SearchBundle\EventListener\Command\PlatformUpdateCommandListener;
 use Oro\Bundle\SearchBundle\EventListener\Command\ReindexationOptionsCommandListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class PlatformUpdateCommandListenerTest extends \PHPUnit\Framework\TestCase
+class PlatformUpdateCommandListenerTest extends TestCase
 {
     private const COMMAND_NAME = 'test:command';
 
-    /** @var Command|\PHPUnit\Framework\MockObject\MockObject */
-    private $command;
-
-    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $input;
-
-    /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $output;
-
-    /** @var CommandExecutor|\PHPUnit\Framework\MockObject\MockObject */
-    private $commandExecutor;
-
-    /** @var InstallerEvent */
-    private $event;
+    private Command&MockObject $command;
+    private InputInterface&MockObject $input;
+    private OutputInterface&MockObject $output;
+    private CommandExecutor&MockObject $commandExecutor;
+    private InstallerEvent $event;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +34,7 @@ class PlatformUpdateCommandListenerTest extends \PHPUnit\Framework\TestCase
         $this->event = new InstallerEvent($this->command, $this->input, $this->output, $this->commandExecutor);
     }
 
-    public function testOnAfterDatabasePreparationNotSupportedCommand()
+    public function testOnAfterDatabasePreparationNotSupportedCommand(): void
     {
         $this->command->expects($this->once())
             ->method('getName')
@@ -63,7 +56,7 @@ class PlatformUpdateCommandListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onAfterDatabasePreparationProvider
      */
-    public function testOnAfterDatabasePreparation(bool $isSkip, bool $isScheduled, string $expectedMessage)
+    public function testOnAfterDatabasePreparation(bool $isSkip, bool $isScheduled, string $expectedMessage): void
     {
         $this->command->expects($this->once())
             ->method('getName')
@@ -75,13 +68,11 @@ class PlatformUpdateCommandListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->input->expects($this->any())
             ->method('getOption')
-            ->willReturnMap(
-                [
-                    ['timeout', 500],
-                    [ReindexationOptionsCommandListener::SKIP_REINDEXATION_OPTION_NAME, $isSkip],
-                    [ReindexationOptionsCommandListener::SCHEDULE_REINDEXATION_OPTION_NAME, $isScheduled],
-                ]
-            );
+            ->willReturnMap([
+                ['timeout', 500],
+                [ReindexationOptionsCommandListener::SKIP_REINDEXATION_OPTION_NAME, $isSkip],
+                [ReindexationOptionsCommandListener::SCHEDULE_REINDEXATION_OPTION_NAME, $isScheduled],
+            ]);
 
         $this->output->expects($this->once())
             ->method('writeln')

@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class ConfigurationHandlerTest extends TestCase
 {
-    public function testCorrectValidation()
+    public function testCorrectValidation(): void
     {
         $handler = new ConfigurationHandler(new \ArrayIterator([new SimpleEntityConfiguration()]));
 
@@ -24,7 +24,7 @@ class ConfigurationHandlerTest extends TestCase
         $this->assertEquals($result, $expected);
     }
 
-    public function testWrongConfigAttribute()
+    public function testWrongConfigAttribute(): void
     {
         $handler = new ConfigurationHandler(new \ArrayIterator([new SimpleEntityConfiguration()]));
 
@@ -39,7 +39,7 @@ class ConfigurationHandlerTest extends TestCase
         );
     }
 
-    public function testWrongAttributeScope()
+    public function testWrongAttributeScope(): void
     {
         $handler = new ConfigurationHandler(new \ArrayIterator([new SimpleEntityConfiguration()]));
 
@@ -52,7 +52,7 @@ class ConfigurationHandlerTest extends TestCase
         ], 'foo');
     }
 
-    public function testAttributeMergingAndDefaultValuesSet()
+    public function testAttributeMergingAndDefaultValuesSet(): void
     {
         $handler = new ConfigurationHandler(
             new \ArrayIterator([new SimpleEntityConfiguration(), new SecondSimpleEntityConfiguration()])

@@ -6,20 +6,15 @@ use Oro\Bundle\LocaleBundle\Configuration\AddressFormatConfigurationProvider;
 use Oro\Bundle\LocaleBundle\Configuration\LocaleConfigurationProvider;
 use Oro\Bundle\LocaleBundle\Configuration\LocaleDataConfigurationProvider;
 use Oro\Bundle\LocaleBundle\Configuration\NameFormatConfigurationProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LocaleConfigurationProviderTest extends \PHPUnit\Framework\TestCase
+class LocaleConfigurationProviderTest extends TestCase
 {
-    /** @var NameFormatConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $nameFormatConfigProvider;
-
-    /** @var AddressFormatConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $addressFormatConfigProvider;
-
-    /** @var LocaleDataConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeDataConfigProvider;
-
-    /** @var LocaleConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
+    private NameFormatConfigurationProvider&MockObject $nameFormatConfigProvider;
+    private AddressFormatConfigurationProvider&MockObject $addressFormatConfigProvider;
+    private LocaleDataConfigurationProvider&MockObject $localeDataConfigProvider;
+    private LocaleConfigurationProvider $configProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +30,7 @@ class LocaleConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNameFormats()
+    public function testGetNameFormats(): void
     {
         $config = ['en' => '%first_name% %last_name%'];
 
@@ -49,7 +44,7 @@ class LocaleConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAddressFormats()
+    public function testGetAddressFormats(): void
     {
         $config = ['US' => ['format' => '%name%\n%organization%']];
 
@@ -63,7 +58,7 @@ class LocaleConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLocaleData()
+    public function testGetLocaleData(): void
     {
         $config = ['US' => ['default_locale' => 'en_US']];
 

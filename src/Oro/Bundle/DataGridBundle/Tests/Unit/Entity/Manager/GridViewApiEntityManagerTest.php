@@ -10,19 +10,16 @@ use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class GridViewApiEntityManagerTest extends \PHPUnit\Framework\TestCase
+class GridViewApiEntityManagerTest extends TestCase
 {
     private const CLASS_NAME = GridView::class;
 
-    /** @var GridViewManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $gridViewManager;
-
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $om;
-
-    /** @var GridViewApiEntityManager */
-    private $gridViewApiEntityManager;
+    private GridViewManager&MockObject $gridViewManager;
+    private ObjectManager&MockObject $om;
+    private GridViewApiEntityManager $gridViewApiEntityManager;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +38,7 @@ class GridViewApiEntityManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetDefaultGridView()
+    public function testSetDefaultGridView(): void
     {
         $user = $this->createMock(AbstractUser::class);
         $gridView = $this->createMock(ViewInterface::class);
@@ -55,7 +52,7 @@ class GridViewApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->gridViewApiEntityManager->setDefaultGridView($user, $gridView);
     }
-    public function testGetView()
+    public function testGetView(): void
     {
         $id = 'test_view';
         $default = 0;

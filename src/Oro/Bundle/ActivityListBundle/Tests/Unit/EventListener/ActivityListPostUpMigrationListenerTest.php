@@ -11,10 +11,11 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
+use PHPUnit\Framework\TestCase;
 
-class ActivityListPostUpMigrationListenerTest extends \PHPUnit\Framework\TestCase
+class ActivityListPostUpMigrationListenerTest extends TestCase
 {
-    public function testOnPostUp()
+    public function testOnPostUp(): void
     {
         $provider = $this->createMock(ActivityListChainProvider::class);
         $activityListExtension = $this->createMock(ActivityListExtension::class);

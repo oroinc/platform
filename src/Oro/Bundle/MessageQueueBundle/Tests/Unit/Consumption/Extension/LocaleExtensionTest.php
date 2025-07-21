@@ -6,17 +6,14 @@ use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\LocaleExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
+class LocaleExtensionTest extends TestCase
 {
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
-
-    /** @var TranslatableListener */
-    private $translatableListener;
-
-    /** @var LocaleExtension */
-    private $localeExtension;
+    private LocaleSettings&MockObject $localeSettings;
+    private TranslatableListener $translatableListener;
+    private LocaleExtension $localeExtension;
 
     #[\Override]
     protected function setUp(): void
@@ -28,12 +25,10 @@ class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testOnStart(): void
     {
-        $this->localeSettings
-            ->expects($this->once())
+        $this->localeSettings->expects($this->once())
             ->method('getLocale')
             ->willReturn('fr');
 
-        /** @var Context $context */
         $context = $this->createMock(Context::class);
         $this->localeExtension->onStart($context);
 
@@ -42,12 +37,10 @@ class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testOnPreReceived(): void
     {
-        $this->localeSettings
-            ->expects($this->once())
+        $this->localeSettings->expects($this->once())
             ->method('getLanguage')
             ->willReturn('FR_fr');
 
-        /** @var Context $context */
         $context = $this->createMock(Context::class);
         $this->localeExtension->onPreReceived($context);
 

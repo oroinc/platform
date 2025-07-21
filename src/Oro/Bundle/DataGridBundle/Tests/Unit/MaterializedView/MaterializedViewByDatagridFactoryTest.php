@@ -14,11 +14,12 @@ use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\MaterializedView\MaterializedViewByDatagridFactory;
 use Oro\Bundle\PlatformBundle\Entity\MaterializedView;
 use Oro\Bundle\PlatformBundle\MaterializedView\MaterializedViewManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MaterializedViewByDatagridFactoryTest extends \PHPUnit\Framework\TestCase
+class MaterializedViewByDatagridFactoryTest extends TestCase
 {
-    private MaterializedViewManager|\PHPUnit\Framework\MockObject\MockObject $materializedViewManager;
-
+    private MaterializedViewManager&MockObject $materializedViewManager;
     private MaterializedViewByDatagridFactory $factory;
 
     #[\Override]
@@ -65,20 +66,17 @@ class MaterializedViewByDatagridFactoryTest extends \PHPUnit\Framework\TestCase
         $datagrid->setDatasource($datasource);
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager
-            ->expects(self::any())
+        $entityManager->expects(self::any())
             ->method('getConfiguration')
             ->willReturn(new Configuration());
 
         $query = new Query($entityManager);
-        $datasource
-            ->expects(self::once())
+        $datasource->expects(self::once())
             ->method('getResultsQuery')
             ->willReturn($query);
 
         $materializedView = new MaterializedView();
-        $this->materializedViewManager
-            ->expects(self::once())
+        $this->materializedViewManager->expects(self::once())
             ->method('createByQuery')
             ->with($query)
             ->willReturn($materializedView);

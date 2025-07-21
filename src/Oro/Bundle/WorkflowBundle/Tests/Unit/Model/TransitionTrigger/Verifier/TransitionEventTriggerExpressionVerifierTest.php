@@ -7,11 +7,11 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\TransitionTriggerVerifierException;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerExpressionVerifier;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
+use PHPUnit\Framework\TestCase;
 
-class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit\Framework\TestCase
+class TransitionEventTriggerExpressionVerifierTest extends TestCase
 {
-    /** @var TransitionEventTriggerExpressionVerifier */
-    private $verifier;
+    private TransitionEventTriggerExpressionVerifier $verifier;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +22,7 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit\Framework\Te
     /**
      * Covers return statement when trigger without expression comes
      */
-    public function testNotVerifyIfNoRequireExpression()
+    public function testNotVerifyIfNoRequireExpression(): void
     {
         $trigger = new TransitionEventTrigger();
 
@@ -32,7 +32,7 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit\Framework\Te
     /**
      * Covers normal configuration processing
      */
-    public function testVerificationOk()
+    public function testVerificationOk(): void
     {
         $trigger = $this->buildEventTriggerWithExpression(
             'wd.getName() !== wi.getId() and entity.getId() === mainEntity.getId()',
@@ -46,7 +46,7 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit\Framework\Te
     /**
      * Covers Expression Language RuntimeException when bad method
      */
-    public function testVerificationBadMethodsCallsOk()
+    public function testVerificationBadMethodsCallsOk(): void
     {
         $trigger = $this->buildEventTriggerWithExpression(
             'wd.name() !== wi.get() and entity.ping(1) === mainEntity.pong(2)',
@@ -57,7 +57,7 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit\Framework\Te
         $this->verifier->verifyTrigger($trigger);
     }
 
-    public function testVerificationBadTypesOperandsOk()
+    public function testVerificationBadTypesOperandsOk(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -75,7 +75,7 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit\Framework\Te
     /**
      * @dataProvider verifyFailures
      */
-    public function testVerifyTriggerException(string $exceptionMessage, TransitionEventTrigger $trigger)
+    public function testVerifyTriggerException(string $exceptionMessage, TransitionEventTrigger $trigger): void
     {
         $this->expectException(TransitionTriggerVerifierException::class);
         $this->expectExceptionMessage($exceptionMessage);

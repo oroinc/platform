@@ -8,7 +8,7 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 
 class JoinCasesTest extends DatagridConfigurationBuilderTestCase
 {
-    public function testJoinFromColumns()
+    public function testJoinFromColumns(): void
     {
         $en = 'Acme\Entity\TestEntity';
         $en1 = 'Acme\Entity\TestEntity1';
@@ -92,7 +92,7 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testUnidirectionalJoinFromColumns()
+    public function testUnidirectionalJoinFromColumns(): void
     {
         $en = 'Acme\Entity\TestEntity';
         $en1 = 'Acme\Entity\TestEntity1';
@@ -259,7 +259,7 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testJoinFromFilters()
+    public function testJoinFromFilters(): void
     {
         $en = 'Acme\Entity\TestEntity';
         $en1 = 'Acme\Entity\TestEntity1';

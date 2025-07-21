@@ -9,17 +9,14 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor;
 use Oro\Bundle\DataGridBundle\Exception\DatasourceException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class YamlProcessorTest extends \PHPUnit\Framework\TestCase
+class YamlProcessorTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var YamlProcessor */
-    private $processor;
+    private ManagerRegistry&MockObject $registry;
+    private EntityManagerInterface&MockObject $em;
+    private YamlProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +27,7 @@ class YamlProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new YamlProcessor($this->registry);
     }
 
-    public function testProcessQuery()
+    public function testProcessQuery(): void
     {
         $entity1 = 'EntityTest1';
         $this->registry->expects($this->once())
@@ -68,7 +65,7 @@ class YamlProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessQueryWithService()
+    public function testProcessQueryWithService(): void
     {
         $qb = new QueryBuilder($this->em);
 
@@ -81,7 +78,7 @@ class YamlProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($queryBuilder, $qb);
     }
 
-    public function testNoQueryAndRepositoryConfigsShouldThrowException()
+    public function testNoQueryAndRepositoryConfigsShouldThrowException(): void
     {
         $this->expectException(DatasourceException::class);
         $this->expectExceptionMessage(sprintf(
@@ -89,13 +86,13 @@ class YamlProcessorTest extends \PHPUnit\Framework\TestCase
             YamlProcessor::class
         ));
 
-        $configs      = [
+        $configs = [
             'type'  => 'orm',
         ];
         $this->processor->processQuery($configs);
     }
 
-    public function testEntityRepositoryDoesNotHasMethodShouldThrowException()
+    public function testEntityRepositoryDoesNotHasMethodShouldThrowException(): void
     {
         $this->expectException(DatasourceException::class);
         $this->expectExceptionMessage('Doctrine\ORM\EntityRepository has no method notExistedMethod');
@@ -115,7 +112,7 @@ class YamlProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->processQuery($configs);
     }
 
-    public function testConfigMethodDoNotReturnQueryBuilderShouldThrowException()
+    public function testConfigMethodDoNotReturnQueryBuilderShouldThrowException(): void
     {
         $entity1 = 'EntityTest1';
 
@@ -148,7 +145,7 @@ class YamlProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->processQuery($configs);
     }
 
-    public function testServicedDoNotReturnQueryBuilderShouldThrowException()
+    public function testServicedDoNotReturnQueryBuilderShouldThrowException(): void
     {
         $qb = 'not-a-querybuilder';
 
@@ -168,7 +165,7 @@ class YamlProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->processQuery($configs);
     }
 
-    public function testMergeCountAndBaseQueryConfigs()
+    public function testMergeCountAndBaseQueryConfigs(): void
     {
         $entity1 = 'EntityTest1';
         $this->registry->expects($this->once())
@@ -181,7 +178,7 @@ class YamlProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('createQueryBuilder')
             ->willReturn($qb);
 
-        $configs      = [
+        $configs = [
             'type'  => 'orm',
             'query' => [
                 'select' => [

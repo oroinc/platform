@@ -3,10 +3,11 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ResourcePathProvidersPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ResourcePathProvidersPassTest extends \PHPUnit\Framework\TestCase
+class ResourcePathProvidersPassTest extends TestCase
 {
     private ResourcePathProvidersPass $compiler;
 
@@ -16,7 +17,7 @@ class ResourcePathProvidersPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new ResourcePathProvidersPass();
     }
 
-    public function testNoTaggedServicesFound()
+    public function testNoTaggedServicesFound(): void
     {
         $container = new ContainerBuilder();
         $pathProviderDef = $container->register('oro_layout.loader.path_provider');
@@ -26,7 +27,7 @@ class ResourcePathProvidersPassTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($pathProviderDef->getMethodCalls());
     }
 
-    public function testFoundProviders()
+    public function testFoundProviders(): void
     {
         $container = new ContainerBuilder();
         $pathProviderDef = $container->register('oro_layout.loader.path_provider');

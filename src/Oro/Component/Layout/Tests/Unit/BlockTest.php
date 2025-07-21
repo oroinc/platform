@@ -8,23 +8,16 @@ use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\RawLayout;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class BlockTest extends \PHPUnit\Framework\TestCase
+class BlockTest extends TestCase
 {
-    /** @var RawLayout */
-    private $rawLayout;
-
-    /** @var BlockTypeHelperInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $typeHelper;
-
-    /** @var LayoutContext */
-    private $context;
-
-    /** @var DataAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $data;
-
-    /** @var Block */
-    private $block;
+    private RawLayout $rawLayout;
+    private BlockTypeHelperInterface&MockObject $typeHelper;
+    private LayoutContext $context;
+    private DataAccessorInterface&MockObject $data;
+    private Block $block;
 
     #[\Override]
     protected function setUp(): void
@@ -42,22 +35,22 @@ class BlockTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTypeHelper()
+    public function testGetTypeHelper(): void
     {
         $this->assertSame($this->typeHelper, $this->block->getTypeHelper());
     }
 
-    public function testGetContext()
+    public function testGetContext(): void
     {
         $this->assertSame($this->context, $this->block->getContext());
     }
 
-    public function testGetData()
+    public function testGetData(): void
     {
         $this->assertSame($this->data, $this->block->getData());
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $id = 'test_id';
 
@@ -66,7 +59,7 @@ class BlockTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($id, $this->block->getId());
     }
 
-    public function testGetTypeName()
+    public function testGetTypeName(): void
     {
         $id = 'test_id';
         $name = 'test_name';
@@ -78,7 +71,7 @@ class BlockTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($name, $this->block->getTypeName());
     }
 
-    public function testGetTypeNameWhenBlockTypeIsAddedAsObject()
+    public function testGetTypeNameWhenBlockTypeIsAddedAsObject(): void
     {
         $id = 'test_id';
         $name = 'test_name';
@@ -95,7 +88,7 @@ class BlockTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($name, $this->block->getTypeName());
     }
 
-    public function testGetAliases()
+    public function testGetAliases(): void
     {
         $id = 'test_id';
 
@@ -108,7 +101,7 @@ class BlockTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['alias1', 'alias2'], $this->block->getAliases());
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->rawLayout->add('root', null, 'root');
         $this->rawLayout->add('header', 'root', 'header');
@@ -127,7 +120,7 @@ class BlockTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->block->getParent()->getParent());
     }
 
-    public function testGetOptions()
+    public function testGetOptions(): void
     {
         $this->rawLayout->add('root', null, 'root', ['root_option1' => 'val1']);
         $this->rawLayout->setProperty(

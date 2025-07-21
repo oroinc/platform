@@ -16,8 +16,7 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 {
     use EntityTrait;
 
-    /** @var SortersStateProvider */
-    private $provider;
+    private SortersStateProvider $provider;
 
     #[\Override]
     protected function setUp(): void

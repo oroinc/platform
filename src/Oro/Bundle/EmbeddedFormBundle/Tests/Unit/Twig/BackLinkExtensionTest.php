@@ -4,21 +4,18 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\EmbeddedFormBundle\Twig\BackLinkExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
+class BackLinkExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var BackLinkExtension */
-    private $extension;
+    private RouterInterface&MockObject $router;
+    private TranslatorInterface&MockObject $translator;
+    private BackLinkExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,7 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new BackLinkExtension($container);
     }
 
-    public function testShouldReplacePlaceholderWithProvidedUrlAndLinkText()
+    public function testShouldReplacePlaceholderWithProvidedUrlAndLinkText(): void
     {
         $id = 'test_id';
         $url = 'test_url';
@@ -58,7 +55,7 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldReplacePlaceholderWithReloadLinkAndLinkText()
+    public function testShouldReplacePlaceholderWithReloadLinkAndLinkText(): void
     {
         $text = 'test text';
         $translatedText = 'test translated text';
@@ -79,7 +76,7 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldReplacePlaceholderWithProvidedUrlAndDefaultLinkText()
+    public function testShouldReplacePlaceholderWithProvidedUrlAndDefaultLinkText(): void
     {
         $id = 'test_id';
         $url = 'test_url';
@@ -101,7 +98,7 @@ class BackLinkExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldReturnOriginalStringWhenNoPlaceholderProvided()
+    public function testShouldReturnOriginalStringWhenNoPlaceholderProvided(): void
     {
         $originalString = 'any string';
 

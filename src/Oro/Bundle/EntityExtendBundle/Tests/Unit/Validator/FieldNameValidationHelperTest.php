@@ -13,21 +13,18 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Event\ValidateBeforeRemoveFieldEvent;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class FieldNameValidationHelperTest extends \PHPUnit\Framework\TestCase
+class FieldNameValidationHelperTest extends TestCase
 {
     private const ENTITY_CLASS = 'Test\Entity';
     private const REMOVE_ERROR_MESSAGE = 'error message';
 
-    /** @var ConfigProviderMock */
-    private $extendConfigProvider;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var FieldNameValidationHelper */
-    private $validationHelper;
+    private ConfigProviderMock $extendConfigProvider;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private FieldNameValidationHelper $validationHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -50,7 +47,7 @@ class FieldNameValidationHelperTest extends \PHPUnit\Framework\TestCase
     public function testCanFieldBeRestored(string $fieldName, bool $expectedResult): void
     {
         $entity = new EntityConfigModel(self::ENTITY_CLASS);
-        $field  = new FieldConfigModel($fieldName);
+        $field = new FieldConfigModel($fieldName);
         $entity->addField($field);
 
         $this->addFieldConfig($fieldName, 'int');
@@ -223,7 +220,7 @@ class FieldNameValidationHelperTest extends \PHPUnit\Framework\TestCase
             $fieldName,
             'int'
         );
-        $fieldConfig   = new Config($fieldConfigId);
+        $fieldConfig = new Config($fieldConfigId);
         $fieldConfig->setValues($values);
 
         return $fieldConfig;

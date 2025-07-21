@@ -15,6 +15,8 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Button;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigInterface;
@@ -23,19 +25,12 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
+class ConfigSubscriberTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationHelper;
-
-    /** @var ConfigSubscriber */
-    private $subscriber;
+    private ConfigManager&MockObject $configManager;
+    private TranslatorInterface&MockObject $translator;
+    private ConfigTranslationHelper&MockObject $translationHelper;
+    private ConfigSubscriber $subscriber;
 
     #[\Override]
     protected function setUp(): void
@@ -793,7 +788,7 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         array $data,
         ConfigModel $model,
         FormInterface|Form|null $form = null
-    ): \PHPUnit\Framework\MockObject\MockObject|FormEvent {
+    ): MockObject|FormEvent {
         $fieldName = '';
         if ($model instanceof FieldConfigModel && !$model->getId()) {
             $fieldName = $model->getFieldName();
@@ -827,7 +822,7 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         string $scope,
         array $configs,
         bool $isGetPropertyConfigExpected
-    ): \PHPUnit\Framework\MockObject\MockObject|ConfigProvider {
+    ): MockObject|ConfigProvider {
         $provider = $this->createMock(ConfigProvider::class);
         $provider->expects(self::any())
             ->method('getScope')

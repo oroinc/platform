@@ -14,35 +14,22 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DefaultGridViewLoadListenerTest extends \PHPUnit\Framework\TestCase
+class DefaultGridViewLoadListenerTest extends TestCase
 {
     private const SAMPLE_ALL_LABEL = 'Sample All Label';
 
-    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassResolver;
-
-    /** @var AbstractSearchMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $mappingProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    private $config;
-
-    /** @var GridViewsLoadEvent */
-    private $event;
-
-    /** @var DefaultGridViewLoadListener */
-    private $listener;
+    private EntityClassResolver&MockObject $entityClassResolver;
+    private AbstractSearchMappingProvider&MockObject $mappingProvider;
+    private ConfigProvider&MockObject $configProvider;
+    private ConfigManager&MockObject $configManager;
+    private TranslatorInterface&MockObject $translator;
+    private DatagridConfiguration&MockObject $config;
+    private GridViewsLoadEvent $event;
+    private DefaultGridViewLoadListener $listener;
 
     #[\Override]
     protected function setUp(): void

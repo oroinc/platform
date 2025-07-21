@@ -8,16 +8,15 @@ use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutContextStack;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
+class ThemeImagePlaceholderProviderTest extends TestCase
 {
-    private LayoutContextStack|\PHPUnit\Framework\MockObject\MockObject $contextStack;
-
-    private ThemeManager|\PHPUnit\Framework\MockObject\MockObject $themeManager;
-
-    private ImagineUrlProviderInterface|\PHPUnit\Framework\MockObject\MockObject $imagineUrlProvider;
-
+    private LayoutContextStack&MockObject $contextStack;
+    private ThemeManager&MockObject $themeManager;
+    private ImagineUrlProviderInterface&MockObject $imagineUrlProvider;
     private ThemeImagePlaceholderProvider $provider;
 
     #[\Override]

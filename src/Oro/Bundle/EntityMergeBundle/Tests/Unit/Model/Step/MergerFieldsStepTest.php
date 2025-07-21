@@ -8,18 +8,15 @@ use Oro\Bundle\EntityMergeBundle\Event\FieldDataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Model\Step\MergeFieldsStep;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class MergerFieldsStepTest extends \PHPUnit\Framework\TestCase
+class MergerFieldsStepTest extends TestCase
 {
-    /** @var StrategyInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $strategy;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var MergeFieldsStep */
-    private $step;
+    private StrategyInterface&MockObject $strategy;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private MergeFieldsStep $step;
 
     #[\Override]
     protected function setUp(): void

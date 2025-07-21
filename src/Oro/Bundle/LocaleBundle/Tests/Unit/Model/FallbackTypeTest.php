@@ -3,10 +3,11 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Model;
 
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
+use PHPUnit\Framework\TestCase;
 
-class FallbackTypeTest extends \PHPUnit\Framework\TestCase
+class FallbackTypeTest extends TestCase
 {
-    public function testConstructAndGetType()
+    public function testConstructAndGetType(): void
     {
         $type = FallbackType::SYSTEM;
         $fallbackType = new FallbackType($type);

@@ -6,18 +6,15 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Provider\TranslationProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\MessageCatalogue;
 
-class TranslationProviderTest extends \PHPUnit\Framework\TestCase
+class TranslationProviderTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var TranslationRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $traslationRepository;
-
-    /** @var TranslationProvider */
-    private $provider;
+    private ManagerRegistry&MockObject $doctrine;
+    private TranslationRepository&MockObject $traslationRepository;
+    private TranslationProvider $provider;
 
     #[\Override]
     protected function setUp(): void

@@ -10,23 +10,16 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Provider\State\ColumnsStateProvider;
 use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
+class ColumnsExtensionTest extends TestCase
 {
-    /** @var DatagridStateProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $columnsStateProvider;
-
-    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagridConfiguration;
-
-    /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagridParameters;
-
-    /** @var MetadataObject|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadataObject;
-
-    /** @var ColumnsExtension */
-    private $extension;
+    private DatagridStateProviderInterface&MockObject $columnsStateProvider;
+    private DatagridConfiguration&MockObject $datagridConfiguration;
+    private ParameterBag&MockObject $datagridParameters;
+    private MetadataObject&MockObject $metadataObject;
+    private ColumnsExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -310,7 +303,7 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider testVisitMetadataDisabledProvider
      */
-    public function testVisitMetadataDisabled(array $configColumns, array $expectedColumns)
+    public function testVisitMetadataDisabled(array $configColumns, array $expectedColumns): void
     {
         $this->columnsStateProvider->expects(self::once())
             ->method('getState')

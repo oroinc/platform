@@ -4,13 +4,14 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider;
 use Oro\Component\Action\Model\DoctrineTypeMappingExtensionInterface;
+use PHPUnit\Framework\TestCase;
 
-class DoctrineTypeMappingProviderTest extends \PHPUnit\Framework\TestCase
+class DoctrineTypeMappingProviderTest extends TestCase
 {
     /**
      * @dataProvider doctrineTypesProvider
      */
-    public function testGetDoctrineTypeMappings(array $extensions, array $expected)
+    public function testGetDoctrineTypeMappings(array $extensions, array $expected): void
     {
         $provider = new DoctrineTypeMappingProvider($extensions);
         $this->assertEquals($expected, $provider->getDoctrineTypeMappings());

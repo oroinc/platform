@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Tools;
 
+use GuzzleHttp\Psr7\Uri;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\UrlHelper as SymfonyUrlHelper;
 use Symfony\Component\Routing\RequestContext;
@@ -58,5 +59,33 @@ class UrlHelper
     private function getBaseUrl(): string
     {
         return $this->requestContext?->getBaseUrl() ?: $this->requestStack->getMainRequest()?->getBaseUrl() ?: '';
+    }
+
+    /**
+     * Checks if the given URL is a local URL.
+     *
+     * A URL is considered local if its host matches one of the predefined local hostnames
+     * such as 'localhost', '127.0.0.1', or other common local addresses.
+     *
+     * @param string|null $url The URL to check. If null, the current request's URL is used.
+     *
+     * @return bool True if the URL is local, false otherwise.
+     */
+    public function isLocalUrl(?string $url = null): bool
+    {
+        $url ??= (string) $this->requestStack->getMainRequest()?->getUri();
+
+        $uri = new Uri($url);
+        $host = $uri->getHost();
+        $localHosts = [
+            '127.0.0.1',               // IPv4 localhost
+            'localhost',               // Standard localhost hostname
+            '0.0.0.0',                 // Non-routable meta-address (commonly used for binding to all interfaces)
+            'localhost.localdomain',   // Commonly used in some configurations
+            'localhost6',              // IPv6-specific localhost hostname
+            'localhost6.localdomain6', // IPv6-specific localhost with local domain
+        ];
+
+        return in_array($host, $localHosts, true);
     }
 }

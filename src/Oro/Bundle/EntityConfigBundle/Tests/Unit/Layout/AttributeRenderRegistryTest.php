@@ -5,11 +5,11 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Layout;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry;
+use PHPUnit\Framework\TestCase;
 
-class AttributeRenderRegistryTest extends \PHPUnit\Framework\TestCase
+class AttributeRenderRegistryTest extends TestCase
 {
-    /** @var AttributeRenderRegistry */
-    private $attributeRenderRegistry;
+    private AttributeRenderRegistry $attributeRenderRegistry;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +17,7 @@ class AttributeRenderRegistryTest extends \PHPUnit\Framework\TestCase
         $this->attributeRenderRegistry = new AttributeRenderRegistry();
     }
 
-    public function testGroupRendered()
+    public function testGroupRendered(): void
     {
         $attributeFamily = new AttributeFamily();
         $attributeFamily->setCode('family_code');
@@ -31,7 +31,7 @@ class AttributeRenderRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->attributeRenderRegistry->isGroupRendered($attributeFamily, $attributeGroup));
     }
 
-    public function testGetNotRenderedGroups()
+    public function testGetNotRenderedGroups(): void
     {
         $attributeFamily = new AttributeFamily();
         $familyCode = 'family_code';
@@ -64,7 +64,7 @@ class AttributeRenderRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($attributeGroup2, $notRenderedGroups->first());
     }
 
-    public function testAttributeRendered()
+    public function testAttributeRendered(): void
     {
         $attributeFamily = new AttributeFamily();
         $attributeFamily->setCode('family_code');

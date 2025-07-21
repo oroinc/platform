@@ -4,8 +4,9 @@ namespace Oro\Component\Config\Tests\Unit\Common;
 
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\Config\Common\ConfigObject;
+use PHPUnit\Framework\TestCase;
 
-class ObjectTest extends \PHPUnit\Framework\TestCase
+class ObjectTest extends TestCase
 {
     private function getConfigObject(): ConfigObject
     {
@@ -27,7 +28,7 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getOffsetExistsDataProvider
      */
-    public function testOffsetExists(string $property, bool $expected)
+    public function testOffsetExists(string $property, bool $expected): void
     {
         $object = $this->getConfigObject();
         $this->assertEquals($expected, $object->offsetExists($property));
@@ -58,7 +59,7 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getOffsetExistByPathDataProvider
      */
-    public function testOffsetExistByPath(string $path, bool $expected)
+    public function testOffsetExistByPath(string $path, bool $expected): void
     {
         $object = $this->getConfigObject();
         $this->assertEquals($expected, $object->offsetExistByPath($path));
@@ -121,7 +122,7 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getOffsetGetDataProvider
      */
-    public function testOffsetGet(string $property, ?bool $expected)
+    public function testOffsetGet(string $property, ?bool $expected): void
     {
         $object = $this->getConfigObject();
         $this->assertEquals($expected, $object->offsetGet($property));
@@ -148,7 +149,7 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getOffsetGetOrDataProvider
      */
-    public function testOffsetGetOr(string $property, ?bool $expected)
+    public function testOffsetGetOr(string $property, ?bool $expected): void
     {
         $object = $this->getConfigObject();
         $this->assertEquals($expected, $object->offsetGetOr($property));
@@ -179,7 +180,7 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getOffsetGetByPathDataProvider
      */
-    public function testOffsetGetByPath(string $path, ?bool $expected)
+    public function testOffsetGetByPath(string $path, ?bool $expected): void
     {
         $object = $this->getConfigObject();
         $this->assertEquals($expected, $object->offsetGetByPath($path));
@@ -242,7 +243,7 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getOffsetGetOrWithDefaultValueDataProvider
      */
-    public function testOffsetGetOrWithDefaultValue(string $property, bool|string $expected)
+    public function testOffsetGetOrWithDefaultValue(string $property, bool|string $expected): void
     {
         $object = $this->getConfigObject();
         $this->assertEquals($expected, $object->offsetGetOr($property, 'default'));
@@ -273,7 +274,7 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getOffsetGetByPathWithDefaultValueDataProvider
      */
-    public function testOffsetGetByPathWithDefaultValue(string $path, bool|string $expected)
+    public function testOffsetGetByPathWithDefaultValue(string $path, bool|string $expected): void
     {
         $object = $this->getConfigObject();
         $this->assertEquals($expected, $object->offsetGetByPath($path, 'default'));
@@ -336,7 +337,7 @@ class ObjectTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getOffsetSetByPathWithDefaultValueDataProvider
      */
-    public function testOffsetSetByPath(string $path)
+    public function testOffsetSetByPath(string $path): void
     {
         $object = $this->getConfigObject();
         $value = 'test';

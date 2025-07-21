@@ -17,8 +17,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TransitionIsAllowedValidatorTest extends ConstraintValidatorTestCase
 {
-    private WorkflowRegistry|MockObject $workflowRegistry;
-    private TranslatorInterface|MockObject $translator;
+    private WorkflowRegistry&MockObject $workflowRegistry;
+    private TranslatorInterface&MockObject $translator;
 
     #[\Override]
     protected function setUp(): void

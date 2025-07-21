@@ -4,11 +4,11 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Event;
 
 use Doctrine\DBAL\Connection;
 use Oro\Bundle\MigrationBundle\Event\PreMigrationEvent;
+use PHPUnit\Framework\TestCase;
 
-class PreMigrationEventTest extends \PHPUnit\Framework\TestCase
+class PreMigrationEventTest extends TestCase
 {
-    /** @var PreMigrationEvent */
-    private $preMigrationEvent;
+    private PreMigrationEvent $preMigrationEvent;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class PreMigrationEventTest extends \PHPUnit\Framework\TestCase
         $this->preMigrationEvent = new PreMigrationEvent($connection);
     }
 
-    public function testLoadedVersions()
+    public function testLoadedVersions(): void
     {
         $this->preMigrationEvent->setLoadedVersion('testBundle', 'v1_0');
         $this->assertEquals(['testBundle' => 'v1_0'], $this->preMigrationEvent->getLoadedVersions());

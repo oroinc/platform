@@ -8,10 +8,11 @@ use Oro\Bundle\TranslationBundle\Action\GetLanguageTranslationMetricsAction;
 use Oro\Bundle\TranslationBundle\Download\TranslationMetricsProviderInterface;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class GetLanguageTranslationMetricsActionTest extends \PHPUnit\Framework\TestCase
+class GetLanguageTranslationMetricsActionTest extends TestCase
 {
     private string $codeWithoutTranslations;
     private string $codeWithTranslations;

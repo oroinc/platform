@@ -2,25 +2,26 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
-use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Condition\NotContains;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class NotContainsTest extends \PHPUnit\Framework\TestCase
+class NotContainsTest extends TestCase
 {
     protected $condition;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->condition = new Condition\NotContains();
+        $this->condition = new NotContains();
         $this->condition->setContextAccessor(new ContextAccessor());
     }
 
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, $context, $expectedResult)
+    public function testEvaluate(array $options, $context, $expectedResult): void
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));

@@ -4,13 +4,11 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\SearchBundle\Entity\IndexInteger;
 use Oro\Bundle\SearchBundle\Entity\Item;
+use PHPUnit\Framework\TestCase;
 
-class IndexIntegerTest extends \PHPUnit\Framework\TestCase
+class IndexIntegerTest extends TestCase
 {
-    /**
-     * @var \Oro\Bundle\SearchBundle\Entity\IndexInteger
-     */
-    private $index;
+    private IndexInteger $index;
 
     #[\Override]
     protected function setUp(): void
@@ -18,26 +16,26 @@ class IndexIntegerTest extends \PHPUnit\Framework\TestCase
         $this->index = new IndexInteger();
     }
 
-    public function testField()
+    public function testField(): void
     {
         $this->assertNull($this->index->getField());
         $this->index->setField('test_integer_field');
         $this->assertEquals('test_integer_field', $this->index->getField());
     }
 
-    public function testValue()
+    public function testValue(): void
     {
         $this->assertNull($this->index->getValue());
         $this->index->setValue(100);
         $this->assertEquals(100, $this->index->getValue());
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertNull($this->index->getId());
     }
 
-    public function testItem()
+    public function testItem(): void
     {
         $this->assertNull($this->index->getItem());
         $item = new Item();

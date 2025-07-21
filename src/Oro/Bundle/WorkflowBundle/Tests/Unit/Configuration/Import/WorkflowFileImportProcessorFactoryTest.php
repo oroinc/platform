@@ -6,15 +6,14 @@ use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowFileImportProcessor;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowFileImportProcessorFactory;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocatorInterface;
 
-class WorkflowFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
+class WorkflowFileImportProcessorFactoryTest extends TestCase
 {
-    /** @var WorkflowFileImportProcessorFactory */
-    private $factory;
-
-    /** @var ConfigFileReaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $reader;
+    private WorkflowFileImportProcessorFactory $factory;
+    private ConfigFileReaderInterface&MockObject $reader;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +28,7 @@ class WorkflowFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
      * @param mixed $import
      * @param bool $expected
      */
-    public function testApplicable($import, bool $expected)
+    public function testApplicable($import, bool $expected): void
     {
         $this->assertEquals($expected, $this->factory->isApplicable($import));
     }
@@ -71,7 +70,7 @@ class WorkflowFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $resource = './file';
         $target = 'target';

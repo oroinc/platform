@@ -15,8 +15,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
 {
-    /** @var AttributeRenderRegistry */
-    private $attributeRenderRegistry;
+    private AttributeRenderRegistry $attributeRenderRegistry;
 
     #[\Override]
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
@@ -43,7 +42,7 @@ class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
             ->addType($groupBlockTypeStub);
     }
 
-    public function testGetBlockView()
+    public function testGetBlockView(): void
     {
         $entityValue = new Expression('context["entity"]');
         $attributeGroup1 = new AttributeGroup();
@@ -81,7 +80,7 @@ class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
         $this->assertEquals('third_group', $thirdAttributeGroup->vars['group']);
     }
 
-    public function testGetBlockViewNothingToRender()
+    public function testGetBlockViewNothingToRender(): void
     {
         $entityValue = new Expression('context["entity"]');
         $attributeGroup = new AttributeGroup();
@@ -103,7 +102,7 @@ class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
         $this->assertCount(0, $view->children);
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $type = $this->getBlockType(AttributeGroupRestType::NAME);
 

@@ -47,6 +47,7 @@ class EntityMetadataFactory
         if ($resultName) {
             $metaPropertyMetadata->setResultName($resultName);
         }
+        $metaPropertyMetadata->setAssociationLevel($field->isAssociationLevelMetaProperty());
         $entityMetadata->addMetaProperty($metaPropertyMetadata);
 
         return $metaPropertyMetadata;

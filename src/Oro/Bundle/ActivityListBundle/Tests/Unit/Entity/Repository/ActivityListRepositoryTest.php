@@ -8,14 +8,13 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ActivityListRepositoryTest extends \PHPUnit\Framework\TestCase
+class ActivityListRepositoryTest extends TestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var ActivityListRepository */
-    private $repository;
+    private EntityManagerInterface&MockObject $entityManager;
+    private ActivityListRepository $repository;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +38,7 @@ class ActivityListRepositoryTest extends \PHPUnit\Framework\TestCase
         ?\DateTime $dateTo,
         int $andWhereCount,
         int $setParameterCount
-    ) {
+    ): void {
         $qb = $this->createMock(QueryBuilder::class);
         $expr = $this->createMock(Expr::class);
         $qb->expects($this->once())

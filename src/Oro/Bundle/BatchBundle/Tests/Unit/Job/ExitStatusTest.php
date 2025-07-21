@@ -3,12 +3,13 @@
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Job;
 
 use Oro\Bundle\BatchBundle\Job\ExitStatus;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class ExitStatusTest extends \PHPUnit\Framework\TestCase
+class ExitStatusTest extends TestCase
 {
     public function testSetExitCode(): void
     {

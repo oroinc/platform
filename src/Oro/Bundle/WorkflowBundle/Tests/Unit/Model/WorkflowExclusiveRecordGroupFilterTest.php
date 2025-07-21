@@ -8,14 +8,13 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGroupFilter;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRecordContext;
 use Oro\Bundle\WorkflowBundle\Provider\RunningWorkflowProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit\Framework\TestCase
+class WorkflowExclusiveRecordGroupFilterTest extends TestCase
 {
-    /** @var RunningWorkflowProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $runningWorkflowProvider;
-
-    /** @var WorkflowExclusiveRecordGroupFilter */
-    private $exclusiveRecordGroupFilter;
+    private RunningWorkflowProvider&MockObject $runningWorkflowProvider;
+    private WorkflowExclusiveRecordGroupFilter $exclusiveRecordGroupFilter;
 
     #[\Override]
     protected function setUp(): void

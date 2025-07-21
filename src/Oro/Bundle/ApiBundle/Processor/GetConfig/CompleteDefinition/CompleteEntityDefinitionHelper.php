@@ -206,14 +206,14 @@ class CompleteEntityDefinitionHelper
         foreach ($idFieldNames as $fieldName) {
             $field = $definition->getField($fieldName);
             if (null === $field) {
-                throw new \RuntimeException(sprintf(
+                throw new \RuntimeException(\sprintf(
                     'The identifier field "%s" for "%s" entity is not defined.',
                     $fieldName,
                     $entityClass
                 ));
             }
             if ($field->isExcluded()) {
-                throw new \RuntimeException(sprintf(
+                throw new \RuntimeException(\sprintf(
                     'The identifier field "%s" for "%s" entity must not be excluded.',
                     $fieldName,
                     $entityClass
@@ -277,8 +277,7 @@ class CompleteEntityDefinitionHelper
         RequestType $requestType
     ): void {
         $exclusionProvider = $this->exclusionProviderRegistry->getExclusionProvider($requestType);
-        $fieldNames = $metadata->getFieldNames();
-        foreach ($fieldNames as $propertyPath) {
+        foreach ($metadata->fieldMappings as $propertyPath => $mapping) {
             if ($skipNotConfiguredCustomFields
                 && !isset($existingFields[$propertyPath])
                 && $this->entityFieldFilteringHelper->isCustomField($metadata->name, $propertyPath)
@@ -286,13 +285,15 @@ class CompleteEntityDefinitionHelper
                 continue;
             }
 
-            if (isset($existingFields[$propertyPath])) {
-                $field = $definition->getField($existingFields[$propertyPath]);
-            } else {
-                $field = $this->getOrAddNotComputedField($definition, $propertyPath);
-            }
+            $field = isset($existingFields[$propertyPath])
+                ? $definition->getField($existingFields[$propertyPath])
+                : $this->getOrAddNotComputedField($definition, $propertyPath);
             if (null === $field) {
                 continue;
+            }
+
+            if (isset($mapping['enumType']) && !$field->getDataType()) {
+                $field->setDataType(DataType::ENUM . DataType::DETAIL_DELIMITER . $mapping['enumType']);
             }
 
             if (!$field->hasExcluded()
@@ -326,8 +327,7 @@ class CompleteEntityDefinitionHelper
         RequestType $requestType
     ): void {
         $exclusionProvider = $this->exclusionProviderRegistry->getExclusionProvider($requestType);
-        $associations = $metadata->getAssociationMappings();
-        foreach ($associations as $propertyPath => $mapping) {
+        foreach ($metadata->associationMappings as $propertyPath => $mapping) {
             if ($skipNotConfiguredCustomFields
                 && !isset($existingFields[$propertyPath])
                 && $this->entityFieldFilteringHelper->isCustomAssociation($metadata->name, $propertyPath)
@@ -471,7 +471,7 @@ class CompleteEntityDefinitionHelper
                     );
                 } catch (\Exception $e) {
                     throw new \RuntimeException(
-                        sprintf(
+                        \sprintf(
                             'Cannot resolve property path "%1$s" specified for "%2$s::%3$s".'
                             . ' Check "property_path" option for this field.'
                             . ' If it is correct you can rename the target property as a possible solution.'
@@ -557,7 +557,7 @@ class CompleteEntityDefinitionHelper
             } catch (\Exception $e) {
                 $hintMessage = 'Check "depends_on" option for this field.';
                 if ($dependsOnFieldName === $fieldName) {
-                    $hintMessage .= sprintf(
+                    $hintMessage .= \sprintf(
                         ' If the value of this option is correct you can declare an excluded field'
                         . ' with "%1$s" property path. For example:%2$s'
                         . '_%1$s:%2$s    property_path: %1$s%2$s    exclude: true',
@@ -566,7 +566,7 @@ class CompleteEntityDefinitionHelper
                     );
                 }
                 throw new \RuntimeException(
-                    sprintf(
+                    \sprintf(
                         'Cannot resolve dependency to "%s" specified for "%s::%s". %s',
                         $dependsOnFieldName,
                         $entityClass,
@@ -601,9 +601,8 @@ class CompleteEntityDefinitionHelper
             $targetField = $targetDefinition->findField($targetPropertyName, true);
             if (null === $targetField) {
                 $targetFullDefinition = $this->loadFullDefinition($targetClass, $version, $requestType);
-                $targetFieldName = $targetDefinition->findField($targetPropertyName)
-                    ? $targetFullDefinition->findFieldNameByPropertyPath($targetPropertyName)
-                    : $targetPropertyName;
+                $targetFieldName = $targetFullDefinition->findFieldNameByPropertyPath($targetPropertyName)
+                    ?? $targetPropertyName;
 
                 $targetField = $targetDefinition->addField(
                     $targetFieldName,
@@ -668,13 +667,13 @@ class CompleteEntityDefinitionHelper
             $definition = $this->associationHelper->loadDefinition($entityClass, $version, $requestType);
         } catch (\Exception $e) {
             throw new \RuntimeException(
-                sprintf('The configuration for "%s" cannot be loaded.', $entityClass),
+                \sprintf('The configuration for "%s" cannot be loaded.', $entityClass),
                 0,
                 $e
             );
         }
         if (null === $definition) {
-            throw new \RuntimeException(sprintf('The configuration for "%s" was not found.', $entityClass));
+            throw new \RuntimeException(\sprintf('The configuration for "%s" was not found.', $entityClass));
         }
 
         return $definition;

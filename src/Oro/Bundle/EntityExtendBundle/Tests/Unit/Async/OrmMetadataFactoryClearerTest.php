@@ -14,6 +14,8 @@ use Doctrine\ORM\Mapping\EntityListenerResolver;
 use Oro\Bundle\EntityBundle\ORM\OroClassMetadataFactory;
 use Oro\Bundle\EntityExtendBundle\Async\OrmMetadataFactoryClearer;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
 use Symfony\Component\DependencyInjection\Container;
@@ -21,13 +23,10 @@ use Symfony\Component\DependencyInjection\Container;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
+class OrmMetadataFactoryClearerTest extends TestCase
 {
-    /** @var Container|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var OrmMetadataFactoryClearer */
-    private $clearer;
+    private Container&MockObject $container;
+    private OrmMetadataFactoryClearer $clearer;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +35,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer = new OrmMetadataFactoryClearer($this->container, 'foo_metadata_factory');
     }
 
-    public function testShouldNotGetUninitializedMetadataFactoryFromContainer()
+    public function testShouldNotGetUninitializedMetadataFactoryFromContainer(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
 
@@ -55,7 +54,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer->clear($logger);
     }
 
-    public function testShouldSkipMetadataFactoryIfItIsNotInstanceOfOroClassMetadataFactoryClass()
+    public function testShouldSkipMetadataFactoryIfItIsNotInstanceOfOroClassMetadataFactoryClass(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $metadataFactory = $this->createMock(ClassMetadataFactory::class);
@@ -77,7 +76,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer->clear($logger);
     }
 
-    public function testShouldSkipAlreadyDisconnectedMetadataFactory()
+    public function testShouldSkipAlreadyDisconnectedMetadataFactory(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
@@ -102,7 +101,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer->clear($logger);
     }
 
-    public function testShouldLogWarningIfUnexpectedTypeOfEntityManager()
+    public function testShouldLogWarningIfUnexpectedTypeOfEntityManager(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
@@ -135,7 +134,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer->clear($logger);
     }
 
-    public function testShouldSkipClosedEntityManager()
+    public function testShouldSkipClosedEntityManager(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
@@ -167,7 +166,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer->clear($logger);
     }
 
-    public function testShouldCloseEntityManagerIfItIsOpen()
+    public function testShouldCloseEntityManagerIfItIsOpen(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
@@ -218,7 +217,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer->clear($logger);
     }
 
-    public function testShouldRemoveUnneededListenersIfEventManagerIsInstanceOfContainerAwareEventManagerClass()
+    public function testShouldRemoveUnneededListenersIfEventManagerIsInstanceOfContainerAwareEventManagerClass(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
@@ -304,7 +303,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldLogWarningIfListenersPropertyOfEventManagerIsNotArray()
+    public function testShouldLogWarningIfListenersPropertyOfEventManagerIsNotArray(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
@@ -362,7 +361,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer->clear($logger);
     }
 
-    public function testShouldLogWarningIfInitializedPropertyOfEventManagerIsNotArray()
+    public function testShouldLogWarningIfInitializedPropertyOfEventManagerIsNotArray(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
@@ -420,7 +419,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer->clear($logger);
     }
 
-    public function testShouldClearEntityListenerResolver()
+    public function testShouldClearEntityListenerResolver(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
@@ -475,7 +474,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer->clear($logger);
     }
 
-    public function testShouldNotCloseConnectionIfItIsAlreadyClosed()
+    public function testShouldNotCloseConnectionIfItIsAlreadyClosed(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
@@ -523,7 +522,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer->clear($logger);
     }
 
-    public function testShouldCloseConnectionIfItIsOpen()
+    public function testShouldCloseConnectionIfItIsOpen(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
@@ -572,7 +571,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
         $this->clearer->clear($logger);
     }
 
-    public function testShouldRemoveSqlLoggerFromConnection()
+    public function testShouldRemoveSqlLoggerFromConnection(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $metadataFactory = $this->createMock(OroClassMetadataFactory::class);
@@ -620,7 +619,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($configuration->getSQLLogger());
     }
 
-    public function testShouldRemoveTransactionWatcherFromConnection()
+    public function testShouldRemoveTransactionWatcherFromConnection(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $metadataFactory = $this->createMock(OroClassMetadataFactory::class);

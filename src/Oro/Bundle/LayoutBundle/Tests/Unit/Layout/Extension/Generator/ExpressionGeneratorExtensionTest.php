@@ -7,16 +7,15 @@ use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ExpressionGeneratorExtens
 use Oro\Component\Layout\Exception\SyntaxException;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
-class ExpressionGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
+class ExpressionGeneratorExtensionTest extends TestCase
 {
-    /** @var ExpressionLanguage|\PHPUnit\Framework\MockObject\MockObject */
-    private $expressionLanguage;
-
-    /** @var ExpressionGeneratorExtension */
-    private $extension;
+    private ExpressionLanguage&MockObject $expressionLanguage;
+    private ExpressionGeneratorExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class ExpressionGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new ExpressionGeneratorExtension($this->expressionLanguage);
     }
 
-    public function testNoConditions()
+    public function testNoConditions(): void
     {
         $visitors = new VisitorCollection();
 
@@ -41,7 +40,7 @@ class ExpressionGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $visitors);
     }
 
-    public function testEmptyConditions()
+    public function testEmptyConditions(): void
     {
         $visitors = new VisitorCollection();
 
@@ -56,7 +55,7 @@ class ExpressionGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $visitors);
     }
 
-    public function testHasConditions()
+    public function testHasConditions(): void
     {
         $visitors = new VisitorCollection();
 
@@ -76,7 +75,7 @@ class ExpressionGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(ExpressionConditionVisitor::class, $visitors->current());
     }
 
-    public function testInvalidConditions()
+    public function testInvalidConditions(): void
     {
         $this->expectException(SyntaxException::class);
         $this->expectExceptionMessage('Syntax error: invalid conditions. some error at "conditions"');

@@ -9,14 +9,13 @@ use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterf
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Fixtures\TestTemplateEntityRepository;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TemplateManagerTest extends \PHPUnit\Framework\TestCase
+class TemplateManagerTest extends TestCase
 {
-    /** @var TemplateEntityRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityRegistry;
-
-    /** @var TemplateManager */
-    private $templateManager;
+    private TemplateEntityRegistry&MockObject $entityRegistry;
+    private TemplateManager $templateManager;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
         $this->templateManager = new TemplateManager($this->entityRegistry);
     }
 
-    public function testHasEntityRepository()
+    public function testHasEntityRepository(): void
     {
         $repository = $this->createMock(TemplateEntityRepositoryInterface::class);
         $repository->expects($this->once())
@@ -43,7 +42,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasEntityFixture()
+    public function testHasEntityFixture(): void
     {
         $repository = $this->createMock(TemplateEntityRepositoryInterface::class);
         $repository->expects($this->once())
@@ -69,7 +68,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityRepository()
+    public function testGetEntityRepository(): void
     {
         $repository = $this->createMock(TemplateEntityRepositoryInterface::class);
         $repository->expects($this->once())
@@ -95,7 +94,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityRepositoryForUnknownEntityType()
+    public function testGetEntityRepositoryForUnknownEntityType(): void
     {
         $repository = $this->templateManager->getEntityFixture('Test\Entity1');
 
@@ -106,7 +105,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Test\Entity1', $repository->getEntityClass());
     }
 
-    public function testGetEntityFixture()
+    public function testGetEntityFixture(): void
     {
         $repository = $this->createMock(TemplateEntityRepositoryInterface::class);
         $repository->expects($this->once())
@@ -127,7 +126,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityFixtureForUnknownEntityType()
+    public function testGetEntityFixtureForUnknownEntityType(): void
     {
         $fixture = $this->templateManager->getEntityFixture('Test\Entity1');
 
@@ -138,7 +137,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Test\Entity1', $fixture->getEntityClass());
     }
 
-    public function testFrozenTemplateManager()
+    public function testFrozenTemplateManager(): void
     {
         $repository = $this->createMock(TemplateEntityRepositoryInterface::class);
         $repository->expects($this->once())
@@ -161,7 +160,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
         $this->templateManager->addEntityRepository($anotherRepository);
     }
 
-    public function testInitialization()
+    public function testInitialization(): void
     {
         $repository = new TestTemplateEntityRepository();
         $this->templateManager->addEntityRepository($repository);

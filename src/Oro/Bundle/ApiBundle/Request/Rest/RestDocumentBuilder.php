@@ -167,6 +167,9 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     {
         $properties = $metadata->getMetaProperties();
         foreach ($properties as $name => $property) {
+            if ($property->isAssociationLevel()) {
+                continue;
+            }
             if (!$property->isOutput()) {
                 continue;
             }
@@ -271,15 +274,29 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         try {
             $targetMetadata = $this->getTargetMetadataProvider()
                 ->getAssociationTargetMetadata($object, $associationMetadata);
+            $data = $this->objectAccessor->toArray($object);
             if ($targetMetadata && $this->hasIdentifierFieldsOnly($targetMetadata)) {
-                $data = $this->objectAccessor->toArray($object);
-
                 return \count($data) === 1
                     ? reset($data)
                     : $data;
             }
 
-            return $this->convertObjectToArray($object, $requestType, $targetMetadata);
+            $result = $this->convertObjectToArray($object, $requestType, $targetMetadata);
+            foreach ($data as $name => $value) {
+                $property = $targetMetadata->getPropertyByPropertyPath($name);
+                if (null !== $property) {
+                    $metaProperty = $targetMetadata->getMetaProperty($property->getName());
+                    if (null !== $metaProperty) {
+                        if ($metaProperty->isAssociationLevel()) {
+                            $result[$metaProperty->getResultName()] = $value;
+                        } else {
+                            unset($result[$metaProperty->getResultName()]);
+                        }
+                    }
+                }
+            }
+
+            return $result;
         } finally {
             $this->resultDataAccessor->removeLastEntity();
         }

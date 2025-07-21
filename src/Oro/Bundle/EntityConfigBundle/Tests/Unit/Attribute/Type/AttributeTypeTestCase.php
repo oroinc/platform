@@ -9,21 +9,18 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TranslationBundle\Entity\Language;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-abstract class AttributeTypeTestCase extends \PHPUnit\Framework\TestCase
+abstract class AttributeTypeTestCase extends TestCase
 {
     protected const CLASS_NAME = Item::class;
     protected const FIELD_NAME = 'test_field_name';
     protected const LOCALE = 'de';
 
-    /** @var FieldConfigModel */
-    protected $attribute;
-
-    /** @var Localization */
-    protected $localization;
-
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityNameResolver;
+    protected FieldConfigModel $attribute;
+    protected Localization $localization;
+    protected EntityNameResolver&MockObject $entityNameResolver;
 
     #[\Override]
     protected function setUp(): void
@@ -42,15 +39,13 @@ abstract class AttributeTypeTestCase extends \PHPUnit\Framework\TestCase
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
         $this->entityNameResolver->expects($this->any())
             ->method('getName')
-            ->willReturnCallback(
-                function ($entity, $format, $locale) {
-                    return sprintf(
-                        'resolved %s name in %s locale',
-                        is_object($entity) ? get_class($entity) : (string)$entity,
-                        $locale->getLanguageCode()
-                    );
-                }
-            );
+            ->willReturnCallback(function ($entity, $format, $locale) {
+                return sprintf(
+                    'resolved %s name in %s locale',
+                    is_object($entity) ? get_class($entity) : (string)$entity,
+                    $locale->getLanguageCode()
+                );
+            });
     }
 
     abstract protected function getAttributeType(): AttributeTypeInterface;
@@ -58,7 +53,7 @@ abstract class AttributeTypeTestCase extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider configurationMethodsDataProvider
      */
-    public function testConfigurationMethods(bool $isSearchable, bool $isFilterable, bool $isSortable)
+    public function testConfigurationMethods(bool $isSearchable, bool $isFilterable, bool $isSortable): void
     {
         $type = $this->getAttributeType();
 

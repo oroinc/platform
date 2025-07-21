@@ -3,11 +3,12 @@
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Routing;
 
 use Oro\Bundle\DistributionBundle\Routing\SharedData;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouteCollection;
 
-class SharedDataTest extends \PHPUnit\Framework\TestCase
+class SharedDataTest extends TestCase
 {
-    public function testRoutes()
+    public function testRoutes(): void
     {
         $sharedData = new SharedData();
 

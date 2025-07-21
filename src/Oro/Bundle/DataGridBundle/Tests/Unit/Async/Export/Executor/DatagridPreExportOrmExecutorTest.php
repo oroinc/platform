@@ -24,22 +24,18 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DatagridPreExportOrmExecutorTest extends \PHPUnit\Framework\TestCase
+class DatagridPreExportOrmExecutorTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject $messageProducer;
-
-    private MaterializedViewManager|\PHPUnit\Framework\MockObject\MockObject $materializedViewManager;
-
-    private MaterializedViewByDatagridFactory|\PHPUnit\Framework\MockObject\MockObject
-        $materializedViewByDatagridFactory;
-
-    private DependentJobService|\PHPUnit\Framework\MockObject\MockObject $dependentJobService;
-
-    private TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject $tokenAccessor;
-
+    private MessageProducerInterface&MockObject $messageProducer;
+    private MaterializedViewManager&MockObject $materializedViewManager;
+    private MaterializedViewByDatagridFactory&MockObject $materializedViewByDatagridFactory;
+    private DependentJobService&MockObject $dependentJobService;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
     private DatagridPreExportOrmExecutor $executor;
 
     #[\Override]
@@ -70,8 +66,7 @@ class DatagridPreExportOrmExecutorTest extends \PHPUnit\Framework\TestCase
         $datagrid->setDatasource(new ArrayDatasource());
         $options = ['sample-key' => 'sample-value'];
 
-        $this->tokenAccessor
-            ->expects(self::any())
+        $this->tokenAccessor->expects(self::any())
             ->method('getUserId')
             ->willReturn(42);
 
@@ -86,8 +81,7 @@ class DatagridPreExportOrmExecutorTest extends \PHPUnit\Framework\TestCase
         $datagrid->setDatasource($this->createMock(OrmDatasource::class));
         $options = ['sample-key' => 'sample-value'];
 
-        $this->tokenAccessor
-            ->expects(self::once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUserId')
             ->willReturn(null);
 
@@ -102,8 +96,7 @@ class DatagridPreExportOrmExecutorTest extends \PHPUnit\Framework\TestCase
         $datagrid->setDatasource($this->createMock(OrmDatasource::class));
         $options = ['sample-key' => 'sample-value'];
 
-        $this->tokenAccessor
-            ->expects(self::once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUserId')
             ->willReturn(42);
 
@@ -117,16 +110,14 @@ class DatagridPreExportOrmExecutorTest extends \PHPUnit\Framework\TestCase
         $datagrid = new Datagrid('sample-datagrid', DatagridConfiguration::create([]), new ParameterBag());
         $options = ['sample-key' => 'sample-value'];
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('error')
             ->with(
                 'Cannot execute job {jobName}: no authenticated user is found',
                 ['jobName' => $job->getName(), 'datagrid' => $datagrid, 'options' => $options]
             );
 
-        $this->tokenAccessor
-            ->expects(self::once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUserId')
             ->willReturn(null);
 
@@ -153,28 +144,24 @@ class DatagridPreExportOrmExecutorTest extends \PHPUnit\Framework\TestCase
         ];
 
         $ormDatasource = $this->createMock(OrmDatasource::class);
-        $ormDatasource
-            ->expects(self::once())
+        $ormDatasource->expects(self::once())
             ->method('getRootEntityName')
             ->willReturn(\stdClass::class);
         $datagrid->setDatasource($ormDatasource);
 
         $userId = 42;
-        $this->tokenAccessor
-            ->expects(self::any())
+        $this->tokenAccessor->expects(self::any())
             ->method('getUserId')
             ->willReturn($userId);
 
         $materializedView = (new MaterializedView())
             ->setName('sample_materialized_view');
-        $this->materializedViewByDatagridFactory
-            ->expects(self::once())
+        $this->materializedViewByDatagridFactory->expects(self::once())
             ->method('createByDatagrid')
             ->with($datagrid)
             ->willReturn($materializedView);
 
-        $this->dependentJobService
-            ->expects(self::once())
+        $this->dependentJobService->expects(self::once())
             ->method('addDependentMessages')
             ->with($rootJob, [
                 DeleteMaterializedViewTopic::getName() => ['materializedViewName' => $materializedView->getName()],
@@ -190,22 +177,19 @@ class DatagridPreExportOrmExecutorTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $materializedViewRepo = $this->createMock(MaterializedViewRepository::class);
-        $this->materializedViewManager
-            ->expects(self::once())
+        $this->materializedViewManager->expects(self::once())
             ->method('getRepository')
             ->with($materializedView->getName())
             ->willReturn($materializedViewRepo);
 
-        $materializedViewRepo
-            ->expects(self::once())
+        $materializedViewRepo->expects(self::once())
             ->method('getRowsCount')
             ->willReturn(0);
 
         $childJob = new Job();
         $childJob->setId(142);
 
-        $this->messageProducer
-            ->expects(self::once())
+        $this->messageProducer->expects(self::once())
             ->method('send')
             ->with(
                 DatagridExportTopic::getName(),
@@ -229,8 +213,7 @@ class DatagridPreExportOrmExecutorTest extends \PHPUnit\Framework\TestCase
             $userId,
             $options['outputFormat']
         );
-        $jobRunner
-            ->expects(self::once())
+        $jobRunner->expects(self::once())
             ->method('createDelayed')
             ->with($jobName, self::isType('callable'))
             ->willReturnCallback(function (string $jobName, callable $callback) use ($childJob) {
@@ -260,28 +243,24 @@ class DatagridPreExportOrmExecutorTest extends \PHPUnit\Framework\TestCase
         ];
 
         $ormDatasource = $this->createMock(OrmDatasource::class);
-        $ormDatasource
-            ->expects(self::once())
+        $ormDatasource->expects(self::once())
             ->method('getRootEntityName')
             ->willReturn(\stdClass::class);
         $datagrid->setDatasource($ormDatasource);
 
         $userId = 42;
-        $this->tokenAccessor
-            ->expects(self::any())
+        $this->tokenAccessor->expects(self::any())
             ->method('getUserId')
             ->willReturn($userId);
 
         $materializedView = (new MaterializedView())
             ->setName('sample_materialized_view');
-        $this->materializedViewByDatagridFactory
-            ->expects(self::once())
+        $this->materializedViewByDatagridFactory->expects(self::once())
             ->method('createByDatagrid')
             ->with($datagrid)
             ->willReturn($materializedView);
 
-        $this->dependentJobService
-            ->expects(self::once())
+        $this->dependentJobService->expects(self::once())
             ->method('addDependentMessages')
             ->with($rootJob, [
                 DeleteMaterializedViewTopic::getName() => ['materializedViewName' => $materializedView->getName()],
@@ -297,20 +276,17 @@ class DatagridPreExportOrmExecutorTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $materializedViewRepo = $this->createMock(MaterializedViewRepository::class);
-        $this->materializedViewManager
-            ->expects(self::once())
+        $this->materializedViewManager->expects(self::once())
             ->method('getRepository')
             ->with($materializedView->getName())
             ->willReturn($materializedViewRepo);
 
         $rowsCount = 3;
-        $materializedViewRepo
-            ->expects(self::once())
+        $materializedViewRepo->expects(self::once())
             ->method('getRowsCount')
             ->willReturn($rowsCount);
 
-        $this->loggerMock
-            ->expects(self::exactly(2))
+        $this->loggerMock->expects(self::exactly(2))
             ->method('info')
             ->withConsecutive(
                 [
@@ -337,8 +313,7 @@ class DatagridPreExportOrmExecutorTest extends \PHPUnit\Framework\TestCase
         $childJob2 = new Job();
         $childJob2->setId(242);
 
-        $this->messageProducer
-            ->expects(self::exactly(2))
+        $this->messageProducer->expects(self::exactly(2))
             ->method('send')
             ->withConsecutive(
                 [
@@ -379,8 +354,7 @@ class DatagridPreExportOrmExecutorTest extends \PHPUnit\Framework\TestCase
             $options['outputFormat']
         );
         $childJobs = [$childJob1, $childJob2];
-        $jobRunner
-            ->expects(self::exactly(2))
+        $jobRunner->expects(self::exactly(2))
             ->method('createDelayed')
             ->withConsecutive(
                 [$jobName . '1', self::isType('callable')],

@@ -3,9 +3,10 @@
 namespace Oro\Bundle\AssetBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\AssetBundle\DependencyInjection\Configuration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit\Framework\TestCase
+class ConfigurationTest extends TestCase
 {
     private function processConfiguration(array $config): array
     {
@@ -60,6 +61,14 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'port' => 8081,
                         'https' => false,
                     ],
+                    'external_resources' => [],
+                    'settings' => [
+                        'resolved' => true,
+                        'subresource_integrity_enabled' => [
+                            'value' => true,
+                            'scope' => 'app'
+                        ],
+                    ]
                 ],
             ],
             [
@@ -75,6 +84,18 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'port' => 65000,
                         'https' => true,
                     ],
+                    'external_resources' => [
+                        'test1' => [
+                            'link' => 'http://example.local/test1.js',
+                        ]
+                    ],
+                    'settings' => [
+                        'resolved' => true,
+                        'subresource_integrity_enabled' => [
+                            'value' => true,
+                            'scope' => 'app'
+                        ],
+                    ]
                 ],
                 'expects' => [
                     'with_babel' => false,
@@ -88,6 +109,18 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'port' => 65000,
                         'https' => true,
                     ],
+                    'external_resources' => [
+                        'test1' => [
+                            'link' => 'http://example.local/test1.js',
+                        ]
+                    ],
+                    'settings' => [
+                        'resolved' => true,
+                        'subresource_integrity_enabled' => [
+                            'value' => true,
+                            'scope' => 'app'
+                        ],
+                    ]
                 ],
             ],
         ];

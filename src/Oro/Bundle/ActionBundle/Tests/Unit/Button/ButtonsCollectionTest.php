@@ -7,14 +7,13 @@ use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Exception\ButtonCollectionMapException;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ButtonsCollectionTest extends \PHPUnit\Framework\TestCase
+class ButtonsCollectionTest extends TestCase
 {
-    /** @var ButtonSearchContext|\PHPUnit\Framework\MockObject\MockObject */
-    private $searchContext;
-
-    /** @var ButtonsCollection */
-    private $collection;
+    private ButtonSearchContext&MockObject $searchContext;
+    private ButtonsCollection $collection;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class ButtonsCollectionTest extends \PHPUnit\Framework\TestCase
         $this->collection = new ButtonsCollection();
     }
 
-    public function testConsume()
+    public function testConsume(): void
     {
         $extension1 = $this->getExtension([$this->getButton(1), $this->getButton(1)]);
         $extension2 = $this->getExtension([$this->getButton(1)]);
@@ -39,7 +38,7 @@ class ButtonsCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(3, $this->collection);
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $buttons = [$this->getButton(1), $this->getButton(1)];
         $this->collection->consume($this->getExtension($buttons), $this->searchContext);
@@ -47,7 +46,7 @@ class ButtonsCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($buttons, $this->collection->toArray());
     }
 
-    public function testToList()
+    public function testToList(): void
     {
         $button1 = $this->getButton(1);
         $button2 = $this->getButton(2);
@@ -57,7 +56,7 @@ class ButtonsCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([$button1, $button2], $this->collection->toList(), 'Must be ordered list.');
     }
 
-    public function testFilter()
+    public function testFilter(): void
     {
         $button1 = $this->getButton(1);
         $button2 = $this->getButton(2);
@@ -74,7 +73,7 @@ class ButtonsCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([$button2], $filtered->toArray(), 'Same buttons instances but filtered.');
     }
 
-    public function testMap()
+    public function testMap(): void
     {
         $button1 = $this->getButton(2);
         $button2 = $this->getButton(1);
@@ -92,7 +91,7 @@ class ButtonsCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$button1, $button2], $mapped->toArray(), 'Buttons are equals by data.');
     }
 
-    public function testMapException()
+    public function testMapException(): void
     {
         $button = $this->getButton(1);
         $extension = $this->getExtension([$button]);
@@ -112,12 +111,12 @@ class ButtonsCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetIterator()
+    public function testGetIterator(): void
     {
         $this->assertInstanceOf(\ArrayIterator::class, $this->collection->getIterator());
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         $buttons = [$this->getButton(1), $this->getButton(1)];
         $extension = $this->getExtension($buttons);

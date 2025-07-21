@@ -13,11 +13,12 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PhoneProviderTest extends \PHPUnit\Framework\TestCase
+class PhoneProviderTest extends TestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendConfigProvider;
+    private ConfigProvider&MockObject $extendConfigProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -51,7 +52,7 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPhoneNumberProvider
      */
-    public function testGetPhoneNumber(object|string|null $object, ?string $expected)
+    public function testGetPhoneNumber(object|string|null $object, ?string $expected): void
     {
         $phoneProvider = $this->createMock(PhoneProviderInterface::class);
         $phoneProvider->expects($this->any())
@@ -67,7 +68,7 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPhoneNumbersProvider
      */
-    public function testGetPhoneNumbers(object|string|null $object, array $expected)
+    public function testGetPhoneNumbers(object|string|null $object, array $expected): void
     {
         $phoneProvider = $this->createMock(PhoneProviderInterface::class);
         $phoneProvider->expects($this->any())
@@ -80,7 +81,7 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $provider->getPhoneNumbers($object));
     }
 
-    public function testGetPhoneNumberFromRelatedObjectNotConfigurableEntity()
+    public function testGetPhoneNumberFromRelatedObjectNotConfigurableEntity(): void
     {
         $object = new TestCustomEntity();
         $object->setUser(new TestUser('user phone'));
@@ -97,7 +98,7 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($provider->getPhoneNumber($object));
     }
 
-    public function testGetPhoneNumbersFromRelatedObjectNotConfigurableEntity()
+    public function testGetPhoneNumbersFromRelatedObjectNotConfigurableEntity(): void
     {
         $object = new TestCustomEntity();
         $object->setUser(new TestUser('user phone'));
@@ -114,7 +115,7 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $provider->getPhoneNumbers($object));
     }
 
-    public function testGetPhoneNumberFromRelatedObjectNoTargetEntities()
+    public function testGetPhoneNumberFromRelatedObjectNoTargetEntities(): void
     {
         $object = new TestCustomEntity();
         $object->setUser(new TestUser('user phone'));
@@ -156,7 +157,7 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(null, $provider->getPhoneNumber($object));
     }
 
-    public function testGetPhoneNumbersFromRelatedObjectNoTargetEntities()
+    public function testGetPhoneNumbersFromRelatedObjectNoTargetEntities(): void
     {
         $object = new TestCustomEntity();
         $object->setUser(new TestUser('user phone'));
@@ -198,7 +199,7 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $provider->getPhoneNumbers($object));
     }
 
-    public function testGetPhoneNumberFromRelatedObject()
+    public function testGetPhoneNumberFromRelatedObject(): void
     {
         $object = new TestCustomEntity();
         $object->setUser(new TestUser('user phone'));
@@ -250,7 +251,7 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('123-123', $provider->getPhoneNumber($object));
     }
 
-    public function testGetPhoneNumbersFromRelatedObject()
+    public function testGetPhoneNumbersFromRelatedObject(): void
     {
         $object = new TestCustomEntity();
         $testUser = new TestUser('user phone');

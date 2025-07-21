@@ -17,31 +17,24 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
+class GridViewsExtensionTest extends TestCase
 {
     use EntityTrait;
 
     private const GRID_VIEW_ID_1 = 101;
     private const GRID_VIEW_ID_2 = 202;
 
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var ServiceLink|\PHPUnit\Framework\MockObject\MockObject */
-    private $serviceLink;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var GridViewsExtension */
-    private $gridViewsExtension;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private ServiceLink&MockObject $serviceLink;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private GridViewsExtension $gridViewsExtension;
 
     #[\Override]
     protected function setUp(): void
@@ -73,7 +66,7 @@ class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitMetadataShouldAddGridViewsFromEvent()
+    public function testVisitMetadataShouldAddGridViewsFromEvent(): void
     {
         $data = MetadataObject::create([]);
         $config = DatagridConfiguration::create(
@@ -120,7 +113,7 @@ class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedViews, $data->offsetGet('gridViews'));
     }
 
-    public function testVisitMetadataForCachedDefaultView()
+    public function testVisitMetadataForCachedDefaultView(): void
     {
         $user = $this->getEntity(User::class, ['id' => 42]);
         $grid1 = 'test_grid_1';
@@ -165,7 +158,7 @@ class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isApplicableDataProvider
      */
-    public function testIsApplicable(array $input, bool $expected)
+    public function testIsApplicable(array $input, bool $expected): void
     {
         $this->gridViewsExtension->setParameters(new ParameterBag($input));
         $config = DatagridConfiguration::create(
@@ -205,7 +198,7 @@ class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setParametersDataProvider
      */
-    public function testSetParameters(array $input, array $expected)
+    public function testSetParameters(array $input, array $expected): void
     {
         $this->gridViewsExtension->setParameters(new ParameterBag($input));
         $this->assertEquals($expected, $this->gridViewsExtension->getParameters()->all());

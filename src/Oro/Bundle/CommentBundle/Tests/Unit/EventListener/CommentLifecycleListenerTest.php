@@ -14,11 +14,8 @@ use PHPUnit\Framework\TestCase;
 
 class CommentLifecycleListenerTest extends TestCase
 {
-    /** @var CommentLifecycleListener */
-    private $subscriber;
-
-    /** @var TokenAccessorInterface|MockObject */
-    private $tokenAccessor;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private CommentLifecycleListener $subscriber;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +33,7 @@ class CommentLifecycleListenerTest extends TestCase
         bool $mockUser = false,
         ?bool $detachedUser = null,
         ?bool $reloadUser = null
-    ) {
+    ): void {
         $oldUser = new User();
         $oldUser->setFirstName('oldUser');
 
@@ -99,11 +96,10 @@ class CommentLifecycleListenerTest extends TestCase
         ];
     }
 
-    /**
-     * @return EntityManagerInterface|MockObject
-     */
-    private function getEntityManagerMock(bool $reloadUser = false, ?User $newUser = null)
-    {
+    private function getEntityManagerMock(
+        bool $reloadUser = false,
+        ?User $newUser = null
+    ): EntityManagerInterface&MockObject {
         $result = $this->createMock(EntityManagerInterface::class);
 
         if ($reloadUser) {

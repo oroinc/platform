@@ -6,11 +6,11 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreFlushEventArgs;
 use Oro\Bundle\EntityBundle\EventListener\DoctrineFlushProgressListener;
+use PHPUnit\Framework\TestCase;
 
-class DoctrineFlushProgressListenerTest extends \PHPUnit\Framework\TestCase
+class DoctrineFlushProgressListenerTest extends TestCase
 {
-    /** @var DoctrineFlushProgressListener */
-    private $listener;
+    private DoctrineFlushProgressListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -18,13 +18,13 @@ class DoctrineFlushProgressListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new DoctrineFlushProgressListener();
     }
 
-    public function testIsFlushInProgressWithoutAnyDoctrineCalls()
+    public function testIsFlushInProgressWithoutAnyDoctrineCalls(): void
     {
         $em = $this->createMock(EntityManager::class);
         $this->assertFalse($this->listener->isFlushInProgress($em));
     }
 
-    public function testIsFlushInProgress()
+    public function testIsFlushInProgress(): void
     {
         $em = $this->createMock(EntityManager::class);
         $preFlushEvent = new PreFlushEventArgs($em);
@@ -38,7 +38,7 @@ class DoctrineFlushProgressListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->listener->isFlushInProgress($em));
     }
 
-    public function testIsFlushInProgressHandlesDifferentEntityManagers()
+    public function testIsFlushInProgressHandlesDifferentEntityManagers(): void
     {
         $em1 = $this->createMock(EntityManager::class);
         $preFlushEvent = new PreFlushEventArgs($em1);

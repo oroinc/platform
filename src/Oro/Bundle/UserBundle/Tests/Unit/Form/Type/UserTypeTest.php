@@ -13,6 +13,8 @@ use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Oro\Bundle\UserBundle\Form\Provider\RolesChoicesForUserProvider;
 use Oro\Bundle\UserBundle\Form\Type\ChangePasswordType;
 use Oro\Bundle\UserBundle\Form\Type\UserType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -25,7 +27,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class UserTypeTest extends \PHPUnit\Framework\TestCase
+class UserTypeTest extends TestCase
 {
     private const MY_PROFILE_ROUTE = 'oro_user_profile_update';
     private const OTHER_PROFILE_ROUTE = 'oro_user_update';
@@ -34,17 +36,10 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
     private const RULE_GROUP = 'oro_user_group_view';
     private const RULE_ROLE = 'oro_user_role_view';
 
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var PasswordFieldOptionsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $optionsProvider;
-
-    /** @var RolesChoicesForUserProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $rolesChoicesForUserProvider;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private PasswordFieldOptionsProvider&MockObject $optionsProvider;
+    private RolesChoicesForUserProvider&MockObject $rolesChoicesForUserProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -58,7 +53,7 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider addEntityFieldsDataProvider
      */
-    public function testAddEntityFields(array $permissions, bool $isMyProfile)
+    public function testAddEntityFields(array $permissions, bool $isMyProfile): void
     {
         $user = new User();
         $user->setId(1);
@@ -206,7 +201,7 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())

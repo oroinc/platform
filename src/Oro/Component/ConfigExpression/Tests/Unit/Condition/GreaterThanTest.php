@@ -3,25 +3,26 @@
 namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\Condition\GreaterThan;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class GreaterThanTest extends \PHPUnit\Framework\TestCase
+class GreaterThanTest extends TestCase
 {
-    /** @var Condition\GreaterThan */
-    protected $condition;
+    private Condition\GreaterThan $condition;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->condition = new Condition\GreaterThan();
+        $this->condition = new GreaterThan();
         $this->condition->setContextAccessor(new ContextAccessor());
     }
 
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, $context, $expectedResult)
+    public function testEvaluate(array $options, $context, $expectedResult): void
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -53,7 +54,7 @@ class GreaterThanTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray($options, $message, $expected)
+    public function testToArray($options, $message, $expected): void
     {
         $this->condition->initialize($options);
         if ($message !== null) {
@@ -97,7 +98,7 @@ class GreaterThanTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile($options, $message, $expected)
+    public function testCompile($options, $message, $expected): void
     {
         $this->condition->initialize($options);
         if ($message !== null) {

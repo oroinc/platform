@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\UIBundle\EventListener\SymfonyDebugToolbarReplaceListener;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,11 +13,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class SymfonyDebugToolbarReplaceListenerTest extends TestCase
 {
-    /** @var KernelInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $kernel;
-
-    /** @var SymfonyDebugToolbarReplaceListener */
-    private $listener;
+    private KernelInterface&MockObject $kernel;
+    private SymfonyDebugToolbarReplaceListener $listener;
 
     #[\Override]
     protected function setUp(): void

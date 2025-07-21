@@ -5,23 +5,23 @@ namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Datagrid\Extension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
+use PHPUnit\Framework\TestCase;
 
-class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
+class EntityPaginationExtensionTest extends TestCase
 {
-    /** @var EntityPaginationExtension */
-    private $extension;
+    private EntityPaginationExtension $extension;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->extension  = new EntityPaginationExtension();
+        $this->extension = new EntityPaginationExtension();
         $this->extension->setParameters(new ParameterBag());
     }
 
     /**
      * @dataProvider isApplicableProvider
      */
-    public function testIsApplicable(array $input, bool $result)
+    public function testIsApplicable(array $input, bool $result): void
     {
         $this->assertEquals(
             $this->extension->isApplicable(DatagridConfiguration::create($input)),
@@ -32,7 +32,7 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processConfigsProvider
      */
-    public function testProcessConfigs(array $input, bool $result)
+    public function testProcessConfigs(array $input, bool $result): void
     {
         $config = DatagridConfiguration::create($input);
         $this->extension->processConfigs($config);
@@ -42,7 +42,7 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessException()
+    public function testProcessException(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Entity pagination is not boolean');

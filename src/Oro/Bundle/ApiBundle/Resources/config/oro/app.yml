@@ -153,6 +153,8 @@ oro_api:
         text[]: array of strings
         ascii_string: string
         ascii_string[]: array of string
+        enum: string
+        enum[]: array of strings
         guid: string
         guid[]: array of strings
         json: object
@@ -211,6 +213,7 @@ oro_api:
             smallint: [integer]
             text: [string, {format: text}]
             ascii_string: [string, {format: ascii}]
+            enum: [string, {format: word, pattern: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEnum::REQUIREMENT}]
             guid: [string, {format: guid, pattern: !php/const Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeGuid::REQUIREMENT}]
             percent: [number]
             percent_100: [number]
@@ -338,6 +341,7 @@ oro_api:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         datetime:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
+        enum: ~
         guid: ~
         text:
             class: Oro\Bundle\ApiBundle\Filter\StringComparisonFilter
@@ -402,6 +406,7 @@ oro_api:
         - string
         - text
         - boolean
+        - enum
         - guid
         - currency
 
@@ -424,8 +429,10 @@ oro_api:
         - Oro\Bundle\ApiBundle\Form\Type\NumberType
         - Oro\Bundle\ApiBundle\Form\Type\DateTimeType
         - Oro\Bundle\ApiBundle\Form\Type\ArrayType
+        - Oro\Bundle\ApiBundle\Form\Type\EnumType
         - Oro\Bundle\ApiBundle\Form\Type\CollectionType
         - Oro\Bundle\ApiBundle\Form\Type\EntityCollectionType
+        - Oro\Bundle\ApiBundle\Form\Type\GuidType
         - Oro\Bundle\ApiBundle\Form\Type\Percent100Type
         - Oro\Bundle\FormBundle\Form\Type\OroDurationType
 
@@ -466,6 +473,12 @@ oro_api:
             form_type: Oro\Bundle\ApiBundle\Form\Type\DateTimeType
         text:
             form_type: Symfony\Component\Form\Extension\Core\Type\TextareaType
+        enum:
+            form_type: Oro\Bundle\ApiBundle\Form\Type\EnumType
+            options:
+                class: '{data_type_detail}'
+        guid:
+            form_type: Oro\Bundle\ApiBundle\Form\Type\GuidType
         percent:
             form_type: Symfony\Component\Form\Extension\Core\Type\NumberType
         percent_100:

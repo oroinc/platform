@@ -4,8 +4,9 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\DoctrineExtensions\DBAL\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Oro\Bundle\EntityBundle\DoctrineExtensions\DBAL\Types\DurationType;
+use PHPUnit\Framework\TestCase;
 
-class DurationTypeTest extends \PHPUnit\Framework\TestCase
+class DurationTypeTest extends TestCase
 {
     private DurationType $type;
 
@@ -18,7 +19,7 @@ class DurationTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider convertToDatabaseValueDataProvider
      */
-    public function testConvertToDatabaseValue(mixed $value, mixed $expected)
+    public function testConvertToDatabaseValue(mixed $value, mixed $expected): void
     {
         $this->assertSame(
             $expected,
@@ -39,7 +40,7 @@ class DurationTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider convertToPHPValueDataProvider
      */
-    public function testConvertToPHPValue(mixed $value, mixed $expected)
+    public function testConvertToPHPValue(mixed $value, mixed $expected): void
     {
         $this->assertSame(
             $expected,

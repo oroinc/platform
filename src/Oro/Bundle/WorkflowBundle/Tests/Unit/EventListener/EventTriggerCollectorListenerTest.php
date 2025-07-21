@@ -11,20 +11,16 @@ use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\EventListener\EventTriggerCollectorListener;
 use Oro\Bundle\WorkflowBundle\EventListener\Extension\EventTriggerExtensionInterface;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
+class EventTriggerCollectorListenerTest extends TestCase
 {
     private const ENTITY = 'stdClass';
     private const FIELD = 'field';
 
-    /** @var EventTriggerExtensionInterface|MockObject */
-    private $extension1;
-
-    /** @var EventTriggerExtensionInterface|MockObject */
-    private $extension2;
-
-    /** @var EventTriggerCollectorListener */
-    private $listener;
+    private EventTriggerExtensionInterface&MockObject $extension1;
+    private EventTriggerExtensionInterface&MockObject $extension2;
+    private EventTriggerCollectorListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +31,7 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new EventTriggerCollectorListener([$this->extension1, $this->extension2]);
     }
 
-    public function testSetEnabledFalsePreventsEventProcessingExceptOnClear()
+    public function testSetEnabledFalsePreventsEventProcessingExceptOnClear(): void
     {
         $this->listener->setEnabled(false);
 
@@ -77,7 +73,7 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onClear($onClearArgs);
     }
 
-    public function testForceQueued()
+    public function testForceQueued(): void
     {
         $this->extension1->expects(self::once())
             ->method('setForceQueued')
@@ -96,7 +92,7 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider preFunctionNotEnabledProvider
      */
-    public function testPreFunctionNotEnabled(string $event)
+    public function testPreFunctionNotEnabled(string $event): void
     {
         $entity = new \stdClass();
 
@@ -126,7 +122,7 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider preFunctionProvider
      */
-    public function testPreFunction(string $event, ?array $changeSet = null, ?array $expectedChangeSet = null)
+    public function testPreFunction(string $event, ?array $changeSet = null, ?array $expectedChangeSet = null): void
     {
         $entity = new \stdClass();
 
@@ -172,7 +168,7 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onClearProvider
      */
-    public function testOnClear(OnClearEventArgs $args, ?string $entityClass)
+    public function testOnClear(OnClearEventArgs $args, ?string $entityClass): void
     {
         $this->extension1->expects(self::atLeastOnce())
             ->method('clear')
@@ -198,7 +194,7 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testPostFlush()
+    public function testPostFlush(): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
 
@@ -212,7 +208,7 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postFlush(new PostFlushEventArgs($em));
     }
 
-    public function testPostFlushNotEnabled()
+    public function testPostFlushNotEnabled(): void
     {
         $this->extension1->expects(self::never())
             ->method('process');

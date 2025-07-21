@@ -26,7 +26,8 @@ Feature: Segment crud and export
 
   Scenario: View segments
     When I go to Reports & Segments/ Manage Segments
-    Then there are 4 records in grid
+    And I check "User" in Entity filter
+    Then there are 2 records in grid
     And I should see following grid containing rows:
       | Name             | Entity | Type    |
       | Username Dynamic | User   | Dynamic |

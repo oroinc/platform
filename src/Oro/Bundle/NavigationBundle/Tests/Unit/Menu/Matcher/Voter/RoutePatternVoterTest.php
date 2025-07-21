@@ -4,12 +4,13 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu\Matcher\Voter;
 
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RoutePatternVoter;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class RoutePatternVoterTest extends \PHPUnit\Framework\TestCase
+class RoutePatternVoterTest extends TestCase
 {
-    public function testMatchingWithoutRequest()
+    public function testMatchingWithoutRequest(): void
     {
         $item = $this->createMock(ItemInterface::class);
         $item->expects($this->never())
@@ -29,7 +30,7 @@ class RoutePatternVoterTest extends \PHPUnit\Framework\TestCase
         array|string|null $itemRoutes,
         array $itemsRoutesParameters,
         ?bool $expected
-    ) {
+    ): void {
         $item = $this->createMock(ItemInterface::class);
         $item->expects($this->any())
             ->method('getExtra')

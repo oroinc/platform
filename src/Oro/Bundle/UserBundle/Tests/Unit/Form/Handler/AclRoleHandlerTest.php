@@ -11,20 +11,17 @@ use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
-class AclRoleHandlerTest extends \PHPUnit\Framework\TestCase
+class AclRoleHandlerTest extends TestCase
 {
-    /** @var AclPrivilegeRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $privilegeRepository;
-
-    /** @var AclManager */
-    private $aclManager;
-
-    /** @var AclRoleHandler */
-    private $handler;
+    private AclPrivilegeRepository&MockObject $privilegeRepository;
+    private AclManager $aclManager;
+    private AclRoleHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +37,7 @@ class AclRoleHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->setAclManager($this->aclManager);
     }
 
-    public function testAddExtensionFilter()
+    public function testAddExtensionFilter(): void
     {
         self::assertEmpty(ReflectionUtil::getPropertyValue($this->handler, 'extensionFilters'));
 
@@ -65,7 +62,7 @@ class AclRoleHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedFilters, ReflectionUtil::getPropertyValue($this->handler, 'extensionFilters'));
     }
 
-    public function testGetAllPrivilegesUseAclGroup()
+    public function testGetAllPrivilegesUseAclGroup(): void
     {
         $privilege1 = new AclPrivilege();
         $privilege2 = new AclPrivilege();

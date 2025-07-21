@@ -7,6 +7,7 @@ use Oro\Bundle\UIBundle\Tests\Unit\Twig\Fixture\EnvironmentNodeVisitor;
 use Oro\Bundle\UIBundle\Twig\Environment;
 use Oro\Component\Testing\TempDirExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 use Twig\Cache\CacheInterface;
 use Twig\Loader\ArrayLoader;
 use Twig\Source;
@@ -14,12 +15,12 @@ use Twig\Source;
 /**
  * Copy of Twig_Tests_EnvironmentTest. Should be removed after merging of pull-request with this service changes.
  */
-class EnvironmentTest extends \PHPUnit\Framework\TestCase
+class EnvironmentTest extends TestCase
 {
     use TempDirExtension;
     use TwigExtensionTestCaseTrait;
 
-    public function testAutoescapeOption()
+    public function testAutoescapeOption(): void
     {
         $loader = new ArrayLoader(
             [
@@ -49,7 +50,7 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         return $filename;
     }
 
-    public function testGlobals()
+    public function testGlobals(): void
     {
         // globals can be added after calling getGlobals
         $twig = new Environment(new ArrayLoader());
@@ -91,7 +92,7 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('bar', $twig->render('test', []));
     }
 
-    public function testExtensionsAreNotInitializedWhenRenderingACompiledTemplate()
+    public function testExtensionsAreNotInitializedWhenRenderingACompiledTemplate(): void
     {
         $options = [
             'cache'       => $this->getTempDir('twig'),
@@ -127,7 +128,7 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         unlink($cache);
     }
 
-    public function testAddExtension()
+    public function testAddExtension(): void
     {
         $twig = new Environment(new ArrayLoader());
         $twig->addExtension(new EnvironmentExtension());
@@ -142,7 +143,7 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(EnvironmentNodeVisitor::class, end($visitors));
     }
 
-    public function testGenerateTemplateCache()
+    public function testGenerateTemplateCache(): void
     {
         $templateName = __FUNCTION__;
 
@@ -162,7 +163,7 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         $twig->generateTemplateCache($templateName);
     }
 
-    public function testGenerateTemplateCacheCachingIsDisabled()
+    public function testGenerateTemplateCacheCachingIsDisabled(): void
     {
         $templateName = __FUNCTION__;
 

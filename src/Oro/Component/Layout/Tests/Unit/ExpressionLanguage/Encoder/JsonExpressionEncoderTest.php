@@ -5,12 +5,13 @@ namespace Oro\Component\Layout\Tests\Unit\ExpressionLanguage\Encoder;
 use Oro\Component\Layout\Action;
 use Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
-class JsonExpressionEncoderTest extends \PHPUnit\Framework\TestCase
+class JsonExpressionEncoderTest extends TestCase
 {
-    public function testEncodeExpr()
+    public function testEncodeExpr(): void
     {
         $parsedExpression = new ParsedExpression('true', new ConstantNode(true));
         $expressionManipulator = $this->createMock(ExpressionManipulator::class);
@@ -33,7 +34,7 @@ class JsonExpressionEncoderTest extends \PHPUnit\Framework\TestCase
         $this->assertJsonStringEqualsJsonFile(__DIR__.'/Fixtures/expression.json', $result);
     }
 
-    public function testEncodeActions()
+    public function testEncodeActions(): void
     {
         $expressionManipulator = new ExpressionManipulator();
         $encoder = new JsonExpressionEncoder($expressionManipulator);

@@ -3,9 +3,10 @@
 namespace Oro\Bundle\SidebarBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\SidebarBundle\DependencyInjection\OroSidebarExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroSidebarExtensionTest extends \PHPUnit\Framework\TestCase
+class OroSidebarExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

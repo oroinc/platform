@@ -7,8 +7,9 @@ use Oro\Bundle\SidebarBundle\Tests\Unit\Fixtures\BarBundle\BarBundle;
 use Oro\Bundle\SidebarBundle\Tests\Unit\Fixtures\FooBundle\FooBundle;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class WidgetDefinitionProviderTest extends \PHPUnit\Framework\TestCase
+class WidgetDefinitionProviderTest extends TestCase
 {
     use TempDirExtension;
 
@@ -31,7 +32,7 @@ class WidgetDefinitionProviderTest extends \PHPUnit\Framework\TestCase
             ]);
     }
 
-    public function testGetWidgetDefinitionsByPlacementForLeftPlacement()
+    public function testGetWidgetDefinitionsByPlacementForLeftPlacement(): void
     {
         self::assertEquals(
             [
@@ -74,7 +75,7 @@ class WidgetDefinitionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetWidgetDefinitionsByPlacementForRightPlacement()
+    public function testGetWidgetDefinitionsByPlacementForRightPlacement(): void
     {
         self::assertEquals(
             [
@@ -121,7 +122,7 @@ class WidgetDefinitionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetWidgetDefinitionsByPlacementForBothPlacements()
+    public function testGetWidgetDefinitionsByPlacementForBothPlacements(): void
     {
         self::assertEquals(
             [

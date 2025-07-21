@@ -3,11 +3,12 @@
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
 use Oro\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass\FeatureToggleVotersPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class FeatureToggleVotersPassTest extends \PHPUnit\Framework\TestCase
+class FeatureToggleVotersPassTest extends TestCase
 {
     public function testProcess(): void
     {

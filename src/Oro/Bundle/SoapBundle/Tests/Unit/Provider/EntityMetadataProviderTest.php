@@ -10,18 +10,15 @@ use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Provider\EntityMetadataProvider;
 use Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager\Stub\Entity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EntityMetadataProviderTest extends \PHPUnit\Framework\TestCase
+class EntityMetadataProviderTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $cm;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var EntityMetadataProvider */
-    private $provider;
+    private ConfigManager&MockObject $cm;
+    private TranslatorInterface&MockObject $translator;
+    private EntityMetadataProvider $provider;
 
     #[\Override]
     protected function setUp(): void

@@ -184,9 +184,16 @@ services:
         tags:
             - { name: doctrine.repository_service }
 
+    Oro\Bundle\PlatformBundle\Entity\Repository\NumberSequenceRepository:
+        parent: oro_entity.abstract_repository
+        arguments:
+            - 'Oro\Bundle\PlatformBundle\Entity\NumberSequence'
+        tags:
+            - { name: doctrine.repository_service }
+
     Oro\Component\DependencyInjection\PgsqlAdvisorySchemaInUrlEnvVarProcessor:
         tags: [container.env_var_processor]
-    
+
     oro_platform.cache.provider.page_request_provider.abstract:
         class: 'Oro\Bundle\PlatformBundle\Provider\AbstractPageRequestProvider'
         arguments:

@@ -4,10 +4,11 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Oro\Component\ConfigExpression\Condition\AbstractCondition;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class AbstractConditionTest extends \PHPUnit\Framework\TestCase
+class AbstractConditionTest extends TestCase
 {
-    public function testEvaluateForAllowedCondition()
+    public function testEvaluateForAllowedCondition(): void
     {
         $context = new \stdClass();
         $condition = $this->createCondition(true);
@@ -18,7 +19,7 @@ class AbstractConditionTest extends \PHPUnit\Framework\TestCase
         self::assertCount(0, $errors);
     }
 
-    public function testEvaluateForNotAllowedCondition()
+    public function testEvaluateForNotAllowedCondition(): void
     {
         $context = new \stdClass();
         $condition = $this->createCondition(false);

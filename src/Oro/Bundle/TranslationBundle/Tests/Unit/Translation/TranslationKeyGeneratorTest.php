@@ -4,11 +4,11 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeySourceInterface;
+use PHPUnit\Framework\TestCase;
 
-class TranslationKeyGeneratorTest extends \PHPUnit\Framework\TestCase
+class TranslationKeyGeneratorTest extends TestCase
 {
-    /** @var TranslationKeyGenerator */
-    private $generator;
+    private TranslationKeyGenerator $generator;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class TranslationKeyGeneratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider generateDataProvider
      */
-    public function testGenerate(array $data, string $expected)
+    public function testGenerate(array $data, string $expected): void
     {
         $keySource = $this->createMock(TranslationKeySourceInterface::class);
         $keySource->expects($this->once())

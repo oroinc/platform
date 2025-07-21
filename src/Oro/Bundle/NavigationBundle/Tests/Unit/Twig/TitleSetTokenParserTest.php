@@ -3,15 +3,16 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\NavigationBundle\Twig\TitleSetTokenParser;
+use PHPUnit\Framework\TestCase;
 use Twig\ExpressionParser;
 use Twig\Node\Node;
 use Twig\Parser;
 use Twig\Token;
 use Twig\TokenStream;
 
-class TitleSetTokenParserTest extends \PHPUnit\Framework\TestCase
+class TitleSetTokenParserTest extends TestCase
 {
-    public function testParsing()
+    public function testParsing(): void
     {
         $node = $this->createMock(Node::class);
 
@@ -39,7 +40,7 @@ class TitleSetTokenParserTest extends \PHPUnit\Framework\TestCase
         $tokenParser->parse($token);
     }
 
-    public function testTagName()
+    public function testTagName(): void
     {
         $tokenParser = new TitleSetTokenParser();
         $this->assertEquals('oro_title_set', $tokenParser->getTag());

@@ -6,14 +6,13 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsDefaultProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ExtendFieldFormOptionsDefaultProviderTest extends \PHPUnit\Framework\TestCase
+class ExtendFieldFormOptionsDefaultProviderTest extends TestCase
 {
-    /** @var EntityConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigManager;
-
-    /** @var ExtendFieldFormOptionsDefaultProvider */
-    private $provider;
+    private EntityConfigManager&MockObject $entityConfigManager;
+    private ExtendFieldFormOptionsDefaultProvider $provider;
 
     #[\Override]
     protected function setUp(): void

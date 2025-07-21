@@ -8,12 +8,12 @@ use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepAssembler;
 use Oro\Component\Action\Exception\AssemblerException;
 use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class StepAssemblerTest extends \PHPUnit\Framework\TestCase
+class StepAssemblerTest extends TestCase
 {
-    /** @var StepAssembler */
-    private $assembler;
+    private StepAssembler $assembler;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +25,7 @@ class StepAssemblerTest extends \PHPUnit\Framework\TestCase
      * @dataProvider invalidOptionsDataProvider
      * @param array $configuration
      */
-    public function testAssembleRequiredOptionException($configuration)
+    public function testAssembleRequiredOptionException($configuration): void
     {
         $this->expectException(AssemblerException::class);
         $this->assembler->assemble($configuration, null);
@@ -52,7 +52,7 @@ class StepAssemblerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider configurationDataProvider
      */
-    public function testAssemble($configuration, $attributes, Step $expectedStep)
+    public function testAssemble($configuration, $attributes, Step $expectedStep): void
     {
         $configurationPass = $this->createMock(ConfigurationPassInterface::class);
 
@@ -75,7 +75,7 @@ class StepAssemblerTest extends \PHPUnit\Framework\TestCase
 
         $expectedAttributes = [];
         /** @var Attribute $attribute */
-        foreach ($attributes ? $attributes : [] as $attribute) {
+        foreach ($attributes ?: [] as $attribute) {
             $expectedAttributes[$attribute->getName()] = $attribute;
         }
 

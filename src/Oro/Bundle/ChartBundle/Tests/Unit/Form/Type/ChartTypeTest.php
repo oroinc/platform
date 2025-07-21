@@ -8,16 +8,14 @@ use Oro\Bundle\ChartBundle\Form\Type\ChartType;
 use Oro\Bundle\ChartBundle\Model\ConfigProvider;
 use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class ChartTypeTest extends FormIntegrationTestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var ChartType */
-    private $type;
+    private ConfigProvider&MockObject $configProvider;
+    private ChartType $type;
 
     #[\Override]
     protected function setUp(): void

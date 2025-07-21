@@ -8,20 +8,15 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Datagrid\MenuUpdateDatasource;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MenuUpdateDatasourceTest extends \PHPUnit\Framework\TestCase
+class MenuUpdateDatasourceTest extends TestCase
 {
-    /** @var BuilderChainProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $chainProvider;
-
-    /** @var MenuManipulator|\PHPUnit\Framework\MockObject\MockObject */
-    private $menuManipulator;
-
-    /** @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurationProvider;
-
-    /** @var MenuUpdateDatasource */
-    private $datasource;
+    private BuilderChainProvider&MockObject $chainProvider;
+    private MenuManipulator&MockObject $menuManipulator;
+    private ConfigurationProvider&MockObject $configurationProvider;
+    private MenuUpdateDatasource $datasource;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +33,7 @@ class MenuUpdateDatasourceTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $grid = $this->createMock(DatagridInterface::class);
         $grid->expects($this->once())
@@ -51,7 +46,7 @@ class MenuUpdateDatasourceTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider menuConfigurationProvider
      */
-    public function testGetResults(array $menu, int $resultCount)
+    public function testGetResults(array $menu, int $resultCount): void
     {
         $this->configurationProvider->expects(self::once())
             ->method('getMenuTree')

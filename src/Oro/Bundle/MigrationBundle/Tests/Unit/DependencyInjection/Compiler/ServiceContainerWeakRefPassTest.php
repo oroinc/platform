@@ -4,6 +4,7 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\MigrationBundle\Container\MigrationContainer;
 use Oro\Bundle\MigrationBundle\DependencyInjection\Compiler\ServiceContainerWeakRefPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -11,10 +12,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class ServiceContainerWeakRefPassTest extends \PHPUnit\Framework\TestCase
+class ServiceContainerWeakRefPassTest extends TestCase
 {
-    /** @var ServiceContainerWeakRefPass */
-    private $compiler;
+    private ServiceContainerWeakRefPass $compiler;
 
     #[\Override]
     protected function setUp(): void

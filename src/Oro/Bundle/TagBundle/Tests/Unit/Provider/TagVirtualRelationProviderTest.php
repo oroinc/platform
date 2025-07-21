@@ -8,17 +8,14 @@ use Oro\Bundle\TagBundle\Entity\Tagging;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Provider\TagVirtualRelationProvider;
 use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TagVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
+class TagVirtualRelationProviderTest extends TestCase
 {
-    /** @var TaggableHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $taggableHelper;
-
-    /** @var TaggableHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var TagVirtualRelationProvider */
-    private $provider;
+    private TaggableHelper&MockObject $taggableHelper;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private TagVirtualRelationProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +32,7 @@ class TagVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isVirtualRelationProvider
      */
-    public function testIsVirtualRelation(string $class, string $field, bool $isTaggable, bool $expected)
+    public function testIsVirtualRelation(string $class, string $field, bool $isTaggable, bool $expected): void
     {
         $this->setHelperExpectation($isTaggable);
         $this->assertSame($expected, $this->provider->isVirtualRelation($class, $field));
@@ -53,7 +50,7 @@ class TagVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getVirtualRelationQueryProvider
      */
-    public function testGetVirtualRelationQuery(string $class, string $field, bool $isTaggable, array $expected)
+    public function testGetVirtualRelationQuery(string $class, string $field, bool $isTaggable, array $expected): void
     {
         $this->setHelperExpectation($isTaggable);
         $this->assertEquals($expected, $this->provider->getVirtualRelationQuery($class, $field));
@@ -98,7 +95,7 @@ class TagVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         bool $isTaggable,
         string $entityIdentifierFieldName,
         array $expected
-    ) {
+    ): void {
         $this->setHelperExpectation($isTaggable, $entityIdentifierFieldName);
         $this->assertEquals($expected, $this->provider->getVirtualRelations($class));
     }
@@ -141,7 +138,7 @@ class TagVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetTargetJoinAlias()
+    public function testGetTargetJoinAlias(): void
     {
         $this->assertEquals('virtualTag', $this->provider->getTargetJoinAlias('', ''));
     }

@@ -3,12 +3,12 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\DependencyInjection\SystemConfiguration;
 
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Processor;
 
-class ProcessorDecoratorTest extends \PHPUnit\Framework\TestCase
+class ProcessorDecoratorTest extends TestCase
 {
-    /** @var ProcessorDecorator */
-    private $processor;
+    private ProcessorDecorator $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class ProcessorDecoratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider mergeDataProvider
      */
-    public function testMerge(array $startData, array $newData, array $expectedResult)
+    public function testMerge(array $startData, array $newData, array $expectedResult): void
     {
         $this->assertEquals($expectedResult, $this->processor->merge($startData, $newData));
     }

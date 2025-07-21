@@ -3,15 +3,16 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Encoder;
 
 use Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter;
+use PHPUnit\Framework\TestCase;
 
-class DefaultCrypterTest extends \PHPUnit\Framework\TestCase
+class DefaultCrypterTest extends TestCase
 {
     /**
      * Test two way encoding/decoding
      *
      * @dataProvider keyDataProvider
      */
-    public function testEncodeDecode(string $key)
+    public function testEncodeDecode(string $key): void
     {
         $someData = 'someValue';
 
@@ -27,7 +28,7 @@ class DefaultCrypterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider keyDataProvider
      */
-    public function testEncodeDecodeDifferentInstances(string $key)
+    public function testEncodeDecodeDifferentInstances(string $key): void
     {
         $someData = 'someValue';
 

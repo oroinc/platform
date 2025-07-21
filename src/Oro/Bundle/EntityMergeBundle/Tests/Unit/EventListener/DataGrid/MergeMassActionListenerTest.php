@@ -9,14 +9,13 @@ use Oro\Bundle\EntityConfigBundle\Config\Config as EntityConfig;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\EventListener\DataGrid\MergeMassActionListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MergeMassActionListenerTest extends \PHPUnit\Framework\TestCase
+class MergeMassActionListenerTest extends TestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigProvider;
-
-    /** @var MergeMassActionListener */
-    private $mergeMassActionListener;
+    private ConfigProvider&MockObject $entityConfigProvider;
+    private MergeMassActionListener $mergeMassActionListener;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class MergeMassActionListenerTest extends \PHPUnit\Framework\TestCase
         $this->mergeMassActionListener = new MergeMassActionListener($this->entityConfigProvider);
     }
 
-    public function testOnBuildUnsetMergeMassAction()
+    public function testOnBuildUnsetMergeMassAction(): void
     {
         $entityName = 'testEntityName';
         $datagridConfig = DatagridConfiguration::create(
@@ -48,7 +47,7 @@ class MergeMassActionListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnBuildNotUnsetMergeMass()
+    public function testOnBuildNotUnsetMergeMass(): void
     {
         $entityName = 'testEntityName';
         $datagridConfig = DatagridConfiguration::create(
@@ -70,7 +69,7 @@ class MergeMassActionListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnBuildBeforeSkipsForEmptyMassActions()
+    public function testOnBuildBeforeSkipsForEmptyMassActions(): void
     {
         $datagridConfig = DatagridConfiguration::create(
             ['mass_actions' => []]
@@ -83,7 +82,7 @@ class MergeMassActionListenerTest extends \PHPUnit\Framework\TestCase
         $this->mergeMassActionListener->onBuildBefore($event);
     }
 
-    public function testOnBuildBeforeForEmptyEntityName()
+    public function testOnBuildBeforeForEmptyEntityName(): void
     {
         $datagridConfig = DatagridConfiguration::create(
             ['mass_actions' => ['merge' => ['entity_name' => '']]]

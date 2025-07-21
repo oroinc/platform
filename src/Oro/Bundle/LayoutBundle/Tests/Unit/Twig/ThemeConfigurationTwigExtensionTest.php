@@ -9,8 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 final class ThemeConfigurationTwigExtensionTest extends TestCase
 {
-    private GeneralProvider|MockObject $generalProvider;
-
+    private GeneralProvider&MockObject $generalProvider;
     private ThemeConfigurationTwigExtension $extension;
 
     #[\Override]
@@ -28,8 +27,7 @@ final class ThemeConfigurationTwigExtensionTest extends TestCase
     {
         $option = 'some_option';
 
-        $this->generalProvider
-            ->expects(self::once())
+        $this->generalProvider->expects(self::once())
             ->method('getThemeConfigurationOption')
             ->with($option)
             ->willReturn($expectedOptionValue);
@@ -37,6 +35,24 @@ final class ThemeConfigurationTwigExtensionTest extends TestCase
         $actualOptionValue = $this->extension->getThemeConfigurationValue($option);
 
         self::assertEquals($expectedOptionValue, $actualOptionValue);
+    }
+
+    /**
+     * @dataProvider getThemeConfigurationOptionDataProvider
+     */
+    public function testGetThemeDefinitionValue(mixed $expectedValue): void
+    {
+        $key = 'some_value';
+
+        $this->generalProvider
+            ->expects(self::once())
+            ->method('getThemeProperty')
+            ->with($key)
+            ->willReturn($expectedValue);
+
+        $actualValue = $this->extension->getThemeDefinitionValue($key);
+
+        self::assertEquals($expectedValue, $actualValue);
     }
 
     public function getThemeConfigurationOptionDataProvider(): array

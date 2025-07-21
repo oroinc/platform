@@ -3,20 +3,16 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuExtensionPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class MenuExtensionPassTest extends \PHPUnit\Framework\TestCase
+class MenuExtensionPassTest extends TestCase
 {
-    /** @var ContainerBuilder */
-    private $container;
-
-    /** @var Definition */
-    private $menuFactory;
-
-    /** @var MenuExtensionPass */
-    private $compiler;
+    private ContainerBuilder $container;
+    private Definition $menuFactory;
+    private MenuExtensionPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -27,13 +23,13 @@ class MenuExtensionPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new MenuExtensionPass();
     }
 
-    public function testProcessWithoutTaggedServices()
+    public function testProcessWithoutTaggedServices(): void
     {
         $this->compiler->process($this->container);
         $this->assertEquals([], $this->menuFactory->getMethodCalls());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $this->container->setDefinition('extension_1', new Definition())
             ->addTag('oro_navigation.menu_extension');

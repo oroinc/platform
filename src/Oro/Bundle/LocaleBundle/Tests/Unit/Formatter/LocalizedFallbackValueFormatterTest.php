@@ -9,25 +9,16 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Formatter\LocalizedFallbackValueFormatter;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LocalizedFallbackValueFormatterTest extends \PHPUnit\Framework\TestCase
+class LocalizedFallbackValueFormatterTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationHelper;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var PropertyAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $propertyAccessor;
-
-    /** @var LocalizedFallbackValueFormatter */
-    private $formatter;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private LocalizationHelper&MockObject $localizationHelper;
+    private TranslatorInterface&MockObject $translator;
+    private LocalizedFallbackValueFormatter $formatter;
 
     #[\Override]
     protected function setUp(): void
@@ -35,20 +26,18 @@ class LocalizedFallbackValueFormatterTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->localizationHelper = $this->createMock(LocalizationHelper::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
 
         $this->formatter = new LocalizedFallbackValueFormatter(
             $this->doctrineHelper,
             $this->localizationHelper,
             $this->translator,
-            $this->propertyAccessor
+            PropertyAccess::createPropertyAccessor()
         );
     }
 
     public function testFormatWithEmptyAssociationName(): void
     {
-        $this->translator
-            ->expects($this->once())
+        $this->translator->expects($this->once())
             ->method('trans')
             ->with('N/A')
             ->willReturnArgument(0);
@@ -61,24 +50,20 @@ class LocalizedFallbackValueFormatterTest extends \PHPUnit\Framework\TestCase
         $localization = new Localization();
         $localization->addTitle((new LocalizedFallbackValue())->setString('Fallback value'));
 
-        $this->translator
-            ->expects($this->once())
+        $this->translator->expects($this->once())
             ->method('trans')
             ->with('N/A')
             ->willReturnArgument(0);
 
         $classMetadata = $this->createMock(ClassMetadata::class);
-        $classMetadata
-            ->expects($this->once())
+        $classMetadata->expects($this->once())
             ->method('hasAssociation')
             ->with('titles')
             ->willReturn(false);
-        $classMetadata
-            ->expects($this->never())
+        $classMetadata->expects($this->never())
             ->method('getAssociationMapping');
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityMetadata')
             ->willReturn($classMetadata);
 
@@ -96,24 +81,20 @@ class LocalizedFallbackValueFormatterTest extends \PHPUnit\Framework\TestCase
         ];
 
         $classMetadata = $this->createMock(ClassMetadata::class);
-        $classMetadata
-            ->expects($this->once())
+        $classMetadata->expects($this->once())
             ->method('hasAssociation')
             ->with('titles')
             ->willReturn(true);
-        $classMetadata
-            ->expects($this->once())
+        $classMetadata->expects($this->once())
             ->method('getAssociationMapping')
             ->with('titles')
             ->willReturn($associationMapping);
 
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityMetadata')
             ->willReturn($classMetadata);
 
-        $this->localizationHelper
-            ->expects($this->once())
+        $this->localizationHelper->expects($this->once())
             ->method('getLocalizedValue')
             ->with($localization->getTitles())
             ->willReturn('Fallback value');
@@ -123,8 +104,7 @@ class LocalizedFallbackValueFormatterTest extends \PHPUnit\Framework\TestCase
 
     public function testGetDefaultValue(): void
     {
-        $this->translator
-            ->expects($this->once())
+        $this->translator->expects($this->once())
             ->method('trans')
             ->with('N/A')
             ->willReturnArgument(0);

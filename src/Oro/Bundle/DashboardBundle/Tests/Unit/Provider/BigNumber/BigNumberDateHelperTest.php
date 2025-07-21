@@ -8,15 +8,16 @@ use Oro\Bundle\LocaleBundle\Model\Calendar;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\TestCase;
 
-class BigNumberDateHelperTest extends \PHPUnit\Framework\TestCase
+class BigNumberDateHelperTest extends TestCase
 {
     use EntityTrait;
 
     /**
      * @dataProvider localeDataProvider
      */
-    public function testGetLastWeekPeriodForLocale(string $locale, string $timezone, string $expectedWeekStart)
+    public function testGetLastWeekPeriodForLocale(string $locale, string $timezone, string $expectedWeekStart): void
     {
         $calendar = new Calendar($locale);
 
@@ -36,7 +37,7 @@ class BigNumberDateHelperTest extends \PHPUnit\Framework\TestCase
 
         $period = $helper->getLastWeekPeriod();
 
-        $lastDayNumber  = $calendar->getFirstDayOfWeek() + 5;
+        $lastDayNumber = $calendar->getFirstDayOfWeek() + 5;
         $lastDayString = date('l', strtotime("Sunday +{$lastDayNumber} days"));
         $end = new \DateTime('last ' . $lastDayString, new \DateTimeZone($timezone));
         $end->setTime(0, 0, 0)->modify('1 day');

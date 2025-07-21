@@ -18,38 +18,23 @@ use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Component\EntitySerializer\EntitySerializer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
+class ActivityContextApiEntityManagerTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityAliasResolver;
-
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityNameResolver;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassNameHelper;
-
-    /** @var ActivityContextApiEntityManager */
-    private $manager;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ConfigManager&MockObject $configManager;
+    private RouterInterface&MockObject $router;
+    private EntityAliasResolver&MockObject $entityAliasResolver;
+    private EntityNameResolver&MockObject $entityNameResolver;
+    private FeatureChecker&MockObject $featureChecker;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private EntityClassNameHelper&MockObject $entityClassNameHelper;
+    private ActivityContextApiEntityManager $manager;
 
     #[\Override]
     protected function setUp(): void

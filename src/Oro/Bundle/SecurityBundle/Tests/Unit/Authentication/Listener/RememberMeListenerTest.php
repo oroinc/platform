@@ -5,13 +5,14 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authentication\Listener;
 use Oro\Bundle\SecurityBundle\Authentication\Listener\RememberMeListener;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Oro\Bundle\SecurityBundle\Request\CsrfProtectedRequestHelper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Http\Authenticator\RememberMeAuthenticator;
 
-class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
+class RememberMeListenerTest extends TestCase
 {
     private const SESSION_NAME = 'TEST_SESSION_ID';
     private const SESSION_ID = 'o595fqdg5214u4e4nfcs3uc923';
@@ -35,7 +36,8 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
     public function testSupportsCsrfProtectedAjaxRequest(): void
     {
         $request = $this->createRequestWithCsrfToken('XMLHttpRequest');
-        $this->csrfProtectedRequestHelper->method('isCsrfProtectedRequest')
+        $this->csrfProtectedRequestHelper->expects(self::any())
+            ->method('isCsrfProtectedRequest')
             ->willReturn(true);
 
         $this->innerRememberMeAuthenticator->expects(self::once())
@@ -49,7 +51,8 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
     public function testDoesNotSupportNonCsrfProtectedAjaxRequest(): void
     {
         $request = $this->createRequestWithCsrfToken('XMLHttpRequest');
-        $this->csrfProtectedRequestHelper->method('isCsrfProtectedRequest')
+        $this->csrfProtectedRequestHelper->expects(self::any())
+            ->method('isCsrfProtectedRequest')
             ->willReturn(false);
 
         $this->assertFalse($this->listener->supports($request));

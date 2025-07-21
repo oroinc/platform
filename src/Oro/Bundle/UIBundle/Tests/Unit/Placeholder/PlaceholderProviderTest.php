@@ -6,20 +6,17 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderConfigurationProvider;
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 use Oro\Component\Config\Resolver\ResolverInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
+class PlaceholderProviderTest extends TestCase
 {
     private const TEST_PLACEHOLDER = 'test_placeholder';
 
-    /** @var ResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $resolver;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
+    private ResolverInterface&MockObject $resolver;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private FeatureChecker&MockObject $featureChecker;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +30,7 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
     }
 
-    public function testOnlyTemplateDefined()
+    public function testOnlyTemplateDefined(): void
     {
         $items = [
             'placeholder_item' => [
@@ -57,7 +54,7 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTemplateAndDataDefined()
+    public function testTemplateAndDataDefined(): void
     {
         $items = [
             'placeholder_item' => [
@@ -82,7 +79,7 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApplicableStringConditionSuccess()
+    public function testApplicableStringConditionSuccess(): void
     {
         $items = [
             'placeholder_item' => [
@@ -116,7 +113,7 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApplicableArrayConditionsSuccess()
+    public function testApplicableArrayConditionsSuccess(): void
     {
         $items = [
             'placeholder_item' => [
@@ -153,7 +150,7 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApplicableArrayConditionsFail()
+    public function testApplicableArrayConditionsFail(): void
     {
         $items = [
             'placeholder_item' => [
@@ -175,7 +172,7 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $actual);
     }
 
-    public function testAclConditionStringSuccess()
+    public function testAclConditionStringSuccess(): void
     {
         $items = [
             'placeholder_item' => [
@@ -197,7 +194,7 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $actual);
     }
 
-    public function testAclConditionStringFail()
+    public function testAclConditionStringFail(): void
     {
         $items = [
             'placeholder_item' => [
@@ -219,7 +216,7 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $actual);
     }
 
-    public function testAclConditionArraySuccess()
+    public function testAclConditionArraySuccess(): void
     {
         $items = [
             'placeholder_item' => [
@@ -246,7 +243,7 @@ class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([$items['placeholder_item']], $actual);
     }
 
-    public function testAclConditionArrayFail()
+    public function testAclConditionArrayFail(): void
     {
         $items = [
             'placeholder_item' => [

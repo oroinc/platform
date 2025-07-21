@@ -5,14 +5,13 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Tools;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\DataGridBundle\Tools\MixinConfigurationHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MixinConfigurationHelperTest extends \PHPUnit\Framework\TestCase
+class MixinConfigurationHelperTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigurationProviderInterface */
-    private $configProvider;
-
-    /** @var MixinConfigurationHelper */
-    private $helper;
+    private ConfigurationProviderInterface&MockObject $configProvider;
+    private MixinConfigurationHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class MixinConfigurationHelperTest extends \PHPUnit\Framework\TestCase
         array $existingParameters,
         array $additionalParameters,
         array $expectedParameters
-    ) {
+    ): void {
         $this->configProvider->expects($this->once())
             ->method('getConfiguration')
             ->willReturn(
@@ -138,7 +137,7 @@ class MixinConfigurationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider mergeDataProvider
      */
-    public function testArrayMergeRecursiveDistinct(array $expected, array $first, array $second)
+    public function testArrayMergeRecursiveDistinct(array $expected, array $first, array $second): void
     {
         $this->assertEquals($expected, MixinConfigurationHelper::arrayMergeRecursiveAppendDistinct($first, $second));
     }

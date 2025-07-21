@@ -8,16 +8,14 @@ use Oro\Bundle\UserBundle\Tests\Unit\Configuration\Fixture\Bundle\TestBundle2\Te
 use Oro\Bundle\UserBundle\Tests\Unit\Configuration\Fixture\Bundle\TestBundle3\TestBundle3;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class PrivilegeCategoryConfigurationProviderTest extends \PHPUnit\Framework\TestCase
+class PrivilegeCategoryConfigurationProviderTest extends TestCase
 {
     use TempDirExtension;
 
-    /** @var string */
-    private $cacheFile;
-
-    /** @var PrivilegeCategoryConfigurationProvider */
-    private $configurationProvider;
+    private string $cacheFile;
+    private PrivilegeCategoryConfigurationProvider $configurationProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +36,7 @@ class PrivilegeCategoryConfigurationProviderTest extends \PHPUnit\Framework\Test
         $this->configurationProvider = new PrivilegeCategoryConfigurationProvider($this->cacheFile, false);
     }
 
-    public function testGetConfigurationWithCache()
+    public function testGetConfigurationWithCache(): void
     {
         $cachedCategories = [
             'category1' => [
@@ -50,7 +48,7 @@ class PrivilegeCategoryConfigurationProviderTest extends \PHPUnit\Framework\Test
         self::assertSame($cachedCategories, $this->configurationProvider->getCategories());
     }
 
-    public function testGetConfigurationWithoutCache()
+    public function testGetConfigurationWithoutCache(): void
     {
         $this->configurationProvider->clearCache();
 

@@ -4,11 +4,12 @@ namespace Oro\Bundle\CacheBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 use Oro\Bundle\CacheBundle\Provider\SyncCacheInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 
-class OroDataCacheManagerTest extends \PHPUnit\Framework\TestCase
+class OroDataCacheManagerTest extends TestCase
 {
-    public function testSync()
+    public function testSync(): void
     {
         $syncProvider = $this->createMock(SyncCacheInterface::class);
         $notSyncProvider = $this->createMock(SyncCacheInterface::class);
@@ -23,7 +24,7 @@ class OroDataCacheManagerTest extends \PHPUnit\Framework\TestCase
         $manager->sync();
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $clearableProvider = $this->createMock(AdapterInterface::class);
         $clearableProvider->expects($this->once())

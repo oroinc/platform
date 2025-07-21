@@ -4,11 +4,11 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Bundle\LayoutBundle\Layout\Extension\ExpressionContextConfigurator;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\TestCase;
 
-class ExpressionContextConfiguratorTest extends \PHPUnit\Framework\TestCase
+class ExpressionContextConfiguratorTest extends TestCase
 {
-    /** @var ExpressionContextConfigurator */
-    private $contextConfigurator;
+    private ExpressionContextConfigurator $contextConfigurator;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class ExpressionContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->contextConfigurator = new ExpressionContextConfigurator();
     }
 
-    public function testDefaultValuesAfterConfigureContext()
+    public function testDefaultValuesAfterConfigureContext(): void
     {
         $context = new LayoutContext();
 
@@ -27,7 +27,7 @@ class ExpressionContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(isset($context['expressions_encoding']));
     }
 
-    public function testConfigureContext()
+    public function testConfigureContext(): void
     {
         $context = new LayoutContext();
 

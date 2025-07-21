@@ -4,14 +4,13 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\LocaleBundle\Formatter\CurrencyFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CurrencyFormatterTest extends \PHPUnit\Framework\TestCase
+class CurrencyFormatterTest extends TestCase
 {
-    /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    private $numberFormatter;
-
-    /** @var CurrencyFormatter */
-    private $formatter;
+    private NumberFormatter&MockObject $numberFormatter;
+    private CurrencyFormatter $formatter;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class CurrencyFormatterTest extends \PHPUnit\Framework\TestCase
         $this->formatter = new CurrencyFormatter($this->numberFormatter);
     }
 
-    public function testFormatWithDefaultArguments()
+    public function testFormatWithDefaultArguments(): void
     {
         $dateTime = new \DateTime();
 
@@ -32,7 +31,7 @@ class CurrencyFormatterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('123.45', $this->formatter->format($dateTime));
     }
 
-    public function testFormat()
+    public function testFormat(): void
     {
         $dateTime = new \DateTime();
 
@@ -55,7 +54,7 @@ class CurrencyFormatterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDefaultValue()
+    public function testGetDefaultValue(): void
     {
         $this->assertEquals(0, $this->formatter->getDefaultValue());
     }

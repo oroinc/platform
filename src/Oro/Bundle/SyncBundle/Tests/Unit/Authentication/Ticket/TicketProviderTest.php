@@ -5,19 +5,16 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Authentication\Ticket;
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestGenerator\TicketDigestGeneratorInterface;
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TicketProviderTest extends \PHPUnit\Framework\TestCase
+class TicketProviderTest extends TestCase
 {
     private const TICKET_DIGEST = 'sampleDigest';
 
-    /** @var TicketDigestGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ticketDigestGenerator;
-
-    /** @var string */
-    private $secret;
-
-    /** @var TicketProvider */
-    private $ticketProvider;
+    private TicketDigestGeneratorInterface&MockObject $ticketDigestGenerator;
+    private string $secret;
+    private TicketProvider $ticketProvider;
 
     #[\Override]
     protected function setUp(): void

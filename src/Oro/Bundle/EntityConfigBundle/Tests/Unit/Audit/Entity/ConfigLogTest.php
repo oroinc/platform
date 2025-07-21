@@ -5,15 +5,13 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Audit\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLog;
 use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLogDiff;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class ConfigLogTest extends \PHPUnit\Framework\TestCase
+class ConfigLogTest extends TestCase
 {
-    /** @var ConfigLog */
-    private $configLog;
-
-    /** @var ConfigLogDiff */
-    private $configLogDiff;
+    private ConfigLog $configLog;
+    private ConfigLogDiff $configLogDiff;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +20,7 @@ class ConfigLogTest extends \PHPUnit\Framework\TestCase
         $this->configLogDiff = new ConfigLogDiff();
     }
 
-    public function testConfigLog()
+    public function testConfigLog(): void
     {
         $userMock = $this->createMock(UserInterface::class);
 
@@ -43,7 +41,7 @@ class ConfigLogTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($diffsCollection, $this->configLog->getDiffs());
     }
 
-    public function testConfigDiff()
+    public function testConfigDiff(): void
     {
         $this->assertEmpty($this->configLogDiff->getId());
 

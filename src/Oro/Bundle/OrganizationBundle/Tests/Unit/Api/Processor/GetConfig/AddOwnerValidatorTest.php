@@ -11,20 +11,14 @@ use Oro\Bundle\OrganizationBundle\Api\Processor\GetConfig\AddOwnerValidator;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\Owner;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class AddOwnerValidatorTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface */
-    private $ownershipMetadataProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValidationHelper */
-    private $validationHelper;
-
-    /** @var AddOwnerValidator */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private OwnershipMetadataProviderInterface&MockObject $ownershipMetadataProvider;
+    private ValidationHelper&MockObject $validationHelper;
+    private AddOwnerValidator $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -43,7 +37,7 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
@@ -55,7 +49,7 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithOwnerField()
+    public function testProcessWithOwnerField(): void
     {
         $config = [
             'fields' => [
@@ -85,7 +79,7 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForExcludedOwnerField()
+    public function testProcessForExcludedOwnerField(): void
     {
         $config = [
             'fields' => [
@@ -112,7 +106,7 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         self::assertNull($configObject->getFormOptions());
     }
 
-    public function testProcessForRenamedOwnerField()
+    public function testProcessForRenamedOwnerField(): void
     {
         $config = [
             'fields' => [
@@ -141,7 +135,7 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWithoutOwnerField()
+    public function testProcessWithoutOwnerField(): void
     {
         $config = [
             'fields' => [
@@ -167,7 +161,7 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         self::assertEmpty($configObject->getFormOptions());
     }
 
-    public function testProcessWhenConstraintAlreadyExists()
+    public function testProcessWhenConstraintAlreadyExists(): void
     {
         $config = [
             'fields' => [
@@ -198,7 +192,7 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         self::assertNull($configObject->getField('owner')->getFormOptions());
     }
 
-    public function testProcessWhenConstraintAlreadyExistsForRenamedOwnerField()
+    public function testProcessWhenConstraintAlreadyExistsForRenamedOwnerField(): void
     {
         $config = [
             'fields' => [

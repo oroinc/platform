@@ -5,15 +5,14 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\EventListener;
 use Oro\Bundle\DataAuditBundle\EventListener\SegmentWidgetOptionsListener;
 use Oro\Bundle\DataAuditBundle\SegmentWidget\ContextChecker;
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class SegmentWidgetOptionsListenerTest extends \PHPUnit\Framework\TestCase
+class SegmentWidgetOptionsListenerTest extends TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var SegmentWidgetOptionsListener */
-    private $listener;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private SegmentWidgetOptionsListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class SegmentWidgetOptionsListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testListener()
+    public function testListener(): void
     {
         $options = [
             'column'       => [],
@@ -52,7 +51,7 @@ class SegmentWidgetOptionsListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedOptions, $event->getWidgetOptions());
     }
 
-    public function testOnLoadWhenNotApplicable()
+    public function testOnLoadWhenNotApplicable(): void
     {
         $options = [
             'column'                       => [],
@@ -69,7 +68,7 @@ class SegmentWidgetOptionsListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($options, $event->getWidgetOptions());
     }
 
-    public function testOnLoadWhenNotGranted()
+    public function testOnLoadWhenNotGranted(): void
     {
         $options = [
             'column'       => [],

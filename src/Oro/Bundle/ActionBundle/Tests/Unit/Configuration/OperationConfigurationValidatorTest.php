@@ -7,26 +7,19 @@ use Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Twig\Loader\LoaderInterface;
 
-class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
+class OperationConfigurationValidatorTest extends TestCase
 {
-    /** @var ControllerClassProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $controllerClassProvider;
-
-    /** @var LoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $twigLoader;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var OperationConfigurationValidator */
-    private $validator;
+    private ControllerClassProvider&MockObject $controllerClassProvider;
+    private LoaderInterface&MockObject $twigLoader;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private LoggerInterface&MockObject $logger;
+    private OperationConfigurationValidator $validator;
 
     #[\Override]
     protected function setUp(): void
@@ -53,7 +46,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validateProvider
      */
-    public function testValidate(array $inputData, array $expectedData)
+    public function testValidate(array $inputData, array $expectedData): void
     {
         $this->createValidator($inputData['debug']);
 
@@ -89,7 +82,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validateWithExceptionProvider
      */
-    public function testValidateWithException(array $config, string $exceptionName, string $exceptionMessage)
+    public function testValidateWithException(array $config, string $exceptionName, string $exceptionMessage): void
     {
         $this->twigLoader->expects($this->any())
             ->method('exists')

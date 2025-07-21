@@ -15,7 +15,7 @@ class VirtualRelationsTest extends DatagridConfigurationBuilderTestCase
         array $virtualRelationQuery,
         array $virtualFieldProviderConfig,
         array $expected
-    ) {
+    ): void {
         $entity = 'Acme\Entity\TestEntity';
         $doctrine = $this->getDoctrine(
             [

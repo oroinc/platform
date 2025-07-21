@@ -7,14 +7,14 @@ use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionCronTriggerAssembler;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggerCronVerifier;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger\Stub\AbstractTransitionTriggerAssemblerStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TransitionCronTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
+class TransitionCronTriggerAssemblerTest extends TestCase
 {
-    /** @var TransitionTriggerCronVerifier|\PHPUnit\Framework\MockObject\MockObject */
-    private $verifier;
-
-    /** @var TransitionCronTriggerAssembler */
-    private $assembler;
+    private TransitionTriggerCronVerifier&MockObject $verifier;
+    private TransitionCronTriggerAssembler $assembler;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +27,7 @@ class TransitionCronTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider canAssembleData
      */
-    public function testCanAssemble(bool $expected, array $options)
+    public function testCanAssemble(bool $expected, array $options): void
     {
         $this->assertEquals($expected, $this->assembler->canAssemble($options));
     }
@@ -56,7 +56,7 @@ class TransitionCronTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testAssemble()
+    public function testAssemble(): void
     {
         $cronOpt = '* * * * *';
         $filterOpt = 'a = b';
@@ -92,7 +92,7 @@ class TransitionCronTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($workflowDefinitionOpt, $trigger->getWorkflowDefinition());
     }
 
-    public function testAssembleDefaults()
+    public function testAssembleDefaults(): void
     {
         $cronOpt = '* * * * *';
         $filterOpt = null;
@@ -126,7 +126,7 @@ class TransitionCronTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($workflowDefinitionOpt, $trigger->getWorkflowDefinition());
     }
 
-    public function testVerifyTriggerException()
+    public function testVerifyTriggerException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -134,7 +134,7 @@ class TransitionCronTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
             'got Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger'
         );
 
-        $stub = new Stub\AbstractTransitionTriggerAssemblerStub();
+        $stub = new AbstractTransitionTriggerAssemblerStub();
 
         $stub->verifyProxy($this->assembler, new TransitionEventTrigger());
     }

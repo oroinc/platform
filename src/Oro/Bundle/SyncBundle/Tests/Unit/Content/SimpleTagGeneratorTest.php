@@ -3,11 +3,11 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Content;
 
 use Oro\Bundle\SyncBundle\Content\SimpleTagGenerator;
+use PHPUnit\Framework\TestCase;
 
-class SimpleTagGeneratorTest extends \PHPUnit\Framework\TestCase
+class SimpleTagGeneratorTest extends TestCase
 {
-    /** @var SimpleTagGenerator */
-    private $generator;
+    private SimpleTagGenerator $generator;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class SimpleTagGeneratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDataProvider
      */
-    public function testSupports(mixed $data, bool $expectedResult)
+    public function testSupports(mixed $data, bool $expectedResult): void
     {
         $this->assertSame($expectedResult, $this->generator->supports($data));
     }
@@ -41,8 +41,12 @@ class SimpleTagGeneratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider generateDataProvider
      */
-    public function testGenerate(mixed $data, bool $includeCollectionTag, bool $processNestedData, int $expectedCount)
-    {
+    public function testGenerate(
+        mixed $data,
+        bool $includeCollectionTag,
+        bool $processNestedData,
+        int $expectedCount
+    ): void {
         $result = $this->generator->generate($data, $includeCollectionTag, $processNestedData);
         $this->assertCount($expectedCount, $result);
     }
@@ -72,7 +76,7 @@ class SimpleTagGeneratorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGenerateIncludesParams()
+    public function testGenerateIncludesParams(): void
     {
         $tagWOParams = ['name' => 'testName'];
 

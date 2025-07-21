@@ -6,22 +6,19 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Form\Handler\CommentApiHandler;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CommentApiHandlerTest extends \PHPUnit\Framework\TestCase
+class CommentApiHandlerTest extends TestCase
 {
-    private FormInterface|\PHPUnit\Framework\MockObject\MockObject $form;
-
+    private FormInterface&MockObject $form;
     private Request $request;
-
-    private ObjectManager|\PHPUnit\Framework\MockObject\MockObject $om;
-
-    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
-
+    private ObjectManager&MockObject $om;
+    private ConfigManager&MockObject $configManager;
     private Comment $comment;
-
     private CommentApiHandler $handler;
 
     #[\Override]

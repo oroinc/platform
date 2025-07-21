@@ -6,11 +6,11 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowTransitionRecordTest extends \PHPUnit\Framework\TestCase
+class WorkflowTransitionRecordTest extends TestCase
 {
-    /** @var WorkflowTransitionRecord */
-    private $transitionRecord;
+    private WorkflowTransitionRecord $transitionRecord;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class WorkflowTransitionRecordTest extends \PHPUnit\Framework\TestCase
         $this->transitionRecord = new WorkflowTransitionRecord();
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertNull($this->transitionRecord->getId());
 
@@ -27,7 +27,7 @@ class WorkflowTransitionRecordTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($value, $this->transitionRecord->getId());
     }
 
-    public function testGetSetWorkflowItem()
+    public function testGetSetWorkflowItem(): void
     {
         $this->assertNull($this->transitionRecord->getWorkflowItem());
 
@@ -36,7 +36,7 @@ class WorkflowTransitionRecordTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->transitionRecord->getWorkflowItem());
     }
 
-    public function testGetSetTransitionName()
+    public function testGetSetTransitionName(): void
     {
         $this->assertNull($this->transitionRecord->getTransitionName());
 
@@ -45,7 +45,7 @@ class WorkflowTransitionRecordTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->transitionRecord->getTransitionName());
     }
 
-    public function testGetSetStepFromName()
+    public function testGetSetStepFromName(): void
     {
         $this->assertNull($this->transitionRecord->getStepFrom());
 
@@ -54,7 +54,7 @@ class WorkflowTransitionRecordTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->transitionRecord->getStepFrom());
     }
 
-    public function testGetSetStepToName()
+    public function testGetSetStepToName(): void
     {
         $this->assertNull($this->transitionRecord->getStepTo());
 
@@ -63,7 +63,7 @@ class WorkflowTransitionRecordTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $this->transitionRecord->getStepTo());
     }
 
-    public function testGetTransitionDateAndPrePersist()
+    public function testGetTransitionDateAndPrePersist(): void
     {
         $this->assertNull($this->transitionRecord->getTransitionDate());
         $this->transitionRecord->prePersist();

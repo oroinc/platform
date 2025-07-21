@@ -10,17 +10,14 @@ use Oro\Component\ConfigExpression\ExpressionFactory;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 use Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension;
 use Oro\Component\ConfigExpression\Extension\ExtensionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ExpressionFactoryTest extends \PHPUnit\Framework\TestCase
+class ExpressionFactoryTest extends TestCase
 {
-    /** @var ContextAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextAccessor;
-
-    /** @var ExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $extension;
-
-    /** @var ExpressionFactory */
-    private $factory;
+    private ContextAccessorInterface&MockObject $contextAccessor;
+    private ExtensionInterface&MockObject $extension;
+    private ExpressionFactory $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +30,7 @@ class ExpressionFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory->addExtension($this->extension);
     }
 
-    public function testCreateNoExpression()
+    public function testCreateNoExpression(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The expression "test" does not exist.');
@@ -48,7 +45,7 @@ class ExpressionFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory->create('test');
     }
 
-    public function testCreateIncorrectExpressionType()
+    public function testCreateIncorrectExpressionType(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(sprintf(
@@ -68,7 +65,7 @@ class ExpressionFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory->create('test');
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $options = ['key' => 'value'];
         $expr = $this->createMock(ExpressionInterface::class);
@@ -92,7 +89,7 @@ class ExpressionFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateContextAccessorAware()
+    public function testCreateContextAccessorAware(): void
     {
         $options = ['key' => 'value'];
         $expr = $this->createMock(Blank::class);
@@ -119,7 +116,7 @@ class ExpressionFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTypes()
+    public function testGetTypes(): void
     {
         $types = ['test_name' => 'test_service_id'];
         $newExtension = $this->createMock(DependencyInjectionExtension::class);
@@ -131,7 +128,7 @@ class ExpressionFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($types, $this->factory->getTypes());
     }
 
-    public function testIsTypeExists()
+    public function testIsTypeExists(): void
     {
         $this->extension->expects($this->exactly(2))
             ->method('hasExpression')

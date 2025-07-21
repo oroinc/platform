@@ -4,8 +4,9 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsProvider;
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsProviderInterface;
+use PHPUnit\Framework\TestCase;
 
-class ExtendFieldFormOptionsProviderTest extends \PHPUnit\Framework\TestCase
+class ExtendFieldFormOptionsProviderTest extends TestCase
 {
     public function testGetOptionsReturnsEmptyArrayWhenNoProviders(): void
     {

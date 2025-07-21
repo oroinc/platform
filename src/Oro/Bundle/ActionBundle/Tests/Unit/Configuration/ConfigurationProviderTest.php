@@ -8,10 +8,11 @@ use Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 use Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle3\TestBundle3;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
-class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigurationProviderTest extends TestCase
 {
     use TempDirExtension;
 
@@ -51,9 +52,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     ];
 
     private string $cacheFile;
-
-    /** @var ConfigurationProvider */
-    private $configurationProvider;
+    private ConfigurationProvider $configurationProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -83,7 +82,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetConfigurationWithCache()
+    public function testGetConfigurationWithCache(): void
     {
         $cachedConfig = [
             'operations' => [],
@@ -94,7 +93,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($cachedConfig, $this->configurationProvider->getConfiguration());
     }
 
-    public function testGetConfigurationWithoutCache()
+    public function testGetConfigurationWithoutCache(): void
     {
         $config = $this->configurationProvider->getConfiguration();
 

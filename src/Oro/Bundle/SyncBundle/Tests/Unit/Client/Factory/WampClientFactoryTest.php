@@ -5,9 +5,10 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Client\Factory;
 use Oro\Bundle\SyncBundle\Client\Wamp\Factory\WampClientFactory;
 use Oro\Bundle\SyncBundle\Client\Wamp\WampClient;
 use Oro\Bundle\SyncBundle\Provider\WebsocketClientParametersProviderInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class WampClientFactoryTest extends \PHPUnit\Framework\TestCase
+class WampClientFactoryTest extends TestCase
 {
     public function testCreateClient(): void
     {

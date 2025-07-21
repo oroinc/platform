@@ -7,15 +7,14 @@ use Oro\Component\ConfigExpression\Condition\AbstractComparison;
 use Oro\Component\ConfigExpression\ContextAccessorInterface;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
+class AbstractComparisonTest extends TestCase
 {
-    /** @var ContextAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextAccessor;
-
-    /** @var AbstractComparison */
-    private $condition;
+    private ContextAccessorInterface&MockObject $contextAccessor;
+    private AbstractComparison $condition;
 
     #[\Override]
     protected function setUp(): void
@@ -37,7 +36,7 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, array $context, bool $expectedValue)
+    public function testEvaluate(array $options, array $context, bool $expectedValue): void
     {
         $condition = $this->getMockForAbstractClass(AbstractComparison::class);
         $condition->setContextAccessor($this->contextAccessor);
@@ -116,7 +115,7 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testInitializeSuccess()
+    public function testInitializeSuccess(): void
     {
         $result = $this->condition->initialize(['left' => 'foo', 'right' => 'bar']);
 
@@ -125,7 +124,7 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('bar', ReflectionUtil::getPropertyValue($this->condition, 'right'));
     }
 
-    public function testInitializeFailsWithEmptyRightOption()
+    public function testInitializeFailsWithEmptyRightOption(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Option "right" is required.');
@@ -133,7 +132,7 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize(['foo'  => 'bar', 'left' => 'foo']);
     }
 
-    public function testInitializeFailsWithEmptyLeftOption()
+    public function testInitializeFailsWithEmptyLeftOption(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Option "left" is required.');
@@ -141,7 +140,7 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize(['right' => 'foo', 'foo'   => 'bar',]);
     }
 
-    public function testInitializeFailsWithInvalidOptionsCount()
+    public function testInitializeFailsWithInvalidOptionsCount(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 2 elements, but 0 given.');
@@ -149,7 +148,7 @@ class AbstractComparisonTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize([]);
     }
 
-    public function testAddError()
+    public function testAddError(): void
     {
         $context = ['foo' => 'fooValue', 'bar' => 'barValue'];
         $options = ['left' => new PropertyPath('foo'), 'right' => new PropertyPath('bar')];

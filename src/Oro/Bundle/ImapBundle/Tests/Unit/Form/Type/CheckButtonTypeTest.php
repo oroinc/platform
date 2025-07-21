@@ -18,7 +18,7 @@ class CheckButtonTypeTest extends FormIntegrationTestCase
 
     public function testForm()
     {
-        $btn  = $this->factory->create(CheckButtonType::class);
+        $btn = $this->factory->create(CheckButtonType::class);
         $view = $btn->createView();
 
         $this->assertArrayHasKey('class', $view->vars['attr']);

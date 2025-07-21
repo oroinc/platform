@@ -49,7 +49,7 @@ class BusinessUnitManagerTest extends TestCase
         );
     }
 
-    public function testGetTreeOptions()
+    public function testGetTreeOptions(): void
     {
         $inputData = [
             [
@@ -110,7 +110,7 @@ class BusinessUnitManagerTest extends TestCase
     /**
      * @dataProvider getTreeNodesProvider
      */
-    public function testGetTreeNodesCount(array $tree, int $expectedCount)
+    public function testGetTreeNodesCount(array $tree, int $expectedCount): void
     {
         $this->assertEquals($expectedCount, $this->businessUnitManager->getTreeNodesCount($tree));
     }
@@ -211,21 +211,21 @@ class BusinessUnitManagerTest extends TestCase
         ];
     }
 
-    public function testGetBusinessUnitsTree()
+    public function testGetBusinessUnitsTree(): void
     {
         $this->buRepo->expects($this->once())
             ->method('getBusinessUnitsTree');
         $this->businessUnitManager->getBusinessUnitsTree();
     }
 
-    public function testGetBusinessUnitIds()
+    public function testGetBusinessUnitIds(): void
     {
         $this->buRepo->expects($this->once())
             ->method('getBusinessUnitIds');
         $this->businessUnitManager->getBusinessUnitIds();
     }
 
-    public function testGetBusinessUnit()
+    public function testGetBusinessUnit(): void
     {
         $this->buRepo->expects($this->once())
             ->method('findOneBy');
@@ -241,7 +241,7 @@ class BusinessUnitManagerTest extends TestCase
         int $accessLevel,
         Organization $organization,
         bool $isCanBeSet
-    ) {
+    ): void {
         $tree = new OwnerTree();
         $this->addUserInfoToTree($tree, $currentUser);
         $this->addUserInfoToTree($tree, $newUser);
@@ -389,7 +389,7 @@ class BusinessUnitManagerTest extends TestCase
         int $accessLevel,
         Organization $organization,
         bool $isCanBeSet
-    ) {
+    ): void {
         $tree = new OwnerTree();
         $this->addUserInfoToTree($tree, $currentUser);
         $this->addBusinessUnitInfoToTree($tree, $newBusinessUnit);
@@ -529,7 +529,7 @@ class BusinessUnitManagerTest extends TestCase
         foreach ($user->getOrganizations() as $organization) {
             $tree->addUserOrganization($user->getId(), $organization->getId());
             foreach ($user->getBusinessUnits() as $businessUnit) {
-                $organizationId   = $organization->getId();
+                $organizationId = $organization->getId();
                 $buOrganizationId = $businessUnit->getOrganization()->getId();
                 if ($organizationId == $buOrganizationId) {
                     $tree->addUserBusinessUnit($user->getId(), $organizationId, $businessUnit->getId());

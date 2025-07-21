@@ -5,16 +5,15 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\Twig;
 use Oro\Bundle\AddressBundle\Provider\PhoneProvider;
 use Oro\Bundle\AddressBundle\Twig\PhoneExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PhoneExtensionTest extends \PHPUnit\Framework\TestCase
+class PhoneExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|PhoneProvider */
-    private $provider;
-
-    /** @var PhoneExtension */
-    private $extension;
+    private PhoneProvider&MockObject $provider;
+    private PhoneExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +30,7 @@ class PhoneExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider phoneSourceProvider
      */
-    public function testGetPhoneNumber(?object $object)
+    public function testGetPhoneNumber(?object $object): void
     {
         $expectedPhone = '123-456-789';
 
@@ -51,7 +50,7 @@ class PhoneExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider phoneSourceProvider
      */
-    public function testGetPhoneNumbers(?object $object)
+    public function testGetPhoneNumbers(?object $object): void
     {
         $sourcePhones = [
             ['123-456-789', new \stdClass()],

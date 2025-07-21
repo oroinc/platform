@@ -8,8 +8,9 @@ use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\TestActivityList;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class ActivityListTest extends \PHPUnit\Framework\TestCase
+class ActivityListTest extends TestCase
 {
     public function testIdGetter(): void
     {

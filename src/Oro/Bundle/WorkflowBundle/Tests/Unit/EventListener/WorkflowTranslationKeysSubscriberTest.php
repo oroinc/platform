@@ -9,15 +9,14 @@ use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowTranslationKeysSubscriber;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
+class WorkflowTranslationKeysSubscriberTest extends TestCase
 {
-    /** @var TranslationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationManager;
-
-    /** @var WorkflowTranslationKeysSubscriber */
-    private $translationKeysSubscriber;
+    private TranslationManager&MockObject $translationManager;
+    private WorkflowTranslationKeysSubscriber $translationKeysSubscriber;
 
     #[\Override]
     protected function setUp(): void
@@ -36,12 +35,12 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
         return $translationKey;
     }
 
-    public function testImplementsSubscriberInterface()
+    public function testImplementsSubscriberInterface(): void
     {
         $this->assertInstanceOf(EventSubscriberInterface::class, $this->translationKeysSubscriber);
     }
 
-    public function testEnsureTranslationKeys()
+    public function testEnsureTranslationKeys(): void
     {
         $definition = (new WorkflowDefinition())->setName('test_workflow');
         $changes = new WorkflowChangesEvent($definition);
@@ -58,7 +57,7 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translationKeysSubscriber->ensureTranslationKeys($changes);
     }
 
-    public function testClearTranslationKeys()
+    public function testClearTranslationKeys(): void
     {
         $updatedDefinition = (new WorkflowDefinition())
             ->setName('test_workflow')
@@ -127,7 +126,7 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testClearLogicExceptionOnAbsentPreviousDefinition()
+    public function testClearLogicExceptionOnAbsentPreviousDefinition(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Previous WorkflowDefinition expected, got null.');
@@ -137,7 +136,7 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDeleteTranslationKeys()
+    public function testDeleteTranslationKeys(): void
     {
         $deletedDefinition = (new WorkflowDefinition())->setName('test_workflow')->setLabel('label_translation_key');
 
@@ -150,7 +149,7 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translationKeysSubscriber->deleteTranslationKeys(new WorkflowChangesEvent($deletedDefinition));
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
             [

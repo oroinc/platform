@@ -11,6 +11,8 @@ use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Component\DependencyInjection\ServiceLink;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
@@ -26,7 +28,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
+class PermissionGrantingStrategyTest extends TestCase
 {
     private const SERVICE_BITS = -16;
     private const REMOVE_SERVICE_BITS = 15;
@@ -47,20 +49,11 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
     private const GROUP_BASIC = 1 + 4;
     private const GROUP_SYSTEM = 2 + 8;
 
-    /** @var UserSecurityIdentity */
-    private $sid;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenInterface */
-    private $securityToken;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|PermissionGrantingStrategyContextInterface */
-    private $context;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AclExtensionInterface */
-    private $extension;
-
-    /** @var PermissionGrantingStrategy */
-    private $strategy;
+    private UserSecurityIdentity $sid;
+    private TokenInterface&MockObject $securityToken;
+    private PermissionGrantingStrategyContextInterface&MockObject $context;
+    private AclExtensionInterface&MockObject $extension;
+    private PermissionGrantingStrategy $strategy;
 
     #[\Override]
     protected function setUp(): void
@@ -212,12 +205,12 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
             ->willReturn($object);
     }
 
-    public function testGetContext()
+    public function testGetContext(): void
     {
         $this->assertSame($this->context, $this->strategy->getContext());
     }
 
-    public function testIsGrantedReturnsExceptionIfNoAceIsFound()
+    public function testIsGrantedReturnsExceptionIfNoAceIsFound(): void
     {
         $this->expectException(NoAceFoundException::class);
         $this->setObjectToContext(new TestEntity(123));
@@ -230,7 +223,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $this->strategy->isGranted($acl, [self::MASK_VIEW_BASIC, self::MASK_VIEW_SYSTEM], [$this->sid]);
     }
 
-    public function testIsGrantedObjectAcesHavePriority()
+    public function testIsGrantedObjectAcesHavePriority(): void
     {
         $this->setObjectToContext(new TestEntity(123));
 
@@ -248,7 +241,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsGrantedUsesClassAcesIfNoApplicableObjectAceWasFound()
+    public function testIsGrantedUsesClassAcesIfNoApplicableObjectAceWasFound(): void
     {
         $this->setObjectToContext(new TestEntity(123));
 
@@ -266,7 +259,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsGrantedPrefersLocalAcesOverParentAclAces()
+    public function testIsGrantedPrefersLocalAcesOverParentAclAces(): void
     {
         $this->setObjectToContext(new TestEntity(123));
 
@@ -287,7 +280,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsGrantedUsesParentAcesIfNoLocalAcesAreApplicable()
+    public function testIsGrantedUsesParentAcesIfNoLocalAcesAreApplicable(): void
     {
         $this->setObjectToContext(new TestEntity(123));
 
@@ -308,7 +301,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsGrantedUsesParentAcesOnlyIfInheritingIsSet()
+    public function testIsGrantedUsesParentAcesOnlyIfInheritingIsSet(): void
     {
         $this->expectException(NoAceFoundException::class);
         $this->setObjectToContext(new TestEntity(123));
@@ -326,7 +319,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $this->strategy->isGranted($acl, [self::MASK_VIEW_BASIC, self::MASK_VIEW_SYSTEM], [$this->sid]);
     }
 
-    public function testIsGrantedAllowAccessIfThereIsGrantedAceForAtLeastOneSidTestWhenFirstSidGranted()
+    public function testIsGrantedAllowAccessIfThereIsGrantedAceForAtLeastOneSidTestWhenFirstSidGranted(): void
     {
         $this->setObjectToContext(new TestEntity(123));
 
@@ -350,7 +343,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsGrantedAllowAccessIfThereIsGrantedAceForAtLeastOneSidTestWhenSecondSidGranted()
+    public function testIsGrantedAllowAccessIfThereIsGrantedAceForAtLeastOneSidTestWhenSecondSidGranted(): void
     {
         $this->setObjectToContext(new TestEntity(123));
 
@@ -374,7 +367,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsGrantedCallsAuditLoggerOnGrant()
+    public function testIsGrantedCallsAuditLoggerOnGrant(): void
     {
         $this->setObjectToContext(new TestEntity(123));
 
@@ -398,7 +391,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsGrantedCallsAuditLoggerOnDeny()
+    public function testIsGrantedCallsAuditLoggerOnDeny(): void
     {
         $this->setObjectToContext(new TestEntity(123));
 
@@ -431,7 +424,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         int $requiredMask,
         bool $result,
         bool $noAceFoundException
-    ) {
+    ): void {
         $this->setObjectToContext(new TestEntity(123));
 
         $acl = $this->getAcl();
@@ -459,7 +452,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         int $requiredMask,
         bool $result,
         bool $noAceFoundException
-    ) {
+    ): void {
         $this->setObjectToContext(new TestEntity(123));
 
         $acl = $this->getAcl();
@@ -609,7 +602,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testIsGrantedForPermissionStrategyShouldCheckOnlyPermissionEncodedInAceMask()
+    public function testIsGrantedForPermissionStrategyShouldCheckOnlyPermissionEncodedInAceMask(): void
     {
         $this->expectException(NoAceFoundException::class);
         $this->setObjectToContext(new TestEntity(123));
@@ -627,7 +620,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsGrantedShouldConsiderZeroPermissionMaskAsDeniedForNotPermissionStrategy()
+    public function testIsGrantedShouldConsiderZeroPermissionMaskAsDeniedForNotPermissionStrategy(): void
     {
         $this->setObjectToContext(new TestEntity(123));
 
@@ -670,7 +663,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $this->strategy->setSecurityMetadataProvider($this->createServiceLink($securityMetadataProvider));
     }
 
-    public function testIsFieldGrantedReturnsTrueIfNoAceIsFound()
+    public function testIsFieldGrantedReturnsTrueIfNoAceIsFound(): void
     {
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
@@ -692,7 +685,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsFieldGrantedObjectAcesHavePriority()
+    public function testIsFieldGrantedObjectAcesHavePriority(): void
     {
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
@@ -718,7 +711,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsFieldGrantedUsesClassAcesIfNoApplicableObjectAceWasFound()
+    public function testIsFieldGrantedUsesClassAcesIfNoApplicableObjectAceWasFound(): void
     {
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
@@ -744,7 +737,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsFieldGrantedPrefersLocalAcesOverParentAclAces()
+    public function testIsFieldGrantedPrefersLocalAcesOverParentAclAces(): void
     {
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
@@ -773,7 +766,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsFieldGrantedUsesParentAcesIfNoLocalAcesAreApplicable()
+    public function testIsFieldGrantedUsesParentAcesIfNoLocalAcesAreApplicable(): void
     {
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
@@ -802,7 +795,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsFieldGrantedUsesParentAcesOnlyIfInheritingIsSet()
+    public function testIsFieldGrantedUsesParentAcesOnlyIfInheritingIsSet(): void
     {
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
@@ -829,7 +822,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsFieldGrantedAllowAccessIfThereIsGrantedAceForAtLeastOneSidTestWhenFirstSidGranted()
+    public function testIsFieldGrantedAllowAccessIfThereIsGrantedAceForAtLeastOneSidTestWhenFirstSidGranted(): void
     {
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
@@ -857,7 +850,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsFieldGrantedAllowAccessIfThereIsGrantedAceForAtLeastOneSidTestWhenSecondSidGranted()
+    public function testIsFieldGrantedAllowAccessIfThereIsGrantedAceForAtLeastOneSidTestWhenSecondSidGranted(): void
     {
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
@@ -885,7 +878,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsFieldGrantedForFieldWithAlias()
+    public function testIsFieldGrantedForFieldWithAlias(): void
     {
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
@@ -911,7 +904,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsFieldGrantedForFieldWithoutAlias()
+    public function testIsFieldGrantedForFieldWithoutAlias(): void
     {
         $obj = new TestEntity(123);
         $this->setObjectToContext($obj);
@@ -936,7 +929,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsGrantedInCaseOfTwoRolesShouldReturnCorrectAccessLevel()
+    public function testIsGrantedInCaseOfTwoRolesShouldReturnCorrectAccessLevel(): void
     {
         $object = new TestEntity(123);
         $this->setObjectToContext($object);
@@ -975,7 +968,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($isGranted);
     }
 
-    public function testIsGrantedInCaseOfTwoRolesShouldReturnCorrectAccessLevelForField()
+    public function testIsGrantedInCaseOfTwoRolesShouldReturnCorrectAccessLevelForField(): void
     {
         $field = 'testField';
         $object = new TestEntity(123);

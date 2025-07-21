@@ -5,18 +5,15 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Title;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
 use Oro\Bundle\NavigationBundle\Title\TranslationExtractor;
 use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\MessageCatalogue;
 
-class TranslationExtractorTest extends \PHPUnit\Framework\TestCase
+class TranslationExtractorTest extends TestCase
 {
-    /** @var TitleReaderRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $titleReaderRegistry;
-
-    /** @var ControllerClassProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $controllerClassProvider;
-
-    /** @var TranslationExtractor */
-    private $translatorExtractor;
+    private TitleReaderRegistry&MockObject $titleReaderRegistry;
+    private ControllerClassProvider&MockObject $controllerClassProvider;
+    private TranslationExtractor $translatorExtractor;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +27,7 @@ class TranslationExtractorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testExtract()
+    public function testExtract(): void
     {
         $controllers = ['route_1' => ['TestBundle/Controller/TestController', 'testAction']];
 

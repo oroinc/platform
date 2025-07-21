@@ -8,22 +8,17 @@ use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Twig\DateTimeOrganizationExtension;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DateTimeOrganizationExtensionTest extends \PHPUnit\Framework\TestCase
+class DateTimeOrganizationExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var DateTimeFormatterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formatter;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationManager;
-
-    /** @var DateTimeOrganizationExtension */
-    private $extension;
+    private DateTimeFormatterInterface&MockObject $formatter;
+    private ConfigManager&MockObject $configManager;
+    private LocalizationManager&MockObject $localizationManager;
+    private DateTimeOrganizationExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +36,7 @@ class DateTimeOrganizationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new DateTimeOrganizationExtension($container);
     }
 
-    public function testFormatDateTimeOrganizationShouldUseTimezoneFromConfigurationIfOrganizationProvided()
+    public function testFormatDateTimeOrganizationShouldUseTimezoneFromConfigurationIfOrganizationProvided(): void
     {
         $date = new \DateTime('2016-05-31 00:00:00');
         $expected = 'May 30, 2016, 4:00 PM';
@@ -77,7 +72,7 @@ class DateTimeOrganizationExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormatDateTimeOrganizationShouldUseTimezonePassedInOptionsIfOrganizationNotProvided()
+    public function testFormatDateTimeOrganizationShouldUseTimezonePassedInOptionsIfOrganizationNotProvided(): void
     {
         $date = new \DateTime('2016-05-31 00:00:00');
         $expected = 'May 30, 2016, 4:00 PM';

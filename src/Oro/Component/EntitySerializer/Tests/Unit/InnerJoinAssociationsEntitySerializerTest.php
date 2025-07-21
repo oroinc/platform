@@ -134,6 +134,57 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
         );
     }
 
+    public function testInnerJoinForFirstLevelAssociationAndInnerJoinAlreadyExists(): void
+    {
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
+            ->innerJoin('e.owner', 'owner', 'WITH', 'owner.id > 0')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT u0_.name AS name_0, p1_.id AS id_1, u0_.id AS id_2, u0_.name AS name_3'
+            . ' FROM product_table p1_'
+            . ' INNER JOIN user_table u0_ ON p1_.owner_id = u0_.id AND (u0_.id > 0)'
+            . ' WHERE p1_.id = ?',
+            [
+                [
+                    'id_1'   => 1,
+                    'id_2'   => 10,
+                    'name_0' => 'user_name',
+                    'name_3' => 'user_name'
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'ownerName' => [
+                        'property_path' => 'owner.name'
+                    ]
+                ]
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'ownerName' => 'user_name',
+                    'owner'     => [
+                        'id'   => 10,
+                        'name' => 'user_name'
+                    ]
+                ]
+            ],
+            $result
+        );
+    }
+
     public function testInnerJoinForFirstLevelAssociationAndLeftJoinAlreadyExists(): void
     {
         $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
@@ -143,16 +194,67 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT p0_.id AS id_0,'
-            . ' u1_.id AS id_1, u1_.name AS name_2'
-            . ' FROM product_table p0_'
-            . ' INNER JOIN user_table u1_ ON p0_.owner_id = u1_.id AND (u1_.id > 0)'
-            . ' WHERE p0_.id = ?',
+            'SELECT u0_.name AS name_0, p1_.id AS id_1, u0_.id AS id_2, u0_.name AS name_3'
+            . ' FROM product_table p1_'
+            . ' LEFT JOIN user_table u0_ ON p1_.owner_id = u0_.id AND (u0_.id > 0)'
+            . ' WHERE p1_.id = ?',
             [
                 [
-                    'id_0'   => 1,
-                    'id_1'   => 10,
-                    'name_2' => 'user_name'
+                    'id_1'   => 1,
+                    'id_2'   => 10,
+                    'name_0' => 'user_name',
+                    'name_3' => 'user_name'
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'ownerName' => [
+                        'property_path' => 'owner.name'
+                    ]
+                ]
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'ownerName' => 'user_name',
+                    'owner'     => [
+                        'id'   => 10,
+                        'name' => 'user_name'
+                    ]
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testInnerJoinForFirstLevelAssociationAndLeftJoinConfiguredAsInnerJoinAlreadyExists(): void
+    {
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
+            ->leftJoin('e.owner', 'owner', 'WITH', 'owner.id > 0')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT u0_.name AS name_0, p1_.id AS id_1, u0_.id AS id_2, u0_.name AS name_3'
+            . ' FROM product_table p1_'
+            . ' INNER JOIN user_table u0_ ON p1_.owner_id = u0_.id AND (u0_.id > 0)'
+            . ' WHERE p1_.id = ?',
+            [
+                [
+                    'id_1'   => 1,
+                    'id_2'   => 10,
+                    'name_0' => 'user_name',
+                    'name_3' => 'user_name'
                 ]
             ],
             [1 => 1],

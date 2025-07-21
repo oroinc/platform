@@ -17,21 +17,6 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
 
 class TranslatorCatalogueListenerTest extends TestCase
 {
-    private TranslatorCatalogueListener $listener;
-
-    private ManagerRegistry|MockObject $managerRegistry;
-
-    private EntityManagerInterface|MockObject $entityManager;
-
-    private AddressTypeTranslationRepository|MockObject $addressTypeTranslationRepository;
-
-    private CountryTranslationRepository|MockObject $countryTranslationRepository;
-
-    private RegionTranslationRepository|MockObject $regionTranslationRepository;
-    private TranslationRepository|MockObject $translationRepository;
-
-    private MessageCatalogueInterface|MockObject $messageCatalogue;
-
     private const ADDRESS_TYPE_TRANSLATION_DATA = [
         'billing' => 'entities.address_type.billing',
         'shipping' => 'entities.address_type.shipping'
@@ -53,6 +38,16 @@ class TranslatorCatalogueListenerTest extends TestCase
         'AD-06' => 'entities.region.AD-06',
     ];
 
+    private ManagerRegistry&MockObject $managerRegistry;
+    private EntityManagerInterface&MockObject $entityManager;
+    private AddressTypeTranslationRepository&MockObject $addressTypeTranslationRepository;
+    private CountryTranslationRepository&MockObject $countryTranslationRepository;
+    private RegionTranslationRepository&MockObject $regionTranslationRepository;
+    private TranslationRepository&MockObject $translationRepository;
+    private MessageCatalogueInterface&MockObject $messageCatalogue;
+    private TranslatorCatalogueListener $listener;
+
+    #[\Override]
     protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
@@ -89,20 +84,14 @@ class TranslatorCatalogueListenerTest extends TestCase
 
     public function testOnAfterCatalogueDumpUpdateUnknownDomain(): void
     {
-        $this
-            ->messageCatalogue
-            ->expects(self::any())
+        $this->messageCatalogue->expects(self::any())
             ->method('getDomains')
             ->willReturn(['unknown']);
 
-        $this
-            ->managerRegistry
-            ->expects(self::never())
+        $this->managerRegistry->expects(self::never())
             ->method('getManagerForClass');
 
-        $this
-            ->entityManager
-            ->expects(self::never())
+        $this->entityManager->expects(self::never())
             ->method('getRepository');
 
         $event = new AfterCatalogueInitialize($this->messageCatalogue);
@@ -111,15 +100,11 @@ class TranslatorCatalogueListenerTest extends TestCase
 
     private function getRepositoryCallsTest(): void
     {
-        $this
-            ->managerRegistry
-            ->expects(self::exactly(6))
+        $this->managerRegistry->expects(self::exactly(6))
             ->method('getManagerForClass')
             ->willReturn($this->entityManager);
 
-        $this
-            ->entityManager
-            ->expects(self::exactly(6))
+        $this->entityManager->expects(self::exactly(6))
             ->method('getRepository')
             ->willReturnCallback(function (string $className) {
                 $repositoryClass = $className.'Repository';
@@ -132,57 +117,41 @@ class TranslatorCatalogueListenerTest extends TestCase
 
     private function updateDefaultTranslationsCallsTest(): void
     {
-        $this
-            ->addressTypeTranslationRepository
-            ->expects(self::once())
+        $this->addressTypeTranslationRepository->expects(self::once())
             ->method('updateDefaultTranslations')
             ->with(self::ADDRESS_TYPE_TRANSLATION_DATA);
 
-        $this
-            ->countryTranslationRepository
-            ->expects(self::once())
+        $this->countryTranslationRepository->expects(self::once())
             ->method('updateDefaultTranslations')
             ->with(self::COUNTRY_TRANSLATION_DATA);
 
-        $this
-            ->regionTranslationRepository
-            ->expects(self::once())
+        $this->regionTranslationRepository->expects(self::once())
             ->method('updateDefaultTranslations')
             ->with(self::REGION_TRANSLATION_DATA);
     }
 
     private function updateTranslationsCallsTest(string $locale): void
     {
-        $this
-            ->addressTypeTranslationRepository
-            ->expects(self::once())
+        $this->addressTypeTranslationRepository->expects(self::once())
             ->method('updateTranslations')
             ->with(self::ADDRESS_TYPE_TRANSLATION_DATA, $locale);
 
-        $this
-            ->countryTranslationRepository
-            ->expects(self::once())
+        $this->countryTranslationRepository->expects(self::once())
             ->method('updateTranslations')
             ->with(self::COUNTRY_TRANSLATION_DATA, $locale);
 
-        $this
-            ->regionTranslationRepository
-            ->expects(self::once())
+        $this->regionTranslationRepository->expects(self::once())
             ->method('updateTranslations')
             ->with(self::REGION_TRANSLATION_DATA, $locale);
     }
 
     private function messageCatalogueCallsTest(string $locale, array $domains = []): void
     {
-        $this
-            ->messageCatalogue
-            ->expects(self::any())
+        $this->messageCatalogue->expects(self::any())
             ->method('getDomains')
             ->willReturn($domains);
 
-        $this
-            ->messageCatalogue
-            ->expects(self::any())
+        $this->messageCatalogue->expects(self::any())
             ->method('all')
             ->willReturnCallback(function (string $domain): array {
                 $data = self::ADDRESS_TYPE_TRANSLATION_DATA +
@@ -197,9 +166,7 @@ class TranslatorCatalogueListenerTest extends TestCase
                 return $data;
             });
 
-        $this
-            ->messageCatalogue
-            ->expects(self::any())
+        $this->messageCatalogue->expects(self::any())
             ->method('getLocale')
             ->willReturn($locale);
     }

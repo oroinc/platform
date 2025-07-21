@@ -8,19 +8,16 @@ use Oro\Bundle\SecurityBundle\Attribute\Loader\AclAttributeLoaderInterface;
 use Oro\Bundle\SecurityBundle\Metadata\AclAttributeProvider;
 use Oro\Bundle\SecurityBundle\Metadata\AclAttributeStorage;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AclAttributeProviderTest extends \PHPUnit\Framework\TestCase
+class AclAttributeProviderTest extends TestCase
 {
     use TempDirExtension;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassResolver;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $loader;
-
-    /** @var AclAttributeProvider */
-    private $provider;
+    private EntityClassResolver&MockObject $entityClassResolver;
+    private AclAttributeLoaderInterface&MockObject $loader;
+    private AclAttributeProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +35,7 @@ class AclAttributeProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFindAndGetAttribute()
+    public function testFindAndGetAttribute(): void
     {
         $this->loader->expects($this->once())
             ->method('load')
@@ -71,7 +68,7 @@ class AclAttributeProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $this->provider->getAttributes('action'));
     }
 
-    public function testHasAttributeAndIsProtected()
+    public function testHasAttributeAndIsProtected(): void
     {
         $this->loader->expects($this->once())
             ->method('load')

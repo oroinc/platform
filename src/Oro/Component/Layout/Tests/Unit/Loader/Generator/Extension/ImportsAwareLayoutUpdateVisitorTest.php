@@ -7,10 +7,11 @@ namespace Oro\Component\Layout\Tests\Unit\Loader\Generator\Extension;
 use Oro\Component\Layout\Loader\Generator\Extension\ImportsAwareLayoutUpdateVisitor;
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 use Oro\Component\PhpUtils\ClassGenerator;
+use PHPUnit\Framework\TestCase;
 
-class ImportsAwareLayoutUpdateVisitorTest extends \PHPUnit\Framework\TestCase
+class ImportsAwareLayoutUpdateVisitorTest extends TestCase
 {
-    public function testVisit()
+    public function testVisit(): void
     {
         $imports = [
             [

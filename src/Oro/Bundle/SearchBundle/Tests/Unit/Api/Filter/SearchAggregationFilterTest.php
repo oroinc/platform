@@ -12,16 +12,16 @@ use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolverFactory;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
+class SearchAggregationFilterTest extends TestCase
 {
     private const ENTITY_CLASS = 'Test\Entity';
 
-    /** @var SearchAggregationFilter */
-    private $filter;
+    private SearchAggregationFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -58,7 +58,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->setFieldMappings($fieldMappings);
     }
 
-    public function testGetAggregationDataTypes()
+    public function testGetAggregationDataTypes(): void
     {
         $this->filter->apply(new Criteria(), new FilterValue('path', ['field2 count', 'field1 sum']));
 
@@ -71,7 +71,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validFilterDataProvider
      */
-    public function testValidFilter(?FilterValue $filterValue, array $expectedAggregations)
+    public function testValidFilter(?FilterValue $filterValue, array $expectedAggregations): void
     {
         $query = new IndexerQuery($this->createMock(Indexer::class), new SearchQuery());
         $this->filter->apply(new Criteria(), $filterValue);
@@ -109,7 +109,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testNoFunction()
+    public function testNoFunction(): void
     {
         $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage(
@@ -121,7 +121,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->apply(new Criteria(), new FilterValue('path', $value));
     }
 
-    public function testNotSupportedFunction()
+    public function testNotSupportedFunction(): void
     {
         $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage('The aggregating function "someFunction" is not supported.');
@@ -130,7 +130,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->apply(new Criteria(), new FilterValue('path', $value));
     }
 
-    public function testNotSupportedFunctionForDataType()
+    public function testNotSupportedFunctionForDataType(): void
     {
         $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage('The aggregating function "sum" is not supported for the field type "text".');
@@ -139,7 +139,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->apply(new Criteria(), new FilterValue('path', $value));
     }
 
-    public function testExtraElement()
+    public function testExtraElement(): void
     {
         $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage(
@@ -151,7 +151,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->apply(new Criteria(), new FilterValue('path', $value));
     }
 
-    public function testEmptyDefinition()
+    public function testEmptyDefinition(): void
     {
         $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage(
@@ -163,7 +163,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->apply(new Criteria(), new FilterValue('path', $value));
     }
 
-    public function testEmptyField()
+    public function testEmptyField(): void
     {
         $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage(
@@ -175,7 +175,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->apply(new Criteria(), new FilterValue('path', $value));
     }
 
-    public function testEmptyFunction()
+    public function testEmptyFunction(): void
     {
         $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage(
@@ -187,7 +187,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->apply(new Criteria(), new FilterValue('path', $value));
     }
 
-    public function testEmptyAlias()
+    public function testEmptyAlias(): void
     {
         $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage(

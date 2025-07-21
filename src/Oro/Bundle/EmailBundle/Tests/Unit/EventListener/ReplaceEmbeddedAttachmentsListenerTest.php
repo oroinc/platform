@@ -25,13 +25,13 @@ class ReplaceEmbeddedAttachmentsListenerTest extends TestCase
      */
     public function testReplace($bodyTemplate, array $attachments): void
     {
-        $email     = new Email();
+        $email = new Email();
         $emailBody = new EmailBody();
 
         $replacements = [];
-        $contentIds   = [];
+        $contentIds = [];
         foreach ($attachments as $attachmentData) {
-            $attachment             = new EmailAttachment();
+            $attachment = new EmailAttachment();
             $emailAttachmentContent = new EmailAttachmentContent();
             $emailAttachmentContent
                 ->setContent($attachmentData['content'])
@@ -42,7 +42,7 @@ class ReplaceEmbeddedAttachmentsListenerTest extends TestCase
                 ->setContent($emailAttachmentContent);
             $emailBody->addAttachment($attachment);
 
-            $cid          = 'cid:' . $attachmentData['content_id'];
+            $cid = 'cid:' . $attachmentData['content_id'];
             $contentIds[] = $cid;
             if ($attachmentData['replace']) {
                 $replacements[] = sprintf('data:%s;base64,%s', $attachmentData['type'], $attachmentData['content']);
@@ -127,7 +127,7 @@ class ReplaceEmbeddedAttachmentsListenerTest extends TestCase
 
     public function testNotSupportedReplace(): void
     {
-        $email     = new Email();
+        $email = new Email();
         $emailBody = new EmailBody();
 
         $replacements = $embeddedContentIds = [];
@@ -140,7 +140,7 @@ class ReplaceEmbeddedAttachmentsListenerTest extends TestCase
 
         $emailBody->addAttachment($attachment);
 
-        $cid          = 'cid:' . $embeddedContentId;
+        $cid = 'cid:' . $embeddedContentId;
         $embeddedContentIds[] = $cid;
         $replacements[] = $cid;
 

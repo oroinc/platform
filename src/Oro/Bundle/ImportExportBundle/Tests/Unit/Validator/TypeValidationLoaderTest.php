@@ -8,9 +8,11 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ImportExportBundle\Validator\TypeValidationLoader;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
+class TypeValidationLoaderTest extends TestCase
 {
     private const INTEGER_CONSTRAINT = [
         [
@@ -22,14 +24,9 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendConfigProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldConfigProvider;
-
-    /** @var TypeValidationLoader */
-    private $loader;
+    private ConfigProvider&MockObject $extendConfigProvider;
+    private ConfigProvider&MockObject $fieldConfigProvider;
+    private TypeValidationLoader $loader;
 
     #[\Override]
     protected function setUp(): void

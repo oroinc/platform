@@ -6,8 +6,9 @@ use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\NotificationBundle\Model\TemplateMassNotification;
+use PHPUnit\Framework\TestCase;
 
-class TemplateMassNotificationTest extends \PHPUnit\Framework\TestCase
+class TemplateMassNotificationTest extends TestCase
 {
     private const SENDER_EMAIL = 'some@some.com';
     private const SENDER_NAME = 'some';

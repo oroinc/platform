@@ -7,6 +7,8 @@ use Oro\Component\Action\Action\FlashMessage;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -15,19 +17,12 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FlashMessageTest extends \PHPUnit\Framework\TestCase
+class FlashMessageTest extends TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $htmlTagHelper;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var FlashMessage */
-    private $action;
+    private TranslatorInterface&MockObject $translator;
+    private HtmlTagHelper&MockObject $htmlTagHelper;
+    private RequestStack $requestStack;
+    private FlashMessage $action;
 
     #[\Override]
     protected function setUp(): void
@@ -45,12 +40,7 @@ class FlashMessageTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
-    /**
-     * @param Request|\PHPUnit\Framework\MockObject\MockObject $request
-     *
-     * @return FlashBagInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function expectGetFlashBag(Request $request): FlashBagInterface
+    private function expectGetFlashBag(Request&MockObject $request): FlashBagInterface&MockObject
     {
         $flashBag = $this->createMock(FlashBagInterface::class);
         $session = $this->createMock(Session::class);
@@ -64,7 +54,7 @@ class FlashMessageTest extends \PHPUnit\Framework\TestCase
         return $flashBag;
     }
 
-    public function testInitializeWithoutMessageParameter()
+    public function testInitializeWithoutMessageParameter(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Parameter "message" is required.');
@@ -72,7 +62,7 @@ class FlashMessageTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize([]);
     }
 
-    public function testInitializeWithEmptyMessageParameter()
+    public function testInitializeWithEmptyMessageParameter(): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('Parameter "message" is required.');
@@ -80,13 +70,13 @@ class FlashMessageTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize(['message' => '']);
     }
 
-    public function testExecuteWithoutRequest()
+    public function testExecuteWithoutRequest(): void
     {
         $this->action->initialize(['message' => 'test']);
         $this->action->execute([]);
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $type = 'test_type';
         $message = 'test message';
@@ -126,7 +116,7 @@ class FlashMessageTest extends \PHPUnit\Framework\TestCase
         ]));
     }
 
-    public function testExecuteWithoutTranslation()
+    public function testExecuteWithoutTranslation(): void
     {
         $type = 'test_type';
         $message = 'test message, %some%, %other%, %missing%';
@@ -166,7 +156,7 @@ class FlashMessageTest extends \PHPUnit\Framework\TestCase
         ]));
     }
 
-    public function testExecuteWithoutTranslationAndWithoutMessageParameters()
+    public function testExecuteWithoutTranslationAndWithoutMessageParameters(): void
     {
         $type = 'test_type';
         $message = 'test message';

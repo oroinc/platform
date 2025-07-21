@@ -8,12 +8,13 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class AttributeGroupTest extends \PHPUnit\Framework\TestCase
+class AttributeGroupTest extends TestCase
 {
     use EntityTestCaseTrait;
 
-    public function testProperties()
+    public function testProperties(): void
     {
         $properties = [
             ['id', 777],
@@ -27,7 +28,7 @@ class AttributeGroupTest extends \PHPUnit\Framework\TestCase
         $this->assertPropertyAccessors($entity, $properties);
     }
 
-    public function testCollections()
+    public function testCollections(): void
     {
         $collections = [
             ['labels', new LocalizedFallbackValue()],

@@ -19,3 +19,10 @@ oro:
 
         filename_with_path:
             not_allowed: 'The file name should not have a path.'
+
+        parent:
+            change_not_allowed: 'This file is already used in another entity.'
+
+        sort_order:
+            invalid_type: 'The sort order should be an integer.'
+            not_in_range: 'The sort order should be between {{ min }} and {{ max }}.'

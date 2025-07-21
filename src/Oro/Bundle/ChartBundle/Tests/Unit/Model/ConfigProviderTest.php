@@ -9,8 +9,9 @@ use Oro\Bundle\ChartBundle\Tests\Unit\Fixtures\SecondTestBundle\SecondTestBundle
 use Oro\Bundle\ChartBundle\Tests\Unit\Fixtures\ThirdTestBundle\ThirdTestBundle;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class ConfigProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigProviderTest extends TestCase
 {
     use TempDirExtension;
 
@@ -35,7 +36,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
             ]);
     }
 
-    public function testConfiguration()
+    public function testConfiguration(): void
     {
         $expectedConfiguration = [
             'line_chart'     => [
@@ -117,12 +118,12 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testHasChartConfigForUnknownChart()
+    public function testHasChartConfigForUnknownChart(): void
     {
         $this->assertFalse($this->configurationProvider->hasChartConfig('unknown'));
     }
 
-    public function testGetChartConfigForUnknownChart()
+    public function testGetChartConfigForUnknownChart(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage("Can't find configuration for chart: unknown");

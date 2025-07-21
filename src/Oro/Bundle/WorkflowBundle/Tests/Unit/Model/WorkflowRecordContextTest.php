@@ -3,8 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRecordContext;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowRecordContextTest extends \PHPUnit\Framework\TestCase
+class WorkflowRecordContextTest extends TestCase
 {
     public function testGetEntity(): void
     {

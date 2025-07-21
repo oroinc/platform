@@ -5,9 +5,10 @@ namespace Oro\Bundle\InstallerBundle\Tests\Unit;
 use Oro\Bundle\InstallerBundle\ScriptManager;
 use Oro\Bundle\InstallerBundle\Tests\Unit\Fixture\src\TestPackage\src\Test1Bundle\TestPackageTest1Bundle;
 use Oro\Bundle\InstallerBundle\Tests\Unit\Fixture\src\TestPackage\src\Test2Bundle\TestPackageTest2Bundle;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class ScriptManagerTest extends \PHPUnit\Framework\TestCase
+class ScriptManagerTest extends TestCase
 {
     private ScriptManager $scriptManager;
 

@@ -8,6 +8,8 @@ use Oro\Bundle\UIBundle\Tests\Unit\Fixture\Controller\TestController;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\Controller\TestInvokeController;
 use Oro\Component\Config\Cache\PhpConfigCacheAccessor;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use ProxyManager\Proxy\VirtualProxyInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\ConfigCache;
@@ -20,24 +22,15 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
+class ControllerClassProviderTest extends TestCase
 {
     use TempDirExtension;
 
-    /** @var RouteCollection */
-    private $routeCollection;
-
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var ControllerClassProvider */
-    private $controllerClassProvider;
-
-    /** @var string */
-    private $cacheFile;
+    private RouteCollection $routeCollection;
+    private ContainerInterface&MockObject $container;
+    private LoggerInterface&MockObject $logger;
+    private ControllerClassProvider $controllerClassProvider;
+    private string $cacheFile;
 
     #[\Override]
     protected function setUp(): void
@@ -62,7 +55,7 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetControllers()
+    public function testGetControllers(): void
     {
         $this->routeCollection->add(
             'route1',
@@ -116,7 +109,7 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(ReflectionClassResource::class, $meta[1]);
     }
 
-    public function testLoadForRouteWithoutController()
+    public function testLoadForRouteWithoutController(): void
     {
         $this->routeCollection->add(
             'test_route',
@@ -134,7 +127,7 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadForRouteWithNotSupportedController()
+    public function testLoadForRouteWithNotSupportedController(): void
     {
         $this->routeCollection->add(
             'test_route',
@@ -155,7 +148,7 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * test for controller defined as "class::method"
      */
-    public function testLoadClassMethod()
+    public function testLoadClassMethod(): void
     {
         $this->routeCollection->add(
             'test_route',
@@ -176,7 +169,7 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * test for controller defined as "service:method"
      */
-    public function testLoadControllerAsService()
+    public function testLoadControllerAsService(): void
     {
         $this->routeCollection->add(
             'test_route',
@@ -203,7 +196,7 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * test for controller defined as "service:method" and the controller service is lazy (initialized)
      */
-    public function testLoadControllerAsInitializedLazyService()
+    public function testLoadControllerAsInitializedLazyService(): void
     {
         $this->routeCollection->add(
             'test_route',
@@ -240,7 +233,7 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * test for controller defined as "service:method" and the controller service is lazy (not initialized)
      */
-    public function testLoadControllerAsNotInitializedLazyService()
+    public function testLoadControllerAsNotInitializedLazyService(): void
     {
         $this->routeCollection->add(
             'test_route',
@@ -277,7 +270,7 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * test for controller defined as "service:method" when service does not exist
      */
-    public function testLoadControllerAsServiceWhenServiceDoesNotExist()
+    public function testLoadControllerAsServiceWhenServiceDoesNotExist(): void
     {
         $this->routeCollection->add(
             'test_route',
@@ -307,7 +300,7 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * test for controller defined as "service"
      */
-    public function testLoadControllerAsServiceWithInvokeMethod()
+    public function testLoadControllerAsServiceWithInvokeMethod(): void
     {
         $this->routeCollection->add(
             'test_route',
@@ -334,7 +327,7 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * test for controller defined as "service" when service does not exist
      */
-    public function testLoadControllerAsServiceWithInvokeMethodWhenServiceDoesNotExist()
+    public function testLoadControllerAsServiceWithInvokeMethodWhenServiceDoesNotExist(): void
     {
         $this->routeCollection->add(
             'test_route',
@@ -364,7 +357,7 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * test for controller defined as "service" when "__invoke" method does not exist
      */
-    public function testLoadControllerAsServiceWithInvokeMethodWhenInvokeMethodDoesNotExist()
+    public function testLoadControllerAsServiceWithInvokeMethodWhenInvokeMethodDoesNotExist(): void
     {
         $this->routeCollection->add(
             'test_route',
@@ -401,7 +394,7 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * test case when the controller service should be ignored
      */
-    public function testLoadControllerAsIgnoredService()
+    public function testLoadControllerAsIgnoredService(): void
     {
         $this->routeCollection->add(
             'test_route',

@@ -5,26 +5,21 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Form\Handler;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Form\Handler\TagHandler;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class TagHandlerTest extends \PHPUnit\Framework\TestCase
+class TagHandlerTest extends TestCase
 {
     private const FORM_DATA = ['field' => 'value'];
 
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
-
-    /** @var Request */
-    private $request;
-
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
+    private FormInterface&MockObject $form;
+    private Request $request;
+    private ObjectManager&MockObject $manager;
     private TagHandler $handler;
-
     private Tag $entity;
 
     #[\Override]
@@ -36,7 +31,7 @@ class TagHandlerTest extends \PHPUnit\Framework\TestCase
         $requestStack->push($this->request);
         $this->manager = $this->createMock(ObjectManager::class);
 
-        $this->entity  = new Tag();
+        $this->entity = new Tag();
         $this->handler = new TagHandler($this->form, $requestStack, $this->manager);
     }
 

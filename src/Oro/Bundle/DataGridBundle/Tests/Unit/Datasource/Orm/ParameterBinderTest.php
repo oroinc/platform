@@ -11,20 +11,15 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\ParameterBinder;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ParameterBinderTest extends \PHPUnit\Framework\TestCase
+class ParameterBinderTest extends TestCase
 {
-    /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagrid;
-
-    /** @var OrmDatasource|\PHPUnit\Framework\MockObject\MockObject */
-    private $datasource;
-
-    /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryBuilder;
-
-    /** @var ParameterBinder */
-    private $parameterBinder;
+    private DatagridInterface&MockObject $datagrid;
+    private OrmDatasource&MockObject $datasource;
+    private QueryBuilder&MockObject $queryBuilder;
+    private ParameterBinder $parameterBinder;
 
     #[\Override]
     protected function setUp(): void
@@ -45,7 +40,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
         array $oldQueryParameters,
         array $expectedQueryParameters,
         bool $append = true
-    ) {
+    ): void {
         $queryParameters = new ArrayCollection($oldQueryParameters);
 
         $this->datagrid->expects($this->once())
@@ -231,7 +226,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testBindParametersFailsWithInvalidPath()
+    public function testBindParametersFailsWithInvalidPath(): void
     {
         $datasource = $this->createMock(DatagridInterface::class);
 
@@ -248,7 +243,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
         $this->parameterBinder->bindParameters($this->datagrid, ['foo']);
     }
 
-    public function testBindParametersFailsWithInvalidDatasource()
+    public function testBindParametersFailsWithInvalidDatasource(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -277,7 +272,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
         $this->parameterBinder->bindParameters($this->datagrid, ['bar' => 'foo.bar']);
     }
 
-    public function testBindParametersWorksWithEmptyParameters()
+    public function testBindParametersWorksWithEmptyParameters(): void
     {
         $this->datagrid->expects($this->never())
             ->method($this->anything());
@@ -285,7 +280,7 @@ class ParameterBinderTest extends \PHPUnit\Framework\TestCase
         $this->parameterBinder->bindParameters($this->datagrid, []);
     }
 
-    public function testBindParametersFailsWithInvalidParameter()
+    public function testBindParametersFailsWithInvalidParameter(): void
     {
         $queryParameters = new ArrayCollection();
 

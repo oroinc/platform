@@ -6,14 +6,13 @@ use Oro\Bundle\FilterBundle\Factory\FilterFactory;
 use Oro\Bundle\FilterBundle\Filter\FilterBagInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FilterFactoryTest extends \PHPUnit\Framework\TestCase
+class FilterFactoryTest extends TestCase
 {
-    /** @var FilterBagInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $filterBag;
-
-    /** @var FilterFactory */
-    private $factory;
+    private FilterBagInterface&MockObject $filterBag;
+    private FilterFactory $factory;
 
     #[\Override]
     protected function setUp(): void

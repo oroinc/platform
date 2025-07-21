@@ -1,0 +1,43 @@
+oro:
+    pdfgenerator:
+        pdfdocument:
+            entity_label: 'PDF Document'
+            entity_plural_label: 'PDF Documents'
+            entity_grid_all_view_label: 'All %entity_plural_label%'
+            entity_description: 'Represents a PDF document.'
+            id:
+                label: 'ID'
+                description: 'The internal ID.'
+            uuid:
+                label: 'UUID'
+                description: 'The universally unique identifier (UUID), e.g. to identify the document in URL.'
+            pdf_document_name:
+                label: 'PDF Document Name'
+                description: 'The name of the PDF document (e.g., order-0101).'
+            pdf_document_type:
+                label: 'PDF Document Type'
+                description: 'The type of the PDF document (e.g., us_standard_invoice).'
+            pdf_document_file:
+                label: 'PDF Document File'
+                description: 'The associated file entity representing the PDF document.'
+            source_entity_class:
+                label: 'Source Entity Class'
+                description: 'The class name of the entity associated with the PDF document.'
+            source_entity_id:
+                label: 'Source Entity ID'
+                description: 'The ID of the entity associated with the PDF document.'
+            pdf_document_payload:
+                label: 'PDF Document Payload'
+                description: 'Arbitrary payload data to be passed to the PDF generator.'
+            pdf_options_preset:
+                label: 'PDF Options Preset'
+                description: 'PDF options preset name (e.g., default, default_a4, etc.).'
+            pdf_document_state:
+                label: 'PDF Document State'
+                description: 'The PDF document state (e.g., new, resolved, failed, etc.).'
+            pdf_document_generation_mode:
+                label: 'PDF Document Generation Mode'
+                description: 'The PDF document generation mode.'
+            organization:
+                label: 'Organization'
+                description: 'The organization associated with the PDF document.'

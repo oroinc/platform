@@ -12,15 +12,14 @@ use Oro\Bundle\SecurityBundle\Exception\InvalidTokenSerializationException;
 use Oro\Bundle\SecurityBundle\Exception\InvalidTokenUserOrganizationException;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class TokenSerializerTest extends \PHPUnit\Framework\TestCase
+class TokenSerializerTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var TokenSerializer */
-    private $tokenSerializer;
+    private ManagerRegistry&MockObject $doctrine;
+    private TokenSerializer $tokenSerializer;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $this->tokenSerializer = new TokenSerializer($this->doctrine);
     }
 
-    public function testSerializeForUnsupportedToken()
+    public function testSerializeForUnsupportedToken(): void
     {
         $this->expectException(InvalidTokenSerializationException::class);
         $this->expectExceptionMessage('An error occurred during token serialization.');
@@ -38,7 +37,7 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $this->tokenSerializer->serialize($this->createMock(TokenInterface::class));
     }
 
-    public function testSerializeForTokenWithoutUser()
+    public function testSerializeForTokenWithoutUser(): void
     {
         $organization = new Organization();
         $organization->setId(1);
@@ -50,7 +49,7 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $this->tokenSerializer->serialize($token);
     }
 
-    public function testSerializeForSupportedTokenWithoutRoles()
+    public function testSerializeForSupportedTokenWithoutRoles(): void
     {
         $organization = new Organization();
         $organization->setId(1);
@@ -65,7 +64,7 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSerializeForSupportedTokenWithRoles()
+    public function testSerializeForSupportedTokenWithRoles(): void
     {
         $organization = new Organization();
         $organization->setId(1);
@@ -84,7 +83,7 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDeserializeSupportedToken()
+    public function testDeserializeSupportedToken(): void
     {
         $organization = new Organization();
         $organization->setId(1);
@@ -129,7 +128,7 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider unsupportedTokenProvider
      */
-    public function testDeserializeUnsupportedToken(?string $value)
+    public function testDeserializeUnsupportedToken(?string $value): void
     {
         $this->expectException(InvalidTokenSerializationException::class);
         $this->expectExceptionMessage('An error occurred while deserializing the token.');
@@ -153,7 +152,7 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testDeserializeSupportedTokenForDeletedUser()
+    public function testDeserializeSupportedTokenForDeletedUser(): void
     {
         $organization = new Organization();
         $organization->setId(1);
@@ -179,7 +178,7 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $this->tokenSerializer->deserialize($value);
     }
 
-    public function testDeserializeSupportedTokenForDeletedOrganization()
+    public function testDeserializeSupportedTokenForDeletedOrganization(): void
     {
         $user = new User();
         $user->setId(123);

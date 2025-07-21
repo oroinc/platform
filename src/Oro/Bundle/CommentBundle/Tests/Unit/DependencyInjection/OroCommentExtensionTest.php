@@ -3,9 +3,10 @@
 namespace Oro\Bundle\CommentBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\CommentBundle\DependencyInjection\OroCommentExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroCommentExtensionTest extends \PHPUnit\Framework\TestCase
+class OroCommentExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

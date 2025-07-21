@@ -9,14 +9,13 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigValueRepository;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigValueRepositoryTest extends \PHPUnit\Framework\TestCase
+class ConfigValueRepositoryTest extends TestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var ConfigValueRepository */
-    private $repository;
+    private EntityManagerInterface&MockObject $em;
+    private ConfigValueRepository $repository;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +31,7 @@ class ConfigValueRepositoryTest extends \PHPUnit\Framework\TestCase
     /**
      * test removeValues
      */
-    public function testRemoveValues()
+    public function testRemoveValues(): void
     {
         $queryBuilder = $this->createMock(QueryBuilder::class);
 

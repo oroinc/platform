@@ -7,13 +7,13 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
 
-class AssignUrlTest extends \PHPUnit\Framework\TestCase
+class AssignUrlTest extends TestCase
 {
-    /** @var AssignUrl */
-    private $action;
+    private AssignUrl $action;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +32,7 @@ class AssignUrlTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testInitialize(array $options)
+    public function testInitialize(array $options): void
     {
         $this->action->initialize($options);
         self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
@@ -62,7 +62,7 @@ class AssignUrlTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage): void
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
@@ -99,7 +99,7 @@ class AssignUrlTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testExecute(array $options, string $expectedUrl)
+    public function testExecute(array $options, string $expectedUrl): void
     {
         $context = new ItemStub();
 

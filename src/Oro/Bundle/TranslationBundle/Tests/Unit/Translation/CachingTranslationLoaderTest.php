@@ -4,20 +4,17 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
 use Oro\Bundle\CacheBundle\Provider\MemoryCache;
 use Oro\Bundle\TranslationBundle\Translation\CachingTranslationLoader;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
-class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
+class CachingTranslationLoaderTest extends TestCase
 {
-    /** @var LoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerLoader;
-
-    /** @var MemoryCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var CachingTranslationLoader */
-    private $cachingLoader;
+    private LoaderInterface&MockObject $innerLoader;
+    private MemoryCache&MockObject $cache;
+    private CachingTranslationLoader $cachingLoader;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +25,7 @@ class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
         $this->cachingLoader = new CachingTranslationLoader($this->innerLoader, $this->cache);
     }
 
-    public function testLoadForStringResourceType()
+    public function testLoadForStringResourceType(): void
     {
         $locale = 'fr';
         $domain = 'test';
@@ -56,7 +53,7 @@ class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadForSupportedObjectResourceType()
+    public function testLoadForSupportedObjectResourceType(): void
     {
         $locale = 'fr';
         $domain = 'test';
@@ -88,7 +85,7 @@ class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadForUnsupportedResourceType()
+    public function testLoadForUnsupportedResourceType(): void
     {
         $locale = 'fr';
         $domain = 'test';
@@ -112,7 +109,7 @@ class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadForEmptyStringResourceType()
+    public function testLoadForEmptyStringResourceType(): void
     {
         $locale = 'fr';
         $domain = 'test';

@@ -5,14 +5,13 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionMetadataFactory;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionMetadataFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MassActionMetadataFactoryTest extends \PHPUnit\Framework\TestCase
+class MassActionMetadataFactoryTest extends TestCase
 {
-    /** @var ActionMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $actionMetadataFactory;
-
-    /** @var MassActionMetadataFactory */
-    private $massActionMetadataFactory;
+    private ActionMetadataFactory&MockObject $actionMetadataFactory;
+    private MassActionMetadataFactory $massActionMetadataFactory;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class MassActionMetadataFactoryTest extends \PHPUnit\Framework\TestCase
         $this->massActionMetadataFactory = new MassActionMetadataFactory($this->actionMetadataFactory);
     }
 
-    public function testCreateActionMetadata()
+    public function testCreateActionMetadata(): void
     {
         $action = $this->createMock(MassActionInterface::class);
         $actionMetadata = ['label' => 'label1'];

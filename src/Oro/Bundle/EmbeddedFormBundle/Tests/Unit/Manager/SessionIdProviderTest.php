@@ -3,18 +3,17 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\EmbeddedFormBundle\Manager\SessionIdProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class SessionIdProviderTest extends \PHPUnit\Framework\TestCase
+class SessionIdProviderTest extends TestCase
 {
     private const TEST_SESSION_FIELD_NAME = 'test_session_field';
 
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var SessionIdProvider */
-    private $sessionIdProvider;
+    private RequestStack&MockObject $requestStack;
+    private SessionIdProvider $sessionIdProvider;
 
     #[\Override]
     protected function setUp(): void

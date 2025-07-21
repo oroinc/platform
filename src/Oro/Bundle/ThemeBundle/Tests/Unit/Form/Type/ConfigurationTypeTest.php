@@ -46,8 +46,7 @@ final class ConfigurationTypeTest extends FormIntegrationTestCase
         $checkboxKey = LayoutThemeConfiguration::buildOptionKey('general', 'checkbox');
         $radioKey = LayoutThemeConfiguration::buildOptionKey('general', 'radio');
 
-        $this->packages
-            ->expects(self::exactly(9))
+        $this->packages->expects(self::exactly(9))
             ->method('getUrl')
             ->withConsecutive(
                 ['radio.png'],

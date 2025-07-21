@@ -6,13 +6,13 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\DigitalAssetBundle\Provider\PreviewMetadataProviderInterface;
 use Oro\Bundle\DigitalAssetBundle\Provider\WebpAwarePreviewMetadataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WebpAwarePreviewMetadataProviderTest extends \PHPUnit\Framework\TestCase
+class WebpAwarePreviewMetadataProviderTest extends TestCase
 {
-    private PreviewMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject $innerPreviewMetadataProvider;
-
-    private AttachmentManager|\PHPUnit\Framework\MockObject\MockObject $attachmentManager;
-
+    private PreviewMetadataProviderInterface&MockObject $innerPreviewMetadataProvider;
+    private AttachmentManager&MockObject $attachmentManager;
     private WebpAwarePreviewMetadataProvider $provider;
 
     #[\Override]
@@ -31,18 +31,15 @@ class WebpAwarePreviewMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $file = new File();
         $innerMetadata = ['sample_key' => 'sample_value'];
-        $this->innerPreviewMetadataProvider
-            ->expects(self::once())
+        $this->innerPreviewMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with($file)
             ->willReturn($innerMetadata);
 
-        $this->attachmentManager
-            ->expects(self::never())
+        $this->attachmentManager->expects(self::never())
             ->method('isWebpEnabledIfSupported');
 
-        $this->attachmentManager
-            ->expects(self::never())
+        $this->attachmentManager->expects(self::never())
             ->method('getFilteredImageUrl');
 
         self::assertEquals($innerMetadata, $this->provider->getMetadata($file));
@@ -52,19 +49,16 @@ class WebpAwarePreviewMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $file = new File();
         $innerMetadata = ['sample_key' => 'sample_value', 'preview' => '/sample/image.png'];
-        $this->innerPreviewMetadataProvider
-            ->expects(self::once())
+        $this->innerPreviewMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with($file)
             ->willReturn($innerMetadata);
 
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('isWebpEnabledIfSupported')
             ->willReturn(false);
 
-        $this->attachmentManager
-            ->expects(self::never())
+        $this->attachmentManager->expects(self::never())
             ->method('getFilteredImageUrl');
 
         self::assertEquals($innerMetadata, $this->provider->getMetadata($file));
@@ -74,20 +68,17 @@ class WebpAwarePreviewMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $file = new File();
         $innerMetadata = ['sample_key' => 'sample_value', 'preview' => '/sample/image.png'];
-        $this->innerPreviewMetadataProvider
-            ->expects(self::once())
+        $this->innerPreviewMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with($file)
             ->willReturn($innerMetadata);
 
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('isWebpEnabledIfSupported')
             ->willReturn(true);
 
         $webpUrl = '/sample/url/img.jpg.webp';
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('getFilteredImageUrl')
             ->with($file, 'digital_asset_icon', 'webp')
             ->willReturn($webpUrl);

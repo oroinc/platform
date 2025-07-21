@@ -6,18 +6,19 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\TestCase;
 
-class ConsoleTokenTest extends \PHPUnit\Framework\TestCase
+class ConsoleTokenTest extends TestCase
 {
     use EntityTrait;
 
-    public function testGetCredentials()
+    public function testGetCredentials(): void
     {
         $token = new ConsoleToken();
         $this->assertEmpty($token->getCredentials());
     }
 
-    public function testSetGetOrganization()
+    public function testSetGetOrganization(): void
     {
         $organization = new Organization();
 
@@ -27,11 +28,9 @@ class ConsoleTokenTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($organization, $token->getOrganization());
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
-        /** @var Role $role */
         $role = $this->getEntity(Role::class, ['id' => 2]);
-        /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 3]);
 
         $token = new ConsoleToken([$role]);

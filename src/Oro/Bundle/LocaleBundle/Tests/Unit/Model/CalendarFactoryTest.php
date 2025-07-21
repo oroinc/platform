@@ -4,15 +4,14 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Model;
 
 use Oro\Bundle\LocaleBundle\Model\Calendar;
 use Oro\Bundle\LocaleBundle\Model\CalendarFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class CalendarFactoryTest extends \PHPUnit\Framework\TestCase
+class CalendarFactoryTest extends TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var CalendarFactory */
-    private $factory;
+    private ContainerInterface&MockObject $container;
+    private CalendarFactory $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class CalendarFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getCalendarDataProvider
      */
-    public function testGetCalendar(?string $locale, ?string $language)
+    public function testGetCalendar(?string $locale, ?string $language): void
     {
         $calendar = $this->createMock(Calendar::class);
         $calendar->expects($this->once())

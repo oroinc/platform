@@ -7,11 +7,12 @@ use Oro\Bundle\RedisConfigBundle\Predis\Client;
 use Oro\Bundle\RedisConfigBundle\Predis\Configuration\IpAddressProvider;
 use Oro\Bundle\RedisConfigBundle\Predis\Configuration\Options;
 use Oro\Bundle\RedisConfigBundle\Predis\Connection\Aggregate\SentinelReplication;
+use PHPUnit\Framework\TestCase;
 use Predis\Connection\Aggregate\MasterSlaveReplication;
 use Predis\Connection\StreamConnection;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
-class RedisConnectionFactoryTest extends \PHPUnit\Framework\TestCase
+class RedisConnectionFactoryTest extends TestCase
 {
     /**
      * @dataProvider factoryTypedInstancesDataProvider
@@ -82,7 +83,7 @@ class RedisConnectionFactoryTest extends \PHPUnit\Framework\TestCase
         string $dsn,
         string $serverIpAddress,
         mixed $expectedPreferSlave
-    ) {
+    ): void {
         $ipServerProvider = new IpAddressProvider($serverIpAddress);
         $factory = new RedisConnectionFactory($ipServerProvider);
         $client = $factory($dsn);

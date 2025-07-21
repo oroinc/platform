@@ -10,17 +10,14 @@ use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\EventListener\ReminderListener;
 use Oro\Bundle\ReminderBundle\Tests\Unit\Fixtures\RemindableEntity;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ReminderListenerTest extends \PHPUnit\Framework\TestCase
+class ReminderListenerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ReminderManager */
-    private $reminderManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface */
-    private $entityManager;
-
-    /** @var ReminderListener */
-    private $listener;
+    private ReminderManager&MockObject $reminderManager;
+    private EntityManagerInterface&MockObject $entityManager;
+    private ReminderListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +35,7 @@ class ReminderListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider entityDataProvider
      */
-    public function testPostLoad(object $entity, bool $expected)
+    public function testPostLoad(object $entity, bool $expected): void
     {
         $event = new LifecycleEventArgs($entity, $this->entityManager);
 
@@ -54,7 +51,7 @@ class ReminderListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider entityDataProvider
      */
-    public function testPostPersist(object $entity, bool $expected)
+    public function testPostPersist(object $entity, bool $expected): void
     {
         $event = new LifecycleEventArgs($entity, $this->entityManager);
 

@@ -9,11 +9,11 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\DTO\SelectedItems;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Datagrid\Extension\MassAction\IterableResultFactory;
+use PHPUnit\Framework\TestCase;
 
-class IterableResultFactoryTest extends \PHPUnit\Framework\TestCase
+class IterableResultFactoryTest extends TestCase
 {
-    /** @var IterableResultFactory */
-    private $iterableResultFactory;
+    private IterableResultFactory $iterableResultFactory;
 
     #[\Override]
     protected function setUp(): void
@@ -21,19 +21,19 @@ class IterableResultFactoryTest extends \PHPUnit\Framework\TestCase
         $this->iterableResultFactory = new IterableResultFactory();
     }
 
-    public function testIsApplicableWhenNotApplicable()
+    public function testIsApplicableWhenNotApplicable(): void
     {
         self::assertFalse($this->iterableResultFactory->isApplicable(new ArrayDatasource()));
     }
 
-    public function testIsApplicable()
+    public function testIsApplicable(): void
     {
         $datasource = $this->createMock(SearchDatasource::class);
 
         self::assertTrue($this->iterableResultFactory->isApplicable($datasource));
     }
 
-    public function testCreateIterableResultWhenDatasourceNotSupported()
+    public function testCreateIterableResultWhenDatasourceNotSupported(): void
     {
         $gridConfiguration = $this->createMock(DatagridConfiguration::class);
         $selectedItems = SelectedItems::createFromParameters([]);

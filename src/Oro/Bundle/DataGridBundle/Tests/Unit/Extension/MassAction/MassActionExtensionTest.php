@@ -15,24 +15,19 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionFactory;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionMetadataFactory;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
+class MassActionExtensionTest extends TestCase
 {
-    /** @var MassActionFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $actionFactory;
-
-    /** @var MassActionMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $actionMetadataFactory;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var MassActionExtension */
-    private $extension;
+    private MassActionFactory&MockObject $actionFactory;
+    private MassActionMetadataFactory&MockObject $actionMetadataFactory;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private MassActionExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -49,12 +44,12 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->setParameters(new ParameterBag());
     }
 
-    public function testIsApplicable()
+    public function testIsApplicable(): void
     {
         self::assertTrue($this->extension->isApplicable(DatagridConfiguration::create([])));
     }
 
-    public function testIsNotApplicableInImportExportMode()
+    public function testIsNotApplicableInImportExportMode(): void
     {
         $params = new ParameterBag();
         $params->set(
@@ -66,7 +61,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->extension->isApplicable($config));
     }
 
-    public function testVisitMetadataWithoutMassActions()
+    public function testVisitMetadataWithoutMassActions(): void
     {
         $config = DatagridConfiguration::create([]);
         $metadata = MetadataObject::create([]);
@@ -81,7 +76,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitMetadataWithMassActions()
+    public function testVisitMetadataWithMassActions(): void
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1'];
@@ -136,7 +131,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitMetadataDisabledMassActions()
+    public function testVisitMetadataDisabledMassActions(): void
     {
         $config = DatagridConfiguration::create(
             [
@@ -160,7 +155,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitMetadataWithMassActionsAndValidHTTPMethods()
+    public function testVisitMetadataWithMassActionsAndValidHTTPMethods(): void
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1'];
@@ -212,7 +207,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitMetadataWithMassActionsAndNotValidHTTPMethods()
+    public function testVisitMetadataWithMassActionsAndNotValidHTTPMethods(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -253,7 +248,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitMetadata($config, $metadata);
     }
 
-    public function testVisitMetadataWithAclProtectedMassActionAndAccessGranted()
+    public function testVisitMetadataWithAclProtectedMassActionAndAccessGranted(): void
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1'];
@@ -310,7 +305,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitMetadataWithAclProtectedMassActionAndAccessDenied()
+    public function testVisitMetadataWithAclProtectedMassActionAndAccessDenied(): void
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1'];
@@ -359,7 +354,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitResultWithoutMassActions()
+    public function testVisitResultWithoutMassActions(): void
     {
         $config = DatagridConfiguration::create([]);
         $result = ResultsObject::create([]);
@@ -375,7 +370,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitResultWithMassActions()
+    public function testVisitResultWithMassActions(): void
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1'];
@@ -431,7 +426,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitResultWithAclProtectedMassActionAndAccessGranted()
+    public function testVisitResultWithAclProtectedMassActionAndAccessGranted(): void
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1'];
@@ -489,7 +484,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitResultWithAclProtectedMassActionAndAccessDenied()
+    public function testVisitResultWithAclProtectedMassActionAndAccessDenied(): void
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1'];
@@ -539,7 +534,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testVisitResultAfterVisitMetadata()
+    public function testVisitResultAfterVisitMetadata(): void
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1'];
@@ -597,7 +592,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMassActionWhenNoActions()
+    public function testGetMassActionWhenNoActions(): void
     {
         $config = DatagridConfiguration::create([]);
         $datagrid = $this->createMock(DatagridInterface::class);
@@ -614,7 +609,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMassActionForKnownAction()
+    public function testGetMassActionForKnownAction(): void
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1'];
@@ -662,7 +657,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMassActionForAclProtectedMassActionAndAccessGranted()
+    public function testGetMassActionForAclProtectedMassActionAndAccessGranted(): void
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1'];
@@ -712,7 +707,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMassActionForAclProtectedMassActionAndAccessDenied()
+    public function testGetMassActionForAclProtectedMassActionAndAccessDenied(): void
     {
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1', 'acl_resource' => 'acl_resource1'];

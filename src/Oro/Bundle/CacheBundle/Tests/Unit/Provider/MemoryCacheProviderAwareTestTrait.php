@@ -3,15 +3,13 @@
 namespace Oro\Bundle\CacheBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\CacheBundle\Provider\MemoryCacheProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 
 trait MemoryCacheProviderAwareTestTrait
 {
-    /** @var MemoryCacheProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var MemoryCacheProviderInterface&MockObject */
     private $memoryCacheProvider;
 
-    /**
-     * @return MemoryCacheProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
     protected function getMemoryCacheProvider(): MemoryCacheProviderInterface
     {
         if (!$this->memoryCacheProvider) {
@@ -23,18 +21,15 @@ trait MemoryCacheProviderAwareTestTrait
 
     protected function mockMemoryCacheProvider(mixed $cachedData = null): void
     {
-        $this->getMemoryCacheProvider()
-            ->expects($this->atLeastOnce())
+        $this->getMemoryCacheProvider()->expects($this->atLeastOnce())
             ->method('get')
-            ->willReturnCallback(
-                static function ($cacheKeyArguments, $callable = null) use ($cachedData) {
-                    if (!$cachedData && is_callable($callable)) {
-                        return call_user_func_array($callable, array_values((array)$cacheKeyArguments));
-                    }
-
-                    return $cachedData;
+            ->willReturnCallback(static function ($cacheKeyArguments, $callable = null) use ($cachedData) {
+                if (!$cachedData && is_callable($callable)) {
+                    return call_user_func_array($callable, array_values((array)$cacheKeyArguments));
                 }
-            );
+
+                return $cachedData;
+            });
     }
 
     protected function setMemoryCacheProvider(object $object): void

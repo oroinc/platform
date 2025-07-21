@@ -4,10 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowStartArgumentsTest extends \PHPUnit\Framework\TestCase
+class WorkflowStartArgumentsTest extends TestCase
 {
-    public function testConstructorSetsProperValues()
+    public function testConstructorSetsProperValues(): void
     {
         $workflowName = 'workflow_name';
         $entity = new EntityStub(42);
@@ -27,7 +28,7 @@ class WorkflowStartArgumentsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($transition, $workflowStartArguments->getTransition());
     }
 
-    public function testConstructorOptionalValues()
+    public function testConstructorOptionalValues(): void
     {
         $workflowName = 'workflow_name';
         $entity = new EntityStub(42);

@@ -4,11 +4,11 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Extension\Theme;
 
 use Oro\Bundle\UIBundle\Layout\Extension\Theme\WidgetPathProvider;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\TestCase;
 
-class WidgetPathProviderTest extends \PHPUnit\Framework\TestCase
+class WidgetPathProviderTest extends TestCase
 {
-    /** @var WidgetPathProvider */
-    private $provider;
+    private WidgetPathProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class WidgetPathProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider pathsDataProvider
      */
-    public function testGetPaths(array $existingPaths, ?string $widget, array $expectedPaths)
+    public function testGetPaths(array $existingPaths, ?string $widget, array $expectedPaths): void
     {
         $context = new LayoutContext();
         $context->set('widget_container', $widget);

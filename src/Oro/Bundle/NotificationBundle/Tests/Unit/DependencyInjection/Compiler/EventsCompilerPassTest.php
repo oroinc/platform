@@ -3,12 +3,12 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\EventsCompilerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class EventsCompilerPassTest extends \PHPUnit\Framework\TestCase
+class EventsCompilerPassTest extends TestCase
 {
-    /** @var EventsCompilerPass */
-    private $compiler;
+    private EventsCompilerPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class EventsCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new EventsCompilerPass();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $notificationManagerDef = $container->register('oro_notification.manager');
@@ -39,7 +39,7 @@ class EventsCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWhenNoEvents()
+    public function testProcessWhenNoEvents(): void
     {
         $container = new ContainerBuilder();
         $notificationManagerDef = $container->register('oro_notification.manager');

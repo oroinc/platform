@@ -5,11 +5,12 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Acl\AccessRule;
 use Oro\Bundle\OrganizationBundle\Acl\AccessRule\OrganizationAwareAccessRule;
 use Oro\Bundle\OrganizationBundle\Provider\OrganizationRestrictionProviderInterface;
 use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class OrganizationAwareAccessRuleTest extends \PHPUnit\Framework\TestCase
+class OrganizationAwareAccessRuleTest extends TestCase
 {
-    /** @var OrganizationRestrictionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $organizationRestrictionProvider;
+    private OrganizationRestrictionProviderInterface&MockObject $organizationRestrictionProvider;
 
     #[\Override]
     protected function setUp(): void

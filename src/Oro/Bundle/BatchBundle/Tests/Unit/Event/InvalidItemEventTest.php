@@ -3,8 +3,9 @@
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Event;
 
 use Oro\Bundle\BatchBundle\Event\InvalidItemEvent;
+use PHPUnit\Framework\TestCase;
 
-class InvalidItemEventTest extends \PHPUnit\Framework\TestCase
+class InvalidItemEventTest extends TestCase
 {
     public function testAccessors(): void
     {

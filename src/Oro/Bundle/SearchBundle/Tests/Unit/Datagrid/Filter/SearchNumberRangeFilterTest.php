@@ -13,12 +13,12 @@ use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapte
 use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchNumberRangeFilter;
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
 use Oro\Component\Exception\UnexpectedTypeException;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 
-class SearchNumberRangeFilterTest extends \PHPUnit\Framework\TestCase
+class SearchNumberRangeFilterTest extends TestCase
 {
-    /** @var SearchNumberRangeFilter */
-    private $filter;
+    private SearchNumberRangeFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +28,7 @@ class SearchNumberRangeFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter = new SearchNumberRangeFilter($formFactory, new FilterUtility());
     }
 
-    public function testThrowsExceptionForWrongFilterDatasourceAdapter()
+    public function testThrowsExceptionForWrongFilterDatasourceAdapter(): void
     {
         $this->expectException(UnexpectedTypeException::class);
 
@@ -42,7 +42,7 @@ class SearchNumberRangeFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApplyBetween()
+    public function testApplyBetween(): void
     {
         $fieldName = 'decimal.field';
 
@@ -91,7 +91,7 @@ class SearchNumberRangeFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApplyNotBetween()
+    public function testApplyNotBetween(): void
     {
         $fieldName = 'decimal.field';
 
@@ -130,7 +130,7 @@ class SearchNumberRangeFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareData()
+    public function testPrepareData(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->filter->prepareData([]);

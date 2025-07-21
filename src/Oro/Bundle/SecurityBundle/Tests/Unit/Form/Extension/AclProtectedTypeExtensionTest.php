@@ -8,12 +8,13 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class AclProtectedTypeExtensionTest extends \PHPUnit\Framework\TestCase
+class AclProtectedTypeExtensionTest extends TestCase
 {
     private const CLASS_NAME = 'AcmeEntity';
 
@@ -32,7 +33,7 @@ class AclProtectedTypeExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([EntityType::class], AclProtectedTypeExtension::getExtendedTypes());
     }
 
-    public function testConfigureOptionsWithEnabledAclOptions()
+    public function testConfigureOptionsWithEnabledAclOptions(): void
     {
         $classMetadata = new ClassMetadata(self::CLASS_NAME);
         $idReader = $this->createMock(IdReader::class);
@@ -69,7 +70,7 @@ class AclProtectedTypeExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(DoctrineChoiceLoader::class, $options['choice_loader']);
     }
 
-    public function testConfigureOptionsWithDisabledAclOptions()
+    public function testConfigureOptionsWithDisabledAclOptions(): void
     {
         $classMetadata = new ClassMetadata(self::CLASS_NAME);
         $idReader = $this->createMock(IdReader::class);
@@ -106,7 +107,7 @@ class AclProtectedTypeExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(DoctrineChoiceLoader::class, $options['choice_loader']);
     }
 
-    public function testConfigureOptionsWithChoices()
+    public function testConfigureOptionsWithChoices(): void
     {
         $optionResolver = new OptionsResolver();
 

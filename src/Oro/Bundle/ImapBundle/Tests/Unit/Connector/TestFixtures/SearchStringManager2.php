@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Connector\TestFixtures;
 
-class SearchStringManager2 implements \Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface
+use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryExpr;
+use Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface;
+
+class SearchStringManager2 implements SearchStringManagerInterface
 {
     #[\Override]
     public function isAcceptableItem($name, $value, $match)
@@ -11,7 +14,7 @@ class SearchStringManager2 implements \Oro\Bundle\ImapBundle\Connector\Search\Se
     }
 
     #[\Override]
-    public function buildSearchString(\Oro\Bundle\ImapBundle\Connector\Search\SearchQueryExpr $searchQueryExpr)
+    public function buildSearchString(SearchQueryExpr $searchQueryExpr)
     {
         return '';
     }

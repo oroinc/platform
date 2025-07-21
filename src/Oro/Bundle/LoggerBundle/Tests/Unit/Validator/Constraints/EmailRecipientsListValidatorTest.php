@@ -4,6 +4,8 @@ namespace Oro\Bundle\LoggerBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\LoggerBundle\Validator\Constraints\EmailRecipientsList;
 use Oro\Bundle\LoggerBundle\Validator\Constraints\EmailRecipientsListValidator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -12,16 +14,11 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class EmailRecipientsListValidatorTest extends \PHPUnit\Framework\TestCase
+class EmailRecipientsListValidatorTest extends TestCase
 {
-    /** @var EmailRecipientsListValidator */
-    private $validator;
-
-    /** @var EmailRecipientsList */
-    private $constraint;
-
-    /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $context;
+    private EmailRecipientsListValidator $validator;
+    private EmailRecipientsList $constraint;
+    private ExecutionContextInterface&MockObject $context;
 
     #[\Override]
     protected function setUp(): void

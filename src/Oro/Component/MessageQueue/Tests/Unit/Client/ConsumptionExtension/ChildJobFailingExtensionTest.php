@@ -9,20 +9,19 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\Test\TestLogger;
 
-class ChildJobFailingExtensionTest extends \PHPUnit\Framework\TestCase
+class ChildJobFailingExtensionTest extends TestCase
 {
     public const JOB_ID = 'jobId';
     public const IGNORED_STATUSES = [Job::STATUS_FAILED, Job::STATUS_CANCELLED, Job::STATUS_STALE];
 
-    private JobProcessor|\PHPUnit\Framework\MockObject\MockObject $jobProcessor;
-
+    private JobProcessor&MockObject $jobProcessor;
     private LoggerInterface $logger;
-
     private ChildJobFailingExtension $extension;
-
     private Context $context;
 
     #[\Override]
@@ -39,8 +38,7 @@ class ChildJobFailingExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testOnPostReceivedIsSkippedWhenNoMessage(): void
     {
-        $this->jobProcessor
-            ->expects(self::never())
+        $this->jobProcessor->expects(self::never())
             ->method(self::anything());
 
         $this->extension->onPostReceived($this->context);
@@ -57,8 +55,7 @@ class ChildJobFailingExtensionTest extends \PHPUnit\Framework\TestCase
         $message->setBody($messageBody);
         $this->context->setMessage($message);
 
-        $this->jobProcessor
-            ->expects(self::never())
+        $this->jobProcessor->expects(self::never())
             ->method(self::anything());
 
         $this->extension->onPostReceived($this->context);
@@ -86,14 +83,12 @@ class ChildJobFailingExtensionTest extends \PHPUnit\Framework\TestCase
         $this->context->setMessage($message);
         $this->context->setStatus(MessageProcessorInterface::REJECT);
 
-        $this->jobProcessor
-            ->expects(self::once())
+        $this->jobProcessor->expects(self::once())
             ->method('findJobById')
             ->with($jobId)
             ->willReturn(null);
 
-        $this->jobProcessor
-            ->expects(self::never())
+        $this->jobProcessor->expects(self::never())
             ->method('failChildJob');
 
         $this->extension->onPostReceived($this->context);
@@ -111,8 +106,7 @@ class ChildJobFailingExtensionTest extends \PHPUnit\Framework\TestCase
         $this->context->setMessage($message);
         $this->context->setStatus(MessageProcessorInterface::REJECT);
 
-        $this->jobProcessor
-            ->expects(self::never())
+        $this->jobProcessor->expects(self::never())
             ->method(self::anything());
 
         $this->extension->onPostReceived($this->context);
@@ -128,14 +122,12 @@ class ChildJobFailingExtensionTest extends \PHPUnit\Framework\TestCase
         $this->context->setStatus(MessageProcessorInterface::REJECT);
 
         $job = new Job();
-        $this->jobProcessor
-            ->expects(self::once())
+        $this->jobProcessor->expects(self::once())
             ->method('findJobById')
             ->with($jobId)
             ->willReturn($job);
 
-        $this->jobProcessor
-            ->expects(self::never())
+        $this->jobProcessor->expects(self::never())
             ->method('failChildJob');
 
         $this->extension->onPostReceived($this->context);
@@ -156,14 +148,12 @@ class ChildJobFailingExtensionTest extends \PHPUnit\Framework\TestCase
         $job = new Job();
         $job->setRootJob(new Job());
         $job->setStatus($status);
-        $this->jobProcessor
-            ->expects(self::once())
+        $this->jobProcessor->expects(self::once())
             ->method('findJobById')
             ->with($jobId)
             ->willReturn($job);
 
-        $this->jobProcessor
-            ->expects(self::never())
+        $this->jobProcessor->expects(self::never())
             ->method('failChildJob');
 
         $this->extension->onPostReceived($this->context);
@@ -190,14 +180,12 @@ class ChildJobFailingExtensionTest extends \PHPUnit\Framework\TestCase
 
         $job = new Job();
         $job->setRootJob(new Job());
-        $this->jobProcessor
-            ->expects(self::once())
+        $this->jobProcessor->expects(self::once())
             ->method('findJobById')
             ->with($jobId)
             ->willReturn($job);
 
-        $this->jobProcessor
-            ->expects(self::once())
+        $this->jobProcessor->expects(self::once())
             ->method('failChildJob')
             ->with($job);
 

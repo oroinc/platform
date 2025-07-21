@@ -8,17 +8,14 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\ChoicesGuesser;
 use Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChoicesGuesserTest extends \PHPUnit\Framework\TestCase
+class ChoicesGuesserTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ChoiceFieldHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $choiceHelper;
-
-    /** @var ChoicesGuesser */
-    private $guesser;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ChoiceFieldHelper&MockObject $choiceHelper;
+    private ChoicesGuesser $guesser;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +26,7 @@ class ChoicesGuesserTest extends \PHPUnit\Framework\TestCase
         $this->guesser = new ChoicesGuesser($this->doctrineHelper, $this->choiceHelper);
     }
 
-    public function testGuessTranslatableColumnOptions()
+    public function testGuessTranslatableColumnOptions(): void
     {
         $metadata = new ClassMetadata('\oro\test');
         $metadata->associationMappings = [
@@ -87,7 +84,7 @@ class ChoicesGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessNonTranslatableColumnOptions()
+    public function testGuessNonTranslatableColumnOptions(): void
     {
         $metadata = new ClassMetadata('\oro\test');
         $metadata->associationMappings = [

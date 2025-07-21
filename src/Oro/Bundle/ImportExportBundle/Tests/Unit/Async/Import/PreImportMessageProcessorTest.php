@@ -32,36 +32,28 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class PreImportMessageProcessorTest extends TestCase
 {
     use EntityTrait;
 
     private const USER_ID = 32;
 
-    private JobRunner|\PHPUnit\Framework\MockObject\MockObject $jobRunner;
-
-    private MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject $messageProducer;
-
-    private DependentJobService|\PHPUnit\Framework\MockObject\MockObject $dependentJob;
-
-    private FileManager|\PHPUnit\Framework\MockObject\MockObject $fileManager;
-
-    private ImportHandler|\PHPUnit\Framework\MockObject\MockObject $importHandler;
-
-    private WriterChain|\PHPUnit\Framework\MockObject\MockObject $writerChain;
-
-    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $registry;
-
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
-
-    private EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
-
-    private FileStreamWriter|\PHPUnit\Framework\MockObject\MockObject $writer;
-
+    private JobRunner&MockObject $jobRunner;
+    private MessageProducerInterface&MockObject $messageProducer;
+    private DependentJobService&MockObject $dependentJob;
+    private FileManager&MockObject $fileManager;
+    private ImportHandler&MockObject $importHandler;
+    private WriterChain&MockObject $writerChain;
+    private ManagerRegistry&MockObject $registry;
+    private LoggerInterface&MockObject $logger;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private FileStreamWriter&MockObject $writer;
     private PreImportMessageProcessor $preImportMessageProcessor;
 
     #[\Override]

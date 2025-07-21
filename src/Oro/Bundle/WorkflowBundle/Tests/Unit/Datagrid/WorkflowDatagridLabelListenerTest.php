@@ -10,12 +10,13 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class WorkflowDatagridLabelListenerTest extends \PHPUnit\Framework\TestCase
+class WorkflowDatagridLabelListenerTest extends TestCase
 {
-    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
-
+    private TranslatorInterface&MockObject $translator;
     private WorkflowDatagridLabelListener $listener;
 
     #[\Override]

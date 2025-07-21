@@ -18,43 +18,24 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowDataHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
+class ActivityListManagerTest extends TestCase
 {
-    /** @var ActivityListManager */
-    private $activityListManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $entityNameResolver;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $config;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $provider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $activityListIdProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $commentManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var WorkflowDataHelper */
-    private $workflowHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $htmlTagHelper;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private EntityNameResolver&MockObject $entityNameResolver;
+    private ConfigManager&MockObject $config;
+    private ActivityListChainProvider&MockObject $provider;
+    private ActivityListIdProvider&MockObject $activityListIdProvider;
+    private CommentApiManager&MockObject $commentManager;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EventDispatcher&MockObject $eventDispatcher;
+    private HtmlTagHelper&MockObject $htmlTagHelper;
+    private WorkflowDataHelper&MockObject $workflowHelper;
+    private ActivityListManager $activityListManager;
 
     #[\Override]
     protected function setUp(): void
@@ -69,6 +50,7 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);
         $this->workflowHelper = $this->createMock(WorkflowDataHelper::class);
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
+
         $this->htmlTagHelper->expects($this->any())
             ->method('purify')
             ->willReturnArgument(0);
@@ -87,7 +69,7 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetRepository()
+    public function testGetRepository(): void
     {
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
@@ -95,7 +77,7 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
         $this->activityListManager->getRepository();
     }
 
-    public function testGetNonExistItem()
+    public function testGetNonExistItem(): void
     {
         $repo = $this->createMock(ActivityListRepository::class);
         $this->doctrineHelper->expects($this->once())
@@ -108,7 +90,7 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->activityListManager->getItem(12));
     }
 
-    public function testGetEntityViewModelWhenActivityIsAbsent()
+    public function testGetEntityViewModelWhenActivityIsAbsent(): void
     {
         $activityList = $this->createMock(ActivityList::class);
         $activityList->expects(self::any())
@@ -132,7 +114,7 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($result);
     }
 
-    public function testGetItem()
+    public function testGetItem(): void
     {
         $testItem = new TestActivityList();
         $testItem->setId(105);

@@ -5,15 +5,16 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Datagrid;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\MessageQueueBundle\Datagrid\RootJobActionConfiguration;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use PHPUnit\Framework\TestCase;
 
-class RootJobActionConfigurationTest extends \PHPUnit\Framework\TestCase
+class RootJobActionConfigurationTest extends TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
+    public function testCouldBeConstructedWithRequiredArguments(): void
     {
         new RootJobActionConfiguration();
     }
 
-    public function testShouldReturnViewActionTrueAllTheTime()
+    public function testShouldReturnViewActionTrueAllTheTime(): void
     {
         $job = new Job();
         $resultRecord = new ResultRecord($job);
@@ -25,7 +26,7 @@ class RootJobActionConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result['view']);
     }
 
-    public function testShouldReturnInterruptRootJobActionTrueIfJobIsNotInterrupted()
+    public function testShouldReturnInterruptRootJobActionTrueIfJobIsNotInterrupted(): void
     {
         $job = new Job();
         $resultRecord = new ResultRecord($job);
@@ -37,7 +38,7 @@ class RootJobActionConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result['interrupt_root_job']);
     }
 
-    public function testShouldReturnInterruptRootJobActionFalseIfJobIsInterrupted()
+    public function testShouldReturnInterruptRootJobActionFalseIfJobIsInterrupted(): void
     {
         $job = new Job();
         $job->setInterrupted(true);

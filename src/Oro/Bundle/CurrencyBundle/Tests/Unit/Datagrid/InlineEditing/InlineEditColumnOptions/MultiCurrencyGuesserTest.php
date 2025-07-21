@@ -5,17 +5,14 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Datagrid\InlineEditing\InlineEdit
 use Oro\Bundle\CurrencyBundle\Converter\CurrencyToString;
 use Oro\Bundle\CurrencyBundle\Datagrid\InlineEditing\InlineEditColumnOptions\MultiCurrencyGuesser;
 use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MultiCurrencyGuesserTest extends \PHPUnit\Framework\TestCase
+class MultiCurrencyGuesserTest extends TestCase
 {
-    /** @var CurrencyNameHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $currencyHelper;
-
-    /** @var MultiCurrencyGuesser */
-    private $guesser;
-
-    /** @var CurrencyToString */
-    private $currencyToStringConverter;
+    private CurrencyNameHelper&MockObject $currencyHelper;
+    private MultiCurrencyGuesser $guesser;
+    private ?CurrencyToString $currencyToStringConverter = null;
 
     #[\Override]
     protected function setUp(): void
@@ -37,7 +34,7 @@ class MultiCurrencyGuesserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setParametersDataProvider
      */
-    public function testRelationGuess(array $column, array $expected, bool $isEnabledInline, array $choices)
+    public function testRelationGuess(array $column, array $expected, bool $isEnabledInline, array $choices): void
     {
         if (empty($choices)) {
             $this->currencyHelper->expects($this->never())

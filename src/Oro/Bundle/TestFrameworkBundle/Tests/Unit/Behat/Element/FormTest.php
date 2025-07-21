@@ -3,15 +3,16 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Element;
 
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
+use PHPUnit\Framework\TestCase;
 
-class FormTest extends \PHPUnit\Framework\TestCase
+class FormTest extends TestCase
 {
     /**
      * @dataProvider normalizeValueProvider
      * @param mixed $expectedValue
      * @param mixed $actualValue
      */
-    public function testNormalizeValue($expectedValue, $actualValue)
+    public function testNormalizeValue($expectedValue, $actualValue): void
     {
         $normalizedValue = Form::normalizeValue($actualValue);
 

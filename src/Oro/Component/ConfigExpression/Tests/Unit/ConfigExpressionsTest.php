@@ -8,11 +8,11 @@ use Oro\Component\ConfigExpression\ContextAccessorInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactoryInterface;
 use Oro\Component\ConfigExpression\Extension\ExtensionInterface;
+use PHPUnit\Framework\TestCase;
 
-class ConfigExpressionsTest extends \PHPUnit\Framework\TestCase
+class ConfigExpressionsTest extends TestCase
 {
-    /** @var ConfigExpressions */
-    private $language;
+    private ConfigExpressions $language;
 
     #[\Override]
     protected function setUp(): void
@@ -20,17 +20,17 @@ class ConfigExpressionsTest extends \PHPUnit\Framework\TestCase
         $this->language = new ConfigExpressions();
     }
 
-    public function testEvaluateNull()
+    public function testEvaluateNull(): void
     {
         $this->assertNull($this->language->evaluate(null, []));
     }
 
-    public function testEvaluateEmpty()
+    public function testEvaluateEmpty(): void
     {
         $this->assertNull($this->language->evaluate([], []));
     }
 
-    public function testEvaluateByConfiguration()
+    public function testEvaluateByConfiguration(): void
     {
         $context = ['foo' => ' '];
         $expr = [
@@ -42,7 +42,7 @@ class ConfigExpressionsTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->language->evaluate($expr, $context));
     }
 
-    public function testEvaluateByExpression()
+    public function testEvaluateByExpression(): void
     {
         $context = ['foo' => ' '];
         $expr = [
@@ -54,28 +54,28 @@ class ConfigExpressionsTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->language->evaluate($this->language->getExpression($expr), $context));
     }
 
-    public function testSetAssembler()
+    public function testSetAssembler(): void
     {
         $assembler = $this->createMock(AssemblerInterface::class);
         $this->language->setAssembler($assembler);
         $this->assertSame($assembler, $this->language->getAssembler());
     }
 
-    public function testSetFactory()
+    public function testSetFactory(): void
     {
         $factory = $this->createMock(ExpressionFactoryInterface::class);
         $this->language->setFactory($factory);
         $this->assertSame($factory, $this->language->getFactory());
     }
 
-    public function testSetContextAccessor()
+    public function testSetContextAccessor(): void
     {
         $contextAccessor = $this->createMock(ContextAccessorInterface::class);
         $this->language->setContextAccessor($contextAccessor);
         $this->assertSame($contextAccessor, $this->language->getContextAccessor());
     }
 
-    public function testAddExtension()
+    public function testAddExtension(): void
     {
         $factory = $this->createMock(ExpressionFactory::class);
         $this->language->setFactory($factory);

@@ -3,13 +3,14 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\Decimal;
+use PHPUnit\Framework\TestCase;
 
-class DecimalTest extends \PHPUnit\Framework\TestCase
+class DecimalTest extends TestCase
 {
     /**
      * @dataProvider constructorProvider
      */
-    public function testConstructor(array $options, int $expectedPrecision, int $expectedScale)
+    public function testConstructor(array $options, int $expectedPrecision, int $expectedScale): void
     {
         $constraint = new Decimal($options);
 

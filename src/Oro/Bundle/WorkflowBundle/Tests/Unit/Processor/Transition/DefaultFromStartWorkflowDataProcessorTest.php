@@ -5,14 +5,13 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
-use Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFormStartHandleProcessor;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFromStartWorkflowDataProcessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 
-class DefaultFromStartWorkflowDataProcessorTest extends \PHPUnit\Framework\TestCase
+class DefaultFromStartWorkflowDataProcessorTest extends TestCase
 {
-    /** @var DefaultFormStartHandleProcessor */
-    private $processor;
+    private DefaultFromStartWorkflowDataProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +19,7 @@ class DefaultFromStartWorkflowDataProcessorTest extends \PHPUnit\Framework\TestC
         $this->processor = new DefaultFromStartWorkflowDataProcessor();
     }
 
-    public function testAddData()
+    public function testAddData(): void
     {
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())
@@ -58,7 +57,7 @@ class DefaultFromStartWorkflowDataProcessorTest extends \PHPUnit\Framework\TestC
         );
     }
 
-    public function testCreatesInitData()
+    public function testCreatesInitData(): void
     {
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())

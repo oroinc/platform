@@ -4,14 +4,13 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Authentication\Origin;
 
 use Oro\Bundle\SyncBundle\Authentication\Origin\OriginProviderInterface;
 use Oro\Bundle\SyncBundle\Authentication\Origin\OriginRegistryFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class OriginRegistryFactoryTest extends \PHPUnit\Framework\TestCase
+class OriginRegistryFactoryTest extends TestCase
 {
-    /** @var OriginProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $originProvider;
-
-    /** @var OriginRegistryFactory */
-    private $factory;
+    private OriginProviderInterface&MockObject $originProvider;
+    private OriginRegistryFactory $factory;
 
     #[\Override]
     protected function setUp(): void

@@ -3,11 +3,12 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\DataProvider;
 
 use Oro\Bundle\LayoutBundle\Layout\DataProvider\PropertyAccessDataProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class PropertyAccessDataProviderTest extends \PHPUnit\Framework\TestCase
+class PropertyAccessDataProviderTest extends TestCase
 {
-    public function testGetValue()
+    public function testGetValue(): void
     {
         $object = new \stdClass();
         $propertyPath = 'foo.bar["fee"]';

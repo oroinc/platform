@@ -7,23 +7,19 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\TriggerDriver\PdoPgsql;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PdoPgsqlTest extends \PHPUnit\Framework\TestCase
+class PdoPgsqlTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private PdoPgsql $testable;
 
-    /** @var PdoPgsql */
-    private $testable;
+    private string $testEntityClass = 'testEntity';
 
-    /** @var string */
-    private $testEntityClass = 'testEntity';
+    private Connection&MockObject $connection;
 
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var string */
-    private $tableName = 'oro_test_entity';
+    private string $tableName = 'oro_test_entity';
 
     #[\Override]
     protected function setUp(): void
@@ -59,12 +55,12 @@ class PdoPgsqlTest extends \PHPUnit\Framework\TestCase
             ->willReturn($entityManager);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals(PdoPgsql::DRIVER_POSTGRESQL, $this->testable->getName());
     }
 
-    public function testEnable()
+    public function testEnable(): void
     {
         $expectedSql = 'ALTER TABLE oro_test_entity ENABLE TRIGGER ALL';
 
@@ -75,7 +71,7 @@ class PdoPgsqlTest extends \PHPUnit\Framework\TestCase
         $this->testable->enable();
     }
 
-    public function testDisable()
+    public function testDisable(): void
     {
         $expectedSql = 'ALTER TABLE oro_test_entity DISABLE TRIGGER ALL';
 

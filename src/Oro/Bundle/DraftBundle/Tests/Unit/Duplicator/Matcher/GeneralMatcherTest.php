@@ -5,13 +5,13 @@ namespace Oro\Bundle\DraftBundle\Tests\Unit\Duplicator\Matcher;
 use Oro\Bundle\DraftBundle\Duplicator\Matcher\GeneralMatcher;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\TestCase;
 
-class GeneralMatcherTest extends \PHPUnit\Framework\TestCase
+class GeneralMatcherTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var GeneralMatcher */
-    private $matcher;
+    private GeneralMatcher $matcher;
 
     #[\Override]
     protected function setUp(): void

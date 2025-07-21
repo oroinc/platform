@@ -5,13 +5,11 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener;
 use Oro\Bundle\SearchBundle\Event\SearchQueryAwareEventInterface;
 use Oro\Bundle\SearchBundle\EventListener\LimitResultsListener;
 use Oro\Bundle\SearchBundle\Query\Query;
+use PHPUnit\Framework\TestCase;
 
-class LimitResultsListenerTest extends \PHPUnit\Framework\TestCase
+class LimitResultsListenerTest extends TestCase
 {
-    /**
-     * @var LimitResultsListener
-     */
-    private $listener;
+    private LimitResultsListener $listener;
 
     #[\Override]
     protected function setUp(): void

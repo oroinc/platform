@@ -6,6 +6,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -15,14 +16,9 @@ class EnumFilterTypeTest extends TypeTestCase
 {
     private const TEST_ENUM_CLASS = 'Extend\Entity\EV_Test_Enum';
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var EnumOptionsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $provider;
-
-    /** @var EnumFilterType */
-    private $type;
+    private TranslatorInterface&MockObject $translator;
+    private EnumOptionsProvider&MockObject $provider;
+    private EnumFilterType $type;
 
     #[\Override]
     protected function setUp(): void

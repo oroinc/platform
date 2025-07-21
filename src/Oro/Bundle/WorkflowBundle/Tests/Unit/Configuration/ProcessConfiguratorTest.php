@@ -11,23 +11,18 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class ProcessConfiguratorTest extends \PHPUnit\Framework\TestCase
+class ProcessConfiguratorTest extends TestCase
 {
     private const CLASS_NAME = ProcessDefinition::class;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
-
-    /** @var ProcessDefinitionsConfigurator|\PHPUnit\Framework\MockObject\MockObject */
-    private $definitionsConfigurator;
-
-    /** @var ProcessTriggersConfigurator|\PHPUnit\Framework\MockObject\MockObject */
-    private $triggersConfigurator;
-
-    /** @var ProcessConfigurator */
-    private $processConfigurator;
+    private ManagerRegistry&MockObject $managerRegistry;
+    private ProcessDefinitionsConfigurator&MockObject $definitionsConfigurator;
+    private ProcessTriggersConfigurator&MockObject $triggersConfigurator;
+    private ProcessConfigurator $processConfigurator;
 
     #[\Override]
     protected function setUp(): void
@@ -44,7 +39,7 @@ class ProcessConfiguratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConfigureProcesses()
+    public function testConfigureProcesses(): void
     {
         $processConfigurations = [
             ProcessConfigurationProvider::NODE_DEFINITIONS => ['...definitions config'],
@@ -74,7 +69,7 @@ class ProcessConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->processConfigurator->configureProcesses($processConfigurations);
     }
 
-    public function testSetLogger()
+    public function testSetLogger(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $this->assertNotSame($logger, ReflectionUtil::getPropertyValue($this->processConfigurator, 'logger'));
@@ -82,7 +77,7 @@ class ProcessConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($logger, ReflectionUtil::getPropertyValue($this->processConfigurator, 'logger'));
     }
 
-    public function testRemoveProcesses()
+    public function testRemoveProcesses(): void
     {
         $definition = new ProcessDefinition();
         $names = [
@@ -116,11 +111,7 @@ class ProcessConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->processConfigurator->removeProcesses($names);
     }
 
-    /**
-     * @param string $entityClass
-     * @return ObjectRepository|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function assertObjectManagerCalledForRepository($entityClass)
+    private function assertObjectManagerCalledForRepository(string $entityClass): ObjectRepository&MockObject
     {
         $repository = $this->createMock(ObjectRepository::class);
 

@@ -7,17 +7,18 @@ use Oro\Bundle\SecurityBundle\Exception\UnsupportedMetadataProviderException;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\ChainOwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ChainOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
+class ChainOwnershipMetadataProviderTest extends TestCase
 {
-    /**
-     * @return OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getMetadataProviderMock(bool $supported, ?OwnershipMetadataInterface $metadata = null)
-    {
+    private function getMetadataProviderMock(
+        bool $supported,
+        ?OwnershipMetadataInterface $metadata = null
+    ): OwnershipMetadataProviderInterface&MockObject {
         $provider = $this->createMock(OwnershipMetadataProviderInterface::class);
         $provider->expects(self::any())
             ->method('supports')

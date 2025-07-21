@@ -4,8 +4,9 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit;
 
 use Oro\Bundle\DistributionBundle\Tests\Unit\Stub\BundleStub;
 use Oro\Bundle\DistributionBundle\Tests\Unit\Stub\OroKernelStub;
+use PHPUnit\Framework\TestCase;
 
-class OroKernelTest extends \PHPUnit\Framework\TestCase
+class OroKernelTest extends TestCase
 {
     private OroKernelStub $kernel;
 
@@ -47,7 +48,7 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider bundleList
      */
-    public function testCompareBundles(array $bundles, array $expects)
+    public function testCompareBundles(array $bundles, array $expects): void
     {
         uasort($bundles, [$this->kernel, 'compareBundles']);
         $id = 0;
@@ -113,7 +114,7 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider bundlesDataProvider
      */
-    public function testRegisterBundles(array $bundles)
+    public function testRegisterBundles(array $bundles): void
     {
         $this->assertEquals(
             $bundles,

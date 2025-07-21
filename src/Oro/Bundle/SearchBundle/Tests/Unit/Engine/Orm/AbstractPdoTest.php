@@ -5,13 +5,13 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine\Orm;
 use Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver;
 use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 use Oro\Bundle\SearchBundle\Query\Query;
+use PHPUnit\Framework\TestCase;
 
-abstract class AbstractPdoTest extends \PHPUnit\Framework\TestCase
+abstract class AbstractPdoTest extends TestCase
 {
-    /** @var BaseDriver */
-    protected $driver;
+    protected BaseDriver $driver;
 
-    public function testAddFilteringFieldException()
+    public function testAddFilteringFieldException(): void
     {
         $this->expectException(ExpressionSyntaxError::class);
         $this->expectExceptionMessage('Unsupported operator "test"');
@@ -29,7 +29,7 @@ abstract class AbstractPdoTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider addFilteringFieldProvider
      */
-    public function testAddFilteringField(string $condition, string $expected)
+    public function testAddFilteringField(string $condition, string $expected): void
     {
         $searchCondition = [
             'condition' => $condition,

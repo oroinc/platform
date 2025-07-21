@@ -4,8 +4,9 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Generator\Prefixed;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Generator\Prefixed\PrefixedIntegrationIdentifierGenerator;
+use PHPUnit\Framework\TestCase;
 
-class PrefixedIntegrationIdentifierGeneratorTest extends \PHPUnit\Framework\TestCase
+class PrefixedIntegrationIdentifierGeneratorTest extends TestCase
 {
     public function testGenerateIdentifier(): void
     {

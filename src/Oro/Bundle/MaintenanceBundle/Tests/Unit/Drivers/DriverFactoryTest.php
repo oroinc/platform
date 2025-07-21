@@ -4,8 +4,9 @@ namespace Oro\Bundle\MaintenanceBundle\Tests\Unit\Drivers;
 
 use Oro\Bundle\MaintenanceBundle\Drivers\DriverFactory;
 use Oro\Bundle\MaintenanceBundle\Drivers\FileDriver;
+use PHPUnit\Framework\TestCase;
 
-class DriverFactoryTest extends \PHPUnit\Framework\TestCase
+class DriverFactoryTest extends TestCase
 {
     private function getDriverFactory(array $options): DriverFactory
     {

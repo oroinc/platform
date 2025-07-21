@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Oro\Bundle\UIBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\UIBundle\DependencyInjection\OroUIExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroUIExtensionTest extends \PHPUnit\Framework\TestCase
+class OroUIExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

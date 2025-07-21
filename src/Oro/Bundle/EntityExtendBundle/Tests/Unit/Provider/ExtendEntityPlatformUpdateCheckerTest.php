@@ -8,14 +8,13 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityPlatformUpdateChecker;
 use Oro\Bundle\EntityExtendBundle\Validator\CustomEntityConfigValidatorService;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ExtendEntityPlatformUpdateCheckerTest extends \PHPUnit\Framework\TestCase
+class ExtendEntityPlatformUpdateCheckerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    private $configManager;
-
-    /** @var ExtendEntityPlatformUpdateChecker */
-    private $platformUpdateChecker;
+    private ConfigManager&MockObject $configManager;
+    private ExtendEntityPlatformUpdateChecker $platformUpdateChecker;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +32,7 @@ class ExtendEntityPlatformUpdateCheckerTest extends \PHPUnit\Framework\TestCase
         return new Config(new EntityConfigId($scope, $className), $values);
     }
 
-    public function testWhenNoSchemaChanges()
+    public function testWhenNoSchemaChanges(): void
     {
         $extendConfig1 = $this->getEntityConfig(
             'extend',
@@ -61,7 +60,7 @@ class ExtendEntityPlatformUpdateCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWhenSchemaChangesExists()
+    public function testWhenSchemaChangesExists(): void
     {
         $extendConfig1 = $this->getEntityConfig(
             'extend',

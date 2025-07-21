@@ -7,15 +7,14 @@ use Oro\Bundle\IntegrationBundle\EventListener\LoggerClientDecoratorListener;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator\LoggerClientDecorator;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\RestTransportSettingsInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class LoggerClientDecoratorListenerTest extends \PHPUnit\Framework\TestCase
+class LoggerClientDecoratorListenerTest extends TestCase
 {
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var LoggerClientDecoratorListener */
-    private $listener;
+    private LoggerInterface&MockObject $logger;
+    private LoggerClientDecoratorListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class LoggerClientDecoratorListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->setLogger($this->logger);
     }
 
-    public function testDecoratorAttached()
+    public function testDecoratorAttached(): void
     {
         $client = $this->createMock(RestClientInterface::class);
         $transport = $this->createMock(RestTransportSettingsInterface::class);
@@ -44,7 +43,7 @@ class LoggerClientDecoratorListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDecoratorNotAttached()
+    public function testDecoratorNotAttached(): void
     {
         $configuration = [
             LoggerClientDecoratorListener::CONFIG_KEY => [

@@ -6,14 +6,15 @@ use Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
+use PHPUnit\Framework\TestCase;
 
-class DatagridGuesserTest extends \PHPUnit\Framework\TestCase
+class DatagridGuesserTest extends TestCase
 {
-    public function testApplyColumnGuesses()
+    public function testApplyColumnGuesses(): void
     {
-        $class    = 'TestClass';
+        $class = 'TestClass';
         $property = 'testProp';
-        $type     = 'integer';
+        $type = 'integer';
 
         $guesser1 = $this->createMock(ColumnOptionsGuesserInterface::class);
         $guesser2 = $this->createMock(ColumnOptionsGuesserInterface::class);
@@ -22,11 +23,11 @@ class DatagridGuesserTest extends \PHPUnit\Framework\TestCase
             ['formatter_prop1' => 'prop1', 'formatter_prop2' => 'prop2'],
             ColumnGuess::LOW_CONFIDENCE
         );
-        $sorterGuess    = new ColumnGuess(
+        $sorterGuess = new ColumnGuess(
             ['sorter_prop1' => 'prop1', 'sorter_prop2' => 'prop2'],
             ColumnGuess::LOW_CONFIDENCE
         );
-        $filterGuess    = new ColumnGuess(
+        $filterGuess = new ColumnGuess(
             ['filter_prop1' => 'prop1', 'filter_prop2' => 'prop2'],
             ColumnGuess::LOW_CONFIDENCE
         );
@@ -59,7 +60,7 @@ class DatagridGuesserTest extends \PHPUnit\Framework\TestCase
             ->willReturn($filterGuess);
 
         $datagridGuesser = new DatagridGuesser([$guesser1, $guesser2]);
-        $columnOptions   = [
+        $columnOptions = [
             DatagridGuesser::FORMATTER => [
                 'formatter_prop1' => 'prop1_initial',
                 'formatter_prop3' => 'prop3_initial',
@@ -97,7 +98,7 @@ class DatagridGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetColumnOptions()
+    public function testSetColumnOptions(): void
     {
         $datagridGuesser = new DatagridGuesser([]);
 

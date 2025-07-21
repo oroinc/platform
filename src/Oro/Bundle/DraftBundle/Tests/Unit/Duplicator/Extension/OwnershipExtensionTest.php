@@ -6,29 +6,26 @@ use DeepCopy\Filter\SetNullFilter;
 use Oro\Bundle\DraftBundle\Duplicator\DraftContext;
 use Oro\Bundle\DraftBundle\Duplicator\Extension\OwnershipExtension;
 use Oro\Bundle\DraftBundle\Duplicator\Matcher\PropertiesNameMatcher;
-use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Bundle\DraftBundle\Manager\DraftManager;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class OwnershipExtensionTest extends \PHPUnit\Framework\TestCase
+class OwnershipExtensionTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var OwnershipExtension */
-    private $ownershipExtension;
-
-    /**
-     * @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $ownershipMetadataProvider;
+    private OwnershipMetadataProviderInterface&MockObject $ownershipMetadataProvider;
+    private OwnershipExtension $ownershipExtension;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
+
         $this->ownershipExtension = new OwnershipExtension($this->ownershipMetadataProvider);
     }
 
@@ -38,12 +35,10 @@ class OwnershipExtensionTest extends \PHPUnit\Framework\TestCase
             OwnershipMetadata::class,
             ['ownerType' => OwnershipMetadata::OWNER_TYPE_USER]
         );
-        $this->ownershipMetadataProvider
-            ->expects($this->once())
+        $this->ownershipMetadataProvider->expects($this->once())
             ->method('getMetadata')
             ->willReturn($ownershipMetadata);
 
-        /** @var DraftableInterface $source */
         $source = $this->getEntity(DraftableEntityStub::class);
         $context = new DraftContext();
         $context->offsetSet('source', $source);
@@ -68,8 +63,7 @@ class OwnershipExtensionTest extends \PHPUnit\Framework\TestCase
                 'organizationFieldName' => 'organizationFieldName'
             ]
         );
-        $this->ownershipMetadataProvider
-            ->expects($this->once())
+        $this->ownershipMetadataProvider->expects($this->once())
             ->method('getMetadata')
             ->willReturn($ownershipMetadata);
 

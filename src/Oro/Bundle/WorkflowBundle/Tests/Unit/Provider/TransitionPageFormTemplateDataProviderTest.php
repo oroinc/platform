@@ -3,11 +3,12 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\WorkflowBundle\Provider\TransitionPageFormTemplateDataProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 
-class TransitionPageFormTemplateDataProviderTest extends \PHPUnit\Framework\TestCase
+class TransitionPageFormTemplateDataProviderTest extends TestCase
 {
     private TransitionPageFormTemplateDataProvider $provider;
 

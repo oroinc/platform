@@ -5,12 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
-class ProcessTriggerConfigurationTest extends \PHPUnit\Framework\TestCase
+class ProcessTriggerConfigurationTest extends TestCase
 {
-    /** @var ProcessTriggerConfiguration */
-    private $configuration;
+    private ProcessTriggerConfiguration $configuration;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +21,7 @@ class ProcessTriggerConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processDataProvider
      */
-    public function testProcess(array $input, array $expected)
+    public function testProcess(array $input, array $expected): void
     {
         $this->assertEquals($expected, $this->configuration->processConfiguration($input));
     }
@@ -100,7 +100,7 @@ class ProcessTriggerConfigurationTest extends \PHPUnit\Framework\TestCase
      * @param string $exception
      * @param string $message
      */
-    public function testProcessException(array $config, $exception, $message)
+    public function testProcessException(array $config, $exception, $message): void
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);

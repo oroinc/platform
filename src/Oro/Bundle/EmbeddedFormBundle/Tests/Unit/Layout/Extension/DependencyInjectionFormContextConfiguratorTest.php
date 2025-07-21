@@ -5,15 +5,14 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Extension;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Extension\DependencyInjectionFormContextConfigurator;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\DependencyInjectionFormAccessor;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DependencyInjectionFormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
+class DependencyInjectionFormContextConfiguratorTest extends TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var DependencyInjectionFormContextConfigurator */
-    private $contextConfigurator;
+    private ContainerInterface&MockObject $container;
+    private DependencyInjectionFormContextConfigurator $contextConfigurator;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class DependencyInjectionFormContextConfiguratorTest extends \PHPUnit\Framework\
         $this->contextConfigurator = new DependencyInjectionFormContextConfigurator($this->container);
     }
 
-    public function testConfigureContextWithoutForm()
+    public function testConfigureContextWithoutForm(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('formServiceId should be specified.');
@@ -32,7 +31,7 @@ class DependencyInjectionFormContextConfiguratorTest extends \PHPUnit\Framework\
         $this->contextConfigurator->configureContext($context);
     }
 
-    public function testConfigureContext()
+    public function testConfigureContext(): void
     {
         $serviceId = 'test_service_id';
         $contextOptionName = 'test_context_form';

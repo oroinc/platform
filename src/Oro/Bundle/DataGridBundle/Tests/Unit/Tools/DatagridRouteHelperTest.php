@@ -3,15 +3,14 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 
-class DatagridRouteHelperTest extends \PHPUnit\Framework\TestCase
+class DatagridRouteHelperTest extends TestCase
 {
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var DatagridRouteHelper */
-    private $routeHelper;
+    private RouterInterface&MockObject $router;
+    private DatagridRouteHelper $routeHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class DatagridRouteHelperTest extends \PHPUnit\Framework\TestCase
         $this->routeHelper = new DatagridRouteHelper($this->router);
     }
 
-    public function testGenerate()
+    public function testGenerate(): void
     {
         $this->router->expects($this->once())
             ->method('generate')

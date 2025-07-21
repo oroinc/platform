@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class EntityConfigPassTest extends TestCase
 {
-    public function testLoadConfig()
+    public function testLoadConfig(): void
     {
         CumulativeResourceManager::getInstance()
             ->clear()
@@ -23,12 +23,13 @@ class EntityConfigPassTest extends TestCase
             ]);
 
         $containerBuilder = $this->createMock(ContainerBuilder::class);
-        $containerBuilder
+        $containerBuilder->expects(self::any())
             ->method('getDefinition')
             ->willReturnCallback(function (string $class) {
                 return new Definition($class, [1, 2, 3]);
             });
-        $containerBuilder->method('setDefinition')
+        $containerBuilder->expects(self::any())
+            ->method('setDefinition')
             ->willReturnArgument(1);
 
         $config = [
@@ -45,7 +46,7 @@ class EntityConfigPassTest extends TestCase
         $configBag->setPublic(false);
         $configBag->setLazy(true);
 
-        $containerBuilder
+        $containerBuilder->expects(self::any())
             ->method('setDefinition')
             ->willReturnCallback(function (string $id, Definition $definition) use ($configBag) {
                 if (EntityConfigPassStub::CONFIG_BAG_SERVICE === $id) {

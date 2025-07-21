@@ -11,6 +11,8 @@ use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 use Oro\Bundle\DataGridBundle\Twig\DataGridExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -21,33 +23,18 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
+class DataGridExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var ManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var NameStrategyInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $nameStrategy;
-
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var DatagridRouteHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagridRouteHelper;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var DataGridExtension */
-    private $extension;
+    private ManagerInterface&MockObject $manager;
+    private NameStrategyInterface&MockObject $nameStrategy;
+    private RouterInterface&MockObject $router;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private DatagridRouteHelper&MockObject $datagridRouteHelper;
+    private RequestStack&MockObject $requestStack;
+    private LoggerInterface&MockObject $logger;
+    private DataGridExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -73,7 +60,7 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new DataGridExtension($container);
     }
 
-    public function testGetGridWorks()
+    public function testGetGridWorks(): void
     {
         $gridName = 'test-grid';
         $params = ['foo' => 'bar'];
@@ -100,7 +87,7 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetGridReturnsNullWhenConfigurationNotFound()
+    public function testGetGridReturnsNullWhenConfigurationNotFound(): void
     {
         $gridName = 'test-grid';
 
@@ -114,7 +101,7 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetGridReturnsNullWhenDontHavePermissions()
+    public function testGetGridReturnsNullWhenDontHavePermissions(): void
     {
         $gridName = 'test-grid';
 
@@ -144,7 +131,7 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider routeProvider
      */
-    public function testGetGridMetadataWorks(?string $configRoute, string $expectedRoute, string $requestMethod)
+    public function testGetGridMetadataWorks(?string $configRoute, string $expectedRoute, string $requestMethod): void
     {
         $gridName = 'test-grid';
         $gridScope = 'test-scope';
@@ -216,7 +203,7 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetGridDataWorks()
+    public function testGetGridDataWorks(): void
     {
         $grid = $this->createMock(DatagridInterface::class);
         $gridData = $this->createMock(ResultsObject::class);
@@ -237,7 +224,7 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetGridDataException()
+    public function testGetGridDataException(): void
     {
         $grid = $this->createMock(DatagridInterface::class);
         $gridData = $this->createMock(ResultsObject::class);
@@ -274,7 +261,7 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider generateGridElementIdDataProvider
      */
-    public function testGenerateGridElementIdWorks(string $gridName, string $gridScope, string $expectedPattern)
+    public function testGenerateGridElementIdWorks(string $gridName, string $gridScope, string $expectedPattern): void
     {
         $grid = $this->createMock(DatagridInterface::class);
         $grid->expects($this->once())
@@ -306,7 +293,7 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testBuildGridFullNameWorks()
+    public function testBuildGridFullNameWorks(): void
     {
         $expectedFullName = 'test-grid:test-scope';
         $gridName = 'test-grid';
@@ -322,7 +309,7 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetColumnAttributes()
+    public function testGetColumnAttributes(): void
     {
         $columnAttributes = [
             'name' => 'column1',
@@ -355,7 +342,7 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPageUrlProvider
      */
-    public function testGetPageUrl(string $queryString, int $page, string $expectedParameters)
+    public function testGetPageUrl(string $queryString, int $page, string $expectedParameters): void
     {
         $gridName = 'test';
 

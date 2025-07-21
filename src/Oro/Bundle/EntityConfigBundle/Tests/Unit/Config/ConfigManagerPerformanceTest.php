@@ -45,11 +45,8 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
     private const NUMBER_OF_ENTITIES = 150;
     private const NUMBER_OF_FIELDS = 30;
 
-    /** @var int */
-    private static $standardDuration;
-
-    /** @var Stopwatch */
-    private static $stopwatch;
+    private static int $standardDuration;
+    private static ?Stopwatch $stopwatch;
 
     public function testConfigGet()
     {
@@ -424,7 +421,9 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
         $lockObject = new LockObject();
         $applicationState = $this->createMock(ApplicationState::class);
 
-        $applicationState->method('isInstalled')->willReturn(true);
+        $applicationState->expects(self::any())
+            ->method('isInstalled')
+            ->willReturn(true);
 
         $databaseChecker = new ConfigDatabaseChecker($lockObject, $doctrine, [], $applicationState);
 

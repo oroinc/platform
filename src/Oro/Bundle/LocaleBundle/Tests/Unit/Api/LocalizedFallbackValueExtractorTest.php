@@ -4,11 +4,11 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Api;
 
 use Oro\Bundle\LocaleBundle\Api\LocalizedFallbackValueExtractor;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
+use PHPUnit\Framework\TestCase;
 
-class LocalizedFallbackValueExtractorTest extends \PHPUnit\Framework\TestCase
+class LocalizedFallbackValueExtractorTest extends TestCase
 {
-    /** @var LocalizedFallbackValueExtractor */
-    private $valueExtractor;
+    private LocalizedFallbackValueExtractor $valueExtractor;
 
     #[\Override]
     protected function setUp(): void

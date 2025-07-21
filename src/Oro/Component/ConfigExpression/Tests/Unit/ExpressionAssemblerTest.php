@@ -6,13 +6,14 @@ use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 use Oro\Component\ConfigExpression\ExpressionAssembler;
 use Oro\Component\ConfigExpression\ExpressionFactoryInterface;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ExpressionStub;
+use PHPUnit\Framework\TestCase;
 
-class ExpressionAssemblerTest extends \PHPUnit\Framework\TestCase
+class ExpressionAssemblerTest extends TestCase
 {
     /**
      * @dataProvider configurationDataProvider
      */
-    public function testAssemble($configuration, $expected)
+    public function testAssemble($configuration, $expected): void
     {
         $factory = $this->createMock(ExpressionFactoryInterface::class);
         $factory->expects($this->any())

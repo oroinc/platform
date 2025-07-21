@@ -5,14 +5,13 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Async;
 use Oro\Bundle\FeatureToggleBundle\Async\MessageFilter;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\MessageQueueBundle\Client\MessageBuffer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MessageFilterTest extends \PHPUnit\Framework\TestCase
+class MessageFilterTest extends TestCase
 {
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var MessageFilter */
-    private $filter;
+    private FeatureChecker&MockObject $featureChecker;
+    private MessageFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class MessageFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter = new MessageFilter($this->featureChecker);
     }
 
-    public function testApply()
+    public function testApply(): void
     {
         $buffer = new MessageBuffer();
         $buffer->addMessage('topic1', 'topic1.message1');

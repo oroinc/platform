@@ -46,13 +46,12 @@ class WorkflowManagerTest extends TestCase
 {
     private const TEST_WORKFLOW_NAME = 'test_workflow';
 
-    private WorkflowRegistry|MockObject $workflowRegistry;
-    private DoctrineHelper|MockObject $doctrineHelper;
-    private EventDispatcherInterface|MockObject $eventDispatcher;
-    private WorkflowEntityConnector|MockObject $entityConnector;
+    private WorkflowRegistry&MockObject $workflowRegistry;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private WorkflowEntityConnector&MockObject $entityConnector;
     private StartedWorkflowsBag $startedWorkflowsBag;
-    private LoggerInterface|MockObject $logger;
-
+    private LoggerInterface&MockObject $logger;
     private WorkflowManager $workflowManager;
 
     #[\Override]
@@ -110,7 +109,7 @@ class WorkflowManagerTest extends TestCase
         ];
     }
 
-    public function testGetWorkflowNotFound()
+    public function testGetWorkflowNotFound(): void
     {
         $this->expectException(WorkflowException::class);
 
@@ -286,11 +285,10 @@ class WorkflowManagerTest extends TestCase
         $this->assertSame($newItem, $item, 'should return item created when workflow->start invoked');
     }
 
-    /**
-     * @return EntityManager|MockObject
-     */
-    private function getTransactionScopedEntityManager(string $manageableEntityClass, int $transactionDepth = 1)
-    {
+    private function getTransactionScopedEntityManager(
+        string $manageableEntityClass,
+        int $transactionDepth = 1
+    ): EntityManager&MockObject {
         $entityManager = $this->createMock(EntityManager::class);
 
         $this->doctrineHelper->expects($this->exactly($transactionDepth))
@@ -1310,10 +1308,7 @@ class WorkflowManagerTest extends TestCase
         return $workflowItem;
     }
 
-    /**
-     * @return Workflow|MockObject
-     */
-    private function createWorkflow(string $name, array $startTransitions = [])
+    private function createWorkflow(string $name, array $startTransitions = []): Workflow&MockObject
     {
         $attributeManager = $this->createMock(AttributeManager::class);
 
@@ -1397,7 +1392,7 @@ class WorkflowManagerTest extends TestCase
         $this->assertCount(0, $this->startedWorkflowsBag->getWorkflowEntities($name));
     }
 
-    public function testHasWorkflowItemsByEntity()
+    public function testHasWorkflowItemsByEntity(): void
     {
         $entity = new EntityStub(1);
         $workflowItem = new WorkflowItem();
@@ -1409,7 +1404,7 @@ class WorkflowManagerTest extends TestCase
         $this->assertTrue($this->workflowManager->hasWorkflowItemsByEntity($entity));
     }
 
-    public function testGetAvailableWorkflowByRecordGroup()
+    public function testGetAvailableWorkflowByRecordGroup(): void
     {
         $entity = new \DateTime('now');
         $entityClass = get_class($entity);

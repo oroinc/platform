@@ -8,20 +8,15 @@ use Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheScheduleArgumentsBuilde
 use Oro\Bundle\CacheBundle\Action\Transformer\DateTimeToStringTransformerInterface;
 use Oro\Bundle\CacheBundle\Command\InvalidateCacheScheduleCommand;
 use Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class InvalidateCacheActionScheduledHandlerTest extends \PHPUnit\Framework\TestCase
+class InvalidateCacheActionScheduledHandlerTest extends TestCase
 {
-    /** @var DeferredScheduler|\PHPUnit\Framework\MockObject\MockObject */
-    private $deferredScheduler;
-
-    /** @var InvalidateCacheScheduleArgumentsBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $scheduleArgumentsBuilder;
-
-    /** @var DateTimeToStringTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cronFormatTransformer;
-
-    /** @var InvalidateCacheActionScheduledHandler */
-    private $handler;
+    private DeferredScheduler&MockObject $deferredScheduler;
+    private InvalidateCacheScheduleArgumentsBuilderInterface&MockObject $scheduleArgumentsBuilder;
+    private DateTimeToStringTransformerInterface&MockObject $cronFormatTransformer;
+    private InvalidateCacheActionScheduledHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -37,7 +32,7 @@ class InvalidateCacheActionScheduledHandlerTest extends \PHPUnit\Framework\TestC
         );
     }
 
-    public function testHandleForRemovingSchedule()
+    public function testHandleForRemovingSchedule(): void
     {
         $dataStorage = new InvalidateCacheDataStorage([
             InvalidateCacheActionScheduledHandler::PARAM_HANDLER_SERVICE_NAME => 'service'
@@ -65,7 +60,7 @@ class InvalidateCacheActionScheduledHandlerTest extends \PHPUnit\Framework\TestC
         $this->handler->handle($dataStorage);
     }
 
-    public function testHandleForAddingSchedule()
+    public function testHandleForAddingSchedule(): void
     {
         $time = new \DateTime();
         $dataStorage = new InvalidateCacheDataStorage([

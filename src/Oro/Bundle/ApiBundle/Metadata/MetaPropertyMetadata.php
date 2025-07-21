@@ -8,6 +8,7 @@ namespace Oro\Bundle\ApiBundle\Metadata;
 class MetaPropertyMetadata extends PropertyMetadata
 {
     private ?string $resultName = null;
+    private bool $associationLevel = false;
 
     /**
      * @param string|null $name         The name of the meta property in the result data.
@@ -44,5 +45,21 @@ class MetaPropertyMetadata extends PropertyMetadata
     public function setResultName(?string $resultName): void
     {
         $this->resultName = $resultName;
+    }
+
+    /**
+     * Indicates whether the meta property is available on an association level only
+     */
+    public function isAssociationLevel(): bool
+    {
+        return $this->associationLevel;
+    }
+
+    /**
+     * Sets a flag indicates whether the meta property is available on an association level only.
+     */
+    public function setAssociationLevel(bool $associationLevel): void
+    {
+        $this->associationLevel = $associationLevel;
     }
 }

@@ -5,13 +5,14 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChainExclusionProviderTest extends \PHPUnit\Framework\TestCase
+class ChainExclusionProviderTest extends TestCase
 {
-    private ChainExclusionProvider $chainProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject[] */
+    /** @var ExclusionProviderInterface[]&MockObject[] */
     private array $providers = [];
+    private ChainExclusionProvider $chainProvider;
 
     #[\Override]
     protected function setUp(): void

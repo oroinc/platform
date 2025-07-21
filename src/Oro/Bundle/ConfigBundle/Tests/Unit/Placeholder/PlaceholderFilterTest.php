@@ -4,14 +4,13 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Placeholder;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Placeholder\PlaceholderFilter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
+class PlaceholderFilterTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    private $configManager;
-
-    /** @var PlaceholderFilter */
-    private $filter;
+    private ConfigManager&MockObject $configManager;
+    private PlaceholderFilter $filter;
 
     #[\Override]
     protected function setUp(): void

@@ -5,12 +5,13 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
 use Oro\Bundle\NavigationBundle\Entity\PinbarTab;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class PinbarTabTest extends \PHPUnit\Framework\TestCase
+class PinbarTabTest extends TestCase
 {
     use EntityTestCaseTrait;
 
-    public function testSetMaximizedNotEmpty()
+    public function testSetMaximizedNotEmpty(): void
     {
         $item = $this->createMock(NavigationItem::class);
 
@@ -21,7 +22,7 @@ class PinbarTabTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf('DateTime', $pinbarTab->getMaximized());
     }
 
-    public function testSetMaximizedEmpty()
+    public function testSetMaximizedEmpty(): void
     {
         $item = $this->createMock(NavigationItem::class);
 
@@ -32,7 +33,7 @@ class PinbarTabTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($pinbarTab->getMaximized());
     }
 
-    public function testSetGet()
+    public function testSetGet(): void
     {
         $item = $this->createMock(NavigationItem::class);
 
@@ -46,7 +47,7 @@ class PinbarTabTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDoPrePersist()
+    public function testDoPrePersist(): void
     {
         $item = $this->createMock(NavigationItem::class);
 
@@ -57,7 +58,7 @@ class PinbarTabTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($pinbarTab->getMaximized());
     }
 
-    public function testSetValues()
+    public function testSetValues(): void
     {
         $values = ['maximized' => '2022-02-02 22:22:22', 'url' => '/'];
         $item = $this->createMock(NavigationItem::class);
@@ -70,13 +71,13 @@ class PinbarTabTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf('DateTime', $pinbarTab->getMaximized());
     }
 
-    public function testGetUserNoItem()
+    public function testGetUserNoItem(): void
     {
         $pinbarTab = new PinbarTab();
         $this->assertNull($pinbarTab->getUser());
     }
 
-    public function testGetUser()
+    public function testGetUser(): void
     {
         $user = $this->createMock(\stdClass::class);
         $item = $this->createMock(NavigationItem::class);

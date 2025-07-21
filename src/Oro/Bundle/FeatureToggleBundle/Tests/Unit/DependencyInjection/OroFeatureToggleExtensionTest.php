@@ -3,11 +3,12 @@
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\FeatureToggleBundle\DependencyInjection\OroFeatureToggleExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroFeatureToggleExtensionTest extends \PHPUnit\Framework\TestCase
+class OroFeatureToggleExtensionTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.environment', 'prod');
@@ -21,7 +22,7 @@ class OroFeatureToggleExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($featureDecisionManagerDef->getArgument('$allowIfEqualGrantedDeniedDecisions'));
     }
 
-    public function testLoadWithCustomConfigs()
+    public function testLoadWithCustomConfigs(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.environment', 'prod');
@@ -50,7 +51,7 @@ class OroFeatureToggleExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAlias()
+    public function testGetAlias(): void
     {
         $this->assertEquals('oro_featuretoggle', (new OroFeatureToggleExtension())->getAlias());
     }

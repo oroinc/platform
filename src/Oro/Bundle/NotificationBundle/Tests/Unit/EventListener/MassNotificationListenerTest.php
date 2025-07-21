@@ -8,13 +8,14 @@ use Oro\Bundle\NotificationBundle\Entity\MassNotification;
 use Oro\Bundle\NotificationBundle\Event\NotificationSentEvent;
 use Oro\Bundle\NotificationBundle\EventListener\MassNotificationListener;
 use Oro\Bundle\NotificationBundle\Model\MassNotificationSender;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 use Symfony\Component\Mime\RawMessage;
 
-class MassNotificationListenerTest extends \PHPUnit\Framework\TestCase
+class MassNotificationListenerTest extends TestCase
 {
-    private EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entityManager;
-
+    private EntityManagerInterface&MockObject $entityManager;
     private MassNotificationListener $listener;
 
     #[\Override]

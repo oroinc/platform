@@ -6,12 +6,12 @@ use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\AddTreeGeneratorExtension
 use Oro\Component\Layout\Exception\SyntaxException;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
 
-class AddTreeGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
+class AddTreeGeneratorExtensionTest extends TestCase
 {
-    /** @var AddTreeGeneratorExtension */
-    private $extension;
+    private AddTreeGeneratorExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +22,7 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider prepareDataProvider
      */
-    public function testPrepare(array $source, array $expectedSource)
+    public function testPrepare(array $source, array $expectedSource): void
     {
         $data = new GeneratorData($source);
 
@@ -135,7 +135,7 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider prepareExceptionDataProvider
      */
-    public function testPrepareExceptions(array $source, string $message)
+    public function testPrepareExceptions(array $source, string $message): void
     {
         $this->expectException(SyntaxException::class);
         $this->expectExceptionMessage($message);

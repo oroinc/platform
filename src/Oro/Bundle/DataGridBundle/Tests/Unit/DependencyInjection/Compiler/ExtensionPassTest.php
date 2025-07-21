@@ -3,17 +3,16 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\DataGridBundle\DependencyInjection\Compiler\ExtensionsPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ExtensionPassTest extends \PHPUnit\Framework\TestCase
+class ExtensionPassTest extends TestCase
 {
     private ContainerBuilder $container;
-
     private Definition $builder;
-
     private ExtensionsPass $compiler;
 
     #[\Override]

@@ -8,6 +8,8 @@ use Oro\Bundle\SecurityBundle\Acl\Cache\UnderlyingAclCache;
 use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityToStringConverterInterface;
 use Oro\Bundle\SecurityBundle\Acl\Event\CacheClearEvent;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Acl\Domain\Acl;
@@ -21,25 +23,15 @@ use Symfony\Contracts\Cache\CacheInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class AclCacheTest extends \PHPUnit\Framework\TestCase
+class AclCacheTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheInterface */
-    private $cache;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|PermissionGrantingStrategyInterface */
-    private $permissionGrantingStrategy;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UnderlyingAclCache */
-    private $underlyingCache;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
-    private $eventDispatcher;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SecurityIdentityToStringConverterInterface */
-    private $sidConverter;
-
+    private CacheInterface&MockObject $cache;
+    private PermissionGrantingStrategyInterface&MockObject $permissionGrantingStrategy;
+    private UnderlyingAclCache&MockObject $underlyingCache;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private SecurityIdentityToStringConverterInterface&MockObject $sidConverter;
     private AclCache $aclCache;
 
     #[\Override]

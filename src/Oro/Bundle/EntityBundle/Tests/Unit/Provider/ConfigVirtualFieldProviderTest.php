@@ -6,14 +6,12 @@ use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
 use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
+use PHPUnit\Framework\TestCase;
 
-class ConfigVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigVirtualFieldProviderTest extends TestCase
 {
-    /** @var ConfigVirtualFieldProvider */
-    private $virtualFieldProvider;
-
-    /** @var array */
-    private $virtualFieldsConfig;
+    private ConfigVirtualFieldProvider $virtualFieldProvider;
+    private array $virtualFieldsConfig;
 
     #[\Override]
     protected function setUp(): void
@@ -87,7 +85,7 @@ class ConfigVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEntityInheritedFromAnotherEntityWithVirtualField()
+    public function testEntityInheritedFromAnotherEntityWithVirtualField(): void
     {
         $this->assertEquals(
             ['virtual_field1', 'virtual_field3'],
@@ -108,7 +106,7 @@ class ConfigVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEntityInheritedFromSeveralEntitiesWithVirtualFields()
+    public function testEntityInheritedFromSeveralEntitiesWithVirtualFields(): void
     {
         $this->assertEquals(
             ['virtual_field1', 'virtual_field3', 'virtual_field2'],
@@ -134,7 +132,7 @@ class ConfigVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEntityWithOwnVirtualFieldsAndInheritedFromAnotherEntityWithVirtualField()
+    public function testEntityWithOwnVirtualFieldsAndInheritedFromAnotherEntityWithVirtualField(): void
     {
         $this->assertEquals(
             ['virtual_field1', 'virtual_field3', 'virtual_field2'],
@@ -160,7 +158,7 @@ class ConfigVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEntityWithOwnVirtualField()
+    public function testEntityWithOwnVirtualField(): void
     {
         $this->assertEquals(
             ['virtual_field1'],
@@ -176,7 +174,7 @@ class ConfigVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEntityWithoutVirtualFields()
+    public function testEntityWithoutVirtualFields(): void
     {
         $this->assertEquals(
             [],

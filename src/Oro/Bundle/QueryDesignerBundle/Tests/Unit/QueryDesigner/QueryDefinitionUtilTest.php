@@ -4,13 +4,14 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\QueryDesigner;
 
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class QueryDefinitionUtilTest extends \PHPUnit\Framework\TestCase
+class QueryDefinitionUtilTest extends TestCase
 {
-    public function testEncodeAndDecodeDefinition()
+    public function testEncodeAndDecodeDefinition(): void
     {
         $definition = ['columns' => [['name' => 'column1']]];
         $encodedDefinition = QueryDefinitionUtil::encodeDefinition($definition);
@@ -18,29 +19,29 @@ class QueryDefinitionUtilTest extends \PHPUnit\Framework\TestCase
         self::assertSame($definition, QueryDefinitionUtil::safeDecodeDefinition($encodedDefinition));
     }
 
-    public function testDecodeDefinitionForNullValue()
+    public function testDecodeDefinitionForNullValue(): void
     {
         self::assertSame([], QueryDefinitionUtil::decodeDefinition(null));
     }
 
-    public function testDecodeDefinitionForInvalidValue()
+    public function testDecodeDefinitionForInvalidValue(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The query designer definition is not valid JSON: Syntax error.');
         QueryDefinitionUtil::decodeDefinition('invalid json');
     }
 
-    public function testSafeDecodeDefinitionForNullValue()
+    public function testSafeDecodeDefinitionForNullValue(): void
     {
         self::assertSame([], QueryDefinitionUtil::safeDecodeDefinition(null));
     }
 
-    public function testSafeDecodeDefinitionForInvalidValue()
+    public function testSafeDecodeDefinitionForInvalidValue(): void
     {
         self::assertSame([], QueryDefinitionUtil::safeDecodeDefinition('invalid json'));
     }
 
-    public function testBuildColumnIdentifierForColumnWithoutFunction()
+    public function testBuildColumnIdentifierForColumnWithoutFunction(): void
     {
         $column = ['name' => 'column1'];
         self::assertEquals(
@@ -49,7 +50,7 @@ class QueryDefinitionUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBuildColumnIdentifierForColumnWithEmptyFunctionDefinition()
+    public function testBuildColumnIdentifierForColumnWithEmptyFunctionDefinition(): void
     {
         $column = ['name' => 'column1', 'func' => []];
         self::assertEquals(
@@ -58,7 +59,7 @@ class QueryDefinitionUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBuildColumnIdentifierForColumnWithFunction()
+    public function testBuildColumnIdentifierForColumnWithFunction(): void
     {
         $column = [
             'name' => 'column1',
@@ -70,7 +71,7 @@ class QueryDefinitionUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBuildColumnIdentifierForColumnWithFunctionWithoutGroupNameAndType()
+    public function testBuildColumnIdentifierForColumnWithFunctionWithoutGroupNameAndType(): void
     {
         $column = [
             'name' => 'column1',
@@ -82,7 +83,7 @@ class QueryDefinitionUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBuildColumnIdentifierForColumnWithFunctionWithoutGroupName()
+    public function testBuildColumnIdentifierForColumnWithFunctionWithoutGroupName(): void
     {
         $column = [
             'name' => 'column1',
@@ -94,7 +95,7 @@ class QueryDefinitionUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBuildColumnIdentifierForColumnWithFunctionWithoutGroupType()
+    public function testBuildColumnIdentifierForColumnWithFunctionWithoutGroupType(): void
     {
         $column = [
             'name' => 'column1',

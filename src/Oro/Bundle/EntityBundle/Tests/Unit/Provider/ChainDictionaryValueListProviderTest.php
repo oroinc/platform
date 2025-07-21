@@ -5,17 +5,14 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 use Oro\Bundle\EntityBundle\Provider\DictionaryValueListProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChainDictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
+class ChainDictionaryValueListProviderTest extends TestCase
 {
-    /** @var DictionaryValueListProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $provider1;
-
-    /** @var DictionaryValueListProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $provider2;
-
-    /** @var ChainDictionaryValueListProvider */
-    private $chainProvider;
+    private DictionaryValueListProviderInterface&MockObject $provider1;
+    private DictionaryValueListProviderInterface&MockObject $provider2;
+    private ChainDictionaryValueListProvider $chainProvider;
 
     #[\Override]
     protected function setUp(): void

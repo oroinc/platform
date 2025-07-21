@@ -11,13 +11,14 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class IndexEntitiesByTypeMessageProcessorTest extends TestCase
 {
     use MessageQueueExtension;
 
-    public function testCouldBeConstructedWithRequiredAttributes()
+    public function testCouldBeConstructedWithRequiredAttributes(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -29,7 +30,7 @@ class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit\Framework\TestCas
         );
     }
 
-    public function testShouldBeSubscribedForTopics()
+    public function testShouldBeSubscribedForTopics(): void
     {
         $this->assertEquals(
             [
@@ -39,7 +40,7 @@ class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit\Framework\TestCas
         );
     }
 
-    public function testShouldRejectMessageIfEntityManagerWasNotFoundForClass()
+    public function testShouldRejectMessageIfEntityManagerWasNotFoundForClass(): void
     {
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->once())

@@ -6,27 +6,20 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SidebarBundle\Configuration\WidgetDefinitionProvider;
 use Oro\Bundle\SidebarBundle\Twig\SidebarExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages as AssetHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
+class SidebarExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WidgetDefinitionProvider */
-    private $widgetDefinitionProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    private $translator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AssetHelper */
-    private $assetHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var SidebarExtension */
-    private $extension;
+    private WidgetDefinitionProvider&MockObject $widgetDefinitionProvider;
+    private TranslatorInterface&MockObject $translator;
+    private AssetHelper&MockObject $assetHelper;
+    private FeatureChecker&MockObject $featureChecker;
+    private SidebarExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -46,7 +39,7 @@ class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->setFeatureChecker($this->featureChecker);
     }
 
-    public function testGetWidgetDefinitions()
+    public function testGetWidgetDefinitions(): void
     {
         $placement = 'left';
 
@@ -96,7 +89,7 @@ class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetWidgetDefinitionsForDisabledWidget()
+    public function testGetWidgetDefinitionsForDisabledWidget(): void
     {
         $placement = 'left';
 

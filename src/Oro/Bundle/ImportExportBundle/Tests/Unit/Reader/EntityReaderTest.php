@@ -23,27 +23,20 @@ use Oro\Bundle\ImportExportBundle\ORM\Query\ExportBufferedIdentityQueryResultIte
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityReaderTest extends \PHPUnit\Framework\TestCase
+class EntityReaderTest extends TestCase
 {
-    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextRegistry;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipMetadataProvider;
-
-    /** @var ExportQueryProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $exportQueryProvider;
-
-    /** @var EntityReaderTestAdapter */
-    private $reader;
+    private ContextRegistry&MockObject $contextRegistry;
+    private ManagerRegistry&MockObject $doctrine;
+    private OwnershipMetadataProviderInterface&MockObject $ownershipMetadataProvider;
+    private ExportQueryProvider&MockObject $exportQueryProvider;
+    private EntityReaderTestAdapter $reader;
 
     #[\Override]
     protected function setUp(): void
@@ -73,7 +66,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         return $stepExecution;
     }
 
-    public function testReadMockIterator()
+    public function testReadMockIterator(): void
     {
         $iterator = $this->createMock(\Iterator::class);
         $this->doctrine->expects(self::never())
@@ -111,7 +104,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->reader->read());
     }
 
-    public function testReadRealIterator()
+    public function testReadRealIterator(): void
     {
         $this->doctrine->expects(self::never())
             ->method(self::anything());
@@ -139,7 +132,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->reader->read());
     }
 
-    public function testReadFailsWhenNoSourceIterator()
+    public function testReadFailsWhenNoSourceIterator(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Reader must be configured with source');
@@ -150,7 +143,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         $this->reader->read();
     }
 
-    public function testSetStepExecutionWithQueryBuilder()
+    public function testSetStepExecutionWithQueryBuilder(): void
     {
         $this->doctrine->expects(self::never())
             ->method(self::anything());
@@ -175,7 +168,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($queryBuilder, $this->reader->getSourceIterator()->getSource());
     }
 
-    public function testSetStepExecutionWithQuery()
+    public function testSetStepExecutionWithQuery(): void
     {
         $configuration = $this->createMock(Configuration::class);
         $configuration->expects(self::once())
@@ -214,7 +207,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($query, $this->reader->getSourceIterator()->getSource());
     }
 
-    public function testSetStepExecutionWithEntityName()
+    public function testSetStepExecutionWithEntityName(): void
     {
         $entityName = 'entityName';
 
@@ -279,7 +272,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($query, $this->reader->getSourceIterator()->getSource());
     }
 
-    public function testSetStepExecutionFailsWhenHasNoRequiredOptions()
+    public function testSetStepExecutionFailsWhenHasNoRequiredOptions(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
@@ -297,7 +290,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         $this->reader->setStepExecution($this->getMockStepExecution($context));
     }
 
-    public function testSetSourceEntityName()
+    public function testSetSourceEntityName(): void
     {
         $name = \stdClass::class;
 
@@ -381,7 +374,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         $this->reader->setSourceEntityName($name, $organization);
     }
 
-    public function testSetNullIterator()
+    public function testSetNullIterator(): void
     {
         $iterator = $this->createMock(\Iterator::class);
         $this->reader->setSourceIterator($iterator);
@@ -390,7 +383,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->reader->getSourceIterator());
     }
 
-    public function testGetIds()
+    public function testGetIds(): void
     {
         $entityName = 'entityName';
         $options = ['entityName' => $entityName];
@@ -457,7 +450,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($result, $this->reader->getIds($entityName, $options));
     }
 
-    public function testGetIdsCompositeKey()
+    public function testGetIdsCompositeKey(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Not supported entity (entityName) with composite primary key.');

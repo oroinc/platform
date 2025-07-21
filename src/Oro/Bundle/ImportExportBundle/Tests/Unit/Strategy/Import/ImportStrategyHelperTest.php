@@ -18,6 +18,8 @@ use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerChecker;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -30,37 +32,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
+class ImportStrategyHelperTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
-
-    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $validator;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldHelper;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendConfigProvider;
-
-    /** @var ConfigurableTableDataConverter|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurableDataConverter;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var OwnerChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownerChecker;
-
-    /** @var ImportStrategyHelper */
-    private $helper;
+    private ManagerRegistry&MockObject $managerRegistry;
+    private ValidatorInterface&MockObject $validator;
+    private TranslatorInterface&MockObject $translator;
+    private FieldHelper&MockObject $fieldHelper;
+    private ConfigProvider&MockObject $extendConfigProvider;
+    private ConfigurableTableDataConverter&MockObject $configurableDataConverter;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private OwnerChecker&MockObject $ownerChecker;
+    private ImportStrategyHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -712,11 +695,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($isGranted);
     }
 
-    /**
-     * @param ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context
-     * @param string $error
-     */
-    private function assertAddValidationErrorCalled(ContextInterface $context, string $error): void
+    private function assertAddValidationErrorCalled(ContextInterface&MockObject $context, string $error): void
     {
         $this->translator->expects(self::exactly(2))
             ->method('trans')
@@ -733,11 +712,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
             ->with('oro.importexport.import.error %number% TR ' . $error . ' TR');
     }
 
-    /**
-     * @param ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context
-     * @param string $msg
-     */
-    private function assertAddError(ContextInterface $context, string $msg): void
+    private function assertAddError(ContextInterface&MockObject $context, string $msg): void
     {
         $this->translator->expects(self::once())
             ->method('trans')

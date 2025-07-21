@@ -766,3 +766,10 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@property_accessor'
+
+    oro_entity.layout.data_provider.entity_name_data_provider:
+        class: Oro\Bundle\EntityBundle\Layout\DataProvider\EntityNameLayoutDataProvider
+        arguments:
+            - '@oro_entity.entity_name_resolver'
+        tags:
+            - { name: layout.data_provider, alias: entity_name }

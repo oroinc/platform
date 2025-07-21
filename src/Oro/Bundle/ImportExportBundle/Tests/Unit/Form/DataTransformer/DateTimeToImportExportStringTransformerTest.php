@@ -12,10 +12,10 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 final class DateTimeToImportExportStringTransformerTest extends TestCase
 {
-    private AbstractNormalizer|MockObject $normalizer;
-
+    private AbstractNormalizer&MockObject $normalizer;
     private DateTimeToImportExportStringTransformer $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->normalizer = $this->createMock(AbstractNormalizer::class);
@@ -40,8 +40,7 @@ final class DateTimeToImportExportStringTransformerTest extends TestCase
         $dateTime = new \DateTimeImmutable('2024-01-01 00:00:00');
         $expected = '2024-01-01T00:00:00+00:00';
 
-        $this->normalizer
-            ->expects(self::once())
+        $this->normalizer->expects(self::once())
             ->method('normalize')
             ->with($dateTime, null, ['type' => 'datetime'])
             ->willReturn($expected);
@@ -67,8 +66,7 @@ final class DateTimeToImportExportStringTransformerTest extends TestCase
         $dateTimeString = '2024-01-01T00:00:00+00:00';
         $expectedDateTime = new \DateTimeImmutable('2024-01-01 00:00:00');
 
-        $this->normalizer
-            ->expects(self::once())
+        $this->normalizer->expects(self::once())
             ->method('denormalize')
             ->with($dateTimeString, 'DateTime', null, ['type' => 'datetime'])
             ->willReturn($expectedDateTime);
@@ -78,8 +76,7 @@ final class DateTimeToImportExportStringTransformerTest extends TestCase
 
     public function testReverseTransformThrowsExceptionOnFailure(): void
     {
-        $this->normalizer
-            ->expects(self::once())
+        $this->normalizer->expects(self::once())
             ->method('denormalize')
             ->willThrowException(new \Exception('Failed to denormalize.'));
 

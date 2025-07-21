@@ -424,7 +424,6 @@ class ImapEmailFolderManagerTest extends TestCase
             EmailFolder::class,
             ['id' => 2, 'name' => 'Sub', 'fullName' => '[Gmail]\Test\Sub', 'type' => 'other', 'origin' => $origin]
         );
-        /** @var EmailFolder $testFolder */
         $testFolder = $this->getEntity(
             EmailFolder::class,
             [

@@ -11,15 +11,13 @@ use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Converter\Stub\EntityNameAwareDataConverter;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\EntityNameAwareStrategy;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ImportProcessorTest extends \PHPUnit\Framework\TestCase
+class ImportProcessorTest extends TestCase
 {
-    /** @var SerializerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $serializer;
-
-    /** @var Context|\PHPUnit\Framework\MockObject\MockObject */
-    protected $context;
-
+    protected SerializerInterface&MockObject $serializer;
+    protected Context&MockObject $context;
     /** @var ContextAwareProcessor */
     protected $processor;
 

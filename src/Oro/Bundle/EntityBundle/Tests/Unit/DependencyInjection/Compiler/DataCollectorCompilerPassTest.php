@@ -12,12 +12,13 @@ use Oro\Bundle\EntityBundle\DataCollector\OrmLogger;
 use Oro\Bundle\EntityBundle\DataCollector\ProfilingManagerRegistry;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DataCollectorCompilerPass;
 use Oro\Bundle\EntityBundle\ORM\Registry;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class DataCollectorCompilerPassTest extends \PHPUnit\Framework\TestCase
+class DataCollectorCompilerPassTest extends TestCase
 {
     private DataCollectorCompilerPass $compilerPass;
 

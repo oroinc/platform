@@ -3,14 +3,14 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Form;
 
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetTitleType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilder;
 
-class WidgetTitleTypeTest extends \PHPUnit\Framework\TestCase
+class WidgetTitleTypeTest extends TestCase
 {
-    /** @var WidgetTitleType */
-    private $formType;
+    private WidgetTitleType $formType;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class WidgetTitleTypeTest extends \PHPUnit\Framework\TestCase
         $this->formType = new WidgetTitleType();
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->exactly(2))

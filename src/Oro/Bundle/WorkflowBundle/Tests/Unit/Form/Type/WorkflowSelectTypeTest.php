@@ -9,6 +9,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -21,14 +22,9 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
     private const TEST_WORKFLOW_NAME = 'test_workflow_name';
     private const TEST_WORKFLOW_LABEL = 'Test Workflow Label';
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var WorkflowSelectType */
-    private $type;
+    private ManagerRegistry&MockObject $registry;
+    private TranslatorInterface&MockObject $translator;
+    private WorkflowSelectType $type;
 
     #[\Override]
     protected function setUp(): void

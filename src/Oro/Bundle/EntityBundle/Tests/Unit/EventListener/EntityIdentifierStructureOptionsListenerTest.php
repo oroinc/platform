@@ -11,16 +11,15 @@ use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityIdentifierStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
+class EntityIdentifierStructureOptionsListenerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
-
-    /** @var EntityIdentifierStructureOptionsListener */
-    private $listener;
+    private ManagerRegistry&MockObject $managerRegistry;
+    private EntityIdentifierStructureOptionsListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class EntityIdentifierStructureOptionsListenerTest extends \PHPUnit\Framework\Te
         $this->listener = new EntityIdentifierStructureOptionsListener($this->managerRegistry);
     }
 
-    public function testOnOptionsRequestIdentifier()
+    public function testOnOptionsRequestIdentifier(): void
     {
         $entityStructure = $this->getEntity(
             EntityStructure::class,
@@ -84,7 +83,7 @@ class EntityIdentifierStructureOptionsListenerTest extends \PHPUnit\Framework\Te
         $this->assertEquals([$expectedEntityStructure], $event->getData());
     }
 
-    public function testOnOptionsRequestWithoutObjectManager()
+    public function testOnOptionsRequestWithoutObjectManager(): void
     {
         $entityStructure = $this->getEntity(
             EntityStructure::class,
@@ -123,7 +122,7 @@ class EntityIdentifierStructureOptionsListenerTest extends \PHPUnit\Framework\Te
         $this->assertEquals([$expectedEntityStructure], $event->getData());
     }
 
-    public function testOnOptionsRequestWithoutMetadata()
+    public function testOnOptionsRequestWithoutMetadata(): void
     {
         $entityStructure = $this->getEntity(
             EntityStructure::class,

@@ -7,8 +7,9 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumOptionRepository;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use PHPUnit\Framework\TestCase;
 
-class EnumOptionRepositoryTest extends \PHPUnit\Framework\TestCase
+class EnumOptionRepositoryTest extends TestCase
 {
     private const string ENUM_VALUE_CLASS_NAME = TestEnumValue::class;
     private EnumOptionRepository $repo;
@@ -22,7 +23,7 @@ class EnumOptionRepositoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateEnumValueWithEmptyName()
+    public function testCreateEnumValueWithEmptyName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$name must not be empty.');
@@ -30,7 +31,7 @@ class EnumOptionRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->repo->createEnumOption('test_enum_code', 'test', '', 1);
     }
 
-    public function testCreateEnumValueWithTooLongId()
+    public function testCreateEnumValueWithTooLongId(): void
     {
         $enumCode = 'test_enum_code';
         $longInternalId = str_repeat('a', 100);
@@ -51,7 +52,7 @@ class EnumOptionRepositoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateEnumOption()
+    public function testCreateEnumOption(): void
     {
         $result = $this->repo->createEnumOption('enumCode', 'internalId', 'name', 1);
 

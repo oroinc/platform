@@ -25,6 +25,8 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\DoctrineUtils\ORM\Walker\TranslatableSqlWalker;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -32,13 +34,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
+class EnumSynchronizerTest extends TestCase
 {
-    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
-    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $doctrine;
-    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
-    private ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject $translationHelper;
-    private TranslationManager|\PHPUnit\Framework\MockObject\MockObject $translationManager;
+    private ConfigManager&MockObject $configManager;
+    private ManagerRegistry&MockObject $doctrine;
+    private TranslatorInterface&MockObject $translator;
+    private ConfigTranslationHelper&MockObject $translationHelper;
+    private TranslationManager&MockObject $translationManager;
     private EnumSynchronizer $synchronizer;
 
     #[\Override]
@@ -1011,10 +1013,10 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
     }
 
     private function setApplyEnumOptionsQueryExpectation(
-        EntityManager|\PHPUnit\Framework\MockObject\MockObject $em,
+        EntityManager&MockObject $em,
         string $locale,
         array $values
-    ): EnumOptionRepository|\PHPUnit\Framework\MockObject\MockObject {
+    ): EnumOptionRepository&MockObject {
         $enumRepo = $this->createMock(EnumOptionRepository::class);
         $teanslationRepo = $this->createMock(TranslationRepository::class);
         $em->expects(self::any())

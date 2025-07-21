@@ -8,22 +8,17 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Form\EventListener\DateGroupingFormSubscriber;
 use Oro\Bundle\ReportBundle\Form\Type\ReportType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 
-class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
+class DateGroupingFormSubscriberTest extends TestCase
 {
-    /** @var DateGroupingFormSubscriber */
-    private $dateGroupingFormSubscriber;
-
-    /** @var FormEvent|\PHPUnit\Framework\MockObject\MockObject */
-    private $event;
-
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
-
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dateForm;
+    private DateGroupingFormSubscriber $dateGroupingFormSubscriber;
+    private FormEvent&MockObject $event;
+    private FormInterface&MockObject $form;
+    private FormInterface&MockObject $dateForm;
 
     #[\Override]
     protected function setUp(): void
@@ -45,13 +40,14 @@ class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
     }
 
-    public function testOnPostSetDataReturnsNull()
+    public function testOnPostSetDataReturnsNull(): void
     {
-        $this->form->expects($this->never())->method('get');
-        $this->assertNull($this->dateGroupingFormSubscriber->onPostSetData($this->event));
+        $this->form->expects($this->never())
+            ->method('get');
+        $this->dateGroupingFormSubscriber->onPostSetData($this->event);
     }
 
-    public function testOnPostSetDataDisablesFilter()
+    public function testOnPostSetDataDisablesFilter(): void
     {
         $report = new Report();
         $report->setDefinition(QueryDefinitionUtil::encodeDefinition([]));
@@ -62,17 +58,15 @@ class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $dateForm = $this->dateForm;
         $dateForm->expects($this->once())
             ->method('setData')
-            ->willReturnCallback(
-                function (DateGrouping $dateModel) use ($dateForm) {
-                    $this->assertFalse($dateModel->getUseDateGroupFilter());
+            ->willReturnCallback(function (DateGrouping $dateModel) use ($dateForm) {
+                $this->assertFalse($dateModel->getUseDateGroupFilter());
 
-                    return $dateForm;
-                }
-            );
+                return $dateForm;
+            });
         $this->dateGroupingFormSubscriber->onPostSetData($this->event);
     }
 
-    public function testOnPostSetDataDisablesEnablesFilter()
+    public function testOnPostSetDataDisablesEnablesFilter(): void
     {
         $report = new Report();
         $report->setDefinition(QueryDefinitionUtil::encodeDefinition([
@@ -88,19 +82,17 @@ class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $dateForm = $this->dateForm;
         $dateForm->expects($this->once())
             ->method('setData')
-            ->willReturnCallback(
-                function (DateGrouping $dateModel) use ($dateForm) {
-                    $this->assertTrue($dateModel->getUseDateGroupFilter());
-                    $this->assertTrue($dateModel->getUseSkipEmptyPeriodsFilter());
-                    $this->assertEquals('testFieldName', $dateModel->getFieldName());
+            ->willReturnCallback(function (DateGrouping $dateModel) use ($dateForm) {
+                $this->assertTrue($dateModel->getUseDateGroupFilter());
+                $this->assertTrue($dateModel->getUseSkipEmptyPeriodsFilter());
+                $this->assertEquals('testFieldName', $dateModel->getFieldName());
 
-                    return $dateForm;
-                }
-            );
+                return $dateForm;
+            });
         $this->dateGroupingFormSubscriber->onPostSetData($this->event);
     }
 
-    public function testOnPostSetDataDisablesEnablesFilterWithExistingDateGroupingModel()
+    public function testOnPostSetDataDisablesEnablesFilterWithExistingDateGroupingModel(): void
     {
         $report = new Report();
         $report->setDefinition(QueryDefinitionUtil::encodeDefinition([
@@ -123,27 +115,25 @@ class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $dateForm = $this->dateForm;
         $dateForm->expects($this->once())
             ->method('setData')
-            ->willReturnCallback(
-                function (DateGrouping $dateModel) use ($originalDateModel, $dateForm) {
-                    $this->assertSame($originalDateModel, $dateModel);
-                    $this->assertTrue($dateModel->getUseDateGroupFilter());
-                    $this->assertFalse($dateModel->getUseSkipEmptyPeriodsFilter());
-                    $this->assertEquals('newValue', $dateModel->getFieldName());
+            ->willReturnCallback(function (DateGrouping $dateModel) use ($originalDateModel, $dateForm) {
+                $this->assertSame($originalDateModel, $dateModel);
+                $this->assertTrue($dateModel->getUseDateGroupFilter());
+                $this->assertFalse($dateModel->getUseSkipEmptyPeriodsFilter());
+                $this->assertEquals('newValue', $dateModel->getFieldName());
 
-                    return $dateForm;
-                }
-            );
+                return $dateForm;
+            });
         $this->dateGroupingFormSubscriber->onPostSetData($this->event);
     }
 
-    public function testOnSubmitReturnsNull()
+    public function testOnSubmitReturnsNull(): void
     {
         $this->form->expects($this->never())
             ->method('get');
         $this->assertNull($this->dateGroupingFormSubscriber->onSubmit($this->event));
     }
 
-    public function testOnSubmitRemovesFilterDefinition()
+    public function testOnSubmitRemovesFilterDefinition(): void
     {
         $report = new Report();
         $report->setDefinition(QueryDefinitionUtil::encodeDefinition([
@@ -167,7 +157,7 @@ class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnSubmitUpdatesDefinition()
+    public function testOnSubmitUpdatesDefinition(): void
     {
         $report = new Report();
         $report->setDefinition(QueryDefinitionUtil::encodeDefinition([

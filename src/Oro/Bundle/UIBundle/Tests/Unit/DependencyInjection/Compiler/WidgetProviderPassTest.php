@@ -3,17 +3,18 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\WidgetProviderPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class WidgetProviderPassTest extends \PHPUnit\Framework\TestCase
+class WidgetProviderPassTest extends TestCase
 {
     private const SERVICE_ID = 'test_service';
-    private const TAG_NAME   = 'test_tag';
+    private const TAG_NAME = 'test_tag';
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
 

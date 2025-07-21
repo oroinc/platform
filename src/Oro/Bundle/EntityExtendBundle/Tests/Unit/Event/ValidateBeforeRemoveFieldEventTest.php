@@ -4,10 +4,11 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Event\ValidateBeforeRemoveFieldEvent;
+use PHPUnit\Framework\TestCase;
 
-class ValidateBeforeRemoveFieldEventTest extends \PHPUnit\Framework\TestCase
+class ValidateBeforeRemoveFieldEventTest extends TestCase
 {
-    public function testGetterSetters()
+    public function testGetterSetters(): void
     {
         $fieldConfigModel = new FieldConfigModel('color');
 

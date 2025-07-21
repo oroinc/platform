@@ -6,18 +6,20 @@ use Oro\Bundle\AddressBundle\Command\ActualizeCountriesRegionsCommand;
 use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Yaml;
 
-class ActualizeCountriesRegionsCommandTest extends \PHPUnit\Framework\TestCase
+class ActualizeCountriesRegionsCommandTest extends TestCase
 {
     use TempDirExtension;
 
     private ActualizeCountriesRegionsCommand $command;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->locator = $this->createMock(FileLocatorInterface::class);

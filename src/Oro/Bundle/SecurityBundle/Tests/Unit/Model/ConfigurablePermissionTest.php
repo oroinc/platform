@@ -3,15 +3,16 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Model;
 
 use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
+use PHPUnit\Framework\TestCase;
 
-class ConfigurablePermissionTest extends \PHPUnit\Framework\TestCase
+class ConfigurablePermissionTest extends TestCase
 {
     private const CAPABILITY = 'test_capability';
     private const ENTITY_CLASS = 'test_entity';
     private const WORKFLOW = 'test_workflow';
     private const PERMISSION = 'test_permission';
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $name = 'test_name';
         $model = new ConfigurablePermission('test_name');
@@ -22,7 +23,7 @@ class ConfigurablePermissionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isCapabilityConfigurableDataProvider
      */
-    public function testIsCapabilityConfigurable(bool $default, array $capabilities, bool $expected)
+    public function testIsCapabilityConfigurable(bool $default, array $capabilities, bool $expected): void
     {
         $model = new ConfigurablePermission('test_name', $default, [], $capabilities);
 
@@ -58,7 +59,7 @@ class ConfigurablePermissionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isEntityPermissionConfigurableDataProvider
      */
-    public function testIsEntityPermissionConfigurable(bool $default, array $entities, bool $expected)
+    public function testIsEntityPermissionConfigurable(bool $default, array $entities, bool $expected): void
     {
         $model = new ConfigurablePermission('test_name', $default, $entities);
 
@@ -109,7 +110,7 @@ class ConfigurablePermissionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isWorkflowPermissionConfigurableDataProvider
      */
-    public function testIsWorkflowPermissionConfigurable(bool $default, array $workflows, bool $expected)
+    public function testIsWorkflowPermissionConfigurable(bool $default, array $workflows, bool $expected): void
     {
         $model = new ConfigurablePermission('test_name', $default, [], [], $workflows);
 

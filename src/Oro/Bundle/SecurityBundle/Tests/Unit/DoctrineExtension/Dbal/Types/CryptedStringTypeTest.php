@@ -5,8 +5,9 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\DoctrineExtension\Dbal\Types;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedStringType;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
+use PHPUnit\Framework\TestCase;
 
-class CryptedStringTypeTest extends \PHPUnit\Framework\TestCase
+class CryptedStringTypeTest extends TestCase
 {
     private CryptedStringType $type;
 
@@ -30,7 +31,7 @@ class CryptedStringTypeTest extends \PHPUnit\Framework\TestCase
         $this->type = new CryptedStringType();
     }
 
-    public function testConvertToDatabaseValue()
+    public function testConvertToDatabaseValue(): void
     {
         $testString = 'test';
         $this->assertEquals(
@@ -39,7 +40,7 @@ class CryptedStringTypeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertToPHPValue()
+    public function testConvertToPHPValue(): void
     {
         $testString = 'test';
         $this->assertEquals(

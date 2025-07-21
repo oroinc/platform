@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 
 class ResolveDestinationPageListenerTest extends TestCase
 {
-    private ActionFactoryInterface|MockObject $actionFactory;
+    private ActionFactoryInterface&MockObject $actionFactory;
     private ResolveDestinationPageListener $listener;
 
     #[\Override]
@@ -27,7 +27,9 @@ class ResolveDestinationPageListenerTest extends TestCase
     public function testOnTransitionNotPageDisplayType(): void
     {
         $transition = $this->createMock(Transition::class);
-        $transition->method('getDisplayType')->willReturn('other');
+        $transition->expects(self::any())
+            ->method('getDisplayType')
+            ->willReturn('other');
 
         $event = new TransitionEvent($this->createMock(WorkflowItem::class), $transition);
 
@@ -40,8 +42,12 @@ class ResolveDestinationPageListenerTest extends TestCase
     public function testOnTransitionPageDisplayType(): void
     {
         $transition = $this->createMock(Transition::class);
-        $transition->method('getDisplayType')->willReturn(WorkflowConfiguration::TRANSITION_DISPLAY_TYPE_PAGE);
-        $transition->method('getDestinationPage')->willReturn('some_destination');
+        $transition->expects(self::any())
+            ->method('getDisplayType')
+            ->willReturn(WorkflowConfiguration::TRANSITION_DISPLAY_TYPE_PAGE);
+        $transition->expects(self::any())
+            ->method('getDestinationPage')
+            ->willReturn('some_destination');
 
         $workflowItem = $this->createMock(WorkflowItem::class);
 

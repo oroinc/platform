@@ -17,50 +17,29 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerChecker;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
+class OwnerCheckerTest extends TestCase
 {
     private const TEST_ENTITY_CLASS = Entity::class;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipMetadataProvider;
-
-    /** @var EntityOwnerAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityOwnerAccessor;
-
-    /** @var BusinessUnitManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $businessUnitManager;
-
-    /** @var AclVoter|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclVoter;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var OwnerTreeProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $treeProvider;
-
-    /** @var Entity */
-    private $testEntity;
-
-    /** @var User */
-    private $currentUser;
-
-    /** @var Organization */
-    private $currentOrg;
-
-    /** @var OwnerChecker */
-    private $ownerChecker;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private OwnershipMetadataProviderInterface&MockObject $ownershipMetadataProvider;
+    private EntityOwnerAccessor&MockObject $entityOwnerAccessor;
+    private BusinessUnitManager&MockObject $businessUnitManager;
+    private AclVoter&MockObject $aclVoter;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private OwnerTreeProviderInterface&MockObject $treeProvider;
+    private Entity $testEntity;
+    private User $currentUser;
+    private Organization $currentOrg;
+    private OwnerChecker $ownerChecker;
 
     #[\Override]
     protected function setUp(): void
@@ -92,7 +71,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testValidateOnNonSupportedEntity()
+    public function testValidateOnNonSupportedEntity(): void
     {
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntity')
@@ -107,7 +86,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
-    public function testValidateOnNonAclProtectedEntity()
+    public function testValidateOnNonAclProtectedEntity(): void
     {
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntity')
@@ -125,7 +104,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
-    public function testValidExistingEntityWithUserOwner()
+    public function testValidExistingEntityWithUserOwner(): void
     {
         $owner = new User();
         $owner->setId(123);
@@ -159,7 +138,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
-    public function testValidExistingEntityWithBusinessUnitOwner()
+    public function testValidExistingEntityWithBusinessUnitOwner(): void
     {
         $owner = new BusinessUnit();
         $owner->setId(123);
@@ -193,7 +172,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
-    public function testValidExistingEntityWithOrganizationOwner()
+    public function testValidExistingEntityWithOrganizationOwner(): void
     {
         $owner = new Organization();
         $owner->setId(123);
@@ -224,7 +203,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
-    public function testInvalidExistingEntityWithUserOwner()
+    public function testInvalidExistingEntityWithUserOwner(): void
     {
         $owner = new User();
         $owner->setId(123);
@@ -258,7 +237,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
-    public function testInvalidExistingEntityWithBusinessUnitOwner()
+    public function testInvalidExistingEntityWithBusinessUnitOwner(): void
     {
         $owner = new BusinessUnit();
         $owner->setId(123);
@@ -292,7 +271,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
-    public function testInvalidExistingEntityWithOrganizationOwner()
+    public function testInvalidExistingEntityWithOrganizationOwner(): void
     {
         $owner = new Organization();
         $owner->setId(123);
@@ -323,7 +302,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
-    public function testValidNewEntityWithUserOwner()
+    public function testValidNewEntityWithUserOwner(): void
     {
         $owner = new User();
         $owner->setId(123);
@@ -356,7 +335,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
-    public function testValidNewEntityWithBusinessUnitOwner()
+    public function testValidNewEntityWithBusinessUnitOwner(): void
     {
         $owner = new BusinessUnit();
         $owner->setId(123);
@@ -389,7 +368,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
-    public function testValidNewEntityWithOrganizationOwner()
+    public function testValidNewEntityWithOrganizationOwner(): void
     {
         $owner = new Organization();
         $owner->setId(123);
@@ -419,7 +398,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
-    public function testInvalidNewEntityWithUserOwner()
+    public function testInvalidNewEntityWithUserOwner(): void
     {
         $owner = new User();
         $owner->setId(123);
@@ -452,7 +431,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
-    public function testInvalidNewEntityWithBusinessUnitOwner()
+    public function testInvalidNewEntityWithBusinessUnitOwner(): void
     {
         $owner = new BusinessUnit();
         $owner->setId(123);
@@ -485,7 +464,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
-    public function testInvalidNewEntityWithOrganizationOwner()
+    public function testInvalidNewEntityWithOrganizationOwner(): void
     {
         $owner = new Organization();
         $owner->setId(123);
@@ -515,7 +494,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
-    public function testValidNewEntityWithNewUserOwner()
+    public function testValidNewEntityWithNewUserOwner(): void
     {
         $owner = new User();
         $owner->setOrganization($this->currentOrg);
@@ -542,12 +521,10 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->testEntity->getOwner());
         $this->entityOwnerAccessor->expects($this->exactly(2))
             ->method('getOrganization')
-            ->willReturnMap(
-                [
-                    [$owner, $owner->getOrganization()],
-                    [$this->testEntity, $this->testEntity->getOrganization()],
-                ]
-            );
+            ->willReturnMap([
+                [$owner, $owner->getOrganization()],
+                [$this->testEntity, $this->testEntity->getOrganization()],
+            ]);
 
         $this->configureDoctrineHelper(true);
         $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
@@ -555,7 +532,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
-    public function testValidNewEntityWithNewBusinessUnitOwner()
+    public function testValidNewEntityWithNewBusinessUnitOwner(): void
     {
         $owner = new BusinessUnit();
         $owner->setOrganization($this->currentOrg);
@@ -582,12 +559,10 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->testEntity->getOwner());
         $this->entityOwnerAccessor->expects($this->exactly(2))
             ->method('getOrganization')
-            ->willReturnMap(
-                [
-                    [$owner, $owner->getOrganization()],
-                    [$this->testEntity, $this->testEntity->getOrganization()],
-                ]
-            );
+            ->willReturnMap([
+                [$owner, $owner->getOrganization()],
+                [$this->testEntity, $this->testEntity->getOrganization()],
+            ]);
 
         $this->configureDoctrineHelper(true);
         $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
@@ -595,7 +570,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
-    public function testInvalidNewEntityWithNewUserOwner()
+    public function testInvalidNewEntityWithNewUserOwner(): void
     {
         $owner = new User();
         $owner->setOrganization(new Organization());
@@ -622,12 +597,10 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->testEntity->getOwner());
         $this->entityOwnerAccessor->expects($this->exactly(2))
             ->method('getOrganization')
-            ->willReturnMap(
-                [
-                    [$owner, $owner->getOrganization()],
-                    [$this->testEntity, $this->testEntity->getOrganization()],
-                ]
-            );
+            ->willReturnMap([
+                [$owner, $owner->getOrganization()],
+                [$this->testEntity, $this->testEntity->getOrganization()],
+            ]);
 
         $this->configureDoctrineHelper(true);
         $this->configureTokenAccessor($this->currentUser, $this->currentOrg);
@@ -635,7 +608,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->ownerChecker->isOwnerCanBeSet($this->testEntity));
     }
 
-    public function testInvalidNewEntityWithNewBusinessUnitOwner()
+    public function testInvalidNewEntityWithNewBusinessUnitOwner(): void
     {
         $owner = new BusinessUnit();
         $owner->setOrganization(new Organization());
@@ -662,12 +635,10 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->testEntity->getOwner());
         $this->entityOwnerAccessor->expects($this->exactly(2))
             ->method('getOrganization')
-            ->willReturnMap(
-                [
-                    [$owner, $owner->getOrganization()],
-                    [$this->testEntity, $this->testEntity->getOrganization()],
-                ]
-            );
+            ->willReturnMap([
+                [$owner, $owner->getOrganization()],
+                [$this->testEntity, $this->testEntity->getOrganization()],
+            ]);
 
         $this->configureDoctrineHelper(true);
         $this->configureTokenAccessor($this->currentUser, $this->currentOrg);

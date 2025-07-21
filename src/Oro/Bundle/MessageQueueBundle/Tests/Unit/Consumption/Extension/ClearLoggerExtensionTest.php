@@ -9,16 +9,15 @@ use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearLoggerExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
 
-class ClearLoggerExtensionTest extends \PHPUnit\Framework\TestCase
+class ClearLoggerExtensionTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Container */
-    private $container;
-
-    /** @var ClearLoggerExtension */
-    private $extension;
+    private Container&MockObject $container;
+    private ClearLoggerExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +30,7 @@ class ClearLoggerExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldNotGetUninitializedLoggerFromContainer()
+    public function testShouldNotGetUninitializedLoggerFromContainer(): void
     {
         $this->container->expects(self::exactly(2))
             ->method('initialized')
@@ -44,7 +43,7 @@ class ClearLoggerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->onIdle($this->createMock(Context::class));
     }
 
-    public function testShouldSkipLoggerIfItIsNotInstanceOfLoggerClass()
+    public function testShouldSkipLoggerIfItIsNotInstanceOfLoggerClass(): void
     {
         $fooLogger = $this->createMock(LoggerInterface::class);
 
@@ -61,7 +60,7 @@ class ClearLoggerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->onIdle($this->createMock(Context::class));
     }
 
-    public function testShouldSkipHandlerIfItIsNotSupported()
+    public function testShouldSkipHandlerIfItIsNotSupported(): void
     {
         $testHandler = $this->createMock(HandlerInterface::class);
         $fooLogger = $this->createMock(Logger::class);
@@ -84,7 +83,7 @@ class ClearLoggerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->onIdle($this->createMock(Context::class));
     }
 
-    public function testShouldRemoveAllRecordsFromFingersCrossedHandler()
+    public function testShouldRemoveAllRecordsFromFingersCrossedHandler(): void
     {
         $testHandler = $this->createMock(FingersCrossedHandler::class);
         $fooLogger = $this->createMock(Logger::class);
@@ -109,7 +108,7 @@ class ClearLoggerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->onIdle($this->createMock(Context::class));
     }
 
-    public function testShouldRemoveAllRecordsFromBufferHandler()
+    public function testShouldRemoveAllRecordsFromBufferHandler(): void
     {
         $testHandler = $this->createMock(BufferHandler::class);
         $fooLogger = $this->createMock(Logger::class);
@@ -134,7 +133,7 @@ class ClearLoggerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->onIdle($this->createMock(Context::class));
     }
 
-    public function testShouldRemoveAllRecordsFromTestHandler()
+    public function testShouldRemoveAllRecordsFromTestHandler(): void
     {
         $testHandler = $this->createMock(TestHandler::class);
         $fooLogger = $this->createMock(Logger::class);

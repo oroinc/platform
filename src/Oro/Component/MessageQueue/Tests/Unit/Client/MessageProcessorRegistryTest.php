@@ -5,8 +5,9 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 use Oro\Component\MessageQueue\Client\MessageProcessorRegistry;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\NullMessageProcessor;
+use PHPUnit\Framework\TestCase;
 
-class MessageProcessorRegistryTest extends \PHPUnit\Framework\TestCase
+class MessageProcessorRegistryTest extends TestCase
 {
     protected function getServiceLocator(array $factories): MessageProcessorRegistry
     {

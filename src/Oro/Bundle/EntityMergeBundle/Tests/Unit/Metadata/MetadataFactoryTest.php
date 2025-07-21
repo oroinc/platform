@@ -7,8 +7,9 @@ use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory;
+use PHPUnit\Framework\TestCase;
 
-class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
+class MetadataFactoryTest extends TestCase
 {
     private MetadataFactory $factory;
 
@@ -18,7 +19,7 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory = new MetadataFactory();
     }
 
-    public function testCreateEntityMetadata()
+    public function testCreateEntityMetadata(): void
     {
         $options = ['foo' => 'bar'];
         $doctrineMetadata = $this->createMock(DoctrineMetadata::class);
@@ -29,7 +30,7 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($doctrineMetadata, $metadata->getDoctrineMetadata());
     }
 
-    public function testCreateEntityMetadataFromArray()
+    public function testCreateEntityMetadataFromArray(): void
     {
         $options = ['foo' => 'bar'];
         $doctrineMetadata = ['doctrineOption' => 'test'];
@@ -42,7 +43,7 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateEntityMetadataFails()
+    public function testCreateEntityMetadataFails(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
@@ -56,7 +57,7 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory->createEntityMetadata($options, $doctrineMetadata);
     }
 
-    public function testCreateFieldMetadata()
+    public function testCreateFieldMetadata(): void
     {
         $options = ['foo' => 'bar'];
         $doctrineMetadata = $this->createMock(DoctrineMetadata::class);
@@ -67,7 +68,7 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($doctrineMetadata, $metadata->getDoctrineMetadata());
     }
 
-    public function testCreateFieldMetadataFromArray()
+    public function testCreateFieldMetadataFromArray(): void
     {
         $options = ['foo' => 'bar'];
         $doctrineMetadata = ['doctrineOption' => 'test'];
@@ -80,7 +81,7 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateFieldMetadataFails()
+    public function testCreateFieldMetadataFails(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
@@ -94,7 +95,7 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory->createFieldMetadata($options, $doctrineMetadata);
     }
 
-    public function testCreateDoctrineMetadata()
+    public function testCreateDoctrineMetadata(): void
     {
         $options = ['foo' => 'bar'];
         $doctrineMetadata = $this->createMock(DoctrineMetadata::class);

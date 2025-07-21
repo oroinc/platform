@@ -7,21 +7,16 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\FieldAcl\FieldAclExtension;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
+class FieldAclExtensionTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
-    private $authorizationChecker;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    private $configManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipQueryHelper */
-    private $ownershipQueryHelper;
-
-    /** @var FieldAclExtension */
-    private $extension;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private ConfigManager&MockObject $configManager;
+    private OwnershipQueryHelper&MockObject $ownershipQueryHelper;
+    private FieldAclExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -39,24 +34,24 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->setParameters(new ParameterBag());
     }
 
-    public function testIsApplicableOnValidConfig()
+    public function testIsApplicableOnValidConfig(): void
     {
         $config = DatagridConfiguration::create(['source' => ['type' => 'orm']]);
         $this->assertTrue($this->extension->isApplicable($config));
     }
 
-    public function testIsApplicableOnNonValidConfig()
+    public function testIsApplicableOnNonValidConfig(): void
     {
         $config = DatagridConfiguration::create(['source' => ['type' => 'search']]);
         $this->assertFalse($this->extension->isApplicable($config));
     }
 
-    public function testGetPriority()
+    public function testGetPriority(): void
     {
         $this->assertEquals(255, $this->extension->getPriority());
     }
 
-    public function testProcessConfigs()
+    public function testProcessConfigs(): void
     {
         $config = DatagridConfiguration::create(
             [

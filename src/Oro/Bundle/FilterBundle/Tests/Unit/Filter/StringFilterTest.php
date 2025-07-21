@@ -6,17 +6,18 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\StringFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 
-class StringFilterTest extends \PHPUnit\Framework\TestCase
+class StringFilterTest extends TestCase
 {
-    /** @var StringFilter */
-    private $filter;
+    private StringFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +35,7 @@ class StringFilterTest extends \PHPUnit\Framework\TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::any())
             ->method('getExpressionBuilder')
-            ->willReturn(new Query\Expr());
+            ->willReturn(new Expr());
         $connection = $this->createMock(Connection::class);
         $em->expects(self::any())
             ->method('getConnection')
@@ -76,7 +77,7 @@ class StringFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider applyProvider
      */
-    public function testApply(array $data, array $expected)
+    public function testApply(array $data, array $expected): void
     {
         $ds = $this->getFilterDatasource();
         $this->filter->apply($ds, $data);
@@ -144,7 +145,7 @@ class StringFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testPrepareData()
+    public function testPrepareData(): void
     {
         $data = [];
         self::assertSame($data, $this->filter->prepareData($data));

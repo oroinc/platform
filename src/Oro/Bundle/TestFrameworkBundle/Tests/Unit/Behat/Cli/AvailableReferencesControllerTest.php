@@ -11,14 +11,15 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\KernelStub;
 use Oro\Component\Testing\TempDirExtension;
 use Oro\Component\Testing\Unit\Command\Stub\InputStub;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Command\Command;
 
-class AvailableReferencesControllerTest extends \PHPUnit\Framework\TestCase
+class AvailableReferencesControllerTest extends TestCase
 {
     use TempDirExtension;
 
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $aliceLoader = new AliceFixtureLoader(new SimpleLoader(new NativeLoader()), new FileLocator());
         $doctrineIsolator = $this->createMock(DoctrineIsolator::class);
@@ -33,11 +34,12 @@ class AvailableReferencesControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($command->getDefinition()->getOption('available-references')->getDefault());
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $aliceLoader = new AliceFixtureLoader(new SimpleLoader(new NativeLoader()), new FileLocator());
         $doctrineIsolator = $this->createMock(DoctrineIsolator::class);
-        $doctrineIsolator->expects($this->once())->method('initReferences');
+        $doctrineIsolator->expects($this->once())
+            ->method('initReferences');
         $kernel = new KernelStub($this->getTempDir('test_kernel_logs'));
         $controller = new AvailableReferencesController($aliceLoader, $doctrineIsolator, $kernel);
         $output = new OutputStub();
@@ -45,11 +47,12 @@ class AvailableReferencesControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(0, $returnCode);
     }
 
-    public function testNotExecute()
+    public function testNotExecute(): void
     {
         $aliceLoader = new AliceFixtureLoader(new SimpleLoader(new NativeLoader()), new FileLocator());
         $doctrineIsolator = $this->createMock(DoctrineIsolator::class);
-        $doctrineIsolator->expects($this->never())->method('initReferences');
+        $doctrineIsolator->expects($this->never())
+            ->method('initReferences');
         $kernel = new KernelStub($this->getTempDir('test_kernel_logs'));
         $controller = new AvailableReferencesController($aliceLoader, $doctrineIsolator, $kernel);
         $output = new OutputStub();

@@ -13,16 +13,15 @@ use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class FindEntitiesTest extends \PHPUnit\Framework\TestCase
+class FindEntitiesTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var FindEntities */
-    private $action;
+    private ManagerRegistry&MockObject $registry;
+    private FindEntities $action;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +35,7 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, string $expectedMessage)
+    public function testInitializeException(array $options, string $expectedMessage): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage($expectedMessage);
@@ -92,7 +91,7 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testExecuteNotManageableEntity()
+    public function testExecuteNotManageableEntity(): void
     {
         $this->expectException(NotManageableEntityException::class);
         $this->expectExceptionMessage(sprintf('Entity class "%s" is not manageable.', \stdClass::class));
@@ -115,7 +114,7 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeDataProvider
      */
-    public function testInitialize(array $source, array $expected)
+    public function testInitialize(array $source, array $expected): void
     {
         self::assertEquals($this->action, $this->action->initialize($source));
         self::assertEquals($expected, ReflectionUtil::getPropertyValue($this->action, 'options'));
@@ -143,7 +142,7 @@ class FindEntitiesTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $parameters = ['name' => 'Test Name'];
 

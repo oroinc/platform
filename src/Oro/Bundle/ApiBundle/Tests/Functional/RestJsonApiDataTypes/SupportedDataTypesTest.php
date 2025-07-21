@@ -26,27 +26,6 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
     {
         $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $entityId);
 
-        $fieldPercent100 = $entity->fieldPercent100;
-        if (null !== $fieldPercent100) {
-            $fieldPercent100 /= 100.0;
-        }
-        $fieldPercent100Round = $entity->fieldPercent100Round;
-        if (null !== $fieldPercent100Round) {
-            $fieldPercent100Round /= 100.0;
-        }
-        $fieldDateTime = $entity->fieldDateTime;
-        if (null !== $fieldDateTime) {
-            $fieldDateTime = $entity->fieldDateTime->format('Y-m-d\TH:i:sO');
-        }
-        $fieldDate = $entity->fieldDate;
-        if (null !== $fieldDate) {
-            $fieldDate = $entity->fieldDate->format('Y-m-d');
-        }
-        $fieldTime = $entity->fieldTime;
-        if (null !== $fieldTime) {
-            $fieldTime = $entity->fieldTime->format('H:i:s');
-        }
-
         return [
             'fieldString'          => $entity->fieldString,
             'fieldText'            => $entity->fieldText,
@@ -61,18 +40,24 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
             'fieldSimpleArray'     => $entity->fieldSimpleArray,
             'fieldJsonArray'       => $entity->fieldJsonArray,
             'fieldJson'            => $entity->fieldJson,
-            'fieldDateTime'        => $fieldDateTime,
-            'fieldDate'            => $fieldDate,
-            'fieldTime'            => $fieldTime,
+            'fieldDateTime'        => $entity->fieldDateTime?->format('Y-m-d\TH:i:sO'),
+            'fieldDate'            => $entity->fieldDate?->format('Y-m-d'),
+            'fieldTime'            => $entity->fieldTime?->format('H:i:s'),
             'fieldGuid'            => $entity->fieldGuid,
             'fieldPercent'         => $entity->fieldPercent,
-            'fieldPercent100'      => $fieldPercent100,
+            'fieldPercent100'      => null !== $entity->fieldPercent100
+                ? $entity->fieldPercent100 / 100.0
+                : null,
             'fieldPercentRound'    => $entity->fieldPercentRound,
-            'fieldPercent100Round' => $fieldPercent100Round,
+            'fieldPercent100Round' => null !== $entity->fieldPercent100Round
+                ? $entity->fieldPercent100Round / 100.0
+                : null,
             'fieldMoney'           => $entity->fieldMoney,
             'fieldDuration'        => $entity->fieldDuration,
             'fieldMoneyValue'      => $entity->fieldMoneyValue,
-            'fieldCurrency'        => $entity->fieldCurrency
+            'fieldCurrency'        => $entity->fieldCurrency,
+            'fieldBackedEnumInt'   => $entity->fieldBackedEnumInt?->name,
+            'fieldBackedEnumStr'   => $entity->fieldBackedEnumStr?->name
         ];
     }
 
@@ -114,7 +99,9 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
                         'fieldMoney'           => '1.2340',
                         'fieldDuration'        => 11,
                         'fieldMoneyValue'      => '1.2345',
-                        'fieldCurrency'        => 'USD'
+                        'fieldCurrency'        => 'USD',
+                        'fieldBackedEnumInt'   => 'Item1',
+                        'fieldBackedEnumStr'   => 'Item1'
                     ]
                 ]
             ],
@@ -154,7 +141,9 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
                     'fieldMoney'           => '123.456',
                     'fieldDuration'        => 123,
                     'fieldMoneyValue'      => '123.4567',
-                    'fieldCurrency'        => 'USD'
+                    'fieldCurrency'        => 'USD',
+                    'fieldBackedEnumInt'   => 'Item1',
+                    'fieldBackedEnumStr'   => 'Item1'
                 ]
             ]
         ];
@@ -217,7 +206,9 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
                 'fieldMoney'          => null,
                 'fieldDuration'       => null,
                 'fieldMoneyValue'     => null,
-                'fieldCurrency'       => null
+                'fieldCurrency'       => null,
+                'fieldBackedEnumInt'  => null,
+                'fieldBackedEnumStr'  => null
             ],
             $this->getEntityData((int)$this->getResourceId($response))
         );
@@ -256,7 +247,9 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
                     'fieldMoney'           => '123.456',
                     'fieldDuration'        => 123,
                     'fieldMoneyValue'      => '123.4567',
-                    'fieldCurrency'        => 'UAH'
+                    'fieldCurrency'        => 'UAH',
+                    'fieldBackedEnumInt'   => 'Item2',
+                    'fieldBackedEnumStr'   => 'Item2'
                 ]
             ]
         ];
@@ -403,7 +396,9 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
             'MoneyValue Zero (int)'        => ['fieldMoneyValue', 0, '0.0000', '0.0000'],
             'MoneyValue Zero (float)'      => ['fieldMoneyValue', 0.0, '0.0000', '0.0000'],
             'Currency NULL'                => ['fieldCurrency', null, null, null],
-            'Currency Empty'               => ['fieldCurrency', '', '', '']
+            'Currency Empty'               => ['fieldCurrency', '', '', ''],
+            'BackedEnumInt NULL'           => ['fieldBackedEnumInt', null, null, null],
+            'BackedEnumStr NULL'           => ['fieldBackedEnumStr', null, null, null]
         ];
     }
 
@@ -474,6 +469,8 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
             'Time (empty string)'                 => ['fieldTime', ''],
             'Time (invalid string)'               => ['fieldTime', 'a', 'The "a" is not valid time.'],
             'Time (not string)'                   => ['fieldTime', false, 'The "false" is not valid time.'],
+            'Guid (empty string)'                 => ['fieldGuid', ''],
+            'Guid (not GUID string)'              => ['fieldGuid', 'a'],
             'Percent (empty string)'              => ['fieldPercent', '', 'Please enter a number.'],
             'Percent (not number string)'         => ['fieldPercent', 'a', 'Please enter a number.'],
             'Percent_100 (empty string)'          => ['fieldPercent100', ''],
@@ -482,7 +479,11 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
             'Money (not number string)'           => ['fieldMoney', 'a'],
             'Duration (not number string)'        => ['fieldDuration', 'a', 'Value is not in a valid duration format'],
             'MoneyValue (empty string)'           => ['fieldMoneyValue', ''],
-            'MoneyValue (not number string)'      => ['fieldMoneyValue', 'a']
+            'MoneyValue (not number string)'      => ['fieldMoneyValue', 'a'],
+            'BackedEnumInt (empty string)'        => ['fieldBackedEnumInt', ''],
+            'BackedEnumInt (undefined item)'      => ['fieldBackedEnumInt', 'a'],
+            'BackedEnumStr (empty string)'        => ['fieldBackedEnumStr', ''],
+            'BackedEnumStr (undefined item)'      => ['fieldBackedEnumStr', 'a']
         ];
     }
 

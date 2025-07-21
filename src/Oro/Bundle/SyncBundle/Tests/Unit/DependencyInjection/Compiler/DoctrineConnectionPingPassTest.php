@@ -14,14 +14,12 @@ class DoctrineConnectionPingPassTest extends TestCase
     public function testProcessNoDefinition(): void
     {
         $container = $this->createMock(ContainerBuilder::class);
-        $container
-            ->expects(self::once())
+        $container->expects(self::once())
             ->method('hasDefinition')
             ->with('oro_sync.periodic.db_ping')
             ->willReturn(false);
 
-        $container
-            ->expects(self::never())
+        $container->expects(self::never())
             ->method('getDefinition')
             ->withAnyParameters();
 
@@ -31,21 +29,18 @@ class DoctrineConnectionPingPassTest extends TestCase
     public function testProcess(): void
     {
         $container = $this->createMock(ContainerBuilder::class);
-        $container
-            ->expects(self::once())
+        $container->expects(self::once())
             ->method('hasDefinition')
             ->with('oro_sync.periodic.db_ping')
             ->willReturn(true);
 
         $definition = $this->createMock(Definition::class);
-        $container
-            ->expects(self::once())
+        $container->expects(self::once())
             ->method('getDefinition')
             ->with('oro_sync.periodic.db_ping')
             ->willReturn($definition);
 
-        $definition
-            ->expects(self::once())
+        $definition->expects(self::once())
             ->method('addMethodCall')
             ->with('addDoctrineConnectionName', ['DummyConnection']);
 

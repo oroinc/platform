@@ -10,19 +10,15 @@ use Oro\Bundle\FilterBundle\Filter\MultiEnumFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Test\FormInterface;
 
 class MultiEnumFilterTest extends OrmTestCase
 {
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var MultiEnumFilter */
-    private $filter;
+    private EntityManagerInterface $em;
+    private FormFactoryInterface&MockObject $formFactory;
+    private MultiEnumFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -43,7 +39,7 @@ class MultiEnumFilterTest extends OrmTestCase
         );
     }
 
-    public function testInit()
+    public function testInit(): void
     {
         $this->filter->init('test', []);
 
@@ -55,7 +51,7 @@ class MultiEnumFilterTest extends OrmTestCase
         );
     }
 
-    public function testInitWithNullValue()
+    public function testInitWithNullValue(): void
     {
         $this->filter->init('test', ['null_value' => ':empty:']);
 
@@ -71,7 +67,7 @@ class MultiEnumFilterTest extends OrmTestCase
         );
     }
 
-    public function testInitWithClass()
+    public function testInitWithClass(): void
     {
         $this->filter->init('test', ['class' => 'Test\EnumValue']);
 
@@ -88,7 +84,7 @@ class MultiEnumFilterTest extends OrmTestCase
         );
     }
 
-    public function testInitWithEnumCode()
+    public function testInitWithEnumCode(): void
     {
         $this->filter->init('test', ['enum_code' => 'test_enum']);
 
@@ -107,7 +103,7 @@ class MultiEnumFilterTest extends OrmTestCase
         );
     }
 
-    public function testGetForm()
+    public function testGetForm(): void
     {
         $form = $this->createMock(FormInterface::class);
 
@@ -119,7 +115,7 @@ class MultiEnumFilterTest extends OrmTestCase
         self::assertSame($form, $this->filter->getForm());
     }
 
-    public function testPrepareData()
+    public function testPrepareData(): void
     {
         $data = [];
         self::assertSame($data, $this->filter->prepareData($data));

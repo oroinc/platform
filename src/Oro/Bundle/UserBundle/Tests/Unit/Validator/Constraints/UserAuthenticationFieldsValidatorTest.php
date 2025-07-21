@@ -6,14 +6,14 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Validator\Constraints\UserAuthenticationFields;
 use Oro\Bundle\UserBundle\Validator\Constraints\UserAuthenticationFieldsValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class UserAuthenticationFieldsValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $userManager;
+    private UserManager&MockObject $userManager;
 
     #[\Override]
     protected function setUp(): void

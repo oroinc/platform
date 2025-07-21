@@ -22,6 +22,8 @@ use Oro\Component\MessageQueue\Test\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -29,7 +31,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
+class ReversSyncIntegrationProcessorTest extends TestCase
 {
     use ClassExtensionTrait;
     use IntegrationTokenAwareTestTrait;
@@ -268,7 +270,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::ACK, $status);
     }
 
-    private function createReversSyncProcessor(): ReverseSyncProcessor|\PHPUnit\Framework\MockObject\MockObject
+    private function createReversSyncProcessor(): ReverseSyncProcessor&MockObject
     {
         $reverseSyncProcessor = $this->createMock(ReverseSyncProcessor::class);
         $reverseSyncProcessor->expects(self::any())
@@ -278,7 +280,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         return $reverseSyncProcessor;
     }
 
-    private function createEntityManager(): EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+    private function createEntityManager(): EntityManagerInterface&MockObject
     {
         $configuration = new Configuration();
 

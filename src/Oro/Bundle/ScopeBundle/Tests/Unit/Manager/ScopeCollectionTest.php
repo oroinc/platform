@@ -6,11 +6,11 @@ use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeCollection;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
+use PHPUnit\Framework\TestCase;
 
-class ScopeCollectionTest extends \PHPUnit\Framework\TestCase
+class ScopeCollectionTest extends TestCase
 {
-    /** @var ScopeCollection */
-    private $collection;
+    private ScopeCollection $collection;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class ScopeCollectionTest extends \PHPUnit\Framework\TestCase
         $this->collection = new ScopeCollection();
     }
 
-    public function testAddAndRemove()
+    public function testAddAndRemove(): void
     {
         $scope1 = new Scope();
         $scope2 = new Scope();
@@ -47,7 +47,7 @@ class ScopeCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([$scope2], $this->collection->getAll());
     }
 
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $scope = new Scope();
         $scopeCriteria = new ScopeCriteria(['test' => 1], $this->createMock(ClassMetadataFactory::class));
@@ -58,7 +58,7 @@ class ScopeCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->collection->isEmpty());
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $scope = new Scope();
         $scopeCriteria = new ScopeCriteria(['test' => 1], $this->createMock(ClassMetadataFactory::class));

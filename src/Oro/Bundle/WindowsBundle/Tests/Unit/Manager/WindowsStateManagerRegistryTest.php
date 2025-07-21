@@ -7,23 +7,18 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateManager;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class WindowsStateManagerRegistryTest extends \PHPUnit\Framework\TestCase
+class WindowsStateManagerRegistryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WindowsStateManager */
-    private $manager1;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WindowsStateManager */
-    private $manager2;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
-    private $tokenStorage;
-
-    /** @var WindowsStateManagerRegistry */
-    private $registry;
+    private WindowsStateManager&MockObject $manager1;
+    private WindowsStateManager&MockObject $manager2;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private WindowsStateManagerRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -44,7 +39,7 @@ class WindowsStateManagerRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetManagerWhenManagerFound()
+    public function testGetManagerWhenManagerFound(): void
     {
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
@@ -57,7 +52,7 @@ class WindowsStateManagerRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->manager1, $this->registry->getManager());
     }
 
-    public function testGetManagerWhenManagerFoundByAbstractClass()
+    public function testGetManagerWhenManagerFoundByAbstractClass(): void
     {
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
@@ -70,7 +65,7 @@ class WindowsStateManagerRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->manager2, $this->registry->getManager());
     }
 
-    public function testGetManagerWhenManagerNotFound()
+    public function testGetManagerWhenManagerNotFound(): void
     {
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
@@ -83,7 +78,7 @@ class WindowsStateManagerRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->registry->getManager());
     }
 
-    public function testGetManagerWhenUserIsString()
+    public function testGetManagerWhenUserIsString(): void
     {
         $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
@@ -96,7 +91,7 @@ class WindowsStateManagerRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->registry->getManager());
     }
 
-    public function testGetManagerWhenNoToken()
+    public function testGetManagerWhenNoToken(): void
     {
         $this->tokenStorage->expects($this->once())
             ->method('getToken')

@@ -7,17 +7,14 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DbalLazyConnectionTest extends \PHPUnit\Framework\TestCase
+class DbalLazyConnectionTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $dbalConnection;
-
-    /** @var DbalLazyConnection */
-    private $connection;
+    private ManagerRegistry&MockObject $registry;
+    private Connection&MockObject $dbalConnection;
+    private DbalLazyConnection $connection;
 
     #[\Override]
     protected function setUp(): void
@@ -31,12 +28,12 @@ class DbalLazyConnectionTest extends \PHPUnit\Framework\TestCase
         $this->connection = new DbalLazyConnection($this->registry, 'theConnection', 'table');
     }
 
-    public function testShouldImplementConnectionInterface()
+    public function testShouldImplementConnectionInterface(): void
     {
         self::assertInstanceOf(DbalConnection::class, $this->connection);
     }
 
-    public function testShouldNotInitializeOnCreateSession()
+    public function testShouldNotInitializeOnCreateSession(): void
     {
         $this->registry->expects(self::never())
             ->method('getConnection');
@@ -46,7 +43,7 @@ class DbalLazyConnectionTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(DbalLazyConnection::class, $session->getConnection());
     }
 
-    public function testShouldInitializeOnGetDBALConnection()
+    public function testShouldInitializeOnGetDBALConnection(): void
     {
         $this->registry->expects(self::once())
             ->method('getConnection')
@@ -58,7 +55,7 @@ class DbalLazyConnectionTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->dbalConnection, $connection);
     }
 
-    public function testShouldNotInitializeOnGetDBALConnectionIfAlreadyInitialized()
+    public function testShouldNotInitializeOnGetDBALConnectionIfAlreadyInitialized(): void
     {
         $this->registry->expects(self::once())
             ->method('getConnection')
@@ -74,7 +71,7 @@ class DbalLazyConnectionTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->dbalConnection, $connection2);
     }
 
-    public function testShouldNotInitializeOnGetTableName()
+    public function testShouldNotInitializeOnGetTableName(): void
     {
         $this->registry->expects(self::never())
             ->method('getConnection');
@@ -82,7 +79,7 @@ class DbalLazyConnectionTest extends \PHPUnit\Framework\TestCase
         $this->connection->getTableName();
     }
 
-    public function testShouldNotInitializeOnGetOptions()
+    public function testShouldNotInitializeOnGetOptions(): void
     {
         $this->registry->expects(self::never())
             ->method('getConnection');
@@ -90,14 +87,14 @@ class DbalLazyConnectionTest extends \PHPUnit\Framework\TestCase
         $this->connection->getOptions();
     }
 
-    public function testShouldNotCallCloseIfNotInitialized()
+    public function testShouldNotCallCloseIfNotInitialized(): void
     {
         $this->dbalConnection->expects(self::never())
             ->method('close');
         $this->connection->close();
     }
 
-    public function testShouldCallCloseIfAlreadyInitialized()
+    public function testShouldCallCloseIfAlreadyInitialized(): void
     {
         $this->registry->expects(self::once())
             ->method('getConnection')

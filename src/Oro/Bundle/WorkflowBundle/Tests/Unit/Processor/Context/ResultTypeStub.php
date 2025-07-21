@@ -6,11 +6,8 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface
 
 class ResultTypeStub implements TransitActionResultTypeInterface
 {
-    /** @var string */
-    private $name;
-
-    /** @var bool */
-    private $supportsCustom;
+    private string $name;
+    private bool $supportsCustom;
 
     public function __construct(string $name, bool $supportsCustom = false)
     {

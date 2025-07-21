@@ -10,24 +10,17 @@ use Oro\Bundle\NoteBundle\Action\CreateNoteAction;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class CreateNoteActionTest extends \PHPUnit\Framework\TestCase
+class CreateNoteActionTest extends TestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityManager;
-
-    /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextAccessor;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var CreateNoteAction */
-    private $action;
+    private EntityManagerInterface&MockObject $entityManager;
+    private ActivityManager&MockObject $activityManager;
+    private ContextAccessor&MockObject $contextAccessor;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private CreateNoteAction $action;
 
     #[\Override]
     protected function setUp(): void
@@ -50,7 +43,7 @@ class CreateNoteActionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeData
      */
-    public function testAction(array $options, string $message, string $target, ?string $attribute = null)
+    public function testAction(array $options, string $message, string $target, ?string $attribute = null): void
     {
         $this->action->initialize($options);
 
@@ -130,7 +123,7 @@ class CreateNoteActionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeExceptions
      */
-    public function testInitializeExceptions(array $options, string $message)
+    public function testInitializeExceptions(array $options, string $message): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage($message);

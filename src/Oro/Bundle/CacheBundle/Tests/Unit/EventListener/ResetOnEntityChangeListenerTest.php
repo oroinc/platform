@@ -15,15 +15,12 @@ use Symfony\Contracts\Service\ResetInterface;
 final class ResetOnEntityChangeListenerTest extends TestCase
 {
     private ResetInterface&MockObject $serviceToReset;
-
     private UnitOfWork&MockObject $unitOfWork;
-
     private OnFlushEventArgs&MockObject $eventArgs;
-
     private ResetOnEntityChangeListener $listener;
-
     private object $sampleEntity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->serviceToReset = $this->createMock(ResetInterface::class);
@@ -39,32 +36,31 @@ final class ResetOnEntityChangeListenerTest extends TestCase
             [$this->sampleEntity::class]
         );
 
-        $this->eventArgs
+        $this->eventArgs->expects(self::any())
             ->method('getObjectManager')
             ->willReturn($entityManager);
-        $entityManager
+        $entityManager->expects(self::any())
             ->method('getUnitOfWork')
             ->willReturn($this->unitOfWork);
     }
 
     public function testOnFlushWithInsertedEntityTriggersReset(): void
     {
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::any())
             ->method('getScheduledEntityInsertions')
             ->willReturn([$this->sampleEntity]);
 
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::any())
             ->method('getScheduledEntityUpdates')
             ->willReturn([]);
 
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::any())
             ->method('getScheduledEntityDeletions')
             ->willReturn([]);
 
         $this->listener->onFlush($this->eventArgs);
 
-        $this->serviceToReset
-            ->expects(self::once())
+        $this->serviceToReset->expects(self::once())
             ->method('reset');
 
         $this->listener->postFlush();
@@ -72,22 +68,21 @@ final class ResetOnEntityChangeListenerTest extends TestCase
 
     public function testOnFlushWithUpdatedEntityTriggersReset(): void
     {
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::any())
             ->method('getScheduledEntityInsertions')
             ->willReturn([]);
 
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::any())
             ->method('getScheduledEntityUpdates')
             ->willReturn([$this->sampleEntity]);
 
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::any())
             ->method('getScheduledEntityDeletions')
             ->willReturn([]);
 
         $this->listener->onFlush($this->eventArgs);
 
-        $this->serviceToReset
-            ->expects(self::once())
+        $this->serviceToReset->expects(self::once())
             ->method('reset');
 
         $this->listener->postFlush();
@@ -95,22 +90,21 @@ final class ResetOnEntityChangeListenerTest extends TestCase
 
     public function testOnFlushWithDeletedEntityTriggersReset(): void
     {
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::any())
             ->method('getScheduledEntityInsertions')
             ->willReturn([]);
 
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::any())
             ->method('getScheduledEntityUpdates')
             ->willReturn([]);
 
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::any())
             ->method('getScheduledEntityDeletions')
             ->willReturn([$this->sampleEntity]);
 
         $this->listener->onFlush($this->eventArgs);
 
-        $this->serviceToReset
-            ->expects(self::once())
+        $this->serviceToReset->expects(self::once())
             ->method('reset');
 
         $this->listener->postFlush();
@@ -118,22 +112,21 @@ final class ResetOnEntityChangeListenerTest extends TestCase
 
     public function testOnFlushWithoutTrackedEntityDoesNotTriggerReset(): void
     {
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::any())
             ->method('getScheduledEntityInsertions')
             ->willReturn([new \stdClass()]);
 
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::any())
             ->method('getScheduledEntityUpdates')
             ->willReturn([]);
 
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::any())
             ->method('getScheduledEntityDeletions')
             ->willReturn([]);
 
         $this->listener->onFlush($this->eventArgs);
 
-        $this->serviceToReset
-            ->expects(self::never())
+        $this->serviceToReset->expects(self::never())
             ->method('reset');
 
         $this->listener->postFlush();
@@ -141,23 +134,22 @@ final class ResetOnEntityChangeListenerTest extends TestCase
 
     public function testOnClearResetsFlag(): void
     {
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::any())
             ->method('getScheduledEntityInsertions')
             ->willReturn([$this->sampleEntity]);
 
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::any())
             ->method('getScheduledEntityUpdates')
             ->willReturn([]);
 
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::any())
             ->method('getScheduledEntityDeletions')
             ->willReturn([]);
 
         $this->listener->onFlush($this->eventArgs);
         $this->listener->onClear();
 
-        $this->serviceToReset
-            ->expects(self::never())
+        $this->serviceToReset->expects(self::never())
             ->method('reset');
 
         $this->listener->postFlush();
@@ -165,8 +157,7 @@ final class ResetOnEntityChangeListenerTest extends TestCase
 
     public function testPostFlushWithoutOnFlushDoesNothing(): void
     {
-        $this->serviceToReset
-            ->expects(self::never())
+        $this->serviceToReset->expects(self::never())
             ->method('reset');
 
         $this->listener->postFlush();

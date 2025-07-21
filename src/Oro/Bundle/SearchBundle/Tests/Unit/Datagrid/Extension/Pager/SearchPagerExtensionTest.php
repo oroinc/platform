@@ -9,17 +9,14 @@ use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Datagrid\Extension\Pager\IndexerPager;
 use Oro\Bundle\SearchBundle\Datagrid\Extension\Pager\SearchPagerExtension;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
+class SearchPagerExtensionTest extends TestCase
 {
-    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagridConfig;
-
-    /** @var IndexerPager|\PHPUnit\Framework\MockObject\MockObject */
-    private $pager;
-
-    /** @var SearchPagerExtension */
-    private $pagerExtension;
+    private DatagridConfiguration&MockObject $datagridConfig;
+    private IndexerPager&MockObject $pager;
+    private SearchPagerExtension $pagerExtension;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +33,7 @@ class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider providerTestIsApplicable
      */
-    public function testIsApplicable(string $dataSourceType, bool $expectedResult)
+    public function testIsApplicable(string $dataSourceType, bool $expectedResult): void
     {
         $this->datagridConfig->expects($this->once())
             ->method('getDatasourceType')
@@ -61,7 +58,7 @@ class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider providerTestVisitDataSource
      */
-    public function testVisitDataSource(int $perPage, bool $onePageEnable)
+    public function testVisitDataSource(int $perPage, bool $onePageEnable): void
     {
         $dataSource = $this->createMock(SearchDatasource::class);
         $searchQuery = $this->createMock(SearchQueryInterface::class);
@@ -124,7 +121,7 @@ class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider datagridPagerParamsDataProvider
      */
-    public function testProcessConfigs(array $parameters, ?int $expectedPageSize, ?int $expectPage)
+    public function testProcessConfigs(array $parameters, ?int $expectedPageSize, ?int $expectPage): void
     {
         $config = [
             'options' => [

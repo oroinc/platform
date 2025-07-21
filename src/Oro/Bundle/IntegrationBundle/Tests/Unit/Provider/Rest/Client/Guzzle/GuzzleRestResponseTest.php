@@ -6,21 +6,20 @@ use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Stream;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestException;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestResponse;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
-class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
+class GuzzleRestResponseTest extends TestCase
 {
     private const REQUEST_URL = 'http://test';
 
-    /** @var Response|\PHPUnit\Framework\MockObject\MockObject */
-    private $sourceResponse;
-
-    /** @var GuzzleRestResponse */
-    private $response;
+    private Response&MockObject $sourceResponse;
+    private GuzzleRestResponse $response;
 
     #[\Override]
     protected function setUp(): void
@@ -30,12 +29,12 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
         $this->response = new GuzzleRestResponse($this->sourceResponse, self::REQUEST_URL);
     }
 
-    public function testGetRequestUrl()
+    public function testGetRequestUrl(): void
     {
         $this->assertEquals(self::REQUEST_URL, $this->response->getRequestUrl());
     }
 
-    public function testGetBodyAsString()
+    public function testGetBodyAsString(): void
     {
         $body = 'test';
         $stream = fopen('php://memory', 'rb+');
@@ -49,7 +48,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($body, $this->response->getBodyAsString());
     }
 
-    public function testGetBodyAsStringWhenErrorOccurred()
+    public function testGetBodyAsStringWhenErrorOccurred(): void
     {
         $this->expectException(GuzzleRestException::class);
         $this->expectExceptionMessage('some error');
@@ -61,7 +60,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
         $this->response->getBodyAsString();
     }
 
-    public function testGetStatusCode()
+    public function testGetStatusCode(): void
     {
         $statusCode = 400;
         $this->sourceResponse->expects(self::once())
@@ -71,7 +70,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($statusCode, $this->response->getStatusCode());
     }
 
-    public function testGetHeader()
+    public function testGetHeader(): void
     {
         $name = 'someHeader';
         $value = ['test'];
@@ -83,7 +82,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($value, $this->response->getHeader($name));
     }
 
-    public function testGetHeaders()
+    public function testGetHeaders(): void
     {
         $values = ['test'];
         $this->sourceResponse->expects(self::once())
@@ -93,7 +92,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($values, $this->response->getHeaders());
     }
 
-    public function testHasHeader()
+    public function testHasHeader(): void
     {
         $name = 'someHeader';
         $this->sourceResponse->expects(self::once())
@@ -104,7 +103,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->response->hasHeader($name));
     }
 
-    public function testGetReasonPhrase()
+    public function testGetReasonPhrase(): void
     {
         $value = 'test';
         $this->sourceResponse->expects(self::once())
@@ -117,7 +116,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isClientErrorDataProvider
      */
-    public function testIsClientError(int $statusCode, bool $result)
+    public function testIsClientError(int $statusCode, bool $result): void
     {
         $this->sourceResponse->expects(self::atLeastOnce())
             ->method('getStatusCode')
@@ -141,7 +140,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isServerErrorDataProvider
      */
-    public function testIsServerError(int $statusCode, bool $result)
+    public function testIsServerError(int $statusCode, bool $result): void
     {
         $this->sourceResponse->expects(self::atLeastOnce())
             ->method('getStatusCode')
@@ -165,7 +164,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isErrorDataProvider
      */
-    public function testIsError(int $statusCode, bool $result)
+    public function testIsError(int $statusCode, bool $result): void
     {
         $this->sourceResponse->expects(self::atLeastOnce())
             ->method('getStatusCode')
@@ -191,7 +190,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isSuccessfulDataProvider
      */
-    public function testIsSuccessful(int $statusCode, bool $result)
+    public function testIsSuccessful(int $statusCode, bool $result): void
     {
         $this->sourceResponse->expects(self::atLeastOnce())
             ->method('getStatusCode')
@@ -219,7 +218,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isInformationalDataProvider
      */
-    public function testIsInformational(int $statusCode, bool $result)
+    public function testIsInformational(int $statusCode, bool $result): void
     {
         $this->sourceResponse->expects(self::atLeastOnce())
             ->method('getStatusCode')
@@ -241,7 +240,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isRedirectDataProvider
      */
-    public function testIsRedirect(int $statusCode, bool $result)
+    public function testIsRedirect(int $statusCode, bool $result): void
     {
         $this->sourceResponse->expects(self::atLeastOnce())
             ->method('getStatusCode')
@@ -262,7 +261,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testJson()
+    public function testJson(): void
     {
         $stream = fopen('php://memory', 'rb+');
         fwrite($stream, '{"key": "val"}');
@@ -275,7 +274,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['key' => 'val'], $this->response->json());
     }
 
-    public function testGetSourceResponse()
+    public function testGetSourceResponse(): void
     {
         $this->assertEquals($this->sourceResponse, $this->response->getSourceResponse());
     }

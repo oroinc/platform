@@ -7,6 +7,7 @@ use Monolog\Handler\NativeMailerHandler;
 use Oro\Bundle\LoggerBundle\Monolog\DisableHandlerWrapper;
 use Oro\Bundle\LoggerBundle\Monolog\LogLevelConfig;
 use Oro\Bundle\LoggerBundle\Test\MonologTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,10 +18,8 @@ class DisableHandlerWrapperTest extends TestCase
 {
     use MonologTestCaseTrait;
 
-    private LogLevelConfig|\PHPUnit\Framework\MockObject\MockObject $config;
-
-    private HandlerInterface|\PHPUnit\Framework\MockObject\MockObject $inner;
-
+    private LogLevelConfig&MockObject $config;
+    private HandlerInterface&MockObject $inner;
     private DisableHandlerWrapper $wrapper;
 
     #[\Override]

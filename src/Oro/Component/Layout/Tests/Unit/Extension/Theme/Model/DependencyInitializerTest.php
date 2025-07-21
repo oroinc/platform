@@ -4,17 +4,15 @@ namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
 use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
 use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\LayoutUpdateWithDependency;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DependencyInitializerTest extends \PHPUnit\Framework\TestCase
+class DependencyInitializerTest extends TestCase
 {
-    /** @var Container */
-    private $container;
-
-    /** @var DependencyInitializer */
-    private $initializer;
+    private Container $container;
+    private DependencyInitializer $initializer;
 
     #[\Override]
     protected function setUp(): void
@@ -24,12 +22,12 @@ class DependencyInitializerTest extends \PHPUnit\Framework\TestCase
         $this->initializer = new DependencyInitializer($this->container);
     }
 
-    public function testShouldNotFailWithNonObject()
+    public function testShouldNotFailWithNonObject(): void
     {
         $this->initializer->initialize(null);
     }
 
-    public function testNoKnownDependenciesShouldNotDoAnything()
+    public function testNoKnownDependenciesShouldNotDoAnything(): void
     {
         $object = $this->createMock(LayoutUpdateWithDependency::class);
         $object->expects($this->never())
@@ -38,7 +36,7 @@ class DependencyInitializerTest extends \PHPUnit\Framework\TestCase
         $this->initializer->initialize($object);
     }
 
-    public function testShouldInitializeDependencies()
+    public function testShouldInitializeDependencies(): void
     {
         $dependency = $this->createMock(ContainerInterface::class);
 

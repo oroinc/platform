@@ -50,5 +50,8 @@ class TestEntitiesMigration implements
         $table->setPrimaryKey(['id']);
 
         $this->attachmentExtension->addFileRelation($schema, 'test_api_attachment_owner', 'test_file');
+        $this->attachmentExtension->addImageRelation($schema, 'test_api_attachment_owner', 'test_image');
+        $this->attachmentExtension->addMultiFileRelation($schema, 'test_api_attachment_owner', 'test_multi_files');
+        $this->attachmentExtension->addMultiImageRelation($schema, 'test_api_attachment_owner', 'test_multi_images');
     }
 }

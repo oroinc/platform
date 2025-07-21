@@ -8,14 +8,13 @@ use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\EntityConfigHelper;
 use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\EntityConfigListener;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
+class EntityConfigListenerTest extends TestCase
 {
-    /** @var EntityConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $helper;
-
-    /** @var EntityConfigListener */
-    private $listener;
+    private EntityConfigHelper&MockObject $helper;
+    private EntityConfigListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +34,7 @@ class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
         return $config;
     }
 
-    public function testOnCreateMetadata()
+    public function testOnCreateMetadata(): void
     {
         $className = 'Foo\Entity';
 

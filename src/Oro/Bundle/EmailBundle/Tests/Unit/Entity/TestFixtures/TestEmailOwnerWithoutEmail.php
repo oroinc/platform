@@ -7,17 +7,11 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 class TestEmailOwnerWithoutEmail implements EmailOwnerInterface
 {
-    /** @var int */
-    protected $id;
+    protected int $id;
+    protected string $firstName;
+    protected string $lastName;
 
-    /** @var string */
-    protected $firstName;
-
-    /** @var string */
-    protected $lastName;
-
-    /** @var OrganizationInterface */
-    protected $organization = null;
+    protected OrganizationInterface $organization = null;
 
     public function __construct($id = null)
     {

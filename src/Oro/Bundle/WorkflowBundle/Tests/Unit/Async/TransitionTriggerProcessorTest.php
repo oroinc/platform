@@ -12,22 +12,21 @@ use Oro\Bundle\WorkflowBundle\Handler\TransitionTriggerHandlerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class TransitionTriggerProcessorTest extends \PHPUnit\Framework\TestCase
+class TransitionTriggerProcessorTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
     private const TRIGGER_ID = 42;
     private const MAIN_ENTITY_ID = 105;
 
-    private ObjectManager|\PHPUnit\Framework\MockObject\MockObject $objectManager;
-
-    private TransitionTriggerHandlerInterface|\PHPUnit\Framework\MockObject\MockObject $handler;
-
+    private ObjectManager&MockObject $objectManager;
+    private TransitionTriggerHandlerInterface&MockObject $handler;
+    private SessionInterface&MockObject $session;
     private TransitionTriggerProcessor $processor;
-
-    private SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session;
 
     #[\Override]
     protected function setUp(): void
@@ -85,7 +84,7 @@ class TransitionTriggerProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::REJECT, $this->processor->process($message, $this->session));
     }
 
-    private function getTriggerMock(): BaseTransitionTrigger|\PHPUnit\Framework\MockObject\MockObject
+    private function getTriggerMock(): BaseTransitionTrigger&MockObject
     {
         $trigger = $this->createMock(BaseTransitionTrigger::class);
         $trigger->expects(self::any())

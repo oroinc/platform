@@ -6,15 +6,14 @@ use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\AssignValue;
 use Oro\Component\Action\Action\UnsetValue;
 use Oro\Component\ConfigExpression\ExpressionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class UnsetValueTest extends \PHPUnit\Framework\TestCase
+class UnsetValueTest extends TestCase
 {
-    /** @var AssignValue|\PHPUnit\Framework\MockObject\MockObject */
-    private $assignValue;
-
-    /** @var ActionInterface */
-    private $action;
+    private AssignValue&MockObject $assignValue;
+    private ActionInterface $action;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class UnsetValueTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $context = [];
         $this->assignValue->expects($this->once())
@@ -37,7 +36,7 @@ class UnsetValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testInitialize(array $options, array $expected)
+    public function testInitialize(array $options, array $expected): void
     {
         $this->assignValue->expects($this->once())
             ->method('initialize')
@@ -61,7 +60,7 @@ class UnsetValueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSetCondition()
+    public function testSetCondition(): void
     {
         $condition = $this->createMock(ExpressionInterface::class);
 

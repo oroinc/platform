@@ -9,16 +9,15 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\EventListener\AttributeGroupGridListener;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AttributeGroupGridListenerTest extends \PHPUnit\Framework\TestCase
+class AttributeGroupGridListenerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var AttributeGroupGridListener */
-    private $listener;
-
-    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeManager;
+    private AttributeGroupGridListener $listener;
+    private AttributeManager&MockObject $attributeManager;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class AttributeGroupGridListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new AttributeGroupGridListener($this->attributeManager);
     }
 
-    public function testOnResultAfter()
+    public function testOnResultAfter(): void
     {
         $groupId1 = 1;
         $groupId2 = 2;

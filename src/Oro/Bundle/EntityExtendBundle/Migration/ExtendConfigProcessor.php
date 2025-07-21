@@ -399,7 +399,13 @@ class ExtendConfigProcessor
                         : $value;
                     $config->set($code, $existingVal);
                 } elseif ($this->isAppend($scope, $key, $className, $fieldName)) {
-                    $config->set($key, array_merge((array)$config->get($key), (array)$value));
+                    $currentConfig = (array)$config->get($key);
+                    // deduplicate if is not unique items
+                    $updateConfig = array_filter((array)$value, function ($item) use ($currentConfig) {
+                        return !in_array($item, $currentConfig, true);
+                    });
+                    $configValue = array_merge($currentConfig, $updateConfig);
+                    $config->set($key, $configValue);
                 } else {
                     $config->set($key, $value);
                 }

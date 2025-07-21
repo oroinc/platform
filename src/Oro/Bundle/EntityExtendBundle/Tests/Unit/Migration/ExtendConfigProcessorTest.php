@@ -13,16 +13,18 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
+class ExtendConfigProcessorTest extends TestCase
 {
     private const CLASS_NAME = 'Test\ExtendConfigProcessorTestBundle\Entity\SomeClass';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ExtendConfigProcessor */
-    private $generator;
+    private ConfigManager&MockObject $configManager;
+    private ExtendConfigProcessor $generator;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +34,7 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         $this->generator = new ExtendConfigProcessor($this->configManager);
     }
 
-    public function testGeneratorWithEmptyConfigs()
+    public function testGeneratorWithEmptyConfigs(): void
     {
         $this->configManager->expects($this->never())
             ->method('flush');
@@ -40,7 +42,7 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         $this->generator->processConfigs([]);
     }
 
-    public function testModificationOfNonConfigurableEntity()
+    public function testModificationOfNonConfigurableEntity(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('A new model can be created for custom entity only. Class:');
@@ -60,7 +62,7 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         $this->generator->processConfigs($configs);
     }
 
-    public function testModificationOfNonConfigurableEntityWithOnlyFieldsTypeSpecified()
+    public function testModificationOfNonConfigurableEntityWithOnlyFieldsTypeSpecified(): void
     {
         $configs = [
             self::CLASS_NAME => [
@@ -100,7 +102,7 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         $this->generator->processConfigs($configs);
     }
 
-    public function testModificationOfNonConfigurableEntityWithFieldsTypeSpecifiedAndHasEntityConfigs()
+    public function testModificationOfNonConfigurableEntityWithFieldsTypeSpecifiedAndHasEntityConfigs(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('A new model can be created for custom entity only. Class:');
@@ -128,7 +130,7 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testModificationOfNonExtendEntity()
+    public function testModificationOfNonExtendEntity(): void
     {
         $configs = [
             self::CLASS_NAME                      => [
@@ -211,10 +213,10 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateCustomEntity()
+    public function testCreateCustomEntity(): void
     {
         $testClassName = ExtendHelper::ENTITY_NAMESPACE . 'TestEntity';
-        $configs       = [
+        $configs = [
             $testClassName => [
                 'configs' => [
                     'extend' => [
@@ -276,13 +278,13 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddExtendFieldToNonExtendEntity()
+    public function testAddExtendFieldToNonExtendEntity(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('An extend field "field1" cannot be added to non extend entity');
 
         $testFieldName = 'field1';
-        $configs       = [
+        $configs = [
             self::CLASS_NAME => [
                 'fields' => [
                     $testFieldName => [
@@ -321,10 +323,10 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         $this->generator->processConfigs($configs);
     }
 
-    public function testNewField()
+    public function testNewField(): void
     {
         $testFieldName = 'field1';
-        $configs       = [
+        $configs = [
             self::CLASS_NAME => [
                 'fields' => [
                     $testFieldName => [
@@ -344,11 +346,11 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
 
         $extendConfigEntity = $this->createConfig('extend', self::CLASS_NAME);
         $extendConfigEntity->set('is_extend', true);
-        $extendConfigField   = $this->createConfig('extend', self::CLASS_NAME, $testFieldName, 'string');
+        $extendConfigField = $this->createConfig('extend', self::CLASS_NAME, $testFieldName, 'string');
         $datagridConfigField = $this->createConfig('datagrid', self::CLASS_NAME, $testFieldName, 'string');
 
         // config providers configuration
-        $extendConfigProvider   = $this->createMock(ConfigProvider::class);
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $datagridConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->any())
             ->method('getProvider')
@@ -397,10 +399,53 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testExistingField()
+    public function testEntityConfigItemMergedOptionsIsUnique(): void
+    {
+        $testClassName = ExtendHelper::ENTITY_NAMESPACE . 'TestEntity';
+        $configs = [
+            $testClassName => [
+                'configs' => [
+                    'extend' => [
+                        'activities' => [
+                            'call'
+                        ]
+                    ],
+                ],
+            ],
+        ];
+        $configs[ExtendConfigProcessor::APPEND_CONFIGS][$testClassName] = [
+            'configs' => [
+                'extend' => ['activities']
+            ]
+        ];
+        $extendConfigEntity = $this->createConfig('extend', self::CLASS_NAME);
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+            ]);
+        $extendConfigProvider
+            ->method('getConfig')
+            ->willReturnMap([
+                [$testClassName, null, $extendConfigEntity],
+            ]);
+
+        // process the same config twice to check is values is not duplicated
+        $this->generator->processConfigs($configs);
+        $this->generator->processConfigs($configs);
+
+        $this->assertEquals(
+            ['state' => ExtendScope::STATE_NEW, 'activities' => ['call']],
+            $extendConfigEntity->getValues()
+        );
+    }
+
+    public function testExistingField(): void
     {
         $testFieldName = 'field1';
-        $configs       = [
+        $configs = [
             self::CLASS_NAME => [
                 'fields' => [
                     $testFieldName => [
@@ -420,12 +465,12 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
 
         $extendConfigEntity = $this->createConfig('extend', self::CLASS_NAME);
         $extendConfigEntity->set('is_extend', true);
-        $extendConfigField   = $this->createConfig('extend', self::CLASS_NAME, $testFieldName, 'string');
+        $extendConfigField = $this->createConfig('extend', self::CLASS_NAME, $testFieldName, 'string');
         $datagridConfigField = $this->createConfig('datagrid', self::CLASS_NAME, $testFieldName, 'string');
-        $configFieldModel    = new FieldConfigModel($testFieldName, 'string');
+        $configFieldModel = new FieldConfigModel($testFieldName, 'string');
 
         // config providers configuration
-        $extendConfigProvider   = $this->createMock(ConfigProvider::class);
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $datagridConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->any())
             ->method('getProvider')
@@ -483,10 +528,10 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testAppendForExistingField()
+    public function testAppendForExistingField(): void
     {
         $testFieldName = 'field1';
-        $configs       = [
+        $configs = [
             self::CLASS_NAME                      => [
                 'fields' => [
                     $testFieldName => [
@@ -519,7 +564,7 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
         $extendConfigEntity = $this->createConfig('extend', self::CLASS_NAME);
         $extendConfigEntity->set('is_extend', true);
         $extendConfigField = $this->createConfig('extend', self::CLASS_NAME, $testFieldName, 'string');
-        $configFieldModel  = new FieldConfigModel($testFieldName, 'string');
+        $configFieldModel = new FieldConfigModel($testFieldName, 'string');
 
         // config providers configuration
         $extendConfigProvider = $this->createMock(ConfigProvider::class);

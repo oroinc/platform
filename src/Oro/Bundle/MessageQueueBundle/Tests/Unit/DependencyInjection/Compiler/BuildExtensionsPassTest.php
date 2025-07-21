@@ -6,10 +6,11 @@ use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ChainExtension;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionWrapper;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildExtensionsPass;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class BuildExtensionsPassTest extends \PHPUnit\Framework\TestCase
+class BuildExtensionsPassTest extends TestCase
 {
     private BuildExtensionsPass $compiler;
 
@@ -19,7 +20,7 @@ class BuildExtensionsPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new BuildExtensionsPass();
     }
 
-    public function testConsumptionShouldReplaceFirstArgumentOfExtensionsServiceConstructorWithTagsExtensions()
+    public function testConsumptionShouldReplaceFirstArgumentOfExtensionsServiceConstructorWithTagsExtensions(): void
     {
         $container = new ContainerBuilder();
         $consumptionExtensionsDef = $container->register('oro_message_queue.consumption.extensions')
@@ -36,7 +37,7 @@ class BuildExtensionsPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConsumptionShouldWrapNotPersistentExtension()
+    public function testConsumptionShouldWrapNotPersistentExtension(): void
     {
         $container = new ContainerBuilder();
         $consumptionExtensionsDef = $container->register('oro_message_queue.consumption.extensions')
@@ -62,7 +63,7 @@ class BuildExtensionsPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConsumptionShouldNotWrapNotPersistentExtensionIfItImplementsResettableExtensionInterface()
+    public function testConsumptionShouldNotWrapNotPersistentExtensionIfItImplementsResettableExtensionInterface(): void
     {
         $container = new ContainerBuilder();
         $consumptionExtensionsDef = $container->register('oro_message_queue.consumption.extensions')
@@ -81,7 +82,7 @@ class BuildExtensionsPassTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($container->hasDefinition('foo_extension.resettable_wrapper'));
     }
 
-    public function testConsumptionShouldResolveExtensionClassIfItSpecifiedAsParameter()
+    public function testConsumptionShouldResolveExtensionClassIfItSpecifiedAsParameter(): void
     {
         $container = new ContainerBuilder();
         $consumptionExtensionsDef = $container->register('oro_message_queue.consumption.extensions')
@@ -101,7 +102,7 @@ class BuildExtensionsPassTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($container->hasDefinition('foo_extension.resettable_wrapper'));
     }
 
-    public function testConsumptionShouldOrderExtensionsByPriority()
+    public function testConsumptionShouldOrderExtensionsByPriority(): void
     {
         $container = new ContainerBuilder();
         $consumptionExtensionsDef = $container->register('oro_message_queue.consumption.extensions')
@@ -126,7 +127,7 @@ class BuildExtensionsPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConsumptionShouldAssumePriorityZeroIfPriorityIsNotSet()
+    public function testConsumptionShouldAssumePriorityZeroIfPriorityIsNotSet(): void
     {
         $container = new ContainerBuilder();
         $consumptionExtensionsDef = $container->register('oro_message_queue.consumption.extensions')

@@ -4,11 +4,11 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Bundle\LayoutBundle\Layout\Extension\ActionContextConfigurator;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\TestCase;
 
-class ActionContextConfiguratorTest extends \PHPUnit\Framework\TestCase
+class ActionContextConfiguratorTest extends TestCase
 {
-    /** @var ActionContextConfigurator */
-    private $contextConfigurator;
+    private ActionContextConfigurator $contextConfigurator;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class ActionContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->contextConfigurator = new ActionContextConfigurator();
     }
 
-    public function testConfigureContextWithDefaultAction()
+    public function testConfigureContextWithDefaultAction(): void
     {
         $context = new LayoutContext();
 
@@ -26,7 +26,7 @@ class ActionContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('', $context['action']);
     }
 
-    public function testConfigureContext()
+    public function testConfigureContext(): void
     {
         $action = 'index';
 

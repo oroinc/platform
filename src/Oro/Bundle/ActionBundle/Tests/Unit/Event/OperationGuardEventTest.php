@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class OperationGuardEventTest extends TestCase
 {
-    public function testEventMinimal()
+    public function testEventMinimal(): void
     {
         $data = new ActionData();
         $definition = new OperationDefinition();
@@ -22,7 +22,7 @@ class OperationGuardEventTest extends TestCase
         $this->assertTrue($event->isAllowed());
     }
 
-    public function testEventFull()
+    public function testEventFull(): void
     {
         $errors = new ArrayCollection();
         $data = new ActionData();

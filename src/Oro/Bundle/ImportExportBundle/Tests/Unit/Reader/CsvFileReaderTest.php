@@ -11,17 +11,14 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Reader\CsvFileReader;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
+class CsvFileReaderTest extends TestCase
 {
-    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextRegistry;
-
-    /** @var ImportStrategyHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $importHelper;
-
-    /** @var CsvFileReader */
-    private $reader;
+    private ContextRegistry&MockObject $contextRegistry;
+    private ImportStrategyHelper&MockObject $importHelper;
+    private CsvFileReader $reader;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +33,7 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider readSeveralEntitiesProvider
      */
-    public function testEnsureThatHeaderIsCleared(array $options, array $expected)
+    public function testEnsureThatHeaderIsCleared(array $options, array $expected): void
     {
         $context = $this->getContextWithOptions($options);
         $stepExecution = $this->createMock(StepExecution::class);
@@ -58,7 +55,7 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $data);
     }
 
-    public function testSetStepExecutionNoFileException()
+    public function testSetStepExecutionNoFileException(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Configuration of reader must contain "filePath".');
@@ -72,7 +69,7 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
         $this->reader->setStepExecution($stepExecution);
     }
 
-    public function testUnknownFileException()
+    public function testUnknownFileException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('File "unknown_file.csv" does not exists.');
@@ -86,7 +83,7 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
         $this->reader->setStepExecution($stepExecution);
     }
 
-    public function testSetStepExecution()
+    public function testSetStepExecution(): void
     {
         $options = [
             'filePath' => __DIR__ . '/fixtures/import_correct.csv',
@@ -169,7 +166,7 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsDataProvider
      */
-    public function testRead(array $options, array $expected)
+    public function testRead(array $options, array $expected): void
     {
         $context = $this->getContextWithOptions($options);
         $stepExecution = $this->createMock(StepExecution::class);
@@ -279,7 +276,7 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testReadWithBackslashes()
+    public function testReadWithBackslashes(): void
     {
         $context = $this->getContextWithOptions([
             'filePath' => __DIR__ . '/fixtures/import_with_backslashes.csv',
@@ -301,7 +298,7 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
     /**
      * Message also contains additional rows info but it is not possible to add it in annotation
      */
-    public function testReadError()
+    public function testReadError(): void
     {
         $this->expectException(InvalidItemException::class);
         $this->expectExceptionMessage('Expecting to get 3 columns, actually got 2.');
@@ -330,7 +327,7 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
     /**
      * Message also contains additional rows info but it is not possible to add it in annotation
      */
-    public function testReadErrorWithinSplitProcess()
+    public function testReadErrorWithinSplitProcess(): void
     {
         $this->expectException(InvalidItemException::class);
         $this->expectExceptionMessage('Expecting to get 3 columns, actually got 2.');
@@ -347,10 +344,7 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
         $this->reader->read($context);
     }
 
-    /**
-     * @return StepExecutionProxyContext|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getContextWithOptions(array $options)
+    private function getContextWithOptions(array $options): StepExecutionProxyContext&MockObject
     {
         $context = $this->createMock(StepExecutionProxyContext::class);
         $context->expects($this->any())

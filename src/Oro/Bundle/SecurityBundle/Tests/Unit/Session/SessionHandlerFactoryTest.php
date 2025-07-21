@@ -3,16 +3,17 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Session;
 
 use Oro\Bundle\SecurityBundle\Session\SessionHandlerFactory;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class SessionHandlerFactoryTest extends \PHPUnit\Framework\TestCase
+class SessionHandlerFactoryTest extends TestCase
 {
     private ServiceLocator $locatorMock;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->locatorMock = self::createMock(ServiceLocator::class);
+        $this->locatorMock = $this->createMock(ServiceLocator::class);
     }
 
     /**
@@ -20,7 +21,7 @@ class SessionHandlerFactoryTest extends \PHPUnit\Framework\TestCase
      */
     public function testSessionHandlerInstanceReturned(string $dns, $expectedAlias): void
     {
-        $sessionHandlerMock = self::createMock(\SessionHandlerInterface::class);
+        $sessionHandlerMock = $this->createMock(\SessionHandlerInterface::class);
         $this->locatorMock->expects(self::once())
             ->method('get')
             ->with($expectedAlias)
@@ -42,7 +43,7 @@ class SessionHandlerFactoryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testEmptySchemeException()
+    public function testEmptySchemeException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "//localhost" session handler DSN must contain a scheme.');

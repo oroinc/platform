@@ -14,9 +14,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\Mime\MimeTypes;
 
-/**
- * Oro Attachment Bundle root configuration.
- */
 class OroAttachmentBundle extends Bundle
 {
     #[\Override]

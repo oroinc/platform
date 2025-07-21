@@ -6,21 +6,16 @@ use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Provider\FieldSearchProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FieldSearchProviderTest extends \PHPUnit\Framework\TestCase
+class FieldSearchProviderTest extends TestCase
 {
-    /** @var ConfigBag|\PHPUnit\Framework\MockObject\MockObject */
-    private $configBag;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translate;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var FieldSearchProvider */
-    private $provider;
+    private ConfigBag&MockObject $configBag;
+    private TranslatorInterface&MockObject $translate;
+    private ConfigManager&MockObject $configManager;
+    private FieldSearchProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +27,7 @@ class FieldSearchProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new FieldSearchProvider($this->configBag, $this->translate, $this->configManager);
     }
 
-    public function testSupportsTrue()
+    public function testSupportsTrue(): void
     {
         $this->configBag->expects($this->once())
             ->method('getFieldsRoot')
@@ -42,7 +37,7 @@ class FieldSearchProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->provider->supports('test'));
     }
 
-    public function testSupportsFalse()
+    public function testSupportsFalse(): void
     {
         $this->configBag->expects($this->once())
             ->method('getFieldsRoot')
@@ -52,7 +47,7 @@ class FieldSearchProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->provider->supports('test'));
     }
 
-    public function testGetDataWithoutSearchType()
+    public function testGetDataWithoutSearchType(): void
     {
         $field = [
             'options' => [
@@ -68,12 +63,10 @@ class FieldSearchProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->translate->expects($this->exactly(2))
             ->method('trans')
-            ->willReturnMap(
-                [
-                    ['label.key', [], null, null, 'Field Label'],
-                    ['tooltip.key', [], null, null, 'Field Tooltip'],
-                ]
-            );
+            ->willReturnMap([
+                ['label.key', [], null, null, 'Field Label'],
+                ['tooltip.key', [], null, null, 'Field Tooltip'],
+            ]);
 
         $this->configManager->expects($this->never())
             ->method('get');
@@ -81,7 +74,7 @@ class FieldSearchProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['Field Label', 'Field Tooltip'], $this->provider->getData('test'));
     }
 
-    public function testGetDataSearchTypeText()
+    public function testGetDataSearchTypeText(): void
     {
         $field = [
             'search_type' => 'text'
@@ -103,7 +96,7 @@ class FieldSearchProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['Field Value'], $this->provider->getData('test'));
     }
 
-    public function testGetDataSearchTypeChoice()
+    public function testGetDataSearchTypeChoice(): void
     {
         $field = [
             'search_type' => 'choice',
@@ -119,12 +112,10 @@ class FieldSearchProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->translate->expects($this->exactly(2))
             ->method('trans')
-            ->willReturnMap(
-                [
-                    ['choice.1.key', [], null, null, 'Field Choice 1'],
-                    ['choice.2.key', [], null, null, 'Field Choice 2'],
-                ]
-            );
+            ->willReturnMap([
+                ['choice.1.key', [], null, null, 'Field Choice 1'],
+                ['choice.2.key', [], null, null, 'Field Choice 2'],
+            ]);
 
         $this->configManager->expects($this->never())
             ->method('get');
@@ -132,7 +123,7 @@ class FieldSearchProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['Field Choice 1', 'Field Choice 2'], $this->provider->getData('test'));
     }
 
-    public function testGetDataEmpty()
+    public function testGetDataEmpty(): void
     {
         $this->configBag->expects($this->once())
             ->method('getFieldsRoot')
@@ -142,7 +133,7 @@ class FieldSearchProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $this->provider->getData('test'));
     }
 
-    public function testGetDataItemNotFoundException()
+    public function testGetDataItemNotFoundException(): void
     {
         $this->configBag->expects($this->once())
             ->method('getFieldsRoot')
@@ -155,7 +146,7 @@ class FieldSearchProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->getData('test');
     }
 
-    public function testGetDataLogicException()
+    public function testGetDataLogicException(): void
     {
         $this->configBag->expects($this->once())
             ->method('getFieldsRoot')

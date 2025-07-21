@@ -11,24 +11,22 @@ use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessage
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit\Framework\TestCase
+class RedeliverOrphanMessagesDbalExtensionTest extends TestCase
 {
-    private DbalPidFileManager|\PHPUnit\Framework\MockObject\MockObject $pidFileManager;
-
-    private DbalCliProcessManager|\PHPUnit\Framework\MockObject\MockObject $cliProcessManager;
-
-    private Connection|\PHPUnit\Framework\MockObject\MockObject $dbalConnection;
-
-    private DbalSessionInterface|\PHPUnit\Framework\MockObject\MockObject $session;
+    private DbalPidFileManager&MockObject $pidFileManager;
+    private DbalCliProcessManager&MockObject $cliProcessManager;
+    private Connection&MockObject $dbalConnection;
+    private DbalSessionInterface&MockObject $session;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->pidFileManager = $this->createMock(DbalPidFileManager::class);
         $this->cliProcessManager = $this->createMock(DbalCliProcessManager::class);
-
         $this->dbalConnection = $this->createMock(Connection::class);
 
         $connection = $this->createMock(DbalConnection::class);

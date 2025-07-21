@@ -4,11 +4,11 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Log\Converter;
 
 use Oro\Component\MessageQueue\Log\Converter\MessageToArrayConverter;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
+use PHPUnit\Framework\TestCase;
 
-class MessageToArrayConverterTest extends \PHPUnit\Framework\TestCase
+class MessageToArrayConverterTest extends TestCase
 {
-    /** @var MessageToArrayConverter */
-    private $converter;
+    private MessageToArrayConverter $converter;
 
     #[\Override]
     protected function setUp(): void
@@ -16,9 +16,8 @@ class MessageToArrayConverterTest extends \PHPUnit\Framework\TestCase
         $this->converter = new MessageToArrayConverter();
     }
 
-    public function testConvertRequiredProperties()
+    public function testConvertRequiredProperties(): void
     {
-        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject $message */
         $message = $this->createMock(MessageInterface::class);
         $message->expects(self::once())
             ->method('getMessageId')
@@ -45,9 +44,8 @@ class MessageToArrayConverterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertAllProperties()
+    public function testConvertAllProperties(): void
     {
-        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject $message */
         $message = $this->createMock(MessageInterface::class);
         $message->expects(self::once())
             ->method('getMessageId')

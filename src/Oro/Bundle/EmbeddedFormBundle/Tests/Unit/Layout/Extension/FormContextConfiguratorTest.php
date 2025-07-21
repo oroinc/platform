@@ -8,6 +8,8 @@ use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
 use Oro\Component\Layout\LayoutContext;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormInterface;
 
@@ -15,13 +17,10 @@ use Symfony\Component\Form\FormInterface;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
+class FormContextConfiguratorTest extends TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var FormContextConfigurator */
-    private $contextConfigurator;
+    private ContainerInterface&MockObject $container;
+    private FormContextConfigurator $contextConfigurator;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +30,7 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->contextConfigurator = new FormContextConfigurator($this->container);
     }
 
-    public function testCreateDIFormAccessor()
+    public function testCreateDIFormAccessor(): void
     {
         $context = new LayoutContext();
 
@@ -59,7 +58,7 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('enctype', $formAccessor->getEnctype());
     }
 
-    public function testCreateFormAccessor()
+    public function testCreateFormAccessor(): void
     {
         $context = new LayoutContext();
 
@@ -83,7 +82,7 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('enctype', $formAccessor->getEnctype());
     }
 
-    public function testCreateDIFormAccessorByRoute()
+    public function testCreateDIFormAccessorByRoute(): void
     {
         $context = new LayoutContext();
 
@@ -113,7 +112,7 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('enctype', $formAccessor->getEnctype());
     }
 
-    public function testCreateFormAccessorByRoute()
+    public function testCreateFormAccessorByRoute(): void
     {
         $context = new LayoutContext();
 
@@ -139,7 +138,7 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('enctype', $formAccessor->getEnctype());
     }
 
-    public function testShouldThrowExceptionIfInvalidFormType()
+    public function testShouldThrowExceptionIfInvalidFormType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
@@ -156,7 +155,7 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $context->resolve();
     }
 
-    public function testFormIsOptional()
+    public function testFormIsOptional(): void
     {
         $context = new LayoutContext();
 
@@ -166,7 +165,7 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(isset($context['form']));
     }
 
-    public function testDoNothingIfFormAccessorIsAlreadySet()
+    public function testDoNothingIfFormAccessorIsAlreadySet(): void
     {
         $context = new LayoutContext();
 
@@ -179,7 +178,7 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($formAccessor, $context['form']);
     }
 
-    public function testCreateFormAccessorByFormActionObject()
+    public function testCreateFormAccessorByFormActionObject(): void
     {
         $context = new LayoutContext();
 
@@ -204,7 +203,7 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('enctype', $formAccessor->getEnctype());
     }
 
-    public function testShouldThrowExceptionIfInvalidFormAction()
+    public function testShouldThrowExceptionIfInvalidFormAction(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
@@ -221,7 +220,7 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $context->resolve();
     }
 
-    public function testShouldThrowExceptionIfInvalidFormRoute()
+    public function testShouldThrowExceptionIfInvalidFormRoute(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "form_route_name" must be a string, but "integer" given.');
@@ -235,7 +234,7 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $context->resolve();
     }
 
-    public function testShouldThrowExceptionIfInvalidFormMethod()
+    public function testShouldThrowExceptionIfInvalidFormMethod(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "form_method" must be a string, but "integer" given.');
@@ -249,7 +248,7 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $context->resolve();
     }
 
-    public function testShouldThrowExceptionIfInvalidFormEnctype()
+    public function testShouldThrowExceptionIfInvalidFormEnctype(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "form_enctype" must be a string, but "integer" given.');

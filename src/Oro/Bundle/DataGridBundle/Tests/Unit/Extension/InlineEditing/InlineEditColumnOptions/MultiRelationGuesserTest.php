@@ -3,11 +3,11 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEditColumnOptions;
 
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\MultiRelationGuesser;
+use PHPUnit\Framework\TestCase;
 
-class MultiRelationGuesserTest extends \PHPUnit\Framework\TestCase
+class MultiRelationGuesserTest extends TestCase
 {
-    /** @var MultiRelationGuesser */
-    private $guesser;
+    private MultiRelationGuesser $guesser;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class MultiRelationGuesserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setParametersDataProvider
      */
-    public function testRelationGuess(array $column, array $expected)
+    public function testRelationGuess(array $column, array $expected): void
     {
         $guessed = $this->guesser->guessColumnOptions('test', 'test', $column);
 

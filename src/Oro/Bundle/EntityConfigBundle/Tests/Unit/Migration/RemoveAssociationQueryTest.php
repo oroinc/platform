@@ -14,18 +14,15 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityConfigBundle\Migration\RemoveAssociationQuery;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
+class RemoveAssociationQueryTest extends TestCase
 {
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var AbstractSchemaManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $schemaManager;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
+    private Connection&MockObject $connection;
+    private AbstractSchemaManager&MockObject $schemaManager;
+    private LoggerInterface&MockObject $logger;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +36,7 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->schemaManager);
     }
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $query = $this->createQuery(
             'Some\Source',
@@ -59,7 +56,7 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testExecuteThrowsExceptionForNonConfigurableEntity()
+    public function testExecuteThrowsExceptionForNonConfigurableEntity(): void
     {
         $this->connection->expects($this->any())
             ->method('fetchAssociative')
@@ -81,7 +78,7 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
         $query->execute($this->logger);
     }
 
-    public function testEntityConfigIsUpdatedAndFieldConfigIsDeleted()
+    public function testEntityConfigIsUpdatedAndFieldConfigIsDeleted(): void
     {
         $dataWithRelation = [
             'extend' => [
@@ -169,8 +166,10 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
      * @dataProvider getPlatformDropConstraints
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testDropRelationshipColumnForManyToOneRelation(AbstractPlatform $dbPlatform, string $dropFKSql)
-    {
+    public function testDropRelationshipColumnForManyToOneRelation(
+        AbstractPlatform $dbPlatform,
+        string $dropFKSql
+    ): void {
         $this->connection->expects($this->any())
             ->method('getDatabasePlatform')
             ->willReturn($dbPlatform);
@@ -293,7 +292,7 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
         $query->execute($this->logger);
     }
 
-    public function testDropRelationshipTableForManyToManyRelation()
+    public function testDropRelationshipTableForManyToManyRelation(): void
     {
         $this->connection->expects($this->any())
             ->method('getDatabasePlatform')

@@ -7,14 +7,13 @@ use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Formatter\Stubs\PersonAllNamePartsStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Formatter\Stubs\PersonFullNameStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class NameFormatterTest extends \PHPUnit\Framework\TestCase
+class NameFormatterTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
-
-    /** @var NameFormatter */
-    private $formatter;
+    private LocaleSettings&MockObject $localeSettings;
+    private NameFormatter $formatter;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class NameFormatterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider formatDataProvider
      */
-    public function testFormat(string $format, string $expected, object $person)
+    public function testFormat(string $format, string $expected, object $person): void
     {
         $this->localeSettings->expects($this->once())
             ->method('getLocale')
@@ -70,7 +69,7 @@ class NameFormatterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetNameFormatFails()
+    public function testGetNameFormatFails(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot get name format for "fr_CA"');
@@ -90,7 +89,7 @@ class NameFormatterTest extends \PHPUnit\Framework\TestCase
         $locale,
         string $expectedFormat,
         ?string $defaultLocale = null
-    ) {
+    ): void {
         $this->localeSettings->expects($this->once())
             ->method('getNameFormats')
             ->willReturn($nameFormats);

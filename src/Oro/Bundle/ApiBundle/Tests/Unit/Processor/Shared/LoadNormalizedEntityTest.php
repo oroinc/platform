@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
+use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetOperationFlags;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedEntity;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
@@ -229,7 +230,7 @@ class LoadNormalizedEntityTest extends CreateProcessorTestCase
         self::assertEquals($expectedContext, $this->context);
     }
 
-    public function testProcessValidateOperation(): void
+    public function testProcessValidateOperationWhenItWasRequested(): void
     {
         $getContext = new GetContext($this->configProvider, $this->metadataProvider);
         $getProcessor = $this->createMock(ActionProcessorInterface::class);
@@ -247,12 +248,62 @@ class LoadNormalizedEntityTest extends CreateProcessorTestCase
         $this->context->setId(123);
         $this->context->setClassName('Test\Entity');
         $this->context->setResult(['key' => 'value']);
-
         $this->context->setConfig($config);
-
+        $this->context->set(SetOperationFlags::VALIDATE_FLAG, true);
         $this->processor->process($this->context);
 
         self::assertEquals(['key' => 'value'], $getContext->getResult());
+        self::assertTrue($this->context->isProcessed(LoadNormalizedEntity::OPERATION_NAME));
+    }
+
+    public function testProcessValidateOperationWhenItWasNotRequested(): void
+    {
+        $getContext = new GetContext($this->configProvider, $this->metadataProvider);
+        $getProcessor = $this->createMock(ActionProcessorInterface::class);
+        $config = new EntityDefinitionConfig();
+        $config->enableValidation();
+
+        $this->processorBag->expects(self::once())
+            ->method('getProcessor')
+            ->with('get')
+            ->willReturn($getProcessor);
+        $getProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn($getContext);
+
+        $this->context->setId(123);
+        $this->context->setClassName('Test\Entity');
+        $this->context->setResult(['key' => 'value']);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+
+        self::assertFalse($getContext->hasResult());
+        self::assertTrue($this->context->isProcessed(LoadNormalizedEntity::OPERATION_NAME));
+    }
+
+    public function testProcessValidateOperationWhenItWasNotRequestedAndValidateFlagIsSetToFalse(): void
+    {
+        $getContext = new GetContext($this->configProvider, $this->metadataProvider);
+        $getProcessor = $this->createMock(ActionProcessorInterface::class);
+        $config = new EntityDefinitionConfig();
+        $config->enableValidation();
+
+        $this->processorBag->expects(self::once())
+            ->method('getProcessor')
+            ->with('get')
+            ->willReturn($getProcessor);
+        $getProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn($getContext);
+
+        $this->context->setId(123);
+        $this->context->setClassName('Test\Entity');
+        $this->context->setResult(['key' => 'value']);
+        $this->context->setConfig($config);
+        $this->context->set(SetOperationFlags::VALIDATE_FLAG, false);
+        $this->processor->process($this->context);
+
+        self::assertFalse($getContext->hasResult());
         self::assertTrue($this->context->isProcessed(LoadNormalizedEntity::OPERATION_NAME));
     }
 

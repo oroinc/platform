@@ -10,6 +10,7 @@ use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Validator\Constraints\EmailCaseInsensitiveOption;
 use Oro\Bundle\UserBundle\Validator\Constraints\EmailCaseInsensitiveOptionValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -17,14 +18,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailCaseInsensitiveOptionValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var UserRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $userRepository;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var DatagridRouteHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagridRouteHelper;
+    private UserRepository&MockObject $userRepository;
+    private TranslatorInterface&MockObject $translator;
+    private DatagridRouteHelper&MockObject $datagridRouteHelper;
 
     #[\Override]
     protected function setUp(): void

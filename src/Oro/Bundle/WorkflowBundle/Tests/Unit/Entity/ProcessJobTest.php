@@ -8,12 +8,12 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class ProcessJobTest extends \PHPUnit\Framework\TestCase
+class ProcessJobTest extends TestCase
 {
-    /** @var ProcessJob */
-    private $entity;
+    private ProcessJob $entity;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +21,7 @@ class ProcessJobTest extends \PHPUnit\Framework\TestCase
         $this->entity = new ProcessJob();
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         self::assertNull($this->entity->getId());
 
@@ -36,7 +36,7 @@ class ProcessJobTest extends \PHPUnit\Framework\TestCase
      * @param mixed $defaultValue
      * @dataProvider setGetDataProvider
      */
-    public function testSetGetEntity($propertyName, $testValue, $defaultValue = null)
+    public function testSetGetEntity($propertyName, $testValue, $defaultValue = null): void
     {
         $setter = 'set' . ucfirst($propertyName);
         $getter = (is_bool($testValue) ? 'is' : 'get') . ucfirst($propertyName);
@@ -55,7 +55,7 @@ class ProcessJobTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetDataWithSerializationFails()
+    public function testGetDataWithSerializationFails(): void
     {
         $this->expectException(SerializerException::class);
         $this->expectExceptionMessage('Cannot deserialize data of process job. Serializer is not available.');
@@ -67,7 +67,7 @@ class ProcessJobTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getDataWithSerializationProvider
      */
-    public function testGetDataWithSerialization($data)
+    public function testGetDataWithSerialization($data): void
     {
         $isDataNull = is_null($data);
         $serializer = $this->getMockForAbstractClass(SerializerInterface::class);
@@ -108,14 +108,14 @@ class ProcessJobTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetDataWithEmptySerializedData()
+    public function testGetDataWithEmptySerializedData(): void
     {
         $data = $this->entity->getData();
         self::assertInstanceOf(ProcessData::class, $data);
         self::assertTrue($data->isEmpty());
     }
 
-    public function testSetSerializedData()
+    public function testSetSerializedData(): void
     {
         self::assertEmpty($this->entity->getSerializedData());
         $data = 'serialized_data';
@@ -123,7 +123,7 @@ class ProcessJobTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($data, $this->entity->getSerializedData());
     }
 
-    public function testGetSerializedData()
+    public function testGetSerializedData(): void
     {
         self::assertNull($this->entity->getSerializedData());
         $data = 'serialized_data';
@@ -131,7 +131,7 @@ class ProcessJobTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($data, $this->entity->getSerializedData());
     }
 
-    public function testSetGetEntityIdAndHash()
+    public function testSetGetEntityIdAndHash(): void
     {
         $entityClass = 'Test\Entity';
         $entityId = 12;
@@ -158,7 +158,7 @@ class ProcessJobTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->entity->getEntityHash());
     }
 
-    public function testSetEntityIdNoTrigger()
+    public function testSetEntityIdNoTrigger(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Process trigger must be defined for process jo');
@@ -166,7 +166,7 @@ class ProcessJobTest extends \PHPUnit\Framework\TestCase
         $this->entity->setEntityId(1);
     }
 
-    public function testSetEntityIdNoDefinition()
+    public function testSetEntityIdNoDefinition(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Process definition must be defined for process jo');

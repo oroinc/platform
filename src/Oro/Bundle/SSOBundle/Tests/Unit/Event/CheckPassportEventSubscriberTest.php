@@ -22,6 +22,7 @@ class CheckPassportEventSubscriberTest extends TestCase
     private ConfigManager&MockObject $configManager;
     private CheckPassportEventSubscriber $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

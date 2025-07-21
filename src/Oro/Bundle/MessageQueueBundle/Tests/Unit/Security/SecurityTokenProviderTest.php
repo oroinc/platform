@@ -3,16 +3,15 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Security;
 
 use Oro\Bundle\MessageQueueBundle\Security\SecurityTokenProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class SecurityTokenProviderTest extends \PHPUnit\Framework\TestCase
+class SecurityTokenProviderTest extends TestCase
 {
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var SecurityTokenProvider */
-    private $tokenProvider;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private SecurityTokenProvider $tokenProvider;
 
     #[\Override]
     protected function setUp(): void

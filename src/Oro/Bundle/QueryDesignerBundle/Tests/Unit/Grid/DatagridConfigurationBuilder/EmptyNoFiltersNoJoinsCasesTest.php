@@ -8,7 +8,7 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 
 class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCase
 {
-    public function testEntityNotSpecified()
+    public function testEntityNotSpecified(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The entity must be specified.');
@@ -19,7 +19,7 @@ class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCas
         $builder->getConfiguration();
     }
 
-    public function testNullDefinition()
+    public function testNullDefinition(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The "columns" definition does not exist.');
@@ -30,7 +30,7 @@ class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCas
         $builder->getConfiguration();
     }
 
-    public function testEmptyDefinition()
+    public function testEmptyDefinition(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The "columns" definition does not exist.');
@@ -42,7 +42,7 @@ class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCas
         $builder->getConfiguration();
     }
 
-    public function testEmptyColumnsInDefinition()
+    public function testEmptyColumnsInDefinition(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The "columns" definition must not be empty.');
@@ -54,7 +54,7 @@ class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCas
         $builder->getConfiguration();
     }
 
-    public function testNoFilters()
+    public function testNoFilters(): void
     {
         $en = 'Acme\Entity\TestEntity';
         $definition = [
@@ -114,7 +114,7 @@ class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCas
         $this->assertEquals($expected, $result);
     }
 
-    public function testNoJoins()
+    public function testNoJoins(): void
     {
         $en = 'Acme\Entity\TestEntity';
         $definition = [

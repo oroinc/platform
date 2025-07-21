@@ -24,12 +24,12 @@ class ConfigurableTypeTest extends ConfigurableBlockTestCase
         $layoutFactoryBuilder->addType($this->type);
     }
 
-    public function testSetOptionException()
+    public function testSetOptionException(): void
     {
         $this->assertSetOptionException($this->type);
     }
 
-    public function testGetNameException()
+    public function testGetNameException(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Name of block type does not configured');
@@ -37,7 +37,7 @@ class ConfigurableTypeTest extends ConfigurableBlockTestCase
         (new ConfigurableType())->getName();
     }
 
-    public function testSetNameExceptionType()
+    public function testSetNameExceptionType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Name of block type should be a string, array given');
@@ -45,7 +45,7 @@ class ConfigurableTypeTest extends ConfigurableBlockTestCase
         $this->type->setName([]);
     }
 
-    public function testSetParentExceptionType()
+    public function testSetParentExceptionType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Name of parent block type should be a string, array given');
@@ -53,7 +53,7 @@ class ConfigurableTypeTest extends ConfigurableBlockTestCase
         $this->type->setParent([]);
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(BaseType::NAME, $this->type->getParent());
         $this->type->setParent('test');

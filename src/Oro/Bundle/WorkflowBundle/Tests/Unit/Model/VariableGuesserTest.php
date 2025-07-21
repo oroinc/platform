@@ -9,6 +9,8 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\UserBundle\Validator\Constraints\UserAuthenticationFields;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Guess\TypeGuess;
@@ -16,16 +18,11 @@ use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class VariableGuesserTest extends \PHPUnit\Framework\TestCase
+class VariableGuesserTest extends TestCase
 {
-    /** @var Variable|\PHPUnit\Framework\MockObject\MockObject */
-    private $variable;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $formConfigProvider;
-
-    /** @var VariableGuesser */
-    private $guesser;
+    private Variable&MockObject $variable;
+    private ConfigProvider&MockObject $formConfigProvider;
+    private VariableGuesser $guesser;
 
     #[\Override]
     protected function setUp(): void
@@ -68,7 +65,7 @@ class VariableGuesserTest extends \PHPUnit\Framework\TestCase
         Variable $variable,
         array $formMapping = [],
         array $formConfig = []
-    ) {
+    ): void {
         foreach ($formMapping as $mapping) {
             $this->guesser->addFormTypeMapping(
                 $mapping['variableType'],
@@ -172,7 +169,7 @@ class VariableGuesserTest extends \PHPUnit\Framework\TestCase
     /**
      * Test guessing with missing type
      */
-    public function testGuessWithMissingType()
+    public function testGuessWithMissingType(): void
     {
         $this->variable->expects($this->once())
             ->method('getType')
@@ -188,7 +185,7 @@ class VariableGuesserTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider optionsDataProvider
      */
-    public function testGuessWithoutOptions(string $type, string $property, mixed $value)
+    public function testGuessWithoutOptions(string $type, string $property, mixed $value): void
     {
         $this->variable->expects($this->once())
             ->method('getType')

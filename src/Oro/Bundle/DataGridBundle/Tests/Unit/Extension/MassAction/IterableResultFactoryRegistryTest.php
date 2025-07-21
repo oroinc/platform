@@ -11,10 +11,11 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\DTO\SelectedItems;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\IterableResultFactoryInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\IterableResultFactoryRegistry;
+use PHPUnit\Framework\TestCase;
 
-class IterableResultFactoryRegistryTest extends \PHPUnit\Framework\TestCase
+class IterableResultFactoryRegistryTest extends TestCase
 {
-    public function testCreateIterableResultWhenNoApplicableFactory()
+    public function testCreateIterableResultWhenNoApplicableFactory(): void
     {
         $actionConfiguration = $this->createMock(ActionConfiguration::class);
 
@@ -46,7 +47,7 @@ class IterableResultFactoryRegistryTest extends \PHPUnit\Framework\TestCase
         $registry->createIterableResult($dataSource, $actionConfiguration, $gridConfiguration, $selectedItems);
     }
 
-    public function testCreateIterableResult()
+    public function testCreateIterableResult(): void
     {
         $actionConfiguration = $this->createMock(ActionConfiguration::class);
 

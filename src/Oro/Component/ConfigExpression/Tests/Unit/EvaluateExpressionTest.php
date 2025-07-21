@@ -4,14 +4,15 @@ namespace Oro\Component\ConfigExpression\Tests\Unit;
 
 use Oro\Component\ConfigExpression\ConfigExpressions;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
 
-class EvaluateExpressionTest extends \PHPUnit\Framework\TestCase
+class EvaluateExpressionTest extends TestCase
 {
     /**
      * @dataProvider configurationForEvaluateDataProvider
      */
-    public function testAssembleWithEvaluateResult(string $yaml, ItemStub $context, bool $expected)
+    public function testAssembleWithEvaluateResult(string $yaml, ItemStub $context, bool $expected): void
     {
         $language = new ConfigExpressions();
         $configuration = Yaml::parse($yaml);

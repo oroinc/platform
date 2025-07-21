@@ -19,8 +19,7 @@ class MigrationExecutorTest extends MigrationExecutorTestCase
 {
     private const TEST_PACKAGE_NAMESPACE = 'Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\\';
 
-    /** @var MigrationExecutor */
-    private $executor;
+    private MigrationExecutor $executor;
 
     #[\Override]
     protected function setUp(): void

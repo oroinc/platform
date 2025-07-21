@@ -27,16 +27,17 @@ use Oro\Bundle\WorkflowBundle\Model\VariableManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityWithWorkflow;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class WorkflowTest extends \PHPUnit\Framework\TestCase
+class WorkflowTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
+    private DoctrineHelper&MockObject $doctrineHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -561,12 +562,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         return $transition;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return Step|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getStepMock(string $name): Step
+    private function getStepMock(string $name): Step&MockObject
     {
         $step = $this->createMock(Step::class);
         $step->expects($this->any())
@@ -576,14 +572,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
         return $step;
     }
 
-    /**
-     * @param string $name
-     * @param bool $isStart
-     * @param Step|null $step
-     *
-     * @return Transition|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getTransitionMock(string $name, bool $isStart = false, ?Step $step = null): Transition
+    private function getTransitionMock(string $name, bool $isStart = false, ?Step $step = null): Transition&MockObject
     {
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->any())

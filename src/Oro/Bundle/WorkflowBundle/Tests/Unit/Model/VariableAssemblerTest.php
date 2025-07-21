@@ -18,21 +18,16 @@ use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowVariableNormalizer;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 use Oro\Component\Action\Exception\AssemblerException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
+class VariableAssemblerTest extends TestCase
 {
-    /** @var WorkflowVariableNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $variableNormalizer;
-
-    /** @var VariableGuesser|\PHPUnit\Framework\MockObject\MockObject */
-    private $variableGuesser;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflow;
+    private WorkflowVariableNormalizer&MockObject $variableNormalizer;
+    private VariableGuesser&MockObject $variableGuesser;
+    private TranslatorInterface&MockObject $translator;
+    private Workflow&MockObject $workflow;
 
     #[\Override]
     protected function setUp(): void
@@ -75,7 +70,7 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidOptionsDataProvider
      */
-    public function testAssembleRequiredOptionException(array $configuration, string $exception, string $message)
+    public function testAssembleRequiredOptionException(array $configuration, string $exception, string $message): void
     {
         $this->expectException($exception);
 
@@ -160,7 +155,7 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider configurationDataProvider
      */
-    public function testAssemble(array $configuration, Variable $expectedVariable, array $guessedParameters = [])
+    public function testAssemble(array $configuration, Variable $expectedVariable, array $guessedParameters = []): void
     {
         $variableConfig = $configuration;
         $configuration = [
@@ -307,7 +302,7 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider configurationEntityIdentifierProvider
      */
-    public function testEntityIdentifierAssemble(array $configuration, Variable $expectedVariable)
+    public function testEntityIdentifierAssemble(array $configuration, Variable $expectedVariable): void
     {
         $configuration = [
             'variable_definitions' => [

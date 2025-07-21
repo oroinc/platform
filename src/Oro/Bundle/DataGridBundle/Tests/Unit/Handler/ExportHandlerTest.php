@@ -7,14 +7,14 @@ use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class ExportHandlerTest extends \PHPUnit\Framework\TestCase
+class ExportHandlerTest extends TestCase
 {
-    private FileManager|\PHPUnit\Framework\MockObject\MockObject $fileManager;
-
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
-
+    private FileManager&MockObject $fileManager;
+    private LoggerInterface&MockObject $logger;
     private ExportHandler $exportHandler;
 
     #[\Override]
@@ -29,7 +29,7 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
         $this->exportHandler->setLogger($this->logger);
     }
 
-    public function testHandleExceptionsAreAddedToContext()
+    public function testHandleExceptionsAreAddedToContext(): void
     {
         $reader = $this->createMock(ItemReaderInterface::class);
         $processor = $this->createMock(ExportProcessor::class);
@@ -41,13 +41,11 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
 
         $exceptionMsg = 'Failure exception';
         $exception = new \Exception($exceptionMsg);
-        $reader
-            ->expects(self::once())
+        $reader->expects(self::once())
             ->method('read')
             ->willThrowException($exception);
 
-        $this->fileManager
-            ->expects(self::once())
+        $this->fileManager->expects(self::once())
             ->method('deleteFile')
             ->with(self::matchesRegularExpression('/\/.+?\/datagrid_.+?\.'.$format.'/'));
 

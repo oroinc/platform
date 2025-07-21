@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\Rest;
 
 use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaAttributeMetadata;
+use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorMetaProperty;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -325,6 +326,96 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
                             'meta1' => 'Name',
                             'meta3' => 'Test\Entity'
                         ]
+                    ]
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testAssociationWithMetaPropertiesInTargetMetadata(): void
+    {
+        $object = [
+            'code'       => 123,
+            'category'   => ['code' => 456, '_meta1' => 'category_meta1'],
+            'categories' => [
+                ['code' => 456, '_meta1' => 'category_meta1_item1', 'meta2' => 'category_meta2_item1'],
+                ['code' => 457, '_meta1' => 'category_meta1_item2']
+            ]
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['code']);
+        $metadata->addField($this->createFieldMetadata('code'));
+        $metadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category', false, ['code']));
+        $metadata->addAssociation($this->createAssociationMetadata('categories', 'Test\Category', true, ['code']));
+
+        foreach ($metadata->getAssociations() as $association) {
+            $associationTargetMetadata = $association->getTargetMetadata();
+            $associationTargetMetadata->addMetaProperty(new MetaPropertyMetadata('meta1', 'string', '_meta1'));
+            $associationTargetMetadata->addMetaProperty(new MetaPropertyMetadata('meta2', 'string'));
+        }
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [
+                'code'       => 'Test\Entity::123',
+                'category'   => [
+                    'code' => 'Test\Category::456'
+                ],
+                'categories' => [
+                    [
+                        'code' => 'Test\Category::456'
+                    ],
+                    [
+                        'code' => 'Test\Category::457'
+                    ]
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testAssociationWithAssociationLevelMetaPropertiesInTargetMetadata(): void
+    {
+        $object = [
+            'code'       => 123,
+            'category'   => ['code' => 456, '_meta1' => 'category_meta1'],
+            'categories' => [
+                ['code' => 456, '_meta1' => 'category_meta1_item1', 'meta2' => 'category_meta2_item1'],
+                ['code' => 457, '_meta1' => 'category_meta1_item2']
+            ]
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['code']);
+        $metadata->addField($this->createFieldMetadata('code'));
+        $metadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category', false, ['code']));
+        $metadata->addAssociation($this->createAssociationMetadata('categories', 'Test\Category', true, ['code']));
+
+        foreach ($metadata->getAssociations() as $association) {
+            $associationTargetMetadata = $association->getTargetMetadata();
+            $associationTargetMetadata->addMetaProperty(new MetaPropertyMetadata('meta1', 'string', '_meta1'))
+                ->setAssociationLevel(true);
+            $associationTargetMetadata->addMetaProperty(new MetaPropertyMetadata('meta2', 'string'))
+                ->setAssociationLevel(true);
+        }
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [
+                'code'          => 'Test\Entity::123',
+                'category'   => [
+                    'code' => 'Test\Category::456',
+                    'meta1' => 'category_meta1'
+                ],
+                'categories' => [
+                    [
+                        'code' => 'Test\Category::456',
+                        'meta1' => 'category_meta1_item1',
+                        'meta2' => 'category_meta2_item1'
+                    ],
+                    [
+                        'code' => 'Test\Category::457',
+                        'meta1' => 'category_meta1_item2'
                     ]
                 ]
             ],

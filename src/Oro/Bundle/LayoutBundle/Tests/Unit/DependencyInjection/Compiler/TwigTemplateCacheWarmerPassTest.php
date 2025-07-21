@@ -4,10 +4,11 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\LayoutBundle\Cache\TwigTemplateCacheWarmer;
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\TwigTemplateCacheWarmerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheWarmer;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class TwigTemplateCacheWarmerPassTest extends \PHPUnit\Framework\TestCase
+class TwigTemplateCacheWarmerPassTest extends TestCase
 {
     private TwigTemplateCacheWarmerPass $compiler;
 
@@ -17,7 +18,7 @@ class TwigTemplateCacheWarmerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new TwigTemplateCacheWarmerPass();
     }
 
-    public function testTwigCacheDisabled()
+    public function testTwigCacheDisabled(): void
     {
         $container = new ContainerBuilder();
 
@@ -26,7 +27,7 @@ class TwigTemplateCacheWarmerPassTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($container->hasDefinition('twig.template_cache_warmer'));
     }
 
-    public function testConfigureTwigCacheWarmer()
+    public function testConfigureTwigCacheWarmer(): void
     {
         $container = new ContainerBuilder();
         $cacheWarmerDef = $container->register('twig.template_cache_warmer', TemplateCacheWarmer::class);

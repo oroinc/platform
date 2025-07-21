@@ -10,17 +10,14 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration;
 use Oro\Bundle\DraftBundle\Acl\AccessRule\DraftAccessRule;
 use Oro\Bundle\DraftBundle\Datagrid\DraftableFilterExtension;
 use Oro\Bundle\DraftBundle\Manager\DraftableFilterManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DraftableFilterExtensionTest extends \PHPUnit\Framework\TestCase
+class DraftableFilterExtensionTest extends TestCase
 {
-    /** @var DraftableFilterManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $filterManager;
-
-    /** @var DraftAccessRule|\PHPUnit\Framework\MockObject\MockObject */
-    private $draftAccessRule;
-
-    /** @var DraftableFilterExtension */
-    private $extension;
+    private DraftableFilterManager&MockObject $filterManager;
+    private DraftAccessRule&MockObject $draftAccessRule;
+    private DraftableFilterExtension $extension;
 
     #[\Override]
     protected function setUp(): void

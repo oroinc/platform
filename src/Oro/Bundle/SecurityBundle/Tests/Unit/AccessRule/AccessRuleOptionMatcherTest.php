@@ -7,17 +7,16 @@ use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class AccessRuleOptionMatcherTest extends \PHPUnit\Framework\TestCase
+class AccessRuleOptionMatcherTest extends TestCase
 {
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var AccessRuleOptionMatcher */
-    private $matcher;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private AccessRuleOptionMatcher $matcher;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +28,7 @@ class AccessRuleOptionMatcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTypeOptionWhenItEqualsToCriteriaType()
+    public function testTypeOptionWhenItEqualsToCriteriaType(): void
     {
         $criteria = new Criteria('ORM', 'Test\Entity', 'test');
 
@@ -38,7 +37,7 @@ class AccessRuleOptionMatcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTypeOptionWhenItDoesNotEqualToCriteriaType()
+    public function testTypeOptionWhenItDoesNotEqualToCriteriaType(): void
     {
         $criteria = new Criteria('ORM', 'Test\Entity', 'test');
 
@@ -47,7 +46,7 @@ class AccessRuleOptionMatcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPermissionOptionWhenItEqualsToCriteriaPermission()
+    public function testPermissionOptionWhenItEqualsToCriteriaPermission(): void
     {
         $criteria = new Criteria('ORM', 'Test\Entity', 'test', 'EDIT');
 
@@ -56,7 +55,7 @@ class AccessRuleOptionMatcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPermissionOptionWhenItDoesNotEqualToCriteriaPermission()
+    public function testPermissionOptionWhenItDoesNotEqualToCriteriaPermission(): void
     {
         $criteria = new Criteria('ORM', 'Test\Entity', 'test', 'EDIT');
 
@@ -65,7 +64,7 @@ class AccessRuleOptionMatcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEntityClassOptionWhenItEqualsToCriteriaEntityClass()
+    public function testEntityClassOptionWhenItEqualsToCriteriaEntityClass(): void
     {
         $criteria = new Criteria('ORM', 'Test\Entity', 'test');
 
@@ -74,7 +73,7 @@ class AccessRuleOptionMatcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEntityClassOptionWhenItDoesNotEqualToCriteriaEntityClass()
+    public function testEntityClassOptionWhenItDoesNotEqualToCriteriaEntityClass(): void
     {
         $criteria = new Criteria('ORM', 'Test\Entity', 'test');
 
@@ -83,7 +82,7 @@ class AccessRuleOptionMatcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoggedUserClassOptionWhenNoLoggedUser()
+    public function testLoggedUserClassOptionWhenNoLoggedUser(): void
     {
         $criteria = new Criteria('ORM', 'Test\Entity', 'test');
 
@@ -96,7 +95,7 @@ class AccessRuleOptionMatcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoggedUserClassOptionWhenItEqualsToClassOfLoggedUser()
+    public function testLoggedUserClassOptionWhenItEqualsToClassOfLoggedUser(): void
     {
         $criteria = new Criteria('ORM', 'Test\Entity', 'test');
         $user = $this->createMock(User::class);
@@ -110,7 +109,7 @@ class AccessRuleOptionMatcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoggedUserClassOptionWhenItDoesNotEqualToCriteriaEntityClass()
+    public function testLoggedUserClassOptionWhenItDoesNotEqualToCriteriaEntityClass(): void
     {
         $criteria = new Criteria('ORM', 'Test\Entity', 'test');
         $user = $this->createMock(User::class);
@@ -124,7 +123,7 @@ class AccessRuleOptionMatcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOptionWhenItDoesNotExistInCriteria()
+    public function testOptionWhenItDoesNotExistInCriteria(): void
     {
         $criteria = new Criteria('ORM', 'Test\Entity', 'test');
 
@@ -133,7 +132,7 @@ class AccessRuleOptionMatcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOptionWhenItsValueEqualsToFalseAndItDoesNotExistInCriteria()
+    public function testOptionWhenItsValueEqualsToFalseAndItDoesNotExistInCriteria(): void
     {
         $criteria = new Criteria('ORM', 'Test\Entity', 'test');
 
@@ -142,7 +141,7 @@ class AccessRuleOptionMatcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOptionWhenItExistsInCriteriaAndItsValueEqualsToCriteriaOptionValue()
+    public function testOptionWhenItExistsInCriteriaAndItsValueEqualsToCriteriaOptionValue(): void
     {
         $criteria = new Criteria('ORM', 'Test\Entity', 'test');
         $criteria->setOption('test', '123');
@@ -152,7 +151,7 @@ class AccessRuleOptionMatcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOptionWhenItExistsInCriteriaAndItsValueDoesNotEqualToCriteriaOptionValue()
+    public function testOptionWhenItExistsInCriteriaAndItsValueDoesNotEqualToCriteriaOptionValue(): void
     {
         $criteria = new Criteria('ORM', 'Test\Entity', 'test');
         $criteria->setOption('test', '123');

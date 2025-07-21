@@ -3,13 +3,14 @@
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\Monolog\Handler;
 
 use Oro\Bundle\LoggerBundle\Monolog\Handler\ExcludeLogByMessageHandler;
+use PHPUnit\Framework\TestCase;
 
-class ExcludeLogByMessageHandlerTest extends \PHPUnit\Framework\TestCase
+class ExcludeLogByMessageHandlerTest extends TestCase
 {
     /**
      * @see ExcludeLogByMessageHandler::isHandling()
      */
-    public function testIsHandling()
+    public function testIsHandling(): void
     {
         $emptyIsHandling = $this->getExcludeLogByMessageHandler([])->isHandling([]);
         $excludeLogMessage = ['message' => 'Failed to connect to websocket server'];
@@ -24,7 +25,7 @@ class ExcludeLogByMessageHandlerTest extends \PHPUnit\Framework\TestCase
      * @dataProvider handleDataProvider
      * @see ExcludeLogByMessageHandler::handle()
      */
-    public function testHandle(array $excludeMessages, array $record, bool $result)
+    public function testHandle(array $excludeMessages, array $record, bool $result): void
     {
         $handler = $this->getExcludeLogByMessageHandler($excludeMessages);
 
@@ -91,7 +92,7 @@ class ExcludeLogByMessageHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @see ExcludeLogByMessageHandler::handleBatch()
      */
-    public function testHandleBatch()
+    public function testHandleBatch(): void
     {
         $records = [
             ['message' => 'Failed to connect to websocket server'],

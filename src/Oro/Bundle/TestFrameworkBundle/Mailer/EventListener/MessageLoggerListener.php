@@ -11,7 +11,14 @@ use Symfony\Component\Mailer\EventListener\MessageLoggerListener as SymfonyMessa
  */
 class MessageLoggerListener extends SymfonyMessageLoggerListener
 {
+    private static ?MessageLoggerListener $instance = null;
+
     private bool $ignoreReset = false;
+
+    public static function instance(): self
+    {
+        return self::$instance ??= new self();
+    }
 
     public function setSkipReset(bool $ignoreReset): void
     {

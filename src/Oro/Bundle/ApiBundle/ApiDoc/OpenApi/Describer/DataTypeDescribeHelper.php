@@ -7,6 +7,7 @@ use OpenApi\Generator;
 use Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Storage\SchemaStorageAwareInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Storage\SchemaStorageAwareTrait;
 use Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Util;
+use Oro\Bundle\ApiBundle\Request\DataType;
 
 /**
  * This class helps to describe OpenAPI data types.
@@ -87,7 +88,7 @@ class DataTypeDescribeHelper implements SchemaStorageAwareInterface
         try {
             $this->setType($api, $parameter, $types, $defaultValue);
         } catch (\Throwable $e) {
-            throw new \LogicException(sprintf(
+            throw new \LogicException(\sprintf(
                 'Unexpected type "%s" for the parameter "%s" of the operation "%s". %s',
                 $type,
                 $parameter->name,
@@ -96,7 +97,7 @@ class DataTypeDescribeHelper implements SchemaStorageAwareInterface
             ));
         }
         if (Generator::isDefault($parameter->schema)) {
-            throw new \LogicException(sprintf(
+            throw new \LogicException(\sprintf(
                 'Unexpected type "%s" for the parameter "%s" of the operation "%s".',
                 $type,
                 $parameter->name,
@@ -116,7 +117,7 @@ class DataTypeDescribeHelper implements SchemaStorageAwareInterface
         try {
             $this->setType($api, $header, $types, null);
         } catch (\Throwable $e) {
-            throw new \LogicException(sprintf(
+            throw new \LogicException(\sprintf(
                 'Unexpected type "%s" for the header "%s". %s',
                 $type,
                 $header->header,
@@ -124,7 +125,7 @@ class DataTypeDescribeHelper implements SchemaStorageAwareInterface
             ));
         }
         if (Generator::isDefault($header->schema)) {
-            throw new \LogicException(sprintf(
+            throw new \LogicException(\sprintf(
                 'Unexpected type "%s" for the header "%s".',
                 $type,
                 $header->header
@@ -145,7 +146,7 @@ class DataTypeDescribeHelper implements SchemaStorageAwareInterface
         try {
             $this->setPropertyType($api, $property, $types, $defaultValue);
         } catch (\Throwable $e) {
-            throw new \LogicException(sprintf(
+            throw new \LogicException(\sprintf(
                 'Unexpected type "%s" for the property "%s" of the model "%s". %s',
                 $type,
                 $property->property,
@@ -154,7 +155,7 @@ class DataTypeDescribeHelper implements SchemaStorageAwareInterface
             ));
         }
         if (Generator::isDefault($property->type) && Generator::isDefault($property->ref)) {
-            throw new \LogicException(sprintf(
+            throw new \LogicException(\sprintf(
                 'Unexpected type "%s" for the property "%s" of the model "%s".',
                 $type,
                 $property->property,
@@ -247,7 +248,7 @@ class DataTypeDescribeHelper implements SchemaStorageAwareInterface
         mixed $defaultValue
     ): void {
         if (1 === \count($types)) {
-            $dataType = $types[0];
+            $dataType = $this->resolveDataType($types[0]);
             if ($this->isSimpleType($dataType)) {
                 $property->type = $this->resolveSimpleType($dataType);
             } else {
@@ -276,6 +277,16 @@ class DataTypeDescribeHelper implements SchemaStorageAwareInterface
     private function resolveSimpleType(string $dataType): string
     {
         return $this->typeMap[$dataType][0] ?? $dataType;
+    }
+
+    private function resolveDataType(string $dataType): string
+    {
+        $dataTypeDetailDelimiterPos = strpos($dataType, DataType::DETAIL_DELIMITER);
+        if (false !== $dataTypeDetailDelimiterPos) {
+            $dataType = substr($dataType, 0, $dataTypeDetailDelimiterPos);
+        }
+
+        return $dataType;
     }
 
     /**
@@ -323,7 +334,7 @@ class DataTypeDescribeHelper implements SchemaStorageAwareInterface
                 $schema = $this->schemaStorage->addSchema($api, $dataTypeName);
                 $this->describeMixedType($api, $schema);
             } else {
-                throw new \LogicException(sprintf(
+                throw new \LogicException(\sprintf(
                     'The data type "%s" is not supported by OpenAPI specification.',
                     $dataType
                 ));
@@ -492,7 +503,7 @@ class DataTypeDescribeHelper implements SchemaStorageAwareInterface
     {
         $rangeValuePattern = $this->rangeValuePatterns[$dataType] ?? null;
         if (!$rangeValuePattern) {
-            throw new \LogicException(sprintf('Cannot build a range pattern for the "%s" data type.', $dataType));
+            throw new \LogicException(\sprintf('Cannot build a range pattern for the "%s" data type.', $dataType));
         }
 
         return $rangeValuePattern . preg_quote('..', '/') . $rangeValuePattern;

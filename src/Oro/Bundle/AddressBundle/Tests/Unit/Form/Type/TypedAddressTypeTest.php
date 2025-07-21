@@ -13,8 +13,7 @@ use Symfony\Component\Form\FormBuilder;
 
 class TypedAddressTypeTest extends TestCase
 {
-    /** @var TypedAddressType */
-    private $type;
+    private TypedAddressType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class TypedAddressTypeTest extends TestCase
     /**
      * @dataProvider buildFormDataProvider
      */
-    public function testBuildForm(array $options, bool $expectAddSubscriber)
+    public function testBuildForm(array $options, bool $expectAddSubscriber): void
     {
         $builder = $this->createMock(FormBuilder::class);
 
@@ -93,12 +92,12 @@ class TypedAddressTypeTest extends TestCase
         ];
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(AddressType::class, $this->type->getParent());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals('oro_typed_address', $this->type->getName());
     }

@@ -20,6 +20,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\JobsAwareTestTrait;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Config\Common\ConfigObject;
 use Oro\Component\MessageQueue\Client\Config;
@@ -93,6 +94,9 @@ class DataAuditTest extends WebTestCase
             ->findAll();
 
         foreach ($fields as $field) {
+            if (is_a($field->getEntity()->getClassName(), TestFrameworkEntityInterface::class, true)) {
+                continue;
+            }
             $typesToTest[$field->getType()] = true;
         }
 
@@ -389,6 +393,11 @@ class DataAuditTest extends WebTestCase
     }
 
     public function testFile()
+    {
+        $this->markTestSkipped('File audit not supported');
+    }
+
+    public function testMultiFile(): void
     {
         $this->markTestSkipped('File audit not supported');
     }

@@ -14,19 +14,15 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEntity;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Test\FormInterface;
 
 class DictionaryFilterTest extends OrmTestCase
 {
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var DictionaryFilter */
-    private $filter;
+    private EntityManagerInterface $em;
+    private FormFactoryInterface&MockObject $formFactory;
+    private DictionaryFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -43,7 +39,7 @@ class DictionaryFilterTest extends OrmTestCase
         $this->filter = new DictionaryFilter($this->formFactory, new FilterUtility());
     }
 
-    public function testInit()
+    public function testInit(): void
     {
         $this->filter->init('test', []);
 
@@ -55,7 +51,7 @@ class DictionaryFilterTest extends OrmTestCase
         );
     }
 
-    public function testInitWithNullValue()
+    public function testInitWithNullValue(): void
     {
         $this->filter->init('test', ['null_value' => ':empty:']);
 
@@ -67,7 +63,7 @@ class DictionaryFilterTest extends OrmTestCase
         );
     }
 
-    public function testInitWithClass()
+    public function testInitWithClass(): void
     {
         $this->filter->init('test', ['class' => 'Test\EnumValue']);
 
@@ -79,7 +75,7 @@ class DictionaryFilterTest extends OrmTestCase
         );
     }
 
-    public function testInitWithDictionaryCode()
+    public function testInitWithDictionaryCode(): void
     {
         $this->filter->init('test', ['dictionary_code' => 'test_dictionary']);
 
@@ -91,7 +87,7 @@ class DictionaryFilterTest extends OrmTestCase
         );
     }
 
-    public function testGetForm()
+    public function testGetForm(): void
     {
         $form = $this->createMock(FormInterface::class);
 
@@ -103,7 +99,7 @@ class DictionaryFilterTest extends OrmTestCase
         self::assertSame($form, $this->filter->getForm());
     }
 
-    public function testApply()
+    public function testApply(): void
     {
         $qb = $this->em->createQueryBuilder()
             ->select('o.id')
@@ -139,7 +135,7 @@ class DictionaryFilterTest extends OrmTestCase
         self::assertEquals($values, $qb->getParameter('param1')->getValue());
     }
 
-    public function testApplyNot()
+    public function testApplyNot(): void
     {
         $qb = $this->em->createQueryBuilder()
             ->select('o.id')
@@ -177,7 +173,7 @@ class DictionaryFilterTest extends OrmTestCase
         self::assertEquals($values, $qb->getParameter('param1')->getValue());
     }
 
-    public function testPrepareData()
+    public function testPrepareData(): void
     {
         $data = [];
         self::assertSame($data, $this->filter->prepareData($data));

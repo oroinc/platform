@@ -9,15 +9,15 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Bundle\UIBundle\Route\Router;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class DraftHelperTest extends \PHPUnit\Framework\TestCase
+class DraftHelperTest extends TestCase
 {
-    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
-
-    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $draftProvider;
-
+    private RequestStack&MockObject $requestStack;
+    private ConfigProvider&MockObject $draftProvider;
     private DraftHelper $helper;
 
     #[\Override]
@@ -32,8 +32,7 @@ class DraftHelperTest extends \PHPUnit\Framework\TestCase
     public function testIsSaveAsDraftAction(): void
     {
         $request = new Request([], [Router::ACTION_PARAMETER => DraftHelper::SAVE_AS_DRAFT_ACTION]);
-        $this->requestStack
-            ->expects(self::exactly(2))
+        $this->requestStack->expects(self::exactly(2))
             ->method('getMainRequest')
             ->willReturn($request);
 
@@ -43,8 +42,7 @@ class DraftHelperTest extends \PHPUnit\Framework\TestCase
     public function testIsAnyAction(): void
     {
         $request = new Request([], [Router::ACTION_PARAMETER => 'any_action']);
-        $this->requestStack
-            ->expects(self::exactly(2))
+        $this->requestStack->expects(self::exactly(2))
             ->method('getMainRequest')
             ->willReturn($request);
 
@@ -67,8 +65,7 @@ class DraftHelperTest extends \PHPUnit\Framework\TestCase
         $source = new DraftableEntityStub();
         $className = DraftableEntityStub::class;
 
-        $this->draftProvider
-            ->expects(self::once())
+        $this->draftProvider->expects(self::once())
             ->method('getConfigs')
             ->with($className, true)
             ->willReturn([

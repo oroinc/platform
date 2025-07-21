@@ -9,25 +9,18 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Component\MessageQueue\Util\JSON;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
+class ImportExportResultSummarizerTest extends TestCase
 {
-    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $urlGenerator;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var ImportExportResultSummarizer */
-    private $summarizer;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
+    private ConfigManager&MockObject $configManager;
+    private FileManager&MockObject $fileManager;
+    private ManagerRegistry&MockObject $registry;
+    private ImportExportResultSummarizer $summarizer;
 
     #[\Override]
     protected function setUp(): void
@@ -45,7 +38,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldReturnCorrectSummaryInformationWithoutErrorInImport()
+    public function testShouldReturnCorrectSummaryInformationWithoutErrorInImport(): void
     {
         $result = [
             'success' => true,
@@ -88,7 +81,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedData, $result);
     }
 
-    public function testShouldReturnCorrectSummaryInformationWithErrorLink()
+    public function testShouldReturnCorrectSummaryInformationWithErrorLink(): void
     {
         $data = [
             'success' => true,
@@ -149,7 +142,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedData, $result);
     }
 
-    public function testShouldReturnErrorLog()
+    public function testShouldReturnErrorLog(): void
     {
         $job = new Job();
         $job->setId(1);
@@ -184,7 +177,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals("Tests error in import.\nLog file of job id: \"2\" was not found.\n", $summary);
     }
 
-    public function testProcessExportData()
+    public function testProcessExportData(): void
     {
         $jobId = 1;
         $expectedResult = [
@@ -223,7 +216,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    public function testProcessExportDataWithoutEntities()
+    public function testProcessExportDataWithoutEntities(): void
     {
         $expectedResult = [
             'exportResult' => [

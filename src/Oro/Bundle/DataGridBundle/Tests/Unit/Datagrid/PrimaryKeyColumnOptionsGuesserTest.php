@@ -5,18 +5,16 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
-use Oro\Bundle\DataGridBundle\Datagrid\DefaultColumnOptionsGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 use Oro\Bundle\DataGridBundle\Datagrid\PrimaryKeyColumnOptionsGuesser;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Guess\Guess;
 
-class PrimaryKeyColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
+class PrimaryKeyColumnOptionsGuesserTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var DefaultColumnOptionsGuesser */
-    private $guesser;
+    private ManagerRegistry&MockObject $doctrine;
+    private PrimaryKeyColumnOptionsGuesser $guesser;
 
     #[\Override]
     protected function setUp(): void

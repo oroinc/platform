@@ -4,18 +4,13 @@ namespace Oro\Bundle\CacheBundle\Tests\Unit\Generator;
 
 use Oro\Bundle\CacheBundle\Generator\ObjectCacheDataConverterInterface;
 use Oro\Bundle\CacheBundle\Generator\ObjectCacheKeyGenerator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ObjectCacheKeyGeneratorTest extends \PHPUnit\Framework\TestCase
+class ObjectCacheKeyGeneratorTest extends TestCase
 {
-    /**
-     * @var ObjectCacheDataConverterInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $converter;
-
-    /**
-     * @var ObjectCacheKeyGenerator
-     */
-    private $generator;
+    private ObjectCacheDataConverterInterface&MockObject $converter;
+    private ObjectCacheKeyGenerator $generator;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +19,7 @@ class ObjectCacheKeyGeneratorTest extends \PHPUnit\Framework\TestCase
         $this->generator = new ObjectCacheKeyGenerator($this->converter);
     }
 
-    public function testGenerate()
+    public function testGenerate(): void
     {
         $object = new \stdClass('first');
         $expectedString = 'someExpectedString';

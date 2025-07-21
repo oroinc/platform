@@ -15,31 +15,22 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class AttributesDatagridListenerTest extends \PHPUnit\Framework\TestCase
+class AttributesDatagridListenerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationHelper;
-
-    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclHelper;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $urlGenerator;
-
-    /** @var AttributesDatagridListener */
-    private $listener;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private LocalizationHelper&MockObject $localizationHelper;
+    private AclHelper&MockObject $aclHelper;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
+    private AttributesDatagridListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -59,7 +50,7 @@ class AttributesDatagridListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnResultAfter()
+    public function testOnResultAfter(): void
     {
         $resultRecord1 = new ResultRecord(['id' => 1]);
         $resultRecord2 = new ResultRecord(['id' => 2]);

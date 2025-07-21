@@ -4,17 +4,16 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Request;
 
 use Oro\Bundle\LayoutBundle\Attribute\Layout as LayoutAttribute;
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class LayoutHelperTest extends \PHPUnit\Framework\TestCase
+class LayoutHelperTest extends TestCase
 {
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var LayoutHelper */
-    private $helper;
+    private RequestStack&MockObject $requestStack;
+    private LayoutHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -49,7 +48,7 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider layoutHelperDataProvider
      */
-    public function testIsLayoutRequest(?Request $request, ?LayoutAttribute $attribute)
+    public function testIsLayoutRequest(?Request $request, ?LayoutAttribute $attribute): void
     {
         $this->setUpRequestStack($request, $attribute);
         $this->assertEquals(null !== $attribute, $this->helper->isLayoutRequest($request));
@@ -58,7 +57,7 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider layoutHelperDataProvider
      */
-    public function testIsTemplateRequest(?Request $request, ?LayoutAttribute $attribute)
+    public function testIsTemplateRequest(?Request $request, ?LayoutAttribute $attribute): void
     {
         $this->setUpRequestStack($request, $attribute);
         $this->assertEquals(null === $attribute, $this->helper->isTemplateRequest($request));

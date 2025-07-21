@@ -10,32 +10,19 @@ use Oro\Bundle\LocaleBundle\Configuration\LocaleConfigurationProvider;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface;
 use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
+class LocaleSettingsTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var CalendarFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $calendarFactory;
-
-    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationManager;
-
-    /** @var LocaleConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeConfigProvider;
-
-    /** @var ViewTypeProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $viewTypeProvider;
-
-    /** @var CurrencyProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $currencyProvider;
-
-    /** @var ThemeRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $themeRegistry;
-
-    /** @var LocaleSettings */
-    private $localeSettings;
+    private ConfigManager&MockObject $configManager;
+    private CalendarFactoryInterface&MockObject $calendarFactory;
+    private LocalizationManager&MockObject $localizationManager;
+    private LocaleConfigurationProvider&MockObject $localeConfigProvider;
+    private ViewTypeProviderInterface&MockObject $viewTypeProvider;
+    private CurrencyProviderInterface&MockObject $currencyProvider;
+    private ThemeRegistry&MockObject $themeRegistry;
+    private LocaleSettings $localeSettings;
 
     #[\Override]
     protected function setUp(): void
@@ -67,7 +54,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         array $currencyList,
         string $currencyCode,
         string $expectedSymbol
-    ) {
+    ): void {
         $this->viewTypeProvider->expects(self::once())
             ->method('getViewType')
             ->willReturn($viewType);

@@ -9,25 +9,20 @@ use Oro\Bundle\UserBundle\Entity\BaseUserManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
+class BaseUserManagerTest extends TestCase
 {
-    /** @var UserLoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $userLoader;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var PasswordHasherFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $passwordHasherFactory;
-
-    /** @var BaseUserManager */
-    private $userManager;
+    private UserLoaderInterface&MockObject $userLoader;
+    private ManagerRegistry&MockObject $doctrine;
+    private PasswordHasherFactoryInterface&MockObject $passwordHasherFactory;
+    private BaseUserManager $userManager;
 
     #[\Override]
     protected function setUp(): void
@@ -47,10 +42,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function expectGetEntityManager()
+    private function expectGetEntityManager(): EntityManagerInterface&MockObject
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $this->doctrine->expects(self::atLeastOnce())
@@ -61,12 +53,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
         return $em;
     }
 
-    /**
-     * @param EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em
-     *
-     * @return EntityRepository|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function expectGetRepository($em)
+    private function expectGetRepository(EntityManagerInterface&MockObject $em): EntityRepository&MockObject
     {
         $repository = $this->createMock(EntityRepository::class);
         $em->expects(self::atLeastOnce())
@@ -77,12 +64,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
         return $repository;
     }
 
-    /**
-     * @param UserInterface $user
-     *
-     * @return PasswordHasherInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function expectGetPasswordHasher(UserInterface $user)
+    private function expectGetPasswordHasher(UserInterface $user): PasswordHasherInterface&MockObject
     {
         $passwordHasher = $this->createMock(PasswordHasherInterface::class);
         $this->passwordHasherFactory->expects(self::once())
@@ -101,12 +83,12 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testCreateUser()
+    public function testCreateUser(): void
     {
         self::assertInstanceOf(User::class, $this->userManager->createUser());
     }
 
-    public function testUpdateUserWithPlainPassword()
+    public function testUpdateUserWithPlainPassword(): void
     {
         $password = 'password';
         $encodedPassword = 'encodedPassword';
@@ -136,7 +118,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($encodedPassword, $user->getPassword());
     }
 
-    public function testUpdateUserWithoutPlainPassword()
+    public function testUpdateUserWithoutPlainPassword(): void
     {
         $user = new User();
 
@@ -153,7 +135,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($user->getPassword());
     }
 
-    public function testGeneratePasswordWithDefaultLength()
+    public function testGeneratePasswordWithDefaultLength(): void
     {
         $password = $this->userManager->generatePassword();
         self::assertNotEmpty($password);
@@ -163,7 +145,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNotEquals($password, $this->userManager->generatePassword());
     }
 
-    public function testGeneratePasswordWithCustomLength()
+    public function testGeneratePasswordWithCustomLength(): void
     {
         $maxLength = 10;
         $password = $this->userManager->generatePassword($maxLength);
@@ -174,7 +156,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNotEquals($password, $this->userManager->generatePassword($maxLength));
     }
 
-    public function testDeleteUser()
+    public function testDeleteUser(): void
     {
         $user = $this->createMock(User::class);
 
@@ -191,7 +173,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider findUserDataProvider
      */
-    public function testFindUserBy($user)
+    public function testFindUserBy($user): void
     {
         $criteria = ['id' => 1];
 
@@ -208,7 +190,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider findUserDataProvider
      */
-    public function testFindUserByEmail($user)
+    public function testFindUserByEmail($user): void
     {
         $email = 'test@example.com';
 
@@ -223,7 +205,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider findUserDataProvider
      */
-    public function testFindUserByUsername($user)
+    public function testFindUserByUsername($user): void
     {
         $username = 'test';
 
@@ -238,7 +220,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider findUserDataProvider
      */
-    public function testFindUserByUsernameOrEmail($user)
+    public function testFindUserByUsernameOrEmail($user): void
     {
         $usernameOrEmail = 'test@test.com';
 
@@ -253,7 +235,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider findUserDataProvider
      */
-    public function testFindUserByConfirmationToken($user)
+    public function testFindUserByConfirmationToken($user): void
     {
         $confirmationToken = 'test';
 
@@ -267,7 +249,7 @@ class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($user, $this->userManager->findUserByConfirmationToken($confirmationToken));
     }
 
-    public function testReloadUser()
+    public function testReloadUser(): void
     {
         $user = $this->createMock(User::class);
 

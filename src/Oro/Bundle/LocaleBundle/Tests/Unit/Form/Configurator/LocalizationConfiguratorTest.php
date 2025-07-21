@@ -12,6 +12,7 @@ use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizationSelectionTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -20,11 +21,8 @@ use Symfony\Component\Form\FormEvents;
 
 class LocalizationConfiguratorTest extends FormIntegrationTestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var LocalizationConfigurator|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurator;
+    private ConfigManager&MockObject $configManager;
+    private LocalizationConfigurator $configurator;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +31,6 @@ class LocalizationConfiguratorTest extends FormIntegrationTestCase
 
         $this->configManager = $this->createMock(ConfigManager::class);
 
-        /** @var ConfigHandler|\PHPUnit\Framework\MockObject\MockObject $configHandler */
         $configHandler = $this->createMock(ConfigHandler::class);
         $configHandler->expects($this->any())
             ->method('getConfigManager')
@@ -50,7 +47,6 @@ class LocalizationConfiguratorTest extends FormIntegrationTestCase
         /** @var callable $callable */
         $callable = null;
 
-        /** @var FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->any())
             ->method('addEventListener')
@@ -124,13 +120,10 @@ class LocalizationConfiguratorTest extends FormIntegrationTestCase
     #[\Override]
     protected function getExtensions(): array
     {
-        /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject $localizationManager */
         $localizationManager = $this->createMock(LocalizationManager::class);
 
-        /** @var LocalizationChoicesProvider|\PHPUnit\Framework\MockObject\MockObject $localizationChoicesProvider */
         $localizationChoicesProvider = $this->createMock(LocalizationChoicesProvider::class);
-        $localizationChoicesProvider
-            ->expects($this->any())
+        $localizationChoicesProvider->expects($this->any())
             ->method('getLocalizationChoices')
             ->willReturn([]);
 

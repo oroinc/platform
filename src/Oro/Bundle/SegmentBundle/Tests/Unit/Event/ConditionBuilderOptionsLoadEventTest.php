@@ -3,10 +3,11 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Event;
 
 use Oro\Bundle\SegmentBundle\Event\ConditionBuilderOptionsLoadEvent;
+use PHPUnit\Framework\TestCase;
 
-class ConditionBuilderOptionsLoadEventTest extends \PHPUnit\Framework\TestCase
+class ConditionBuilderOptionsLoadEventTest extends TestCase
 {
-    public function testGettersAndSetters()
+    public function testGettersAndSetters(): void
     {
         $originalOptions = [
             'oo' => 'ov',

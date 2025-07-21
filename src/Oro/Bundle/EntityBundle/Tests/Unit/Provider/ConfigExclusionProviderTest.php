@@ -7,8 +7,9 @@ use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
 use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
+use PHPUnit\Framework\TestCase;
 
-class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigExclusionProviderTest extends TestCase
 {
     private ConfigExclusionProvider $provider;
 
@@ -45,7 +46,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider entityProvider
      */
-    public function testIsIgnoredEntity($className, $expected)
+    public function testIsIgnoredEntity($className, $expected): void
     {
         self::assertEquals(
             $expected,
@@ -56,7 +57,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fieldProvider
      */
-    public function testIsIgnoredField($metadata, $fieldName, $expected)
+    public function testIsIgnoredField($metadata, $fieldName, $expected): void
     {
         self::assertEquals(
             $expected,
@@ -64,7 +65,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsIgnoredFieldByDataType()
+    public function testIsIgnoredFieldByDataType(): void
     {
         $metadata = $this->getEntityMetadata(
             'Test\Entity2',
@@ -81,7 +82,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fieldProvider
      */
-    public function testIsIgnoredRelation($metadata, $associationName, $expected)
+    public function testIsIgnoredRelation($metadata, $associationName, $expected): void
     {
         self::assertEquals(
             $expected,

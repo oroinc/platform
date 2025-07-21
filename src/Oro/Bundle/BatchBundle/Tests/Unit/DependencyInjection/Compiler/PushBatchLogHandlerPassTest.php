@@ -3,11 +3,13 @@
 namespace Oro\Bundle\BatchBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\BatchBundle\DependencyInjection\Compiler\PushBatchLogHandlerPass;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class PushBatchLogHandlerPassTest extends \PHPUnit\Framework\TestCase
+class PushBatchLogHandlerPassTest extends TestCase
 {
     private PushBatchLogHandlerPass $pushBatchLogHandlerPass;
 
@@ -44,11 +46,9 @@ class PushBatchLogHandlerPassTest extends \PHPUnit\Framework\TestCase
         $this->pushBatchLogHandlerPass->process($container);
     }
 
-    private function getContainerBuilderMock(
-        ?Definition $logger = null
-    ): ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject {
+    private function getContainerBuilderMock(?Definition $logger = null): ContainerBuilder&MockObject
+    {
         $container = $this->createMock(ContainerBuilder::class);
-
         $container->expects(self::any())
             ->method('has')
             ->willReturnMap([['monolog.logger.batch', null !== $logger]]);

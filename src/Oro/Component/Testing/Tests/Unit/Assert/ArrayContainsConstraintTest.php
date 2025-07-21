@@ -123,7 +123,7 @@ TEXT;
             'key2' => [
                 'key21' => 'value21',
                 'key22' => [
-                    'key221' => 'value221',
+                    'key221' => 'value221'
                 ]
             ]
         ];
@@ -132,7 +132,7 @@ TEXT;
             'key2' => [
                 'key21' => 'value21',
                 'key22' => [
-                    'key221' => 'value221',
+                    'key221' => 'value221'
                 ]
             ]
         ];
@@ -148,7 +148,7 @@ TEXT;
             [
                 'value21',
                 [
-                    'value221',
+                    'value221'
                 ]
             ]
         ];
@@ -157,7 +157,7 @@ TEXT;
             [
                 'value21',
                 [
-                    'value221',
+                    'value221'
                 ]
             ]
         ];
@@ -173,7 +173,7 @@ TEXT;
             'key2' => [
                 'key21' => 'value21',
                 'key22' => [
-                    'key221' => 'value221',
+                    'key221' => 'value221'
                 ]
             ]
         ];
@@ -183,7 +183,7 @@ TEXT;
                 'key21' => 'value21',
                 'key22' => [
                     'key221' => 'value221',
-                    'key222' => 'value222',
+                    'key222' => 'value222'
                 ],
                 'key23' => 'value23'
             ],
@@ -201,7 +201,7 @@ TEXT;
             [
                 'value21',
                 [
-                    'value221',
+                    'value221'
                 ]
             ]
         ];
@@ -211,7 +211,7 @@ TEXT;
                 'value21',
                 [
                     'value221',
-                    'value222',
+                    'value222'
                 ],
                 'value23'
             ],
@@ -289,7 +289,7 @@ TEXT;
             'value9',
             'value10',
             'value11',
-            'value12',
+            'value12'
         ];
         $actual = [];
         $expectedMessage = <<<TEXT
@@ -322,7 +322,7 @@ TEXT;
             'key2' => [
                 'key21' => 'value21',
                 'key22' => [
-                    'key221' => 'value221',
+                    'key221' => 'value221'
                 ]
             ]
         ];
@@ -331,7 +331,7 @@ TEXT;
             'key2' => [
                 'key21' => 'value21',
                 'key22' => [
-                    'key221' => 'value221_other',
+                    'key221' => 'value221_other'
                 ]
             ]
         ];
@@ -354,14 +354,14 @@ TEXT;
             'key1' => 'value1',
             'key2' => [
                 ['key' => 'value221'],
-                ['key' => 'value222'],
+                ['key' => 'value222']
             ]
         ];
         $actual = [
             'key1' => 'value1',
             'key2' => [
                 ['key' => 'value222'],
-                ['key' => 'value221'],
+                ['key' => 'value221']
             ]
         ];
         $expectedMessage = <<<TEXT
@@ -384,14 +384,14 @@ TEXT;
             'key1' => 'value1',
             'key2' => [
                 ['key' => 'value221'],
-                ['key' => 'value222'],
+                ['key' => 'value222']
             ]
         ];
         $actual = [
             'key1' => 'value1',
             'key2' => [
                 ['key' => 'value222'],
-                ['key' => 'value221'],
+                ['key' => 'value221']
             ]
         ];
 
@@ -405,14 +405,14 @@ TEXT;
             'key1' => 'value1',
             'key2' => [
                 ['key' => 'value221'],
-                ['key' => 'value222'],
+                ['key' => 'value222']
             ]
         ];
         $actual = [
             'key1' => 'value1',
             'key2' => [
                 ['key' => ['value222']],
-                ['key' => ['value221']],
+                ['key' => ['value221']]
             ]
         ];
         $expectedMessage = <<<TEXT
@@ -438,7 +438,7 @@ TEXT;
         $expected = [
             'key1' => 'value1',
             'key2' => [
-                ['key1' => 'value1', 'key2' => 'value2'],
+                ['key1' => 'value1', 'key2' => 'value2']
             ]
         ];
         $actual = [
@@ -446,7 +446,7 @@ TEXT;
             'key2' => [
                 ['key1' => 'value1'],
                 ['key2' => 'value2'],
-                ['key1' => 1, 'key2' => 2],
+                ['key1' => 1, 'key2' => 2]
             ]
         ];
         $expectedMessage = <<<TEXT
@@ -660,6 +660,42 @@ TEXT;
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected, false);
+        $constraint->evaluate($actual);
+    }
+
+    public function testUseStartsWithComparison()
+    {
+        $expected = [
+            'key1' => 'value 1 other',
+            'key2' => [
+                'key21' => 'value 2 1',
+                'key22' => [
+                    ['key221' => 'value 2 2 1 other']
+                ]
+            ]
+        ];
+        $actual = [
+            'key1' => 'value 1',
+            'key2' => [
+                'key21' => 'value 2 1',
+                'key22' => [
+                    ['key221' => 'value 2 2 1']
+                ]
+            ]
+        ];
+        $expectedMessage = <<<TEXT
+Failed asserting that the array contains other array.
+Errors:
+Path: "key1". Error: Failed asserting that 'value 1' starts with "value 1 other".
+Path: "key2.key22.0.key221". Error: Failed asserting that 'value 2 2 1' starts with "value 2 2 1 other".
+TEXT;
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $constraint = new ArrayContainsConstraint($expected);
+        $constraint->useStartsWithComparison('key1');
+        $constraint->useStartsWithComparison('key2.key22.key221');
         $constraint->evaluate($actual);
     }
 }

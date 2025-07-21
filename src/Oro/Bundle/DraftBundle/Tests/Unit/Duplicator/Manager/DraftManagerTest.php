@@ -11,19 +11,16 @@ use Oro\Bundle\DraftBundle\Manager\Publisher;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DraftManagerTest extends \PHPUnit\Framework\TestCase
+class DraftManagerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var DraftManager */
-    private $draftManager;
-
-    /** @var Publisher|\PHPUnit\Framework\MockObject\MockObject */
-    private $publisher;
-
-    /** @var ContextAccessor */
-    private $contextAccessor;
+    private DraftManager $draftManager;
+    private Publisher&MockObject $publisher;
+    private ContextAccessor $contextAccessor;
 
     #[\Override]
     protected function setUp(): void
@@ -53,8 +50,7 @@ class DraftManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testCreatePublication(): void
     {
-        $this->publisher
-            ->expects($this->once())
+        $this->publisher->expects($this->once())
             ->method('create')
             ->willReturnArgument(0);
 

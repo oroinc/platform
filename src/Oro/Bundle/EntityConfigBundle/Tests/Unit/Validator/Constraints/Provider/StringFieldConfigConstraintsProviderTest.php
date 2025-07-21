@@ -5,9 +5,10 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Validator\Constraints\Provide
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Validator\Constraints\Provider\StringFieldConfigConstraintsProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Length;
 
-class StringFieldConfigConstraintsProviderTest extends \PHPUnit\Framework\TestCase
+class StringFieldConfigConstraintsProviderTest extends TestCase
 {
     private FieldConfigId $configId;
 

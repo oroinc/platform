@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\DoctrineExtensions\ORM;
 
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Component\Testing\Unit\ORM\Mocks\EntityManagerMock;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Symfony\Component\Yaml\Parser;
@@ -39,7 +40,7 @@ final class DateTruncTest extends OrmTestCase
     {
         $queryBuilder = new QueryBuilder($this->em);
         $queryBuilder->select("date_trunc('YEAR', d.createdAt)")
-            ->from('Oro\Bundle\DashboardBundle\Entity\Dashboard', 'd');
+            ->from(Dashboard::class, 'd');
 
         self::assertSame(
             'SELECT DATE_TRUNC(\'YEAR\', o0_.createdAt) AS sclr_0 FROM oro_dashboard o0_',

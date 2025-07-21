@@ -4,20 +4,17 @@ namespace Oro\Bundle\InstallerBundle\Tests\Unit\Composer;
 
 use Oro\Bundle\InstallerBundle\Composer\PermissionsHandler;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
+class PermissionsHandlerTest extends TestCase
 {
     use TempDirExtension;
 
-    /** @var Process|\PHPUnit\Framework\MockObject\MockObject */
-    private $process;
-
-    /** @var string */
-    private $directory;
-
-    /** @var PermissionsHandler */
-    private $handler;
+    private Process&MockObject $process;
+    private string $directory;
+    private PermissionsHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +27,7 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testSetPermissionsSetFACL()
+    public function testSetPermissionsSetFACL(): void
     {
         $this->process->expects($this->atLeastOnce())
             ->method('isSuccessful')
@@ -39,30 +36,28 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->expects($this->exactly(3))
             ->method('getProcess')
             ->with(
-                $this->callback(
-                    function ($argument) {
-                        return in_array(
-                            $argument,
-                            [
-                                PermissionsHandler::PS_AUX,
-                                str_replace(
-                                    [
-                                        PermissionsHandler::VAR_USER,
-                                        PermissionsHandler::VAR_GROUP,
-                                        PermissionsHandler::VAR_PATH
-                                    ],
-                                    [
-                                        PermissionsHandler::USER,
-                                        PermissionsHandler::USER,
-                                        $this->directory
-                                    ],
-                                    PermissionsHandler::SETFACL
-                                )
-                            ],
-                            true
-                        );
-                    }
-                )
+                $this->callback(function ($argument) {
+                    return in_array(
+                        $argument,
+                        [
+                            PermissionsHandler::PS_AUX,
+                            str_replace(
+                                [
+                                    PermissionsHandler::VAR_USER,
+                                    PermissionsHandler::VAR_GROUP,
+                                    PermissionsHandler::VAR_PATH
+                                ],
+                                [
+                                    PermissionsHandler::USER,
+                                    PermissionsHandler::USER,
+                                    $this->directory
+                                ],
+                                PermissionsHandler::SETFACL
+                            )
+                        ],
+                        true
+                    );
+                })
             )
             ->willReturn($this->process);
 
@@ -73,7 +68,7 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->setPermissionsSetfacl($this->directory);
     }
 
-    public function testSetPermissionsChmod()
+    public function testSetPermissionsChmod(): void
     {
         $this->process->expects($this->atLeastOnce())
             ->method('isSuccessful')
@@ -82,22 +77,20 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->expects($this->exactly(3))
             ->method('getProcess')
             ->with(
-                $this->callback(
-                    function ($argument) {
-                        return in_array(
-                            $argument,
-                            [
-                                PermissionsHandler::PS_AUX,
-                                str_replace(
-                                    [PermissionsHandler::VAR_USER, PermissionsHandler::VAR_PATH],
-                                    [PermissionsHandler::USER, $this->directory],
-                                    PermissionsHandler::CHMOD
-                                )
-                            ],
-                            true
-                        );
-                    }
-                )
+                $this->callback(function ($argument) {
+                    return in_array(
+                        $argument,
+                        [
+                            PermissionsHandler::PS_AUX,
+                            str_replace(
+                                [PermissionsHandler::VAR_USER, PermissionsHandler::VAR_PATH],
+                                [PermissionsHandler::USER, $this->directory],
+                                PermissionsHandler::CHMOD
+                            )
+                        ],
+                        true
+                    );
+                })
             )
             ->willReturn($this->process);
 
@@ -108,7 +101,7 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->setPermissionsChmod($this->directory);
     }
 
-    public function testSetPermissions()
+    public function testSetPermissions(): void
     {
         $this->handler->expects($this->any())
             ->method('getProcess')

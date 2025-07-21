@@ -5,11 +5,12 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Twig\Sandbox;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\EntityVariablesProviderInterface;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\SystemVariablesProviderInterface;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\VariablesProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class VariablesProviderTest extends \PHPUnit\Framework\TestCase
+class VariablesProviderTest extends TestCase
 {
-    public function testGetSystemVariableDefinitions()
+    public function testGetSystemVariableDefinitions(): void
     {
         $provider1 = $this->createMock(SystemVariablesProviderInterface::class);
         $provider1->expects($this->once())
@@ -51,7 +52,7 @@ class VariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityVariableDefinitions()
+    public function testGetEntityVariableDefinitions(): void
     {
         $entity1Class = 'TestEntity1';
         $entity2Class = 'TestEntity2';
@@ -121,7 +122,7 @@ class VariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSystemVariableValues()
+    public function testGetSystemVariableValues(): void
     {
         $provider1 = $this->createMock(SystemVariablesProviderInterface::class);
         $provider1->expects($this->once())
@@ -163,7 +164,7 @@ class VariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityVariableProcessors()
+    public function testGetEntityVariableProcessors(): void
     {
         $entityClass = 'TestEntity';
 
@@ -211,7 +212,7 @@ class VariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityVariableGetters()
+    public function testGetEntityVariableGetters(): void
     {
         $entity1Class = 'TestEntity1';
         $entity2Class = 'TestEntity2';

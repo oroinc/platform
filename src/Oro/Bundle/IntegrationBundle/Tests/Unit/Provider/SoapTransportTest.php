@@ -6,22 +6,17 @@ use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException;
 use Oro\Bundle\IntegrationBundle\Provider\SOAPTransport;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class SoapTransportTest extends \PHPUnit\Framework\TestCase
+class SoapTransportTest extends TestCase
 {
-    /** @var SOAPTransport|\PHPUnit\Framework\MockObject\MockObject */
-    private $transport;
-
-    /** @var Transport|\PHPUnit\Framework\MockObject\MockObject */
-    private $transportEntity;
-
-    /** @var ParameterBag */
-    private $settings;
-
-    /** @var \SoapClient|\PHPUnit\Framework\MockObject\MockObject */
-    private $soapClient;
+    private SOAPTransport&MockObject $transport;
+    private Transport&MockObject $transportEntity;
+    private ParameterBag $settings;
+    private \SoapClient&MockObject $soapClient;
 
     #[\Override]
     protected function setUp(): void
@@ -52,7 +47,7 @@ class SoapTransportTest extends \PHPUnit\Framework\TestCase
             ->willReturn(1);
     }
 
-    public function testInit()
+    public function testInit(): void
     {
         $this->transport->expects($this->once())
             ->method('getSoapClient')
@@ -72,7 +67,7 @@ class SoapTransportTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($this->transport->getLastResponse());
     }
 
-    public function testInitErrors()
+    public function testInitErrors(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->transport->init($this->transportEntity);
@@ -81,7 +76,7 @@ class SoapTransportTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider exceptionProvider
      */
-    public function testMultipleAttemptException(string $header, int $attempt, int $code)
+    public function testMultipleAttemptException(string $header, int $attempt, int $code): void
     {
         $this->expectException(SoapConnectionException::class);
         $this->soapClient->expects($this->any())
@@ -116,7 +111,7 @@ class SoapTransportTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testMultipleAttempt()
+    public function testMultipleAttempt(): void
     {
         $this->soapClient->expects($this->exactly(4))
             ->method('__soapCall')

@@ -6,14 +6,12 @@ use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
 use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\Provider\ConfigVirtualRelationProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
+use PHPUnit\Framework\TestCase;
 
-class ConfigVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigVirtualRelationProviderTest extends TestCase
 {
-    /** @var ConfigVirtualRelationProvider */
-    private $virtualRelationProvider;
-
-    /** @var array */
-    private $virtualRelationsConfig;
+    private ConfigVirtualRelationProvider $virtualRelationProvider;
+    private array $virtualRelationsConfig;
 
     #[\Override]
     protected function setUp(): void
@@ -84,7 +82,7 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVirtualFields()
+    public function testGetVirtualFields(): void
     {
         $this->assertEquals(
             $this->virtualRelationsConfig['AbstractEntity'],
@@ -96,13 +94,13 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsVirtualField()
+    public function testIsVirtualField(): void
     {
         $this->assertTrue($this->virtualRelationProvider->isVirtualRelation('TestEntity1', 'virtual_relation'));
         $this->assertFalse($this->virtualRelationProvider->isVirtualRelation('TestEntity1', 'non_virtual_field'));
     }
 
-    public function testGetVirtualFieldQuery()
+    public function testGetVirtualFieldQuery(): void
     {
         $this->assertEquals(
             $this->virtualRelationsConfig['AbstractEntity']['virtual_relation']['query'],
@@ -113,7 +111,7 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider targetJoinAliasProvider
      */
-    public function testGetTargetJoinAlias(string $className, string $fieldName, mixed $expected)
+    public function testGetTargetJoinAlias(string $className, string $fieldName, mixed $expected): void
     {
         if (is_array($expected)) {
             [$exception, $message] = $expected;

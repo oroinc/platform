@@ -34,6 +34,8 @@ oro.age: "{0} newborn|]0,Inf[age %count%"
 "Communications": "Communications"
 "Additional Information": "Additional"
 "Ok, got it": "Ok, got it"
+"Primary navigation": "Primary"
+"Page navigation": "Page"
 
 oro:
     auth:

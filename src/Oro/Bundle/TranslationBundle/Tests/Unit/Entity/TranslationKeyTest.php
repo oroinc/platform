@@ -4,12 +4,13 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class TranslationKeyTest extends \PHPUnit\Framework\TestCase
+class TranslationKeyTest extends TestCase
 {
     use EntityTestCaseTrait;
 
-    public function testAccessors()
+    public function testAccessors(): void
     {
         $this->assertPropertyAccessors(new TranslationKey(), [
             ['id', 1],

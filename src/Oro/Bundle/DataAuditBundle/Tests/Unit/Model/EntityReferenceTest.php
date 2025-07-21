@@ -3,42 +3,43 @@
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Model;
 
 use Oro\Bundle\DataAuditBundle\Model\EntityReference;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityReferenceTest extends \PHPUnit\Framework\TestCase
+class EntityReferenceTest extends TestCase
 {
-    public function testShouldCreateNullReference()
+    public function testShouldCreateNullReference(): void
     {
         new EntityReference();
     }
 
-    public function testShouldNullReferenceBeInitializedAsLoaded()
+    public function testShouldNullReferenceBeInitializedAsLoaded(): void
     {
         $reference = new EntityReference();
         self::assertTrue($reference->isLoaded());
     }
 
-    public function testShouldClassNameForNullReferenceBeNull()
+    public function testShouldClassNameForNullReferenceBeNull(): void
     {
         $reference = new EntityReference();
         self::assertNull($reference->getClassName());
     }
 
-    public function testShouldIdForNullReferenceBeNull()
+    public function testShouldIdForNullReferenceBeNull(): void
     {
         $reference = new EntityReference();
         self::assertNull($reference->getId());
     }
 
-    public function testShouldEntityForNullReferenceBeNull()
+    public function testShouldEntityForNullReferenceBeNull(): void
     {
         $reference = new EntityReference();
         self::assertNull($reference->getEntity());
     }
 
-    public function testShouldNotBePossibleToSetEntityForNullReference()
+    public function testShouldNotBePossibleToSetEntityForNullReference(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('An entity cannot be set to "null" reference object.');
@@ -47,30 +48,30 @@ class EntityReferenceTest extends \PHPUnit\Framework\TestCase
         $reference->setEntity(new \stdClass());
     }
 
-    public function testShouldCreateReference()
+    public function testShouldCreateReference(): void
     {
         new EntityReference('Test\Class', 'testId');
     }
 
-    public function testShouldReferenceBeInitializedAsNotLoaded()
+    public function testShouldReferenceBeInitializedAsNotLoaded(): void
     {
         $reference = new EntityReference('Test\Class', 'testId');
         self::assertFalse($reference->isLoaded());
     }
 
-    public function testShouldClassNameBeInitialized()
+    public function testShouldClassNameBeInitialized(): void
     {
         $reference = new EntityReference('Test\Class', 'testId');
         self::assertEquals('Test\Class', $reference->getClassName());
     }
 
-    public function testShouldIdBeInitialized()
+    public function testShouldIdBeInitialized(): void
     {
         $reference = new EntityReference('Test\Class', 'testId');
         self::assertEquals('testId', $reference->getId());
     }
 
-    public function testShouldThrowExceptionIfEntityIsNotLoadedYet()
+    public function testShouldThrowExceptionIfEntityIsNotLoadedYet(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The entity is not loaded yet. Call "setEntity" method before.');
@@ -79,7 +80,7 @@ class EntityReferenceTest extends \PHPUnit\Framework\TestCase
         $reference->getEntity();
     }
 
-    public function testShouldBePossibleToSetEntity()
+    public function testShouldBePossibleToSetEntity(): void
     {
         $entity = new \stdClass();
         $reference = new EntityReference(get_class($entity), 'testId');
@@ -87,7 +88,7 @@ class EntityReferenceTest extends \PHPUnit\Framework\TestCase
         self::assertSame($entity, $reference->getEntity());
     }
 
-    public function testShouldBePossibleToSetInheritedEntity()
+    public function testShouldBePossibleToSetInheritedEntity(): void
     {
         $entityClass = get_class(new \stdClass());
         $entity = $this->createMock($entityClass);
@@ -101,14 +102,14 @@ class EntityReferenceTest extends \PHPUnit\Framework\TestCase
         self::assertSame($entity, $reference->getEntity());
     }
 
-    public function testShouldBePossibleToSetNullEntity()
+    public function testShouldBePossibleToSetNullEntity(): void
     {
         $reference = new EntityReference(get_class(new \stdClass()), 'testId');
         $reference->setEntity(null);
         self::assertNull($reference->getEntity());
     }
 
-    public function testShouldSetEntityThrowExceptionIfNotObjectPassed()
+    public function testShouldSetEntityThrowExceptionIfNotObjectPassed(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected argument of type "null or instance of Test\Class", "integer" given.');
@@ -117,7 +118,7 @@ class EntityReferenceTest extends \PHPUnit\Framework\TestCase
         $reference->setEntity(123);
     }
 
-    public function testShouldSetEntityThrowExceptionIfInvalidEntityTypePassed()
+    public function testShouldSetEntityThrowExceptionIfInvalidEntityTypePassed(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
@@ -129,7 +130,7 @@ class EntityReferenceTest extends \PHPUnit\Framework\TestCase
         $reference->setEntity(new EntityReference());
     }
 
-    public function testShouldNotBePossibleToChangeAlreadySetEntity()
+    public function testShouldNotBePossibleToChangeAlreadySetEntity(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The entity is already loaded.');

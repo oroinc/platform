@@ -14,30 +14,21 @@ use Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class GridViewManagerTest extends \PHPUnit\Framework\TestCase
+class GridViewManagerTest extends TestCase
 {
     private const GRID_VIEW_CLASS_NAME = 'GridViewClassName';
     private const GRID_VIEW_USER_CLASS_NAME = 'GridViewUserClassName';
 
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $gridViewRepository;
-
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $gridViewUserRepository;
-
-    /** @var User */
-    private $user;
-
-    /** @var ManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dataGridManager;
-
-    /** @var RestrictionManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $restrictionManager;
-
-    /** @var GridViewManager */
-    private $gridViewManager;
+    private EntityRepository&MockObject $gridViewRepository;
+    private EntityRepository&MockObject $gridViewUserRepository;
+    private User $user;
+    private ManagerInterface&MockObject $dataGridManager;
+    private RestrictionManager&MockObject $restrictionManager;
+    private GridViewManager $gridViewManager;
 
     #[\Override]
     protected function setUp(): void
@@ -73,7 +64,7 @@ class GridViewManagerTest extends \PHPUnit\Framework\TestCase
         $this->gridViewManager->setGridViewUserClassName(self::GRID_VIEW_USER_CLASS_NAME);
     }
 
-    public function testGetDefaultView()
+    public function testGetDefaultView(): void
     {
         $systemView = new View('view1');
         $systemView->setDefault(true);

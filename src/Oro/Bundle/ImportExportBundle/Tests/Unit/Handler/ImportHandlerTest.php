@@ -15,36 +15,21 @@ use Oro\Bundle\ImportExportBundle\Reader\CsvFileReader;
 use Oro\Bundle\ImportExportBundle\Reader\ReaderChain;
 use Oro\Bundle\ImportExportBundle\Writer\CsvEchoWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ImportHandlerTest extends \PHPUnit\Framework\TestCase
+class ImportHandlerTest extends TestCase
 {
-    /** @var JobExecutor|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobExecutor;
-
-    /** @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $processorRegistry;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var WriterChain|\PHPUnit\Framework\MockObject\MockObject */
-    private $writerChain;
-
-    /** @var ReaderChain|\PHPUnit\Framework\MockObject\MockObject */
-    private $readerChain;
-
-    /** @var BatchFileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $batchFileManager;
-
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var ImportHandler */
-    private $importHandler;
+    private JobExecutor&MockObject $jobExecutor;
+    private ProcessorRegistry&MockObject $processorRegistry;
+    private ConfigProvider&MockObject $configProvider;
+    private TranslatorInterface&MockObject $translator;
+    private WriterChain&MockObject $writerChain;
+    private ReaderChain&MockObject $readerChain;
+    private BatchFileManager&MockObject $batchFileManager;
+    private FileManager&MockObject $fileManager;
+    private ImportHandler $importHandler;
 
     #[\Override]
     protected function setUp(): void

@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Oro\Bundle\UserBundle\Form\Type\ResetType;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -13,11 +14,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ResetTypeTest extends FormIntegrationTestCase
 {
-    /** @var ResetType */
-    private $type;
-
-    /** @var PasswordFieldOptionsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $optionsProvider;
+    private ResetType $type;
+    private PasswordFieldOptionsProvider&MockObject $optionsProvider;
 
     #[\Override]
     protected function setUp(): void

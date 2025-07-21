@@ -11,11 +11,11 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
 use Oro\Bundle\TranslationBundle\EventListener\Datagrid\TranslatableListener;
+use PHPUnit\Framework\TestCase;
 
-class TranslatableListenerTest extends \PHPUnit\Framework\TestCase
+class TranslatableListenerTest extends TestCase
 {
-    /** @var TranslatableListener */
-    private $listener;
+    private TranslatableListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +23,7 @@ class TranslatableListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new TranslatableListener();
     }
 
-    public function testOnResultBefore()
+    public function testOnResultBefore(): void
     {
         $gedmoTranslatableListener = new GedmoTranslatableListener();
         $gedmoTranslatableListener->setTranslatableLocale('en');
@@ -66,7 +66,7 @@ class TranslatableListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onResultBefore($ormResultBefore);
     }
 
-    public function testOnResultBeforeWithoutDatasource()
+    public function testOnResultBeforeWithoutDatasource(): void
     {
         $datagrid = $this->createMock(DatagridInterface::class);
         $datagrid->expects(self::once())
@@ -85,7 +85,7 @@ class TranslatableListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onResultBefore($ormResultBefore);
     }
 
-    public function testOnResultBeforeWithoutTranslatableHint()
+    public function testOnResultBeforeWithoutTranslatableHint(): void
     {
         $entityManager = $this->createMock(EntityManager::class);
 

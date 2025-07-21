@@ -8,11 +8,11 @@ use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasProvider;
+use PHPUnit\Framework\TestCase;
 
-class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
+class EntityAliasProviderTest extends TestCase
 {
-    /** @var EntityAliasProvider */
-    private $entityAliasProvider;
+    private EntityAliasProvider $entityAliasProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -38,13 +38,13 @@ class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
                 ]
             ]);
 
-        $this->entityAliasProvider  = new EntityAliasProvider(
+        $this->entityAliasProvider = new EntityAliasProvider(
             new EntityAliasConfigBag($configProvider),
             (new InflectorFactory())->build()
         );
     }
 
-    public function testGetClassNames()
+    public function testGetClassNames(): void
     {
         $this->assertEntityAlias(
             ['Test\EntityWithCustomAlias'],
@@ -55,7 +55,7 @@ class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getEntityAliasDataProvider
      */
-    public function testGetEntityAlias($entityClass, $expectedAlias)
+    public function testGetEntityAlias($entityClass, $expectedAlias): void
     {
         $result = $this->entityAliasProvider->getEntityAlias($entityClass);
         $this->assertEntityAlias($expectedAlias, $result);

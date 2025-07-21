@@ -7,20 +7,17 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-class FormProviderTest extends \PHPUnit\Framework\TestCase
+class FormProviderTest extends TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var string */
-    private $formType;
-
-    /** @var FormProvider */
-    private $formProvider;
+    private FormFactoryInterface&MockObject $formFactory;
+    private string $formType;
+    private FormProvider $formProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +28,7 @@ class FormProviderTest extends \PHPUnit\Framework\TestCase
         $this->formProvider = new FormProvider($this->formFactory, $this->formType);
     }
 
-    public function testGetTokenData()
+    public function testGetTokenData(): void
     {
         $actionData = new ActionData([ActionData::OPERATION_TOKEN => 'test_key']);
         $operation = $this->createMock(Operation::class);
@@ -58,7 +55,7 @@ class FormProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey(OperationExecutionType::NAME, $result);
     }
 
-    public function testGetOperationExecutionForm()
+    public function testGetOperationExecutionForm(): void
     {
         $actionData = new ActionData([ActionData::OPERATION_TOKEN => 'test_key']);
         $operation = $this->createMock(Operation::class);

@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
@@ -13,6 +14,8 @@ use Oro\Bundle\FilterBundle\Filter\NumberFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterTypeInterface;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -23,11 +26,9 @@ use Symfony\Component\Form\FormView;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
-class NumberFilterTest extends \PHPUnit\Framework\TestCase
+class NumberFilterTest extends TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $formFactory;
-
+    protected FormFactoryInterface&MockObject $formFactory;
     /** @var NumberFilter */
     protected $filter;
 
@@ -47,7 +48,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::any())
             ->method('getExpressionBuilder')
-            ->willReturn(new Query\Expr());
+            ->willReturn(new Expr());
         $connection = $this->createMock(Connection::class);
         $em->expects(self::any())
             ->method('getConnection')
@@ -100,7 +101,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider applyProvider
      */
-    public function testApply(array $data, array $expected)
+    public function testApply(array $data, array $expected): void
     {
         $ds = $this->getFilterDatasource();
         $this->filter->apply($ds, $data);
@@ -112,7 +113,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider applyProviderForDivisor
      */
-    public function testApplyForDivisor(array $data, array $expected)
+    public function testApplyForDivisor(array $data, array $expected): void
     {
         $this->filter->init('test-filter', [
             FilterUtility::DATA_NAME_KEY => 'field_name',
@@ -129,7 +130,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider parseDataProvider
      */
-    public function testParseData($data, $expected)
+    public function testParseData($data, $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -352,7 +353,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetMetadata()
+    public function testGetMetadata(): void
     {
         $form = $this->createMock(FormInterface::class);
         $view = $this->createMock(FormView::class);
@@ -391,7 +392,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->filter->getMetadata());
     }
 
-    public function testPrepareDataWhenNoValue()
+    public function testPrepareDataWhenNoValue(): void
     {
         self::assertSame(
             ['value' => null],
@@ -399,7 +400,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWhenNoValueAndArrayRelatedFilterType()
+    public function testPrepareDataWhenNoValueAndArrayRelatedFilterType(): void
     {
         self::assertSame(
             ['type' => (string)NumberFilterTypeInterface::TYPE_IN, 'value' => null],
@@ -407,7 +408,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWithNullValue()
+    public function testPrepareDataWithNullValue(): void
     {
         self::assertSame(
             ['value' => null],
@@ -415,7 +416,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWithNullValueAndArrayRelatedFilterType()
+    public function testPrepareDataWithNullValueAndArrayRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => null, 'type' => (string)NumberFilterTypeInterface::TYPE_IN],
@@ -423,7 +424,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWithEmptyStringValue()
+    public function testPrepareDataWithEmptyStringValue(): void
     {
         self::assertSame(
             ['value' => null],
@@ -431,7 +432,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWithEmptyStringValueAndArrayRelatedFilterType()
+    public function testPrepareDataWithEmptyStringValueAndArrayRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => null, 'type' => (string)NumberFilterTypeInterface::TYPE_IN],
@@ -439,7 +440,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWithZeroValueAsString()
+    public function testPrepareDataWithZeroValueAsString(): void
     {
         self::assertSame(
             ['value' => 0.0],
@@ -447,7 +448,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWithZeroValueAsStringAndArrayRelatedFilterType()
+    public function testPrepareDataWithZeroValueAsStringAndArrayRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => [0.0], 'type' => (string)NumberFilterTypeInterface::TYPE_IN],
@@ -455,7 +456,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWithZeroValueAsInteger()
+    public function testPrepareDataWithZeroValueAsInteger(): void
     {
         self::assertSame(
             ['value' => 0.0],
@@ -463,7 +464,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWithZeroValueAsIntegerAndArrayRelatedFilterType()
+    public function testPrepareDataWithZeroValueAsIntegerAndArrayRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => [0.0], 'type' => (string)NumberFilterTypeInterface::TYPE_IN],
@@ -471,7 +472,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWithIntegerValue()
+    public function testPrepareDataWithIntegerValue(): void
     {
         self::assertSame(
             ['value' => 123.0],
@@ -479,7 +480,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWithIntegerValueAndArrayRelatedFilterType()
+    public function testPrepareDataWithIntegerValueAndArrayRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => [123.0], 'type' => (string)NumberFilterTypeInterface::TYPE_IN],
@@ -487,7 +488,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWithIntegerValueAsString()
+    public function testPrepareDataWithIntegerValueAsString(): void
     {
         self::assertSame(
             ['value' => 123.0],
@@ -495,7 +496,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWithIntegerValueAsStringAndArrayRelatedFilterType()
+    public function testPrepareDataWithIntegerValueAsStringAndArrayRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => [123.0, 234.0], 'type' => (string)NumberFilterTypeInterface::TYPE_IN],
@@ -503,7 +504,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWithFloatValue()
+    public function testPrepareDataWithFloatValue(): void
     {
         self::assertSame(
             ['value' => 123.1],
@@ -511,7 +512,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWithFloatValueAndArrayRelatedFilterType()
+    public function testPrepareDataWithFloatValueAndArrayRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => [123.1], 'type' => (string)NumberFilterTypeInterface::TYPE_IN],
@@ -519,7 +520,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWithFloatValueAsString()
+    public function testPrepareDataWithFloatValueAsString(): void
     {
         self::assertSame(
             ['value' => 123.1],
@@ -527,7 +528,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWithFloatValueAsStringAndArrayRelatedFilterType()
+    public function testPrepareDataWithFloatValueAsStringAndArrayRelatedFilterType(): void
     {
         self::assertSame(
             ['value' => [123.1], 'type' => (string)NumberFilterTypeInterface::TYPE_IN],
@@ -535,26 +536,26 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPrepareDataWithNotNumericStringValue()
+    public function testPrepareDataWithNotNumericStringValue(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->filter->prepareData(['value' => 'abc']);
     }
 
-    public function testPrepareDataWithNotNumericStringValueAndArrayRelatedFilterType()
+    public function testPrepareDataWithNotNumericStringValueAndArrayRelatedFilterType(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->filter->prepareData(['value' => 'abc', 'type' => (string)NumberFilterTypeInterface::TYPE_IN]);
     }
 
-    public function testPrepareDataWithArrayValue()
+    public function testPrepareDataWithArrayValue(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The value is not valid. Expected a scalar value, "array" given');
         $this->filter->prepareData(['value' => [123]]);
     }
 
-    public function testPrepareDataWithArrayValueAndArrayRelatedFilterType()
+    public function testPrepareDataWithArrayValueAndArrayRelatedFilterType(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The value is not valid. Expected a scalar value, "array" given');

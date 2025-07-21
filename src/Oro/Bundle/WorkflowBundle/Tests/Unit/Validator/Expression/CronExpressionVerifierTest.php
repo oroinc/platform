@@ -4,11 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Validator\Expression;
 
 use Oro\Bundle\WorkflowBundle\Validator\Expression\CronExpressionVerifier;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException;
+use PHPUnit\Framework\TestCase;
 
-class CronExpressionVerifierTest extends \PHPUnit\Framework\TestCase
+class CronExpressionVerifierTest extends TestCase
 {
-    /** @var CronExpressionVerifier */
-    private $verifier;
+    private CronExpressionVerifier $verifier;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class CronExpressionVerifierTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validateExpressionDataProvider
      */
-    public function testExpression(string $expression, ?\Exception $exception = null)
+    public function testExpression(string $expression, ?\Exception $exception = null): void
     {
         if ($exception) {
             $this->expectException(get_class($exception));

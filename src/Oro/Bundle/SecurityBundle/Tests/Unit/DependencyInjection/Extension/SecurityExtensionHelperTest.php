@@ -4,8 +4,9 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\DependencyInjection\Extension;
 
 use Oro\Bundle\SecurityBundle\DependencyInjection\Extension\SecurityExtensionHelper;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+use PHPUnit\Framework\TestCase;
 
-class SecurityExtensionHelperTest extends \PHPUnit\Framework\TestCase
+class SecurityExtensionHelperTest extends TestCase
 {
     public function testMakeFirewallLatestNoFirewall(): void
     {

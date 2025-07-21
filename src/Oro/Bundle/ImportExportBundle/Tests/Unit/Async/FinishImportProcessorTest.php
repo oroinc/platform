@@ -16,9 +16,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FinishImportProcessorTest extends TestCase
 {
+    private EventDispatcher&MockObject $eventDispatcher;
     private FinishImportProcessor $finishImportProcessor;
-    private EventDispatcher|MockObject $eventDispatcher;
-
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +33,7 @@ class FinishImportProcessorTest extends TestCase
 
     public function testProcess(): void
     {
-        $session = self::createMock(SessionInterface::class);
+        $session = $this->createMock(SessionInterface::class);
         $message = new Message();
         $message->setBody([
             'rootImportJobId' => 123,
@@ -45,8 +44,7 @@ class FinishImportProcessorTest extends TestCase
 
         $event = new FinishImportEvent(123, 'processor_alias', ProcessorRegistry::TYPE_IMPORT, []);
 
-        $this->eventDispatcher
-            ->expects(self::once())
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with($event, Events::FINISH_IMPORT);
 

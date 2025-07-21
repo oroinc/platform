@@ -3,6 +3,7 @@
 namespace Oro\Bundle\GaufretteBundle\Tests\Unit;
 
 use Gaufrette\Adapter;
+use Gaufrette\Adapter\InMemory;
 use Gaufrette\Exception\FileNotFound;
 use Gaufrette\File;
 use Gaufrette\Filesystem;
@@ -15,6 +16,8 @@ use Oro\Bundle\GaufretteBundle\Exception\FlushFailedException;
 use Oro\Bundle\GaufretteBundle\Exception\ProtocolConfigurationException;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Bundle\GaufretteBundle\FilesystemMap;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Exception\IOException;
 
 /**
@@ -24,17 +27,14 @@ use Symfony\Component\Filesystem\Exception\IOException;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class FileManagerTest extends \PHPUnit\Framework\TestCase
+class FileManagerTest extends TestCase
 {
-    private const TEST_FILE_SYSTEM_NAME  = 'testFileSystem';
-    private const TEST_PROTOCOL          = 'testProtocol';
+    private const TEST_FILE_SYSTEM_NAME = 'testFileSystem';
+    private const TEST_PROTOCOL = 'testProtocol';
     private const TEST_READONLY_PROTOCOL = 'testReadonlyProtocol';
 
-    /** @var Filesystem|\PHPUnit\Framework\MockObject\MockObject */
-    private $filesystem;
-
-    /** @var Adapter|\PHPUnit\Framework\MockObject\MockObject */
-    private $filesystemAdapter;
+    private Filesystem&MockObject $filesystem;
+    private Adapter&MockObject $filesystemAdapter;
 
     #[\Override]
     protected function setUp(): void
@@ -65,35 +65,35 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         return $fileManager;
     }
 
-    public function testGetProtocol()
+    public function testGetProtocol(): void
     {
         $fileManager = $this->getFileManager(true);
 
         self::assertEquals(self::TEST_PROTOCOL, $fileManager->getProtocol());
     }
 
-    public function testGetReadonlyProtocol()
+    public function testGetReadonlyProtocol(): void
     {
         $fileManager = $this->getFileManager(true);
 
         self::assertEquals(self::TEST_READONLY_PROTOCOL, $fileManager->getReadonlyProtocol());
     }
 
-    public function testGetSubDirectory()
+    public function testGetSubDirectory(): void
     {
         $fileManager = $this->getFileManager(true);
 
         self::assertEquals(self::TEST_FILE_SYSTEM_NAME, $fileManager->getSubDirectory());
     }
 
-    public function testGetSubDirectoryForNotSubDirAwareManager()
+    public function testGetSubDirectoryForNotSubDirAwareManager(): void
     {
         $fileManager = $this->getFileManager(false);
 
         self::assertNull($fileManager->getSubDirectory());
     }
 
-    public function testGetSubDirectoryWithCustomSubDirectory()
+    public function testGetSubDirectoryWithCustomSubDirectory(): void
     {
         $subDirectory = 'testSubDir';
 
@@ -102,21 +102,21 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($subDirectory, $fileManager->getSubDirectory());
     }
 
-    public function testGetSubDirectoryWithoutCustomSubDirectory()
+    public function testGetSubDirectoryWithoutCustomSubDirectory(): void
     {
         $fileManager = $this->getFileManager(true);
 
         self::assertEquals(self::TEST_FILE_SYSTEM_NAME, $fileManager->getSubDirectory());
     }
 
-    public function testGetSubDirectoryForNotSubDirectoryAwareFileManager()
+    public function testGetSubDirectoryForNotSubDirectoryAwareFileManager(): void
     {
         $fileManager = $this->getFileManager(false);
 
         self::assertNull($fileManager->getSubDirectory());
     }
 
-    public function testGetFilePath()
+    public function testGetFilePath(): void
     {
         $fileManager = $this->getFileManager(true);
 
@@ -131,7 +131,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFilePathForNotSubDirAwareManager()
+    public function testGetFilePathForNotSubDirAwareManager(): void
     {
         $fileManager = $this->getFileManager(false);
 
@@ -145,7 +145,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFilePathWhenFileNameIsEmptyString()
+    public function testGetFilePathWhenFileNameIsEmptyString(): void
     {
         $fileManager = $this->getFileManager(true);
 
@@ -160,7 +160,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFilePathWithCustomSubDirectory()
+    public function testGetFilePathWithCustomSubDirectory(): void
     {
         $fileManager = $this->getFileManager(true, 'testSubDir');
 
@@ -170,7 +170,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFilePathWithAutoConfiguredCustomSubDirectory()
+    public function testGetFilePathWithAutoConfiguredCustomSubDirectory(): void
     {
         $fileManager = $this->getFileManager(false, 'testSubDir');
 
@@ -180,7 +180,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFilePathWhenProtocolIsNotConfigured()
+    public function testGetFilePathWhenProtocolIsNotConfigured(): void
     {
         $this->expectException(ProtocolConfigurationException::class);
 
@@ -189,7 +189,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->getFilePath('file.txt');
     }
 
-    public function testGetFilePathWhenFileNameHaveLeadingSlash()
+    public function testGetFilePathWhenFileNameHaveLeadingSlash(): void
     {
         $fileManager = $this->getFileManager(true);
 
@@ -204,7 +204,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetReadonlyFilePath()
+    public function testGetReadonlyFilePath(): void
     {
         $fileManager = $this->getFileManager(true);
 
@@ -219,7 +219,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetReadonlyFilePathForNotSubDirAwareManager()
+    public function testGetReadonlyFilePathForNotSubDirAwareManager(): void
     {
         $fileManager = $this->getFileManager(false);
 
@@ -233,7 +233,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetReadonlyFilePathWhenFileNameIsEmptyString()
+    public function testGetReadonlyFilePathWhenFileNameIsEmptyString(): void
     {
         $fileManager = $this->getFileManager(true);
 
@@ -248,7 +248,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetReadonlyFilePathWithCustomSubDirectory()
+    public function testGetReadonlyFilePathWithCustomSubDirectory(): void
     {
         $fileManager = $this->getFileManager(true, 'testSubDir');
 
@@ -258,7 +258,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetReadonlyFilePathWithAutoConfiguredCustomSubDirectory()
+    public function testGetReadonlyFilePathWithAutoConfiguredCustomSubDirectory(): void
     {
         $fileManager = $this->getFileManager(false, 'testSubDir');
 
@@ -268,7 +268,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetReadonlyFilePathWhenProtocolIsNotConfigured()
+    public function testGetReadonlyFilePathWhenProtocolIsNotConfigured(): void
     {
         $this->expectException(ProtocolConfigurationException::class);
 
@@ -277,7 +277,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->getReadonlyFilePath('file.txt');
     }
 
-    public function testGetReadonlyFilePathWhenFileNameHaveLeadingSlash()
+    public function testGetReadonlyFilePathWhenFileNameHaveLeadingSlash(): void
     {
         $fileManager = $this->getFileManager(true);
 
@@ -292,7 +292,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetReadonlyFilePathWithoutProtocol()
+    public function testGetReadonlyFilePathWithoutProtocol(): void
     {
         $fileManager = $this->getFileManager(true);
 
@@ -302,7 +302,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFilePathWithoutProtocolForNotSubDirAwareManager()
+    public function testGetFilePathWithoutProtocolForNotSubDirAwareManager(): void
     {
         $fileManager = $this->getFileManager(false);
 
@@ -312,7 +312,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFilePathWithoutProtocolWithCustomSubDirectory()
+    public function testGetFilePathWithoutProtocolWithCustomSubDirectory(): void
     {
         $fileManager = $this->getFileManager(true, 'testSubDir');
 
@@ -322,12 +322,12 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAdapterDescription()
+    public function testGetAdapterDescription(): void
     {
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects(self::exactly(2))
             ->method('getAdapter')
-            ->willReturn(new Adapter\InMemory());
+            ->willReturn(new InMemory());
         $filesystemMap = $this->createMock(FilesystemMap::class);
         $filesystemMap->expects(self::once())
             ->method('get')
@@ -339,7 +339,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('InMemory', $fileManager->getAdapterDescription());
     }
 
-    public function testGetAdapterDescriptionWithLocalAdapter()
+    public function testGetAdapterDescriptionWithLocalAdapter(): void
     {
         $expected = __DIR__;
         $filesystem = $this->createMock(Filesystem::class);
@@ -357,12 +357,12 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $fileManager->getAdapterDescription());
     }
 
-    public function testGetLocalPathWithNonLocalAdapter()
+    public function testGetLocalPathWithNonLocalAdapter(): void
     {
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects(self::once())
             ->method('getAdapter')
-            ->willReturn(new Adapter\InMemory());
+            ->willReturn(new InMemory());
         $filesystemMap = $this->createMock(FilesystemMap::class);
         $filesystemMap->expects(self::once())
             ->method('get')
@@ -374,7 +374,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($fileManager->getLocalPath());
     }
 
-    public function testGetLocalPathWithLocalAdapter()
+    public function testGetLocalPathWithLocalAdapter(): void
     {
         $expected = __DIR__;
         $filesystem = $this->createMock(Filesystem::class);
@@ -392,7 +392,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $fileManager->getLocalPath());
     }
 
-    public function testGetFileMimeType()
+    public function testGetFileMimeType(): void
     {
         $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $fileInfo->file(__DIR__ . '/Fixtures/test.txt');
@@ -407,7 +407,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($mimeType, $fileManager->getFileMimeType('file.txt'));
     }
 
-    public function testGetFileMimeTypeForNotSubDirAwareManager()
+    public function testGetFileMimeTypeForNotSubDirAwareManager(): void
     {
         $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $fileInfo->file(__DIR__ . '/Fixtures/test.txt');
@@ -422,7 +422,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($mimeType, $fileManager->getFileMimeType('file.txt'));
     }
 
-    public function testGetFileMimeTypeWhenFileNameIsEmptyString()
+    public function testGetFileMimeTypeWhenFileNameIsEmptyString(): void
     {
         $this->filesystem->expects(self::never())
             ->method('mimeType');
@@ -432,7 +432,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($fileManager->getFileMimeType(''));
     }
 
-    public function testGetFileMimeTypeWhenGaufretteAdapterCannotRecognizeMimeType()
+    public function testGetFileMimeTypeWhenGaufretteAdapterCannotRecognizeMimeType(): void
     {
         $this->filesystem->expects(self::once())
             ->method('mimeType')
@@ -444,7 +444,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($fileManager->getFileMimeType('file.txt'));
     }
 
-    public function testGetFileMimeTypeWhenGaufretteAdapterDoesNotSupportMimeTypes()
+    public function testGetFileMimeTypeWhenGaufretteAdapterDoesNotSupportMimeTypes(): void
     {
         $this->filesystem->expects(self::once())
             ->method('mimeType')
@@ -456,7 +456,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($fileManager->getFileMimeType('file.txt'));
     }
 
-    public function testGetFileMimeTypeForNotSubDirectoryAwareFileManager()
+    public function testGetFileMimeTypeForNotSubDirectoryAwareFileManager(): void
     {
         $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $fileInfo->file(__DIR__ . '/Fixtures/test.txt');
@@ -471,7 +471,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($mimeType, $fileManager->getFileMimeType('file.txt'));
     }
 
-    public function testFindFiles()
+    public function testFindFiles(): void
     {
         $this->filesystem->expects(self::once())
             ->method('listKeys')
@@ -486,7 +486,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['file1', 'file2'], $fileManager->findFiles());
     }
 
-    public function testFindFilesForNotSubDirAwareManager()
+    public function testFindFilesForNotSubDirAwareManager(): void
     {
         $this->filesystem->expects(self::once())
             ->method('listKeys')
@@ -501,7 +501,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['file1', 'file2'], $fileManager->findFiles());
     }
 
-    public function testFindFilesByPrefix()
+    public function testFindFilesByPrefix(): void
     {
         $prefix = 'prefix';
         $directory = self::TEST_FILE_SYSTEM_NAME . '/' . $prefix;
@@ -519,7 +519,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([$prefix . '_file1', $prefix . '_file2'], $fileManager->findFiles($prefix));
     }
 
-    public function testFindFilesByPrefixForNotSubDirAwareManager()
+    public function testFindFilesByPrefixForNotSubDirAwareManager(): void
     {
         $prefix = 'prefix';
 
@@ -536,7 +536,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([$prefix . '_file1', $prefix . '_file2'], $fileManager->findFiles($prefix));
     }
 
-    public function testFindFilesByPrefixWhenPrefixIsSlash()
+    public function testFindFilesByPrefixWhenPrefixIsSlash(): void
     {
         $prefix = '/';
         $directory = self::TEST_FILE_SYSTEM_NAME . '/';
@@ -554,7 +554,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['file1', 'file2'], $fileManager->findFiles($prefix));
     }
 
-    public function testFindFilesByPrefixWhenPrefixIsSlashForNotSubDirAwareManager()
+    public function testFindFilesByPrefixWhenPrefixIsSlashForNotSubDirAwareManager(): void
     {
         $prefix = '/';
 
@@ -571,7 +571,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['file1', 'file2'], $fileManager->findFiles($prefix));
     }
 
-    public function testFindFilesWhenNoFilesFound()
+    public function testFindFilesWhenNoFilesFound(): void
     {
         $prefix = 'prefix';
 
@@ -588,7 +588,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * E.g. this may happens when AwsS3 or GoogleCloudStorage adapters are used
      */
-    public function testFindFilesWhenAdapterReturnsOnlyKeys()
+    public function testFindFilesWhenAdapterReturnsOnlyKeys(): void
     {
         $prefix = 'prefix';
         $directory = self::TEST_FILE_SYSTEM_NAME . '/' . $prefix;
@@ -603,7 +603,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([$prefix . '_file1', $prefix . '_file2'], $fileManager->findFiles($prefix));
     }
 
-    public function testHasFileWhenFileExists()
+    public function testHasFileWhenFileExists(): void
     {
         $fileName = 'testFile.txt';
 
@@ -617,7 +617,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($fileManager->hasFile($fileName));
     }
 
-    public function testHasFileWhenFileDoesNotExist()
+    public function testHasFileWhenFileDoesNotExist(): void
     {
         $fileName = 'testFile.txt';
 
@@ -631,7 +631,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($fileManager->hasFile($fileName));
     }
 
-    public function testHasFileWhenFileNameIsEmptyString()
+    public function testHasFileWhenFileNameIsEmptyString(): void
     {
         $this->filesystem->expects(self::never())
             ->method('has');
@@ -641,7 +641,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($fileManager->hasFile(''));
     }
 
-    public function testHasFileForNotSubDirAwareManager()
+    public function testHasFileForNotSubDirAwareManager(): void
     {
         $fileName = 'testFile.txt';
 
@@ -655,7 +655,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($fileManager->hasFile($fileName));
     }
 
-    public function testGetFile()
+    public function testGetFile(): void
     {
         $fileName = 'testFile.txt';
 
@@ -679,7 +679,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($file, $fileManager->getFile($fileName));
     }
 
-    public function testGetFileForNotSubDirAwareManager()
+    public function testGetFileForNotSubDirAwareManager(): void
     {
         $fileName = 'testFile.txt';
 
@@ -703,7 +703,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($file, $fileManager->getFile($fileName));
     }
 
-    public function testGetFileWhenFileDoesNotExistAndRequestedIgnoreException()
+    public function testGetFileWhenFileDoesNotExistAndRequestedIgnoreException(): void
     {
         $fileName = 'testFile.txt';
 
@@ -719,7 +719,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($fileManager->getFile($fileName, false));
     }
 
-    public function testGetFileWhenFileExistsAndRequestedIgnoreException()
+    public function testGetFileWhenFileExistsAndRequestedIgnoreException(): void
     {
         $fileName = 'testFile.txt';
 
@@ -745,7 +745,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($file, $fileManager->getFile($fileName, false));
     }
 
-    public function testGetFileWhenFileNameIsEmptyString()
+    public function testGetFileWhenFileNameIsEmptyString(): void
     {
         $this->filesystem->expects(self::never())
             ->method('has');
@@ -757,7 +757,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($fileManager->getFile(''));
     }
 
-    public function testGetStreamWhenFileDoesNotExist()
+    public function testGetStreamWhenFileDoesNotExist(): void
     {
         $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage('The file "testFileSystem/testFile.txt" was not found.');
@@ -776,7 +776,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->getStream($fileName);
     }
 
-    public function testGetStreamWhenFileDoesNotExistAndRequestedIgnoreException()
+    public function testGetStreamWhenFileDoesNotExistAndRequestedIgnoreException(): void
     {
         $fileName = 'testFile.txt';
 
@@ -792,7 +792,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($fileManager->getStream($fileName, false));
     }
 
-    public function testGetStreamWhenFileExistsAndRequestedIgnoreException()
+    public function testGetStreamWhenFileExistsAndRequestedIgnoreException(): void
     {
         $fileName = 'testFile.txt';
         $stream = new LocalStream('test');
@@ -811,7 +811,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($stream, $fileManager->getStream($fileName, false));
     }
 
-    public function testGetStreamWhenFileNameIsEmptyString()
+    public function testGetStreamWhenFileNameIsEmptyString(): void
     {
         $this->filesystem->expects(self::never())
             ->method('has');
@@ -823,7 +823,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($fileManager->getStream(''));
     }
 
-    public function testGetStreamForNotSubDirAwareManager()
+    public function testGetStreamForNotSubDirAwareManager(): void
     {
         $fileName = 'testFile.txt';
         $stream = new LocalStream('test');
@@ -842,7 +842,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($stream, $fileManager->getStream($fileName, false));
     }
 
-    public function testGetFileContent()
+    public function testGetFileContent(): void
     {
         $fileName = 'testFile.txt';
         $fileContent = 'test data';
@@ -870,7 +870,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($fileContent, $fileManager->getFileContent($fileName));
     }
 
-    public function testGetFileContentForNotSubDirAwareManager()
+    public function testGetFileContentForNotSubDirAwareManager(): void
     {
         $fileName = 'testFile.txt';
         $fileContent = 'test data';
@@ -898,7 +898,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($fileContent, $fileManager->getFileContent($fileName));
     }
 
-    public function testGetFileContentWhenFileDoesNotExistAndRequestedIgnoreException()
+    public function testGetFileContentWhenFileDoesNotExistAndRequestedIgnoreException(): void
     {
         $fileName = 'testFile.txt';
 
@@ -914,7 +914,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($fileManager->getFileContent($fileName, false));
     }
 
-    public function testGetFileContentWhenFileExistsAndRequestedIgnoreException()
+    public function testGetFileContentWhenFileExistsAndRequestedIgnoreException(): void
     {
         $fileName = 'testFile.txt';
         $fileContent = 'test data';
@@ -944,7 +944,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($fileContent, $fileManager->getFileContent($fileName, false));
     }
 
-    public function testGetFileContentWhenFileNameIsEmptyString()
+    public function testGetFileContentWhenFileNameIsEmptyString(): void
     {
         $this->filesystem->expects(self::never())
             ->method('has');
@@ -956,7 +956,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($fileManager->getFileContent(''));
     }
 
-    public function testDeleteFile()
+    public function testDeleteFile(): void
     {
         $fileName = 'file.txt';
 
@@ -979,7 +979,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteFile($fileName);
     }
 
-    public function testDeleteFileForNotSubDirAwareManager()
+    public function testDeleteFileForNotSubDirAwareManager(): void
     {
         $fileName = 'file.txt';
 
@@ -1002,7 +1002,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteFile($fileName);
     }
 
-    public function testDeleteFileWhenFileNameIsDirectory()
+    public function testDeleteFileWhenFileNameIsDirectory(): void
     {
         $fileName = 'file.txt';
 
@@ -1025,7 +1025,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteFile($fileName);
     }
 
-    public function testDeleteFileForNotExistingFile()
+    public function testDeleteFileForNotExistingFile(): void
     {
         $fileName = 'file.txt';
 
@@ -1045,7 +1045,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteFile($fileName);
     }
 
-    public function testDeleteFileWhenFileNameIsEmptyString()
+    public function testDeleteFileWhenFileNameIsEmptyString(): void
     {
         $this->filesystem->expects(self::never())
             ->method('has');
@@ -1061,7 +1061,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteFile('');
     }
 
-    public function testDeleteFileFromSubDirAndThereAreOtherFiles()
+    public function testDeleteFileFromSubDirAndThereAreOtherFiles(): void
     {
         $fileName = 'dir/file.txt';
 
@@ -1097,7 +1097,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * E.g. this may happens when AwsS3 or GoogleCloudStorage adapters are used
      */
-    public function testDeleteFileFromSubDirAndThereAreOtherFilesWhenAdapterReturnsOnlyKeys()
+    public function testDeleteFileFromSubDirAndThereAreOtherFilesWhenAdapterReturnsOnlyKeys(): void
     {
         $fileName = 'dir/file.txt';
 
@@ -1130,7 +1130,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteFile($fileName);
     }
 
-    public function testDeleteFileFromSubDirAndNoOtherFiles()
+    public function testDeleteFileFromSubDirAndNoOtherFiles(): void
     {
         $fileName = 'dir/file.txt';
 
@@ -1164,7 +1164,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteFile($fileName);
     }
 
-    public function testDeleteFileFromSubDirAndNoOtherFilesForNotSubDirAwareManager()
+    public function testDeleteFileFromSubDirAndNoOtherFilesForNotSubDirAwareManager(): void
     {
         $fileName = 'dir/file.txt';
 
@@ -1201,7 +1201,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * E.g. this may happens when AwsS3 or GoogleCloudStorage adapters are used
      */
-    public function testDeleteFileFromSubDirAndNoOtherFilesWhenAdapterReturnsOnlyKeys()
+    public function testDeleteFileFromSubDirAndNoOtherFilesWhenAdapterReturnsOnlyKeys(): void
     {
         $fileName = 'dir/file.txt';
 
@@ -1235,7 +1235,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteFile($fileName);
     }
 
-    public function testDeleteFileFromNestedSubDirAndNoOtherFiles()
+    public function testDeleteFileFromNestedSubDirAndNoOtherFiles(): void
     {
         $fileName = 'dir1/dir2/file.txt';
 
@@ -1277,7 +1277,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteFile($fileName);
     }
 
-    public function testDeleteFileFromNestedSubDirAndThereAreOtherFilesInFirstLevelDir()
+    public function testDeleteFileFromNestedSubDirAndThereAreOtherFilesInFirstLevelDir(): void
     {
         $fileName = 'dir1/dir2/file.txt';
 
@@ -1319,7 +1319,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteFile($fileName);
     }
 
-    public function testDeleteFileFromNestedSubDirAndThereAreOtherFilesInSecondLevelDir()
+    public function testDeleteFileFromNestedSubDirAndThereAreOtherFilesInSecondLevelDir(): void
     {
         $fileName = 'dir1/dir2/file.txt';
 
@@ -1352,7 +1352,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteFile($fileName);
     }
 
-    public function testDeleteFileFromNestedSubDirAndThereAreOtherDirsInFirstLevelDir()
+    public function testDeleteFileFromNestedSubDirAndThereAreOtherDirsInFirstLevelDir(): void
     {
         $fileName = 'dir1/dir2/file.txt';
 
@@ -1394,7 +1394,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteFile($fileName);
     }
 
-    public function testDeleteFileFromSubDirAndNoOtherFilesAndFileNameHaveLeadingSlash()
+    public function testDeleteFileFromSubDirAndNoOtherFilesAndFileNameHaveLeadingSlash(): void
     {
         $fileNameWithoutLeadingSlash = 'dir/file.txt';
         $fileName = '/' . $fileNameWithoutLeadingSlash;
@@ -1429,7 +1429,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteFile($fileName);
     }
 
-    public function testDeleteFileFromSubDirAndNoOtherFilesAndFileNameHaveLeadingSlashForNotSubDirAwareManager()
+    public function testDeleteFileFromSubDirAndNoOtherFilesAndFileNameHaveLeadingSlashForNotSubDirAwareManager(): void
     {
         $fileNameWithoutLeadingSlash = 'dir/file.txt';
         $fileName = '/' . $fileNameWithoutLeadingSlash;
@@ -1464,7 +1464,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteFile($fileName);
     }
 
-    public function testDeleteAllFiles()
+    public function testDeleteAllFiles(): void
     {
         $this->filesystem->expects(self::once())
             ->method('listKeys')
@@ -1490,7 +1490,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteAllFiles();
     }
 
-    public function testDeleteAllFilesForNotSubDirAwareManager()
+    public function testDeleteAllFilesForNotSubDirAwareManager(): void
     {
         $this->filesystem->expects(self::once())
             ->method('listKeys')
@@ -1519,7 +1519,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * E.g. this may happens when AwsS3 or GoogleCloudStorage adapters are used
      */
-    public function testDeleteAllFilesWhenAdapterReturnsOnlyKeys()
+    public function testDeleteAllFilesWhenAdapterReturnsOnlyKeys(): void
     {
         $this->filesystem->expects(self::once())
             ->method('listKeys')
@@ -1541,7 +1541,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteAllFiles();
     }
 
-    public function testDeleteAllFilesByPrefix()
+    public function testDeleteAllFilesByPrefix(): void
     {
         $prefix = 'prefix';
         $directory = self::TEST_FILE_SYSTEM_NAME . '/' . $prefix;
@@ -1570,7 +1570,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteAllFiles($prefix);
     }
 
-    public function testDeleteAllFilesByPrefixForNotSubDirAwareManager()
+    public function testDeleteAllFilesByPrefixForNotSubDirAwareManager(): void
     {
         $prefix = 'prefix';
 
@@ -1598,7 +1598,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteAllFiles($prefix);
     }
 
-    public function testDeleteAllFilesByPrefixWhenPrefixIsSlash()
+    public function testDeleteAllFilesByPrefixWhenPrefixIsSlash(): void
     {
         $prefix = '/';
         $directory = self::TEST_FILE_SYSTEM_NAME . '/';
@@ -1627,7 +1627,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteAllFiles($prefix);
     }
 
-    public function testDeleteAllFilesByPrefixWhenPrefixIsSlashForNotSubDirAwareManager()
+    public function testDeleteAllFilesByPrefixWhenPrefixIsSlashForNotSubDirAwareManager(): void
     {
         $prefix = '/';
 
@@ -1655,7 +1655,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteAllFiles($prefix);
     }
 
-    public function testDeleteAllFilesByPrefixWithTailingSlash()
+    public function testDeleteAllFilesByPrefixWithTailingSlash(): void
     {
         $prefix = 'prefix/';
         $directory = self::TEST_FILE_SYSTEM_NAME . '/prefix';
@@ -1689,7 +1689,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteAllFiles($prefix);
     }
 
-    public function testDeleteAllFilesByPrefixWithTailingSlashWhenFilesystemNotSupportDirectories()
+    public function testDeleteAllFilesByPrefixWithTailingSlashWhenFilesystemNotSupportDirectories(): void
     {
         $prefix = 'prefix/';
         $directory = self::TEST_FILE_SYSTEM_NAME . '/prefix';
@@ -1720,7 +1720,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteAllFiles($prefix);
     }
 
-    public function testDeleteAllFilesByPrefixWithTwoTailingSlashes()
+    public function testDeleteAllFilesByPrefixWithTwoTailingSlashes(): void
     {
         $prefix = 'prefix//';
         $directory = self::TEST_FILE_SYSTEM_NAME . '/prefix';
@@ -1754,7 +1754,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteAllFiles($prefix);
     }
 
-    public function testWriteToStorage()
+    public function testWriteToStorage(): void
     {
         $content = 'Test data';
         $fileName = 'file.txt';
@@ -1778,7 +1778,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($content, $resultStream->read(100));
     }
 
-    public function testWriteToStorageForNotSubDirAwareManager()
+    public function testWriteToStorageForNotSubDirAwareManager(): void
     {
         $content = 'Test data';
         $fileName = 'file.txt';
@@ -1802,7 +1802,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($content, $resultStream->read(100));
     }
 
-    public function testWriteToStorageWhenFlushFailed()
+    public function testWriteToStorageWhenFlushFailed(): void
     {
         $this->expectException(FlushFailedException::class);
         $this->expectExceptionMessage(
@@ -1838,7 +1838,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->writeToStorage($content, $fileName);
     }
 
-    public function testWriteToStorageWhenFlushFailedForNotSubDirAwareManager()
+    public function testWriteToStorageWhenFlushFailedForNotSubDirAwareManager(): void
     {
         $this->expectException(FlushFailedException::class);
         $this->expectExceptionMessage('Failed to flush data to the "file.txt" file.');
@@ -1872,7 +1872,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->writeToStorage($content, $fileName);
     }
 
-    public function testWriteToStorageWhenFlushFailedWithCustomSubDirectory()
+    public function testWriteToStorageWhenFlushFailedWithCustomSubDirectory(): void
     {
         $this->expectException(FlushFailedException::class);
         $this->expectExceptionMessage('Failed to flush data to the "testSubDir/file.txt" file.');
@@ -1906,7 +1906,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->writeToStorage($content, $fileName);
     }
 
-    public function testWriteToStorageWhenFileNameIsEmptyString()
+    public function testWriteToStorageWhenFileNameIsEmptyString(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The file name must not be empty.');
@@ -1916,7 +1916,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->writeToStorage('Test data', '');
     }
 
-    public function testWriteFileToStorage()
+    public function testWriteFileToStorage(): void
     {
         $localFilePath = __DIR__ . '/Fixtures/test.txt';
         $fileName = 'file.txt';
@@ -1940,7 +1940,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertStringEqualsFile($localFilePath, $resultStream->read(100));
     }
 
-    public function testWriteFileToStorageForNotSubDirAwareManager()
+    public function testWriteFileToStorageForNotSubDirAwareManager(): void
     {
         $localFilePath = __DIR__ . '/Fixtures/test.txt';
         $fileName = 'file.txt';
@@ -1964,7 +1964,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertStringEqualsFile($localFilePath, $resultStream->read(100));
     }
 
-    public function testWriteFileToStorageWhenLocalFilePathIsEmptyString()
+    public function testWriteFileToStorageWhenLocalFilePathIsEmptyString(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The local path must not be empty.');
@@ -1974,7 +1974,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->writeFileToStorage('', 'file.txt');
     }
 
-    public function testWriteFileToStorageWhenFileNameIsEmptyString()
+    public function testWriteFileToStorageWhenFileNameIsEmptyString(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The file name must not be empty.');
@@ -1984,7 +1984,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->writeFileToStorage(__DIR__ . '/Fixtures/test.txt', '');
     }
 
-    public function testWriteStreamToStorage()
+    public function testWriteStreamToStorage(): void
     {
         $localFilePath = __DIR__ . '/Fixtures/test.txt';
         $fileName = 'file.txt';
@@ -2012,7 +2012,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($srcStream->cast(1));
     }
 
-    public function testWriteStreamToStorageForNotSubDirAwareManager()
+    public function testWriteStreamToStorageForNotSubDirAwareManager(): void
     {
         $localFilePath = __DIR__ . '/Fixtures/test.txt';
         $fileName = 'file.txt';
@@ -2040,7 +2040,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($srcStream->cast(1));
     }
 
-    public function testWriteStreamToStorageWhenFlushFailed()
+    public function testWriteStreamToStorageWhenFlushFailed(): void
     {
         $localFilePath = __DIR__ . '/Fixtures/test.txt';
         $fileName = 'file.txt';
@@ -2082,7 +2082,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testWriteStreamToStorageWhenFlushFailedForNotSubDirAwareManager()
+    public function testWriteStreamToStorageWhenFlushFailedForNotSubDirAwareManager(): void
     {
         $localFilePath = __DIR__ . '/Fixtures/test.txt';
         $fileName = 'file.txt';
@@ -2124,7 +2124,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testWriteStreamToStorageWhenFlushFailedWithCustomSubDirectory()
+    public function testWriteStreamToStorageWhenFlushFailedWithCustomSubDirectory(): void
     {
         $localFilePath = __DIR__ . '/Fixtures/test.txt';
         $fileName = 'file.txt';
@@ -2166,7 +2166,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testWriteStreamToStorageWithEmptyStreamAndAvoidWriteEmptyStream()
+    public function testWriteStreamToStorageWithEmptyStreamAndAvoidWriteEmptyStream(): void
     {
         $localFilePath = __DIR__ . '/Fixtures/emptyFile.txt';
         $fileName = 'file.txt';
@@ -2189,7 +2189,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($srcStream->cast(1));
     }
 
-    public function testWriteStreamToStorageWithEmptyStream()
+    public function testWriteStreamToStorageWithEmptyStream(): void
     {
         $localFilePath = __DIR__ . '/Fixtures/emptyFile.txt';
         $fileName = 'file.txt';
@@ -2217,7 +2217,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($srcStream->cast(1));
     }
 
-    public function testWriteStreamToStorageAndAvoidWriteEmptyStream()
+    public function testWriteStreamToStorageAndAvoidWriteEmptyStream(): void
     {
         $localFilePath = __DIR__ . '/Fixtures/test.txt';
         $fileName = 'file.txt';
@@ -2245,7 +2245,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($srcStream->cast(1));
     }
 
-    public function testWriteStreamToStorageWhenFileNameIsEmptyString()
+    public function testWriteStreamToStorageWhenFileNameIsEmptyString(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The file name must not be empty.');
@@ -2260,7 +2260,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->writeStreamToStorage(new LocalStream(__DIR__ . '/Fixtures/test.txt'), '');
     }
 
-    public function testWriteToTemporaryFile()
+    public function testWriteToTemporaryFile(): void
     {
         $content = 'Test data';
 
@@ -2279,7 +2279,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testWriteStreamToTemporaryFile()
+    public function testWriteStreamToTemporaryFile(): void
     {
         $content = 'Test data';
 
@@ -2310,7 +2310,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testGetTemporaryFileNameWithoutSuggestedFileName()
+    public function testGetTemporaryFileNameWithoutSuggestedFileName(): void
     {
         $fileManager = $this->getFileManager(true);
 
@@ -2329,7 +2329,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testGetTemporaryFileNameWithSuggestedFileNameWithoutExtension()
+    public function testGetTemporaryFileNameWithSuggestedFileNameWithoutExtension(): void
     {
         $suggestedFileName = sprintf('TestFile%s', str_replace('.', '', uniqid('', true)));
 
@@ -2341,7 +2341,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertStringEndsWith(DIRECTORY_SEPARATOR . $suggestedFileName, $tmpFileName);
     }
 
-    public function testGetTemporaryFileNameWithSuggestedFileNameWithExtension()
+    public function testGetTemporaryFileNameWithSuggestedFileNameWithExtension(): void
     {
         $suggestedFileName = sprintf('TestFile%s', str_replace('.', '', uniqid('', true))) . '.txt';
 
@@ -2353,7 +2353,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertStringEndsWith(DIRECTORY_SEPARATOR . $suggestedFileName, $tmpFileName);
     }
 
-    public function testGetTemporaryFileNameWithSuggestedFileNameWithoutExtensionWhenFileAlreadyExists()
+    public function testGetTemporaryFileNameWithSuggestedFileNameWithoutExtensionWhenFileAlreadyExists(): void
     {
         $suggestedFileName = sprintf('TestFile%s', str_replace('.', '', uniqid('', true)));
 
@@ -2375,7 +2375,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testGetTemporaryFileNameWithSuggestedFileNameWithExtensionWhenFileAlreadyExists()
+    public function testGetTemporaryFileNameWithSuggestedFileNameWithExtensionWhenFileAlreadyExists(): void
     {
         $fileExtension = '.txt';
         $suggestedFileName = sprintf('TestFile%s', str_replace('.', '', uniqid('', true))) . $fileExtension;

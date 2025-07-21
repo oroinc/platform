@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * This data transformer is used to wrap all view transformers,
@@ -14,10 +15,16 @@ use Symfony\Component\Form\DataTransformerInterface;
 class NullValueTransformer implements DataTransformerInterface
 {
     private DataTransformerInterface $transformer;
+    private bool $allowEmptyString = true;
 
     public function __construct(DataTransformerInterface $transformer)
     {
         $this->transformer = $transformer;
+    }
+
+    public function setAllowEmptyString(bool $allowEmptyString): void
+    {
+        $this->allowEmptyString = $allowEmptyString;
     }
 
     /**
@@ -51,6 +58,9 @@ class NullValueTransformer implements DataTransformerInterface
     {
         $result = $this->transformer->reverseTransform($value ?? '');
         if (null === $result && '' === $value) {
+            if (!$this->allowEmptyString) {
+                throw new TransformationFailedException('The value is not valid.');
+            }
             $result = $value;
         }
 

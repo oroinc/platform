@@ -5,13 +5,11 @@ namespace Oro\Bundle\CronBundle\Tests\Unit\Checker;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\CronBundle\Checker\ScheduleIntervalChecker;
 use Oro\Bundle\CronBundle\Tests\Unit\Stub\ScheduleIntervalStub;
+use PHPUnit\Framework\TestCase;
 
-class ScheduleIntervalCheckerTest extends \PHPUnit\Framework\TestCase
+class ScheduleIntervalCheckerTest extends TestCase
 {
-    /**
-     * @var ScheduleIntervalChecker
-     */
-    private $scheduleIntervalChecker;
+    private ScheduleIntervalChecker $scheduleIntervalChecker;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +17,7 @@ class ScheduleIntervalCheckerTest extends \PHPUnit\Framework\TestCase
         $this->scheduleIntervalChecker = new ScheduleIntervalChecker();
     }
 
-    public function testHasActiveScheduleWithoutDateTimePassed()
+    public function testHasActiveScheduleWithoutDateTimePassed(): void
     {
         $scheduleOne = (new ScheduleIntervalStub())
             ->setActiveAt((new \DateTime('now', new \DateTimeZone('UTC')))->modify('-1 day'))
@@ -28,7 +26,7 @@ class ScheduleIntervalCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->scheduleIntervalChecker->hasActiveSchedule($schedules));
     }
 
-    public function testHasNotActiveScheduleWithDateTimePassed()
+    public function testHasNotActiveScheduleWithDateTimePassed(): void
     {
         $dateTime = (new \DateTime('now', new \DateTimeZone('UTC')))->modify('+2 day');
         $scheduleOne = (new ScheduleIntervalStub())
@@ -38,7 +36,7 @@ class ScheduleIntervalCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->scheduleIntervalChecker->hasActiveSchedule($schedules, $dateTime));
     }
 
-    public function testScheduleWithoutDeactivateAt()
+    public function testScheduleWithoutDeactivateAt(): void
     {
         $dateTime = (new \DateTime('now', new \DateTimeZone('UTC')))->modify('+2 day');
         $scheduleOne = (new ScheduleIntervalStub())
@@ -47,7 +45,7 @@ class ScheduleIntervalCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->scheduleIntervalChecker->hasActiveSchedule($schedules, $dateTime));
     }
 
-    public function testScheduleWithoutActivateAt()
+    public function testScheduleWithoutActivateAt(): void
     {
         $dateTime = (new \DateTime('now', new \DateTimeZone('UTC')));
         $scheduleOne = (new ScheduleIntervalStub())
@@ -56,7 +54,7 @@ class ScheduleIntervalCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->scheduleIntervalChecker->hasActiveSchedule($schedules, $dateTime));
     }
 
-    public function testHasActiveScheduleWithActivateAtEqualsToDateTime()
+    public function testHasActiveScheduleWithActivateAtEqualsToDateTime(): void
     {
         $scheduleOne = (new ScheduleIntervalStub())
             ->setActiveAt(new \DateTime('now', new \DateTimeZone('UTC')))
@@ -65,7 +63,7 @@ class ScheduleIntervalCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->scheduleIntervalChecker->hasActiveSchedule($schedules));
     }
 
-    public function testHasNotActiveScheduleWithDeactivateAtEqualsToDateTime()
+    public function testHasNotActiveScheduleWithDeactivateAtEqualsToDateTime(): void
     {
         $scheduleOne = (new ScheduleIntervalStub())
             ->setActiveAt((new \DateTime('now', new \DateTimeZone('UTC')))->modify('-1 day'))
@@ -74,7 +72,7 @@ class ScheduleIntervalCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->scheduleIntervalChecker->hasActiveSchedule($schedules));
     }
 
-    public function testHasNotActiveScheduleWithDateTimeBeforeActiveAt()
+    public function testHasNotActiveScheduleWithDateTimeBeforeActiveAt(): void
     {
         $dateTime = (new \DateTime('now', new \DateTimeZone('UTC')))->modify('-2 day');
         $scheduleOne = (new ScheduleIntervalStub())

@@ -9,8 +9,7 @@ class SearchProviderStub implements SearchProviderInterface
     /** array */
     private $data = [];
 
-    /** @var bool */
-    private $enabled = true;
+    private bool $enabled = true;
 
     /**
      * @param array $data

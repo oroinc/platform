@@ -7,16 +7,15 @@ use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\ImportExportBundle\Model\Action\ExecuteJobAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class ExecuteJobActionTest extends \PHPUnit\Framework\TestCase
+class ExecuteJobActionTest extends TestCase
 {
-    /** @var JobExecutor|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobExecutor;
-
-    /** @var ExecuteJobAction */
-    private $action;
+    private JobExecutor&MockObject $jobExecutor;
+    private ExecuteJobAction $action;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class ExecuteJobActionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidOptionsDataProvider
      */
-    public function testInitializeErrors(array $options, string $expectedExceptionMessage)
+    public function testInitializeErrors(array $options, string $expectedExceptionMessage): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
@@ -67,7 +66,7 @@ class ExecuteJobActionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $options = [
             'jobType' => 'a',
@@ -81,7 +80,7 @@ class ExecuteJobActionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidExecuteOptionsDataProvider
      */
-    public function testExecuteExceptions(array $options, array $context, string $expectedExceptionMessage)
+    public function testExecuteExceptions(array $options, array $context, string $expectedExceptionMessage): void
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
@@ -163,7 +162,7 @@ class ExecuteJobActionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $options = [
             'jobType' => 'type',

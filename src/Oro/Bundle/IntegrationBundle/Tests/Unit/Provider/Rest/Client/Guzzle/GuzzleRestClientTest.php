@@ -10,18 +10,17 @@ use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestClient;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestException;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestResponse;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 
-class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
+class GuzzleRestClientTest extends TestCase
 {
     private const BASE_URL = 'https://example.com/api/';
     private const DEFAULT_OPTIONS = ['default' => 'value'];
 
-    /** @var Client|\PHPUnit\Framework\MockObject\MockObject */
-    private $sourceClient;
-
-    /** @var GuzzleRestClient */
-    private $client;
+    private Client&MockObject $sourceClient;
+    private GuzzleRestClient $client;
 
     #[\Override]
     protected function setUp(): void
@@ -32,13 +31,13 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
         $this->client->setGuzzleClient($this->sourceClient);
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         self::assertEquals(self::BASE_URL, ReflectionUtil::getPropertyValue($this->client, 'baseUrl'));
         self::assertEquals(self::DEFAULT_OPTIONS, ReflectionUtil::getPropertyValue($this->client, 'defaultOptions'));
     }
 
-    public function testGetLastResponseWorks()
+    public function testGetLastResponseWorks(): void
     {
         $response = $this->client->get('users');
 
@@ -48,26 +47,24 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider performRequestDataProvider
      */
-    public function testPerformRequestWorks(string $method, array $args, array $expected)
+    public function testPerformRequestWorks(string $method, array $args, array $expected): void
     {
         $response = $this->createMock(Response::class);
 
         $this->sourceClient->expects(self::once())
             ->method('send')
             ->with(
-                $this->callback(
-                    function (Request $request) use ($expected) {
-                        $this->assertEquals($expected['method'], strtolower($request->getMethod()));
-                        $this->assertEquals($expected['url'], $request->getUri());
-                        $this->assertEquals(
-                            $expected['headers'],
-                            array_diff_key($request->getHeaders(), ['Host' => null])
-                        );
-                        $this->assertEquals($expected['data'], (string) $request->getBody());
+                $this->callback(function (Request $request) use ($expected) {
+                    $this->assertEquals($expected['method'], strtolower($request->getMethod()));
+                    $this->assertEquals($expected['url'], $request->getUri());
+                    $this->assertEquals(
+                        $expected['headers'],
+                        array_diff_key($request->getHeaders(), ['Host' => null])
+                    );
+                    $this->assertEquals($expected['data'], (string) $request->getBody());
 
-                        return true;
-                    }
-                ),
+                    return true;
+                }),
                 $expected['options']
             )
             ->willReturn($response);
@@ -205,7 +202,7 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testPerformRequestThrowException()
+    public function testPerformRequestThrowException(): void
     {
         $this->expectException(GuzzleRestException::class);
         $this->expectExceptionMessage('Exception message');
@@ -220,7 +217,7 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
         $this->client->performRequest($method, $url);
     }
 
-    public function testGetFormattedResult()
+    public function testGetFormattedResult(): void
     {
         $url = 'https://example.com/api/v2/users.json';
         $params = ['foo' => 'param'];
@@ -249,7 +246,7 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedResult, $this->client->getJSON($url, $params, $headers, $options));
     }
 
-    public function testGetFormattedResultThrowException()
+    public function testGetFormattedResultThrowException(): void
     {
         $url = 'https://example.com/api/v2/users.json';
         $params = ['foo' => 'param'];

@@ -9,9 +9,10 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesController;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Cli\Stub\SpecificationLocatorStub;
 use Oro\Component\Testing\Unit\Command\Stub\InputStub;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 
-class AvailableSuitesControllerTest extends \PHPUnit\Framework\TestCase
+class AvailableSuitesControllerTest extends TestCase
 {
     private $suites = [
         'One',
@@ -22,7 +23,7 @@ class AvailableSuitesControllerTest extends \PHPUnit\Framework\TestCase
         'Six',
     ];
 
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $suiteRegistry = new SuiteRegistry();
         $specificationFinder = new SpecificationFinder();
@@ -35,7 +36,7 @@ class AvailableSuitesControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($command->getDefinition()->getOption('available-suites')->isValueRequired());
     }
 
-    public function testSkipExecutionWithoutOptions()
+    public function testSkipExecutionWithoutOptions(): void
     {
         $suiteRegistry = new SuiteRegistry();
         $specificationFinder = new SpecificationFinder();
@@ -48,7 +49,7 @@ class AvailableSuitesControllerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getSuitesWithSpecifications
      */
-    public function testAvailableSuites(array $suitesWithSpecifications)
+    public function testAvailableSuites(array $suitesWithSpecifications): void
     {
         $suiteRegistry = new SuiteRegistry();
         $suiteRegistry->registerSuiteGenerator(new GenericSuiteGenerator());

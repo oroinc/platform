@@ -4,13 +4,14 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Title\TitleReader;
 
 use Oro\Bundle\NavigationBundle\Tests\Unit\Title\TitleReader\Stub\TitleReaderStub;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
+use PHPUnit\Framework\TestCase;
 
-class TitleReaderRegistryTest extends \PHPUnit\Framework\TestCase
+class TitleReaderRegistryTest extends TestCase
 {
     /**
      * @dataProvider titleReaderProvider
      */
-    public function testGetTitleByRoute(array $readers, string $routeName, ?string $expectedTitle)
+    public function testGetTitleByRoute(array $readers, string $routeName, ?string $expectedTitle): void
     {
         $registry = new TitleReaderRegistry($readers);
 

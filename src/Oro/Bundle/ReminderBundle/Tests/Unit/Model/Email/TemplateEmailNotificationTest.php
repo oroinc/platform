@@ -14,22 +14,17 @@ use Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ReminderBundle\Model\Email\TemplateEmailNotification;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TemplateEmailNotificationTest extends \PHPUnit\Framework\TestCase
+class TemplateEmailNotificationTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $objectManager;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityNameResolver;
-
-    /** @var TemplateEmailNotification */
-    private $templateEmailNotification;
+    private ObjectManager&MockObject $objectManager;
+    private ConfigProvider&MockObject $configProvider;
+    private EntityNameResolver&MockObject $entityNameResolver;
+    private TemplateEmailNotification $templateEmailNotification;
 
     #[\Override]
     protected function setUp(): void
@@ -47,7 +42,6 @@ class TemplateEmailNotificationTest extends \PHPUnit\Framework\TestCase
     public function testGetRecipients(): void
     {
         $recipient = new User();
-        /** @var Reminder $reminder */
         $reminder = $this->getEntity(Reminder::class, [
             'recipient' => $recipient,
         ]);
@@ -66,7 +60,6 @@ class TemplateEmailNotificationTest extends \PHPUnit\Framework\TestCase
     public function testGetTemplateCriteria(): void
     {
         $entityClassName = \stdClass::class;
-        /** @var Reminder $reminder */
         $reminder = $this->getEntity(Reminder::class, [
             'relatedEntityClassName' => $entityClassName,
         ]);
@@ -88,7 +81,7 @@ class TemplateEmailNotificationTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTemplateCriteriaWhenNoReminder()
+    public function testGetTemplateCriteriaWhenNoReminder(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Reminder was not set');
@@ -100,7 +93,6 @@ class TemplateEmailNotificationTest extends \PHPUnit\Framework\TestCase
         $expectedEntity = new User();
 
         $entityId = 247;
-        /** @var Reminder $reminder */
         $reminder = $this->getEntity(Reminder::class, [
             'relatedEntityClassName' => User::class,
             'relatedEntityId' => $entityId
@@ -128,7 +120,6 @@ class TemplateEmailNotificationTest extends \PHPUnit\Framework\TestCase
         $senderName = 'senderName';
         $sender = (new User())->setEmail($senderEmail);
 
-        /** @var Reminder $reminder */
         $reminder = $this->getEntity(Reminder::class, ['sender' => $sender]);
 
         $this->entityNameResolver->expects($this->any())
@@ -143,7 +134,6 @@ class TemplateEmailNotificationTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSenderWhenReminderHasNoSender(): void
     {
-        /** @var Reminder $reminder */
         $reminder = $this->getEntity(Reminder::class);
 
         $this->templateEmailNotification->setReminder($reminder);

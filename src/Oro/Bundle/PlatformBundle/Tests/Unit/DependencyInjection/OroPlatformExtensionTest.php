@@ -7,10 +7,11 @@ use Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class OroPlatformExtensionTest extends \PHPUnit\Framework\TestCase
+class OroPlatformExtensionTest extends TestCase
 {
-    public function testSecurityShouldBeMergedCorrectly()
+    public function testSecurityShouldBeMergedCorrectly(): void
     {
         $originalConfig = [
             [
@@ -89,35 +90,33 @@ class OroPlatformExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedConfig, $containerBuilder->getExtensionConfig('security'));
     }
 
-    public function testThatWebBackendPrefixIsUsedDefaultWhenParamNotPassed()
+    public function testThatWebBackendPrefixIsUsedDefaultWhenParamNotPassed(): void
     {
         $extension = new OroPlatformExtension();
 
         $containerBuilder = $this->createMock(ExtendedContainerBuilder::class);
 
-        $containerBuilder
-            ->expects($this->any())
+        $containerBuilder->expects($this->any())
             ->method('getExtensionConfig')
             ->willReturn([]);
 
         $extension->prepend($containerBuilder);
     }
 
-    public function testThatWebBackendPrefixIsNotUsedDefaultWhenParameterPassed()
+    public function testThatWebBackendPrefixIsNotUsedDefaultWhenParameterPassed(): void
     {
         $extension = new OroPlatformExtension();
 
         $containerBuilder = $this->createMock(ExtendedContainerBuilder::class);
 
-        $containerBuilder
-            ->expects($this->any())
+        $containerBuilder->expects($this->any())
             ->method('getExtensionConfig')
             ->willReturn([]);
 
         $extension->prepend($containerBuilder);
     }
 
-    public function testAccessControlSorting()
+    public function testAccessControlSorting(): void
     {
         $extension = new OroPlatformExtension();
         $fooBundle = new Fixtures\FooBundle\FooBundle();
@@ -133,15 +132,17 @@ class OroPlatformExtensionTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $containerBuilder = $this->createMock(ExtendedContainerBuilder::class);
-        $containerBuilder->method('getExtensions')->willReturn([
-            'oro_security' => $this->createMock(OroSecurityExtension::class)
-        ]);
+        $containerBuilder->expects(self::any())
+            ->method('getExtensions')
+            ->willReturn(['oro_security' => $this->createMock(OroSecurityExtension::class)]);
 
-        $containerBuilder->method('hasExtension')->willReturnMap([
-            ['security', false],
-            ['oro_security', true],
-            ['jms_serializer', false],
-        ]);
+        $containerBuilder->expects(self::any())
+            ->method('hasExtension')
+            ->willReturnMap([
+                ['security', false],
+                ['oro_security', true],
+                ['jms_serializer', false],
+            ]);
 
         $appLevelConfig = [
             [
@@ -154,15 +155,17 @@ class OroPlatformExtensionTest extends \PHPUnit\Framework\TestCase
                 ],
             ]
         ];
-        $containerBuilder->method('getExtensionConfig')->willReturnMap(
-            [
+        $containerBuilder->expects(self::any())
+            ->method('getExtensionConfig')
+            ->willReturnMap([
                 ['oro_security', $appLevelConfig],
                 ['security', []],
                 ['doctrine', []],
-            ]
-        );
+            ]);
 
-        $containerBuilder->method('setExtensionConfig')->with('security', $this->getExpectedPrioritizedRules());
+        $containerBuilder->expects(self::any())
+            ->method('setExtensionConfig')
+            ->with('security', $this->getExpectedPrioritizedRules());
         $extension->prepend($containerBuilder);
     }
 

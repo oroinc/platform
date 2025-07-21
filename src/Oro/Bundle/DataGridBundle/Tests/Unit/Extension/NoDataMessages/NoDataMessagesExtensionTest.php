@@ -10,29 +10,16 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class NoDataMessagesExtensionTest extends \PHPUnit\Framework\TestCase
+class NoDataMessagesExtensionTest extends TestCase
 {
-    /**
-     * @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $entityClassResolver;
-
-    /**
-     * @var AbstractSearchMappingProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $mappingProvider;
-
-    /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $translator;
-
-    /**
-     * @var NoDataMessagesExtension
-     */
-    private $extension;
+    private EntityClassResolver&MockObject $entityClassResolver;
+    private AbstractSearchMappingProvider&MockObject $mappingProvider;
+    private TranslatorInterface&MockObject $translator;
+    private NoDataMessagesExtension $extension;
 
     #[\Override]
     protected function setUp(): void

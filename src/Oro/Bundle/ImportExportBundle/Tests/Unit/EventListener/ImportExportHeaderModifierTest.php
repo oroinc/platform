@@ -8,9 +8,9 @@ use PHPUnit\Framework\TestCase;
 
 class ImportExportHeaderModifierTest extends TestCase
 {
-    public function testAddHeader()
+    public function testAddHeader(): void
     {
-        $event  = new LoadEntityRulesAndBackendHeadersEvent(
+        $event = new LoadEntityRulesAndBackendHeadersEvent(
             'entityName',
             [['value' => 'header1', 'order' => 20]],
             ['rule1' => ['value' => 'header1', 'order' => 20]],

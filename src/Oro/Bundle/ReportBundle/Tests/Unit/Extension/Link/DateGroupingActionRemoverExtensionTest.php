@@ -6,11 +6,12 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\ReportBundle\Extension\Link\DateGroupingActionRemoverExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DateGroupingActionRemoverExtensionTest extends \PHPUnit\Framework\TestCase
+class DateGroupingActionRemoverExtensionTest extends TestCase
 {
-    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    private $config;
+    private DatagridConfiguration&MockObject $config;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +19,7 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit\Framework\TestCase
         $this->config = $this->createMock(DatagridConfiguration::class);
     }
 
-    public function testIsApplicableFalse()
+    public function testIsApplicableFalse(): void
     {
         $this->config->expects($this->once())
             ->method('offsetExists')
@@ -29,7 +30,7 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($extension->isApplicable($this->config));
     }
 
-    public function testIsApplicableFalseIfNotCorrectTable()
+    public function testIsApplicableFalseIfNotCorrectTable(): void
     {
         $this->config->expects($this->once())
             ->method('offsetExists')
@@ -47,7 +48,7 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($extension->isApplicable($this->config));
     }
 
-    public function testIsApplicableTrue()
+    public function testIsApplicableTrue(): void
     {
         $this->config->expects($this->once())
             ->method('offsetExists')
@@ -68,7 +69,7 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider visitResultProvider
      */
-    public function testVisitResult($inputRows, $expectedRows)
+    public function testVisitResult($inputRows, $expectedRows): void
     {
         $result = $this->createMock(ResultsObject::class);
         $result->expects($this->once())

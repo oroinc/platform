@@ -6,19 +6,16 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class WorkflowAwareCacheRetrievingTest extends \PHPUnit\Framework\TestCase
+class WorkflowAwareCacheRetrievingTest extends TestCase
 {
-    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var WorkflowAwareCache */
-    private $workflowAwareCache;
+    private CacheInterface&MockObject $cache;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private WorkflowAwareCache $workflowAwareCache;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +29,7 @@ class WorkflowAwareCacheRetrievingTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider listDataProvider
      */
-    public function testHasRelatedActiveWorkflowsFetched(bool $expected, array $classes, object $entity)
+    public function testHasRelatedActiveWorkflowsFetched(bool $expected, array $classes, object $entity): void
     {
         $this->assertCacheFetching(
             'active_workflow_related',
@@ -46,7 +43,7 @@ class WorkflowAwareCacheRetrievingTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider listDataProvider
      */
-    public function testHasRelatedActiveWorkflowsFetchingAndSave(bool $expected, array $classes, object $entity)
+    public function testHasRelatedActiveWorkflowsFetchingAndSave(bool $expected, array $classes, object $entity): void
     {
         $this->assertRepositoryFetching(
             'active_workflow_related',
@@ -61,7 +58,7 @@ class WorkflowAwareCacheRetrievingTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider listDataProvider
      */
-    public function testHasRelatedWorkflowsFetched(bool $expected, array $classes, object $entity)
+    public function testHasRelatedWorkflowsFetched(bool $expected, array $classes, object $entity): void
     {
         $this->assertCacheFetching(
             'all_workflow_related',
@@ -75,7 +72,7 @@ class WorkflowAwareCacheRetrievingTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider listDataProvider
      */
-    public function testHasRelatedWorkflowsFetchingAndSave(bool $expected, array $classes, object $entity)
+    public function testHasRelatedWorkflowsFetchingAndSave(bool $expected, array $classes, object $entity): void
     {
         $this->assertRepositoryFetching(
             'all_workflow_related',

@@ -5,6 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig\TokenParser;
 use Oro\Bundle\LayoutBundle\Twig\Node\BlockThemeNode;
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
@@ -12,14 +13,14 @@ use Twig\Node\Expression\NameExpression;
 use Twig\Parser;
 use Twig\Source;
 
-class BlockThemeTokenParserTest extends \PHPUnit\Framework\TestCase
+class BlockThemeTokenParserTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     /**
      * @dataProvider getTestsForLayoutTheme
      */
-    public function testCompile(Source $source, BlockThemeNode $expected)
+    public function testCompile(Source $source, BlockThemeNode $expected): void
     {
         $env = new Environment(
             $this->getLoader(),

@@ -6,10 +6,11 @@ use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
+use PHPUnit\Framework\TestCase;
 
-class AclPrivilegeTest extends \PHPUnit\Framework\TestCase
+class AclPrivilegeTest extends TestCase
 {
-    public function testGettersAndSetters()
+    public function testGettersAndSetters(): void
     {
         $obj = new AclPrivilege();
 
@@ -26,7 +27,7 @@ class AclPrivilegeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('TestCategory', $obj->getCategory());
     }
 
-    public function testPermissions()
+    public function testPermissions(): void
     {
         $obj = new AclPrivilege();
 

@@ -25,7 +25,7 @@ class ProcessRequestParameterLikeRouteTraitTest extends TestCase
     /**
      * @dataProvider processRequestDataProvider
      */
-    public function testProcessRequestParameter(?string $expected, ?string $actual)
+    public function testProcessRequestParameter(?string $expected, ?string $actual): void
     {
         if (null === $expected) {
             $this->logger->expects(self::once())

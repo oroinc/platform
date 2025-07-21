@@ -5,13 +5,13 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Metadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
+use PHPUnit\Framework\TestCase;
 
-class DoctrineMetadataTest extends \PHPUnit\Framework\TestCase
+class DoctrineMetadataTest extends TestCase
 {
     private const CLASS_NAME = 'Namespace\Entity';
 
-    /** @var DoctrineMetadata */
-    private $doctrineMetadata;
+    private DoctrineMetadata $doctrineMetadata;
 
     #[\Override]
     protected function setUp(): void
@@ -19,14 +19,14 @@ class DoctrineMetadataTest extends \PHPUnit\Framework\TestCase
         $this->doctrineMetadata = new DoctrineMetadata();
     }
 
-    public function testGetFieldName()
+    public function testGetFieldName(): void
     {
         $expectedFieldName = 'test';
         $this->doctrineMetadata->set('fieldName', $expectedFieldName);
         $this->assertEquals($expectedFieldName, $this->doctrineMetadata->getFieldName());
     }
 
-    public function testGetFieldNameFails()
+    public function testGetFieldNameFails(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Option "fieldName" not exists');
@@ -34,7 +34,7 @@ class DoctrineMetadataTest extends \PHPUnit\Framework\TestCase
         $this->doctrineMetadata->getFieldName();
     }
 
-    public function testIsField()
+    public function testIsField(): void
     {
         $this->assertTrue($this->doctrineMetadata->isField());
 
@@ -45,7 +45,7 @@ class DoctrineMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->doctrineMetadata->isField());
     }
 
-    public function testIsAssociation()
+    public function testIsAssociation(): void
     {
         $this->assertFalse($this->doctrineMetadata->isAssociation());
 
@@ -56,7 +56,7 @@ class DoctrineMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->doctrineMetadata->isAssociation());
     }
 
-    public function testIsOneToOne()
+    public function testIsOneToOne(): void
     {
         $this->assertFalse($this->doctrineMetadata->isOneToOne());
 
@@ -64,7 +64,7 @@ class DoctrineMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->doctrineMetadata->isOneToOne());
     }
 
-    public function testIsOneToMany()
+    public function testIsOneToMany(): void
     {
         $this->assertFalse($this->doctrineMetadata->isOneToMany());
 
@@ -72,7 +72,7 @@ class DoctrineMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->doctrineMetadata->isOneToMany());
     }
 
-    public function testIsManyToMany()
+    public function testIsManyToMany(): void
     {
         $this->assertFalse($this->doctrineMetadata->isManyToMany());
 
@@ -80,7 +80,7 @@ class DoctrineMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->doctrineMetadata->isManyToMany());
     }
 
-    public function testIsManyToOne()
+    public function testIsManyToOne(): void
     {
         $this->assertFalse($this->doctrineMetadata->isManyToOne());
 
@@ -88,7 +88,7 @@ class DoctrineMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->doctrineMetadata->isManyToOne());
     }
 
-    public function testIsTypeEqual()
+    public function testIsTypeEqual(): void
     {
         $expectedType = ClassMetadataInfo::ONE_TO_MANY;
         $this->doctrineMetadata->set('type', $expectedType);
@@ -96,7 +96,7 @@ class DoctrineMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->doctrineMetadata->isTypeEqual(ClassMetadataInfo::ONE_TO_ONE));
     }
 
-    public function testOrphanRemoval()
+    public function testOrphanRemoval(): void
     {
         $this->assertFalse($this->doctrineMetadata->isOrphanRemoval());
 

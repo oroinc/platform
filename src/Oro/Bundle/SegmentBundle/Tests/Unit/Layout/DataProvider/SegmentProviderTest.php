@@ -7,14 +7,13 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Layout\DataProvider\SegmentProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SegmentProviderTest extends \PHPUnit\Framework\TestCase
+class SegmentProviderTest extends TestCase
 {
-    /** @var SegmentProvider */
-    private $provider;
-
-    /** @var SegmentManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
+    private SegmentProvider $provider;
+    private SegmentManager&MockObject $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class SegmentProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new SegmentProvider($this->manager);
     }
 
-    public function testGetCollection()
+    public function testGetCollection(): void
     {
         $segment = new Segment();
 
@@ -50,7 +49,7 @@ class SegmentProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['result'], $this->provider->getCollection(1));
     }
 
-    public function testGetCollectionWithoutSegment()
+    public function testGetCollectionWithoutSegment(): void
     {
         $this->manager->expects($this->once())
             ->method('findById')
@@ -63,7 +62,7 @@ class SegmentProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $this->provider->getCollection(1));
     }
 
-    public function testGetCollectionWithoutQueryBuilder()
+    public function testGetCollectionWithoutQueryBuilder(): void
     {
         $segment = new Segment();
 

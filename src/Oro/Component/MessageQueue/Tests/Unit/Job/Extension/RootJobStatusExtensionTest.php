@@ -5,14 +5,13 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Job\Extension;
 use Oro\Component\MessageQueue\Job\Extension\RootJobStatusExtension;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\RootJobStatusCalculator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class RootJobStatusExtensionTest extends \PHPUnit\Framework\TestCase
+class RootJobStatusExtensionTest extends TestCase
 {
-    /** @var RootJobStatusCalculator|\PHPUnit\Framework\MockObject\MockObject */
-    private $rootJobStatusCalculator;
-
-    /** @var RootJobStatusExtension */
-    private $extension;
+    private RootJobStatusCalculator&MockObject $rootJobStatusCalculator;
+    private RootJobStatusExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -24,8 +23,7 @@ class RootJobStatusExtensionTest extends \PHPUnit\Framework\TestCase
     public function testOnPreRunUnique(): void
     {
         $job = new Job();
-        $this->rootJobStatusCalculator
-            ->expects($this->once())
+        $this->rootJobStatusCalculator->expects($this->once())
             ->method('calculate')
             ->with($job);
 
@@ -35,8 +33,7 @@ class RootJobStatusExtensionTest extends \PHPUnit\Framework\TestCase
     public function testOnPostRunUnique(): void
     {
         $job = new Job();
-        $this->rootJobStatusCalculator
-            ->expects($this->once())
+        $this->rootJobStatusCalculator->expects($this->once())
             ->method('calculate')
             ->with($job);
 
@@ -46,8 +43,7 @@ class RootJobStatusExtensionTest extends \PHPUnit\Framework\TestCase
     public function testOnPostRunDelayed(): void
     {
         $job = new Job();
-        $this->rootJobStatusCalculator
-            ->expects($this->once())
+        $this->rootJobStatusCalculator->expects($this->once())
             ->method('calculate')
             ->with($job);
 
@@ -57,8 +53,7 @@ class RootJobStatusExtensionTest extends \PHPUnit\Framework\TestCase
     public function testOnError(): void
     {
         $job = new Job();
-        $this->rootJobStatusCalculator
-            ->expects($this->once())
+        $this->rootJobStatusCalculator->expects($this->once())
             ->method('calculate')
             ->with($job);
 

@@ -4,21 +4,18 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Twig\Sandbox;
 
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProvider;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\VariablesProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class TemplateRendererConfigProviderTest extends \PHPUnit\Framework\TestCase
+class TemplateRendererConfigProviderTest extends TestCase
 {
     private const CONFIG_CACHE_KEY = 'test_config_cache_key';
 
-    /** @var VariablesProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $variablesProvider;
-
-    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var TemplateRendererConfigProvider */
-    private $configProvider;
+    private VariablesProvider&MockObject $variablesProvider;
+    private CacheInterface&MockObject $cache;
+    private TemplateRendererConfigProvider $configProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +30,7 @@ class TemplateRendererConfigProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetConfigurationWhenCachedConfigExists()
+    public function testGetConfigurationWhenCachedConfigExists(): void
     {
         $cachedConfig = [
             'properties'         => ['Test\Entity' => ['field2']],
@@ -52,7 +49,7 @@ class TemplateRendererConfigProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame($cachedConfig, $this->configProvider->getConfiguration());
     }
 
-    public function testGetConfigurationWhenCachedConfigDoesNotExist()
+    public function testGetConfigurationWhenCachedConfigDoesNotExist(): void
     {
         $entityVariableGetters = [
             'Test\Entity' => [
@@ -101,7 +98,7 @@ class TemplateRendererConfigProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame($config, $this->configProvider->getConfiguration());
     }
 
-    public function testGetSystemVariableValues()
+    public function testGetSystemVariableValues(): void
     {
         $systemVariableValues = ['variable1' => 'value1'];
 
@@ -114,7 +111,7 @@ class TemplateRendererConfigProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame($systemVariableValues, $this->configProvider->getSystemVariableValues());
     }
 
-    public function testGetEntityVariableProcessors()
+    public function testGetEntityVariableProcessors(): void
     {
         $entityClass1 = 'Test\Entity1';
         $entityClass2 = 'Test\Entity2';
@@ -150,7 +147,7 @@ class TemplateRendererConfigProviderTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testClearCache()
+    public function testClearCache(): void
     {
         $this->cache->expects(self::once())
             ->method('delete')

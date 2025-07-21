@@ -4,13 +4,11 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\SearchBundle\Entity\IndexDecimal;
 use Oro\Bundle\SearchBundle\Entity\Item;
+use PHPUnit\Framework\TestCase;
 
-class IndexDecimalTest extends \PHPUnit\Framework\TestCase
+class IndexDecimalTest extends TestCase
 {
-    /**
-     * @var \Oro\Bundle\SearchBundle\Entity\IndexDecimal
-     */
-    private $index;
+    private IndexDecimal $index;
 
     #[\Override]
     protected function setUp(): void
@@ -18,26 +16,26 @@ class IndexDecimalTest extends \PHPUnit\Framework\TestCase
         $this->index = new IndexDecimal();
     }
 
-    public function testField()
+    public function testField(): void
     {
         $this->assertNull($this->index->getField());
         $this->index->setField('test_decimal_field');
         $this->assertEquals('test_decimal_field', $this->index->getField());
     }
 
-    public function testValue()
+    public function testValue(): void
     {
         $this->assertNull($this->index->getValue());
         $this->index->setValue(55.25);
         $this->assertEquals(55.25, $this->index->getValue());
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertNull($this->index->getId());
     }
 
-    public function testItem()
+    public function testItem(): void
     {
         $this->assertNull($this->index->getItem());
         $item = new Item();

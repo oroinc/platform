@@ -4,21 +4,18 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\NavigationBundle\Twig\TitleExtension;
 use Oro\Bundle\NavigationBundle\Twig\TitleNode;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Twig\Compiler;
 use Twig\Error\SyntaxError;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Node;
 
-class TitleNodeTest extends \PHPUnit\Framework\TestCase
+class TitleNodeTest extends TestCase
 {
-    /** @var Node|\PHPUnit\Framework\MockObject\MockObject */
-    private $node;
-
-    /** @var Compiler|\PHPUnit\Framework\MockObject\MockObject */
-    private $compiler;
-
-    /** @var TitleNode */
-    private $titleNode;
+    private Node&MockObject $node;
+    private Compiler&MockObject $compiler;
+    private TitleNode $titleNode;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +26,7 @@ class TitleNodeTest extends \PHPUnit\Framework\TestCase
         $this->titleNode = new TitleNode($this->node);
     }
 
-    public function testFailedCompile()
+    public function testFailedCompile(): void
     {
         $this->expectException(SyntaxError::class);
 
@@ -40,7 +37,7 @@ class TitleNodeTest extends \PHPUnit\Framework\TestCase
         $this->titleNode->compile($this->compiler);
     }
 
-    public function testSuccessCompile()
+    public function testSuccessCompile(): void
     {
         $expr = $this->createMock(ArrayExpression::class);
 

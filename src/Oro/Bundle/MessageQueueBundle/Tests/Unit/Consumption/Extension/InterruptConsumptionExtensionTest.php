@@ -6,12 +6,14 @@ use Oro\Bundle\MessageQueueBundle\Consumption\CacheState;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\InterruptConsumptionExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\Testing\Logger\BufferingLogger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
-class InterruptConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
+class InterruptConsumptionExtensionTest extends TestCase
 {
-    private CacheState|\PHPUnit\Framework\MockObject\MockObject $cacheState;
+    private CacheState&MockObject $cacheState;
 
     #[\Override]
     protected function setUp(): void

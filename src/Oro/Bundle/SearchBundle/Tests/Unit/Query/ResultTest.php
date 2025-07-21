@@ -8,20 +8,16 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
+use PHPUnit\Framework\TestCase;
 
-class ResultTest extends \PHPUnit\Framework\TestCase
+class ResultTest extends TestCase
 {
-    /** @var array */
-    private $items = [];
+    private array $items = [];
 
-    /** @var Result */
-    private $result;
+    private Result $result;
+    private Result $result1;
 
-    /** @var Result */
-    private $result1;
-
-    /** @var array */
-    protected static $aggregatedData = [
+    private static array $aggregatedData = [
         'test_name' => [
             'field' => 'test_field_name',
             'function' => Query::AGGREGATE_FUNCTION_COUNT
@@ -94,7 +90,7 @@ class ResultTest extends \PHPUnit\Framework\TestCase
         $this->result1 = new Result($query, [], 0);
     }
 
-    public function testGetQuery()
+    public function testGetQuery(): void
     {
         $query = $this->result->getQuery();
         $from = $query->getFrom();
@@ -109,12 +105,12 @@ class ResultTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test string', $whereExpression->getValue()->getValue());
     }
 
-    public function testGetRecordsCount()
+    public function testGetRecordsCount(): void
     {
         $this->assertEquals(3, $this->result->getRecordsCount());
     }
 
-    public function testToSearchResultData()
+    public function testToSearchResultData(): void
     {
         $resultArray = $this->result->toSearchResultData();
         $this->assertEquals(3, $resultArray['records_count']);
@@ -125,13 +121,13 @@ class ResultTest extends \PHPUnit\Framework\TestCase
         $this->result1->toSearchResultData();
     }
 
-    public function testGetAggregatedData()
+    public function testGetAggregatedData(): void
     {
         $this->assertSame(self::$aggregatedData, $this->result->getAggregatedData());
         $this->assertSame([], $this->result1->getAggregatedData());
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $this->assertEquals($this->items, $this->result->toArray());
     }

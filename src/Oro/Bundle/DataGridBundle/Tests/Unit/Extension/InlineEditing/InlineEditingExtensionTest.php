@@ -9,14 +9,13 @@ use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditingConfigurator;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditingExtension;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class InlineEditingExtensionTest extends \PHPUnit\Framework\TestCase
+class InlineEditingExtensionTest extends TestCase
 {
-    /** @var InlineEditingConfigurator|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurator;
-
-    /** @var InlineEditingExtension */
-    private $extension;
+    private InlineEditingConfigurator&MockObject $configurator;
+    private InlineEditingExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class InlineEditingExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->setParameters(new ParameterBag());
     }
 
-    public function testIsNotApplicableInImportExportMode()
+    public function testIsNotApplicableInImportExportMode(): void
     {
         $params = new ParameterBag();
         $params->set(
@@ -39,7 +38,7 @@ class InlineEditingExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->extension->isApplicable($config));
     }
 
-    public function testVisitMetadata()
+    public function testVisitMetadata(): void
     {
         $config = DatagridConfiguration::create([
             'extended_entity_name' => 'Test',
@@ -54,7 +53,7 @@ class InlineEditingExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessConfigsWithWrongConfiguration()
+    public function testProcessConfigsWithWrongConfiguration(): void
     {
         $config = DatagridConfiguration::create([Configuration::BASE_CONFIG_KEY => ['enable' => true]]);
 

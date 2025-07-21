@@ -7,15 +7,14 @@ use Oro\Bundle\FormBundle\Form\DataTransformer\IdToEntityTransformer;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Form\Type\ConfigIntegrationSelectType;
 use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationSelectType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class ConfigIntegrationSelectTypeTest extends \PHPUnit\Framework\TestCase
+class ConfigIntegrationSelectTypeTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var ConfigIntegrationSelectType */
-    private $formType;
+    private ManagerRegistry&MockObject $registry;
+    private ConfigIntegrationSelectType $formType;
 
     #[\Override]
     protected function setUp(): void
@@ -23,13 +22,10 @@ class ConfigIntegrationSelectTypeTest extends \PHPUnit\Framework\TestCase
         $this->registry = $this->createMock(ManagerRegistry::class);
 
         $this->formType = new ConfigIntegrationSelectType($this->registry);
-
-        parent::setUp();
     }
 
     public function testBuildForm(): void
     {
-        /** @var FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->once())
             ->method('addModelTransformer')

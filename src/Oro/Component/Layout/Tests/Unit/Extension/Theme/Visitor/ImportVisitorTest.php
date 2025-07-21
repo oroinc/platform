@@ -17,17 +17,15 @@ use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\ImportedLayoutUpdate;
 use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\ImportedLayoutUpdateWithImports;
 use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\LayoutUpdateWithImports;
 use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\NotApplicableImportAwareLayoutUpdateStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ImportVisitorTest extends \PHPUnit\Framework\TestCase
+class ImportVisitorTest extends TestCase
 {
-    private LayoutUpdateLoaderInterface|\PHPUnit\Framework\MockObject\MockObject $loader;
-
-    private DependencyInitializer|\PHPUnit\Framework\MockObject\MockObject $dependencyInitializer;
-
-    private ResourceProviderInterface|\PHPUnit\Framework\MockObject\MockObject $resourceProvider;
-
-    private ThemeManager|\PHPUnit\Framework\MockObject\MockObject $themeManager;
-
+    private LayoutUpdateLoaderInterface&MockObject $loader;
+    private DependencyInitializer&MockObject $dependencyInitializer;
+    private ResourceProviderInterface&MockObject $resourceProvider;
+    private ThemeManager&MockObject $themeManager;
     private ImportVisitor $visitor;
 
     #[\Override]

@@ -5,13 +5,14 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 use Oro\Bundle\ConfigBundle\Config\SettingsConverter;
 use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
+use PHPUnit\Framework\TestCase;
 
-class SettingsConverterTest extends \PHPUnit\Framework\TestCase
+class SettingsConverterTest extends TestCase
 {
     /**
      * @dataProvider dataProviderForConverter
      */
-    public function testConvertToSettings(Config $config, array $expectedSettings)
+    public function testConvertToSettings(Config $config, array $expectedSettings): void
     {
         $this->assertEquals($expectedSettings, SettingsConverter::convertToSettings($config));
     }

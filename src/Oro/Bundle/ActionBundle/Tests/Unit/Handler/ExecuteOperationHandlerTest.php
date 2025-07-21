@@ -11,6 +11,8 @@ use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
 use Oro\Component\Action\Exception\InvalidConfigurationException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Exception\AlreadySubmittedException;
 use Symfony\Component\Form\FormInterface;
@@ -18,28 +20,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
+class ExecuteOperationHandlerTest extends TestCase
 {
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var FormProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $formProvider;
-
-    /** @var ContextHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextHelper;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var Operation|\PHPUnit\Framework\MockObject\MockObject */
-    private $operation;
-
-    /** @var ActionData|\PHPUnit\Framework\MockObject\MockObject */
-    private $actionData;
-
-    /** @var ExecuteOperationHandler */
-    private $handler;
+    private RequestStack&MockObject $requestStack;
+    private FormProvider&MockObject $formProvider;
+    private ContextHelper&MockObject $contextHelper;
+    private LoggerInterface&MockObject $logger;
+    private Operation&MockObject $operation;
+    private ActionData $actionData;
+    private ExecuteOperationHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -66,7 +55,7 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessSuccess()
+    public function testProcessSuccess(): void
     {
         $request = new Request();
         $this->requestStack->expects($this->once())
@@ -101,7 +90,7 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($result->getValidationErrors());
     }
 
-    public function testProcessSuccessWithoutRequest()
+    public function testProcessSuccessWithoutRequest(): void
     {
         $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')
@@ -126,7 +115,7 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($result->getValidationErrors());
     }
 
-    public function testProcessInvalidForm()
+    public function testProcessInvalidForm(): void
     {
         $request = new Request();
         $this->requestStack->expects($this->once())
@@ -170,7 +159,7 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(Response::HTTP_FORBIDDEN, $result->getCode());
     }
 
-    public function testProcessOperationNotAvailable()
+    public function testProcessOperationNotAvailable(): void
     {
         $request = new Request();
         $this->requestStack->expects($this->once())
@@ -226,7 +215,7 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessFormNotConfigured()
+    public function testProcessFormNotConfigured(): void
     {
         $request = new Request();
         $this->requestStack->expects($this->once())
@@ -256,7 +245,7 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('execution form error', $result->getExceptionMessage());
     }
 
-    public function testProcessAlreadySubmitted()
+    public function testProcessAlreadySubmitted(): void
     {
         $request = new Request();
         $this->requestStack->expects($this->once())
@@ -292,7 +281,7 @@ class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('form already submitted', $result->getExceptionMessage());
     }
 
-    public function testProcessExecuteException()
+    public function testProcessExecuteException(): void
     {
         $request = new Request();
         $this->requestStack->expects($this->once())

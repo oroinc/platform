@@ -13,10 +13,8 @@ class ThemeExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    private ThemeRegistry|MockObject $themeRegistry;
-
-    private Theme|MockObject $theme;
-
+    private ThemeRegistry&MockObject $themeRegistry;
+    private Theme&MockObject $theme;
     private ThemeExtension $extension;
 
     #[\Override]

@@ -3,15 +3,16 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Context;
 
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
+use PHPUnit\Framework\TestCase;
 
-class OroMainContextTest extends \PHPUnit\Framework\TestCase
+class OroMainContextTest extends TestCase
 {
     /**
      * @dataProvider skipWaitProvider
      * @param int $isMatch
      * @param string $step
      */
-    public function testSkipWait($isMatch, $step)
+    public function testSkipWait($isMatch, $step): void
     {
         $this->assertSame($isMatch, preg_match(OroMainContext::SKIP_WAIT_PATTERN, $step));
     }

@@ -6,11 +6,11 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\WorkflowBundle\Datagrid\Translation\WorkflowColumnListener;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowColumnListenerTest extends \PHPUnit\Framework\TestCase
+class WorkflowColumnListenerTest extends TestCase
 {
-    /** @var WorkflowColumnListener */
-    private $listener;
+    private WorkflowColumnListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class WorkflowColumnListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new WorkflowColumnListener();
     }
 
-    public function testOnBuildBefore()
+    public function testOnBuildBefore(): void
     {
         $event = new BuildBefore($this->createMock(DatagridInterface::class), DatagridConfiguration::create([]));
 

@@ -9,14 +9,13 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AuditConfigProviderTest extends \PHPUnit\Framework\TestCase
+class AuditConfigProviderTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var AuditConfigProvider */
-    private $provider;
+    private ConfigManager&MockObject $configManager;
+    private AuditConfigProvider $provider;
 
     #[\Override]
     protected function setUp(): void

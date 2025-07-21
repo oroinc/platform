@@ -8,18 +8,19 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\WorkflowBundle\Migration\RemoveWorkflowDefinitionQuery;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class RemoveWorkflowDefinitionQueryTest extends \PHPUnit\Framework\TestCase
+class RemoveWorkflowDefinitionQueryTest extends TestCase
 {
-    public function testGetDescriptionIncludesWorkflowName()
+    public function testGetDescriptionIncludesWorkflowName(): void
     {
         $workflowName = 'some_workflow_name';
         $query = new RemoveWorkflowDefinitionQuery($workflowName);
         self::assertStringContainsString($workflowName, $query->getDescription());
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $workflowName = 'some_workflow_name';
         $query = new RemoveWorkflowDefinitionQuery($workflowName);

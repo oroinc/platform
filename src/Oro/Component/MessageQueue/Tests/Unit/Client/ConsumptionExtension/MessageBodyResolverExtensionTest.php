@@ -11,22 +11,20 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Topic\TopicRegistry;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class MessageBodyResolverExtensionTest extends \PHPUnit\Framework\TestCase
+class MessageBodyResolverExtensionTest extends TestCase
 {
     private const TOPIC = 'sample.topic';
     private const BODY = ['sample_key' => 'sample_value'];
 
-    private MessageBodyResolverInterface|\PHPUnit\Framework\MockObject\MockObject $messageBodyResolver;
-
-    private TopicRegistry|\PHPUnit\Framework\MockObject\MockObject $topicRegistry;
-
-    private MessageBodyResolverExtension $extension;
-
+    private MessageBodyResolverInterface&MockObject $messageBodyResolver;
+    private TopicRegistry&MockObject $topicRegistry;
     private Context $context;
-
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
+    private LoggerInterface&MockObject $logger;
+    private MessageBodyResolverExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -50,8 +48,7 @@ class MessageBodyResolverExtensionTest extends \PHPUnit\Framework\TestCase
         $this->context->setMessage($message);
         $this->context->setStatus(MessageProcessorInterface::REJECT);
 
-        $this->logger
-            ->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('debug')
             ->with(
                 'Skipping message body resolving as message status is already set.',
@@ -67,8 +64,7 @@ class MessageBodyResolverExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testOnPreReceivedDoesNothingIfNoMessage(): void
     {
-        $this->logger
-            ->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('debug')
             ->with(
                 'Skipping message body resolving as topic name is empty or is not present in topic registry.',
@@ -85,8 +81,7 @@ class MessageBodyResolverExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setMessage($message);
 
-        $this->logger
-            ->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('debug')
             ->with(
                 'Skipping message body resolving as topic name is empty or is not present in topic registry.',
@@ -104,14 +99,12 @@ class MessageBodyResolverExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setMessage($message);
 
-        $this->topicRegistry
-            ->expects(self::once())
+        $this->topicRegistry->expects(self::once())
             ->method('has')
             ->with(self::TOPIC)
             ->willReturn(false);
 
-        $this->logger
-            ->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('debug')
             ->with(
                 'Skipping message body resolving as topic name is empty or is not present in topic registry.',
@@ -132,21 +125,18 @@ class MessageBodyResolverExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setMessage($message);
 
-        $this->topicRegistry
-            ->expects(self::once())
+        $this->topicRegistry->expects(self::once())
             ->method('has')
             ->with(self::TOPIC)
             ->willReturn(true);
 
         $resolvedBody = self::BODY + ['resolved' => 1];
-        $this->messageBodyResolver
-            ->expects(self::once())
+        $this->messageBodyResolver->expects(self::once())
             ->method('resolveBody')
             ->with(self::TOPIC, self::BODY)
             ->willReturn($resolvedBody);
 
-        $this->logger
-            ->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('debug')
             ->with(
                 'Message body is resolved.',
@@ -167,21 +157,18 @@ class MessageBodyResolverExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setMessage($message);
 
-        $this->topicRegistry
-            ->expects(self::once())
+        $this->topicRegistry->expects(self::once())
             ->method('has')
             ->with(self::TOPIC)
             ->willReturn(true);
 
         $exception = InvalidMessageBodyException::create('Invalid body', self::TOPIC, self::BODY);
-        $this->messageBodyResolver
-            ->expects(self::once())
+        $this->messageBodyResolver->expects(self::once())
             ->method('resolveBody')
             ->with(self::TOPIC, self::BODY)
             ->willThrowException($exception);
 
-        $this->logger
-            ->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('error')
             ->with(
                 self::stringContains(

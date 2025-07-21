@@ -6,21 +6,18 @@ use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 use Oro\Bundle\NavigationBundle\Twig\TitleExtension;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class TitleExtensionTest extends \PHPUnit\Framework\TestCase
+class TitleExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var TitleServiceInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $titleService;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var TitleExtension */
-    private $extension;
+    private TitleServiceInterface&MockObject $titleService;
+    private RequestStack&MockObject $requestStack;
+    private TitleExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +33,7 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new TitleExtension($container);
     }
 
-    public function testRenderSerialized()
+    public function testRenderSerialized(): void
     {
         $expectedResult = 'expected';
         $routeName = 'test_route';
@@ -60,7 +57,7 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRender()
+    public function testRender(): void
     {
         $expectedResult = 'expected';
         $title = 'title';
@@ -87,7 +84,7 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRenderShort()
+    public function testRenderShort(): void
     {
         $expectedResult = 'expected';
         $title = 'title';
@@ -117,7 +114,7 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider renderAfterSetDataProvider
      */
-    public function testRenderAfterSet(array $data, array $expectedData)
+    public function testRenderAfterSet(array $data, array $expectedData): void
     {
         foreach ($data as $arguments) {
             [$data, $templateScope] = array_pad($arguments, 2, null);
@@ -187,7 +184,7 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $fooData = ['k' => 'foo'];
         $barData = ['k' => 'bar'];
@@ -204,7 +201,7 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTokenParserDeclarations()
+    public function testTokenParserDeclarations(): void
     {
         $result = $this->extension->getTokenParsers();
 

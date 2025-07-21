@@ -3,99 +3,100 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
 use Oro\Component\MessageQueue\Job\Job;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class JobTest extends \PHPUnit\Framework\TestCase
+class JobTest extends TestCase
 {
-    public function testShouldConstructWithNullId()
+    public function testShouldConstructWithNullId(): void
     {
         $job = new Job();
         self::assertNull($job->getId());
     }
 
-    public function testShouldConstructWithNullOwnerId()
+    public function testShouldConstructWithNullOwnerId(): void
     {
         $job = new Job();
         self::assertNull($job->getOwnerId());
     }
 
-    public function testShouldConstructWithNullName()
+    public function testShouldConstructWithNullName(): void
     {
         $job = new Job();
         self::assertNull($job->getName());
     }
 
-    public function testShouldConstructWithNullStatus()
+    public function testShouldConstructWithNullStatus(): void
     {
         $job = new Job();
         self::assertNull($job->getStatus());
     }
 
-    public function testShouldConstructWithNullJobProgress()
+    public function testShouldConstructWithNullJobProgress(): void
     {
         $job = new Job();
         self::assertNull($job->getJobProgress());
     }
 
-    public function testShouldConstructNotInterrupted()
+    public function testShouldConstructNotInterrupted(): void
     {
         $job = new Job();
         self::assertFalse($job->isInterrupted());
     }
 
-    public function testShouldConstructNotUnique()
+    public function testShouldConstructNotUnique(): void
     {
         $job = new Job();
         self::assertFalse($job->isUnique());
     }
 
-    public function testShouldConstructWithNullRootJob()
+    public function testShouldConstructWithNullRootJob(): void
     {
         $job = new Job();
         self::assertNull($job->getRootJob());
         self::assertTrue($job->isRoot());
     }
 
-    public function testShouldConstructWithNullChildJobs()
+    public function testShouldConstructWithNullChildJobs(): void
     {
         $job = new Job();
         self::assertEmpty($job->getChildJobs());
     }
 
-    public function testShouldConstructWithNullCreatedAt()
+    public function testShouldConstructWithNullCreatedAt(): void
     {
         $job = new Job();
         self::assertNull($job->getCreatedAt());
     }
 
-    public function testShouldConstructWithNullStartedAt()
+    public function testShouldConstructWithNullStartedAt(): void
     {
         $job = new Job();
         self::assertNull($job->getStartedAt());
     }
 
-    public function testShouldConstructWithNullStoppedAt()
+    public function testShouldConstructWithNullStoppedAt(): void
     {
         $job = new Job();
         self::assertNull($job->getStoppedAt());
     }
 
-    public function testShouldConstructWithEmptyData()
+    public function testShouldConstructWithEmptyData(): void
     {
         $job = new Job();
         self::assertSame([], $job->getData());
     }
 
-    public function testShouldConstructWithEmptyProperties()
+    public function testShouldConstructWithEmptyProperties(): void
     {
         $job = new Job();
         self::assertSame([], $job->getProperties());
     }
 
-    public function testShouldBePossibleToSetId()
+    public function testShouldBePossibleToSetId(): void
     {
         $job = new Job();
 
@@ -103,7 +104,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
         self::assertSame(123, $job->getId());
     }
 
-    public function testShouldBePossibleToSetOwnerId()
+    public function testShouldBePossibleToSetOwnerId(): void
     {
         $job = new Job();
 
@@ -111,7 +112,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
         self::assertSame('123', $job->getOwnerId());
     }
 
-    public function testShouldBePossibleToSetName()
+    public function testShouldBePossibleToSetName(): void
     {
         $job = new Job();
 
@@ -119,7 +120,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test', $job->getName());
     }
 
-    public function testShouldBePossibleToSetStatus()
+    public function testShouldBePossibleToSetStatus(): void
     {
         $job = new Job();
 
@@ -127,7 +128,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(Job::STATUS_RUNNING, $job->getStatus());
     }
 
-    public function testShouldBePossibleToSetJobProgress()
+    public function testShouldBePossibleToSetJobProgress(): void
     {
         $job = new Job();
 
@@ -135,7 +136,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
         self::assertSame(1.23, $job->getJobProgress());
     }
 
-    public function testShouldBePossibleToSetInterrupted()
+    public function testShouldBePossibleToSetInterrupted(): void
     {
         $job = new Job();
 
@@ -143,7 +144,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($job->isInterrupted());
     }
 
-    public function testShouldBePossibleToSetUnique()
+    public function testShouldBePossibleToSetUnique(): void
     {
         $job = new Job();
 
@@ -151,7 +152,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($job->isUnique());
     }
 
-    public function testShouldBePossibleToSetRootJob()
+    public function testShouldBePossibleToSetRootJob(): void
     {
         $job = new Job();
 
@@ -161,7 +162,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($job->isRoot());
     }
 
-    public function testShouldBePossibleToSetCreatedAt()
+    public function testShouldBePossibleToSetCreatedAt(): void
     {
         $job = new Job();
 
@@ -170,7 +171,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
         self::assertSame($date, $job->getCreatedAt());
     }
 
-    public function testShouldBePossibleToSetStartedAt()
+    public function testShouldBePossibleToSetStartedAt(): void
     {
         $job = new Job();
 
@@ -179,7 +180,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
         self::assertSame($date, $job->getStartedAt());
     }
 
-    public function testShouldBePossibleToSetStoppedAt()
+    public function testShouldBePossibleToSetStoppedAt(): void
     {
         $job = new Job();
 
@@ -188,7 +189,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
         self::assertSame($date, $job->getStoppedAt());
     }
 
-    public function testShouldBePossibleToAddChildJob()
+    public function testShouldBePossibleToAddChildJob(): void
     {
         $job = new Job();
 
@@ -199,7 +200,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
         self::assertSame($childJob, $childJobs[0]);
     }
 
-    public function testShouldBePossibleToSetChildJobs()
+    public function testShouldBePossibleToSetChildJobs(): void
     {
         $job = new Job();
 
@@ -210,7 +211,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
         self::assertSame($childJob, $childJobs[0]);
     }
 
-    public function testShouldBePossibleToSetData()
+    public function testShouldBePossibleToSetData(): void
     {
         $job = new Job();
 
@@ -219,7 +220,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
         self::assertSame($data, $job->getData());
     }
 
-    public function testShouldBePossibleToSetProperties()
+    public function testShouldBePossibleToSetProperties(): void
     {
         $job = new Job();
 
@@ -228,7 +229,7 @@ class JobTest extends \PHPUnit\Framework\TestCase
         self::assertSame($properties, $job->getProperties());
     }
 
-    public function testShouldBePossibleToKeepPropertiesAsIsWhenDataIsChanged()
+    public function testShouldBePossibleToKeepPropertiesAsIsWhenDataIsChanged(): void
     {
         $job = new Job();
 

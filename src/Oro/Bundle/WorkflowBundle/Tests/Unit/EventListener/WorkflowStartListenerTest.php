@@ -12,24 +12,17 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowStartListenerTest extends \PHPUnit\Framework\TestCase
+class WorkflowStartListenerTest extends TestCase
 {
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $systemWorkflowManager;
-
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManager;
-
-    /** @var WorkflowManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowManagerRegistry;
-
-    /** @var WorkflowAwareCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowAwareCache;
-
-    /** @var WorkflowStartListener */
-    private $listener;
+    private WorkflowManager&MockObject $systemWorkflowManager;
+    private WorkflowManager&MockObject $workflowManager;
+    private WorkflowManagerRegistry&MockObject $workflowManagerRegistry;
+    private WorkflowAwareCache&MockObject $workflowAwareCache;
+    private WorkflowStartListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -52,7 +45,7 @@ class WorkflowStartListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testScheduleStartWorkflowForNewEntityNoWorkflow()
+    public function testScheduleStartWorkflowForNewEntityNoWorkflow(): void
     {
         $entity = new \stdClass();
 
@@ -66,7 +59,7 @@ class WorkflowStartListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($this->getEntitiesScheduledForWorkflowStart($this->listener));
     }
 
-    public function testScheduleStartWorkflowForNewEntityNoStartStep()
+    public function testScheduleStartWorkflowForNewEntityNoStartStep(): void
     {
         $entity = new \stdClass();
 
@@ -100,7 +93,7 @@ class WorkflowStartListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($this->getEntitiesScheduledForWorkflowStart($this->listener));
     }
 
-    public function testStartWorkflowForNewEntity()
+    public function testStartWorkflowForNewEntity(): void
     {
         $entity = new \stdClass();
         $childEntity = new \DateTime();
@@ -193,10 +186,7 @@ class WorkflowStartListenerTest extends \PHPUnit\Framework\TestCase
         return ReflectionUtil::getPropertyValue($listener, 'entitiesScheduledForWorkflowStart');
     }
 
-    /**
-     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getWorkflow()
+    private function getWorkflow(): Workflow&MockObject
     {
         $definition = new WorkflowDefinition();
         $definition->setConfiguration(['start_type' => 'default']);
@@ -229,10 +219,7 @@ class WorkflowStartListenerTest extends \PHPUnit\Framework\TestCase
         return [$event, $workflow];
     }
 
-    /**
-     * @return LifecycleEventArgs|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getEvent(object $entity)
+    private function getEvent(object $entity): LifecycleEventArgs&MockObject
     {
         $event = $this->createMock(LifecycleEventArgs::class);
         $event->expects($this->atLeastOnce())

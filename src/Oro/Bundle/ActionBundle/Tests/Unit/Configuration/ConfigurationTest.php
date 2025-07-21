@@ -4,10 +4,11 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\ActionBundle\Configuration\Configuration;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit\Framework\TestCase
+class ConfigurationTest extends TestCase
 {
     private function processConfiguration(array $configs): array
     {
@@ -17,7 +18,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processValidConfigurationForOperationsProvider
      */
-    public function testProcessValidConfigurationForOperations(array $inputData, array $expectedData)
+    public function testProcessValidConfigurationForOperations(array $inputData, array $expectedData): void
     {
         $result = $this->processConfiguration(['actions' => ['operations' => $inputData]]);
         $this->assertEquals($expectedData, $result['operations']);
@@ -26,7 +27,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processInvalidConfigurationForOperationsProvider
      */
-    public function testProcessInvalidConfigurationForOperations(array $inputData, $expectedExceptionMessage)
+    public function testProcessInvalidConfigurationForOperations(array $inputData, $expectedExceptionMessage): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
@@ -37,7 +38,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processValidConfigurationForActionGroupsProvider
      */
-    public function testProcessValidConfigurationForActionGroups(array $inputData, array $expectedData)
+    public function testProcessValidConfigurationForActionGroups(array $inputData, array $expectedData): void
     {
         $result = $this->processConfiguration(['actions' => ['action_groups' => $inputData]]);
         $this->assertEquals($expectedData, $result['action_groups']);
@@ -46,7 +47,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processInvalidConfigurationForActionGroupsProvider
      */
-    public function testProcessInvalidConfigurationForActionGroups(array $inputData, $expectedExceptionMessage)
+    public function testProcessInvalidConfigurationForActionGroups(array $inputData, $expectedExceptionMessage): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);

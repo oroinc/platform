@@ -10,15 +10,15 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Log\MessageProcessorClassProvider;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class InterruptionDetailConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
+class InterruptionDetailConsumptionExtensionTest extends TestCase
 {
-    private ContainerInterface|\PHPUnit\Framework\MockObject\MockObject $container;
-
-    private MessageProcessorClassProvider|\PHPUnit\Framework\MockObject\MockObject $messageProcessorClassProvider;
-
+    private ContainerInterface&MockObject $container;
+    private MessageProcessorClassProvider&MockObject $messageProcessorClassProvider;
     private InterruptionDetailConsumptionExtension $extension;
 
     #[\Override]
@@ -55,16 +55,14 @@ class InterruptionDetailConsumptionExtensionTest extends \PHPUnit\Framework\Test
 
         $this->container->expects(self::exactly(2))
             ->method('get')
-            ->willReturnMap(
+            ->willReturnMap([
+                ['oro_logger.cache', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $logger],
                 [
-                    ['oro_logger.cache', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $logger],
-                    [
-                        'oro_config.user',
-                        ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                        $this->createMock(ConfigManagerProxyStub::class),
-                    ],
+                    'oro_config.user',
+                    ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                    $this->createMock(ConfigManagerProxyStub::class),
                 ]
-            );
+            ]);
         $logger->expects(self::once())
             ->method('info')
             ->with(
@@ -133,16 +131,14 @@ class InterruptionDetailConsumptionExtensionTest extends \PHPUnit\Framework\Test
 
         $this->container->expects(self::exactly(2))
             ->method('get')
-            ->willReturnMap(
+            ->willReturnMap([
+                ['oro_logger.cache', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $logger],
                 [
-                    ['oro_logger.cache', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $logger],
-                    [
-                        'oro_config.user',
-                        ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                        $this->createMock(ConfigManagerProxyStub::class),
-                    ],
+                    'oro_config.user',
+                    ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                    $this->createMock(ConfigManagerProxyStub::class),
                 ]
-            );
+            ]);
 
         $this->extension->onPostReceived($context);
         $this->extension->onInterrupted($context);

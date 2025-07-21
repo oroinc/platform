@@ -8,29 +8,24 @@ use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class IndexerQueryTest extends \PHPUnit\Framework\TestCase
+class IndexerQueryTest extends TestCase
 {
     private const TEST_VALUE = 'test_value';
     private const TEST_COUNT = 42;
 
-    /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
-    private $searchIndexer;
+    private Indexer&MockObject $searchIndexer;
+    private Query&MockObject $innerQuery;
 
-    /** @var Query|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerQuery;
+    private array $testElements = [1, 2, 3];
 
-    /** @var array */
-    private $testElements = [1, 2, 3];
-
-    /** @var Criteria|\PHPUnit\Framework\MockObject\MockObject */
-    private $criteria;
-
-    /** @var IndexerQuery */
-    private $query;
+    private Criteria&MockObject $criteria;
+    private IndexerQuery $query;
 
     #[\Override]
     protected function setUp(): void
@@ -64,7 +59,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         return new Result($this->innerQuery, $this->testElements, self::TEST_COUNT);
     }
 
-    public function testCall()
+    public function testCall(): void
     {
         $this->innerQuery->expects($this->once())
             ->method('getOrderDirection')
@@ -73,7 +68,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(self::TEST_VALUE, $this->query->getOrderDirection());
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $result = $this->prepareResult();
 
@@ -87,7 +82,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->testElements, $this->query->execute());
     }
 
-    public function testSetFirstResult()
+    public function testSetFirstResult(): void
     {
         $this->criteria->expects($this->once())
             ->method('setFirstResult')
@@ -96,7 +91,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->query, $this->query->setFirstResult(self::TEST_VALUE));
     }
 
-    public function testGetFirstResult()
+    public function testGetFirstResult(): void
     {
         $this->criteria->expects($this->once())
             ->method('getFirstResult')
@@ -105,7 +100,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(self::TEST_VALUE, $this->query->getFirstResult());
     }
 
-    public function testSetMaxResults()
+    public function testSetMaxResults(): void
     {
         $this->criteria->expects($this->once())
             ->method('setMaxResults')
@@ -114,7 +109,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->query, $this->query->setMaxResults(self::TEST_VALUE));
     }
 
-    public function testGetMaxResults()
+    public function testGetMaxResults(): void
     {
         $this->criteria->expects($this->once())
             ->method('getMaxResults')
@@ -123,7 +118,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(self::TEST_VALUE, $this->query->getMaxResults());
     }
 
-    public function testGetTotalCount()
+    public function testGetTotalCount(): void
     {
         $result = $this->prepareResult();
 
@@ -135,7 +130,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(self::TEST_COUNT, $this->query->getTotalCount());
     }
 
-    public function testGetSortBy()
+    public function testGetSortBy(): void
     {
         $this->criteria->expects($this->once())
             ->method('getOrderings')
@@ -144,7 +139,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(self::TEST_VALUE, $this->query->getSortBy());
     }
 
-    public function testGetSortOrder()
+    public function testGetSortOrder(): void
     {
         $this->criteria->expects($this->once())
             ->method('getOrderings')
@@ -153,7 +148,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('ASC', $this->query->getSortOrder());
     }
 
-    public function testSetWhere()
+    public function testSetWhere(): void
     {
         $expression = Criteria::expr()->eq('field', 'value');
 
@@ -164,7 +159,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->query, $this->query->addWhere($expression));
     }
 
-    public function testSetWhereOr()
+    public function testSetWhereOr(): void
     {
         $expression = Criteria::expr()->eq('field', 'value');
 
@@ -182,7 +177,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider orderByDataProvider
      */
-    public function testSetOrderBy(array $arguments, array $ordering)
+    public function testSetOrderBy(array $arguments, array $ordering): void
     {
         $this->criteria->expects($this->once())
             ->method('orderBy')
@@ -213,7 +208,49 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testAddSelect()
+    /**
+     * @dataProvider addOrderByDataProvider
+     */
+    public function testAddOrderBy(array $arguments, array $ordering): void
+    {
+        $this->criteria->expects(self::once())
+            ->method('getOrderings')
+            ->willReturn(['integer.field' => 3]);
+
+        $this->criteria->expects(self::once())
+            ->method('orderBy')
+            ->with($ordering);
+
+        $this->query->addOrderBy(...$arguments);
+    }
+
+    public function addOrderByDataProvider(): array
+    {
+        return [
+            'only field name' => [
+                'arguments' => ['field'],
+                'ordering' => ['integer.field' => 3, 'text.field' => 'asc']
+            ],
+            'field and direction' => [
+                'arguments' => ['field', 'desc'],
+                'ordering'  => ['integer.field' => 3, 'text.field' => 'desc'],
+            ],
+            'field, direction and type' => [
+                'arguments' => ['field', 'desc', 'decimal'],
+                'ordering'  => ['integer.field' => 3, 'decimal.field' => 'desc'],
+            ],
+            'field with predefined type' => [
+                'arguments' => ['decimal.field', 'desc'],
+                'ordering'  => ['integer.field' => 3, 'decimal.field' => 'desc'],
+            ],
+            'field with prepend' => [
+                'arguments' => ['field', 'desc', 'decimal', true],
+                'ordering'  => ['decimal.field' => 'desc', 'integer.field' => 3],
+            ],
+        ];
+    }
+
+    public function testAddSelect(): void
     {
         $this->innerQuery->expects($this->once())
             ->method('addSelect')
@@ -222,7 +259,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->query, $this->query->addSelect('field', 'decimal'));
     }
 
-    public function testGetFromWhenItIsNotSet()
+    public function testGetFromWhenItIsNotSet(): void
     {
         $this->innerQuery->expects($this->once())
             ->method('getFrom')
@@ -231,7 +268,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->query->getFrom());
     }
 
-    public function testGetFrom()
+    public function testGetFrom(): void
     {
         $this->innerQuery->expects($this->once())
             ->method('getFrom')
@@ -240,7 +277,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(self::TEST_VALUE, $this->query->getFrom());
     }
 
-    public function testSetFrom()
+    public function testSetFrom(): void
     {
         $this->innerQuery->expects($this->once())
             ->method('from')
@@ -249,7 +286,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->query, $this->query->setFrom(self::TEST_VALUE));
     }
 
-    public function testAggregationAccessors()
+    public function testAggregationAccessors(): void
     {
         $this->assertEquals([], $this->query->getAggregations());
 
@@ -265,7 +302,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $result1 = $this->prepareResult();
         $result2 = $this->prepareResult();

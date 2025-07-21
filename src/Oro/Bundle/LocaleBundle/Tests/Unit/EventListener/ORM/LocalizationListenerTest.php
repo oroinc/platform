@@ -7,17 +7,14 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\EventListener\ORM\LocalizationListener;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LocalizationListenerTest extends \PHPUnit\Framework\TestCase
+class LocalizationListenerTest extends TestCase
 {
-    /** @var LocalizationFallbackStrategy|\PHPUnit\Framework\MockObject\MockObject */
-    private $strategy;
-
-    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationManager;
-
-    /** @var LocalizationListener */
-    private $listener;
+    private LocalizationFallbackStrategy&MockObject $strategy;
+    private LocalizationManager&MockObject $localizationManager;
+    private LocalizationListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -33,19 +30,19 @@ class LocalizationListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new LocalizationListener($this->strategy, $this->localizationManager);
     }
 
-    public function testPostPersist()
+    public function testPostPersist(): void
     {
         $args = $this->createMock(LifecycleEventArgs::class);
         $this->listener->postPersist(new Localization(), $args);
     }
 
-    public function testPostUpdate()
+    public function testPostUpdate(): void
     {
         $args = $this->createMock(LifecycleEventArgs::class);
         $this->listener->postUpdate(new Localization(), $args);
     }
 
-    public function testPostRemove()
+    public function testPostRemove(): void
     {
         $args = $this->createMock(LifecycleEventArgs::class);
         $this->listener->postRemove(new Localization(), $args);

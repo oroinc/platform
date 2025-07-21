@@ -11,6 +11,9 @@ use Oro\Bundle\AttachmentBundle\Entity\Attachment;
  */
 class AttachmentTest extends RestJsonApiTestCase
 {
+    private const string BLANK_FILE_CONTENT = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA'
+        . '1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII=';
+
     #[\Override]
     protected function setUp(): void
     {
@@ -22,12 +25,7 @@ class AttachmentTest extends RestJsonApiTestCase
 
     private function getTargetId(Attachment $attachment): ?int
     {
-        $target = $attachment->getTarget();
-        if (null === $target) {
-            return null;
-        }
-
-        return $target->getId();
+        return $attachment->getTarget()?->getId();
     }
 
     public function testGetList(): void
@@ -124,10 +122,21 @@ class AttachmentTest extends RestJsonApiTestCase
                     ],
                     'relationships' => [
                         'file'   => [
-                            'data' => ['type' => 'files', 'id' => '<toString(@file4->id)>']
+                            'data' => ['type' => 'files', 'id' => 'file']
                         ],
                         'target' => [
                             'data' => ['type' => 'testapidepartments', 'id' => '<toString(@department1->id)>']
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type'          => 'files',
+                        'id'            => 'file',
+                        'attributes' => [
+                            'mimeType'         => 'image/png',
+                            'originalFilename' => 'blank.png',
+                            'content'          => self::BLANK_FILE_CONTENT
                         ]
                     ]
                 ]
@@ -153,7 +162,18 @@ class AttachmentTest extends RestJsonApiTestCase
                     ],
                     'relationships' => [
                         'file' => [
-                            'data' => ['type' => 'files', 'id' => '<toString(@file4->id)>']
+                            'data' => ['type' => 'files', 'id' => 'file']
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type'          => 'files',
+                        'id'            => 'file',
+                        'attributes' => [
+                            'mimeType'         => 'image/png',
+                            'originalFilename' => 'blank.png',
+                            'content'          => self::BLANK_FILE_CONTENT
                         ]
                     ]
                 ]
@@ -183,10 +203,21 @@ class AttachmentTest extends RestJsonApiTestCase
                     ],
                     'relationships' => [
                         'file'   => [
-                            'data' => ['type' => 'files', 'id' => '<toString(@file4->id)>']
+                            'data' => ['type' => 'files', 'id' => 'file']
                         ],
                         'target' => [
                             'data' => null
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type'          => 'files',
+                        'id'            => 'file',
+                        'attributes' => [
+                            'mimeType'         => 'image/png',
+                            'originalFilename' => 'blank.png',
+                            'content'          => self::BLANK_FILE_CONTENT
                         ]
                     ]
                 ]
@@ -491,31 +522,12 @@ class AttachmentTest extends RestJsonApiTestCase
 
     public function testUpdateRelationshipForFile(): void
     {
-        $attachmentId = $this->getReference('attachment1')->getId();
-        $file4Id = $this->getReference('file2')->getId();
-        $this->patchRelationship(
-            ['entity' => 'attachments', 'id' => (string)$attachmentId, 'association' => 'file'],
-            ['data' => ['type' => 'files', 'id' => (string)$file4Id]]
-        );
-        /** @var Attachment $attachment */
-        $attachment = $this->getEntityManager()->find(Attachment::class, $attachmentId);
-        self::assertEquals($file4Id, $attachment->getFile()->getId());
-    }
-
-    public function testTryToUpdateRelationshipForFileToNull()
-    {
         $response = $this->patchRelationship(
             ['entity' => 'attachments', 'id' => '<toString(@attachment1->id)>', 'association' => 'file'],
-            ['data' => null],
+            ['data' => ['type' => 'files', 'id' => '<toString(@file1->id)>']],
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'not blank constraint',
-                'detail' => 'This value should not be blank.'
-            ],
-            $response
-        );
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
     }
 }

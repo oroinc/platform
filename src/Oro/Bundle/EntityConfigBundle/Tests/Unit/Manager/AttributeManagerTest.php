@@ -22,29 +22,24 @@ use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class AttributeManagerTest extends \PHPUnit\Framework\TestCase
+class AttributeManagerTest extends TestCase
 {
     use EntityTrait;
 
     private const ENTITY_CLASS_NAME = 'entity_class_name';
     private const ATTRIBUTE_FIELD_NAME = 'attribute_field_name';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $configTranslationHelper;
-
-    /** @var AttributeManager */
-    private $manager;
+    private ConfigManager&MockObject $configManager;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ConfigTranslationHelper&MockObject $configTranslationHelper;
+    private AttributeManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -329,7 +324,6 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
             ->with('extend')
             ->willReturn($extendConfigProvider);
 
-        /** @var FieldConfigModel $attribute */
         $attribute = $this->getEntity(FieldConfigModel::class, [
             'fieldName' => $attributeFieldName,
             'entity' => $this->getEntity(EntityConfigModel::class, ['className' => $entityClassName])
@@ -382,7 +376,6 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockAttributeLabelTranslation(self::ENTITY_CLASS_NAME, self::ATTRIBUTE_FIELD_NAME, $expectedTranslation);
 
-        /** @var FieldConfigModel $attribute */
         $attribute = $this->getEntity(FieldConfigModel::class, [
             'fieldName' => self::ATTRIBUTE_FIELD_NAME,
             'entity' => $this->getEntity(EntityConfigModel::class, ['className' => self::ENTITY_CLASS_NAME])
@@ -502,7 +495,6 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         array $familyData,
         array $expected
     ): void {
-        /** @var AttributeFamily $attributeFamily */
         $attributeFamily = $this->getEntity(AttributeFamily::class, $familyData);
 
         $groupRepository = $this->createMock(AttributeGroupRepository::class);
@@ -551,7 +543,6 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
             ->with('extend')
             ->willReturn($extendConfigProvider);
 
-        /** @var FieldConfigModel $attribute */
         $attribute = $this->getEntity(FieldConfigModel::class, [
             'fieldName' => $attributeFieldName,
             'entity' => $this->getEntity(EntityConfigModel::class, ['className' => $entityClassName])
@@ -569,10 +560,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($isCheckSuccessful);
     }
 
-    /**
-     * @return FieldConfigModelRepository|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function expectsGetFieldConfigModelRepository(int $calls = 1)
+    private function expectsGetFieldConfigModelRepository(int $calls = 1): FieldConfigModelRepository&MockObject
     {
         $repository = $this->createMock(FieldConfigModelRepository::class);
 
@@ -584,10 +572,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         return $repository;
     }
 
-    /**
-     * @return AttributeFamilyRepository|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function expectsGetAttributeFamilyRepository(int $calls = 1)
+    private function expectsGetAttributeFamilyRepository(int $calls = 1): AttributeFamilyRepository&MockObject
     {
         $repository = $this->createMock(AttributeFamilyRepository::class);
 
@@ -599,10 +584,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         return $repository;
     }
 
-    /**
-     * @return AttributeGroupRelationRepository|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function expectsGetAttributeGroupRelationRepository()
+    private function expectsGetAttributeGroupRelationRepository(): AttributeGroupRelationRepository&MockObject
     {
         $repository = $this->createMock(AttributeGroupRelationRepository::class);
 

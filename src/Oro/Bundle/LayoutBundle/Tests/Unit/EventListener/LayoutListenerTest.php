@@ -13,6 +13,8 @@ use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutBuilderInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,16 +25,11 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class LayoutListenerTest extends \PHPUnit\Framework\TestCase
+class LayoutListenerTest extends TestCase
 {
-    /** @var LayoutManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $layoutManager;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var LayoutListener */
-    private $listener;
+    private LayoutManager&MockObject $layoutManager;
+    private LoggerInterface&MockObject $logger;
+    private LayoutListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -388,7 +385,7 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
     private function getLayoutMock(
         array $renderBlocks,
         ?string $blockId
-    ): \PHPUnit\Framework\MockObject\MockObject|Layout {
+    ): MockObject|Layout {
         $renderContent = 'Test Layout';
         if ($blockId) {
             $renderContent = $renderBlocks[$blockId] ?? '';

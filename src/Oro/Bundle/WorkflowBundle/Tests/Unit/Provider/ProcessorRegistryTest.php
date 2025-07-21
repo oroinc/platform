@@ -6,11 +6,11 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\IntegrationBundle\Provider\AbstractSyncProcessor;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
+use PHPUnit\Framework\TestCase;
 
-class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
+class ProcessorRegistryTest extends TestCase
 {
-    /** @var SyncProcessorRegistry */
-    private $registry;
+    private SyncProcessorRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry = new SyncProcessorRegistry();
     }
 
-    public function testRegistry()
+    public function testRegistry(): void
     {
         $channelOne = $this->createMock(Channel::class);
         $channelOne->expects($this->any())
@@ -47,7 +47,7 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($defaultProcessor, $this->registry->getProcessorForIntegration($channelTwo));
     }
 
-    public function testRegistryException()
+    public function testRegistryException(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Default sync processor was not set');

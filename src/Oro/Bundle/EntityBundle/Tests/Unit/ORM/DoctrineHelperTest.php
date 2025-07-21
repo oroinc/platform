@@ -30,17 +30,10 @@ class DoctrineHelperTest extends TestCase
 {
     private const TEST_IDENTIFIER = 42;
 
-    /** @var MockObject|ManagerRegistry */
-    private $registry;
-
-    /** @var MockObject */
-    private $em;
-
-    /** @var MockObject */
-    private $classMetadata;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private ManagerRegistry&MockObject $registry;
+    private MockObject $em;
+    private MockObject $classMetadata;
+    private DoctrineHelper $doctrineHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -52,7 +45,7 @@ class DoctrineHelperTest extends TestCase
         $this->doctrineHelper = new DoctrineHelper($this->registry);
     }
 
-    public function testGetClassForEntity()
+    public function testGetClassForEntity(): void
     {
         $entity = new ItemStub();
         $expectedClass = get_class($entity);
@@ -61,7 +54,7 @@ class DoctrineHelperTest extends TestCase
         $this->assertEquals($expectedClass, $this->doctrineHelper->getClass($entity));
     }
 
-    public function testGetClassForEntityProxy()
+    public function testGetClassForEntityProxy(): void
     {
         $entity = new ItemStubProxy();
         $expectedClass = 'ItemStubProxy';
@@ -70,7 +63,7 @@ class DoctrineHelperTest extends TestCase
         $this->assertEquals($expectedClass, $this->doctrineHelper->getClass($entity));
     }
 
-    public function testGetRealClassForEntityClass()
+    public function testGetRealClassForEntityClass(): void
     {
         $class = ItemStub::class;
         $expectedClass = $class;
@@ -79,7 +72,7 @@ class DoctrineHelperTest extends TestCase
         $this->assertEquals($expectedClass, $this->doctrineHelper->getRealClass($class));
     }
 
-    public function testGetRealClassForEntityProxyClass()
+    public function testGetRealClassForEntityProxyClass(): void
     {
         $class = ItemStubProxy::class;
         $expectedClass = 'ItemStubProxy';
@@ -88,7 +81,7 @@ class DoctrineHelperTest extends TestCase
         $this->assertEquals($expectedClass, $this->doctrineHelper->getRealClass($class));
     }
 
-    public function testGetEntityClassForEntity()
+    public function testGetEntityClassForEntity(): void
     {
         $entity = new ItemStub();
         $expectedClass = get_class($entity);
@@ -97,7 +90,7 @@ class DoctrineHelperTest extends TestCase
         $this->assertEquals($expectedClass, $this->doctrineHelper->getEntityClass($entity));
     }
 
-    public function testGetEntityClassForEntityProxy()
+    public function testGetEntityClassForEntityProxy(): void
     {
         $entity = new ItemStubProxy();
         $expectedClass = 'ItemStubProxy';
@@ -106,7 +99,7 @@ class DoctrineHelperTest extends TestCase
         $this->assertEquals($expectedClass, $this->doctrineHelper->getEntityClass($entity));
     }
 
-    public function testGetEntityClassForEntityClass()
+    public function testGetEntityClassForEntityClass(): void
     {
         $class = ItemStub::class;
         $expectedClass = $class;
@@ -115,7 +108,7 @@ class DoctrineHelperTest extends TestCase
         $this->assertEquals($expectedClass, $this->doctrineHelper->getEntityClass($class));
     }
 
-    public function testGetEntityClassForEntityProxyClass()
+    public function testGetEntityClassForEntityProxyClass(): void
     {
         $class = ItemStubProxy::class;
         $expectedClass = 'ItemStubProxy';
@@ -127,7 +120,7 @@ class DoctrineHelperTest extends TestCase
     /**
      * @dataProvider testIsNewEntityDataProvider
      */
-    public function testIsNewEntity(object $entity, string $class, array $identifiers, bool $expected)
+    public function testIsNewEntity(object $entity, string $class, array $identifiers, bool $expected): void
     {
         $this->classMetadata->expects($this->once())
             ->method('getIdentifierValues')
@@ -190,7 +183,7 @@ class DoctrineHelperTest extends TestCase
     /**
      * @dataProvider getEntityIdentifierDataProvider
      */
-    public function testGetEntityIdentifier(object $entity, string $class)
+    public function testGetEntityIdentifier(object $entity, string $class): void
     {
         $identifiers = ['id' => self::TEST_IDENTIFIER];
 
@@ -213,7 +206,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testGetEntityIdentifierForNotManageableEntityWithGetIdMethod()
+    public function testGetEntityIdentifierForNotManageableEntityWithGetIdMethod(): void
     {
         $identifiers = ['id' => self::TEST_IDENTIFIER];
         $entity = new TestEntity($identifiers['id']);
@@ -228,7 +221,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testGetEntityIdentifierForNotManageableEntityWithoutGetIdMethod()
+    public function testGetEntityIdentifierForNotManageableEntityWithoutGetIdMethod(): void
     {
         $entity = $this->createMock(\stdClass::class);
 
@@ -260,10 +253,10 @@ class DoctrineHelperTest extends TestCase
     /**
      * @dataProvider getSingleEntityIdentifierDataProvider
      */
-    public function testGetSingleEntityIdentifier(?int $expected, array $identifiers, bool $throwException = true)
+    public function testGetSingleEntityIdentifier(?int $expected, array $identifiers, bool $throwException = true): void
     {
         $entity = new ItemStubProxy();
-        $class  = 'ItemStubProxy';
+        $class = 'ItemStubProxy';
 
         $this->classMetadata->expects($this->once())
             ->method('getIdentifierValues')
@@ -303,7 +296,7 @@ class DoctrineHelperTest extends TestCase
         ];
     }
 
-    public function testGetSingleEntityIdentifierIncorrectIdentifier()
+    public function testGetSingleEntityIdentifierIncorrectIdentifier(): void
     {
         $this->expectException(InvalidEntityException::class);
         $this->expectExceptionMessage('Can\'t get single identifier for "ItemStubProxy" entity.');
@@ -311,7 +304,7 @@ class DoctrineHelperTest extends TestCase
         $identifiers = ['key1' => 'value1', 'key2' => 'value2'];
 
         $entity = new ItemStubProxy();
-        $class  = 'ItemStubProxy';
+        $class = 'ItemStubProxy';
 
         $this->classMetadata->expects($this->once())
             ->method('getIdentifierValues')
@@ -332,7 +325,7 @@ class DoctrineHelperTest extends TestCase
     /**
      * @dataProvider getEntityIdentifierFieldNamesDataProvider
      */
-    public function testGetEntityIdentifierFieldNames(object $entity, string $class)
+    public function testGetEntityIdentifierFieldNames(object $entity, string $class): void
     {
         $identifiers = ['id' => self::TEST_IDENTIFIER];
 
@@ -354,7 +347,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testGetEntityIdentifierFieldNamesNotManageableEntity()
+    public function testGetEntityIdentifierFieldNamesNotManageableEntity(): void
     {
         $entity = $this->createMock(\stdClass::class);
 
@@ -383,7 +376,7 @@ class DoctrineHelperTest extends TestCase
         ];
     }
 
-    public function testGetEntityIdentifierFieldNamesForClass()
+    public function testGetEntityIdentifierFieldNamesForClass(): void
     {
         $class = ItemStub::class;
         $identifiers = ['id' => self::TEST_IDENTIFIER];
@@ -406,7 +399,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testGetEntityIdentifierFieldNamesForClassNotManageableEntity()
+    public function testGetEntityIdentifierFieldNamesForClassNotManageableEntity(): void
     {
         $class = \stdClass::class;
 
@@ -428,9 +421,9 @@ class DoctrineHelperTest extends TestCase
         ?string $expected,
         array $identifiers,
         bool $throwException = true
-    ) {
+    ): void {
         $entity = new ItemStubProxy();
-        $class  = 'ItemStubProxy';
+        $class = 'ItemStubProxy';
 
         $this->classMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
@@ -469,7 +462,7 @@ class DoctrineHelperTest extends TestCase
         ];
     }
 
-    public function testGetSingleEntityIdentifierFieldNameIncorrectIdentifier()
+    public function testGetSingleEntityIdentifierFieldNameIncorrectIdentifier(): void
     {
         $this->expectException(InvalidEntityException::class);
         $this->expectExceptionMessage('Can\'t get single identifier field name for "ItemStubProxy" entity.');
@@ -477,7 +470,7 @@ class DoctrineHelperTest extends TestCase
         $identifiers = ['key1' => 'value1', 'key2' => 'value2'];
 
         $entity = new ItemStubProxy();
-        $class  = 'ItemStubProxy';
+        $class = 'ItemStubProxy';
 
         $this->classMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
@@ -501,9 +494,9 @@ class DoctrineHelperTest extends TestCase
         ?string $expected,
         array $identifiers,
         bool $throwException = true
-    ) {
+    ): void {
         $entity = new ItemStubProxy();
-        $class  = 'ItemStubProxy';
+        $class = 'ItemStubProxy';
 
         $this->classMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
@@ -548,7 +541,7 @@ class DoctrineHelperTest extends TestCase
         ];
     }
 
-    public function testGetSingleEntityIdentifierFieldTypeIncorrectIdentifier()
+    public function testGetSingleEntityIdentifierFieldTypeIncorrectIdentifier(): void
     {
         $this->expectException(InvalidEntityException::class);
         $this->expectExceptionMessage('Can\'t get single identifier field type for "ItemStubProxy" entity.');
@@ -556,7 +549,7 @@ class DoctrineHelperTest extends TestCase
         $identifiers = ['key1' => 'integer', 'key2' => 'string'];
 
         $entity = new ItemStubProxy();
-        $class  = 'ItemStubProxy';
+        $class = 'ItemStubProxy';
 
         $this->classMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
@@ -575,7 +568,7 @@ class DoctrineHelperTest extends TestCase
         $this->doctrineHelper->getSingleEntityIdentifierFieldType($entity);
     }
 
-    public function testGetSingleEntityIdentifierFieldTypeEmptyIdentifier()
+    public function testGetSingleEntityIdentifierFieldTypeEmptyIdentifier(): void
     {
         $this->expectException(InvalidEntityException::class);
         $this->expectExceptionMessage('Can\'t get single identifier field type for "ItemStubProxy" entity.');
@@ -583,7 +576,7 @@ class DoctrineHelperTest extends TestCase
         $identifiers = [];
 
         $entity = new ItemStubProxy();
-        $class  = 'ItemStubProxy';
+        $class = 'ItemStubProxy';
 
         $this->classMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
@@ -602,7 +595,7 @@ class DoctrineHelperTest extends TestCase
         $this->doctrineHelper->getSingleEntityIdentifierFieldType($entity);
     }
 
-    public function testIsManageableEntity()
+    public function testIsManageableEntity(): void
     {
         $entity = new ItemStubProxy();
 
@@ -616,7 +609,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testIsManageableEntityForNotManageableEntity()
+    public function testIsManageableEntityForNotManageableEntity(): void
     {
         $entity = new ItemStubProxy();
 
@@ -630,7 +623,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testIsManageableEntityClass()
+    public function testIsManageableEntityClass(): void
     {
         $class = ItemStub::class;
 
@@ -644,7 +637,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testIsManageableEntityClassForNotManageableEntity()
+    public function testIsManageableEntityClassForNotManageableEntity(): void
     {
         $class = ItemStub::class;
 
@@ -661,7 +654,7 @@ class DoctrineHelperTest extends TestCase
     /**
      * @dataProvider getEntityMetadataDataProvider
      */
-    public function testGetEntityMetadata(string|object $entityOrClass, string $class)
+    public function testGetEntityMetadata(string|object $entityOrClass, string $class): void
     {
         $this->em->expects($this->once())
             ->method('getClassMetadata')
@@ -686,7 +679,7 @@ class DoctrineHelperTest extends TestCase
         ];
     }
 
-    public function testGetEntityMetadataNotManageableEntity()
+    public function testGetEntityMetadataNotManageableEntity(): void
     {
         $this->expectException(NotManageableEntityException::class);
         $this->expectExceptionMessage('Entity class "ItemStub" is not manageable');
@@ -701,7 +694,7 @@ class DoctrineHelperTest extends TestCase
         $this->doctrineHelper->getEntityMetadata($class);
     }
 
-    public function testGetEntityMetadataNotManageableEntityWithoutThrowException()
+    public function testGetEntityMetadataNotManageableEntityWithoutThrowException(): void
     {
         $class = 'ItemStub';
 
@@ -715,7 +708,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testGetEntityMetadataForClass()
+    public function testGetEntityMetadataForClass(): void
     {
         $class = 'ItemStub';
 
@@ -734,7 +727,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testGetEntityMetadataForClassNotManageableEntity()
+    public function testGetEntityMetadataForClassNotManageableEntity(): void
     {
         $this->expectException(NotManageableEntityException::class);
         $this->expectExceptionMessage('Entity class "ItemStub" is not manageable');
@@ -749,7 +742,7 @@ class DoctrineHelperTest extends TestCase
         $this->doctrineHelper->getEntityMetadataForClass($class);
     }
 
-    public function testGetEntityMetadataForClassNotManageableEntityWithoutThrowException()
+    public function testGetEntityMetadataForClassNotManageableEntityWithoutThrowException(): void
     {
         $class = 'ItemStub';
 
@@ -766,7 +759,7 @@ class DoctrineHelperTest extends TestCase
     /**
      * @dataProvider getEntityManagerDataProvider
      */
-    public function testGetEntityManager(string|object $entityOrClass)
+    public function testGetEntityManager(string|object $entityOrClass): void
     {
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
@@ -787,7 +780,7 @@ class DoctrineHelperTest extends TestCase
         ];
     }
 
-    public function testGetEntityManagerNotManageableEntity()
+    public function testGetEntityManagerNotManageableEntity(): void
     {
         $this->expectException(NotManageableEntityException::class);
         $this->expectExceptionMessage('Entity class "ItemStub" is not manageable');
@@ -802,7 +795,7 @@ class DoctrineHelperTest extends TestCase
         $this->doctrineHelper->getEntityManager($class);
     }
 
-    public function testGetEntityManagerNotManageableEntityWithoutThrowException()
+    public function testGetEntityManagerNotManageableEntityWithoutThrowException(): void
     {
         $class = 'ItemStub';
 
@@ -816,7 +809,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testGetEntityManagerForClass()
+    public function testGetEntityManagerForClass(): void
     {
         $class = 'ItemStub';
 
@@ -831,7 +824,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testGetEntityManagerForClassNotManageableEntity()
+    public function testGetEntityManagerForClassNotManageableEntity(): void
     {
         $this->expectException(NotManageableEntityException::class);
         $this->expectExceptionMessage('Entity class "ItemStub" is not manageable');
@@ -846,7 +839,7 @@ class DoctrineHelperTest extends TestCase
         $this->doctrineHelper->getEntityManagerForClass($class);
     }
 
-    public function testGetEntityManagerForClassNotManageableEntityWithoutThrowException()
+    public function testGetEntityManagerForClassNotManageableEntityWithoutThrowException(): void
     {
         $class = 'ItemStub';
 
@@ -860,7 +853,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testGetEntityRepositoryByEntity()
+    public function testGetEntityRepositoryByEntity(): void
     {
         $entity = new ItemStubProxy();
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
@@ -882,7 +875,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testGetEntityRepositoryByClass()
+    public function testGetEntityRepositoryByClass(): void
     {
         $class = 'ItemStubProxy';
 
@@ -903,7 +896,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testGetEntityRepositoryNotManageableEntity()
+    public function testGetEntityRepositoryNotManageableEntity(): void
     {
         $class = 'ItemStubProxy';
 
@@ -918,7 +911,7 @@ class DoctrineHelperTest extends TestCase
         $this->doctrineHelper->getEntityRepository($class);
     }
 
-    public function testGetEntityRepositoryForClass()
+    public function testGetEntityRepositoryForClass(): void
     {
         $class = 'ItemStub';
 
@@ -939,7 +932,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testGetEntityRepositoryForClassNotManageableEntity()
+    public function testGetEntityRepositoryForClassNotManageableEntity(): void
     {
         $class = 'ItemStub';
 
@@ -954,7 +947,7 @@ class DoctrineHelperTest extends TestCase
         $this->doctrineHelper->getEntityRepositoryForClass($class);
     }
 
-    public function testCreateQueryBuilderWithoutIndexBy()
+    public function testCreateQueryBuilderWithoutIndexBy(): void
     {
         $class = 'ItemStub';
         $alias = 'itemAlias';
@@ -982,7 +975,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testCreateQueryBuilderWithIndexBy()
+    public function testCreateQueryBuilderWithIndexBy(): void
     {
         $class = 'ItemStub';
         $alias = 'itemAlias';
@@ -1011,7 +1004,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testGetEntityReference()
+    public function testGetEntityReference(): void
     {
         $expectedResult = $this->createMock(\stdClass::class);
         $entityClass = 'MockEntity';
@@ -1032,7 +1025,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testGetEntity()
+    public function testGetEntity(): void
     {
         $expectedResult = new TestEntity();
         $entityClass = 'MockEntity';
@@ -1053,7 +1046,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testCreateEntityInstance()
+    public function testCreateEntityInstance(): void
     {
         $entity = new ItemStubProxy();
         $class = 'ItemStubProxy';
@@ -1076,7 +1069,7 @@ class DoctrineHelperTest extends TestCase
         );
     }
 
-    public function testRefreshIncludingUnitializedRelations()
+    public function testRefreshIncludingUnitializedRelations(): void
     {
         $itemsToRefresh = [
             new ItemStub(['id' => 0]),

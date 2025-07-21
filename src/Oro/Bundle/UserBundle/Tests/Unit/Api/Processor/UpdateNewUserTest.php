@@ -7,15 +7,13 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData\CustomizeFormDat
 use Oro\Bundle\UserBundle\Api\Processor\UpdateNewUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormInterface;
 
 class UpdateNewUserTest extends CustomizeFormDataProcessorTestCase
 {
-    /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $userManager;
-
-    /** @var UpdateNewUser */
-    private $processor;
+    private UserManager&MockObject $userManager;
+    private UpdateNewUser $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -30,9 +28,9 @@ class UpdateNewUserTest extends CustomizeFormDataProcessorTestCase
         $this->processor = new UpdateNewUser($this->userManager);
     }
 
-    public function testProcessWhenFormIsNotValid()
+    public function testProcessWhenFormIsNotValid(): void
     {
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
+        /** @var FormInterface&MockObject $form */
         $form = $this->context->getForm();
         $form->expects(self::once())
             ->method('isSubmitted')
@@ -49,12 +47,12 @@ class UpdateNewUserTest extends CustomizeFormDataProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenUserDoesNotHavePassword()
+    public function testProcessWhenUserDoesNotHavePassword(): void
     {
         $user = $this->createMock(User::class);
         $plainPassword = 'some_password';
 
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
+        /** @var FormInterface&MockObject $form */
         $form = $this->context->getForm();
         $form->expects(self::once())
             ->method('isSubmitted')
@@ -84,11 +82,11 @@ class UpdateNewUserTest extends CustomizeFormDataProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenUserPasswordAlreadySet()
+    public function testProcessWhenUserPasswordAlreadySet(): void
     {
         $user = $this->createMock(User::class);
 
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
+        /** @var FormInterface&MockObject $form */
         $form = $this->context->getForm();
         $form->expects(self::once())
             ->method('isSubmitted')

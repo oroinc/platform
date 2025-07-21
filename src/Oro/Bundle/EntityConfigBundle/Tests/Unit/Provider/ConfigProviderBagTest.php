@@ -7,17 +7,14 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
 use Oro\Component\DependencyInjection\ServiceLink;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigProviderBagTest extends \PHPUnit\Framework\TestCase
+class ConfigProviderBagTest extends TestCase
 {
-    /** @var PropertyConfigBag|\PHPUnit\Framework\MockObject\MockObject */
-    private $configBag;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ConfigProviderBag */
-    private $configProviderBag;
+    private PropertyConfigBag&MockObject $configBag;
+    private ConfigManager&MockObject $configManager;
+    private ConfigProviderBag $configProviderBag;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +30,7 @@ class ConfigProviderBagTest extends \PHPUnit\Framework\TestCase
         $this->configProviderBag = new ConfigProviderBag(['scope1'], $configManagerLink, $this->configBag);
     }
 
-    public function testGetProviderForExistingScope()
+    public function testGetProviderForExistingScope(): void
     {
         $provider = $this->configProviderBag->getProvider('scope1');
         self::assertInstanceOf(ConfigProvider::class, $provider);
@@ -42,12 +39,12 @@ class ConfigProviderBagTest extends \PHPUnit\Framework\TestCase
         self::assertSame($provider, $this->configProviderBag->getProvider('scope1'));
     }
 
-    public function testGetProviderForNotExistingScope()
+    public function testGetProviderForNotExistingScope(): void
     {
         self::assertNull($this->configProviderBag->getProvider('scope2'));
     }
 
-    public function testGetProviders()
+    public function testGetProviders(): void
     {
         $providers = $this->configProviderBag->getProviders();
         self::assertCount(1, $providers);

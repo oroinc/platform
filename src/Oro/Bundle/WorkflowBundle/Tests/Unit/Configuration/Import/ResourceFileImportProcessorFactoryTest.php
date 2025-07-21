@@ -5,15 +5,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Import;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\ResourceFileImportProcessorFactory;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocatorInterface;
 
-class ResourceFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
+class ResourceFileImportProcessorFactoryTest extends TestCase
 {
-    /** @var ConfigFileReaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $reader;
-
-    /** @var ResourceFileImportProcessorFactory */
-    private $factory;
+    private ConfigFileReaderInterface&MockObject $reader;
+    private ResourceFileImportProcessorFactory $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class ResourceFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isApplicableDataProvider
      */
-    public function testIsApplicable(array|string $import, bool $expected)
+    public function testIsApplicable(array|string $import, bool $expected): void
     {
         $this->assertEquals($expected, $this->factory->isApplicable($import));
     }
@@ -92,7 +91,7 @@ class ResourceFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider createDataProvider
      */
-    public function testCreate(array|string $import, string $expectedPath)
+    public function testCreate(array|string $import, string $expectedPath): void
     {
         $processor = $this->factory->create($import);
 
@@ -118,7 +117,7 @@ class ResourceFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testCreateException()
+    public function testCreateException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Import options is not applicable for factory.');

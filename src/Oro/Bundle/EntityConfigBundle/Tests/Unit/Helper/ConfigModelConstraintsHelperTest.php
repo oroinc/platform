@@ -6,10 +6,11 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Helper\ConfigModelConstraintsHelper;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\ConfigModelAwareConstraintInterface;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\EnumValuesUnique;
+use PHPUnit\Framework\TestCase;
 
-class ConfigModelConstraintsHelperTest extends \PHPUnit\Framework\TestCase
+class ConfigModelConstraintsHelperTest extends TestCase
 {
-    public function testConfigureConstraintsWithConfigModel()
+    public function testConfigureConstraintsWithConfigModel(): void
     {
         $constraints = [
             [EnumValuesUnique::class => null],

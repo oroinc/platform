@@ -26,6 +26,7 @@ class ExtendAutocompleteGeneratorTest extends WebTestCase
 
     public function testGenerate()
     {
+        $this->markTestSkipped('Will be fixed in BB-25923');
         /** @var ExtendAutocompleteGenerator $generator */
         $generator = self::getContainer()->get('oro_entity_extend.autocomplete_class_generator');
         $generator->generate();

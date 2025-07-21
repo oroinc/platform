@@ -4,18 +4,15 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Grid\InlineEditing\InlineEditColumnOpt
 
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\TagBundle\Grid\InlineEditing\InlineEditColumnOptions\TagsGuesser;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class TagsGuesserTest extends \PHPUnit\Framework\TestCase
+class TagsGuesserTest extends TestCase
 {
-    /** @var EntityRoutingHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityRoutingHelper;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TagsGuesser */
-    private $guesser;
+    private EntityRoutingHelper&MockObject $entityRoutingHelper;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TagsGuesser $guesser;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +26,7 @@ class TagsGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessColumnOptions()
+    public function testGuessColumnOptions(): void
     {
         $this->authorizationChecker->expects($this->exactly(2))
             ->method('isGranted')

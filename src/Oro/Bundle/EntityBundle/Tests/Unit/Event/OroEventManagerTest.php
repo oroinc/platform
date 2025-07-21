@@ -4,15 +4,14 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityBundle\Event\OroEventManager;
 use Oro\Bundle\EntityBundle\Tests\Unit\Event\Stub\StubEventListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class OroEventManagerTest extends \PHPUnit\Framework\TestCase
+class OroEventManagerTest extends TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var OroEventManager */
-    private $manager;
+    private ContainerInterface&MockObject $container;
+    private OroEventManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class OroEventManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager = new OroEventManager($this->container);
     }
 
-    public function testDisableAndReset()
+    public function testDisableAndReset(): void
     {
         $this->assertFalse($this->manager->hasDisabledListeners());
         $this->manager->disableListeners();
@@ -34,7 +33,7 @@ class OroEventManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dispatchEventDataProvider
      */
-    public function testDispatchEvent(bool $isEnabled)
+    public function testDispatchEvent(bool $isEnabled): void
     {
         $eventName = 'postFlush';
 

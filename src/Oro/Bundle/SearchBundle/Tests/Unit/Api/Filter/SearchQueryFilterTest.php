@@ -13,14 +13,14 @@ use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolver;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolverFactory;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchQueryFilter;
 use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
+use PHPUnit\Framework\TestCase;
 
-class SearchQueryFilterTest extends \PHPUnit\Framework\TestCase
+class SearchQueryFilterTest extends TestCase
 {
     private const ENTITY_CLASS = 'Test\Entity';
     private const ENTITY_ALIAS = 'test_entity';
 
-    /** @var SearchQueryFilter */
-    private $filter;
+    private SearchQueryFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -60,7 +60,7 @@ class SearchQueryFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->setFieldMappings($fieldMappings);
     }
 
-    public function testValidFilter()
+    public function testValidFilter(): void
     {
         $criteria = new Criteria();
         $this->filter->apply($criteria, new FilterValue('searchQuery', 'field1 = "test"'));
@@ -71,7 +71,7 @@ class SearchQueryFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testValidFilterWithSearchQueryCriteriaVisitor()
+    public function testValidFilterWithSearchQueryCriteriaVisitor(): void
     {
         $criteria = new Criteria();
         $searchQueryCriteriaVisitor = $this->createMock(ExpressionVisitor::class);
@@ -91,7 +91,7 @@ class SearchQueryFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInvalidFilter()
+    public function testInvalidFilter(): void
     {
         $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage('Not allowed operator.');
@@ -100,7 +100,7 @@ class SearchQueryFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->apply($criteria, new FilterValue('searchQuery', 'field1 . "test"'));
     }
 
-    public function testEmptyFilterValue()
+    public function testEmptyFilterValue(): void
     {
         $criteria = new Criteria();
         $this->filter->apply($criteria, new FilterValue('searchQuery', ''));
@@ -108,7 +108,7 @@ class SearchQueryFilterTest extends \PHPUnit\Framework\TestCase
         self::assertNull($criteria->getWhereExpression());
     }
 
-    public function testEmptyFilterValueWithSearchQueryCriteriaVisitor()
+    public function testEmptyFilterValueWithSearchQueryCriteriaVisitor(): void
     {
         $criteria = new Criteria();
         $searchQueryCriteriaVisitor = $this->createMock(ExpressionVisitor::class);

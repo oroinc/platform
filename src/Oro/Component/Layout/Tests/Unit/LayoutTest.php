@@ -10,17 +10,15 @@ use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutContextStack;
 use Oro\Component\Layout\LayoutRendererInterface;
 use Oro\Component\Layout\LayoutRendererRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 class LayoutTest extends LayoutTestCase
 {
-    private LayoutRendererInterface|\PHPUnit\Framework\MockObject\MockObject $renderer;
-
+    private LayoutRendererInterface&MockObject $renderer;
     private LayoutRendererRegistry $rendererRegistry;
-
     private ContextInterface $context;
-
-    private LayoutContextStack|\PHPUnit\Framework\MockObject\MockObject $layoutContextStack;
+    private LayoutContextStack&MockObject $layoutContextStack;
 
     #[\Override]
     protected function setUp(): void
@@ -54,13 +52,11 @@ class LayoutTest extends LayoutTestCase
             ->with(self::identicalTo($view))
             ->willReturn($expected);
 
-        $this->layoutContextStack
-            ->expects(self::once())
+        $this->layoutContextStack->expects(self::once())
             ->method('push')
             ->with($this->context);
 
-        $this->layoutContextStack
-            ->expects(self::once())
+        $this->layoutContextStack->expects(self::once())
             ->method('pop')
             ->with();
 
@@ -93,13 +89,11 @@ class LayoutTest extends LayoutTestCase
             ->with(self::identicalTo($view))
             ->willReturn($expected);
 
-        $this->layoutContextStack
-            ->expects(self::once())
+        $this->layoutContextStack->expects(self::once())
             ->method('push')
             ->with($this->context);
 
-        $this->layoutContextStack
-            ->expects(self::once())
+        $this->layoutContextStack->expects(self::once())
             ->method('pop')
             ->with();
 
@@ -124,13 +118,11 @@ class LayoutTest extends LayoutTestCase
             ->with(self::identicalTo($view))
             ->willReturn($expected);
 
-        $this->layoutContextStack
-            ->expects(self::once())
+        $this->layoutContextStack->expects(self::once())
             ->method('push')
             ->with($this->context);
 
-        $this->layoutContextStack
-            ->expects(self::once())
+        $this->layoutContextStack->expects(self::once())
             ->method('pop')
             ->with();
 
@@ -160,13 +152,11 @@ class LayoutTest extends LayoutTestCase
             ->with(self::identicalTo($view))
             ->willReturn($expected);
 
-        $this->layoutContextStack
-            ->expects(self::once())
+        $this->layoutContextStack->expects(self::once())
             ->method('push')
             ->with($this->context);
 
-        $this->layoutContextStack
-            ->expects(self::once())
+        $this->layoutContextStack->expects(self::once())
             ->method('pop')
             ->with();
 
@@ -184,13 +174,11 @@ class LayoutTest extends LayoutTestCase
             ->method('setFormTheme')
             ->with([$theme]);
 
-        $this->layoutContextStack
-            ->expects(self::once())
+        $this->layoutContextStack->expects(self::once())
             ->method('push')
             ->with($this->context);
 
-        $this->layoutContextStack
-            ->expects(self::once())
+        $this->layoutContextStack->expects(self::once())
             ->method('pop')
             ->with();
 
@@ -231,13 +219,11 @@ class LayoutTest extends LayoutTestCase
             ->with($view)
             ->willReturn('render result');
 
-        $this->layoutContextStack
-            ->expects(self::once())
+        $this->layoutContextStack->expects(self::once())
             ->method('push')
             ->with($this->context);
 
-        $this->layoutContextStack
-            ->expects(self::once())
+        $this->layoutContextStack->expects(self::once())
             ->method('pop')
             ->with();
 

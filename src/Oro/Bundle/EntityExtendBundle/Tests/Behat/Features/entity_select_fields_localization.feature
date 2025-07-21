@@ -18,9 +18,9 @@ Feature: Entity select fields localization
       | Field name | ACME   |
       | Type       | Select |
     And I click "Continue"
-    And set Options with:
-      | Label    |
-      | ACME_Eng |
+    And click "Add"
+    And I fill "Entity Config Form" with:
+      | Option First | ACME_Eng |
     And I save and close form
 
   Scenario: Update field`s options for second language

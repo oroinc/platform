@@ -7,14 +7,14 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 abstract class AbstractLocalizedType extends FormIntegrationTestCase
 {
     protected const LOCALIZATION_CLASS = Localization::class;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    protected ManagerRegistry&MockObject $registry;
 
     protected function setRegistryExpectations(): void
     {

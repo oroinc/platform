@@ -3,14 +3,15 @@
 namespace Oro\Component\ConfigExpression\Tests\Unit\ConfigurationPass;
 
 use Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class ReplacePropertyPathTest extends \PHPUnit\Framework\TestCase
+class ReplacePropertyPathTest extends TestCase
 {
     /**
      * @dataProvider passDataProvider
      */
-    public function testPassConfiguration(array $sourceData, array $expectedData, ?string $prefix = null)
+    public function testPassConfiguration(array $sourceData, array $expectedData, ?string $prefix = null): void
     {
         $parameterPass = new ReplacePropertyPath($prefix);
         $actualData = $parameterPass->passConfiguration($sourceData);
@@ -66,7 +67,7 @@ class ReplacePropertyPathTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testLocalCache()
+    public function testLocalCache(): void
     {
         $parameterPass = new ReplacePropertyPath();
         $actualData = $parameterPass->passConfiguration(['a' => '$path']);

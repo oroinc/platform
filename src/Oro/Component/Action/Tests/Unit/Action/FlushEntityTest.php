@@ -8,16 +8,15 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Component\Action\Action\FlushEntity;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class FlushEntityTest extends \PHPUnit\Framework\TestCase
+class FlushEntityTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var FlushEntity */
-    private $action;
+    private ManagerRegistry&MockObject $registry;
+    private FlushEntity $action;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class FlushEntityTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
-    public function testExecuteWithoutEntity()
+    public function testExecuteWithoutEntity(): void
     {
         $context = new ActionData(['data' => null]);
         $this->registry->expects($this->never())
@@ -41,7 +40,7 @@ class FlushEntityTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeDataProvider
      */
-    public function testExecute(array $data, array $options, object $entity, bool $flushException = false)
+    public function testExecute(array $data, array $options, object $entity, bool $flushException = false): void
     {
         $context = new ActionData($data);
         $this->assertEntityManagerCalled($entity, $flushException);

@@ -6,10 +6,11 @@ use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Factory\QueryFactory;
 use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Query;
+use PHPUnit\Framework\TestCase;
 
-class QueryFactoryTest extends \PHPUnit\Framework\TestCase
+class QueryFactoryTest extends TestCase
 {
-    public function testFactory()
+    public function testFactory(): void
     {
         $indexer = $this->createMock(Indexer::class);
 
@@ -22,7 +23,7 @@ class QueryFactoryTest extends \PHPUnit\Framework\TestCase
         $config = [];
 
         $factory = new QueryFactory($indexer);
-        $result  = $factory->create($config);
+        $result = $factory->create($config);
 
         $this->assertInstanceOf(IndexerQuery::class, $result);
     }

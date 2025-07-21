@@ -7,16 +7,15 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\ImpersonationToken;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\TestCase;
 
-class ImpersonationTokenTest extends \PHPUnit\Framework\TestCase
+class ImpersonationTokenTest extends TestCase
 {
     use EntityTrait;
 
-    public function testGetOrganization()
+    public function testGetOrganization(): void
     {
-        /** @var User $user */
         $user = $this->getEntity(User::class, ['id' => 1]);
-        /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 3]);
 
         $token = new ImpersonationToken($user, $organization);
@@ -24,14 +23,11 @@ class ImpersonationTokenTest extends \PHPUnit\Framework\TestCase
         self::assertSame($organization, $token->getOrganization());
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
-        /** @var User $user */
         $user = $this->getEntity(User::class, ['id' => 1]);
-        /** @var Role $role */
         $role = $this->getEntity(Role::class, ['id' => 2]);
         $user->addUserRole($role);
-        /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 3]);
 
         $token = new ImpersonationToken($user, $organization, [$role]);

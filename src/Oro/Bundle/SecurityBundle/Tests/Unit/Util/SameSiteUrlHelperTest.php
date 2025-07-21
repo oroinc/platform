@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 final class SameSiteUrlHelperTest extends TestCase
 {
     private RequestStack $requestStack;
-
     private SameSiteUrlHelper $sameSiteUrlHelper;
 
     #[\Override]

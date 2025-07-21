@@ -7,19 +7,16 @@ use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Twig\TagExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TagExtensionTest extends \PHPUnit\Framework\TestCase
+class TagExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TagManager */
-    private $manager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TaggableHelper */
-    private $helper;
-
-    /** @var TagExtension */
-    private $extension;
+    private TagManager&MockObject $manager;
+    private TaggableHelper&MockObject $helper;
+    private TagExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +32,7 @@ class TagExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new TagExtension($container);
     }
 
-    public function testGetList()
+    public function testGetList(): void
     {
         $entity = $this->createMock(Taggable::class);
         $expected = ['test tag'];
