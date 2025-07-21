@@ -1,7 +1,7 @@
 @regression
 @ticket-BAP-16397
 @ticket-BB-14555
-
+@ticket-BB-25327
 Feature: Import extend entity fields
   In order to effectively manage extend fields for entities
   As an Administrator

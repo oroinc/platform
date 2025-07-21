@@ -1,6 +1,6 @@
 @regression
 @ticket-BAP-17951
-
+@ticket-BB-25327
 Feature: Entity select fields
   In order to allows users to chose single or multiple value from a list of predetermined options
   As an Administrator

@@ -13,6 +13,7 @@ use Twig\TwigFilter;
  *   - oro_html_strip_tags
  *   - oro_attribute_name_purify
  *   - oro_html_sanitize
+ *   - oro_html_sanitize_basic
  *   - oro_html_escape
  */
 class HtmlTagExtension extends AbstractExtension implements ServiceSubscriberInterface
@@ -33,6 +34,7 @@ class HtmlTagExtension extends AbstractExtension implements ServiceSubscriberInt
             new TwigFilter('oro_attribute_name_purify', [$this, 'attributeNamePurify']),
             new TwigFilter('oro_html_sanitize', [$this, 'htmlSanitize'], ['is_safe' => ['html']]),
             new TwigFilter('oro_html_escape', [$this, 'htmlEscape'], ['is_safe' => ['html']]),
+            new TwigFilter('oro_html_sanitize_basic', [$this, 'htmlSanitizeBasic'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -67,6 +69,22 @@ class HtmlTagExtension extends AbstractExtension implements ServiceSubscriberInt
     public function htmlSanitize($string)
     {
         return $this->getHtmlTagHelper()->sanitize($string);
+    }
+
+    /**
+     * Remove html elements except allowed in the "basic" HTML purification mode.
+     *
+     * @param string|null $string
+     *
+     * @return string
+     */
+    public function htmlSanitizeBasic(?string $string): string
+    {
+        if ($string === null) {
+            return '';
+        }
+
+        return $this->getHtmlTagHelper()->sanitize($string, 'basic', false);
     }
 
     /**

@@ -23,7 +23,7 @@ Oro\Bundle\SegmentBundle\Entity\Segment:
   segment_entity:
     name: 'New Segment'
     type: '@segment_dynamic_type'
-    entity: 'Oro\Bundle\CustomerBundle\Entity\CustomerUser'
-    definition: <('{"columns":[{"name":"contactInformation","label":"Contact Information","sorting":"","func":null}]}')>
+    entity: 'Oro\Bundle\UserBundle\Entity\User'
+    definition: <('{"columns":[{"name":"id","label":"Id","sorting":"ASC","func":null},{"name":"username","label":"Username","sorting":null,"func":null}],"filters":[]}')>
     organization: '@organization'
     owner: '@business_unit'

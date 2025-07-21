@@ -9,6 +9,12 @@ oro_behat_extension:
         - '@OroIntegrationBundle/Tests/Behat/Features'
 
   elements:
-    Integration Channel Form:
+    Integration Form:
       selector: 'form[name="oro_integration_channel_form"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Type: 'oro_integration_channel_form[type]'
+          Name: 'oro_integration_channel_form[name]'
+          Label: 'oro_integration_channel_form[transport][labels][values][default]'
+          Short Label: 'oro_integration_channel_form[transport][shortLabels][values][default]'

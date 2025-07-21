@@ -3421,4 +3421,36 @@ JS;
     {
         return self::POSITION_MAP[$rowNumber] ?? null;
     }
+
+    private array $pageRoutes = [
+        'Translations page' => 'oro_translation_translation_index',
+        'Languages page' => 'oro_translation_language_index',
+        'Localizations page' => 'oro_locale_localization_index',
+        'User Login Attempts page' => 'oro_user_login_attempts',
+        'System Configuration page' => 'oro_config_configuration_system',
+        'User Profile View page' => 'oro_user_profile_view',
+        'User Profile Edit page' => 'oro_user_profile_update',
+        'User Configuration page' => 'oro_user_profile_configuration',
+        'Login Check page' => 'oro_user_security_check',
+    ];
+
+    /**
+     * The URL is generated from a predefined route name associated with the given page name in the current application.
+     * Example: And I go to the direct URL of the "Translation page"
+
+     * @Given /^(?:|I )go to the direct URL of the "(?P<pageName>[^"]+)"$/
+     */
+    public function iGoToTheDirectUrlOfPage(string $pageName): void
+    {
+        if (!array_key_exists($pageName, $this->pageRoutes)) {
+            throw new \InvalidArgumentException(sprintf(
+                'The page "%s" is not recognized — no predefined route is associated with it.',
+                $pageName
+            ));
+        }
+
+        $route = $this->pageRoutes[$pageName];
+        $uri = $this->getAppContainer()->get('router')->generate($route);
+        $this->visitPath($uri);
+    }
 }

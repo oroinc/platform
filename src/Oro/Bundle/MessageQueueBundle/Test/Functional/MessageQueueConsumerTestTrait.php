@@ -76,12 +76,8 @@ trait MessageQueueConsumerTestTrait
 
     protected static function consume(?int $messagesCount = null, int $timeLimit = 10): void
     {
-        $messageLoggerListener = self::getContainer()
-            ->get('mailer.message_logger_listener');
-        if ($messageLoggerListener instanceof MessageLoggerListener) {
-            // Makes mailer message logger listener ignore reset to keep state during MQ consumption.
-            $messageLoggerListener->setSkipReset(true);
-        }
+        // Makes mailer message logger listener ignore reset to keep state during MQ consumption.
+        MessageLoggerListener::instance()->setSkipReset(true);
 
         self::getLoggerTestHandler()->setSkipReset(true);
 
@@ -108,7 +104,8 @@ trait MessageQueueConsumerTestTrait
                 self::consume($messagesCount, $timeLimit);
             }
         } finally {
-            $messageLoggerListener->setSkipReset(false);
+            MessageLoggerListener::instance()->setSkipReset(false);
+
             self::getLoggerTestHandler()->setSkipReset(false);
         }
     }

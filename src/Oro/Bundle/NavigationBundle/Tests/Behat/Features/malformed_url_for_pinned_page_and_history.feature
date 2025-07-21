@@ -1,6 +1,7 @@
 @regression
 @ticket-BB-18995
 @fixture-OroNavigationBundle:MalformedUrlForPinnedPage.yml
+@ticket-BB-25327
 Feature: Malformed Url for Pinned Page And History
   In order to have prevent UI hung
   As admin

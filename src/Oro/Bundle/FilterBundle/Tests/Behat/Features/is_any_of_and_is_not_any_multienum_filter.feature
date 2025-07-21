@@ -1,6 +1,7 @@
 @regression
 @ticket-BAP-18936
 @fixture-OroFilterBundle:is_any_of_and_is_not_any_of_number_filters.yml
+@ticket-BB-25327
 Feature: Is any of and is not any multienum filter
   In order to filter multienum filter on segments
   As an Administrator

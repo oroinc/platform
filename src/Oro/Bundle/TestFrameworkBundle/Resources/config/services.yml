@@ -158,6 +158,7 @@ services:
     oro_test.mailer.message_logger_listener:
         decorates: mailer.message_logger_listener
         class: Oro\Bundle\TestFrameworkBundle\Mailer\EventListener\MessageLoggerListener
+        factory: ['Oro\Bundle\TestFrameworkBundle\Mailer\EventListener\MessageLoggerListener', 'instance']
 
     oro_test.event_listener.install_option_command:
         class: Oro\Bundle\TestFrameworkBundle\EventListener\InstallOptionCommandEventListener

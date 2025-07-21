@@ -1,0 +1,136 @@
+parameters:
+    oro_pdf_generator.pdf_document.url_generator.route_name: 'oro_pdf_generator_pdf_document_file'
+
+services:
+
+    oro_pdf_generator.acl.voter.pdf_document:
+        class: 'Oro\Bundle\PdfGeneratorBundle\Acl\Voter\PdfDocumentVoter'
+        arguments:
+            $doctrineHelper: '@oro_entity.doctrine_helper'
+        calls:
+            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+            - [ 'setClassName', [ 'Oro\Bundle\PdfGeneratorBundle\Entity\PdfDocument' ] ]
+        tags:
+            - { name: 'security.voter' }
+            - { name: 'container.service_subscriber', id: 'oro_security.authorization_checker' }
+
+    oro_pdf_generator.pdf_document.factory.generic:
+        class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Factory\GenericPdfDocumentFactory'
+        arguments:
+            $doctrineHelper: '@oro_entity.doctrine_helper'
+
+    oro_pdf_generator.pdf_document.pdf_template.provider:
+        class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\PdfTemplate\PdfDocumentTemplateProviderComposite'
+        arguments:
+            $innerProviders: !tagged_iterator { tag: 'oro_pdf_generator.pdf_document.pdf_template.provider' }
+
+    oro_pdf_generator.layout.extension.pdf_document_templates:
+        class: 'Oro\Bundle\PdfGeneratorBundle\Layout\Extension\PdfDocumentTemplatesThemeConfigurationExtension'
+        tags:
+            - { name: 'layout.theme_config_extension' }
+
+    oro_pdf_generator.pdf_document.pdf_template.provider.theme_aware:
+        class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\PdfTemplate\LayoutThemeAwarePdfDocumentTemplateProvider'
+        arguments:
+            $themeConfigurationProvider: '@oro_theme.provider.theme_configuration'
+            $themeManager: '@oro_layout.theme_manager'
+        tags:
+            - { name: 'oro_pdf_generator.pdf_document.pdf_template.provider' }
+
+    oro_pdf_generator.pdf_document.generator.generic:
+        class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Generator\GenericPdfDocumentGenerator'
+        arguments:
+            $doctrine: '@doctrine'
+            $pdfBuilderFactory: '@oro_pdf_generator.pdf_builder.factory'
+            $pdfTemplateFactory: '@oro_pdf_generator.pdf_template.factory'
+            $pdfDocumentTemplateProvider: '@oro_pdf_generator.pdf_document.pdf_template.provider'
+            $eventDispatcher: '@event_dispatcher'
+        tags:
+            - { name: 'oro_pdf_generator.pdf_document.generator' }
+
+    oro_pdf_generator.pdf_document.generator.composite:
+        class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Generator\PdfDocumentGeneratorComposite'
+        arguments:
+            $innerGenerators: !tagged_iterator { tag: 'oro_pdf_generator.pdf_document.generator' }
+        tags:
+            - { name: 'oro_pdf_generator.pdf_document.generator' }
+
+    oro_pdf_generator.pdf_document.resolver.deferred:
+        class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Resolver\DeferredPdfDocumentResolver'
+        tags:
+            - { name: 'oro_pdf_generator.pdf_document.resolver' }
+
+    oro_pdf_generator.pdf_document.resolver.instant:
+        class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Resolver\InstantPdfDocumentResolver'
+        arguments:
+            $doctrine: '@doctrine'
+            $pdfDocumentGenerator: '@oro_pdf_generator.pdf_document.generator.composite'
+            $fileFromPdfFileFactory: '@oro_pdf_generator.pdf_file.factory.file_entity_from_pdf_file'
+        calls:
+            - [ 'setLogger', [ '@logger' ] ]
+        tags:
+            - { name: 'oro_pdf_generator.pdf_document.resolver' }
+            - { name: 'monolog.logger', channel: 'oro_pdf_generator' }
+
+    oro_pdf_generator.pdf_document.url_generator:
+        class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\UrlGenerator\PdfDocumentUrlGenerator'
+        arguments:
+            $urlGenerator: '@router'
+            $routeName: 'oro_pdf_generator_pdf_document_file'
+
+    oro_pdf_generator.pdf_document.provider.single_pdf_document_by_source_entity:
+        class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Provider\SinglePdfDocumentBySourceEntityProvider'
+        arguments:
+            $doctrineHelper: '@oro_entity.doctrine_helper'
+
+    oro_pdf_generator.pdf_document.name.provider.generic:
+        class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Name\GenericPdfDocumentNameProvider'
+        arguments:
+            $entityNameResolver: '@oro_entity.entity_name_resolver'
+
+    # Abstract definition for the deferred PDF document operator.
+    oro_pdf_generator.pdf_document.operator.deferred.abstract:
+        abstract: true
+        class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Operator\GenericPdfDocumentOperator'
+        arguments:
+            $doctrine: '@doctrine'
+            $pdfDocumentFactory: '@oro_pdf_generator.pdf_document.factory.generic'
+            $pdfDocumentResolver: '@oro_pdf_generator.pdf_document.resolver.deferred'
+            $eventDispatcher: '@event_dispatcher'
+            $pdfDocumentGenerationMode: !php/const 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\PdfDocumentGenerationMode::DEFERRED'
+
+    # Default definition for the deferred PDF document operator.
+    oro_pdf_generator.pdf_document.operator.deferred.default:
+        parent: oro_pdf_generator.pdf_document.operator.deferred.abstract
+        tags:
+            -   name: 'oro_pdf_generator.pdf_document.operator'
+                entity_class: !php/const 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Operator\PdfDocumentOperatorRegistry::DEFAULT'
+                mode: !php/const 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\PdfDocumentGenerationMode::DEFERRED'
+
+    # Abstract definition for the instant PDF document operator.
+    oro_pdf_generator.pdf_document.operator.instant.abstract:
+        abstract: true
+        class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Operator\GenericPdfDocumentOperator'
+        arguments:
+            $doctrine: '@doctrine'
+            $pdfDocumentFactory: '@oro_pdf_generator.pdf_document.factory.generic'
+            $pdfDocumentResolver: '@oro_pdf_generator.pdf_document.resolver.instant'
+            $eventDispatcher: '@event_dispatcher'
+            $pdfDocumentGenerationMode: !php/const 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\PdfDocumentGenerationMode::INSTANT'
+
+    # Default definition for the instant PDF document operator.
+    oro_pdf_generator.pdf_document.operator.instant.default:
+        parent: oro_pdf_generator.pdf_document.operator.instant.abstract
+        tags:
+            -   name: 'oro_pdf_generator.pdf_document.operator'
+                entity_class: !php/const 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Operator\PdfDocumentOperatorRegistry::DEFAULT'
+                mode: !php/const 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\PdfDocumentGenerationMode::INSTANT'
+
+    # The main entry point to retrieve a PDF document operator.
+    oro_pdf_generator.pdf_document.operator.registry:
+        class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Operator\PdfDocumentOperatorRegistry'
+        arguments:
+            $pdfDocumentOperatorLocator: !abstract 'collected by tag "oro_pdf_generator.pdf_document.operator" in \Oro\Bundle\PdfGeneratorBundle\DependencyInjection\Compiler\PdfDocumentOperatorRegistryPass'
+
+    Oro\Bundle\PdfGeneratorBundle\PdfDocument\Operator\PdfDocumentOperatorRegistry:
+        alias: 'oro_pdf_generator.pdf_document.operator.registry'

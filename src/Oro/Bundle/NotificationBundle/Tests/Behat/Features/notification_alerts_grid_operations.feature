@@ -1,6 +1,6 @@
 @regression
 @fixture-OroNotificationBundle:NotificationAlertsFixture.yml
-
+@ticket-BB-25327
 Feature: Notification Alerts Grid operations
   In order to manage notifications alerts, e.g. display, filter, delete, mass-delete, export
   As an Administrator

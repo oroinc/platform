@@ -100,4 +100,44 @@ class UrlHelperTest extends TestCase
 
         self::assertEquals($expectedUrl, $urlHelper->getAbsolutePath($path));
     }
+
+    /**
+     * @dataProvider isLocalUrlProvider
+     */
+    public function testIsLocalUrlWithExplicitUrl(string $url, bool $expected): void
+    {
+        $requestStack = new RequestStack();
+        $symfonyUrlHelper = new SymfonyUrlHelper($requestStack);
+        $urlHelper = new UrlHelper($symfonyUrlHelper, $requestStack);
+
+        self::assertSame($expected, $urlHelper->isLocalUrl($url));
+    }
+
+    public function isLocalUrlProvider(): array
+    {
+        return [
+            'IPv4 localhost' => ['http://127.0.0.1', true],
+            'Standard localhost' => ['http://localhost', true],
+            'Non-routable meta-address' => ['http://0.0.0.0', true],
+            'Local domain' => ['http://localhost.localdomain', true],
+            'IPv6-specific localhost' => ['http://localhost6', true],
+            'IPv6-specific local domain' => ['http://localhost6.localdomain6', true],
+            'Non-local example.com' => ['http://example.com', false],
+            'Non-local private IP' => ['http://192.168.1.1', false],
+            'Non-local google.com' => ['http://google.com', false],
+        ];
+    }
+
+    /**
+     * @dataProvider isLocalUrlProvider
+     */
+    public function testIsLocalUrlWithNullUrl(string $url, bool $expected): void
+    {
+        $requestStack = new RequestStack();
+        $requestStack->push(Request::create($url));
+        $symfonyUrlHelper = new SymfonyUrlHelper($requestStack);
+        $urlHelper = new UrlHelper($symfonyUrlHelper, $requestStack);
+
+        self::assertSame($expected, $urlHelper->isLocalUrl());
+    }
 }

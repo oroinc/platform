@@ -1,6 +1,7 @@
 @regression
 @ticket-BAP-9497
 @ticket-BAP-15092
+@ticket-BB-25327
 Feature: DataAudit logs acl protection
 
   Scenario: Create different window session

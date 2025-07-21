@@ -70,7 +70,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
             $form->fill($table);
 
             return true;
-        }, 3);
+        }, 5);
     }
 
     //@codingStandardsIgnoreStart
