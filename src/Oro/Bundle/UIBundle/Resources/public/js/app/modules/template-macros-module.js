@@ -59,5 +59,14 @@ macros('oroui', {
      * @param {string} data.current
      * @param {Object} data.map
      */
-    renderStatus: require('tpl-loader!oroui/templates/macros/status.html')
+    renderStatus: require('tpl-loader!oroui/templates/macros/status.html'),
+
+    /**
+     * Renders a status label as a tooltip
+     * @param {string} data.label
+     * @param {string} data.current
+     * @param {Object} data.map
+     * @param {string} data.offset
+     */
+    renderTooltipStatus: require('tpl-loader!oroui/templates/macros/tooltip-status.html')
 });

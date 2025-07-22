@@ -89,16 +89,16 @@ define(function(require) {
         const $textEl = $el.find('[data-text]');
         const $iconEl = $el.find('[data-icon]');
 
-        if (this._config[`${prefix}Title`]) {
-            $el.attr('title', this._config[`${prefix}Title`]);
+        if ($el.data(`${prefix}Title`)) {
+            $el.attr('title', $el.data[`${prefix}Title`]);
         }
 
-        if (this._config[`${prefix}AriaLabel`]) {
-            $el.attr('aria-label', this._config[`${prefix}AriaLabel`]);
+        if ($el.data(`${prefix}AriaLabel`)) {
+            $el.attr('aria-label', $el.data(`${prefix}AriaLabel`));
         }
 
-        if (this._config[`${prefix}Text`]) {
-            $textEl.text(this._config[`${prefix}Text`]);
+        if ($el.data(`${prefix}Text`)) {
+            $textEl.text($el.data(`${prefix}Text`));
         }
 
         if (prefix === EXPANDED) {

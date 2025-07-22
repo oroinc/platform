@@ -3142,10 +3142,14 @@ JS;
      */
     public function elementAttributeContains($element, $attribute, $value)
     {
-        $element = $this->createElement($element);
-        $this->assertNotNull($element);
-        $this->assertTrue($element->isValid());
-        static::assertStringContainsString($value, $element->getAttribute($attribute));
+        $htmlElement = $this->createElement($element);
+        $this->assertNotNull($htmlElement);
+        $this->assertTrue($htmlElement->isValid());
+
+        $attrValue = $htmlElement->getAttribute($attribute);
+        $this->assertNotNull($attrValue, sprintf('Attribute "%s" not found on element "%s"', $attribute, $element));
+
+        static::assertStringContainsString($value, $attrValue);
     }
 
     /**
@@ -3157,10 +3161,14 @@ JS;
      */
     public function elementAttributeNotContains($element, $attribute, $value)
     {
-        $element = $this->createElement($element);
-        $this->assertNotNull($element);
-        $this->assertTrue($element->isValid());
-        static::assertStringNotContainsString($value, $element->getAttribute($attribute));
+        $htmlElement = $this->createElement($element);
+        $this->assertNotNull($htmlElement);
+        $this->assertTrue($htmlElement->isValid());
+
+        $attrValue = $htmlElement->getAttribute($attribute);
+        $this->assertNotNull($attrValue, sprintf('Attribute "%s" not found on element "%s"', $attribute, $element));
+
+        static::assertStringNotContainsString($value, $attrValue);
     }
 
     /**

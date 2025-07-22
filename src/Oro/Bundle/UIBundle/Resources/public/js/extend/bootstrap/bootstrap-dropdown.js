@@ -54,7 +54,8 @@ define(function(require, exports, module) {
     config = _.extend({
         displayArrow: true,
         keepSeparately: true,
-        fullscreenable: false
+        fullscreenable: false,
+        positionFixedBoundary: false
     }, config);
 
     _.extend(Dropdown.prototype, {
@@ -363,6 +364,20 @@ define(function(require, exports, module) {
                     onCreate(data);
                     updateScrollLocker(data);
                 };
+            }
+
+            if (
+                this._config.positionFixed &&
+                this._config.positionFixedBoundary &&
+                (config.placement.substring(0, 6) === 'bottom' || config.placement.substring(0, 3) === 'top')
+            ) {
+                const modifierConfig = {enabled: true};
+
+                if (this._config.positionFixedBoundaryOffset) {
+                    modifierConfig.offset = this._config.positionFixedBoundaryOffset;
+                }
+
+                config.modifiers.positionFixedBoundary = modifierConfig;
             }
 
             if (this._displayArrow()) {

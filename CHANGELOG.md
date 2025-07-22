@@ -10,6 +10,7 @@ The current file describes significant changes in the code that may affect the u
 * Added `Oro\Component\Layout\Extension\Theme\Model\ThemeManagerInterface` interface that represents a manager for layout themes.
 * Added `ThemeConfigOptionGetEvent` and `ThemeOptionGetEvent` events that are fired when a theme option or theme config value is retrieved.
 * Added new `getThemeConfigOption` and `getThemeOption` methods in `Oro\Component\Layout\Extension\Theme\Model\ThemeManager` for retrieving inherited values.
+* Added `Oro\Component\Layout\Extension\Theme\Model\OldThemeProvider` to determine if the current theme is the old theme or inherits from it.
 
 #### LayoutBundle
 * Added a new `fonts` configuration to the theme definition for building fonts with Webpack and referencing preloaded fonts.
