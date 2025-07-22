@@ -2965,6 +2965,36 @@ TEXT;
     }
 
     /**
+     * Example: I should see next rows in "Inventory Levels Table" table without headers in the exact order
+     *   | first warehouse     | 5    |
+     *   | second warehouse    | 30   |
+     *
+     * @Then /^(?:|I )should see next rows in "(?P<elementName>[\w\s]+)" table without headers in the exact order$/
+     * @param TableNode $expectedTableNode
+     * @param string $elementName
+     */
+    public function iShouldSeeExactlyNextRowsInTableWithoutHeaders(TableNode $expectedTableNode, $elementName): void
+    {
+        /** @var Table $table */
+        $table = $this->createElement($elementName);
+
+        static::assertInstanceOf(Table::class, $table, sprintf('Element should be of type %s', Table::class));
+
+        $expectedTableRepresentation = array_values($expectedTableNode->getTable());
+        static::assertTrue(isset($expectedTableRepresentation[0]), 'Expected table should have at least one row');
+
+        $actualTableRepresentation = [];
+
+        foreach ($table->getRows() as $index => $row) {
+            for ($i = 0; $i < count($expectedTableRepresentation[0]); ++$i) {
+                $actualTableRepresentation[$index][$i] = $row->getCellByNumber($i)->getText();
+            }
+        }
+
+        self::assertEquals($expectedTableRepresentation, $actualTableRepresentation);
+    }
+
+    /**
      * Example: I should see no records in "Discounts" table
      *
      * @Then /^I should see no records in "(?P<elementName>[\w\s]+)" table$/

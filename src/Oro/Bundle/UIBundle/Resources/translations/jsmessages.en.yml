@@ -159,6 +159,8 @@ oro:
             show_less: 'Show less items'
         dropdown_option_aria_label: "More Actions"
         dropdown_main_btn_prefix: "Action"
+        status_button:
+            aria_label: 'View status'
     htmlpurifier:
         formatted_error_line: 'Line #{{ line }}: {{ message }}'
         formatted_error: '{{ message }}'
