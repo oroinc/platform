@@ -28,10 +28,10 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->collection->isPrimaryEntity('Test\Class', '123'));
     }
 
-    public function testShouldIsPrimaryEntityReturnFalseIfPrimaryEntityIdIsNull(): void
+    public function testShouldIsPrimaryEntityReturnTrueIfPrimaryEntityIdIsNull(): void
     {
         $this->collection->setPrimaryEntityId('Test\Class', null);
-        self::assertFalse($this->collection->isPrimaryEntity('Test\Class', null));
+        self::assertTrue($this->collection->isPrimaryEntity('Test\Class', null));
         self::assertFalse($this->collection->isPrimaryEntity('Test\Class', '123'));
     }
 
@@ -67,7 +67,7 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
         $this->collection->setPrimaryEntity(new \stdClass(), null);
     }
 
-    public function testShouldSetPrimaryEntity(): void
+    public function testShouldBePossibleToSetPrimaryEntity(): void
     {
         $entityClass = 'Test\Class';
         $entityId = '123';
@@ -80,14 +80,23 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertSame($metadata, $this->collection->getPrimaryEntityMetadata());
     }
 
-    public function testShouldBePossibleToGetAlreadySetPrimaryEntity(): void
+    public function testShouldSetPrimaryEntityRequestDataThrowExceptionIfPrimaryEntityIdIsNotSetYet(): void
     {
-        $entity = new \stdClass();
-        $metadata = new EntityMetadata(get_class($entity));
-        $this->collection->setPrimaryEntityId('Test\Class', '123');
-        $this->collection->setPrimaryEntity($entity, $metadata);
-        self::assertSame($entity, $this->collection->getPrimaryEntity());
-        self::assertSame($metadata, $this->collection->getPrimaryEntityMetadata());
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The primary entity identifier must be set before.');
+
+        $this->collection->setPrimaryEntityRequestData(['key' => 'value']);
+    }
+
+    public function testShouldBePossibleToSetPrimaryEntityRequestData(): void
+    {
+        $entityClass = 'Test\Class';
+        $entityId = '123';
+        $requestData = ['key' => 'value'];
+        $this->collection->setPrimaryEntityId($entityClass, $entityId);
+        $this->collection->setPrimaryEntityRequestData($requestData);
+        self::assertTrue($this->collection->isPrimaryEntity('Test\Class', '123'));
+        self::assertSame($requestData, $this->collection->getPrimaryEntityRequestData());
     }
 
     public function testShouldGetReturnNullForUnknownEntity(): void

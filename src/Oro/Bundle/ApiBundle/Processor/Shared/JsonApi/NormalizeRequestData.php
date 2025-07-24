@@ -15,7 +15,7 @@ class NormalizeRequestData extends AbstractNormalizeRequestData
     #[\Override]
     public function process(ContextInterface $context): void
     {
-        /** @var FormContext|SingleItemContext $context */
+        /** @var FormContext&SingleItemContext $context */
 
         $requestData = $context->getRequestData();
         if ($context->hasIdentifierFields()) {
@@ -36,6 +36,20 @@ class NormalizeRequestData extends AbstractNormalizeRequestData
             }
         } elseif (\array_key_exists(JsonApiDoc::META, $requestData)) {
             $context->setRequestData($requestData[JsonApiDoc::META]);
+        }
+
+        $includedEntities = $context->getIncludedEntities();
+        if (null !== $includedEntities) {
+            $entityClass = $context->getClassName();
+            $entityId = $context->getId();
+            if ($includedEntities->isPrimaryEntity($entityClass, $entityId)) {
+                $includedEntities->setPrimaryEntityRequestData($context->getRequestData());
+            } else {
+                $includedEntity = $includedEntities->get($entityClass, $entityId);
+                if (null !== $includedEntity) {
+                    $includedEntities->getData($includedEntity)?->setRequestData($context->getRequestData());
+                }
+            }
         }
     }
 }

@@ -53,6 +53,20 @@ class IncludedEntityDataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(ApiAction::CREATE, $data->getTargetAction());
     }
 
+    public function testShouldRequestDataBeNullByDefault(): void
+    {
+        $data = new IncludedEntityData('path', 123, true);
+        self::assertNull($data->getRequestData());
+    }
+
+    public function testShouldSetRequestData(): void
+    {
+        $data = new IncludedEntityData('path', 123, true);
+        $requestData = ['key' => 'value'];
+        $data->setRequestData($requestData);
+        self::assertEquals($requestData, $data->getRequestData());
+    }
+
     public function testShouldNormalizedDataBeNullByDefault(): void
     {
         $data = new IncludedEntityData('path', 123, true);

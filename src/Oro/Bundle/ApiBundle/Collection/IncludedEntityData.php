@@ -16,6 +16,7 @@ class IncludedEntityData
     private int $index;
     private bool $existing;
     private string $targetAction;
+    private ?array $requestData = null;
     private ?array $normalizedData = null;
     private ?EntityMetadata $metadata = null;
     private ?FormInterface $form = null;
@@ -67,6 +68,23 @@ class IncludedEntityData
     public function getTargetAction(): string
     {
         return $this->targetAction;
+    }
+
+    /**
+     * Gets request data for the entity.
+     * Note: this method returns an empty array in case request data for the entity are invalid.
+     */
+    public function getRequestData(): ?array
+    {
+        return $this->requestData;
+    }
+
+    /**
+     * Sets request data for the entity.
+     */
+    public function setRequestData(array $requestData): void
+    {
+        $this->requestData = $requestData;
     }
 
     /**
