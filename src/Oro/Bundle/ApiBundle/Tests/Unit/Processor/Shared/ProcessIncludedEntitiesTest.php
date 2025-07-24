@@ -103,7 +103,6 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
         $expectedContext->skipFormValidation(true);
-        $expectedContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
         $expectedContext->setSoftErrorsHandling(true);
 
         $actionMetadata = new EntityMetadata('Test\Entity');
@@ -117,12 +116,20 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $actionProcessor->expects(self::once())
             ->method('createContext')
             ->willReturn($actionContext);
-        $actionProcessor->expects(self::once())
+        $actionProcessor->expects(self::exactly(2))
             ->method('process')
             ->willReturnCallback(function (CreateContext $context) use ($expectedContext, $actionMetadata) {
-                self::assertEquals($expectedContext, $context);
+                $expectedContext->setFirstGroup($context->getFirstGroup());
+                $expectedContext->setLastGroup($context->getLastGroup());
+                self::assertEquals($expectedContext, $context, 'LastGroup: ' . $context->getLastGroup());
+                if (ApiActionGroup::TRANSFORM_DATA === $context->getLastGroup()) {
+                    self::assertEquals(ApiActionGroup::SECURITY_CHECK, $context->getFirstGroup());
+                }
 
-                $context->setMetadata($actionMetadata);
+                if (ApiActionGroup::NORMALIZE_INPUT === $context->getLastGroup()) {
+                    $context->setMetadata($actionMetadata);
+                    $expectedContext->setMetadata($actionMetadata);
+                }
             });
         $this->errorCompleter->expects(self::never())
             ->method('fixIncludedEntityPath');
@@ -163,7 +170,81 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
         $expectedContext->skipFormValidation(true);
-        $expectedContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
+        $expectedContext->setSoftErrorsHandling(true);
+
+        $actionMetadata = new EntityMetadata('Test\Entity');
+
+        $actionContext = new CreateContext($this->configProvider, $this->metadataProvider);
+        $actionProcessor = $this->createMock(ActionProcessorInterface::class);
+        $this->processorBag->expects(self::once())
+            ->method('getProcessor')
+            ->with(ApiAction::CREATE)
+            ->willReturn($actionProcessor);
+        $actionProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn($actionContext);
+        $actionProcessor->expects(self::exactly(2))
+            ->method('process')
+            ->willReturnCallback(function (CreateContext $context) use ($expectedContext, $error, $actionMetadata) {
+                $expectedContext->setFirstGroup($context->getFirstGroup());
+                $expectedContext->setLastGroup($context->getLastGroup());
+                self::assertEquals($expectedContext, $context, 'LastGroup: ' . $context->getLastGroup());
+                if (ApiActionGroup::TRANSFORM_DATA === $context->getLastGroup()) {
+                    self::assertEquals(ApiActionGroup::SECURITY_CHECK, $context->getFirstGroup());
+                }
+
+                if (ApiActionGroup::NORMALIZE_INPUT === $context->getLastGroup()) {
+                    $context->setMetadata($actionMetadata);
+                    $expectedContext->setMetadata($actionMetadata);
+                }
+                if (ApiActionGroup::TRANSFORM_DATA === $context->getLastGroup()) {
+                    $context->addError($error);
+                }
+            });
+        $this->errorCompleter->expects(self::once())
+            ->method('fixIncludedEntityPath')
+            ->with(
+                $includedEntityData->getPath(),
+                self::identicalTo($error),
+                $expectedContext->getRequestType(),
+                self::identicalTo($actionMetadata)
+            );
+        $this->exceptionTextExtractor->expects(self::never())
+            ->method('getExceptionStatusCode');
+
+        $this->context->setIncludedData($includedData);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->context->getRequestHeaders()->set('header1', 'value1');
+        $this->processor->process($this->context);
+        self::assertEquals([$error], $actionContext->getErrors());
+        self::assertNull($includedEntityData->getMetadata());
+    }
+
+    public function testNewIncludedEntityWhenCreateActionFailedDueToInvalidRequestData(): void
+    {
+        $includedData = [
+            ['data' => ['type' => 'testType', 'id' => 'testId']]
+        ];
+        $includedEntity = new \stdClass();
+
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntityData = new IncludedEntityData('/included/0', 0);
+        $includedEntities->add($includedEntity, 'Test\Class', 'id', $includedEntityData);
+
+        $error = Error::createValidationError('some error');
+
+        $expectedContext = new CreateContext($this->configProvider, $this->metadataProvider);
+        $expectedContext->setVersion($this->context->getVersion());
+        $expectedContext->getRequestType()->set($this->context->getRequestType());
+        $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedContext->setSharedData($this->sharedData);
+        $expectedContext->setIncludedEntities($includedEntities);
+        $expectedContext->setClassName('Test\Class');
+        $expectedContext->setId('id');
+        $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
+        $expectedContext->setResult($includedEntity);
+        $expectedContext->skipFormValidation(true);
+        $expectedContext->setLastGroup(ApiActionGroup::NORMALIZE_INPUT);
         $expectedContext->setSoftErrorsHandling(true);
 
         $actionMetadata = new EntityMetadata('Test\Entity');
@@ -180,7 +261,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $actionProcessor->expects(self::once())
             ->method('process')
             ->willReturnCallback(function (CreateContext $context) use ($expectedContext, $error, $actionMetadata) {
-                self::assertEquals($expectedContext, $context);
+                self::assertEquals($expectedContext, $context, 'LastGroup: ' . $context->getLastGroup());
 
                 $context->setMetadata($actionMetadata);
                 $context->addError($error);
@@ -202,6 +283,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $this->processor->process($this->context);
         self::assertEquals([$error], $actionContext->getErrors());
         self::assertNull($includedEntityData->getMetadata());
+        self::assertSame([], $includedEntityData->getRequestData());
     }
 
     public function testNewIncludedEntityWhenCreateActionFailedWithErrorStatusCodeWithoutResponseContent(): void
@@ -231,7 +313,6 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
         $expectedContext->skipFormValidation(true);
-        $expectedContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
         $expectedContext->setSoftErrorsHandling(true);
 
         $actionMetadata = new EntityMetadata('Test\Entity');
@@ -245,13 +326,23 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $actionProcessor->expects(self::once())
             ->method('createContext')
             ->willReturn($actionContext);
-        $actionProcessor->expects(self::once())
+        $actionProcessor->expects(self::exactly(2))
             ->method('process')
             ->willReturnCallback(function (CreateContext $context) use ($expectedContext, $error, $actionMetadata) {
-                self::assertEquals($expectedContext, $context);
+                $expectedContext->setFirstGroup($context->getFirstGroup());
+                $expectedContext->setLastGroup($context->getLastGroup());
+                self::assertEquals($expectedContext, $context, 'LastGroup: ' . $context->getLastGroup());
+                if (ApiActionGroup::TRANSFORM_DATA === $context->getLastGroup()) {
+                    self::assertEquals(ApiActionGroup::SECURITY_CHECK, $context->getFirstGroup());
+                }
 
-                $context->setMetadata($actionMetadata);
-                $context->addError($error);
+                if (ApiActionGroup::NORMALIZE_INPUT === $context->getLastGroup()) {
+                    $context->setMetadata($actionMetadata);
+                    $expectedContext->setMetadata($actionMetadata);
+                }
+                if (ApiActionGroup::TRANSFORM_DATA === $context->getLastGroup()) {
+                    $context->addError($error);
+                }
             });
         $this->errorCompleter->expects(self::once())
             ->method('fixIncludedEntityPath')
@@ -296,7 +387,6 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
         $expectedContext->skipFormValidation(true);
-        $expectedContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
         $expectedContext->setSoftErrorsHandling(true);
 
         $actionMetadata = new EntityMetadata('Test\Entity');
@@ -310,12 +400,20 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $actionProcessor->expects(self::once())
             ->method('createContext')
             ->willReturn($actionContext);
-        $actionProcessor->expects(self::once())
+        $actionProcessor->expects(self::exactly(2))
             ->method('process')
             ->willReturnCallback(function (UpdateContext $context) use ($expectedContext, $actionMetadata) {
-                self::assertEquals($expectedContext, $context);
+                $expectedContext->setFirstGroup($context->getFirstGroup());
+                $expectedContext->setLastGroup($context->getLastGroup());
+                self::assertEquals($expectedContext, $context, 'LastGroup: ' . $context->getLastGroup());
+                if (ApiActionGroup::TRANSFORM_DATA === $context->getLastGroup()) {
+                    self::assertEquals(ApiActionGroup::SECURITY_CHECK, $context->getFirstGroup());
+                }
 
-                $context->setMetadata($actionMetadata);
+                if (ApiActionGroup::NORMALIZE_INPUT === $context->getLastGroup()) {
+                    $context->setMetadata($actionMetadata);
+                    $expectedContext->setMetadata($actionMetadata);
+                }
             });
         $this->errorCompleter->expects(self::never())
             ->method('fixIncludedEntityPath');
@@ -361,7 +459,88 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
         $expectedContext->skipFormValidation(true);
-        $expectedContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
+        $expectedContext->setSoftErrorsHandling(true);
+
+        $actionMetadata = new EntityMetadata('Test\Entity');
+
+        $actionContext = new UpdateContext($this->configProvider, $this->metadataProvider);
+        $actionProcessor = $this->createMock(ActionProcessorInterface::class);
+        $this->processorBag->expects(self::once())
+            ->method('getProcessor')
+            ->with(ApiAction::UPDATE)
+            ->willReturn($actionProcessor);
+        $actionProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn($actionContext);
+        $actionProcessor->expects(self::exactly(2))
+            ->method('process')
+            ->willReturnCallback(function (UpdateContext $context) use ($expectedContext, $error, $actionMetadata) {
+                $expectedContext->setFirstGroup($context->getFirstGroup());
+                $expectedContext->setLastGroup($context->getLastGroup());
+                self::assertEquals($expectedContext, $context, 'LastGroup: ' . $context->getLastGroup());
+                if (ApiActionGroup::TRANSFORM_DATA === $context->getLastGroup()) {
+                    self::assertEquals(ApiActionGroup::SECURITY_CHECK, $context->getFirstGroup());
+                }
+
+                if (ApiActionGroup::NORMALIZE_INPUT === $context->getLastGroup()) {
+                    $context->setMetadata($actionMetadata);
+                    $expectedContext->setMetadata($actionMetadata);
+                }
+                if (ApiActionGroup::TRANSFORM_DATA === $context->getLastGroup()) {
+                    $context->addError($error);
+                }
+            });
+        $this->errorCompleter->expects(self::once())
+            ->method('fixIncludedEntityPath')
+            ->with(
+                $includedEntityData->getPath(),
+                self::identicalTo($error),
+                $expectedContext->getRequestType(),
+                self::identicalTo($actionMetadata)
+            );
+        $this->exceptionTextExtractor->expects(self::once())
+            ->method('getExceptionStatusCode')
+            ->with(self::identicalTo($errorException))
+            ->willReturn(Response::HTTP_CONFLICT);
+
+        $this->context->setIncludedData($includedData);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->context->getRequestHeaders()->set('header1', 'value1');
+        $this->processor->process($this->context);
+        self::assertEquals([$expectedError], $actionContext->getErrors());
+        self::assertNull($includedEntityData->getMetadata());
+    }
+
+    public function testExistingIncludedEntityWhenUpdateActionFailedDueToInvalidRequestData(): void
+    {
+        $includedData = [
+            ['data' => ['type' => 'testType', 'id' => 'testId']]
+        ];
+        $includedEntity = new \stdClass();
+
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntityData = new IncludedEntityData('/included/0', 0, true);
+        $includedEntities->add($includedEntity, 'Test\Class', 'id', $includedEntityData);
+
+        $errorException = new \Exception();
+        $error = Error::create('some error');
+        $error->setInnerException($errorException);
+
+        $expectedError = clone $error;
+        $expectedError->setStatusCode(Response::HTTP_CONFLICT);
+
+        $expectedContext = new UpdateContext($this->configProvider, $this->metadataProvider);
+        $expectedContext->setVersion($this->context->getVersion());
+        $expectedContext->getRequestType()->set($this->context->getRequestType());
+        $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
+        $expectedContext->setSharedData($this->sharedData);
+        $expectedContext->setIncludedEntities($includedEntities);
+        $expectedContext->setClassName('Test\Class');
+        $expectedContext->setId('id');
+        $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
+        $expectedContext->setResult($includedEntity);
+        $expectedContext->skipFormValidation(true);
+        $expectedContext->setLastGroup(ApiActionGroup::NORMALIZE_INPUT);
         $expectedContext->setSoftErrorsHandling(true);
 
         $actionMetadata = new EntityMetadata('Test\Entity');
@@ -378,7 +557,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $actionProcessor->expects(self::once())
             ->method('process')
             ->willReturnCallback(function (UpdateContext $context) use ($expectedContext, $error, $actionMetadata) {
-                self::assertEquals($expectedContext, $context);
+                self::assertEquals($expectedContext, $context, 'LastGroup: ' . $context->getLastGroup());
 
                 $context->setMetadata($actionMetadata);
                 $context->addError($error);
@@ -402,6 +581,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $this->processor->process($this->context);
         self::assertEquals([$expectedError], $actionContext->getErrors());
         self::assertNull($includedEntityData->getMetadata());
+        self::assertSame([], $includedEntityData->getRequestData());
     }
 
     public function testExistingIncludedEntityByCreateAction(): void
@@ -428,7 +608,6 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
         $expectedContext->skipFormValidation(true);
-        $expectedContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
         $expectedContext->setSoftErrorsHandling(true);
 
         $actionMetadata = new EntityMetadata('Test\Entity');
@@ -442,12 +621,20 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $actionProcessor->expects(self::once())
             ->method('createContext')
             ->willReturn($actionContext);
-        $actionProcessor->expects(self::once())
+        $actionProcessor->expects(self::exactly(2))
             ->method('process')
             ->willReturnCallback(function (UpdateContext $context) use ($expectedContext, $actionMetadata) {
-                self::assertEquals($expectedContext, $context);
+                $expectedContext->setFirstGroup($context->getFirstGroup());
+                $expectedContext->setLastGroup($context->getLastGroup());
+                self::assertEquals($expectedContext, $context, 'LastGroup: ' . $context->getLastGroup());
+                if (ApiActionGroup::TRANSFORM_DATA === $context->getLastGroup()) {
+                    self::assertEquals(ApiActionGroup::SECURITY_CHECK, $context->getFirstGroup());
+                }
 
-                $context->setMetadata($actionMetadata);
+                if (ApiActionGroup::NORMALIZE_INPUT === $context->getLastGroup()) {
+                    $context->setMetadata($actionMetadata);
+                    $expectedContext->setMetadata($actionMetadata);
+                }
             });
         $this->errorCompleter->expects(self::never())
             ->method('fixIncludedEntityPath');

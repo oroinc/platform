@@ -13,7 +13,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
     private KeyObjectCollection $collection;
     /** @var array [key => [entity class, entity id], ...] */
     private array $keys = [];
-    /** @var array|null [entity class, entity id, entity, metadata] */
+    /** @var array|null [entity class, entity id, entity, metadata, request data] */
     private ?array $primaryEntity = null;
 
     public function __construct()
@@ -27,7 +27,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
      */
     public function setPrimaryEntityId(string $entityClass, mixed $entityId): void
     {
-        $this->primaryEntity = [$entityClass, $entityId, null, null];
+        $this->primaryEntity = [$entityClass, $entityId, null, null, null];
     }
 
     /**
@@ -38,7 +38,6 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
     {
         return
             null !== $this->primaryEntity
-            && null !== $this->primaryEntity[1]
             && $entityClass === $this->primaryEntity[0]
             && $entityId === $this->primaryEntity[1];
     }
@@ -74,6 +73,28 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
         return null !== $this->primaryEntity
             ? $this->primaryEntity[3]
             : null;
+    }
+
+    /**
+     * Gets request data for the primary entity.
+     */
+    public function getPrimaryEntityRequestData(): ?array
+    {
+        return null !== $this->primaryEntity
+            ? $this->primaryEntity[4]
+            : null;
+    }
+
+    /**
+     * Sets request data for the primary entity.
+     */
+    public function setPrimaryEntityRequestData(array $requestData): void
+    {
+        if (null === $this->primaryEntity) {
+            throw new \LogicException('The primary entity identifier must be set before.');
+        }
+
+        $this->primaryEntity[4] = $requestData;
     }
 
     /**
