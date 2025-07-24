@@ -26,7 +26,6 @@ class ExtendAutocompleteGeneratorTest extends WebTestCase
 
     public function testGenerate()
     {
-        $this->markTestSkipped('Will be fixed in BB-25923');
         /** @var ExtendAutocompleteGenerator $generator */
         $generator = self::getContainer()->get('oro_entity_extend.autocomplete_class_generator');
         $generator->generate();
@@ -36,14 +35,14 @@ class ExtendAutocompleteGeneratorTest extends WebTestCase
 
         $fileContents = \file_get_contents($autocompleteFile);
 
-        self::assertStringNotContainsString('): void', $fileContents);
-        self::assertStringNotContainsString('): int', $fileContents);
-        self::assertStringNotContainsString('): string', $fileContents);
-        self::assertStringNotContainsString('):', $fileContents);
-        self::assertStringContainsString('@method void', $fileContents);
-        self::assertStringContainsString('@method string|null', $fileContents);
-        self::assertStringContainsString('@method integer|null', $fileContents);
-        self::assertStringContainsString('@method string', $fileContents);
+        $methodPattern = '/@method\s+(?:[\w\\\\]+)?\s*\w+\s*\(.*\)/';
+        $propertyPattern = '/@property\s+([\w\\\\|]+)\s+\$\w+/';
+        $notExistedMethodPattern = '/^@method\s+(?:[\w|\\\\?]+\s+)?(\w+)\s*\((.*?)\)\s*:\s*([\w|\\\\?]+)$/';
+        $notExistedPropertyPattern = '/^@property\s+\?[\w|\\\\]+\s+\$\w+$/';
+        self::assertMatchesRegularExpression($methodPattern, $fileContents);
+        self::assertMatchesRegularExpression($propertyPattern, $fileContents);
+        self::assertDoesNotMatchRegularExpression($notExistedMethodPattern, $fileContents);
+        self::assertDoesNotMatchRegularExpression($notExistedPropertyPattern, $fileContents);
 
         preg_match_all('/^trait (.+)/m', $fileContents, $matches);
         $traitNames = $matches[1];

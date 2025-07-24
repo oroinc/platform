@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Request\ErrorStatusCodesWithoutContentTrait;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,8 +42,7 @@ class ProcessIncludedEntities implements ProcessorInterface
     {
         /** @var FormContext $context */
 
-        $includedData = $context->getIncludedData();
-        if (empty($includedData)) {
+        if (!$context->getIncludedData()) {
             // no included data
             return;
         }
@@ -59,30 +59,63 @@ class ProcessIncludedEntities implements ProcessorInterface
                 $entityMapper->registerEntity($entity);
             }
         }
+
+        $this->processIncludedEntities($context);
+    }
+
+    private function processIncludedEntities(FormContext $context): void
+    {
+        // normalize request data for all included entities
+        $processingIncludedEntities = [];
+        $includedData = $context->getIncludedData();
+        $includedEntities = $context->getIncludedEntities();
         foreach ($includedEntities as $entity) {
+            /** @var IncludedEntityData $entityData */
             $entityData = $includedEntities->getData($entity);
-            $this->processIncludedEntity(
+            $actionProcessor = $this->processorBag->getProcessor($entityData->getTargetAction());
+            $actionContext = $this->createIncludedEntityProcessingContext(
+                $actionProcessor,
                 $context,
                 $includedData[$entityData->getIndex()],
                 $entity,
                 $includedEntities->getClass($entity),
-                $includedEntities->getId($entity),
-                $entityData
+                $includedEntities->getId($entity)
             );
+            $actionContext->setLastGroup(ApiActionGroup::NORMALIZE_INPUT);
+            $actionProcessor->process($actionContext);
+            if ($actionContext->hasErrors() && null === $entityData->getRequestData()) {
+                // request data for the entity are invalid
+                $entityData->setRequestData([]);
+            }
+
+            $processingIncludedEntities[] = [$actionProcessor, $actionContext, $entityData];
+        }
+
+        // validate and fill all included entities
+        /**
+         * @var ActionProcessorInterface $actionProcessor
+         * @var SingleItemContext&FormContext $actionContext
+         * @var IncludedEntityData $entityData
+         */
+        foreach ($processingIncludedEntities as [$actionProcessor, $actionContext, $entityData]) {
+            if (!$actionContext->hasErrors()) {
+                $actionContext->setFirstGroup(ApiActionGroup::SECURITY_CHECK);
+                $actionContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
+                $actionProcessor->process($actionContext);
+            }
+            $this->handleIncludedEntityProcessingResult($context, $actionContext, $entityData);
         }
     }
 
-    private function processIncludedEntity(
+    private function createIncludedEntityProcessingContext(
+        ActionProcessorInterface $actionProcessor,
         FormContext $context,
         array $entityRequestData,
         object $entity,
         string $entityClass,
-        mixed $entityIncludeId,
-        IncludedEntityData $entityData
-    ): void {
-        $actionProcessor = $this->processorBag->getProcessor($entityData->getTargetAction());
-
-        /** @var SingleItemContext|FormContext $actionContext */
+        mixed $entityIncludeId
+    ): FormContext {
+        /** @var SingleItemContext&FormContext $actionContext */
         $actionContext = $actionProcessor->createContext();
         $actionContext->setVersion($context->getVersion());
         $actionContext->getRequestType()->set($context->getRequestType());
@@ -97,11 +130,16 @@ class ProcessIncludedEntities implements ProcessorInterface
         $actionContext->setResult($entity);
 
         $actionContext->skipFormValidation(true);
-        $actionContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
         $actionContext->setSoftErrorsHandling(true);
 
-        $actionProcessor->process($actionContext);
+        return $actionContext;
+    }
 
+    private function handleIncludedEntityProcessingResult(
+        FormContext $context,
+        FormContext $actionContext,
+        IncludedEntityData $entityData
+    ): void {
         if ($actionContext->hasErrors()) {
             $requestType = $actionContext->getRequestType();
             $errorCompleter = $this->errorCompleterRegistry->getErrorCompleter($requestType);
