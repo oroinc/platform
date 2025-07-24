@@ -1,6 +1,6 @@
 @regression
 @ticket-BAP-17951
-@ticket-BB-25327
+
 Feature: Entity select fields
   In order to allows users to chose single or multiple value from a list of predetermined options
   As an Administrator
@@ -20,11 +20,13 @@ Feature: Entity select fields
     And click "Continue"
     And fill form with:
       | Label | Select Field |
-    And set Options with:
-      | Label    |
-      | Option 1 |
-      | Option 2 |
-      | option 2 |
+    And click "Add"
+    And click "Add"
+    And click "Add"
+    And I fill "Entity Config Form" with:
+      | Option First  | Option 1 |
+      | Option Second | Option 2 |
+      | Option Third  | option 2 |
     And save and close form
     Then I should see "Field saved" flash message
 
@@ -36,11 +38,13 @@ Feature: Entity select fields
     And click "Continue"
     And fill form with:
       | Label | Multi Select Field |
-    And set Options with:
-      | Label    |
-      | Option 1 |
-      | Option 2 |
-      | option 2 |
+    And click "Add"
+    And click "Add"
+    And click "Add"
+    And I fill "Entity Config Form" with:
+      | Option First  | Option 1 |
+      | Option Second | Option 2 |
+      | Option Third  | option 2 |
     And save and close form
     Then I should see "Field saved" flash message
 
@@ -53,14 +57,19 @@ Feature: Entity select fields
       | Field name | selectDuplicates |
       | Type       | Select           |
     And click "Continue"
-    And set Options with:
-      | Label                    |
-      | Duplicate Option 1       |
-      | Another Duplicate Option |
-      | Duplicate Option 1       |
-      | Another Duplicate Option |
-      | Another Duplicate Option |
-      | Another Option           |
+    And click "Add"
+    And click "Add"
+    And click "Add"
+    And click "Add"
+    And click "Add"
+    And click "Add"
+    And I fill "Entity Config Form" with:
+      | Option First  | Duplicate Option 1       |
+      | Option Second | Another Duplicate Option |
+      | Option Third  | Duplicate Option 1       |
+      | Option Fourth | Another Duplicate Option |
+      | Option Fifth  | Another Duplicate Option |
+      | Option Sixth  | Another Option           |
     When I save and close form
     Then I should see "The options 'Duplicate Option 1', 'Another Duplicate Option' are duplicated."
     And should not see "Update schema"
@@ -74,14 +83,19 @@ Feature: Entity select fields
       | Field name | multiSelectDuplicates |
       | Type       | Multi-Select          |
     And click "Continue"
-    And set Options with:
-      | Label                    |
-      | Duplicate Option 1       |
-      | Another Duplicate Option |
-      | Duplicate Option 1       |
-      | Another Duplicate Option |
-      | Another Duplicate Option |
-      | Another Option           |
+    And click "Add"
+    And click "Add"
+    And click "Add"
+    And click "Add"
+    And click "Add"
+    And click "Add"
+    And I fill "Entity Config Form" with:
+      | Option First  | Duplicate Option 1       |
+      | Option Second | Another Duplicate Option |
+      | Option Third  | Duplicate Option 1       |
+      | Option Fourth | Another Duplicate Option |
+      | Option Fifth  | Another Duplicate Option |
+      | Option Sixth  | Another Option           |
     When I save and close form
     Then I should see "The options 'Duplicate Option 1', 'Another Duplicate Option' are duplicated."
     And should not see "Update schema"
