@@ -1,7 +1,7 @@
 @regression
 @ticket-BAP-15726
 @ticket-BAP-21510
-@ticket-BB-25327
+
 Feature: Extended table fields
   In order to manage data of extended fields
   As an Administrator
@@ -36,7 +36,6 @@ Feature: Extended table fields
       | SmallInt |
       | String   |
       | Text     |
-      | WYSIWYG  |
 
   Scenario: Create Custom Field File
     When I click "Create Field"
@@ -97,11 +96,13 @@ Feature: Extended table fields
       | Storage Type | Table column      |
       | Type         | Select            |
     And click "Continue"
-    And set Options with:
-      | Label   |
-      | Option1 |
-      | Option2 |
-      | Option3 |
+    And click "Add"
+    And click "Add"
+    And click "Add"
+    And I fill "Entity Config Form" with:
+      | Option First  | Option1 |
+      | Option Second | Option2 |
+      | Option Third  | Option3 |
     And save and close form
     Then I should see "Field saved" flash message
 
@@ -112,11 +113,13 @@ Feature: Extended table fields
       | Storage Type | Table column           |
       | Type         | Multi-Select           |
     And click "Continue"
-    And set Options with:
-      | Label   |
-      | Option1 |
-      | Option2 |
-      | Option3 |
+    And click "Add"
+    And click "Add"
+    And click "Add"
+    And I fill "Entity Config Form" with:
+      | Option First  | Option1 |
+      | Option Second | Option2 |
+      | Option Third  | Option3 |
     And save and close form
     Then I should see "Field saved" flash message
 

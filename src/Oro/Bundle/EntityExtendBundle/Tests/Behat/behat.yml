@@ -40,6 +40,9 @@ oro_behat_extension:
           Option First: 'oro_entity_config_type[enum][enum_options][0][label]'
           Option Second: 'oro_entity_config_type[enum][enum_options][1][label]'
           Option Third: 'oro_entity_config_type[enum][enum_options][2][label]'
+          Option Fourth: 'oro_entity_config_type[enum][enum_options][3][label]'
+          Option Fifth: 'oro_entity_config_type[enum][enum_options][4][label]'
+          Option Sixth: 'oro_entity_config_type[enum][enum_options][5][label]'
 
     CustomEntityForm:
       selector: "form[name='custom_entity_type']"
