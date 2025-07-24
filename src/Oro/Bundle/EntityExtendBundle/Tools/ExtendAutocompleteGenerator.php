@@ -168,8 +168,9 @@ class ExtendAutocompleteGenerator
                     ? $methodName . '(' . str_replace('?', '', $propertyType) . ' $value)'
                     : $returnType . ' '. $methodName . '() ';
             }
+            $methodsArguments = $this->isMethodHasArgument($methodName) ? '($value)' : '()';
 
-            return $methodName . $this->isMethodHasArgument($methodName) ? '($value)' : '()';
+            return $methodName . $methodsArguments;
         }
         $formatFromRelation = $this->getFormatFromRelation(
             $methodName,
