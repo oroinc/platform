@@ -9,6 +9,7 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Provider\EmailTemplateProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,19 +23,13 @@ use Symfony\Component\Yaml\Yaml;
  * Renders an email template.
  * Optionally, sends a compiled email to the email address specified in the "recipient" option.
  */
+#[AsCommand(
+    name: 'oro:debug:email:template:compile',
+    description: 'Renders an email template. Optionally, sends a compiled email' .
+        'to the email address specified in the "recipient" option.'
+)]
 class DebugEmailTemplateCompileCommand extends Command
 {
-    /**
-     * @var string
-     */
-    protected static $defaultName = 'oro:debug:email:template:compile';
-
-    /**
-     * @var string
-     */
-    protected static $defaultDescription = 'Renders an email template.'
-        . ' Optionally, sends a compiled email to the email address specified in the "recipient" option.';
-
     private DoctrineHelper $doctrineHelper;
 
     private EmailTemplateProvider $emailTemplateProvider;

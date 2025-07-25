@@ -6,6 +6,7 @@ namespace Oro\Bundle\SearchBundle\Command;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,11 +16,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Rebuilds the search index.
  */
+#[AsCommand(
+    name: 'oro:search:reindex',
+    description: 'Rebuilds the search index.'
+)]
 class ReindexCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:search:reindex';
-
     private DoctrineHelper $doctrineHelper;
     private IndexerInterface $asyncIndexer;
     private IndexerInterface $syncIndexer;
@@ -44,7 +46,6 @@ class ReindexCommand extends Command
         $this
             ->addArgument('class', InputArgument::OPTIONAL, 'Entity to reindex (FQCN or short name)')
             ->addOption('scheduled', null, InputOption::VALUE_NONE, 'Schedule the reindexation in the background')
-            ->setDescription('Rebuilds the search index.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command rebuilds the search index.

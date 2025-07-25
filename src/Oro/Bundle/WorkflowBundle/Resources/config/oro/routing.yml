@@ -1,6 +1,6 @@
 oro_workflow_bundle:
     resource:     "@OroWorkflowBundle/Controller"
-    type:         annotation
+    type:         attribute
 
 
 #

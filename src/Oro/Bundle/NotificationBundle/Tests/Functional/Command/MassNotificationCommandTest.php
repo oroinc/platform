@@ -4,7 +4,6 @@ namespace Oro\Bundle\NotificationBundle\Tests\Functional\Command;
 
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\NotificationBundle\Async\Topic\SendMassEmailNotificationTopic;
-use Oro\Bundle\NotificationBundle\Command\MassNotificationCommand;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class MassNotificationCommandTest extends WebTestCase
@@ -19,7 +18,7 @@ class MassNotificationCommandTest extends WebTestCase
         self::assertMessagesCount(SendMassEmailNotificationTopic::getName(), 0);
 
         $result = self::runCommand(
-            MassNotificationCommand::getDefaultName(),
+            'oro:maintenance-notification',
             [
                 '--subject' => 'sbj',
                 '--message' => 'msg',

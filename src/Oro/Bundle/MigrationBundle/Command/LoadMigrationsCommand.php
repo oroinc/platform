@@ -9,6 +9,7 @@ use Oro\Bundle\MigrationBundle\Migration\MigrationExecutorWithNameGenerator;
 use Oro\Component\Log\OutputLogger;
 use Oro\Component\PhpUtils\Tools\CommandExecutor\CommandExecutor;
 use Oro\Component\PhpUtils\Tools\CommandExecutor\CommandExecutorInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,11 +18,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Executes migration scripts.
  */
+#[AsCommand(
+    name: 'oro:migration:load',
+    description: 'Executes migration scripts.'
+)]
 class LoadMigrationsCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:migration:load';
-
     private MigrationsLoader $migrationLoader;
     private MigrationExecutorWithNameGenerator $migrationExecutor;
     private CommandExecutorInterface $commandExecutor;
@@ -64,7 +66,6 @@ class LoadMigrationsCommand extends Command
                 'Timeout for child command execution',
                 CommandExecutor::DEFAULT_TIMEOUT
             )
-            ->setDescription('Executes migration scripts.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command executes migration scripts.

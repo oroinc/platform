@@ -296,6 +296,11 @@ services:
             - { name: oro.api.processor, action: customize_loaded_data, collection: true, priority: 255 }
             - { name: oro.api.processor, action: customize_form_data, event: pre_submit|submit|post_submit|pre_validate|post_validate|pre_flush_data|post_flush_data|post_save_data, priority: 255 }
 
+    oro_api.tests.assert_request_data_exist_for_included_entities_in_customize_form_data_context:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\AssertRequestDataExistForIncludedEntitiesInCustomizeFormDataContext
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: pre_submit|submit|post_submit|pre_validate|post_validate|pre_flush_data|post_flush_data|post_save_data, priority: 255 }
+
     oro_api.tests.assert_shared_data_exist_in_batch_update_item_context:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\AssertSharedDataExistInBatchUpdateItemContext
         tags:

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\EventListener\Command;
 
-use Oro\Bundle\InstallerBundle\Command\PlatformUpdateCommand;
 use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -51,7 +50,7 @@ class PlatformUpdateCommandListener
 
     protected function isApplicable(Command $command): bool
     {
-        return $command->getName() === PlatformUpdateCommand::getDefaultName();
+        return $command->getName() === 'oro:platform:update';
     }
 
     private function skipReindexation(InputInterface $input): bool

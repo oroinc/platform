@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\LocaleBundle\Tests\Functional\Command;
 
-use Oro\Bundle\LocaleBundle\Command\CleanupUnusedLocalizedFallbackValuesCommand;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizedFallbackValueRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -35,7 +34,7 @@ class CleanupUnusedLocalizedFallbackValuesCommandTest extends WebTestCase
 
         self::assertGreaterThanOrEqual(5, $numberOfUnusedLocalizedFallbackValuesBeforeCommand);
 
-        $result = self::runCommand(CleanupUnusedLocalizedFallbackValuesCommand::getDefaultName());
+        $result = self::runCommand('oro:localization:localized-fallback-values:cleanup-unused');
 
         self::assertStringContainsString('Removing unused localized fallback values completed.', $result);
 

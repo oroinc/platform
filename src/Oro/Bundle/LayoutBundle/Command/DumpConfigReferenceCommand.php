@@ -6,6 +6,7 @@ namespace Oro\Bundle\LayoutBundle\Command;
 
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,11 +15,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Dumps the reference structure for Resources/views/layouts/THEME_NAME/theme.yml.
  */
+#[AsCommand(
+    name: 'oro:layout:config:dump-reference',
+    description: 'Dumps the reference structure for Resources/views/layouts/THEME_NAME/theme.yml.'
+)]
 class DumpConfigReferenceCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:layout:config:dump-reference';
-
     private ThemeConfiguration $themeConfiguration;
 
     public function __construct(ThemeConfiguration $themeConfiguration)
@@ -32,7 +34,6 @@ class DumpConfigReferenceCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Dumps the reference structure for Resources/views/layouts/THEME_NAME/theme.yml.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command dumps the reference structure

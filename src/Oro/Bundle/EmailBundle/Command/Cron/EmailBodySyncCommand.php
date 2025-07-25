@@ -7,6 +7,7 @@ namespace Oro\Bundle\EmailBundle\Command\Cron;
 use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer;
 use Oro\Component\Log\OutputLogger;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,6 +18,10 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 /**
  * Synchronizes email bodies.
  */
+#[AsCommand(
+    name: 'oro:cron:email-body-sync',
+    description: 'Synchronizes email bodies.'
+)]
 class EmailBodySyncCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
     /** Number of emails in batch */
@@ -24,9 +29,6 @@ class EmailBodySyncCommand extends Command implements CronCommandScheduleDefinit
 
     /** The maximum execution time (in minutes) */
     public const MAX_EXEC_TIME_IN_MIN = 15;
-
-    /** @var string */
-    protected static $defaultName = 'oro:cron:email-body-sync';
 
     private EmailBodySynchronizer $synchronizer;
 
@@ -61,7 +63,6 @@ class EmailBodySyncCommand extends Command implements CronCommandScheduleDefinit
                 'Number of emails to process in a single batch',
                 self::BATCH_SIZE
             )
-            ->setDescription('Synchronizes email bodies.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command synchronizes email bodies.

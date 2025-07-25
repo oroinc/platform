@@ -11,6 +11,7 @@ use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,11 +23,12 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 /**
  * Imports data from a file.
  */
+#[AsCommand(
+    name: 'oro:import:file',
+    description: 'Imports data from a file.'
+)]
 class ImportCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:import:file';
-
     private ProcessorRegistry $processorRegistry;
     private ConnectorRegistry $connectorRegistry;
     private MessageProducerInterface $messageProducer;
@@ -59,7 +61,6 @@ class ImportCommand extends Command
             ->addOption('processor', null, InputOption::VALUE_REQUIRED, 'Import processor name')
             ->addOption('validation', null, InputOption::VALUE_NONE, 'Only validate data instead of import')
             ->addOption('email', null, InputOption::VALUE_REQUIRED, 'Email to send the import log to')
-            ->setDescription('Imports data from a file.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command imports data from a file.

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\PlatformBundle\Tests\Functional\Command\Cron;
 
-use Oro\Bundle\PlatformBundle\Command\Cron\RemoveOrphanedMaterializedViewsCronCommand;
 use Oro\Bundle\PlatformBundle\Entity\MaterializedView as MaterializedViewEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Command\CommandTestingTrait;
@@ -24,7 +23,7 @@ class RemoveOrphanedMaterializedViewsCronCommandTest extends WebTestCase
         $repository = self::getContainer()->get('doctrine')->getRepository(MaterializedViewEntity::class);
         self::assertCount(1, $repository->findOlderThan(new \DateTime('today -7 days', new \DateTimeZone('UTC'))));
 
-        $commandTester = $this->doExecuteCommand(RemoveOrphanedMaterializedViewsCronCommand::getDefaultName());
+        $commandTester = $this->doExecuteCommand('oro:cron:platform:materialized-view:remove-orphans');
 
         $this->assertSuccessReturnCode($commandTester);
         $this->assertOutputContains(
@@ -46,7 +45,7 @@ class RemoveOrphanedMaterializedViewsCronCommandTest extends WebTestCase
         self::assertCount(2, $repository->findAll());
 
         $commandTester = $this->doExecuteCommand(
-            RemoveOrphanedMaterializedViewsCronCommand::getDefaultName(),
+            'oro:cron:platform:materialized-view:remove-orphans',
             ['--days-old' => 10]
         );
 
@@ -62,7 +61,7 @@ class RemoveOrphanedMaterializedViewsCronCommandTest extends WebTestCase
     public function testExecuteWhenInvalidDaysOldOption(int|string $daysOld): void
     {
         $commandTester = $this->doExecuteCommand(
-            RemoveOrphanedMaterializedViewsCronCommand::getDefaultName(),
+            'oro:cron:platform:materialized-view:remove-orphans',
             ['--days-old' => $daysOld]
         );
 

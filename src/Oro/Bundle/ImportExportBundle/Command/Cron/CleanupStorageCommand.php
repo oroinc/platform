@@ -7,15 +7,14 @@ namespace Oro\Bundle\ImportExportBundle\Command\Cron;
 use Gaufrette\File;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Manager\ImportExportResultManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 /**
  * Deletes old temporary import/export files.
  */
+#[AsCommand(name: 'oro:cron:import-clean-up-storage')]
 class CleanupStorageCommand extends CleanupStorageCommandAbstract
 {
-    /** @var string */
-    protected static $defaultName = 'oro:cron:import-clean-up-storage';
-
     private FileManager $fileManager;
     private ImportExportResultManager $importExportResultManager;
 

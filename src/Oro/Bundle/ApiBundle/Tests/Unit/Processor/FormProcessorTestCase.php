@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
@@ -70,7 +69,6 @@ class FormProcessorTestCase extends TestCase
     {
         $validator = Validation::createValidatorBuilder()
             ->enableAttributeMapping()
-            ->setDoctrineAnnotationReader(new AnnotationReader())
             ->getValidator();
 
         return [new ValidatorExtension($validator)];

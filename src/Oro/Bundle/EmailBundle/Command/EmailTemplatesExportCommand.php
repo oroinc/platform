@@ -6,6 +6,7 @@ namespace Oro\Bundle\EmailBundle\Command;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,12 +16,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Exports email templates
  */
+#[AsCommand(
+    name: 'oro:email:template:export',
+    description: 'Exports email templates'
+)]
 class EmailTemplatesExportCommand extends Command
 {
-    protected static $defaultName = 'oro:email:template:export';
-
-    protected static $defaultDescription = 'Exports email templates';
-
     private DoctrineHelper $doctrineHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper)

@@ -7,6 +7,7 @@ namespace Oro\Bundle\WorkflowBundle\Command;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,12 +19,13 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Dumps workflow translations.
  */
+#[AsCommand(
+    name: 'oro:workflow:translations:dump',
+    description: 'Dumps workflow translations.'
+)]
 class DumpWorkflowTranslationsCommand extends Command
 {
     public const INLINE_LEVEL = 10;
-
-    /** @var string */
-    protected static $defaultName = 'oro:workflow:translations:dump';
 
     private WorkflowManager $workflowManager;
     private WorkflowTranslationHelper $workflowTranslationHelper;
@@ -44,7 +46,6 @@ class DumpWorkflowTranslationsCommand extends Command
             ->addArgument('workflow', InputArgument::REQUIRED, 'Workflow name')
             ->addOption('parent-workflow', null, InputOption::VALUE_OPTIONAL, 'Parent workflow name')
             ->addOption('locale', null, InputOption::VALUE_OPTIONAL, 'Locale', Translator::DEFAULT_LOCALE)
-            ->setDescription('Dumps workflow translations.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command dumps (prints) workflow translations

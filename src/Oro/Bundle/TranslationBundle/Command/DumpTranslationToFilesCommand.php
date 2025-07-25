@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Command;
 
 use Oro\Bundle\TranslationBundle\Provider\Catalogue\CatalogueLoaderInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,11 +17,12 @@ use Symfony\Component\Translation\Writer\TranslationWriter;
 /**
  * Dumps the translations for the given languages in separate formats.
  */
+#[AsCommand(
+    name: 'oro:translation:dump-files',
+    description: 'Dumps the translations for the given languages in separate formats.'
+)]
 class DumpTranslationToFilesCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:translation:dump-files';
-
     private TranslationWriter $translationWriter;
     private TranslationReader $translationReader;
     private string $targetPath;
@@ -75,7 +77,6 @@ class DumpTranslationToFilesCommand extends Command
                 'Output file format. Available formats: ' . implode(', ', $this->translationWriter->getFormats()),
                 'yml'
             )
-            ->setDescription('Dumps the translations for the given languages in separate formats.')
             ->setHelp(
                 <<<HELP
 The <info>%command.name%</info> command dumps the translations for the given languages in separate formats.

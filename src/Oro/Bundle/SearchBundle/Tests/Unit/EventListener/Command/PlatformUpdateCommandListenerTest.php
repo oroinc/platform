@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener\Command;
 
-use Oro\Bundle\InstallerBundle\Command\PlatformUpdateCommand;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Oro\Bundle\SearchBundle\EventListener\Command\PlatformUpdateCommandListener;
@@ -60,7 +59,7 @@ class PlatformUpdateCommandListenerTest extends TestCase
     {
         $this->command->expects($this->once())
             ->method('getName')
-            ->willReturn(PlatformUpdateCommand::getDefaultName());
+            ->willReturn('oro:platform:update');
 
         $this->input->expects($this->any())
             ->method('hasOption')

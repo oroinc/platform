@@ -20,9 +20,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class ThemeValidateConfigurationCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:theme:configuration:validate';
-
     public function __construct(
         private ConfigurationValidator $validator
     ) {

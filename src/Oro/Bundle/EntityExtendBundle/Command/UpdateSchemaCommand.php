@@ -13,6 +13,7 @@ use Oro\Bundle\EntityExtendBundle\Exception\RecoverableUpdateSchemaException;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
 use Oro\Bundle\EntityExtendBundle\Tools\SchemaTrait;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -22,12 +23,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Updates database schema for extend entities.
  */
+#[AsCommand(
+    name: 'oro:entity-extend:update-schema',
+    description: 'Updates database schema for extend entities.'
+)]
 class UpdateSchemaCommand extends Command
 {
     use SchemaTrait;
-
-    /** @var string */
-    protected static $defaultName = 'oro:entity-extend:update-schema';
 
     private ManagerRegistry $registry;
     private ExtendEntityConfigProviderInterface $extendEntityConfigProvider;
@@ -60,7 +62,6 @@ class UpdateSchemaCommand extends Command
                 InputOption::VALUE_NONE,
                 'Tells that you want process update schema only and skip enums sync.'
             )
-            ->setDescription('Updates database schema for extend entities.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command updates database schema for extend entities.

@@ -35,7 +35,7 @@ class SyncCommandTest extends WebTestCase
 
     public function testShouldOutputHelpForTheCommand(): void
     {
-        $result = self::runCommand(SyncCommand::getDefaultName(), ['--help']);
+        $result = self::runCommand('oro:cron:integration:sync', ['--help']);
 
         self::assertStringContainsString('Usage: oro:cron:integration:sync [options]', $result);
     }
@@ -77,7 +77,7 @@ class SyncCommandTest extends WebTestCase
         /** @var Channel $integration */
         $integration = $this->getReference('oro_integration:foo_integration');
 
-        $result = self::runCommand(SyncCommand::getDefaultName(), ['--integration='.$integration->getId()]);
+        $result = self::runCommand('oro:cron:integration:sync', ['--integration='.$integration->getId()]);
 
         self::assertStringContainsString('Schedule sync for "Foo Integration" integration.', $result);
 
@@ -96,7 +96,7 @@ class SyncCommandTest extends WebTestCase
         $integration = $this->getReference('oro_integration:foo_integration');
 
         $result = self::runCommand(
-            SyncCommand::getDefaultName(),
+            'oro:cron:integration:sync',
             [
                 '--integration='.$integration->getId(),
                 '--connector' => 'theConnector',
@@ -141,7 +141,7 @@ class SyncCommandTest extends WebTestCase
             )
         );
 
-        $result = self::runCommand(SyncCommand::getDefaultName(), ['--integration='.$integration->getId()]);
+        $result = self::runCommand('oro:cron:integration:sync', ['--integration='.$integration->getId()]);
 
         self::assertStringContainsString('Schedule sync for "Foo Integration" integration.', $result);
 

@@ -57,6 +57,37 @@ Object.assign(Popper.Defaults.modifiers, {
             return data;
         }
     },
+    positionFixedBoundary: {
+        order: 210,
+        enabled: false,
+        offset: 8,
+        fn(data, options) {
+            const {offset} = options;
+            const windowWidth = document.documentElement.clientWidth;
+
+            if (data.popper.width > windowWidth) {
+                return data;
+            }
+
+            const newOffset = data.popper.width + offset > windowWidth ? 0 : offset;
+
+            // Popover is out of the screen on the left side
+            if (data.popper.left < 0) {
+                data.popper.left = newOffset;
+                data.offsets.right = data.offsets.right - newOffset;
+                data.offsets.popper.left = newOffset;
+                data.offsets.popper.right = data.offsets.popper.right - newOffset;
+            // Popover is out of the screen on the right side
+            } else if (data.popper.left + data.popper.width > windowWidth) {
+                data.popper.left = windowWidth - newOffset - data.popper.width;
+                data.popper.right = windowWidth - newOffset;
+                data.offsets.popper.left = windowWidth - newOffset - data.popper.width;
+                data.offsets.popper.right = windowWidth - newOffset;
+            }
+
+            return data;
+        }
+    },
     rtl: {
         order: 650,
         enabled: isRTL(),

@@ -6,6 +6,7 @@ namespace Oro\Bundle\FormBundle\Command;
 
 use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverterInterface;
 use ProxyManager\Proxy\LazyLoadingInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,12 +16,12 @@ use Symfony\Component\VarExporter\LazyObjectInterface;
 /**
  * The command aims to get the list of registered JS constraint converters
  */
+#[AsCommand(
+    name: 'oro:debug:form:js-constraint-converters',
+    description: 'Returns the list of registered JS constraint converters in order to priority'
+)]
 class DebugJsConstraintConvertersCommand extends Command
 {
-    protected static $defaultName = 'oro:debug:form:js-constraint-converters';
-    protected static $defaultDescription =
-        'Returns the list of registered JS constraint converters in order to priority';
-
     /** @var iterable|ConstraintConverterInterface[] */
     private iterable $converters;
 

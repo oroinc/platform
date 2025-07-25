@@ -1,7 +1,7 @@
 @regression
 @ticket-BAP-18936
 @fixture-OroFilterBundle:is_any_of_and_is_not_any_of_number_filters.yml
-@ticket-BB-25327
+
 Feature: Is any of and is not any multienum filter
   In order to filter multienum filter on segments
   As an Administrator
@@ -17,11 +17,13 @@ Feature: Is any of and is not any multienum filter
       | Field Name | MultiSelectField |
       | Type       | Multi-Select     |
     And I click "Continue"
-    And I set Options with:
-      | Label |
-      | AAA   |
-      | BBB   |
-      | CCC   |
+    And click "Add"
+    And click "Add"
+    And click "Add"
+    And I fill "Entity Config Form" with:
+      | Option First  | AAA |
+      | Option Second | BBB |
+      | Option Third  | CCC |
     When I save and close form
     Then I should see "Field saved" flash message
 

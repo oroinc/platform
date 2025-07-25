@@ -171,6 +171,8 @@ oro:
                 aria_label: 'Search Filters'
                 reset_btn:
                     aria_label: 'Reset Search'
+        status_button:
+            aria_label: 'View status'
     htmlpurifier:
         formatted_error_line: 'Line #{{ line }}: {{ message }}'
         formatted_error: '{{ message }}'

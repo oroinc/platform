@@ -7,6 +7,7 @@ namespace Oro\Bundle\AssetBundle\Command;
 use Oro\Bundle\AssetBundle\AssetCommandProcessFactory;
 use Oro\Bundle\AssetBundle\Cache\AssetConfigCache;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,6 +20,10 @@ use Symfony\Component\Process\Process;
 /**
  * Runs webpack to build assets.
  */
+#[AsCommand(
+    name: 'oro:assets:build',
+    description: 'Runs webpack to build assets.'
+)]
 class OroAssetsBuildCommand extends Command
 {
     /** @see https://webpack.js.org/configuration/stats/#stats */
@@ -40,8 +45,6 @@ class OroAssetsBuildCommand extends Command
     ];
 
     private const ADMIN_ORO_THEME = 'admin.oro';
-
-    protected static $defaultName = 'oro:assets:build';
 
     private AssetCommandProcessFactory $nodeProcessFactory;
     private AssetConfigCache $cache;
@@ -115,7 +118,6 @@ class OroAssetsBuildCommand extends Command
             ->addOption('iterate-themes', null, InputOption::VALUE_NONE, 'Run webpack for each theme separately')
         ;
         $this
-            ->setDescription('Runs webpack to build assets.')
             ->setHelp(
                 // @codingStandardsIgnoreStart
                 <<<'HELP'

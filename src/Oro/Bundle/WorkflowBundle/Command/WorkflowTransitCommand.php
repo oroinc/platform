@@ -8,6 +8,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,11 +17,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Transitions a workflow item.
  */
+#[AsCommand(
+    name: 'oro:workflow:transit',
+    description: 'Transitions a workflow item.'
+)]
 class WorkflowTransitCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:workflow:transit';
-
     private ManagerRegistry $registry;
     private WorkflowManager $workflowManager;
 
@@ -39,7 +41,6 @@ class WorkflowTransitCommand extends Command
         $this
             ->addOption('transition', null, InputOption::VALUE_REQUIRED, 'Transition name')
             ->addOption('workflow-item', null, InputOption::VALUE_REQUIRED, 'WorkflowItem ID')
-            ->setDescription('Transitions a workflow item.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command executes a transition on a workflow item:

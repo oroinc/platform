@@ -35,11 +35,12 @@ Collapse.prototype.captionUpdate = function(state, $el) {
     captionUpdateOrigin.call(this, state, $el);
 
     const $iconEl = $el.find('[data-icon]');
+    const svgClass = $iconEl.find('.theme-icon').attr('class');
     const {triggerIconShow, triggerIconHide} = this._config;
 
     if (state && triggerIconShow) {
-        $iconEl.html(macros('oroui::renderIcon')({name: triggerIconShow}));
+        $iconEl.html(macros('oroui::renderIcon')({'name': triggerIconShow, 'class': svgClass}));
     } else if (!state && triggerIconHide) {
-        $iconEl.html(macros('oroui::renderIcon')({name: triggerIconHide}));
+        $iconEl.html(macros('oroui::renderIcon')({'name': triggerIconHide, 'class': svgClass}));
     }
 };

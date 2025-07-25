@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Controller;
 use Oro\Bundle\EntityBundle\Provider\DictionaryEntityDataProvider;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * The controller to get dictionary values.

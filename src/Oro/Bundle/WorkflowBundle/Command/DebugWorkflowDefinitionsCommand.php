@@ -9,6 +9,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
@@ -20,11 +21,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Displays current workflow definitions.
  */
+#[AsCommand(
+    name: 'oro:debug:workflow:definitions',
+    description: 'Displays current workflow definitions.'
+)]
 class DebugWorkflowDefinitionsCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:debug:workflow:definitions';
-
     private const INLINE_DEPTH = 20;
 
     protected static array $tableHeader = [
@@ -55,7 +57,6 @@ class DebugWorkflowDefinitionsCommand extends Command
     {
         $this
             ->addArgument('workflow-name', InputArgument::OPTIONAL, 'Workflow name')
-            ->setDescription('Displays current workflow definitions.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command displays workflow definitions

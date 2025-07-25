@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Command;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
-use Oro\Bundle\ApiBundle\Command\CleanupAsyncOperationsCommand;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadOperationFilesData;
 use Oro\Bundle\GaufretteBundle\FileManager;
@@ -65,7 +64,7 @@ class CleanupAsyncOperationsCommandTest extends WebTestCase
         $this->updateModificationDateForTestOperations([$outdatedOperationId]);
         $this->updateElapsedTimeForTestOperations([$processingTimeElapsedOperationId]);
 
-        self::runCommand(CleanupAsyncOperationsCommand::getDefaultName(), ['--dry-run']);
+        self::runCommand('oro:cron:api:async_operations:cleanup', ['--dry-run']);
 
         /** @var FileManager $fileManager */
         $fileManager = self::getContainer()->get('oro_api.batch.file_manager');
@@ -110,7 +109,7 @@ class CleanupAsyncOperationsCommandTest extends WebTestCase
         $this->updateModificationDateForTestOperations($outdatedOperationIds);
         $this->updateElapsedTimeForTestOperations($processingTimeElapsedOperationsIds);
 
-        self::runCommand(CleanupAsyncOperationsCommand::getDefaultName());
+        self::runCommand('oro:cron:api:async_operations:cleanup');
 
         /** @var FileManager $fileManager */
         $fileManager = self::getContainer()->get('oro_api.batch.file_manager');

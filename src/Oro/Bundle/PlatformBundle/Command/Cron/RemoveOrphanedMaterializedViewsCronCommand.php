@@ -4,6 +4,7 @@ namespace Oro\Bundle\PlatformBundle\Command\Cron;
 
 use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\PlatformBundle\MaterializedView\MaterializedViewRemover;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -15,11 +16,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * An orphaned materialized view can appear when it was not removed after usage, for example after an unexpected
  * interruption of a datagrid export that caused loss of the dependent message that should have done a cleanup.
  */
+#[AsCommand(
+    name: 'oro:cron:platform:materialized-view:remove-orphans',
+    description: 'Removes orphaned MaterializedView entities and related materialized views.'
+)]
 class RemoveOrphanedMaterializedViewsCronCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
-    protected static $defaultName = 'oro:cron:platform:materialized-view:remove-orphans';
-    protected static $defaultDescription = 'Removes orphaned MaterializedView entities and related materialized views.';
-
     private MaterializedViewRemover $materializedViewRemover;
 
     private int $defaultDaysOld;

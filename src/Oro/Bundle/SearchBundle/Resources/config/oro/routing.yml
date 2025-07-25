@@ -1,6 +1,6 @@
 oro_search:
     resource:     "@OroSearchBundle/Controller"
-    type:         annotation
+    type:         attribute
     prefix:       /search
 
 

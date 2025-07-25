@@ -8,6 +8,7 @@ use Oro\Bundle\LayoutBundle\Command\Util\DebugOptionsResolverDecorator;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\LayoutManager;
 use Oro\Component\Layout\LayoutRegistryInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,11 +17,12 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Displays block type list.
  */
+#[AsCommand(
+    name: 'oro:debug:layout:block-types',
+    description: 'Displays block type list.'
+)]
 class DebugLayoutBlockTypeSignatureCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:debug:layout:block-types';
-
     private LayoutRegistryInterface $registry;
 
     public function __construct(
@@ -34,7 +36,6 @@ class DebugLayoutBlockTypeSignatureCommand extends Command
     public function configure()
     {
         $this
-            ->setDescription('Displays block type list.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command displays layout block type list

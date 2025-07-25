@@ -10,6 +10,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,11 +24,13 @@ use Symfony\Component\Intl\Locales;
  *  `oro:install --language=de --formatting-code=de_DE`
  *  will change "Language" value to "de" and "Formatting code" value to "de_DE" for the default localization.
  */
+#[AsCommand(
+    name: 'oro:localization:update',
+    description: 'Replaces default localization parameters during installation.',
+    hidden: true
+)]
 class UpdateLocalizationCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:localization:update';
-
     private ManagerRegistry $doctrine;
 
     public function __construct(ManagerRegistry $doctrine)
@@ -55,8 +58,6 @@ class UpdateLocalizationCommand extends Command
                 'Language code',
                 Translator::DEFAULT_LOCALE
             )
-            ->setHidden(true)
-            ->setDescription('Replaces default localization parameters during installation.')
             ->setHelp(
                 // @codingStandardsIgnoreStart
                 <<<'HELP'

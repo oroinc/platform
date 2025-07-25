@@ -1,4 +1,4 @@
 oro_sync_bundle:
     resource:     "@OroSyncBundle/Controller"
-    type:         annotation
+    type:         attribute
     prefix:       /

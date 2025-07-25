@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,10 +15,12 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * Clears validator metadata cache.
  */
+#[AsCommand(
+    name: 'validator:cache:clear',
+    description: 'Clears validator metadata cache.'
+)]
 class ValidatorCacheClearCommand extends Command
 {
-    protected static $defaultName = 'validator:cache:clear';
-
     public function __construct(
         private readonly KernelInterface $kernel,
         private readonly ValidatorCacheWarmer $validatorCacheWarmer,
@@ -30,7 +33,6 @@ class ValidatorCacheClearCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Clears validator metadata cache.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command clears validator metadata cache.

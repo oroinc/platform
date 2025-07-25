@@ -14,6 +14,7 @@ use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
 use Oro\Component\Layout\LayoutRegistry;
 use Oro\Component\Layout\LayoutRegistryInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,11 +24,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Displays layout configuration.
  */
+#[AsCommand(
+    name: 'oro:debug:layout',
+    description: 'Displays layout configuration.'
+)]
 class DebugCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:debug:layout';
-
     private LayoutManager $layoutManager;
     private array $blockTypes;
     private array $dataProviders;
@@ -56,7 +58,6 @@ class DebugCommand extends Command
             ->addOption('type', 't', InputOption::VALUE_REQUIRED, 'Show block type configuration')
             ->addOption('provider', 'p', InputOption::VALUE_REQUIRED, 'Show data provider configuration')
             ->addOption('format', 'f', InputOption::VALUE_REQUIRED, 'Output format', 'txt')
-            ->setDescription('Displays layout configuration.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command displays layout configuration (default context,

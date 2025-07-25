@@ -4,6 +4,7 @@ namespace Oro\Bundle\MaintenanceBundle\Command;
 
 use Oro\Bundle\MaintenanceBundle\Drivers\DriverFactory;
 use Oro\Bundle\MaintenanceBundle\Event\MaintenanceEvent;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,11 +15,13 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * Disables maintenance mode
  */
+#[AsCommand(
+    name: 'oro:maintenance:unlock',
+    description: 'Unlock access to the site while maintenance...',
+    aliases: ['lexik:maintenance:unlock']
+)]
 class MaintenanceUnlockCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:maintenance:unlock';
-
     private DriverFactory $driverFactory;
 
     private EventDispatcherInterface $dispatcher;
@@ -35,15 +38,13 @@ class MaintenanceUnlockCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Unlock access to the site while maintenance...')
             ->setHelp(
                 <<<'HELP'
     You can execute the unlock without a warning message which you need to interact with:
 
     <info>%command.full_name% --no-interaction</info>
 HELP
-            )
-            ->setAliases(['lexik:maintenance:unlock']);
+            );
     }
 
     #[\Override]

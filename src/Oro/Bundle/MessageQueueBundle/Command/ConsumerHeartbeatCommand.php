@@ -9,6 +9,7 @@ use Oro\Bundle\CronBundle\Command\SynchronousCommandInterface;
 use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
 use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,13 +17,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Pushes a websocket notification if there are no available MQ consumers.
  */
+#[AsCommand(
+    name: 'oro:cron:message-queue:consumer_heartbeat_check',
+    description: 'Pushes a websocket notification if there are no available MQ consumers.'
+)]
 class ConsumerHeartbeatCommand extends Command implements
     CronCommandScheduleDefinitionInterface,
     SynchronousCommandInterface
 {
-    /** @var string */
-    protected static $defaultName = 'oro:cron:message-queue:consumer_heartbeat_check';
-
     private ConsumerHeartbeat $consumerHeartbeat;
     private ConnectionChecker $connectionChecker;
     private WebsocketClientInterface $websocketClient;
@@ -55,7 +57,7 @@ class ConsumerHeartbeatCommand extends Command implements
     #[\Override]
     public function configure()
     {
-        $this->setDescription('Pushes a websocket notification if there are no available MQ consumers.')
+        $this
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command checks if there are any active message queue consumers

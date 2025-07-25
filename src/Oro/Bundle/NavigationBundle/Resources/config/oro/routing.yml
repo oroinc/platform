@@ -7,7 +7,7 @@ oro_navigation_js_routing_js:
 
 oro_navigation_bundle:
     resource:     "@OroNavigationBundle/Controller"
-    type:         annotation
+    type:         attribute
 
 
 #

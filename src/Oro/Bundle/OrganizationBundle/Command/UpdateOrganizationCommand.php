@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\OrganizationBundle\Command;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,10 +16,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Updates an organization.
  */
+#[AsCommand(
+    name: 'oro:organization:update',
+    description: 'Updates an organization.'
+)]
 class UpdateOrganizationCommand extends Command
 {
-    protected static $defaultName = 'oro:organization:update';
-
     private OrganizationManager $organizationManager;
 
     public function __construct(OrganizationManager $organizationManager)
@@ -36,7 +39,6 @@ class UpdateOrganizationCommand extends Command
             ->addOption('organization-name', null, InputOption::VALUE_OPTIONAL, 'New name')
             ->addOption('organization-description', null, InputOption::VALUE_OPTIONAL, 'Description')
             ->addOption('organization-enabled', null, InputOption::VALUE_OPTIONAL, '"Enabled" flag')
-            ->setDescription('Updates an organization.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command updates an organization.

@@ -6,6 +6,7 @@ namespace Oro\Bundle\UserBundle\Command;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,11 +16,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Updates a user.
  */
+#[AsCommand(
+    name: 'oro:user:update',
+    description: 'Updates a user.'
+)]
 class UpdateUserCommand extends CreateUserCommand
 {
-    /** @var string */
-    protected static $defaultName = 'oro:user:update';
-
     /** @noinspection PhpMissingParentCallCommonInspection */
     #[\Override]
     protected function configure()
@@ -37,7 +39,6 @@ class UpdateUserCommand extends CreateUserCommand
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
                 'Organizations'
             )
-            ->setDescription('Updates a user.')
             // @codingStandardsIgnoreStart
             ->setHelp(
                 <<<'HELP'

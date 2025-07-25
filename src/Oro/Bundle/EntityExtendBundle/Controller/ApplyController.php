@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Controller;
 use Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateHandlerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Updates the database schema and all related caches to reflect changes made in extended entities.

@@ -6,6 +6,7 @@ namespace Oro\Bundle\EmailBundle\Command;
 
 use Oro\Bundle\EmailBundle\Async\Topic\UpdateVisibilitiesTopic;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,11 +15,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Updates visibilities for emails and email addresses.
  */
+#[AsCommand(
+    name: 'oro:email:update-visibilities',
+    description: 'Updates visibilities for emails and email addresses.'
+)]
 class UpdateVisibilitiesCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:email:update-visibilities';
-
     private MessageProducerInterface $producer;
 
     public function __construct(MessageProducerInterface $producer)
@@ -32,7 +34,7 @@ class UpdateVisibilitiesCommand extends Command
     #[\Override]
     protected function configure()
     {
-        $this->setDescription('Updates visibilities for emails and email addresses.')
+        $this
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command updates visibilities for emails and email addresses.

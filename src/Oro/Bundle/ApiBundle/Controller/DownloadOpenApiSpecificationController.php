@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Util\OpenApiSpecificationArchive;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * The controller for download OpenAPI specification.

@@ -16,6 +16,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,11 +27,12 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Dumps API entity metadata.
  */
+#[AsCommand(
+    name: 'oro:api:metadata:dump',
+    description: 'Dumps API entity metadata.'
+)]
 class DumpMetadataCommand extends AbstractDebugCommand
 {
-    /** @var string */
-    protected static $defaultName = 'oro:api:metadata:dump';
-
     private ProcessorBagInterface $processorBag;
     private MetadataProvider $metadataProvider;
     private ConfigProvider $configProvider;
@@ -57,7 +59,6 @@ class DumpMetadataCommand extends AbstractDebugCommand
             ->addOption('action', null, InputOption::VALUE_REQUIRED, 'Action name', ApiAction::GET_LIST)
             ->addOption('parentAction', null, InputOption::VALUE_REQUIRED, 'Parent action name')
             ->addOption('hateoas', null, InputOption::VALUE_NONE, 'Add HATEOAS links')
-            ->setDescription('Dumps API entity metadata.')
             ->setHelp(
                 // @codingStandardsIgnoreStart
                 <<<'HELP'

@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationAlert;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,12 +15,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Deletes resolved notification alerts that is older than 30 days.
  */
+#[AsCommand(
+    name: 'oro:cron:notification:alerts:cleanup',
+    description: 'Deletes resolved notification alerts that is older than 30 days.'
+)]
 class NotificationAlertCleanupCronCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
     public const DEFAULT_OUTDATED_ALERT_INTERVAL =  '30 days';
-
-    /** @var string */
-    protected static $defaultName = 'oro:cron:notification:alerts:cleanup';
 
     private ManagerRegistry $doctrine;
 
@@ -32,7 +34,6 @@ class NotificationAlertCleanupCronCommand extends Command implements CronCommand
     #[\Override]
     protected function configure(): void
     {
-        $this->setDescription('Deletes resolved notification alerts that is older than 30 days.');
     }
 
     #[\Override]

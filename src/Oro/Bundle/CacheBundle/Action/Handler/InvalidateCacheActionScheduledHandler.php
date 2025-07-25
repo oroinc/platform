@@ -3,7 +3,6 @@
 namespace Oro\Bundle\CacheBundle\Action\Handler;
 
 use Oro\Bundle\CacheBundle\Action\Transformer\DateTimeToStringTransformerInterface;
-use Oro\Bundle\CacheBundle\Command\InvalidateCacheScheduleCommand;
 use Oro\Bundle\CacheBundle\DataStorage\DataStorageInterface;
 use Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler;
 
@@ -44,7 +43,7 @@ class InvalidateCacheActionScheduledHandler implements InvalidateCacheActionHand
     public function handle(DataStorageInterface $dataStorage)
     {
         $scheduleTime = $dataStorage->get(self::PARAM_INVALIDATE_TIME);
-        $command = InvalidateCacheScheduleCommand::getDefaultName();
+        $command = 'oro:cache:invalidate:schedule';
         $args = $this->scheduleArgumentsBuilder->build($dataStorage);
 
         $this->deferredScheduler->removeScheduleForCommand($command, $args);

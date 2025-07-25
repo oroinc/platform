@@ -4,7 +4,6 @@ namespace Oro\Bundle\CacheBundle\Action\Provider;
 
 use Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheScheduleArgumentsBuilderInterface;
 use Oro\Bundle\CacheBundle\Action\Transformer\DateTimeToStringTransformerInterface;
-use Oro\Bundle\CacheBundle\Command\InvalidateCacheScheduleCommand;
 use Oro\Bundle\CacheBundle\DataStorage\DataStorageInterface;
 use Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager;
 use Oro\Bundle\CronBundle\Entity\Schedule;
@@ -63,7 +62,7 @@ class InvalidateCacheTimeProvider
     {
         $args = $this->scheduleArgsBuilder->build($dataStorage);
         $schedules = $this->scheduleManager->getSchedulesByCommandAndArguments(
-            InvalidateCacheScheduleCommand::getDefaultName(),
+            'oro:cache:invalidate:schedule',
             $args
         );
 

@@ -16,6 +16,7 @@ use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\Debug\TraceableProcessor;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
@@ -29,15 +30,16 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
+#[AsCommand(
+    name: 'oro:api:debug',
+    description: 'Displays registered API actions and processors.'
+)]
 class DebugCommand extends AbstractDebugCommand
 {
     private const MAX_ELEMENTS_PER_LINE = 2;
     private const HIDDEN_ACTIONS = [
         'customize_loaded_data.identifier_only'
     ];
-
-    /** @var string */
-    protected static $defaultName = 'oro:api:debug';
 
     private ActionProcessorBagInterface $actionProcessorBag;
     private ProcessorBagInterface $processorBag;
@@ -92,7 +94,6 @@ class DebugCommand extends AbstractDebugCommand
                 InputOption::VALUE_NONE,
                 'Do not show descriptions of API processors'
             )
-            ->setDescription('Displays registered API actions and processors.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command displays a list of available API actions.

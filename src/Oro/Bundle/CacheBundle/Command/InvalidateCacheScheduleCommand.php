@@ -7,6 +7,7 @@ namespace Oro\Bundle\CacheBundle\Command;
 use Oro\Bundle\CacheBundle\Action\DataStorage\InvalidateCacheDataStorage;
 use Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheActionHandlerInterface;
 use Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheActionScheduledHandler;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,6 +17,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Schedules cache invalidation using a specified service and parameters.
  */
+#[AsCommand(
+    name: 'oro:cache:invalidate:schedule',
+    description: 'Schedules cache invalidation using a specified service and parameters.'
+)]
 class InvalidateCacheScheduleCommand extends Command
 {
     /**
@@ -24,9 +29,6 @@ class InvalidateCacheScheduleCommand extends Command
     public const ARGUMENT_SERVICE_NAME = InvalidateCacheActionScheduledHandler::PARAM_HANDLER_SERVICE_NAME;
 
     public const ARGUMENT_PARAMETERS = 'parameters';
-
-    /** @var string */
-    protected static $defaultName = 'oro:cache:invalidate:schedule';
 
     private ContainerInterface $container;
 
@@ -52,7 +54,6 @@ class InvalidateCacheScheduleCommand extends Command
                 InputArgument::OPTIONAL,
                 'Serialized parameters for service'
             )
-            ->setDescription('Schedules cache invalidation using a specified service and parameters.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command schedules cache invalidation using a specified service and parameters.

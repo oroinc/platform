@@ -10,6 +10,7 @@ use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,11 +19,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Loads permission configuration to the database.
  */
+#[AsCommand(
+    name: 'security:permission:configuration:load',
+    description: 'Loads permission configuration to the database.'
+)]
 class LoadPermissionConfigurationCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'security:permission:configuration:load';
-
     private PermissionManager $permissionManager;
     private PermissionConfigurationProvider $permissionConfigurationProvider;
     private PermissionConfigurationBuilder $permissionConfigurationBuilder;
@@ -53,7 +55,6 @@ class LoadPermissionConfigurationCommand extends Command
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
                 'Permissions to load'
             )
-            ->setDescription('Loads permission configuration to the database.')
             ->setHelp(
                 // @codingStandardsIgnoreStart
                 <<<'HELP'

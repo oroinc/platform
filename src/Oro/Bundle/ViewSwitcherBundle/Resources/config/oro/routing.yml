@@ -1,6 +1,6 @@
 oro_frontend_view_switcher_bundle:
     resource:     "@OroViewSwitcherBundle/Controller/Frontend"
-    type:         annotation
+    type:         attribute
     prefix:       /
     options:
         frontend: true

@@ -6,6 +6,7 @@ namespace Oro\Bundle\EntityConfigBundle\Command;
 
 use Oro\Bundle\EntityConfigBundle\EntityConfig\ConfigurationHandler;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,11 +15,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Dumps the reference structure for Resources/config/oro/entity.yml.
  */
+#[AsCommand(
+    name: 'oro:entity:config:validation:dump-reference',
+    description: 'List of entity config validation with description'
+)]
 class OroEntityConfigDumpReferenceCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:entity:config:validation:dump-reference';
-
     private ConfigurationHandler $configurationHandler;
 
     public function __construct(ConfigurationHandler $configurationHandler)
@@ -32,7 +34,6 @@ class OroEntityConfigDumpReferenceCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('List of entity config validation with description')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command dumps the reference structure

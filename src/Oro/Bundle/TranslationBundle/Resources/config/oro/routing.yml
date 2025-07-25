@@ -7,12 +7,12 @@ oro_translation_jstranslation:
 
 oro_translation_service:
     resource:     "@OroTranslationBundle/Controller"
-    type:         annotation
+    type:         attribute
     prefix:       /translation
 
 oro_translation_language:
     resource:     "@OroTranslationBundle/Controller/LanguageController.php"
-    type:         annotation
+    type:         attribute
     prefix:       /language
 
 

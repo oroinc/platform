@@ -6,6 +6,7 @@ namespace Oro\Bundle\SanitizeBundle\Command;
 
 use Oro\Bundle\SanitizeBundle\Tools\SanitizeSqlLoader;
 use Oro\Bundle\SanitizeBundle\Tools\SqlSyntaxValidator;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,11 +17,12 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * Command to dump SQL queries that perform data sanitization based on predefined rules or raw SQLs.
  */
+#[AsCommand(
+    name: 'oro:sanitize:dump-sql',
+    description: 'Dumps DB sanitizing SQLs related to rules assigned to entities and their fields'
+)]
 class SanitizeDumpSqlCommand extends Command
 {
-    /** @var string  */
-    protected static $defaultName = 'oro:sanitize:dump-sql';
-
     public function __construct(
         private SanitizeSqlLoader $sanitizeSqlLoader,
         private SqlSyntaxValidator $sqlSyntaxValidator
@@ -35,7 +37,6 @@ class SanitizeDumpSqlCommand extends Command
             ->addArgument('file', InputArgument::OPTIONAL, 'File name to dump sanitizing SQLs')
             ->addOption('no-guessing', null, InputOption::VALUE_NONE, 'Skip guessing the sanitizing rule for a field')
             ->addOption('skip-validate-sql', null, InputOption::VALUE_NONE, 'Skip syntax validation of dumped SQLs')
-            ->setDescription('Dumps DB sanitizing SQLs related to rules assigned to entities and their fields')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command dumps DB sanitizing SQL queries regarding to rules assigned to entities

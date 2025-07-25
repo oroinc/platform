@@ -8,6 +8,7 @@ use Doctrine\Common\Util\Debug;
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,11 +18,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Displays available operations and action groups.
  */
+#[AsCommand(
+    name: 'oro:debug:operation',
+    description: 'Displays available operations and action groups.'
+)]
 class DebugOperationCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:debug:operation';
-
     private ConfigurationProviderInterface $operationsProvider;
     private OperationRegistry $operationRegistry;
     private ConfigurationProviderInterface $actionGroupsProvider;
@@ -49,7 +51,6 @@ class DebugOperationCommand extends Command
             ->addArgument('name', InputArgument::OPTIONAL, 'Operation or action group')
             ->addOption('action-group', null, InputOption::VALUE_NONE, 'Show action groups instead of operations')
             ->addOption('assemble', null, InputOption::VALUE_NONE, 'Show instantiated objects')
-            ->setDescription('Displays available operations and action groups.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command displays available operations by default:

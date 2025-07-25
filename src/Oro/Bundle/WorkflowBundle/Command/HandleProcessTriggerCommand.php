@@ -9,6 +9,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,11 +18,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Executes a process trigger.
  */
+#[AsCommand(
+    name: 'oro:process:handle-trigger',
+    description: 'Executes a process trigger.'
+)]
 class HandleProcessTriggerCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:process:handle-trigger';
-
     public function __construct(
         private ManagerRegistry $doctrine,
         private ProcessHandler $processHandler
@@ -36,7 +38,6 @@ class HandleProcessTriggerCommand extends Command
         $this
             ->addOption('name', null, InputOption::VALUE_REQUIRED, 'Process name')
             ->addOption('id', null, InputOption::VALUE_REQUIRED, 'Trigger ID')
-            ->setDescription('Executes a process trigger.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command executes a specified process trigger.

@@ -11,6 +11,7 @@ use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,11 +23,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * Generates one-time link to impersonate a user.
  */
+#[AsCommand(
+    name: 'oro:user:impersonate',
+    description: 'Generates one-time link to impersonate a user.'
+)]
 class ImpersonateUserCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:user:impersonate';
-
     private ManagerRegistry $registry;
     private UrlGeneratorInterface $urlGenerator;
     private ConfigManager $configManager;
@@ -69,7 +71,6 @@ class ImpersonateUserCommand extends Command
                 InputOption::VALUE_NONE,
                 'Do not send email notification to the impersonated user'
             )
-            ->setDescription('Generates one-time link to impersonate a user.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command generates a one-time impersonation link for a given user:

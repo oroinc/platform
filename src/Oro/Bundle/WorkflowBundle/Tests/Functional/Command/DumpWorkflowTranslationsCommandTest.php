@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Command;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
-use Oro\Bundle\WorkflowBundle\Command\DumpWorkflowTranslationsCommand;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowTranslations;
 use Symfony\Component\Yaml\Yaml;
@@ -28,7 +27,7 @@ class DumpWorkflowTranslationsCommandTest extends WebTestCase
     public function testExecute()
     {
         $result = $this->runCommand(
-            DumpWorkflowTranslationsCommand::getDefaultName(),
+            'oro:workflow:translations:dump',
             [
                 LoadWorkflowTranslations::WORKFLOW4,
                 '--locale' => LoadLanguages::LANGUAGE2,

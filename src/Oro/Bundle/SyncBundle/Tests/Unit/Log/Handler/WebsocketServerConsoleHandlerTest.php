@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Log\Handler;
 
-use Gos\Bundle\WebSocketBundle\Command\WebsocketServerCommand;
 use Oro\Bundle\SyncBundle\Log\Handler\WebsocketServerConsoleHandler;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -58,7 +57,7 @@ class WebsocketServerConsoleHandlerTest extends TestCase
     {
         $output = $this->createMock(OutputInterface::class);
         $event = new ConsoleCommandEvent(
-            new Command(WebsocketServerCommand::getDefaultName()),
+            new Command('gos:websocket:server'),
             $this->createMock(InputInterface::class),
             $output
         );
@@ -92,7 +91,7 @@ class WebsocketServerConsoleHandlerTest extends TestCase
     {
         $output = $this->createMock(OutputInterface::class);
         $event = new ConsoleCommandEvent(
-            new Command(WebsocketServerCommand::getDefaultName()),
+            new Command('gos:websocket:server'),
             $this->createMock(InputInterface::class),
             $output
         );
@@ -102,7 +101,7 @@ class WebsocketServerConsoleHandlerTest extends TestCase
             ->with($output);
 
         $terminateEvent = new ConsoleTerminateEvent(
-            new Command(WebsocketServerCommand::getDefaultName()),
+            new Command('gos:websocket:server'),
             $this->createMock(InputInterface::class),
             $this->createMock(OutputInterface::class),
             Command::SUCCESS

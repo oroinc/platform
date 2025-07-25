@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\EventListener\Command;
 
-use Oro\Bundle\InstallerBundle\Command\InstallCommand;
 use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,6 +52,6 @@ class InstallCommandListener
 
     protected function isApplicable(Command $command): bool
     {
-        return $command->getName() === InstallCommand::getDefaultName();
+        return $command->getName() === 'oro:install';
     }
 }

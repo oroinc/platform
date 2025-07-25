@@ -7,6 +7,7 @@ namespace Oro\Component\MessageQueue\Client\Meta;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Topic\TopicRegistry;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
@@ -16,11 +17,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Lists available message queue topics.
  */
+#[AsCommand(
+    name: 'oro:message-queue:topics',
+    description: 'Lists available message queue topics.'
+)]
 class TopicsCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:message-queue:topics';
-
     private TopicRegistry $topicRegistry;
 
     private TopicMetaRegistry $topicMetaRegistry;
@@ -44,7 +46,6 @@ class TopicsCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Lists available message queue topics.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command lists available message queue topics.

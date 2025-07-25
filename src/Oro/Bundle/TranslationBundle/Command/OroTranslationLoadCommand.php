@@ -10,6 +10,7 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,11 +19,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Loads translations to the database.
  */
+#[AsCommand(
+    name: 'oro:translation:load',
+    description: 'Loads translations to the database.'
+)]
 final class OroTranslationLoadCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:translation:load';
-
     private ManagerRegistry $registry;
     private Translator $translator;
     private DatabasePersister $databasePersister;
@@ -53,7 +55,6 @@ final class OroTranslationLoadCommand extends Command
                 'Languages to load'
             )
             ->addOption('rebuild-cache', null, InputOption::VALUE_NONE, 'Rebuild translation cache')
-            ->setDescription('Loads translations to the database.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command loads translations to the database.

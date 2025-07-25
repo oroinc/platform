@@ -14,10 +14,8 @@ use Oro\Bundle\InstallerBundle\InstallerEvents;
 use Oro\Bundle\InstallerBundle\PlatformUpdateCheckerInterface;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand;
-use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
-use Oro\Bundle\TranslationBundle\Command\OroTranslationUpdateCommand;
 use Oro\Component\PhpUtils\PhpIniUtil;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -28,11 +26,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * Updates the application state.
  */
+#[AsCommand(
+    name: 'oro:platform:update',
+    description: 'Updates the application state.'
+)]
 class PlatformUpdateCommand extends AbstractCommand
 {
-    /** @var string */
-    protected static $defaultName = 'oro:platform:update';
-
     private PlatformUpdateCheckerInterface $platformUpdateChecker;
     private ConfigManager $configManager;
     private ManagerRegistry $doctrine;
@@ -57,7 +56,6 @@ class PlatformUpdateCommand extends AbstractCommand
             ->addOption('force', null, InputOption::VALUE_NONE, 'Force the execution')
             ->addOption('skip-download-translations', null, InputOption::VALUE_NONE, 'Skip downloading translations')
             ->addOption('skip-translations', null, InputOption::VALUE_NONE, 'Skip applying translations')
-            ->setDescription('Updates the application state.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command executes the application update commands
@@ -164,12 +162,12 @@ HELP
                     '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
                 ]
             )
-            ->runCommand(LoadPermissionConfigurationCommand::getDefaultName(), ['--process-isolation' => true])
+            ->runCommand('security:permission:configuration:load', ['--process-isolation' => true])
             ->runCommand('oro:cron:definitions:load', ['--process-isolation' => true])
             ->runCommand('oro:workflow:definitions:load', ['--process-isolation' => true])
             ->runCommand('oro:process:configuration:load', ['--process-isolation' => true])
             ->runCommand(
-                LoadDataFixturesCommand::getDefaultName(),
+                'oro:migration:data:load',
                 [
                     '--process-isolation' => true,
                     '--formatting-code' => $formattingCode,
@@ -264,7 +262,7 @@ HELP
             if (!$input->getOption('skip-download-translations')) {
                 $commandExecutor
                     ->runCommand(
-                        OroTranslationUpdateCommand::getDefaultName(),
+                        'oro:translation:update',
                         ['--process-isolation' => true, '--all' => true]
                     );
             }

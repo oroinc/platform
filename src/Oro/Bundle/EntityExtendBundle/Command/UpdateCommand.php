@@ -8,6 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateProcessor;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableStyle;
@@ -19,11 +20,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Applies extend entity changes to the database schema.
  */
+#[AsCommand(
+    name: 'oro:entity-extend:update',
+    description: 'Applies extend entity changes to the database schema.'
+)]
 class UpdateCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:entity-extend:update';
-
     private EntityExtendUpdateProcessor $entityExtendUpdateProcessor;
     private ConfigManager $configManager;
 
@@ -42,7 +44,6 @@ class UpdateCommand extends Command
     {
         $this
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Display changes without applying them')
-            ->setDescription('Applies extend entity changes to the database schema.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command applies extend entity changes

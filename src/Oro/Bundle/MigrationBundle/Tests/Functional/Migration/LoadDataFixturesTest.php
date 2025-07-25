@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Oro\Bundle\MigrationBundle\Tests\Functional\Migration;
 
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
-use Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -24,7 +23,7 @@ class LoadDataFixturesTest extends WebTestCase
     public function testLoadDemoDataFixtures(): void
     {
         // for manual execution needs reset autoincrements, like that ALTER TABLE `<table_name>` AUTO_INCREMENT=2
-        self::runCommand(LoadDataFixturesCommand::getDefaultName(), ['--fixtures-type=demo', '-vvv'], true, true);
+        self::runCommand('oro:migration:data:load', ['--fixtures-type=demo', '-vvv'], true, true);
 
         $messages = [];
         foreach (self::getSentMessages() as $message) {

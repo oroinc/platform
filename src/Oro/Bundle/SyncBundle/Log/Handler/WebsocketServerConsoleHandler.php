@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SyncBundle\Log\Handler;
 
-use Gos\Bundle\WebSocketBundle\Command\WebsocketServerCommand;
 use Monolog\Handler\HandlerWrapper;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler as SymfonyConsoleHandler;
 use Symfony\Component\Console\Command\Command;
@@ -47,7 +46,7 @@ class WebsocketServerConsoleHandler extends HandlerWrapper implements EventSubsc
 
     private function isApplicable(?Command $command): bool
     {
-        return $command && $command->getName() === WebsocketServerCommand::getDefaultName();
+        return $command && $command->getName() === 'gos:websocket:server';
     }
 
     #[\Override]

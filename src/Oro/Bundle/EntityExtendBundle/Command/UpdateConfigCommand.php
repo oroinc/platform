@@ -7,6 +7,7 @@ namespace Oro\Bundle\EntityExtendBundle\Command;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ConfigFilter\ByInitialStateFilter;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,10 +17,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Updates extend entity config.
  * Entity config manager is set to utilizes only local cache.
  */
+#[AsCommand(
+    name: 'oro:entity-extend:update-config',
+    description: 'Updates extend entity config.'
+)]
 class UpdateConfigCommand extends Command
 {
-    protected static $defaultName = 'oro:entity-extend:update-config';
-
     private ExtendConfigDumper $extendConfigDumper;
     private ConfigManager $configManager;
 
@@ -48,7 +51,6 @@ class UpdateConfigCommand extends Command
                 'File containing the initial state of entity configs'
             )
             ->addOption('force', null, InputOption::VALUE_NONE, 'Force the execution')
-            ->setDescription('Updates extend entity config.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command updates extend entity config.

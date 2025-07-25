@@ -8,6 +8,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Entity\NotificationAlert;
 use Oro\Bundle\NotificationBundle\Exception\NotificationAlertUpdateFailedException;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,11 +19,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Deletes notification alert records.
  */
+#[AsCommand(
+    name: 'oro:notification:alerts:cleanup',
+    description: 'Deletes notification alert records.'
+)]
 class NotificationAlertCleanupCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:notification:alerts:cleanup';
-
     private ManagerRegistry $registry;
     private TokenAccessor $tokenAccessor;
     private ?QueryBuilder $queryBuilder = null;
@@ -41,7 +43,6 @@ class NotificationAlertCleanupCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Deletes notification alert records.')
             ->addOption('id', null, InputOption::VALUE_OPTIONAL, 'Delete by Id')
             ->addOption('source-type', null, InputOption::VALUE_OPTIONAL, 'Delete by source type')
             ->addOption('resource-type', null, InputOption::VALUE_OPTIONAL, 'Delete by resource type')

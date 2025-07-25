@@ -12,6 +12,7 @@ use Oro\Bundle\CronBundle\Tools\CronHelper;
 use Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceModeState;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,12 +21,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Launches scheduled cron commands.
  */
+#[AsCommand(
+    name: 'oro:cron',
+    description: 'Launches scheduled cron commands.'
+)]
 class CronCommand extends Command
 {
     public const string CRON_LAST_EXECUTION_DATA = 'cron_last_execution_data';
-
-    /** @var string */
-    protected static $defaultName = 'oro:cron';
 
     public function __construct(
         private ManagerRegistry $doctrine,
@@ -45,7 +47,6 @@ class CronCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Launches scheduled cron commands.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command launches scheduled cron commands that are due for execution.

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\PlatformBundle\Provider\Console;
 
-use Oro\Bundle\PlatformBundle\Command\OptionalListenersCommand;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -34,7 +33,7 @@ class OptionalListenersGlobalOptionsProvider extends AbstractGlobalOptionsProvid
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 \sprintf(
                     '"<comment>all</comment>" or run <info>%s</info> to see available',
-                    OptionalListenersCommand::getDefaultName(),
+                    'oro:platform:optional-listeners',
                 )
             ),
         ];
