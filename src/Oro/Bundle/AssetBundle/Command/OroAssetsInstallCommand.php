@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\AssetBundle\Command;
 
 use Oro\Bundle\InstallerBundle\Command\AbstractCommand;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,11 +14,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Installs and builds application assets.
  */
+#[AsCommand(
+    name: 'oro:assets:install',
+    description: 'Installs and builds application assets.'
+)]
 class OroAssetsInstallCommand extends AbstractCommand
 {
-    /** @var string */
-    protected static $defaultName = 'oro:assets:install';
-
     #[\Override]
     protected function configure()
     {
@@ -30,7 +32,6 @@ class OroAssetsInstallCommand extends AbstractCommand
                 'Symlink using relative path instead of absolute'
             )
             ->addOption('iterate-themes', null, InputOption::VALUE_NONE, 'Run webpack for each theme separately')
-            ->setDescription('Installs and builds application assets.')
             ->setHelp(
                 <<<HELP
 The <info>%command.name%</info> command installs and builds assets.

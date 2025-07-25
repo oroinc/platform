@@ -162,7 +162,7 @@ services:
         class: Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator
 
     oro_layout.expression_language.expression_validator:
-        class: Symfony\Component\Validator\Constraints\ExpressionLanguageSyntaxValidator
+        class: Symfony\Component\Validator\Constraints\ExpressionSyntaxValidator
         arguments:
             - '@oro_layout.expression_language'
         tags:

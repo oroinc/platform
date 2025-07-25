@@ -6,6 +6,7 @@ namespace Oro\Bundle\LocaleBundle\Command;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,14 +15,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Removes unused localized fallback values.
  */
+#[AsCommand(
+    name: 'oro:localization:localized-fallback-values:cleanup-unused',
+    description: 'Removes unused localized fallback values.'
+)]
 class CleanupUnusedLocalizedFallbackValuesCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:localization:localized-fallback-values:cleanup-unused';
-
-    /** @var string */
-    protected static $defaultDescription = 'Removes unused localized fallback values.';
-
     private ManagerRegistry $managerRegistry;
 
     public function __construct(ManagerRegistry $managerRegistry)

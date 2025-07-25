@@ -24,7 +24,7 @@ class ReindexationOptionsCommandListener
         if ($command instanceof HelpCommand) {
             if ($this->isHelpForPlatformUpdateCommand($command, $event->getInput())) {
                 $this->addReindexationOptions(
-                    $command->getApplication()->find(PlatformUpdateCommand::getDefaultName())
+                    $command->getApplication()->find('oro:platform:update')
                 );
             }
         } elseif ($command instanceof PlatformUpdateCommand) {
@@ -45,7 +45,7 @@ class ReindexationOptionsCommandListener
             return $innerCommand instanceof PlatformUpdateCommand;
         }
 
-        return false !== $input->getParameterOption(PlatformUpdateCommand::getDefaultName());
+        return false !== $input->getParameterOption('oro:platform:update');
     }
 
     private function addReindexationOptions(Command $command): void

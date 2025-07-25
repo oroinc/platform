@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Tests\Functional\Command;
 
-use Oro\Bundle\InstallerBundle\Command\InstallCommand;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Command\CommandTestingTrait;
 
@@ -18,7 +17,7 @@ class InstallCommandTest extends WebTestCase
      */
     public function testDisplaysErrorAndTerminates()
     {
-        $commandTester = $this->doExecuteCommand(InstallCommand::getDefaultName(), []);
+        $commandTester = $this->doExecuteCommand('oro:install', []);
 
         $this->assertProducedError($commandTester, 'application is already installed');
     }

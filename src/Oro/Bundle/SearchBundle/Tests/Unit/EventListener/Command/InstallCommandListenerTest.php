@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener\Command;
 
-use Oro\Bundle\InstallerBundle\Command\InstallCommand;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Oro\Bundle\SearchBundle\EventListener\Command\InstallCommandListener;
@@ -64,7 +63,7 @@ class InstallCommandListenerTest extends TestCase
 
         $this->command->expects($this->once())
             ->method('getName')
-            ->willReturn(InstallCommand::getDefaultName());
+            ->willReturn('oro:install');
 
         $this->input->expects($this->once())
             ->method('hasOption')

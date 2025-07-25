@@ -5,7 +5,7 @@ namespace Oro\Bundle\ViewSwitcherBundle\Controller\Frontend;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * This controller provides access to application_url config value for the view switcher js part.

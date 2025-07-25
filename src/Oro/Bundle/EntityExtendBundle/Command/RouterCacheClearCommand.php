@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,10 +19,12 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * Clears router cache.
  */
+#[AsCommand(
+    name: 'router:cache:clear',
+    description: 'Clears router cache.'
+)]
 class RouterCacheClearCommand extends Command
 {
-    protected static $defaultName = 'router:cache:clear';
-
     private KernelInterface $kernel;
     private RouterInterface $router;
     private Filesystem $filesystem;
@@ -51,7 +54,6 @@ class RouterCacheClearCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Clears router cache.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command clears router cache.

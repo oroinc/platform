@@ -16,6 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,11 +30,12 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
+#[AsCommand(
+    name: 'oro:entity-config:debug',
+    description: 'Displays entity configuration.'
+)]
 class DebugCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:entity-config:debug';
-
     private ManagerRegistry $registry;
     private ConfigManager $configManager;
 
@@ -65,7 +67,6 @@ class DebugCommand extends Command
                 InputOption::VALUE_NONE,
                 'Show fields that are references to non-configurable entities'
             )
-            ->setDescription('Displays entity configuration.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command displays entity configuration.

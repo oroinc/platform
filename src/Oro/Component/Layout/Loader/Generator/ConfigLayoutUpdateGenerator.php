@@ -9,7 +9,7 @@ use Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCacheWarmer;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use Oro\Component\PhpUtils\ReflectionClassHelper;
-use Symfony\Component\Validator\Constraints\ExpressionLanguageSyntax;
+use Symfony\Component\Validator\Constraints\ExpressionSyntax;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -30,7 +30,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 
     private ValidatorInterface $validator;
 
-    private ?ExpressionLanguageSyntax $constraint = null;
+    private ?ExpressionSyntax $constraint = null;
 
     public function __construct(
         ValidatorInterface $validator,
@@ -197,10 +197,10 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
         }
     }
 
-    private function getConstraint(): ExpressionLanguageSyntax
+    private function getConstraint(): ExpressionSyntax
     {
         if (!$this->constraint) {
-            $this->constraint = new ExpressionLanguageSyntax([
+            $this->constraint = new ExpressionSyntax([
                 'service' => 'oro_layout.expression_language.expression_validator',
                 'message' => '{{ syntax_error }}',
             ]);

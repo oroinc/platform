@@ -3,7 +3,6 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\IntegrationBundle\Command\SyncCommand;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Test\Provider\TestConnector;
@@ -43,7 +42,7 @@ class SyncIntegrationProcessorTest extends WebTestCase
             '--integration' => (string)$integration->getId()
         ];
 
-        self::runCommand(SyncCommand::getDefaultName(), $params);
+        self::runCommand('oro:cron:integration:sync', $params);
 
         self::consume();
 

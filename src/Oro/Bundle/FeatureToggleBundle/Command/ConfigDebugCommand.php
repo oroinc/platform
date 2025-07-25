@@ -4,6 +4,7 @@ namespace Oro\Bundle\FeatureToggleBundle\Command;
 
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationExtension;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -16,11 +17,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Dumps features configured in "Resources/config/oro/features.yml".
  */
+#[AsCommand(
+    name: 'oro:feature-toggle:config:debug',
+    description: 'Dumps features configured in Resources/config/oro/features.yml.'
+)]
 class ConfigDebugCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:feature-toggle:config:debug';
-
     private ConfigurationProvider $configurationProvider;
     private ConfigurationExtension $configurationExtension;
     private TranslatorInterface $translator;
@@ -41,7 +43,6 @@ class ConfigDebugCommand extends Command
     {
         $this
             ->addArgument('feature', InputArgument::OPTIONAL, 'The name of a feature')
-            ->setDescription('Dumps features configured in Resources/config/oro/features.yml.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command dumps configuration of features.

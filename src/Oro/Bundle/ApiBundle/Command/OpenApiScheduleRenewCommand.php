@@ -7,6 +7,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Async\Topic\CreateOpenApiSpecificationTopic;
 use Oro\Bundle\ApiBundle\Entity\OpenApiSpecification;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,11 +15,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Schedules renew all OpenAPI specifications.
  */
+#[AsCommand(
+    name: 'oro:api:doc:open-api:schedule-renew',
+    description: 'Schedules renew all OpenAPI specifications.'
+)]
 class OpenApiScheduleRenewCommand extends Command
 {
-    protected static $defaultName = 'oro:api:doc:open-api:schedule-renew';
-    protected static $defaultDescription = 'Schedules renew all OpenAPI specifications.';
-
     private ManagerRegistry $doctrine;
     private MessageProducerInterface $producer;
 

@@ -71,7 +71,6 @@ class UpdateCountriesRegionsCommand extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Actualized countries and regions data for updating database.'
             )
-            ->setDescription('Update countries and regions data')
             ->setHelp(
                 // @codingStandardsIgnoreStart
                 <<<'HELP'

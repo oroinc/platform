@@ -8,6 +8,7 @@ use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\NotificationBundle\Exception\NotificationSendException;
 use Oro\Bundle\NotificationBundle\Model\MassNotificationSender;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,11 +17,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Sends an email notification to the application users.
  */
+#[AsCommand(
+    name: 'oro:maintenance-notification',
+    description: 'Sends an email notification to the application users.'
+)]
 class MassNotificationCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:maintenance-notification';
-
     private MassNotificationSender $massNotificationSender;
     private LoggerInterface $logger;
 
@@ -41,7 +43,6 @@ class MassNotificationCommand extends Command
             ->addOption('file', null, InputOption::VALUE_OPTIONAL, 'Path to the text file with message.')
             ->addOption('sender_name', null, InputOption::VALUE_OPTIONAL, 'Notification sender name')
             ->addOption('sender_email', null, InputOption::VALUE_OPTIONAL, 'Notification sender email')
-            ->setDescription('Sends an email notification to the application users.')
             ->setHelp(
                 // @codingStandardsIgnoreStart
                 <<<'HELP'

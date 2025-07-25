@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Oro\Bundle\WorkflowBundle\Command;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -20,12 +20,13 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Loads workflow definitions to the database.
  */
+#[AsCommand(
+    name: 'oro:workflow:definitions:load',
+    description: 'Loads workflow definitions to the database.'
+)]
 class LoadWorkflowDefinitionsCommand extends Command
 {
     private const DEFAULT_WATCH_INTERVAL = 10;
-
-    /** @var string */
-    protected static $defaultName = 'oro:workflow:definitions:load';
 
     private WorkflowConfigurationProvider $configurationProvider;
     private WorkflowDefinitionHandler $definitionHandler;
@@ -70,7 +71,6 @@ class LoadWorkflowDefinitionsCommand extends Command
                 'Definition reload interval seconds',
                 self::DEFAULT_WATCH_INTERVAL
             )
-            ->setDescription('Loads workflow definitions to the database.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command loads workflow definitions
@@ -125,7 +125,7 @@ HELP
             $output->writeln(
                 \sprintf(
                     "Please run command '<info>%s</info>' to load translations.",
-                    OroTranslationLoadCommand::getDefaultName()
+                    'oro:translation:load'
                 )
             );
         } else {

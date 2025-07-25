@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\EntityConfigBundle\Command;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigCacheWarmer;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,11 +13,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Warms up the entity config cache.
  */
+#[AsCommand(
+    name: 'oro:entity-config:cache:warmup',
+    description: 'Warms up the entity config cache.'
+)]
 class CacheWarmupCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:entity-config:cache:warmup';
-
     private ConfigCacheWarmer $configCacheWarmer;
 
     public function __construct(ConfigCacheWarmer $configCacheWarmer)
@@ -30,7 +32,6 @@ class CacheWarmupCommand extends Command
     public function configure()
     {
         $this
-            ->setDescription('Warms up the entity config cache.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command warms up the entity config cache.

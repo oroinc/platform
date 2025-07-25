@@ -1,6 +1,6 @@
 oro_imap_connection:
     resource:     "@OroImapBundle/Controller/ConnectionController.php"
-    type:         annotation
+    type:         attribute
     prefix:       /
 
 oro_imap_gmail_access_token:

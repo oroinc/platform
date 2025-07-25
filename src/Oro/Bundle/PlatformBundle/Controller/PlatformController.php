@@ -7,7 +7,7 @@ use Oro\Bundle\PlatformBundle\Provider\PackageProvider;
 use Oro\Bundle\PlatformBundle\Provider\UsageStats\UsageStatsProvider;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Controller provide information about installed packages

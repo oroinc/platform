@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyType;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -25,7 +24,6 @@ class UniqueKeyTypeTest extends TypeTestCase
     {
         $validator = Validation::createValidatorBuilder()
             ->enableAttributeMapping()
-            ->setDoctrineAnnotationReader(new AnnotationReader())
             ->getValidator();
 
         $this->factory =

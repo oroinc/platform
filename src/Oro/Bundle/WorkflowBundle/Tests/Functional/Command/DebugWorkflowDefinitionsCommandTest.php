@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Command;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\WorkflowBundle\Command\DebugWorkflowDefinitionsCommand;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -29,7 +28,7 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
     {
         $workflows = $this->getWorkflowDefinitionRepository()->findAll();
 
-        $result = self::runCommand(DebugWorkflowDefinitionsCommand::getDefaultName());
+        $result = self::runCommand('oro:debug:workflow:definitions');
 
         /** @var TranslatorInterface $translator */
         $translator = self::getContainer()->get('translator');
@@ -53,7 +52,7 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
         /** @var WorkflowDefinition $initialWorkflow */
         $initialWorkflow = $this->getWorkflowDefinitionRepository()->findOneBy(['name' => $workflowName]);
 
-        $result = self::runCommand(DebugWorkflowDefinitionsCommand::getDefaultName(), [$workflowName], false);
+        $result = self::runCommand('oro:debug:workflow:definitions', [$workflowName], false);
 
         self::assertStringNotContainsString('No workflow definitions found.', $result);
 
@@ -126,7 +125,7 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
         /** @var WorkflowDefinition $initialWorkflow */
         $initialWorkflow = $this->getWorkflowDefinitionRepository()->findOneBy(['name' => $workflowName]);
 
-        $result = self::runCommand(DebugWorkflowDefinitionsCommand::getDefaultName(), [$workflowName], false);
+        $result = self::runCommand('oro:debug:workflow:definitions', [$workflowName], false);
 
         self::assertStringNotContainsString('No workflow definitions found.', $result);
 
@@ -223,7 +222,7 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
 
     public function testExecuteWithArgumentWhenWorkflowNotExists(): void
     {
-        $result = self::runCommand(DebugWorkflowDefinitionsCommand::getDefaultName(), ['missing_workflow'], false);
+        $result = self::runCommand('oro:debug:workflow:definitions', ['missing_workflow'], false);
 
         self::assertStringContainsString('No workflow definitions found.', $result);
     }

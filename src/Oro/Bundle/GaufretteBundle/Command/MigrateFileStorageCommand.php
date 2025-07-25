@@ -3,6 +3,7 @@
 namespace Oro\Bundle\GaufretteBundle\Command;
 
 use Oro\Bundle\GaufretteBundle\FileManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,11 +15,12 @@ use Symfony\Component\Finder\Finder;
 /**
  * Moves files from old filesystem storages to FileManager.
  */
+#[AsCommand(
+    name: 'oro:gaufrette:migrate-filestorages',
+    description: 'Move application files from old storages to the proper Gaufrette file storages.'
+)]
 class MigrateFileStorageCommand extends Command
 {
-    /** * @var string */
-    protected static $defaultName = 'oro:gaufrette:migrate-filestorages';
-
     /** @var array [old files path => file manager name] */
     private $mappings = [];
 
@@ -49,7 +51,7 @@ class MigrateFileStorageCommand extends Command
     #[\Override]
     protected function configure()
     {
-        $this->setDescription('Move application files from old storages to the proper Gaufrette file storages.')
+        $this
             ->addOption('mode', null, InputOption::VALUE_OPTIONAL, 'Command run mode. Automatic or Manual')
             ->addOption(
                 'migration-path',

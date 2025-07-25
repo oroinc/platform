@@ -8,7 +8,6 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm;
-use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
@@ -181,7 +180,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
         $repository = $this->getAppContainer()->get('oro_entity.doctrine_helper')
             ->getEntityRepositoryForClass(Schedule::class);
 
-        $schedules = $repository->findBy(['command' => HandleProcessTriggerCommand::getDefaultName()]);
+        $schedules = $repository->findBy(['command' => 'oro:process:handle-trigger']);
 
         /** @var Schedule $schedule */
         foreach ($schedules as $schedule) {

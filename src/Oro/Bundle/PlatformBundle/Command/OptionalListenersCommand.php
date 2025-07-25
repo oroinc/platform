@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\PlatformBundle\Command;
 
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,10 +13,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Lists Doctrine listeners that can be disabled.
  */
+#[AsCommand(
+    name: 'oro:platform:optional-listeners',
+    description: 'Lists Doctrine listeners that can be disabled.'
+)]
 class OptionalListenersCommand extends Command
 {
-    protected static $defaultName = 'oro:platform:optional-listeners';
-
     private OptionalListenerManager $optionalListenerManager;
 
     public function __construct(OptionalListenerManager $optionalListenerManager)
@@ -30,7 +33,6 @@ class OptionalListenersCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Lists Doctrine listeners that can be disabled.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command lists optional Doctrine listeners

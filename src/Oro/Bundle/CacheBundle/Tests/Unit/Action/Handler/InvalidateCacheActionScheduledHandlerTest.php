@@ -6,7 +6,6 @@ use Oro\Bundle\CacheBundle\Action\DataStorage\InvalidateCacheDataStorage;
 use Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheActionScheduledHandler;
 use Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheScheduleArgumentsBuilderInterface;
 use Oro\Bundle\CacheBundle\Action\Transformer\DateTimeToStringTransformerInterface;
-use Oro\Bundle\CacheBundle\Command\InvalidateCacheScheduleCommand;
 use Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -49,7 +48,7 @@ class InvalidateCacheActionScheduledHandlerTest extends TestCase
 
         $this->deferredScheduler->expects(self::once())
             ->method('removeScheduleForCommand')
-            ->with(InvalidateCacheScheduleCommand::getDefaultName(), $arguments);
+            ->with('oro:cache:invalidate:schedule', $arguments);
 
         $this->deferredScheduler->expects(self::never())
             ->method('addSchedule');
@@ -86,11 +85,11 @@ class InvalidateCacheActionScheduledHandlerTest extends TestCase
 
         $this->deferredScheduler->expects(self::once())
             ->method('removeScheduleForCommand')
-            ->with(InvalidateCacheScheduleCommand::getDefaultName(), $arguments);
+            ->with('oro:cache:invalidate:schedule', $arguments);
 
         $this->deferredScheduler->expects(self::once())
             ->method('addSchedule')
-            ->with(InvalidateCacheScheduleCommand::getDefaultName(), $arguments, $cronDefinition);
+            ->with('oro:cache:invalidate:schedule', $arguments, $cronDefinition);
 
         $this->deferredScheduler->expects(self::once())
             ->method('flush');

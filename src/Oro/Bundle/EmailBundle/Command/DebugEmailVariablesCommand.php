@@ -7,6 +7,7 @@ namespace Oro\Bundle\EmailBundle\Command;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\VariablesProvider;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,12 +17,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Displays email template variables
  */
+#[AsCommand(
+    name: 'oro:debug:email:variables',
+    description: 'Displays email template variables'
+)]
 class DebugEmailVariablesCommand extends Command
 {
-    protected static $defaultName = 'oro:debug:email:variables';
-
-    protected static $defaultDescription = 'Displays email template variables';
-
     private DoctrineHelper $doctrineHelper;
 
     private EmailRenderer $emailRenderer;

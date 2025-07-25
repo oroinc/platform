@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Cron;
 
 use Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler;
-use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
@@ -49,7 +48,7 @@ class ProcessTriggerCronSchedulerTest extends TestCase
 
         $this->deferredScheduler->expects($this->once())
             ->method('addSchedule')
-            ->with(HandleProcessTriggerCommand::getDefaultName(), $arguments, $cronExpression);
+            ->with('oro:process:handle-trigger', $arguments, $cronExpression);
 
         $this->processCronScheduler->add($trigger);
     }

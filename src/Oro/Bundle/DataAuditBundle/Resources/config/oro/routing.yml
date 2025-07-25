@@ -1,6 +1,6 @@
 oro_dataaudit_bundle:
     resource:     "@OroDataAuditBundle/Controller"
-    type:         annotation
+    type:         attribute
     prefix:       /audit
 
 

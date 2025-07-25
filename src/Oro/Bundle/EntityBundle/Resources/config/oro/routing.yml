@@ -1,6 +1,6 @@
 oro_entity:
     resource:     "@OroEntityBundle/Controller"
-    type:         annotation
+    type:         attribute
     prefix:       /
 
 

@@ -3,12 +3,12 @@ oro_user_google_login:
 
 oro_user_bundle:
     resource:     "@OroUserBundle/Controller"
-    type:         annotation
+    type:         attribute
     prefix:       /user
 
 oro_user_bundle_config:
     resource:     "@OroUserBundle/Controller/ConfigurationController.php"
-    type:         annotation
+    type:         attribute
     prefix:       /config
 
 oro_rest_api_user_profile:

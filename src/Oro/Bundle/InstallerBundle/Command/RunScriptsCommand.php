@@ -6,6 +6,7 @@ namespace Oro\Bundle\InstallerBundle\Command;
 
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,11 +16,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Runs OroScript files in the application scope.
  */
+#[AsCommand(
+    name: 'oro:platform:run-script',
+    description: 'Runs OroScript files in the application scope.'
+)]
 class RunScriptsCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:platform:run-script';
-
     private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
@@ -35,7 +37,6 @@ class RunScriptsCommand extends Command
     {
         $this
             ->addArgument('script', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'Script files')
-            ->setDescription('Runs OroScript files in the application scope.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command runs OroScript files while providing them with

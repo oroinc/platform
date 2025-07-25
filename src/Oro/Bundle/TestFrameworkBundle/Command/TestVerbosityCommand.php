@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,10 +14,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @link https://github.com/symfony/symfony/pull/24425
  * @see  \Symfony\Component\Console\Application::configureIO
  */
+#[AsCommand(name: 'oro:test:verbosity')]
 class TestVerbosityCommand extends Command
 {
-    protected static $defaultName = 'oro:test:verbosity';
-
     #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {

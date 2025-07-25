@@ -8,6 +8,7 @@ use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\EmailBundle\Sync\EmailSynchronizerInterface;
 use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Oro\Component\Log\OutputLogger;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,6 +17,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Synchronizes emails via IMAP.
  */
+#[AsCommand(
+    name: 'oro:cron:imap-sync',
+    description: 'Synchronizes emails via IMAP.'
+)]
 class EmailSyncCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
     /** The maximum number of email origins which can be synchronized */
@@ -32,9 +37,6 @@ class EmailSyncCommand extends Command implements CronCommandScheduleDefinitionI
 
     /** The maximum number of jobs running in the same time */
     public const MAX_JOBS_COUNT = 3;
-
-    /** @var string */
-    protected static $defaultName = 'oro:cron:imap-sync';
 
     private EmailSynchronizerInterface $imapEmailSynchronizer;
 
@@ -104,7 +106,6 @@ class EmailSyncCommand extends Command implements CronCommandScheduleDefinitionI
                 InputOption::VALUE_NONE,
                 'Display the log messages during email synchronization'
             )
-            ->setDescription('Synchronizes emails via IMAP.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command synchronizes emails via IMAP.

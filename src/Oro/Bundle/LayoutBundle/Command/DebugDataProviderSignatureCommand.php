@@ -7,6 +7,7 @@ namespace Oro\Bundle\LayoutBundle\Command;
 use Oro\Bundle\LayoutBundle\Command\Util\MethodPhpDocExtractor;
 use Oro\Component\Layout\LayoutManager;
 use Oro\Component\Layout\LayoutRegistryInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,11 +17,12 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Displays data provider signatures.
  */
+#[AsCommand(
+    name: 'oro:debug:layout:data-providers',
+    description: 'Displays data provider signatures.'
+)]
 class DebugDataProviderSignatureCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:debug:layout:data-providers';
-
     private LayoutManager $layoutManager;
     private MethodPhpDocExtractor $methodPhpDocExtractor;
     private array $dataProviders;
@@ -42,7 +44,6 @@ class DebugDataProviderSignatureCommand extends Command
     public function configure()
     {
         $this
-            ->setDescription('Displays data provider signatures.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command displays function signatures for all data providers

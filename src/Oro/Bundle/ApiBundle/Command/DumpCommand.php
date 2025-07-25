@@ -17,6 +17,7 @@ use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,11 +28,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Dumps all resources accessible through API.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
+#[AsCommand(
+    name: 'oro:api:dump',
+    description: 'Dumps all resources accessible through API.'
+)]
 class DumpCommand extends AbstractDebugCommand
 {
-    /** @var string */
-    protected static $defaultName = 'oro:api:dump';
-
     private SubresourcesProvider $subresourcesProvider;
     private EntityClassProviderInterface $entityClassProvider;
     private ConfigProvider $configProvider;
@@ -94,7 +96,6 @@ class DumpCommand extends AbstractDebugCommand
                 InputOption::VALUE_NONE,
                 'Show resources that support the validate operation'
             )
-            ->setDescription('Dumps all resources accessible through API.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command dumps all resources accessible through API.

@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Command;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\WorkflowBundle\Command\HandleTransitionCronTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -33,7 +32,7 @@ class HandleTransitionCronTriggerCommandTest extends WebTestCase
         $this->assertNotNull($trigger);
 
         $result = $this->runCommand(
-            HandleTransitionCronTriggerCommand::getDefaultName(),
+            'oro:workflow:handle-transition-cron-trigger',
             ['--id' => (string)$trigger->getId()]
         );
 

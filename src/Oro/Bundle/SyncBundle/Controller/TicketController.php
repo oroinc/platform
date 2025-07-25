@@ -6,7 +6,7 @@ use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Controller that allows to retrieve a new Sync authentication ticket for currently authenticated user.

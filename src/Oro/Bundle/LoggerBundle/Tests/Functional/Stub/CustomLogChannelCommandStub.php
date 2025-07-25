@@ -4,6 +4,7 @@ namespace Oro\Bundle\LoggerBundle\Tests\Functional\Stub;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Monolog\Logger;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -11,13 +12,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * The command used to test logging to the custom channel
  */
+#[AsCommand(name: 'oro:logger:use-custom-channel')]
 class CustomLogChannelCommandStub extends Command
 {
     public const LOGGER_NAME = 'monolog.logger.custom_channel';
     public const LOG_MESSAGE = 'Test log message';
-
-    /** @var string */
-    protected static $defaultName = 'oro:logger:use-custom-channel';
 
     private LoggerInterface $logger;
 

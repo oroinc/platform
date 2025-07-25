@@ -8,7 +8,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\PlatformBundle\Async\Topic\DeleteOldNumberSequenceTopic;
-use Oro\Bundle\PlatformBundle\Command\Cron\DeleteOldNumberSequenceCronCommand;
 use Oro\Bundle\PlatformBundle\Entity\NumberSequence;
 use Oro\Bundle\PlatformBundle\Tests\Functional\DataFixtures\LoadNumberSequences;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -48,7 +47,7 @@ class DeleteOldNumberSequenceCronCommandTest extends WebTestCase
 
     public function testExecute(): void
     {
-        $commandTester = $this->doExecuteCommand(DeleteOldNumberSequenceCronCommand::getDefaultName());
+        $commandTester = $this->doExecuteCommand('oro:cron:platform:delete-old-number-sequences');
 
         $this->assertSuccessReturnCode($commandTester);
         $this->assertOutputContains(
@@ -87,7 +86,7 @@ class DeleteOldNumberSequenceCronCommandTest extends WebTestCase
             'Expected no sequences after deletion.'
         );
 
-        $commandTester = $this->doExecuteCommand(DeleteOldNumberSequenceCronCommand::getDefaultName());
+        $commandTester = $this->doExecuteCommand('oro:cron:platform:delete-old-number-sequences');
         $this->assertSuccessReturnCode($commandTester);
         $this->assertOutputContains($commandTester, 'Deletion has been queued for 0 sequence types.');
 

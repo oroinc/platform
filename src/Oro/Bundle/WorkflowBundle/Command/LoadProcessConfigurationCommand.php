@@ -8,6 +8,7 @@ use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator;
 use Psr\Log\LogLevel;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,11 +18,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Loads process definitions to the database.
  */
+#[AsCommand(
+    name: 'oro:process:configuration:load',
+    description: 'Loads process definitions to the database.'
+)]
 class LoadProcessConfigurationCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:process:configuration:load';
-
     private ProcessConfigurationProvider $configurationProvider;
     private ProcessConfigurator $processConfigurator;
     private EventTriggerCache $eventTriggerCache;
@@ -55,7 +57,6 @@ class LoadProcessConfigurationCommand extends Command
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
                 'Process names'
             )
-            ->setDescription('Loads process definitions to the database.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command loads process definitions

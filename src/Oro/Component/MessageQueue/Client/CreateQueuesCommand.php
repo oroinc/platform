@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Component\MessageQueue\Client;
 
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,11 +13,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Creates required message queues.
  */
+#[AsCommand(
+    name: 'oro:message-queue:create-queues',
+    description: 'Creates required message queues.'
+)]
 class CreateQueuesCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:message-queue:create-queues';
-
     private DriverInterface $clientDriver;
     private DestinationMetaRegistry $destinationMetaRegistry;
 
@@ -32,7 +34,6 @@ class CreateQueuesCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Creates required message queues.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command creates required message queues.

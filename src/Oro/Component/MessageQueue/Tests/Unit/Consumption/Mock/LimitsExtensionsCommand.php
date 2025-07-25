@@ -3,10 +3,16 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\Mock;
 
 use Oro\Component\MessageQueue\Consumption\LimitsExtensionsCommandTrait;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(
+    name: 'name',
+    description: 'description',
+    hidden: false,
+)]
 class LimitsExtensionsCommand extends Command
 {
     use LimitsExtensionsCommandTrait;

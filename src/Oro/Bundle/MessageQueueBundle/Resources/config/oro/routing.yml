@@ -1,6 +1,6 @@
 oro_message_queue_bundle:
     resource:     "@OroMessageQueueBundle/Controller"
-    type:         annotation
+    type:         attribute
     prefix:       /message-queue
 
 

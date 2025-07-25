@@ -8,6 +8,7 @@ use Oro\Bundle\LayoutBundle\Command\Util\DebugOptionsResolverDecorator;
 use Oro\Bundle\LayoutBundle\Command\Util\DebugSymfonyOptionsResolverDecorator;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\LayoutContext;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,11 +17,12 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Displays context configurators list.
  */
+#[AsCommand(
+    name: 'oro:debug:layout:context-configurators',
+    description: 'Displays context configurators list.'
+)]
 class DebugLayoutContextConfiguratorsSignatureCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:debug:layout:context-configurators';
-
     public function __construct(
         private array $contextConfigurators,
     ) {
@@ -31,7 +33,6 @@ class DebugLayoutContextConfiguratorsSignatureCommand extends Command
     public function configure()
     {
         $this
-            ->setDescription('Displays context configurators list.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command displays layout context configurators list

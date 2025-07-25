@@ -1,6 +1,6 @@
 oro_datagrid_bundle:
     resource: "@OroDataGridBundle/Controller"
-    type:     annotation
+    type:     attribute
     prefix:   /datagrid
 
 

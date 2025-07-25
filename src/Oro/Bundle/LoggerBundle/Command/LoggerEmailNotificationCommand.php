@@ -6,6 +6,7 @@ namespace Oro\Bundle\LoggerBundle\Command;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,10 +18,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * Updates logger email notification configuration.
  */
+#[AsCommand(
+    name: 'oro:logger:email-notification',
+    description: 'Updates logger email notification configuration.'
+)]
 class LoggerEmailNotificationCommand extends Command
 {
-    protected static $defaultName = 'oro:logger:email-notification';
-
     private ValidatorInterface $validator;
     private ?ConfigManager $configManager;
 
@@ -45,7 +48,6 @@ class LoggerEmailNotificationCommand extends Command
         $this
             ->addOption('disable', null, InputOption::VALUE_NONE, 'Disable email notifications about logged errors')
             ->addOption('recipients', 'r', InputOption::VALUE_REQUIRED, 'Recipient email addresses separated by ;')
-            ->setDescription('Updates logger email notification configuration.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command updates logger email notification configuration.

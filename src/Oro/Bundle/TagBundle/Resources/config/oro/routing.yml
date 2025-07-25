@@ -1,11 +1,11 @@
 oro_tag_bundle:
     resource:     "@OroTagBundle/Controller/TagController.php"
-    type:         annotation
+    type:         attribute
     prefix:       /tag
 
 oro_tag_bundle.taxonomy:
     resource:     "@OroTagBundle/Controller/TaxonomyController.php"
-    type:         annotation
+    type:         attribute
     prefix:       /taxonomy
 
 

@@ -6,6 +6,7 @@ namespace Oro\Bundle\EmailBundle\Command;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
@@ -15,19 +16,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Displays a list of current email templates for an application or an exact template
  */
+#[AsCommand(
+    name: 'oro:debug:email:template',
+    description: 'Displays a list of current email templates for an application or an exact template'
+)]
 class DebugEmailTemplateCommand extends Command
 {
-    /**
-     * @var string
-     */
-    protected static $defaultName = 'oro:debug:email:template';
-
-    /**
-     * @var string
-     */
-    protected static $defaultDescription = 'Displays a list of current email templates '
-        . 'for an application or an exact template';
-
     private DoctrineHelper $doctrineHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper)

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Functional\Command;
 
-use Oro\Bundle\ReportBundle\Command\CalendarDateCommand;
 use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -29,9 +28,9 @@ class CalendarDateCommandTest extends WebTestCase
         }
         $manager->flush();
 
-        $this->runCommand(CalendarDateCommand::getDefaultName());
+        $this->runCommand('oro:cron:calendar:date');
         // Check that another command execution does not add duplicate dates
-        $this->runCommand(CalendarDateCommand::getDefaultName());
+        $this->runCommand('oro:cron:calendar:date');
 
         $results = $repository->findAll();
         $this->assertNotEmpty($results);

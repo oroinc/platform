@@ -3,13 +3,15 @@
 namespace Oro\Bundle\CronBundle\Tests\Functional\Stub;
 
 use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 
+#[AsCommand(
+    name: 'oro:cron:test:lazy',
+    description: 'Test lazy CRON command.'
+)]
 class LazyTestCronCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
-    protected static $defaultName = 'oro:cron:test:lazy';
-    protected static $defaultDescription = 'Test lazy CRON command.';
-
     #[\Override]
     public function getDefaultDefinition(): string
     {

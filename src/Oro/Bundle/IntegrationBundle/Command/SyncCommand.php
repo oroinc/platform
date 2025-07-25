@@ -13,6 +13,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobProcessor;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,13 +24,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Schedules synchronization for integrations.
  */
+#[AsCommand(
+    name: 'oro:cron:integration:sync',
+    description: 'Schedules synchronization for integrations.'
+)]
 class SyncCommand extends Command implements
     CronCommandScheduleDefinitionInterface,
     CronCommandActivationInterface
 {
-    /** @var string */
-    protected static $defaultName = 'oro:cron:integration:sync';
-
     private JobProcessor $jobProcessor;
     private TranslatorInterface $translator;
     private GenuineSyncScheduler $syncScheduler;
@@ -86,7 +88,6 @@ class SyncCommand extends Command implements
             )
             ->addOption('integration', 'i', InputOption::VALUE_OPTIONAL, 'Integration ID')
             ->addOption('connector', 'con', InputOption::VALUE_OPTIONAL, 'Connector name')
-            ->setDescription('Schedules synchronization for integrations.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command schedules synchronization for all active integrations.

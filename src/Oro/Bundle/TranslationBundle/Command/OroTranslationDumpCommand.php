@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\TranslationBundle\Command;
 
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,11 +16,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Dumps translations for use in JavaScript.
  */
+#[AsCommand(
+    name: 'oro:translation:dump',
+    description: 'Dumps translations for use in JavaScript.'
+)]
 class OroTranslationDumpCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:translation:dump';
-
     private JsTranslationDumper $dumper;
 
     public function __construct(JsTranslationDumper $dumper)
@@ -35,7 +37,6 @@ class OroTranslationDumpCommand extends Command
         $this
             ->addArgument('locale', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'Locales')
             ->addOption('debug', null, InputOption::VALUE_OPTIONAL, '[Obsolete option, do not use]', false)
-            ->setDescription('Dumps translations for use in JavaScript.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command dumps the translations used by JavaScript code

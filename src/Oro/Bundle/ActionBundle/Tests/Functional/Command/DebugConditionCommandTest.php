@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Functional\Command;
 
-use Oro\Bundle\ActionBundle\Command\DebugConditionCommand;
-
 class DebugConditionCommandTest extends AbstractDebugCommandTestCase
 {
     #[\Override]
@@ -15,6 +13,6 @@ class DebugConditionCommandTest extends AbstractDebugCommandTestCase
     #[\Override]
     protected function getCommandName(): string
     {
-        return DebugConditionCommand::getDefaultName();
+        return 'oro:debug:condition';
     }
 }

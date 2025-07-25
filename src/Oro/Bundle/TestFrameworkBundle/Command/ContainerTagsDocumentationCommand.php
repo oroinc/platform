@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\TestFrameworkBundle\Command;
 
 use Oro\Bundle\TestFrameworkBundle\Provider\ContainerTagsDocumentationInformationProvider;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,10 +15,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Lists available documentation for dependency injection tags.
  */
+#[AsCommand(
+    name: 'oro:debug:container:tag-documentation',
+    description: 'Lists available documentation for dependency injection tags.'
+)]
 class ContainerTagsDocumentationCommand extends Command
 {
-    protected static $defaultName = 'oro:debug:container:tag-documentation';
-
     private ContainerTagsDocumentationInformationProvider $docInfoProvider;
 
     public function __construct(
@@ -53,7 +56,6 @@ class ContainerTagsDocumentationCommand extends Command
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
                 'Tag name patterns to include'
             )
-            ->setDescription('Lists available documentation for dependency injection tags.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command lists available documentation

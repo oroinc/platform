@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\MigrationBundle\Tools\SchemaDumper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -22,15 +23,16 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 /**
  * Displays database schema as code.
  */
+#[AsCommand(
+    name: 'oro:migration:dump',
+    description: 'Displays database schema as code.'
+)]
 class DumpMigrationsCommand extends Command
 {
     private const GLOBAL_INSTALLATION_CLASSNAME = 'GlobalInstallation';
 
     private const SUCCESS_ACTION_CREATED = 'created';
     private const SUCCESS_ACTION_UPDATED = 'updated';
-
-    /** @var string */
-    protected static $defaultName = 'oro:migration:dump';
 
     private InputInterface $input;
     private OutputInterface $output;
@@ -74,7 +76,6 @@ class DumpMigrationsCommand extends Command
             ->addOption('all', null, InputOption::VALUE_NONE, 'Generate migration for all bundles')
             ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Bundle to generate migration for')
             ->addOption('migration-version', null, InputOption::VALUE_OPTIONAL, 'Migration version', 'v1_0')
-            ->setDescription('Displays database schema as code.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command displays the database schema as PHP code

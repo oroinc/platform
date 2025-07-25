@@ -13,6 +13,7 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -21,11 +22,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Creates a user.
  */
+#[AsCommand(
+    name: 'oro:user:create',
+    description: 'Creates a user.'
+)]
 class CreateUserCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:user:create';
-
     protected UserManager $userManager;
     protected EntityManagerInterface $entityManager;
 
@@ -54,7 +56,6 @@ class CreateUserCommand extends Command
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
                 'Organizations'
             )
-            ->setDescription('Creates a user.')
             // @codingStandardsIgnoreStart
             ->setHelp(
                 <<<'HELP'

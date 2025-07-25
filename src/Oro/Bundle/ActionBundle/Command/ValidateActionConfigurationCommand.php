@@ -7,6 +7,7 @@ namespace Oro\Bundle\ActionBundle\Command;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationValidatorInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,11 +15,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Validates action configuration.
  */
+#[AsCommand(
+    name: 'oro:action:configuration:validate',
+    description: 'Validates action configuration.'
+)]
 class ValidateActionConfigurationCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:action:configuration:validate';
-
     private ConfigurationProviderInterface $operationsProvider;
     private ConfigurationValidatorInterface $configurationValidator;
 
@@ -37,7 +39,6 @@ class ValidateActionConfigurationCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Validates action configuration.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command validates action configuration and displays the encountered errors.

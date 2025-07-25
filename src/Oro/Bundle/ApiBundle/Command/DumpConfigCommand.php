@@ -21,6 +21,7 @@ use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use ProxyManager\Proxy\VirtualProxyInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -32,11 +33,12 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Dumps entity configuration used in API.
  */
+#[AsCommand(
+    name: 'oro:api:config:dump',
+    description: 'Dumps entity configuration used in API.'
+)]
 class DumpConfigCommand extends AbstractDebugCommand
 {
-    /** @var string */
-    protected static $defaultName = 'oro:api:config:dump';
-
     private ProcessorBagInterface $processorBag;
     private ConfigProvider $configProvider;
 
@@ -90,7 +92,6 @@ class DumpConfigCommand extends AbstractDebugCommand
                 InputOption::VALUE_NONE,
                 'Show a list of documentation resources'
             )
-            ->setDescription('Dumps entity configuration used in API.')
             ->setHelp(
                 // @codingStandardsIgnoreStart
                 <<<'HELP'

@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\ActionBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 
 /**
  * Displays available conditions.
  */
+#[AsCommand(
+    name: 'oro:debug:condition',
+    description: 'Displays available conditions.'
+)]
 class DebugConditionCommand extends AbstractDebugCommand
 {
     public const ARGUMENT_NAME = 'condition-name';
-
-    /** @var string */
-    protected static $defaultName = 'oro:debug:condition';
 
     /** @noinspection PhpMissingParentCallCommonInspection */
     #[\Override]
@@ -22,7 +24,6 @@ class DebugConditionCommand extends AbstractDebugCommand
     {
         $this
             ->addArgument(self::ARGUMENT_NAME, InputArgument::OPTIONAL, 'Condition name')
-            ->setDescription('Displays available conditions.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command displays available conditions.

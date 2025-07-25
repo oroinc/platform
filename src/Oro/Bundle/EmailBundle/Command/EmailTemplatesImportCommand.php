@@ -11,6 +11,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,12 +23,12 @@ use Symfony\Component\Finder\SplFileInfo;
 /**
  * Imports email templates from the directory
  */
+#[AsCommand(
+    name: 'oro:email:template:import',
+    description: 'Imports email templates from the directory'
+)]
 class EmailTemplatesImportCommand extends Command
 {
-    protected static $defaultName = 'oro:email:template:import';
-
-    protected static $defaultDescription = 'Imports email templates from the directory';
-
     private DoctrineHelper $doctrineHelper;
 
     private ?Organization $organization = null;

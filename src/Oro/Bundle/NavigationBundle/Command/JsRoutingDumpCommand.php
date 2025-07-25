@@ -7,6 +7,7 @@ namespace Oro\Bundle\NavigationBundle\Command;
 use FOS\JsRoutingBundle\Extractor\ExposedRoutesExtractorInterface;
 use FOS\JsRoutingBundle\Response\RoutesResponse;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,11 +20,12 @@ use Symfony\Component\Serializer\SerializerInterface;
  * * changed default values for "format" and "target" options
  * * support of the Gaufrette path for the target file
  */
+#[AsCommand(
+    name: 'fos:js-routing:dump',
+    description: 'Dumps exposed routes into a file.'
+)]
 class JsRoutingDumpCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'fos:js-routing:dump';
-
     private ExposedRoutesExtractorInterface $extractor;
     private SerializerInterface $serializer;
     private ?string $requestContextBaseUrl;
@@ -50,7 +52,6 @@ class JsRoutingDumpCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Dumps exposed routes into a file.')
             ->addOption(
                 'callback',
                 null,

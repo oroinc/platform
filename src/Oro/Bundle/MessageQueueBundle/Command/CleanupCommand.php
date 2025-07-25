@@ -11,6 +11,7 @@ use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Job\Job as JobComponent;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,13 +20,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Clears old records from message_queue_job table.
  */
+#[AsCommand(
+    name: 'oro:cron:message-queue:cleanup',
+    description: 'Clears old records from message_queue_job table.'
+)]
 class CleanupCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
     public const INTERVAL_FOR_SUCCESSES = '-2 weeks';
     public const INTERVAL_FOR_FAILED = '-1 month';
-
-    /** @var string */
-    protected static $defaultName = 'oro:cron:message-queue:cleanup';
 
     private DoctrineHelper $doctrineHelper;
 
@@ -52,7 +54,6 @@ class CleanupCommand extends Command implements CronCommandScheduleDefinitionInt
                 InputOption::VALUE_NONE,
                 'Show the number of jobs that match the cleanup criteria instead of deletion'
             )
-            ->setDescription('Clears old records from message_queue_job table.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command clears successful job records

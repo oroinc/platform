@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\ConfigBundle\Command;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,11 +14,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Updates a configuration value in the global scope.
  */
+#[AsCommand(
+    name: 'oro:config:update',
+    description: 'Updates a configuration value in the global scope.'
+)]
 class ConfigUpdateCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:config:update';
-
     private ConfigManager $configManager;
 
     public function __construct(ConfigManager $configManager)
@@ -34,7 +36,6 @@ class ConfigUpdateCommand extends Command
         $this
             ->addArgument('name', InputArgument::REQUIRED, 'Config parameter name')
             ->addArgument('value', InputArgument::REQUIRED, 'Config parameter value')
-            ->setDescription('Updates a configuration value in the global scope.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command updates a configuration value in the global scope.
