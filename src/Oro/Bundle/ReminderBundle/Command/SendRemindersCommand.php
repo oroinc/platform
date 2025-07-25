@@ -10,6 +10,7 @@ use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
 use Oro\Bundle\ReminderBundle\Model\ReminderSenderInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,13 +18,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Sends reminders that are due now.
  */
+#[AsCommand(
+    name: 'oro:cron:send-reminders',
+    description: 'Sends reminders that are due now.'
+)]
 class SendRemindersCommand extends Command implements
     CronCommandScheduleDefinitionInterface,
     CronCommandActivationInterface
 {
-    /** @var string */
-    protected static $defaultName = 'oro:cron:send-reminders';
-
     private ManagerRegistry $doctrine;
     private ReminderSenderInterface $sender;
 
@@ -53,7 +55,6 @@ class SendRemindersCommand extends Command implements
     protected function configure()
     {
         $this
-            ->setDescription('Sends reminders that are due now.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command sends reminders that are due now.

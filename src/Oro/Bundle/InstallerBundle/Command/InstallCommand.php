@@ -17,12 +17,9 @@ use Oro\Bundle\InstallerBundle\InstallerEvents;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
 use Oro\Bundle\LocaleBundle\Command\LocalizationOptionsCommandTrait;
-use Oro\Bundle\LocaleBundle\Command\UpdateLocalizationCommand;
 use Oro\Bundle\LocaleBundle\DependencyInjection\OroLocaleExtension;
-use Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand;
-use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
-use Oro\Bundle\TranslationBundle\Command\OroTranslationUpdateCommand;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -40,12 +37,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
+#[AsCommand(name: 'oro:install', description: 'Application installer.')]
 class InstallCommand extends AbstractCommand implements InstallCommandInterface
 {
     use LocalizationOptionsCommandTrait;
-
-    /** @var string */
-    protected static $defaultName = 'oro:install';
 
     private Process $assetsCommandProcess;
     private InputOptionProvider $inputOptionProvider;
@@ -92,7 +87,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ->addOption('skip-translations', null, InputOption::VALUE_NONE, 'Skip applying translations')
             ->addOption('drop-database', null, InputOption::VALUE_NONE, 'Delete all existing data')
             ->addOption('default-currency', null, InputOption::VALUE_OPTIONAL, 'Oro default currency')
-            ->setDescription('Application installer.')
             // @codingStandardsIgnoreStart
             ->setHelp(
                 <<<'HELP'
@@ -531,12 +525,12 @@ HELP
                     '--timeout'           => $commandExecutor->getDefaultOption('process-timeout'),
                 ]
             )
-            ->runCommand(LoadPermissionConfigurationCommand::getDefaultName(), ['--process-isolation' => true])
+            ->runCommand('security:permission:configuration:load', ['--process-isolation' => true])
             ->runCommand('oro:cron:definitions:load', ['--process-isolation' => true])
             ->runCommand('oro:workflow:definitions:load', ['--process-isolation' => true])
             ->runCommand('oro:process:configuration:load', ['--process-isolation' => true])
             ->runCommand(
-                LoadDataFixturesCommand::getDefaultName(),
+                'oro:migration:data:load',
                 \array_merge(
                     [
                         '--process-isolation' => true,
@@ -632,7 +626,7 @@ HELP
             if (!$input->getOption('skip-download-translations')) {
                 $commandExecutor
                     ->runCommand(
-                        OroTranslationUpdateCommand::getDefaultName(),
+                        'oro:translation:update',
                         ['--process-isolation' => true, '--all' => true]
                     );
             }
@@ -647,7 +641,7 @@ HELP
         $language = $this->getContainer()->getParameter(OroLocaleExtension::PARAMETER_LANGUAGE);
 
         $commandExecutor->runCommand(
-            UpdateLocalizationCommand::getDefaultName(),
+            'oro:localization:update',
             array_merge(
                 ['--process-isolation' => true],
                 $this->getLocalizationParametersFromOptions($formattingCode, $language)

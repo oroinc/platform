@@ -8,6 +8,7 @@ use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,10 +18,12 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 /**
  * Resets menu updates.
  */
+#[AsCommand(
+    name: 'oro:navigation:menu:reset',
+    description: 'Resets menu updates.'
+)]
 class ResetMenuUpdatesCommand extends Command
 {
-    protected static $defaultName = 'oro:navigation:menu:reset';
-
     private UserManager $userManager;
     private ScopeManager $scopeManager;
     private MenuUpdateManager $menuUpdateManager;
@@ -46,7 +49,6 @@ class ResetMenuUpdatesCommand extends Command
         $this
             ->addOption('user', 'u', InputOption::VALUE_REQUIRED, 'Email of existing user')
             ->addOption('menu', 'm', InputOption::VALUE_REQUIRED, 'Menu name to reset')
-            ->setDescription('Resets menu updates.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command resets all menu updates.

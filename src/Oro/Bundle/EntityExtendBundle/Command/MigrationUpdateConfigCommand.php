@@ -9,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Tools\ConfigLogger;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
 use Oro\Component\Log\OutputLogger;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,11 +19,13 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Updates extended entities configuration during the DB structure migration.
  * Entity config manager is set to utilizes only local cache.
  */
+#[AsCommand(
+    name: 'oro:entity-extend:migration:update-config',
+    description: 'Updates extended entities configuration during the DB structure migration.',
+    hidden: true
+)]
 class MigrationUpdateConfigCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:entity-extend:migration:update-config';
-
     private ExtendOptionsParser $extendOptionsParser;
     private ExtendConfigProcessor $extendConfigProcessor;
     private ConfigManager $configManager;
@@ -54,8 +57,6 @@ class MigrationUpdateConfigCommand extends Command
                 InputOption::VALUE_NONE,
                 'Output modifications without applying them'
             )
-            ->setHidden(true)
-            ->setDescription('Updates extended entities configuration during the DB structure migration.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command updates extended entities configuration

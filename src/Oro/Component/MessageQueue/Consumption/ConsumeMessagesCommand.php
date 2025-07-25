@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Component\MessageQueue\Consumption;
 
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,12 +15,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Processes a message-queue with a specific processor.
  */
+#[AsCommand(
+    name: 'oro:message-queue:transport:consume',
+    description: 'Processes messages from the specified queue with the specified processor.'
+)]
 class ConsumeMessagesCommand extends Command
 {
     use LimitsExtensionsCommandTrait;
-
-    /** @var string */
-    protected static $defaultName = 'oro:message-queue:transport:consume';
 
     protected QueueConsumer $queueConsumer;
 
@@ -39,7 +41,6 @@ class ConsumeMessagesCommand extends Command
         $this
             ->addArgument('queue', InputArgument::REQUIRED, 'Queue to consume from')
             ->addArgument('processor-service', InputArgument::OPTIONAL, 'The message processor service id')
-            ->setDescription('Processes messages from the specified queue with the specified processor.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command consumes message from a specified message queue.

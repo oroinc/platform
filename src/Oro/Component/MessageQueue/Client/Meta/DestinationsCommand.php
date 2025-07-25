@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Oro\Component\MessageQueue\Client\Meta;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
@@ -13,11 +14,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Lists available message queue destinations.
  */
+#[AsCommand(
+    name: 'oro:message-queue:destinations',
+    description: 'Lists available message queue destinations.'
+)]
 class DestinationsCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:message-queue:destinations';
-
     private DestinationMetaRegistry $destinationMetaRegistry;
 
     public function __construct(DestinationMetaRegistry $destinationMetaRegistry)
@@ -32,7 +34,6 @@ class DestinationsCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Lists available message queue destinations.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command lists available message queue destinations.

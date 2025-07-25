@@ -1,4 +1,4 @@
 oro_digital_asset:
     resource: '@OroDigitalAssetBundle/Controller/DigitalAssetController.php'
-    type: annotation
+    type: attribute
     prefix:  '/cms/digital-asset'

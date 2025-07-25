@@ -13,7 +13,7 @@ class DebugActionCommandTest extends AbstractDebugCommandTestCase
     {
         self::assertNotEmpty($this->command->getDescription());
         self::assertNotEmpty($this->command->getHelp());
-        self::assertEquals(DebugActionCommand::getDefaultName(), $this->command->getName());
+        self::assertEquals('oro:debug:action', $this->command->getName());
     }
 
     #[\Override]

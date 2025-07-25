@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\ActionBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 
 /**
  * Displays available actions.
  */
+#[AsCommand(
+    name: 'oro:debug:action',
+    description: 'Displays available actions.'
+)]
 class DebugActionCommand extends AbstractDebugCommand
 {
     public const ARGUMENT_NAME = 'action-name';
-
-    /** @var string */
-    protected static $defaultName = 'oro:debug:action';
 
     /** @noinspection PhpMissingParentCallCommonInspection */
     #[\Override]
@@ -22,7 +24,6 @@ class DebugActionCommand extends AbstractDebugCommand
     {
         $this
             ->addArgument(self::ARGUMENT_NAME, InputArgument::OPTIONAL, 'Action name')
-            ->setDescription('Displays available actions.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command displays available actions.

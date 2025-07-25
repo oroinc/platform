@@ -6,6 +6,7 @@ namespace Oro\Bundle\ImapBundle\Command\Cron;
 
 use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,11 +14,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Sends notifications if email origin sync failed due to invalid credentials.
  */
+#[AsCommand(
+    name: 'oro:cron:imap-credential-notifications',
+    description: 'Sends notifications if email origin sync failed due to invalid credentials.'
+)]
 class SendCredentialNotificationsCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
-    /** @var string */
-    protected static $defaultName = 'oro:cron:imap-credential-notifications';
-
     private SyncCredentialsIssueManager $syncCredentialsIssueManager;
 
     public function __construct(SyncCredentialsIssueManager $syncCredentialsIssueManager)
@@ -37,7 +39,6 @@ class SendCredentialNotificationsCommand extends Command implements CronCommandS
     protected function configure()
     {
         $this
-            ->setDescription('Sends notifications if email origin sync failed due to invalid credentials.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command sends notifications

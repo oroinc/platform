@@ -10,6 +10,7 @@ use Oro\Bundle\TranslationBundle\Download\TranslationDownloader;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Helper\FileBasedLanguageHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,11 +22,12 @@ use Symfony\Component\Intl\Locales;
 /**
  * Downloads and updates translations.
  */
+#[AsCommand(
+    name: 'oro:translation:update',
+    description: 'Downloads and updates translations.'
+)]
 class OroTranslationUpdateCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:translation:update';
-
     private TranslationDownloader $translationDownloader;
     private ManagerRegistry $doctrine;
     private FileBasedLanguageHelper $fileBasedLanguageHelper;
@@ -48,7 +50,6 @@ class OroTranslationUpdateCommand extends Command
         $this
             ->addArgument('language', InputArgument::OPTIONAL, 'Language code')
             ->addOption('all', null, InputOption::VALUE_NONE, 'Update all installed languages')
-            ->setDescription('Downloads and updates translations.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command downloads and installs a new version of translations for a specified language:

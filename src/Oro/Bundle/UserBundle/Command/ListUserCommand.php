@@ -9,6 +9,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,11 +19,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Lists users.
  */
+#[AsCommand(
+    name: 'oro:user:list',
+    description: 'Lists users.'
+)]
 class ListUserCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:user:list';
-
     private ManagerRegistry $doctrine;
 
     public function __construct(ManagerRegistry $doctrine)
@@ -46,7 +48,6 @@ class ListUserCommand extends Command
                 'Role filter (use ANY for all)',
                 []
             )
-            ->setDescription('Lists users.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command lists users. By default it shows only the first 20 active (enabled) users.

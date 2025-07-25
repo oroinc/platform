@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,6 +14,10 @@ use Symfony\Requirements\Requirement;
 /**
  * Checks that the environment meets the application requirements.
  */
+#[AsCommand(
+    name: 'oro:check-requirements',
+    description: 'Checks that the environment meets the application requirements.'
+)]
 class CheckRequirementsCommand extends Command
 {
     protected const CATEGORY_MANDATORY_REQUIREMENTS = 'mandatory-requirements';
@@ -26,8 +31,6 @@ class CheckRequirementsCommand extends Command
         self::CATEGORY_ORO_REQUIREMENTS => 'Oro specific requirements',
         self::CATEGORY_RECOMMENDATIONS => 'Optional recommendations'
     ];
-
-    protected static $defaultName = 'oro:check-requirements';
 
     protected iterable $providersIterator;
 
@@ -43,7 +46,6 @@ class CheckRequirementsCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Checks that the environment meets the application requirements.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command checks that the environment meets the application requirements.

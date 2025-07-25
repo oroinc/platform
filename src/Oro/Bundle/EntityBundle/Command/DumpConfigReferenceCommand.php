@@ -6,6 +6,7 @@ namespace Oro\Bundle\EntityBundle\Command;
 
 use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,17 +15,17 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Dumps the reference structure for Resources/config/oro/entity.yml.
  */
+#[AsCommand(
+    name: 'oro:entity:config:dump-reference',
+    description: 'Dumps the reference structure for Resources/config/oro/entity.yml.'
+)]
 class DumpConfigReferenceCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:entity:config:dump-reference';
-
     /** @noinspection PhpMissingParentCallCommonInspection */
     #[\Override]
     protected function configure()
     {
         $this
-            ->setDescription('Dumps the reference structure for Resources/config/oro/entity.yml.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command dumps the reference structure

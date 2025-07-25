@@ -73,7 +73,6 @@ class ActualizeCountriesRegionsCommand extends Command
                 InputOption::VALUE_NONE,
                 'Remove countries and regions from our storage'
             )
-            ->setDescription('Actualize countries and regions data')
             ->setHelp(
                 // @codingStandardsIgnoreStart
                 <<<'HELP'

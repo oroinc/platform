@@ -6,6 +6,7 @@ namespace Oro\Bundle\ThemeBundle\Command;
 
 use Oro\Bundle\ThemeBundle\Model\Theme;
 use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,11 +14,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Lists available themes.
  */
+#[AsCommand(
+    name: 'oro:theme:list',
+    description: 'Lists available themes.'
+)]
 class ThemeCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:theme:list';
-
     private ThemeRegistry $themeRegistry;
 
     public function __construct(ThemeRegistry $themeRegistry)
@@ -31,7 +33,6 @@ class ThemeCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Lists available themes.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command lists available themes.

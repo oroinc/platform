@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -60,7 +59,6 @@ class ChangeRelationshipProcessorTestCase extends TestCase
     {
         $validator = Validation::createValidatorBuilder()
             ->enableAttributeMapping()
-            ->setDoctrineAnnotationReader(new AnnotationReader())
             ->getValidator();
 
         return [new ValidatorExtension($validator)];

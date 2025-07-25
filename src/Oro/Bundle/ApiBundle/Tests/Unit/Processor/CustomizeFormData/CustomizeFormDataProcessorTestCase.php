@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGrantedValidator;
@@ -74,7 +73,6 @@ class CustomizeFormDataProcessorTestCase extends TestCase
 
         $validator = Validation::createValidatorBuilder()
             ->enableAttributeMapping()
-            ->setDoctrineAnnotationReader(new AnnotationReader())
             ->setConstraintValidatorFactory(
                 new ContainerConstraintValidatorFactory($constraintValidatorFactoryContainer)
             )

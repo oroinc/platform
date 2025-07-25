@@ -7,6 +7,7 @@ namespace Oro\Bundle\AttachmentBundle\Command;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Migration\FilteredAttachmentMigrationServiceInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,11 +15,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Migrates filtered attachments to the new directory structure.
  */
+#[AsCommand(
+    name: 'oro:attachment:migrate-directory-structure',
+    description: 'Migrates filtered attachments to the new directory structure.'
+)]
 class MigrateImagesCommand extends Command
 {
-    /** * @var string */
-    protected static $defaultName = 'oro:attachment:migrate-directory-structure';
-
     private ManagerRegistry $registry;
     private FilteredAttachmentMigrationServiceInterface $migrationService;
 
@@ -41,7 +43,6 @@ class MigrateImagesCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Migrates filtered attachments to the new directory structure.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command migrates filtered attachments

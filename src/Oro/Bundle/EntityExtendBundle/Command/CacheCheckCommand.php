@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,10 +14,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Prepares extended entity configs for processing by other commands.
  */
+#[AsCommand(
+    name: 'oro:entity-extend:cache:check',
+    description: 'Prepares extended entity configs for processing by other commands.',
+    hidden: true
+)]
 class CacheCheckCommand extends Command
 {
-    protected static $defaultName = 'oro:entity-extend:cache:check';
-
     private ExtendConfigDumper $extendConfigDumper;
 
     public function __construct(ExtendConfigDumper $extendConfigDumper)
@@ -32,8 +36,6 @@ class CacheCheckCommand extends Command
     {
         $this
             ->addOption('cache-dir', null, InputOption::VALUE_REQUIRED, 'Cache directory')
-            ->setHidden(true)
-            ->setDescription('Prepares extended entity configs for processing by other commands.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command makes sure that extended entity configs

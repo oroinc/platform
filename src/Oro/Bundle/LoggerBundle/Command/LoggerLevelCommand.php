@@ -9,6 +9,7 @@ use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Psr\Log\LogLevel;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,11 +20,12 @@ use Symfony\Contracts\Cache\CacheInterface;
 /**
  * Temporarily changes the configured logging level.
  */
+#[AsCommand(
+    name: 'oro:logger:level',
+    description: 'Temporarily changes the configured logging level.'
+)]
 class LoggerLevelCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:logger:level';
-
     private ConfigManager $globalConfigManager;
     private ConfigManager $userConfigManager;
     private CacheInterface $cache;
@@ -62,7 +64,6 @@ class LoggerLevelCommand extends Command
             ->addArgument('level', InputArgument::REQUIRED, 'Log level (warning, notice, info, debug)')
             ->addArgument('disable-after', InputArgument::REQUIRED, 'Disable logging after specified time interval')
             ->addOption('user', 'u', InputOption::VALUE_REQUIRED, 'Email of existing user')
-            ->setDescription('Temporarily changes the configured logging level.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command temporarily increases the configured logging level for

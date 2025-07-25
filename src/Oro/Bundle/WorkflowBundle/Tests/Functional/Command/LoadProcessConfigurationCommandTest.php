@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Command;
 
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\WorkflowBundle\Command\LoadProcessConfigurationCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Component\Testing\ReflectionUtil;
@@ -28,7 +27,7 @@ class LoadProcessConfigurationCommandTest extends WebTestCase
         $definitionsBefore = $this->getRepository(ProcessDefinition::class)->findAll();
         $triggersBefore = $this->getRepository(ProcessTrigger::class)->findAll();
 
-        $result = $this->runCommand(LoadProcessConfigurationCommand::getDefaultName());
+        $result = $this->runCommand('oro:process:configuration:load');
 
         $this->assertNotEmpty($result);
         foreach ($expectedMessages as $message) {

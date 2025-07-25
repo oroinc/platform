@@ -13,6 +13,7 @@ use Oro\Bundle\BatchBundle\Job\DoctrineJobRepository;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\CronBundle\Command\CronCommandActivationInterface;
 use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -21,14 +22,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Deletes old batch job records.
  */
+#[AsCommand(
+    name: 'oro:cron:batch:cleanup',
+    description: 'Deletes old batch job records.'
+)]
 class CleanupCommand extends Command implements
     CronCommandScheduleDefinitionInterface,
     CronCommandActivationInterface
 {
     public const FLUSH_BATCH_SIZE = 100;
-
-    /** @var string */
-    protected static $defaultName = 'oro:cron:batch:cleanup';
 
     private DoctrineJobRepository $doctrineJobRepository;
     private string $batchCleanupInterval;
@@ -71,7 +73,6 @@ class CleanupCommand extends Command implements
                 InputOption::VALUE_OPTIONAL,
                 'Time interval to keep the batch records (e.g. "2 weeks")'
             )
-            ->setDescription('Deletes old batch job records.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command deletes old batch job records.

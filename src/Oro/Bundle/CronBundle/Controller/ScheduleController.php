@@ -6,7 +6,7 @@ use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * The controller for Schedule entity.

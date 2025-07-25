@@ -10,6 +10,7 @@ use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\LimitsExtensionsCommandTrait;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,12 +20,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Processes messages from the message-queue.
  */
+#[AsCommand(
+    name: 'oro:message-queue:consume',
+    description: 'Processes messages from the message-queue.'
+)]
 class ConsumeMessagesCommand extends Command
 {
     use LimitsExtensionsCommandTrait;
-
-    /** @var string */
-    protected static $defaultName = 'oro:message-queue:consume';
 
     protected QueueConsumer $queueConsumer;
 
@@ -46,7 +48,6 @@ class ConsumeMessagesCommand extends Command
     {
         $this
             ->addArgument('clientDestinationName', InputArgument::OPTIONAL, 'Queues to consume messages from')
-            ->setDescription('Processes messages from the message-queue.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command processes messages from the message-queue

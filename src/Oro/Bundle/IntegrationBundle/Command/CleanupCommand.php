@@ -14,6 +14,7 @@ use Oro\Bundle\CronBundle\Command\CronCommandActivationInterface;
 use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -22,6 +23,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Deletes old integration status records.
  */
+#[AsCommand(
+    name: 'oro:cron:integration:cleanup',
+    description: 'Deletes old integration status records.'
+)]
 class CleanupCommand extends Command implements
     CronCommandScheduleDefinitionInterface,
     CronCommandActivationInterface
@@ -29,9 +34,6 @@ class CleanupCommand extends Command implements
     public const BATCH_SIZE = 100;
     public const FAILED_STATUSES_INTERVAL = '1 month';
     public const DEFAULT_COMPLETED_STATUSES_INTERVAL =  '1 week';
-
-    /** @var string */
-    protected static $defaultName = 'oro:cron:integration:cleanup';
 
     private ManagerRegistry $doctrine;
     private NativeQueryExecutorHelper $nativeQueryExecutorHelper;
@@ -78,7 +80,6 @@ class CleanupCommand extends Command implements
                 'Time interval to keep the batch records (e.g. "2 weeks")',
                 self::DEFAULT_COMPLETED_STATUSES_INTERVAL
             )
-            ->setDescription('Deletes old integration status records.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command deletes completed integration status records

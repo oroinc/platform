@@ -6,6 +6,7 @@ namespace Oro\Bundle\TranslationBundle\Command;
 
 use Oro\Bundle\TranslationBundle\Cache\RebuildTranslationCacheProcessor;
 use Oro\Bundle\TranslationBundle\Translation\TranslationMessageSanitizationErrorCollection;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -15,11 +16,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Rebuilds the translation cache.
  */
+#[AsCommand(
+    name: 'oro:translation:rebuild-cache',
+    description: 'Rebuilds the translation cache.'
+)]
 class OroTranslationRebuildCacheCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:translation:rebuild-cache';
-
     private RebuildTranslationCacheProcessor $rebuildTranslationCacheProcessor;
     private TranslationMessageSanitizationErrorCollection $sanitizationErrorCollection;
 
@@ -37,7 +39,6 @@ class OroTranslationRebuildCacheCommand extends Command
     public function configure()
     {
         $this
-            ->setDescription('Rebuilds the translation cache.')
             ->addOption(
                 'show-sanitization-errors',
                 null,

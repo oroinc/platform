@@ -7,6 +7,7 @@ namespace Oro\Bundle\CronBundle\Command;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\CronBundle\Entity\Schedule;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,11 +16,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Updates cron commands definitions stored in the database.
  */
+#[AsCommand(
+    name: 'oro:cron:definitions:load',
+    description: 'Updates cron commands definitions stored in the database.'
+)]
 class CronDefinitionsLoadCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:cron:definitions:load';
-
     private ManagerRegistry $doctrine;
 
     public function __construct(ManagerRegistry $doctrine)
@@ -33,7 +35,7 @@ class CronDefinitionsLoadCommand extends Command
     #[\Override]
     protected function configure()
     {
-        $this->setDescription('Updates cron commands definitions stored in the database.')
+        $this
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command updates cron commands definitions stored in the database.

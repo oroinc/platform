@@ -1,6 +1,6 @@
 oro_segment:
     resource:     "@OroSegmentBundle/Controller"
-    type:         annotation
+    type:         attribute
     prefix:       /segment
 
 

@@ -4,6 +4,7 @@ namespace Oro\Bundle\FeatureToggleBundle\Command;
 
 use Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,11 +13,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Dumps the reference structure for "Resources/config/oro/features.yml".
  */
+#[AsCommand(
+    name: 'oro:feature-toggle:config:dump-reference',
+    description: 'Dumps the reference structure for Resources/config/oro/features.yml.'
+)]
 class ConfigDumpReferenceCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:feature-toggle:config:dump-reference';
-
     private FeatureToggleConfiguration $configuration;
 
     public function __construct(FeatureToggleConfiguration $configuration)
@@ -29,7 +31,6 @@ class ConfigDumpReferenceCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Dumps the reference structure for Resources/config/oro/features.yml.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command dumps the reference structure

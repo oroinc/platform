@@ -8,6 +8,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,11 +17,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Clears old navigation history.
  */
+#[AsCommand(
+    name: 'oro:navigation:history:clear',
+    description: 'Clears old navigation history.'
+)]
 class ClearNavigationHistoryCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
-    /** @var string */
-    protected static $defaultName = 'oro:navigation:history:clear';
-
     private const DEFAULT_INTERVAL = '1 day';
 
     private ManagerRegistry $doctrine;
@@ -45,7 +47,6 @@ class ClearNavigationHistoryCommand extends Command implements CronCommandSchedu
     {
         $this
             ->addOption('interval', 'i', InputOption::VALUE_OPTIONAL, 'Relative date/time')
-            ->setDescription('Clears old navigation history.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command clears old navigation history.

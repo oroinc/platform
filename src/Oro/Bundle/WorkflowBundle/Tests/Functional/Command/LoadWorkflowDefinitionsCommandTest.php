@@ -6,8 +6,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Command;
 
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand;
-use Oro\Bundle\WorkflowBundle\Command\LoadWorkflowDefinitionsCommand;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
@@ -88,7 +86,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
                     'Loading workflow definitions...',
                     sprintf(
                         "Please run command '%s' to load translations.",
-                        OroTranslationLoadCommand::getDefaultName()
+                        'oro:translation:load'
                     )
                 ],
                 'expectedDefinitions' => [
@@ -147,7 +145,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
             '/Tests/Functional/Command/DataFixtures/ValidDefinitionsVerbosityNormal'
         );
 
-        $output = $this->runCommand(LoadWorkflowDefinitionsCommand::getDefaultName());
+        $output = $this->runCommand('oro:workflow:definitions:load');
 
         self::assertStringContainsString('Loading workflow definitions...', $output);
         self::assertStringContainsString('Done.', $output);
@@ -161,7 +159,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
             $output,
             sprintf(
                 '"%s -v" should not dump workflow configuration to output.',
-                LoadWorkflowDefinitionsCommand::getDefaultName()
+                'oro:workflow:definitions:load'
             )
         );
     }
@@ -170,7 +168,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
     {
         $this->configFinderBuilder->setSubDirectory('/Tests/Functional/Command/DataFixtures/ValidDefinitionsVerbose');
 
-        $output = $this->runCommand(LoadWorkflowDefinitionsCommand::getDefaultName(), ['-v']);
+        $output = $this->runCommand('oro:workflow:definitions:load', ['-v']);
 
         self::assertStringContainsString('Loading workflow definitions...', $output);
         self::assertStringContainsString('Done.', $output);
@@ -184,7 +182,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
             $output,
             sprintf(
                 '"%s -v" should not dump workflow configuration to output.',
-                LoadWorkflowDefinitionsCommand::getDefaultName()
+                'oro:workflow:definitions:load'
             )
         );
     }
@@ -195,7 +193,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
             '/Tests/Functional/Command/DataFixtures/ValidDefinitionsVeryVerbose'
         );
 
-        $output = $this->runCommand(LoadWorkflowDefinitionsCommand::getDefaultName(), ['-vv']);
+        $output = $this->runCommand('oro:workflow:definitions:load', ['-vv']);
 
         self::assertStringContainsString('Loading workflow definitions...', $output);
         self::assertStringContainsString('Done.', $output);
@@ -209,7 +207,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
             $output,
             sprintf(
                 '"%s -vv" should not dump workflow configuration to output.',
-                LoadWorkflowDefinitionsCommand::getDefaultName()
+                'oro:workflow:definitions:load'
             )
         );
     }
@@ -218,7 +216,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
     {
         $this->configFinderBuilder->setSubDirectory('/Tests/Functional/Command/DataFixtures/ValidDefinitionsDebug');
 
-        $output = $this->runCommand(LoadWorkflowDefinitionsCommand::getDefaultName(), ['-vvv']);
+        $output = $this->runCommand('oro:workflow:definitions:load', ['-vvv']);
 
         self::assertStringContainsString('Loading workflow definitions...', $output);
         self::assertStringContainsString('Done.', $output);
@@ -232,7 +230,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
             $output,
             sprintf(
                 '"%s -vvv" should output workflow configuration dump.',
-                LoadWorkflowDefinitionsCommand::getDefaultName()
+                'oro:workflow:definitions:load'
             )
         );
     }
@@ -250,7 +248,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 
     private function assertCommandExecuted(array $messages): void
     {
-        $output = $this->runCommand(LoadWorkflowDefinitionsCommand::getDefaultName());
+        $output = $this->runCommand('oro:workflow:definitions:load');
 
         $this->assertNotEmpty($output);
         foreach ($messages as $message) {

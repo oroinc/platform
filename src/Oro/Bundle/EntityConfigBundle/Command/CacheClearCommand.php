@@ -6,6 +6,7 @@ namespace Oro\Bundle\EntityConfigBundle\Command;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigCacheWarmer;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,11 +15,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Clears the entity config cache.
  */
+#[AsCommand(
+    name: 'oro:entity-config:cache:clear',
+    description: 'Clears the entity config cache.'
+)]
 class CacheClearCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:entity-config:cache:clear';
-
     private ConfigManager $configManager;
     private ConfigCacheWarmer $configCacheWarmer;
 
@@ -36,7 +38,6 @@ class CacheClearCommand extends Command
     {
         $this
             ->addOption('no-warmup', null, InputOption::VALUE_NONE, 'Do not warm up the cache.')
-            ->setDescription('Clears the entity config cache.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command clears the entity config cache.

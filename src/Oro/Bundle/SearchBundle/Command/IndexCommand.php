@@ -7,6 +7,7 @@ namespace Oro\Bundle\SearchBundle\Command;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,11 +16,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Updates search index for specified entities.
  */
+#[AsCommand(
+    name: 'oro:search:index',
+    description: 'Updates search index for specified entities.'
+)]
 class IndexCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:search:index';
-
     private ManagerRegistry $registry;
     private IndexerInterface $asyncIndexer;
 
@@ -42,7 +44,6 @@ class IndexCommand extends Command
                 InputArgument::REQUIRED | InputArgument::IS_ARRAY,
                 'IDs of the entities to reindex'
             )
-            ->setDescription('Updates search index for specified entities.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command updates search index for specified entities.

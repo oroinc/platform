@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\MaintenanceBundle\Tests\Functional\Command;
 
-use Oro\Bundle\MaintenanceBundle\Command\MaintenanceLockCommand;
-use Oro\Bundle\MaintenanceBundle\Command\MaintenanceUnlockCommand;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Command\CommandTestingTrait;
 
@@ -21,7 +19,7 @@ class MaintenanceLockUnlockCommandTest extends WebTestCase
     {
         $this->assertResponseCode(200);
 
-        $commandTester = $this->doExecuteCommand(MaintenanceLockCommand::getDefaultName());
+        $commandTester = $this->doExecuteCommand('oro:maintenance:lock');
 
         $this->assertOutputContains($commandTester, 'Maintenance mode is turned on.');
         $this->assertResponseCode(503);
@@ -32,7 +30,7 @@ class MaintenanceLockUnlockCommandTest extends WebTestCase
      */
     public function testMaintenanceUnlock(): void
     {
-        $commandTester = $this->doExecuteCommand(MaintenanceUnlockCommand::getDefaultName());
+        $commandTester = $this->doExecuteCommand('oro:maintenance:unlock');
 
         $this->assertOutputContains($commandTester, 'Maintenance mode is turned off.');
         $this->assertResponseCode(200);
@@ -40,22 +38,22 @@ class MaintenanceLockUnlockCommandTest extends WebTestCase
 
     public function testMaintenanceLockWhenAlreadyEnabled(): void
     {
-        $this->doExecuteCommand(MaintenanceLockCommand::getDefaultName());
+        $this->doExecuteCommand('oro:maintenance:lock');
 
-        $commandTester = $this->doExecuteCommand(MaintenanceLockCommand::getDefaultName());
+        $commandTester = $this->doExecuteCommand('oro:maintenance:lock');
 
         $this->assertOutputContains($commandTester, 'Maintenance mode is already enabled.');
         $this->assertSuccessReturnCode($commandTester);
         $this->assertResponseCode(503);
 
-        $this->doExecuteCommand(MaintenanceUnlockCommand::getDefaultName());
+        $this->doExecuteCommand('oro:maintenance:unlock');
     }
 
     public function testMaintenanceUnlockWhenAlreadyDisabled(): void
     {
-        $this->doExecuteCommand(MaintenanceUnlockCommand::getDefaultName());
+        $this->doExecuteCommand('oro:maintenance:unlock');
 
-        $commandTester = $this->doExecuteCommand(MaintenanceUnlockCommand::getDefaultName());
+        $commandTester = $this->doExecuteCommand('oro:maintenance:unlock');
 
         $this->assertOutputContains($commandTester, 'Maintenance mode is already disabled.');
         $this->assertSuccessReturnCode($commandTester);

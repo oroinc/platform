@@ -39,11 +39,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'gos:websocket:server', description: 'Starts the websocket server')]
 final class WebsocketServerCommand extends Command
 {
-    /**
-     * @var string|null
-     */
-    protected static $defaultName = 'gos:websocket:server';
-
     private ServerLauncherInterface $serverLauncher;
 
     private string $host;
@@ -80,7 +75,6 @@ final class WebsocketServerCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Starts the websocket server')
             ->addArgument(
                 'name',
                 InputArgument::OPTIONAL,

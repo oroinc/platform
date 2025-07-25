@@ -6,7 +6,6 @@ use Oro\Bundle\CacheBundle\Action\DataStorage\InvalidateCacheDataStorage;
 use Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheScheduleArgumentsBuilderInterface;
 use Oro\Bundle\CacheBundle\Action\Provider\InvalidateCacheTimeProvider;
 use Oro\Bundle\CacheBundle\Action\Transformer\DateTimeToStringTransformerInterface;
-use Oro\Bundle\CacheBundle\Command\InvalidateCacheScheduleCommand;
 use Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -45,7 +44,7 @@ class InvalidateCacheTimeProviderTest extends TestCase
 
         $this->scheduleManager->expects(self::once())
             ->method('getSchedulesByCommandAndArguments')
-            ->with(InvalidateCacheScheduleCommand::getDefaultName(), $args)
+            ->with('oro:cache:invalidate:schedule', $args)
             ->willReturn([$schedule]);
 
         $this->cronFormatTransformer->expects(self::once())
@@ -68,7 +67,7 @@ class InvalidateCacheTimeProviderTest extends TestCase
 
         $this->scheduleManager->expects(self::once())
             ->method('getSchedulesByCommandAndArguments')
-            ->with(InvalidateCacheScheduleCommand::getDefaultName(), $args)
+            ->with('oro:cache:invalidate:schedule', $args)
             ->willReturn([]);
 
         $this->cronFormatTransformer->expects(self::never())

@@ -13,7 +13,7 @@ class DebugConditionCommandTest extends AbstractDebugCommandTestCase
     {
         self::assertNotEmpty($this->command->getDescription());
         self::assertNotEmpty($this->command->getHelp());
-        self::assertEquals(DebugConditionCommand::getDefaultName(), $this->command->getName());
+        self::assertEquals('oro:debug:condition', $this->command->getName());
     }
 
     #[\Override]

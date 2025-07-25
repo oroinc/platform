@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\WorkflowBundle\Command\LoadWorkflowDefinitionsCommand;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
@@ -21,7 +20,7 @@ abstract class WorkflowTestCase extends WebTestCase
         self::getContainer()->get('oro_workflow.configuration.workflow_config_finder.builder')
             ->setSubDirectory($directory);
 
-        return self::runCommand(LoadWorkflowDefinitionsCommand::getDefaultName(), [], true, true);
+        return self::runCommand('oro:workflow:definitions:load', [], true, true);
     }
 
     protected function getSystemWorkflowManager(): WorkflowManager

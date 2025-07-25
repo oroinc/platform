@@ -1,6 +1,6 @@
 oro_form_bundle:
     resource: "@OroFormBundle/Controller"
-    type: annotation
+    type: attribute
 
 #
 # OLD REST API ROUTES

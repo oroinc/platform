@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\EntityBundle\Command;
 
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,11 +13,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Displays entity aliases.
  */
+#[AsCommand(
+    name: 'oro:entity-alias:debug',
+    description: 'Displays entity aliases.'
+)]
 class EntityAliasDebugCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:entity-alias:debug';
-
     private EntityAliasResolver $entityAliasResolver;
 
     public function __construct(EntityAliasResolver $entityAliasResolver)
@@ -30,7 +32,6 @@ class EntityAliasDebugCommand extends Command
     public function configure()
     {
         $this
-            ->setDescription('Displays entity aliases.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command displays singular and plural aliases for entity classes.

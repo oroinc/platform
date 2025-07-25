@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\ApiBundle\Command;
 
 use Oro\Bundle\ApiBundle\Provider\CacheManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,11 +15,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Clears the API cache.
  */
+#[AsCommand(
+    name: 'oro:api:cache:clear',
+    description: 'Clears the API cache.'
+)]
 class CacheClearCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:api:cache:clear';
-
     private CacheManager $cacheManager;
 
     public function __construct(CacheManager $cacheManager)
@@ -34,7 +36,6 @@ class CacheClearCommand extends Command
     {
         $this
             ->addOption('no-warmup', null, InputOption::VALUE_NONE, 'Do not warm up the cache')
-            ->setDescription('Clears the API cache.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command clears the API cache. It is usually required

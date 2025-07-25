@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\Command\ImpersonateUserCommand;
 use Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
 use Oro\Component\Testing\Command\CommandOutputNormalizer;
@@ -28,7 +27,7 @@ class UserImpersonationTest extends WebTestCase
 
     private function runUserImpersonateCommand(string $username, string $route): CommandTester
     {
-        return $this->doExecuteCommand(ImpersonateUserCommand::getDefaultName(), [
+        return $this->doExecuteCommand('oro:user:impersonate', [
             'username' => $username,
             '--route' => $route
         ]);
@@ -48,7 +47,7 @@ class UserImpersonationTest extends WebTestCase
         if (1 !== preg_match($urlPattern, $output, $matches)) {
             $this->fail(sprintf(
                 'Cannot find URL in the output of the %s command',
-                ImpersonateUserCommand::getDefaultName()
+                'oro:user:impersonate'
             ));
         }
         $url = $matches[0];

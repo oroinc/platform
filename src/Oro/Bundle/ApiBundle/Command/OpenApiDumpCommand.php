@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Command;
 use Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Renderer\OpenApiRenderer;
 use Oro\Bundle\ApiBundle\Provider\OpenApiChoicesProvider;
 use Psr\Log\LogLevel;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,11 +17,12 @@ use Symfony\Component\ErrorHandler\BufferingLogger;
 /**
  * Dumps API documentation in OpenAPI format.
  */
+#[AsCommand(
+    name: 'oro:api:doc:open-api:dump',
+    description: 'Dumps API documentation in OpenAPI format.'
+)]
 class OpenApiDumpCommand extends Command
 {
-    protected static $defaultName = 'oro:api:doc:open-api:dump';
-    protected static $defaultDescription = 'Dumps API documentation in OpenAPI format.';
-
     private OpenApiRenderer $openApiRenderer;
     private OpenApiChoicesProvider $openApiChoicesProvider;
 

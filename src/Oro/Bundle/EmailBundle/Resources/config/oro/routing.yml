@@ -1,16 +1,16 @@
 oro_email:
     resource:     "@OroEmailBundle/Controller"
-    type:         annotation
+    type:         attribute
     prefix:       /email
 
 oro_email_dashboard:
     resource:     "@OroEmailBundle/Controller/Dashboard"
-    type:         annotation
+    type:         attribute
     prefix:       /dashboard
 
 oro_mailbox_config:
     resource:     "@OroEmailBundle/Controller/Configuration"
-    type:         annotation
+    type:         attribute
     prefix:       /config
 
 

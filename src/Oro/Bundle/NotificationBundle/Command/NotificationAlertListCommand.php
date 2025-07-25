@@ -10,6 +10,7 @@ use Oro\Bundle\NotificationBundle\Entity\NotificationAlert;
 use Oro\Bundle\NotificationBundle\Exception\NotificationAlertFetchFailedException;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,11 +21,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Lists notification alert records.
  */
+#[AsCommand(
+    name: 'oro:notification:alerts:list',
+    description: 'Lists notification alert records for given user and organization.'
+)]
 class NotificationAlertListCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:notification:alerts:list';
-
     private ManagerRegistry $registry;
     private TokenAccessor $tokenAccessor;
     private DateTimeFormatterInterface $dateTimeFormatter;
@@ -53,7 +55,6 @@ class NotificationAlertListCommand extends Command
             ->addOption('alert-type', null, InputOption::VALUE_OPTIONAL, 'Filter by alert type')
             ->addOption('summary', null, InputOption::VALUE_NONE, 'Group alerts by source, resource, alert type.')
             ->addOption('resolved', null, InputOption::VALUE_NONE, 'Include resolved notification alerts')
-            ->setDescription('Lists notification alert records for given user and organization.')
             ->addUsage('--current-user=<user-identifier> --current-organization=<organization-identifier>')
             ->setHelp(
                 <<<HELP

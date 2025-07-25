@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\EntityConfigBundle\Command;
 
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,11 +14,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Updates configuration data for entities.
  * Command uses config loader that utilizes DBAL based update approach.
  */
+#[AsCommand(
+    name: 'oro:entity-config:update',
+    description: 'Updates configuration data for entities.'
+)]
 class UpdateCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'oro:entity-config:update';
-
     private ConfigLoader $configLoader;
 
     public function __construct(ConfigLoader $configLoader)
@@ -32,7 +34,6 @@ class UpdateCommand extends Command
     public function configure()
     {
         $this
-            ->setDescription('Updates configuration data for entities.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command reads entities configuration 

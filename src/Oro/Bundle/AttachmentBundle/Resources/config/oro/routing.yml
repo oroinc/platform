@@ -1,6 +1,6 @@
 oro_attachment:
     resource:     "@OroAttachmentBundle/Controller/AttachmentController.php"
-    type:         annotation
+    type:         attribute
     prefix:       /
 
 oro_filtered_attachment:

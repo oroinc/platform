@@ -4,7 +4,6 @@ namespace Oro\Bundle\SecurityBundle\Tests\Functional\Command;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityRepository;
-use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
@@ -51,7 +50,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
 
         $this->appendPermissionConfig($this->provider, $newPermissions);
 
-        $result = $this->runCommand(LoadPermissionConfigurationCommand::getDefaultName());
+        $result = $this->runCommand('security:permission:configuration:load');
 
         self::assertStringContainsString('Configuration of permission PERMISSION.BAD.NAME is invalid:', $result);
     }
@@ -66,7 +65,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
 
         $permissionsBefore = $this->getRepository(Permission::class)->findAll();
 
-        $result = $this->runCommand(LoadPermissionConfigurationCommand::getDefaultName());
+        $result = $this->runCommand('security:permission:configuration:load');
         $this->assertNotEmpty($result);
 
         foreach ($expectedMessages as $message) {

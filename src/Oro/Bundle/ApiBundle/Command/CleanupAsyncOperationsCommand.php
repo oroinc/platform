@@ -11,6 +11,7 @@ use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,11 +20,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Deletes all obsolete asynchronous operations.
  */
+#[AsCommand(
+    name: 'oro:cron:api:async_operations:cleanup',
+    description: 'Deletes all obsolete asynchronous operations.'
+)]
 class CleanupAsyncOperationsCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
-    /** @var string */
-    protected static $defaultName = 'oro:cron:api:async_operations:cleanup';
-
     private int $operationLifetime;
     private int $cleanupProcessTimeout;
     private int $operationTimeout;
@@ -64,7 +66,6 @@ class CleanupAsyncOperationsCommand extends Command implements CronCommandSchedu
                 InputOption::VALUE_NONE,
                 'Show the number of obsolete asynchronous operations without deleting them'
             )
-            ->setDescription('Deletes all obsolete asynchronous operations.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command deletes all obsolete asynchronous operations.

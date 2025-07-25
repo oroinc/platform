@@ -1,6 +1,6 @@
 oro_organization_bundle:
     resource:     "@OroOrganizationBundle/Controller"
-    type:         annotation
+    type:         attribute
     prefix:       /organization
 
 

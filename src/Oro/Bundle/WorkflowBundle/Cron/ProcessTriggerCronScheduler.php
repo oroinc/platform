@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Cron;
 
-use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 /**
@@ -22,7 +21,7 @@ class ProcessTriggerCronScheduler extends AbstractTriggerCronScheduler
         }
 
         $this->deferredScheduler->addSchedule(
-            HandleProcessTriggerCommand::getDefaultName(),
+            'oro:process:handle-trigger',
             $this->buildArguments($trigger),
             $trigger->getCron()
         );
@@ -40,7 +39,7 @@ class ProcessTriggerCronScheduler extends AbstractTriggerCronScheduler
         }
 
         $this->deferredScheduler->removeSchedule(
-            HandleProcessTriggerCommand::getDefaultName(),
+            'oro:process:handle-trigger',
             $this->buildArguments($trigger),
             $trigger->getCron()
         );

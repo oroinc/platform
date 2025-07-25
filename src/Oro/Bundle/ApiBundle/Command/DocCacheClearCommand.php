@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\ApiBundle\Command;
 
 use Oro\Bundle\ApiBundle\Provider\CacheManager;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,12 +15,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Clears the API documentation cache.
  */
+#[AsCommand(
+    name: 'oro:api:doc:cache:clear',
+    description: 'Clears the API documentation cache.'
+)]
 class DocCacheClearCommand extends Command
 {
     private const ALL_VIEWS = 'all';
-
-    /** @var string */
-    protected static $defaultName = 'oro:api:doc:cache:clear';
 
     private CacheManager $cacheManager;
     /** @var string[] */
@@ -63,7 +65,6 @@ class DocCacheClearCommand extends Command
                 [self::ALL_VIEWS]
             )
             ->addOption('no-warmup', null, InputOption::VALUE_NONE, 'Do not warm up the cache.')
-            ->setDescription('Clears the API documentation cache.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command clears the API documentation cache for all views.
