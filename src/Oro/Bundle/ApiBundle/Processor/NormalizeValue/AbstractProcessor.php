@@ -53,7 +53,7 @@ abstract class AbstractProcessor implements ProcessorInterface
             $requirement = $this->getRequirement();
         }
         if ($context->isRangeAllowed()) {
-            $requirement = sprintf(
+            $requirement = \sprintf(
                 '%s|%s',
                 $requirement,
                 $this->getRangeRequirement($context->getRangeDelimiter())
@@ -72,7 +72,7 @@ abstract class AbstractProcessor implements ProcessorInterface
      */
     protected function getArrayRequirement(string $arrayDelimiter): string
     {
-        return sprintf('%1$s(%2$s%1$s)*', $this->getRequirement(), $arrayDelimiter);
+        return \sprintf('%1$s(%2$s%1$s)*', $this->getRequirement(), $arrayDelimiter);
     }
 
     /**
@@ -80,7 +80,7 @@ abstract class AbstractProcessor implements ProcessorInterface
      */
     protected function getRangeRequirement(string $rangeDelimiter): string
     {
-        return sprintf('%1$s%2$s%1$s', $this->getRequirement(), preg_quote($rangeDelimiter, '/'));
+        return \sprintf('%1$s%2$s%1$s', $this->getRequirement(), preg_quote($rangeDelimiter, '/'));
     }
 
     /**
@@ -120,7 +120,7 @@ abstract class AbstractProcessor implements ProcessorInterface
                 throw $e;
             }
             throw new \UnexpectedValueException(
-                sprintf('Expected an array of %s. Given "%s".', $this->getDataTypePluralString(), $value),
+                \sprintf('Expected an array of %s. Given "%s".', $this->getDataTypePluralString(), $value),
                 0,
                 $e
             );
@@ -144,7 +144,7 @@ abstract class AbstractProcessor implements ProcessorInterface
             $normalizedValues = $this->normalizeValues($values);
         } catch (\Exception $e) {
             throw new \UnexpectedValueException(
-                sprintf(
+                \sprintf(
                     'Expected a pair of %1$s (%3$s%4$s%3$s). Given "%2$s".',
                     $this->getDataTypePluralString(),
                     $value,
@@ -164,7 +164,7 @@ abstract class AbstractProcessor implements ProcessorInterface
     protected function validateValue(string $value): void
     {
         if (!preg_match('/^' . $this->getRequirement() . '$/', $value)) {
-            throw new \UnexpectedValueException(sprintf(
+            throw new \UnexpectedValueException(\sprintf(
                 'Expected %s value. Given "%s".',
                 $this->getDataTypeString(),
                 $value

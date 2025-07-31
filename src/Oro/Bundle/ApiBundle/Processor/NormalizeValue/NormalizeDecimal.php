@@ -38,12 +38,21 @@ class NormalizeDecimal extends AbstractProcessor
             $normalizedValue = '-0' . substr($normalizedValue, 1);
         }
 
+        if (str_contains($normalizedValue, '.') && str_ends_with($normalizedValue, '0')) {
+            $normalizedValue = rtrim($normalizedValue, '0');
+            if (str_ends_with($normalizedValue, '.')) {
+                $normalizedValue = substr($normalizedValue, 0, -1);
+            }
+        }
         if (((string)(float)$value) !== $normalizedValue) {
-            throw new \UnexpectedValueException(sprintf(
+            throw new \UnexpectedValueException(\sprintf(
                 'Expected %s value. Given "%s".',
                 $this->getDataTypeString(),
                 $value
             ));
+        }
+        if (!str_contains($normalizedValue, '.')) {
+            $normalizedValue .= '.0';
         }
 
         return $normalizedValue;

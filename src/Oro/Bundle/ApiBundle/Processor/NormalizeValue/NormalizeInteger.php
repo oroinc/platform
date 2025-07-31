@@ -33,7 +33,7 @@ class NormalizeInteger extends AbstractProcessor
     {
         $normalizedValue = (int)$value;
         if (((string)$normalizedValue) !== $value) {
-            throw new \UnexpectedValueException(sprintf(
+            throw new \UnexpectedValueException(\sprintf(
                 'Expected %s value. Given "%s".',
                 $this->getDataTypeString(),
                 $value

@@ -46,7 +46,7 @@ class NormalizeString extends AbstractProcessor
     {
         parent::validateValue($value);
         if (true !== $this->getOption('allow_empty') && '' === trim($value, ' ')) {
-            throw new \UnexpectedValueException(sprintf(
+            throw new \UnexpectedValueException(\sprintf(
                 'Expected %s value. Given "%s".',
                 $this->getDataTypeString(),
                 $value
