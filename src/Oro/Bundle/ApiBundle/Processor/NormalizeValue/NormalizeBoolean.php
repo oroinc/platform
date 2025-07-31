@@ -42,7 +42,7 @@ class NormalizeBoolean extends AbstractProcessor
                 return false;
         }
 
-        throw new \UnexpectedValueException(sprintf(
+        throw new \UnexpectedValueException(\sprintf(
             'Expected %s value. Given "%s".',
             $this->getDataTypeString(),
             $value

@@ -31,7 +31,7 @@ class NormalizeGuid implements ProcessorInterface
     {
         $requirement = self::REQUIREMENT;
         if ($context->isArrayAllowed()) {
-            $requirement = sprintf('%1$s(%2$s%1$s)*', $requirement, $context->getArrayDelimiter());
+            $requirement = \sprintf('%1$s(%2$s%1$s)*', $requirement, $context->getArrayDelimiter());
         }
         $context->setRequirement($requirement);
     }
@@ -55,7 +55,7 @@ class NormalizeGuid implements ProcessorInterface
     private function validateValue(string $value): void
     {
         if (!$this->isValidGuid($value)) {
-            throw new \UnexpectedValueException(sprintf('Expected GUID value. Given "%s".', $value));
+            throw new \UnexpectedValueException(\sprintf('Expected GUID value. Given "%s".', $value));
         }
     }
 
@@ -76,7 +76,7 @@ class NormalizeGuid implements ProcessorInterface
 
         foreach ($values as $val) {
             if (!$this->isValidGuid($val)) {
-                throw new \UnexpectedValueException(sprintf('Expected an array of GUIDs. Given "%s".', $value));
+                throw new \UnexpectedValueException(\sprintf('Expected an array of GUIDs. Given "%s".', $value));
             }
         }
 

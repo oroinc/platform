@@ -40,7 +40,7 @@ class NormalizeNumber extends AbstractProcessor
 
         $normalizedValue = (float)$value;
         if (((string)$normalizedValue) !== $normalizedSrcValue) {
-            throw new \UnexpectedValueException(sprintf(
+            throw new \UnexpectedValueException(\sprintf(
                 'Expected %s value. Given "%s".',
                 $this->getDataTypeString(),
                 $value
