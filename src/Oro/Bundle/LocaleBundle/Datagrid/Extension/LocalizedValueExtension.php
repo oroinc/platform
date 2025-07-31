@@ -105,45 +105,73 @@ class LocalizedValueExtension extends AbstractExtension
             return;
         }
 
-        $properties = $this->getProperties($config);
-
-        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $datasource->getQueryBuilder();
         $exprBuilder = $queryBuilder->expr();
-        foreach ($properties as $name => $definition) {
-            QueryBuilderUtil::checkIdentifier($name);
-            $propertyPath = $definition[LocalizedValueProperty::DATA_NAME_KEY];
+        $rootAlias = $config->getOrmQuery()->getRootAlias();
 
-            $shouldAllowEmpty = \array_key_exists(LocalizedValueProperty::ALLOW_EMPTY, $definition);
-            $joinType = $shouldAllowEmpty ? Join::LEFT_JOIN : Join::INNER_JOIN;
-
-            if (!str_contains($propertyPath, '.')) {
-                $propertyPath = sprintf('%s.%s', $rootEntityAlias, $propertyPath);
-            }
-
-            $this->joinDefaultLocalizedValue(
-                $queryBuilder,
-                $this->inflector->pluralize($propertyPath),
-                $this->inflector->pluralize($name),
-                $name,
-                $joinType
-            );
-
-            // in case of left join , use only default localization
-            if ($shouldAllowEmpty) {
-                $localizedEntityAliasValues = explode('.', $propertyPath);
-                $queryBuilder->andWhere(
-                    $exprBuilder->orX(
-                        $exprBuilder->isNotNull(QueryBuilderUtil::getField($this->inflector->pluralize($name), 'id')),
-                        $exprBuilder->isNull(QueryBuilderUtil::getField(reset($localizedEntityAliasValues), 'id'))
-                    )
-                );
-            }
-
-            if ($queryBuilder->getDQLPart('groupBy')) {
-                $queryBuilder->addGroupBy($name);
-            }
+        if (!$rootAlias) {
+            return;
         }
+
+        $properties = $this->getProperties($config);
+
+        foreach ($properties as $name => $definition) {
+            $this->processProperty($queryBuilder, $exprBuilder, $rootAlias, $name, $definition);
+        }
+    }
+
+    private function processProperty(QueryBuilder $qb, $expr, string $rootAlias, string $name, array $definition): void
+    {
+        QueryBuilderUtil::checkIdentifier($name);
+
+        $propertyPath = $this->normalizePropertyPath($definition, $rootAlias);
+        $allowEmpty = \array_key_exists(LocalizedValueProperty::ALLOW_EMPTY, $definition);
+        $joinType = $allowEmpty ? Join::LEFT_JOIN : Join::INNER_JOIN;
+
+        $this->joinDefaultLocalizedValue(
+            $qb,
+            $this->inflector->pluralize($propertyPath),
+            $this->inflector->pluralize($name),
+            $name,
+            $joinType
+        );
+
+        if ($allowEmpty) {
+            # In case of left join , use only default localization.
+            $this->applyEmptyOrDefaultCondition($qb, $expr, $propertyPath, $name);
+        }
+
+        if ($qb->getDQLPart('groupBy')) {
+            $qb->addGroupBy($name);
+        }
+    }
+
+    private function normalizePropertyPath(array $definition, string $rootAlias): string
+    {
+        $path = $definition[LocalizedValueProperty::DATA_NAME_KEY];
+
+        return str_contains($path, '.') ? $path : "$rootAlias.$path";
+    }
+
+    private function applyEmptyOrDefaultCondition(QueryBuilder $qb, $expr, string $propertyPath, string $name): void
+    {
+        $localizedAliasParts = explode('.', $propertyPath);
+        $pluralAlias = $this->inflector->pluralize($name);
+        $fallbackAlias = reset($localizedAliasParts);
+
+        $qb->andWhere(
+            $expr->orX(
+                $expr->andX(
+                    sprintf('%s IS EMPTY', $propertyPath),
+                    $expr->isNull(QueryBuilderUtil::getField($pluralAlias, 'id'))
+                ),
+                $expr->andX(
+                    sprintf('%s IS NOT EMPTY', $propertyPath),
+                    $expr->isNotNull(QueryBuilderUtil::getField($pluralAlias, 'id'))
+                ),
+                $expr->isNull(QueryBuilderUtil::getField($fallbackAlias, 'id'))
+            )
+        );
     }
 
     #[\Override]
