@@ -864,9 +864,9 @@ services:
     oro_entity_extend.accessor.property_access_factory:
         class: Oro\Bundle\EntityExtendBundle\PropertyAccess
         calls:
-            - [ 'setCacheItemPool', [ '@oro_entity_extend.accessor.cache_item_pool' ] ]
+            - [ 'setCacheItemPool', [ '@oro_entity_extend.accessor.cache' ] ]
 
-    oro_entity_extend.accessor.cache_item_pool:
+    oro_entity_extend.accessor.cache:
         parent: oro.data.cache
         tags:
             - { name: 'cache.pool', namespace: 'oro_entity_extend_property_accessor' }

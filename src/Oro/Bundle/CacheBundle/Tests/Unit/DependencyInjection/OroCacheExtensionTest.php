@@ -23,7 +23,7 @@ class OroCacheExtensionTest extends TestCase
 
         self::assertNotEmpty($container->getDefinitions());
 
-        self::assertTrue($container->hasDefinition('oro.cache.serializer.mapping.cache_warmer'));
+        self::assertTrue($container->hasDefinition('oro_cache.serializer.mapping.cache_warmer'));
         self::assertEquals(
             new Definition(ClassMetadataFactory::class, [new Definition(LoaderChain::class, [[]])]),
             $container->getDefinition('oro.cache.serializer.mapping.factory.class_metadata')

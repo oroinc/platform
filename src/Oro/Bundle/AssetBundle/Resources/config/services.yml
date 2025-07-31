@@ -70,7 +70,7 @@ services:
         tags:
             - { name: twig.extension }
 
-    oro_asset.cache.integrity_pool:
+    oro_asset.cache.integrity:
         parent: cache.system
         tags:
             - cache.pool
@@ -80,7 +80,7 @@ services:
         factory: [ Symfony\Component\Cache\Adapter\PhpArrayAdapter, create ]
         arguments:
             - '%kernel.cache_dir%/subresource_integrity_cache.php'
-            - '@oro_asset.cache.integrity_pool'
+            - '@oro_asset.cache.integrity'
 
     oro_asset.cache.subresource_integrity_cache_warmer:
         class: Oro\Bundle\AssetBundle\Cache\SubresourceIntegrityCacheWarmer
