@@ -23,6 +23,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class FileController extends AbstractController
 {
+    public const int CACHE_CONTROL_DEFAULT_MAX_AGE = 3600;
+
     public function getFileAction(int $id, string $filename, string $action, Request $request): Response
     {
         $file = $this->getFileById($id);
@@ -59,6 +61,15 @@ class FileController extends AbstractController
     ): Response {
         $file = $this->getFileById($id);
         $this->unlockSession($request);
+        $response = new Response();
+        $sessionConfig = $this->getParameter('session.storage.options');
+        $imageMaxLifetime = \array_key_exists('cookie_lifetime', $sessionConfig)
+            ? $sessionConfig['cookie_lifetime']
+            : $sessionConfig['gc_maxlifetime'];
+
+        if ($imageMaxLifetime > self::CACHE_CONTROL_DEFAULT_MAX_AGE) {
+            $imageMaxLifetime = self::CACHE_CONTROL_DEFAULT_MAX_AGE;
+        }
 
         try {
             $this->assertValidResizedImageName($file, $filename, $width, $height);
@@ -81,11 +92,17 @@ class FileController extends AbstractController
             );
         }
 
-        if (!isset($binary)) {
-            throw $this->createNotFoundException();
+        if (isset($binary)) {
+            $response->setContent($binary->getContent());
+            $response->headers->set('Content-Type', $binary->getMimeType());
+            $response->headers->set('Content-Length', strlen($binary->getContent()));
+            $response->headers->set('Cache-Control', sprintf('max-age=%d, public', $imageMaxLifetime));
+            $response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, true);
+
+            return $response;
         }
 
-        return new Response($binary->getContent(), Response::HTTP_OK, ['Content-Type' => $binary->getMimeType()]);
+        throw $this->createNotFoundException();
     }
 
     public function getFilteredImageAction(int $id, string $filter, string $filename, Request $request): Response
@@ -135,11 +152,11 @@ class FileController extends AbstractController
             $imageMaxAge = \array_key_exists('cookie_lifetime', $sessionConfig)
                 ? $sessionConfig['cookie_lifetime']
                 : $sessionConfig['gc_maxlifetime'];
-            if ($imageMaxAge > 3600) {
-                $imageMaxAge = 3600;
+            if ($imageMaxAge > self::CACHE_CONTROL_DEFAULT_MAX_AGE) {
+                $imageMaxAge = self::CACHE_CONTROL_DEFAULT_MAX_AGE;
             }
 
-            $response->headers->set('Cache-Control', sprintf('public, max-age=%d', $imageMaxAge));
+            $response->headers->set('Cache-Control', sprintf('max-age=%d, public', $imageMaxAge));
         }
 
         return $response;
