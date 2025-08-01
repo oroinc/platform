@@ -217,7 +217,6 @@ services:
             - { name: kernel.cache_warmer }
 
     oro_layout.expression_language.cache:
-        public: false
         parent: oro.data.cache
         tags:
             - { name: 'cache.pool', namespace: 'oro_layout_expression_language' }

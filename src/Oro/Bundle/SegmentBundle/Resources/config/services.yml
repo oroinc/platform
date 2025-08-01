@@ -45,7 +45,6 @@ services:
 
     oro_segment.query.segment_query_cache:
         parent: oro.cache.adapter.array
-        public: true
         tags:
             - { name: 'cache.pool', namespace: 'oro_segment_query_cache' }
 

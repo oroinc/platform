@@ -196,9 +196,8 @@ services:
 
     oro_entity.virtual_field_provider.cache.dictionary:
         parent: oro.data.cache.without_memory_cache
-        public: false
         tags:
-              - { name: 'cache.pool', namespace: 'oro_dictionary_virtual_fields' }
+            - { name: 'cache.pool', namespace: 'oro_dictionary_virtual_fields' }
 
     oro_entity.virtual_field_provider.dictionary:
         class: Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider
@@ -338,7 +337,6 @@ services:
 
     oro_entity.entity_alias_cache:
         parent: oro.data.cache.without_memory_cache
-        public: false
         tags:
             - { name: 'cache.pool', namespace: 'oro_entity_aliases' }
 
@@ -604,7 +602,6 @@ services:
 
     oro_entity.entity_structure_cache:
         parent: oro.data.cache
-        public: false
         tags:
             - { name: 'cache.pool', namespace: 'oro_entity_structure' }
 

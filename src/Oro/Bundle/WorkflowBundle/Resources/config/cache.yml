@@ -16,7 +16,6 @@ services:
             - '@doctrine'
 
     oro_workflow.cache.entities_with_workflow:
-        public: false
         parent: oro.data.cache
         tags:
             - { name: 'cache.pool', namespace: 'oro_workflow_entities_with_workflow' }
@@ -34,7 +33,6 @@ services:
             - [ setTriggerClassName, [ 'Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger' ] ]
 
     oro_workflow.cache:
-        public: false
         parent: oro.data.cache
         tags:
             - { name: 'cache.pool', namespace: 'oro_workflow' }

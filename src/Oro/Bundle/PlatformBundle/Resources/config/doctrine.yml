@@ -1,24 +1,20 @@
 services:
     doctrine.metadata.cache:
-        public: false
         parent: oro.data.cache.without_memory_cache
         tags:
             - { name: 'cache.pool', namespace: 'doctrine_metadata' }
 
     doctrine.query.cache:
-        public: false
         parent: oro.data.cache.without_memory_cache
         tags:
             - { name: 'cache.pool', namespace: 'doctrine_query' }
 
     doctrine.metadata.cache.config:
-        public: false
         parent: oro.data.cache.without_memory_cache
         tags:
             - { name: 'cache.pool', namespace: 'doctrine_metadata_config' }
 
     doctrine.query.cache.config:
-        public: false
         parent: oro.data.cache.without_memory_cache
         tags:
             - { name: 'cache.pool', namespace: 'doctrine_query_config' }

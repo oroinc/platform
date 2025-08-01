@@ -740,7 +740,6 @@ services:
             - { name: oro_message_queue.consumption.clearer, priority: -10 }
 
     oro_entity_extend.cache.enum_translation:
-        public: false
         parent: oro.data.cache
         tags:
             - { name: 'cache.pool', namespace: 'oro_entity_extend_enum_trans' }
@@ -936,7 +935,6 @@ services:
             - '%oro_entity_extend.custom_entities%'
 
     oro_entity_extend.cache.validator_mapping:
-        public: false
         parent: oro.data.cache
         tags:
             - { name: 'cache.pool', namespace: 'validator_mapping' }

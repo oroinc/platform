@@ -12,7 +12,6 @@ services:
             - [] # settings; they are set by Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass
 
     oro_config.cache:
-        public: false
         parent: oro.data.cache
         tags:
             - { name: 'cache.pool', namespace: 'oro_config' }
