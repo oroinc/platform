@@ -918,3 +918,12 @@ services:
         arguments:
             - '@oro_security.acl_query.cache_instantiator'
             - '@oro_security.acl_query.cache_user_info_provider'
+
+    Oro\Bundle\SecurityBundle\Provider\SymmetricCrypterCheckProvider:
+        class: Oro\Bundle\SecurityBundle\Provider\SymmetricCrypterCheckProvider
+        arguments:
+            - '@oro_config.manager'
+            - '@oro_distribution.handler.application_status'
+            - '@oro_security.encoder.default'
+        tags:
+            - { name: oro.requirements_provider }
