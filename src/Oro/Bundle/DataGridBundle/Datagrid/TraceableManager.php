@@ -65,22 +65,27 @@ class TraceableManager extends Manager implements ResetInterface
     {
         $request = $this->requestStack?->getCurrentRequest();
         $hash = $request ? spl_object_hash($request) : null;
-        $this->datagrids[$hash][$name][$key] = [
-            'configuration' => $datagrid->getConfig()->toArray(),
-            'resolved_metadata' => $datagrid->getResolvedMetadata()->toArray(),
-            'parameters' => $datagrid->getParameters()->all(),
-            'extensions' => array_map(
-                fn ($extension) => [
-                    'stub' => new ClassStub($extension::class),
-                    'priority' => $extension->getPriority(),
-                ],
-                $datagrid->getAcceptor()->getExtensions()
-            ),
-            'names' => [
-                ...$datagrid->getConfig()->offsetGetOr(SystemAwareResolver::KEY_EXTENDED_FROM, []),
-                $datagrid->getConfig()->getName()
-            ]
-        ];
+
+        if (!isset($this->datagrids[$hash][$name][$key])) {
+            $config = $datagrid->getConfig();
+
+            $this->datagrids[$hash][$name][$key] = [
+                'configuration' => $config->toArray(),
+                'resolved_metadata' => $datagrid->getResolvedMetadata()->toArray(),
+                'parameters' => $datagrid->getParameters()->all(),
+                'extensions' => array_map(
+                    fn ($extension) => [
+                        'stub' => new ClassStub($extension::class),
+                        'priority' => $extension->getPriority(),
+                    ],
+                    $datagrid->getAcceptor()->getExtensions()
+                ),
+                'names' => [
+                    ...$config->offsetGetOr(SystemAwareResolver::KEY_EXTENDED_FROM, []),
+                    $config->getName()
+                ]
+            ];
+        }
 
         return $datagrid;
     }
