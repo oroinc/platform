@@ -1,4 +1,4 @@
 services:
-    oro_reminder.test.behat.sender:
-        alias: 'oro_reminder.sender'
+    oro_reminder.behat.sender:
+        alias: oro_reminder.sender
         public: true

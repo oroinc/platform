@@ -81,7 +81,6 @@ services:
             - [ setBaseAclManager, [ '@oro_security.acl.base_manager' ] ]
 
     security.acl.cache.doctrine.cache_impl:
-        public: false
         parent: oro.data.cache
         tags:
             - { name: 'cache.pool', namespace: 'oro_acl' }
@@ -145,7 +144,6 @@ services:
             - '@security.acl.underlying.cache.doctrine.cache_impl'
 
     security.acl.underlying.cache.doctrine.cache_impl:
-        public: false
         parent: oro.data.cache
         tags:
             - { name: 'cache.pool', namespace: 'oro_acl_underlying' }
@@ -281,7 +279,6 @@ services:
             - '@oro_security.acl.group_provider.chain'
 
     oro_security.entity_security_metadata_provider.cache:
-        public: false
         parent: oro.data.cache
         tags:
             - { name: 'cache.pool', namespace: 'oro_acl_entities' }
@@ -437,7 +434,6 @@ services:
             - { name: oro_entity.database_checker }
 
     oro_security.ownership_tree_provider.cache:
-        public: false
         parent: oro.data.cache
         tags:
             - { name: 'cache.pool', namespace: 'oro_acl_owner_tree' }
@@ -922,3 +918,12 @@ services:
         arguments:
             - '@oro_security.acl_query.cache_instantiator'
             - '@oro_security.acl_query.cache_user_info_provider'
+
+    Oro\Bundle\SecurityBundle\Provider\SymmetricCrypterCheckProvider:
+        class: Oro\Bundle\SecurityBundle\Provider\SymmetricCrypterCheckProvider
+        arguments:
+            - '@oro_config.manager'
+            - '@oro_distribution.handler.application_status'
+            - '@oro_security.encoder.default'
+        tags:
+            - { name: oro.requirements_provider }

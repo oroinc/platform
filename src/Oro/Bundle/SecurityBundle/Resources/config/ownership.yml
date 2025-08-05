@@ -34,7 +34,6 @@ services:
 
     oro_security.owner.ownership_metadata_provider.cache:
         parent: oro.data.cache
-        public: false
         tags:
             - { name: 'cache.pool', namespace: 'oro_acl_entity_ownership' }
 

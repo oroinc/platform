@@ -426,9 +426,9 @@ services:
             - '@doctrine.orm.entity_manager'
 
     oro_email.cache:
-          parent: oro.data.cache
-          tags:
-              - { name: 'cache.pool', namespace: 'oro_email' }
+        parent: oro.data.cache
+        tags:
+          - { name: 'cache.pool', namespace: 'oro_email' }
 
     oro_email.listener.config_listener:
         class: Oro\Bundle\EmailBundle\EventListener\EntityConfigListener

@@ -73,7 +73,7 @@ services:
     oro_asset.cache.integrity:
         parent: cache.system
         tags:
-            - cache.pool
+            - { name: 'cache.pool', namespace: 'oro_asset_integrity' }
 
     oro_asset.cache.subresource_integrity_cache:
         class: Psr\Cache\CacheItemPoolInterface

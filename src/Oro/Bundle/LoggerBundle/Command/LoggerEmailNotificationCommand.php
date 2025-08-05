@@ -115,7 +115,8 @@ HELP
 
     protected function validateRecipients(string $recipients): array
     {
-        $emails = explode(';', $recipients);
+        // Trim brackets to prevents email validation errors
+        $emails = explode(';', \trim($recipients, "\"'"));
         $errors = [];
         foreach ($emails as $email) {
             $violations = $this->validator->validate($email, new Email());

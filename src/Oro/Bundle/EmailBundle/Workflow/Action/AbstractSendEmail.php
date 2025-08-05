@@ -68,6 +68,13 @@ abstract class AbstractSendEmail extends AbstractAction implements LoggerAwareIn
      */
     protected function validateEmailAddress(string $email, string $context = ''): void
     {
+        // Check if the email string contains a display name (e.g., '"John Doe" <john@example.com>')
+        // If so, extract only the pure email address for validation (e.g., john@example.com)
+        // This prevents email validation errors due to formatting
+        if ($this->emailAddressHelper->isFullEmailAddress($email)) {
+            $email = $this->emailAddressHelper->extractPureEmailAddress($email);
+        }
+
         $errorList = $this->validator->validate($email, new EmailConstraint());
 
         if ($errorList && $errorList->count() > 0) {
