@@ -6,7 +6,6 @@ services:
 
     oro_locale.cache.provider.tree_fallback_strategy:
         parent: oro.data.cache
-        public: false
         tags:
             - { name: 'cache.pool', namespace: 'oro_locale_tree_fallback_strategy' }
 

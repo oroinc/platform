@@ -30,7 +30,7 @@ class ReminderContext extends OroFeatureContext
     {
         self::assertNotEmpty($reminders, 'No reminders to send.');
 
-        $sender = $this->getAppContainer()->get('oro_reminder.test.behat.sender');
+        $sender = $this->getAppContainer()->get('oro_reminder.behat.sender');
 
         foreach ($reminders as $reminder) {
             $sender->push($reminder);

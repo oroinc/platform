@@ -84,7 +84,7 @@ services:
     oro_translation.cache:
         parent: oro.data.cache
         tags:
-            - { name: cache.pool, namespace: oro_translation }
+            - { name: 'cache.pool', namespace: 'oro_translation' }
 
     oro_translation.resource.cache:
         class: Oro\Bundle\CacheBundle\Provider\MemoryCache

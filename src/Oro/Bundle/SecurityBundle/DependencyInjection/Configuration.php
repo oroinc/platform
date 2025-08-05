@@ -3,26 +3,35 @@
 namespace Oro\Bundle\SecurityBundle\DependencyInjection;
 
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 
 class Configuration implements ConfigurationInterface
 {
+    protected const string ROOT_NODE = 'oro_security';
+    public const string SYSTEM_CHECK_CRYPTER_KEY = 'system_check_symmetric_crypter_key';
+    public const string SYMFONY_PROFILER_COLLECTION = 'symfony_profiler_collection_of_voter_decisions';
+
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder('oro_security');
+        $treeBuilder = new TreeBuilder(self::ROOT_NODE);
         $rootNode = $treeBuilder->getRootNode();
 
         SettingsBuilder::append(
             $rootNode,
             [
-                'symfony_profiler_collection_of_voter_decisions' => [
+                self::SYMFONY_PROFILER_COLLECTION => [
                     'value' => false
+                ],
+                self::SYSTEM_CHECK_CRYPTER_KEY => [
+                    'value' => '',
+                    'type' => 'string',
                 ],
             ]
         );
@@ -125,5 +134,10 @@ class Configuration implements ConfigurationInterface
         ->end();
 
         return $treeBuilder;
+    }
+
+    public static function getConfigKey(string $key): string
+    {
+        return TreeUtils::getConfigKey(self::ROOT_NODE, $key);
     }
 }

@@ -22,7 +22,6 @@ services:
 
     oro_report.cache:
           parent: oro.data.cache
-          public: false
           tags:
               - { name: 'cache.pool', namespace: 'oro_report' }
 

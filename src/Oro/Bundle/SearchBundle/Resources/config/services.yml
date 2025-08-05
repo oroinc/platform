@@ -169,7 +169,6 @@ services:
             - '%kernel.debug%'
 
     oro_search.cache.mapping_configuration:
-        public: false
         parent: oro.data.cache
         tags:
             - { name: 'cache.pool', namespace: 'oro_search_mapping_configuration' }
@@ -193,13 +192,11 @@ services:
             - { name: kernel.cache_warmer }
 
     oro_search.cache.doctrine_metadata:
-        public: false
         parent: oro.data.cache.without_memory_cache
         tags:
             - { name: 'cache.pool', namespace: 'doctrine_metadata_search' }
 
     oro_search.cache.doctrine_query:
-        public: false
         parent: oro.data.cache.without_memory_cache
         tags:
             - { name: 'cache.pool', namespace: 'doctrine_query_search' }
