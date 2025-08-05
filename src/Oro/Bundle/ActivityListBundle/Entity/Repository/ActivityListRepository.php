@@ -63,6 +63,11 @@ class ActivityListRepository extends EntityRepository
         $queryBuilder = $this->createQueryBuilder('activity')
             ->leftJoin('activity.' . $this->getAssociationName($entityClass), 'r')
             ->leftJoin('activity.activityOwners', 'ao');
+
+        if (empty($entityIds)) {
+            return $queryBuilder;
+        }
+
         if (count($entityIds) > 1) {
             $queryBuilder
                 ->where('r.id IN (:entityIds)')
