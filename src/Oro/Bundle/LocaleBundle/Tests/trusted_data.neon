@@ -4,6 +4,9 @@ trusted_data:
         Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository:
             getBatchIterator:
                 fieldName: true
+        Oro\Bundle\LocaleBundle\Datagrid\Extension\LocalizedValueExtension:
+            applyEmptyOrDefaultCondition:
+                whereExpr: true
     safe_methods:
         Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter:
             getFormattedNameDQL: true
