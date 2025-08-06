@@ -162,20 +162,19 @@ class LocalizedValueExtension extends AbstractExtension
         $localizedAliasParts = explode('.', $propertyPath);
         $pluralAlias = $this->inflector->pluralize($name);
         $fallbackAlias = reset($localizedAliasParts);
-
-        $qb->andWhere(
-            $expr->orX(
-                $expr->andX(
-                    sprintf('%s IS EMPTY', $propertyPath),
-                    $expr->isNull(QueryBuilderUtil::getField($pluralAlias, 'id'))
-                ),
-                $expr->andX(
-                    sprintf('%s IS NOT EMPTY', $propertyPath),
-                    $expr->isNotNull(QueryBuilderUtil::getField($pluralAlias, 'id'))
-                ),
-                $expr->isNull(QueryBuilderUtil::getField($fallbackAlias, 'id'))
-            )
+        $whereExpr = $expr->orX(
+            $expr->andX(
+                QueryBuilderUtil::sprintf('%s IS EMPTY', $propertyPath),
+                $expr->isNull(QueryBuilderUtil::getField($pluralAlias, 'id'))
+            ),
+            $expr->andX(
+                QueryBuilderUtil::sprintf('%s IS NOT EMPTY', $propertyPath),
+                $expr->isNotNull(QueryBuilderUtil::getField($pluralAlias, 'id'))
+            ),
+            $expr->isNull(QueryBuilderUtil::getField($fallbackAlias, 'id'))
         );
+
+        $qb->andWhere($whereExpr);
     }
 
     /**
