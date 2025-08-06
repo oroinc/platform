@@ -20,7 +20,8 @@ Oro\Bundle\UserBundle\Entity\User:
                 max: 255
                 allowEmptyString: false
                 groups: [UserForm, Registration]
-            - Email:        ~
+            - Email:
+                mode: strict
         plainPassword:
             - NotBlank:
                 groups:     [Registration, ResetPassword]
@@ -82,4 +83,5 @@ Oro\Bundle\UserBundle\Entity\Email:
         user:
             - NotBlank: ~
         email:
-            - Email: ~
+            - Email:
+                mode: strict

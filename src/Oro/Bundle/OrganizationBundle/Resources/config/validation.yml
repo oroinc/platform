@@ -22,7 +22,8 @@ Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
                 min: 6
                 max: 255
                 allowEmptyString: false
-            - Email: ~
+            - Email:
+                mode: strict
         website:
             - Url:
                 protocols: ['http', 'https']
