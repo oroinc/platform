@@ -21,7 +21,8 @@ Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
             - Length:
                 min: 6
                 max: 255
-            - Email: ~
+            - Email:
+                mode: strict
         website:
             - Url:
                 protocols: ['http', 'https']
