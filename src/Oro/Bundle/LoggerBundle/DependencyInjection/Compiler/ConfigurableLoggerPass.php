@@ -22,32 +22,27 @@ class ConfigurableLoggerPass implements CompilerPassInterface
     public const string DISABLE_DEPRECATIONS_WRAPPER_POSTFIX = '.disable_deprecations';
 
     #[\Override]
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $configuration = $container->getExtension('monolog')->getConfiguration([], $container);
         $config = (new Processor())->processConfiguration($configuration, $container->getExtensionConfig('monolog'));
-
         foreach ($config['handlers'] as $handlerName => $handlerConfig) {
-            $handlerId = $this->getHandlerId($handlerName);
-
+            $handlerId = 'monolog.handler.' . $handlerName;
             switch ($handlerConfig['type']) {
                 case 'fingers_crossed':
                     $container->getDefinition($handlerId)
                         ->setClass(ConfigurableFingersCrossedHandler::class)
-                        ->addMethodCall('setLogLevelConfig', [
-                            new Reference('oro_logger.log_level_config_provider')]);
+                        ->addMethodCall('setLogLevelConfig', [new Reference('oro_logger.log_level_config_provider')]);
                     $this->addDisableDeprecationsWrapper($container, $handlerId);
                     break;
                 case 'filter':
                     $disableWrapperServiceId = $handlerId . self::DISABLE_FILTER_WRAPPER_POSTFIX;
                     $container
                         ->register($disableWrapperServiceId, DisableFilterHandlerWrapper::class)
-                        ->setArguments(
-                            [
-                                new Reference('oro_logger.log_level_config_provider'),
-                                new Reference('.inner'),
-                            ]
-                        )
+                        ->setArguments([
+                            new Reference('oro_logger.log_level_config_provider'),
+                            new Reference('.inner'),
+                        ])
                         ->setDecoratedService($handlerId)
                         ->setPublic(false);
                     $this->addDisableDeprecationsWrapper($container, $handlerId);
@@ -61,12 +56,10 @@ class ConfigurableLoggerPass implements CompilerPassInterface
                     $disableWrapperServiceId = $handlerId . '.disable_wrapper';
                     $container
                         ->register($disableWrapperServiceId, DisableHandlerWrapper::class)
-                        ->setArguments(
-                            [
-                                new Reference('oro_logger.log_level_config_provider'),
-                                new Reference('.inner'),
-                            ]
-                        )
+                        ->setArguments([
+                            new Reference('oro_logger.log_level_config_provider'),
+                            new Reference('.inner'),
+                        ])
                         ->setDecoratedService($handlerId)
                         ->setPublic(false);
                     break;
@@ -74,13 +67,14 @@ class ConfigurableLoggerPass implements CompilerPassInterface
         }
     }
 
-    protected function addDisableDeprecationsWrapper(ContainerBuilder $container, string $handlerId): void
+    private function addDisableDeprecationsWrapper(ContainerBuilder $container, string $handlerId): void
     {
         if (!$container->hasParameter('oro_platform.collect_deprecations')
             || $container->getParameter('oro_platform.collect_deprecations')
         ) {
             return;
         }
+
         $disableDeprecationWrapperDefinition = new Definition(
             DisableDeprecationsHandlerWrapper::class,
             [
@@ -93,10 +87,5 @@ class ConfigurableLoggerPass implements CompilerPassInterface
             $handlerId . self::DISABLE_DEPRECATIONS_WRAPPER_POSTFIX,
             $disableDeprecationWrapperDefinition
         );
-    }
-
-    private function getHandlerId(string $name): string
-    {
-        return sprintf('monolog.handler.%s', $name);
     }
 }
