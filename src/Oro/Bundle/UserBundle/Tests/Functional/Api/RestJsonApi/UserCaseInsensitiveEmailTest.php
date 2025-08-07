@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
-use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserData;
@@ -13,8 +12,6 @@ use Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserData;
  */
 class UserCaseInsensitiveEmailTest extends RestJsonApiTestCase
 {
-    use ConfigManagerAwareTestTrait;
-
     #[\Override]
     protected function setUp(): void
     {
@@ -22,7 +19,7 @@ class UserCaseInsensitiveEmailTest extends RestJsonApiTestCase
         $this->loadFixtures([LoadUserData::class]);
     }
 
-    private function setCaseInsensitiveEmailAddresses(bool $value)
+    private function setCaseInsensitiveEmailAddresses(bool $value): void
     {
         $configManager = self::getConfigManager();
         $configManager->set('oro_user.case_insensitive_email_addresses_enabled', $value);
@@ -67,7 +64,7 @@ class UserCaseInsensitiveEmailTest extends RestJsonApiTestCase
         return $user;
     }
 
-    public function testCreateAndUpdateCaseSensitive()
+    public function testCreateAndUpdateCaseSensitive(): void
     {
         if ($this->getUserRepository()->isCaseInsensitiveCollation()) {
             $this->markTestSkipped('Case insensitive email option cannot be disabled.');
@@ -86,7 +83,7 @@ class UserCaseInsensitiveEmailTest extends RestJsonApiTestCase
         $this->assertRequestSuccess($data);
     }
 
-    public function testCreateAndUpdateCaseInsensitive()
+    public function testCreateAndUpdateCaseInsensitive(): void
     {
         $this->setCaseInsensitiveEmailAddresses(true);
 
@@ -114,7 +111,7 @@ class UserCaseInsensitiveEmailTest extends RestJsonApiTestCase
         $this->assertRequestSuccess($data);
     }
 
-    public function testFindUserByEmail()
+    public function testFindUserByEmail(): void
     {
         $this->setCaseInsensitiveEmailAddresses(true);
         $response = $this->cget(['entity' => 'users'], [

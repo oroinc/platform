@@ -426,11 +426,11 @@ class EmailTest extends RestJsonApiTestCase
             'id'   => (string)$department->getId()
         ];
 
-        $originalAutoLinkAttachmentsForUser = $this->setAutoLinkAttachments(TestDepartment::class, true);
+        $initialAutoLinkAttachmentsForUser = $this->setAutoLinkAttachments(TestDepartment::class, true);
         try {
             $response = $this->post(['entity' => 'emails'], $data);
         } finally {
-            $this->setAutoLinkAttachments(TestDepartment::class, $originalAutoLinkAttachmentsForUser);
+            $this->setAutoLinkAttachments(TestDepartment::class, $initialAutoLinkAttachmentsForUser);
         }
 
         $createdEmail = $this->getEntityManager()->find(Email::class, (int)$this->getResourceId($response));
@@ -713,11 +713,11 @@ class EmailTest extends RestJsonApiTestCase
         $activityManager->addActivityTarget($email, $department);
         $em->flush();
 
-        $originalAutoLinkAttachmentsForUser = $this->setAutoLinkAttachments(TestDepartment::class, true);
+        $initialAutoLinkAttachmentsForUser = $this->setAutoLinkAttachments(TestDepartment::class, true);
         try {
             $this->testSetBodyWithAttachment();
         } finally {
-            $this->setAutoLinkAttachments(TestDepartment::class, $originalAutoLinkAttachmentsForUser);
+            $this->setAutoLinkAttachments(TestDepartment::class, $initialAutoLinkAttachmentsForUser);
         }
 
         /** @var EmailAttachment $emailAttachment */
