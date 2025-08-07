@@ -8,7 +8,6 @@ use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate as EmailTemplateEntity;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Form\Type\EmailType;
-use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -19,6 +18,7 @@ class EmailTemplateRenderingSubscriberTest extends WebTestCase
 {
     use ConfigManagerAwareTestTrait;
 
+    private ?string $initialDefaultLocalization;
     private FormFactoryInterface $formFactory;
 
     #[\Override]
@@ -34,6 +34,13 @@ class EmailTemplateRenderingSubscriberTest extends WebTestCase
         $this->loginUser(self::AUTH_USER);
         $this->updateUserSecurityToken(self::AUTH_USER);
 
+        $this->initialDefaultLocalization = self::getConfigManager('user')->get(
+            'oro_locale.default_localization',
+            false,
+            false,
+            $this->getReference(LoadUserData::SIMPLE_USER)
+        );
+
         $this->formFactory = self::getContainer()->get(FormFactoryInterface::class);
     }
 
@@ -41,7 +48,18 @@ class EmailTemplateRenderingSubscriberTest extends WebTestCase
     protected function tearDown(): void
     {
         $user = $this->getReference(LoadUserData::SIMPLE_USER);
-        $this->switchUserLocalization($user, null);
+        $userConfigManager = self::getConfigManager('user');
+        $userConfigManager->set('oro_locale.default_localization', $this->initialDefaultLocalization, $user);
+        $userConfigManager->flush($user);
+        $userConfigManager->reload();
+    }
+
+    private function switchUserLocalization(?Localization $localization): void
+    {
+        $user = $this->getReference(LoadUserData::SIMPLE_USER);
+        $userConfigManager = self::getConfigManager('user');
+        $userConfigManager->set('oro_locale.default_localization', $localization?->getId(), $user);
+        $userConfigManager->flush($user);
     }
 
     public function testRegularEmailTemplateIsCompiled(): void
@@ -69,7 +87,7 @@ class EmailTemplateRenderingSubscriberTest extends WebTestCase
         /** @var Localization $localizationDe */
         $localizationDe = $this->getReference('localization_de');
 
-        $this->switchUserLocalization($user, $localizationDe);
+        $this->switchUserLocalization($localizationDe);
 
         /** @var EmailTemplateEntity $emailTemplateEntity */
         $emailTemplateEntity = $this->getReference('email_template_regular');
@@ -110,7 +128,7 @@ class EmailTemplateRenderingSubscriberTest extends WebTestCase
         /** @var Localization $localizationDe */
         $localizationDe = $this->getReference('localization_de');
 
-        $this->switchUserLocalization($user, $localizationDe);
+        $this->switchUserLocalization($localizationDe);
 
         /** @var EmailTemplateEntity $emailTemplateEntity */
         $emailTemplateEntity = $this->getReference('email_template_extended');
@@ -126,16 +144,5 @@ class EmailTemplateRenderingSubscriberTest extends WebTestCase
         self::assertEquals('Email Template (DE) Extended', $emailModel->getSubject());
         self::assertStringContainsString('Email Template (DE) Base', $emailModel->getBody());
         self::assertStringContainsString('Email Template (DE) Extended Content', $emailModel->getBody());
-    }
-
-    private function switchUserLocalization(User $user, ?Localization $localization): void
-    {
-        $userConfigManager = self::getConfigManager('user');
-        $userConfigManager->set(
-            Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION),
-            $localization?->getId(),
-            $user
-        );
-        $userConfigManager->flush($user);
     }
 }

@@ -18,17 +18,17 @@ trait JobsAwareTestTrait
 {
     protected function getJobManager(): JobManager
     {
-        return $this->getContainer()->get('oro_message_queue.job.manager');
+        return self::getContainer()->get('oro_message_queue.job.manager');
     }
 
     protected function getJobRunner(): JobRunner
     {
-        return $this->getContainer()->get('oro_message_queue.job.runner');
+        return self::getContainer()->get('oro_message_queue.job.runner');
     }
 
     protected function getJobProcessor(): JobProcessor
     {
-        return $this->getContainer()->get('oro_message_queue.job.processor');
+        return self::getContainer()->get('oro_message_queue.job.processor');
     }
 
     protected function createUniqueJob(): ?Job
@@ -63,7 +63,7 @@ trait JobsAwareTestTrait
         return $rootJob->getData()['dependentJobs'] ?? [];
     }
 
-    protected function createRootJobMyMessage(MessageInterface $message)
+    protected function createRootJobMyMessage(MessageInterface $message): void
     {
         $this->getJobProcessor()->findOrCreateRootJob(
             $message->getMessageId(),

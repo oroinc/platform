@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ReportBundle\Tests\Functional\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\NoteBundle\Entity\Note;
@@ -24,6 +24,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class ReportControllerWithFiltersTest extends WebTestCase
 {
+    use ConfigManagerAwareTestTrait;
     use ReportDateTimeFilterExtension;
 
     private const ENTITY_NOTE = Note::class;
@@ -31,34 +32,29 @@ class ReportControllerWithFiltersTest extends WebTestCase
     private const REPORT_NAME = 'Test report';
     private const DATE_FORMAT = 'Y-m-d H:i:s';
 
-    /** @var User */
-    private $owner;
-
-    /** @var BusinessUnit */
-    private $businessUnit;
-
-    /** @var ReportType */
-    private $reportType;
-
-    /** @var EntityManagerInterface */
-    private $entityManager;
-
-    /** @var ConfigManager */
-    private $configManager;
+    private ?string $initialTimezone;
+    private EntityManagerInterface $entityManager;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
 
-        $this->entityManager = $this->getContainer()->get('doctrine')->getManager();
-        $this->configManager = $this->getContainer()->get('oro_config.manager');
+        $this->initialTimezone = self::getConfigManager(null)->get('oro_locale.timezone');
+        $this->entityManager = self::getContainer()->get('doctrine')->getManager();
     }
 
     #[\Override]
     protected function tearDown(): void
     {
+        $configManager = self::getConfigManager(null);
+        if ($configManager->get('oro_locale.timezone') !== $this->initialTimezone) {
+            $configManager->set('oro_locale.timezone', $this->initialTimezone);
+            $configManager->flush();
+            $configManager->reload();
+        }
+
         $this->removeEntities(self::ENTITY_NOTE);
         $this->removeEntities(self::ENTITY_REPORT);
     }
@@ -72,8 +68,16 @@ class ReportControllerWithFiltersTest extends WebTestCase
         array $actual,
         array $expected
     ): void {
-        $this->updateSystemTimeZone($timeZone);
-        $this->prepareEntities($actual);
+        $configManager = self::getConfigManager(null);
+        $configManager->set('oro_locale.timezone', $timeZone);
+        $configManager->flush();
+
+        foreach ($actual as $message => $createdAt) {
+            $note = $this->createEntity($message, $createdAt);
+            $this->entityManager->persist($note);
+        }
+        $this->entityManager->flush();
+
         $report = $this->createReport($definition);
 
         $this->client->request('GET', $this->getUrl('oro_report_view', ['id' => $report->getId()]));
@@ -321,7 +325,7 @@ class ReportControllerWithFiltersTest extends WebTestCase
             $end = $end ? $this->dateTimeWithModifyAsString($end) : $this->dateTimeWithModifyAsString();
         }
 
-        $filterData = ['type' => strval($type), 'part' => 'value', 'value' => ['start' => $start, 'end' => $end]];
+        $filterData = ['type' => (string)$type, 'part' => 'value', 'value' => ['start' => $start, 'end' => $end]];
 
         return [
             'columns' => [['name' => 'message', 'label' => 'Note message', 'func' => '', 'sorting' => '']],
@@ -344,24 +348,10 @@ class ReportControllerWithFiltersTest extends WebTestCase
         return $data;
     }
 
-    private function prepareEntities(array $entitiesData): void
-    {
-        foreach ($entitiesData as $message => $createdAt) {
-            $note = $this->createEntity($message, $createdAt);
-            $this->entityManager->persist($note);
-        }
-        $this->entityManager->flush();
-    }
-
-    private function updateSystemTimeZone(string $timeZone): void
-    {
-        $this->configManager->set('oro_locale.timezone', $timeZone);
-        $this->configManager->flush();
-    }
-
     private function createEntity(string $message, \DateTime $createAt): Note
     {
-        $owner = $this->getOwner();
+        /** @var User $owner */
+        $owner = $this->entityManager->getRepository(User::class)->findOneBy(['email' => self::AUTH_USER]);
         $note = new Note();
         $note->setOwner($owner);
         $note->setMessage($message);
@@ -373,13 +363,19 @@ class ReportControllerWithFiltersTest extends WebTestCase
 
     private function createReport(array $definition): Report
     {
-        $businessUnit = $this->getBusinessUnit();
-        $type = $this->getReportType();
+        /** @var BusinessUnit $businessUnit */
+        $businessUnit = $this->entityManager->getRepository(BusinessUnit::class)->findOneBy(
+            ['name' => LoadOrganizationAndBusinessUnitData::MAIN_BUSINESS_UNIT]
+        );
+        /** @var ReportType $reportType */
+        $reportType = $this->entityManager->getRepository(ReportType::class)->findOneBy(
+            ['name' => ReportType::TYPE_TABLE]
+        );
 
         $report = new Report();
         $report->setName(self::REPORT_NAME);
         $report->setEntity(self::ENTITY_NOTE);
-        $report->setType($type);
+        $report->setType($reportType);
         $report->setDefinition(QueryDefinitionUtil::encodeDefinition($definition));
         $report->setOwner($businessUnit);
         $report->setOrganization($businessUnit->getOrganization());
@@ -398,33 +394,5 @@ class ReportControllerWithFiltersTest extends WebTestCase
             $this->entityManager->remove($note);
         }
         $this->entityManager->flush();
-    }
-
-    private function getOwner(string $email = self::AUTH_USER): User
-    {
-        if (!$this->owner) {
-            return $this->entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
-        }
-
-        return $this->owner;
-    }
-
-    private function getBusinessUnit(
-        string $businessUnit = LoadOrganizationAndBusinessUnitData::MAIN_BUSINESS_UNIT
-    ): BusinessUnit {
-        if (!$this->businessUnit) {
-            return $this->entityManager->getRepository(BusinessUnit::class)->findOneBy(['name' => $businessUnit]);
-        }
-
-        return $this->businessUnit;
-    }
-
-    private function getReportType(string $reportType = ReportType::TYPE_TABLE): ReportType
-    {
-        if (!$this->reportType) {
-            return $this->entityManager->getRepository(ReportType::class)->findOneBy(['name' => $reportType]);
-        }
-
-        return $this->reportType;
     }
 }
