@@ -63,6 +63,20 @@ class NumberSequence implements DatesAwareInterface
         return $this->id;
     }
 
+    /**
+     * @internal
+     */
+    public function setId(?int $id): self
+    {
+        if ($this->id !== null) {
+            throw new \LogicException('The ID of an existing NumberSequence cannot be changed.');
+        }
+
+        $this->id = $id;
+
+        return $this;
+    }
+
     public function getSequenceType(): ?string
     {
         return $this->sequenceType;
