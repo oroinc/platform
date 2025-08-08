@@ -51,7 +51,7 @@ class PdfBuilderStub implements PdfBuilderInterface
             }
 
             if ($name === 'Invoice with commerce default theme #InvoiceCommerceDefaultTheme') {
-                return new PdfFileStub(__DIR__ . '/сommerce_default_pdf_file_stub.pdf');
+                return new PdfFileStub(__DIR__ . '/commerce_default_pdf_file_stub.pdf');
             }
 
             if ($name === 'Invoice with golden carbon theme #InvoiceGoldenCarbonTheme') {
