@@ -4,6 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
@@ -16,6 +17,7 @@ use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessor;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestContext;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\TestConnector;
+use Oro\Component\Config\Common\ConfigObject;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -246,6 +248,285 @@ class SyncProcessorTest extends TestCase
                 ]
             ]
         ];
+    }
+
+    public function testProcessImportWithErrorsAndWarningsLoggingEnabled(): void
+    {
+        $errors = ['Error 1', 'Error 2'];
+
+        $testConnector = 'testConnector';
+        $integrationType = 'testChannelType';
+        $channel = 'testChannel';
+        $realConnectorsMap = [
+            [
+                $integrationType,
+                $testConnector,
+                $this->prepareConnectorStub(
+                    $testConnector,
+                    $job = 'test job',
+                    $entity = 'testEntity',
+                    true,
+                    100
+                )
+            ]
+        ];
+
+        $expected = [
+            [
+                'import',
+                $job,
+                [
+                    'import' => [
+                        'processorAlias' => false,
+                        'entityName'     => $entity,
+                        'channel'        => $channel,
+                        'channelType'    => $integrationType,
+                        'testParameter'  => 'testValue'
+                    ]
+                ]
+            ]
+        ];
+
+        $this->integration->expects($this->once())
+            ->method('getConnectors')
+            ->willReturn([$testConnector]);
+        $this->integration->expects($this->any())
+            ->method('getId')
+            ->willReturn($channel);
+        $this->integration->expects($this->atLeastOnce())
+            ->method('getType')
+            ->willReturn($integrationType);
+        $this->integration->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
+
+        $this->registry->expects($this->any())
+            ->method('getConnectorType')
+            ->willReturnMap($realConnectorsMap);
+
+        $this->processorRegistry->expects($this->any())
+            ->method('getProcessorAliasesByEntity')
+            ->willReturn([]);
+
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects($this->once())
+            ->method('getErrors')
+            ->willReturn($errors);
+
+        $jobResult = new JobResult();
+        $jobResult->setContext($context);
+        $jobResult->setSuccessful(true);
+        $this->jobExecutor->expects($this->exactly(count($expected)))
+            ->method('executeJob')
+            ->withConsecutive(...$expected)
+            ->willReturn($jobResult);
+
+        $syncSettings = $this->createMock(ConfigObject::class);
+        $syncSettings->expects($this->once())
+            ->method('offsetGetOr')
+            ->with('logWarnings', false)
+            ->willReturn(true);
+
+        $this->integration->expects($this->once())
+            ->method('getSynchronizationSettings')
+            ->willReturn($syncSettings);
+
+        $this->log->expects($this->exactly(2))
+            ->method('error')
+            ->withConsecutive(
+                ['Error 1'],
+                ['Error 2']
+            );
+
+        $processor = $this->getSyncProcessor();
+        $this->assertTrue(
+            $processor->process($this->integration, $testConnector, ['testParameter' => 'testValue'])
+        );
+    }
+
+    public function testProcessImportWithErrorsAndWarningsLoggingDisabled(): void
+    {
+        $errors = ['Error 1', 'Error 2'];
+
+        $testConnector = 'testConnector';
+        $integrationType = 'testChannelType';
+        $channel = 'testChannel';
+        $realConnectorsMap = [
+            [
+                $integrationType,
+                $testConnector,
+                $this->prepareConnectorStub(
+                    $testConnector,
+                    $job = 'test job',
+                    $entity = 'testEntity',
+                    true,
+                    100
+                )
+            ]
+        ];
+
+        $expected = [
+            [
+                'import',
+                $job,
+                [
+                    'import' => [
+                        'processorAlias' => false,
+                        'entityName'     => $entity,
+                        'channel'        => $channel,
+                        'channelType'    => $integrationType,
+                        'testParameter'  => 'testValue'
+                    ]
+                ]
+            ]
+        ];
+
+        $this->integration->expects($this->once())
+            ->method('getConnectors')
+            ->willReturn([$testConnector]);
+        $this->integration->expects($this->any())
+            ->method('getId')
+            ->willReturn($channel);
+        $this->integration->expects($this->atLeastOnce())
+            ->method('getType')
+            ->willReturn($integrationType);
+        $this->integration->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
+
+        $this->registry->expects($this->any())
+            ->method('getConnectorType')
+            ->willReturnMap($realConnectorsMap);
+
+        $this->processorRegistry->expects($this->any())
+            ->method('getProcessorAliasesByEntity')
+            ->willReturn([]);
+
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects($this->once())
+            ->method('getErrors')
+            ->willReturn($errors);
+
+        $jobResult = new JobResult();
+        $jobResult->setContext($context);
+        $jobResult->setSuccessful(true);
+        $this->jobExecutor->expects($this->exactly(count($expected)))
+            ->method('executeJob')
+            ->withConsecutive(...$expected)
+            ->willReturn($jobResult);
+
+        $syncSettings = $this->createMock(ConfigObject::class);
+        $syncSettings->expects($this->once())
+            ->method('offsetGetOr')
+            ->with('logWarnings', false)
+            ->willReturn(false);
+
+        $this->integration->expects($this->once())
+            ->method('getSynchronizationSettings')
+            ->willReturn($syncSettings);
+
+        $this->log->expects($this->never())
+            ->method('error');
+
+        $processor = $this->getSyncProcessor();
+        $this->assertTrue(
+            $processor->process($this->integration, $testConnector, ['testParameter' => 'testValue'])
+        );
+    }
+
+    public function testProcessImportWithJobFailure(): void
+    {
+        $errors = ['Error 1', 'Error 2'];
+
+        $testConnector = 'testConnector';
+        $integrationType = 'testChannelType';
+        $channel = 'testChannel';
+        $realConnectorsMap = [
+            [
+                $integrationType,
+                $testConnector,
+                $this->prepareConnectorStub(
+                    $testConnector,
+                    $job = 'test job',
+                    $entity = 'testEntity',
+                    true,
+                    100
+                )
+            ]
+        ];
+
+        $expected = [
+            [
+                'import',
+                $job,
+                [
+                    'import' => [
+                        'processorAlias' => false,
+                        'entityName'     => $entity,
+                        'channel'        => $channel,
+                        'channelType'    => $integrationType,
+                        'testParameter'  => 'testValue'
+                    ]
+                ]
+            ]
+        ];
+
+        $this->integration->expects($this->once())
+            ->method('getConnectors')
+            ->willReturn([$testConnector]);
+        $this->integration->expects($this->any())
+            ->method('getId')
+            ->willReturn($channel);
+        $this->integration->expects($this->atLeastOnce())
+            ->method('getType')
+            ->willReturn($integrationType);
+        $this->integration->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
+
+        $this->registry->expects($this->any())
+            ->method('getConnectorType')
+            ->willReturnMap($realConnectorsMap);
+
+        $this->processorRegistry->expects($this->any())
+            ->method('getProcessorAliasesByEntity')
+            ->willReturn([]);
+
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects($this->once())
+            ->method('getErrors')
+            ->willReturn($errors);
+
+        $jobResult = new JobResult();
+        $jobResult->setContext($context);
+        $jobResult->setSuccessful(false);
+        $jobResult->setFailureExceptions([
+            'Exception 1',
+            'Exception 2',
+        ]);
+        $this->jobExecutor->expects($this->exactly(count($expected)))
+            ->method('executeJob')
+            ->withConsecutive(...$expected)
+            ->willReturn($jobResult);
+
+        $syncSettings = $this->createMock(ConfigObject::class);
+        $syncSettings->expects($this->never())
+            ->method('offsetGetOr');
+
+        $this->integration->expects($this->never())
+            ->method('getSynchronizationSettings');
+
+        $this->log->expects($this->exactly(2))
+            ->method('error')
+            ->withConsecutive(
+                ['Errors have occurred:'],
+                ['Exception 1' . PHP_EOL . 'Exception 2']
+            );
+
+        $processor = $this->getSyncProcessor();
+        $this->assertFalse(
+            $processor->process($this->integration, $testConnector, ['testParameter' => 'testValue'])
+        );
     }
 
     private function getSyncProcessor(): SyncProcessor
