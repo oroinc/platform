@@ -54,6 +54,27 @@ class SetDefaultSorting implements ProcessorInterface
         return 'Result sorting. Comma-separated fields, e.g. \'field1,-field2\'.';
     }
 
+    protected function getAllowedSortFieldsDescription(
+        EntityDefinitionConfig $config,
+        SortersConfig $configOfSorters
+    ): ?string {
+        $fieldNames = [];
+        foreach ($configOfSorters->getFields() as $fieldName => $field) {
+            if (!$field->isExcluded()) {
+                $fieldNames[] = $fieldName;
+            }
+        }
+        if (!$fieldNames) {
+            return null;
+        }
+
+        if (\count($fieldNames) > 1) {
+            sort($fieldNames);
+        }
+
+        return 'Allowed fields: ' . implode(', ', $fieldNames) . '.';
+    }
+
     /**
      * @param EntityDefinitionConfig $config
      * @param SortersConfig|null     $configOfSorters
@@ -66,10 +87,6 @@ class SetDefaultSorting implements ProcessorInterface
         if (!$orderBy) {
             $idFieldNames = $config->getIdentifierFieldNames();
             foreach ($idFieldNames as $fieldName) {
-                $field = $config->getField($fieldName);
-                if (null !== $field) {
-                    $fieldName = $field->getPropertyPath($fieldName);
-                }
                 if ($this->isSorterEnabled($fieldName, $configOfSorters)) {
                     $orderBy[$fieldName] = Criteria::ASC;
                 }
@@ -79,15 +96,12 @@ class SetDefaultSorting implements ProcessorInterface
         return $orderBy;
     }
 
-    protected function isSorterEnabled(
-        string $fieldName,
-        ?SortersConfig $configOfSorters,
-        bool $byPropertyPath = true
-    ): bool {
+    protected function isSorterEnabled(string $fieldName, ?SortersConfig $configOfSorters): bool
+    {
         if (null === $configOfSorters) {
             return false;
         }
-        $sorter = $configOfSorters->findField($fieldName, $byPropertyPath);
+        $sorter = $configOfSorters->findField($fieldName);
         if (null === $sorter) {
             return false;
         }
@@ -109,16 +123,23 @@ class SetDefaultSorting implements ProcessorInterface
 
     private function addSortFilter(
         string $filterName,
-        FilterCollection $filters,
+        FilterCollection $filterCollection,
         EntityDefinitionConfig $config,
         ?SortersConfig $configOfSorters
     ): void {
-        if (!$filters->has($filterName)) {
-            $filters->add(
+        if (!$filterCollection->has($filterName)) {
+            $filterDescription = $this->getSortFilterDescription();
+            if (null !== $configOfSorters) {
+                $allowedSortFieldsDescription = $this->getAllowedSortFieldsDescription($config, $configOfSorters);
+                if ($allowedSortFieldsDescription) {
+                    $filterDescription .= ' ' . $allowedSortFieldsDescription;
+                }
+            }
+            $filterCollection->add(
                 $filterName,
                 new SortFilter(
                     DataType::ORDER_BY,
-                    $this->getSortFilterDescription(),
+                    $filterDescription,
                     function () use ($config, $configOfSorters) {
                         return $this->getDefaultValue($config, $configOfSorters);
                     },

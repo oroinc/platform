@@ -7,6 +7,9 @@ use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadAllRolesData;
 
+/**
+ * @group search
+ */
 class RoleSearchTest extends RestJsonApiTestCase
 {
     use SearchExtensionTrait;

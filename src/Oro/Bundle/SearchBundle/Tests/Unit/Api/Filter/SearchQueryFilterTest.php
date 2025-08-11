@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Exception\InvalidFilterException;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolver;
-use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolverFactory;
+use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolverFactoryInterface;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchQueryFilter;
 use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
 
@@ -46,7 +46,7 @@ class SearchQueryFilterTest extends \PHPUnit\Framework\TestCase
             ->method('resolveFieldType')
             ->willReturn('text');
 
-        $searchFieldResolverFactory = $this->createMock(SearchFieldResolverFactory::class);
+        $searchFieldResolverFactory = $this->createMock(SearchFieldResolverFactoryInterface::class);
         $searchFieldResolverFactory->expects(self::any())
             ->method('createFieldResolver')
             ->with(self::ENTITY_CLASS, $fieldMappings)

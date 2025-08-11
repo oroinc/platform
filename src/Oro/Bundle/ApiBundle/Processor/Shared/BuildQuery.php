@@ -2,16 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Exception\InvalidSorterException;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
-use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
-use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
-use Oro\Bundle\ApiBundle\Model\Error;
-use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Model\LoadEntityIdsQueryExecutorInterface;
 use Oro\Bundle\ApiBundle\Model\LoadEntityIdsQueryInterface;
-use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Request\Constraint;
-use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Processor\ListContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -22,12 +16,14 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class BuildQuery implements ProcessorInterface
 {
     private DoctrineHelper $doctrineHelper;
-    private FilterNamesRegistry $filterNamesRegistry;
+    private LoadEntityIdsQueryExecutorInterface $loadEntityIdsQueryExecutor;
 
-    public function __construct(DoctrineHelper $doctrineHelper, FilterNamesRegistry $filterNamesRegistry)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        LoadEntityIdsQueryExecutorInterface $loadEntityIdsQueryExecutor
+    ) {
         $this->doctrineHelper = $doctrineHelper;
-        $this->filterNamesRegistry = $filterNamesRegistry;
+        $this->loadEntityIdsQueryExecutor = $loadEntityIdsQueryExecutor;
     }
 
     /**
@@ -35,7 +31,7 @@ class BuildQuery implements ProcessorInterface
      */
     public function process(ContextInterface $context): void
     {
-        /** @var Context $context */
+        /** @var ListContext $context */
 
         if ($context->hasResult()) {
             // data already exist
@@ -55,18 +51,21 @@ class BuildQuery implements ProcessorInterface
                 if (null === $config || \count($config->getIdentifierFieldNames()) !== 1) {
                     throw new RuntimeException('The entity must have one identifier field.');
                 }
-                $entityIds = $this->getEntityIds($query, $context);
+                $entityIds = $this->loadEntityIdsQueryExecutor->execute($context, fn () => $query->getEntityIds());
                 if (null !== $entityIds) {
                     $context->setQuery(
                         $this->doctrineHelper->createQueryBuilder($entityClass, 'e')
-                            ->andWhere(sprintf(
+                            ->andWhere(\sprintf(
                                 'e.%s IN (:ids)',
                                 $this->doctrineHelper->getSingleEntityIdentifierFieldName($entityClass)
                             ))
                             ->setParameter('ids', $entityIds)
                     );
-                    $context->setTotalCountCallback(function () use ($query) {
-                        return $query->getEntityTotalCount();
+                    $context->setTotalCountCallback(function () use ($context, $query) {
+                        return $this->loadEntityIdsQueryExecutor->execute(
+                            $context,
+                            fn () => $query->getEntityTotalCount()
+                        );
                     });
                     $context->set(LoadEntitiesByEntitySerializer::ENTITY_IDS, $entityIds);
                 }
@@ -74,34 +73,5 @@ class BuildQuery implements ProcessorInterface
         } else {
             $context->setQuery($this->doctrineHelper->createQueryBuilder($entityClass, 'e'));
         }
-    }
-
-    private function getEntityIds(LoadEntityIdsQueryInterface $query, Context $context): ?array
-    {
-        try {
-            return $query->getEntityIds();
-        } catch (InvalidSorterException $e) {
-            $context->addError(
-                Error::createValidationError(Constraint::SORT, $e->getMessage())
-                    ->setSource(ErrorSource::createByParameter(
-                        $this->getSortFilterName($context->getRequestType(), $context->getFilterValues())
-                    ))
-            );
-        }
-
-        return null;
-    }
-
-    private function getSortFilterName(RequestType $requestType, FilterValueAccessorInterface $filterValues): string
-    {
-        $sortFilterName = $this->filterNamesRegistry
-            ->getFilterNames($requestType)
-            ->getSortFilterName();
-        $sortFilterValue = $filterValues->get($sortFilterName);
-        if (null === $sortFilterValue) {
-            return $sortFilterName;
-        }
-
-        return $sortFilterValue->getSourceKey();
     }
 }

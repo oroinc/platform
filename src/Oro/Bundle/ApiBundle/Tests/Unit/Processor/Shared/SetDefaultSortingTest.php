@@ -72,6 +72,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals(['id' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertEquals(
+            "Result sorting. Comma-separated fields, e.g. 'field1,-field2'. Allowed fields: id.",
+            $sortFilter->getDescription()
+        );
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
@@ -95,6 +99,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals(['name' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertEquals(
+            "Result sorting. Comma-separated fields, e.g. 'field1,-field2'. Allowed fields: name.",
+            $sortFilter->getDescription()
+        );
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
@@ -118,6 +126,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertSame([], $sortFilter->getDefaultValue());
+        self::assertEquals(
+            "Result sorting. Comma-separated fields, e.g. 'field1,-field2'.",
+            $sortFilter->getDescription()
+        );
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
@@ -143,6 +155,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals(['id' => 'ASC', 'title' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertEquals(
+            "Result sorting. Comma-separated fields, e.g. 'field1,-field2'. Allowed fields: id, title.",
+            $sortFilter->getDescription()
+        );
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
@@ -168,6 +184,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals(['title' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertEquals(
+            "Result sorting. Comma-separated fields, e.g. 'field1,-field2'. Allowed fields: title.",
+            $sortFilter->getDescription()
+        );
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
@@ -190,17 +210,21 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals(['id' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertEquals(
+            "Result sorting. Comma-separated fields, e.g. 'field1,-field2'. Allowed fields: id.",
+            $sortFilter->getDescription()
+        );
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
     public function testProcessWhenConfigHasOrderByOption()
     {
         $config = new EntityDefinitionConfig();
-        $config->setIdentifierFieldNames(['id']);
+        $config->setIdentifierFieldNames(['name']);
         $config->setOrderBy(['name' => 'DESC']);
 
         $configOfSorters = new SortersConfig();
-        $configOfSorters->addField('id');
+        $configOfSorters->addField('name');
 
         $this->context->setClassName(User::class);
         $this->context->setConfig($config);
@@ -213,6 +237,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals(['name' => 'DESC'], $sortFilter->getDefaultValue());
+        self::assertEquals(
+            "Result sorting. Comma-separated fields, e.g. 'field1,-field2'. Allowed fields: name.",
+            $sortFilter->getDescription()
+        );
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
@@ -232,29 +260,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals([], $sortFilter->getDefaultValue());
-        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
-    }
-
-    public function testProcessForEntityWithRenamedIdentifierField()
-    {
-        $config = new EntityDefinitionConfig();
-        $config->setIdentifierFieldNames(['renamedId']);
-        $config->addField('renamedId')->setPropertyPath('id');
-
-        $configOfSorters = new SortersConfig();
-        $configOfSorters->addField('renamedId')->setPropertyPath('id');
-
-        $this->context->setClassName(User::class);
-        $this->context->setConfig($config);
-        $this->context->setConfigOfSorters($configOfSorters);
-        $this->processor->process($this->context);
-
-        $filters = $this->context->getFilters();
-        self::assertCount(1, $filters);
-        /** @var SortFilter $sortFilter */
-        $sortFilter = $filters->get('sort');
-        self::assertEquals('orderBy', $sortFilter->getDataType());
-        self::assertEquals(['id' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertEquals(
+            "Result sorting. Comma-separated fields, e.g. 'field1,-field2'.",
+            $sortFilter->getDescription()
+        );
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
@@ -280,6 +289,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertSame([], $sortFilter->getDefaultValue());
+        self::assertEquals(
+            "Result sorting. Comma-separated fields, e.g. 'field1,-field2'.",
+            $sortFilter->getDescription()
+        );
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 

@@ -31,10 +31,15 @@ class LoadSearchEntities implements ProcessorInterface
             return;
         }
 
+        $entityClasses = $context->getFilterValues()->get('entityType')?->getValue();
+        if (\is_string($entityClasses)) {
+            $entityClasses = [$entityClasses];
+        }
         $context->setResult(
             $this->searchEntityRepository->getSearchEntities(
                 $context->getVersion(),
                 $context->getRequestType(),
+                $entityClasses,
                 $context->getFilterValues()->get('searchable')?->getValue()
             )
         );

@@ -5,7 +5,6 @@ namespace Oro\Bundle\SearchBundle\Api\Processor;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueTransformer;
-use Oro\Bundle\SearchBundle\Api\Filter\SearchAggregationFilter;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -15,15 +14,13 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class NormalizeSearchAggregatedData implements ProcessorInterface
 {
-    private ValueTransformer $valueTransformer;
-    private string $aggregationFilterName;
+    public const OPERATION_NAME = 'normalize_search_aggregated_data';
+
+    public const AGGREGATION_DATA_TYPES = 'aggregation_data_types';
 
     public function __construct(
-        ValueTransformer $valueTransformer,
-        string $aggregationFilterName = 'aggregations'
+        private readonly ValueTransformer $valueTransformer
     ) {
-        $this->valueTransformer = $valueTransformer;
-        $this->aggregationFilterName = $aggregationFilterName;
     }
 
     /**
@@ -33,25 +30,25 @@ class NormalizeSearchAggregatedData implements ProcessorInterface
     {
         /** @var Context $context */
 
+        if ($context->isProcessed(self::OPERATION_NAME)) {
+            // a search aggregation filter was already applied to a search query
+            return;
+        }
+
         $infoRecords = $context->getInfoRecords();
-        if (!isset($infoRecords['aggregatedData'])) {
+        $aggregatedData = $infoRecords['aggregatedData'] ?? null;
+        if (!$aggregatedData) {
             // no aggregated data
             return;
         }
 
-        $aggregatedData = $infoRecords['aggregatedData'];
-        if ($aggregatedData) {
-            $filter = $context->getFilters()->get($this->aggregationFilterName);
-            if ($filter instanceof SearchAggregationFilter) {
-                $aggregatedData = $this->normalizeAggregatedData(
-                    $aggregatedData,
-                    $filter->getAggregationDataTypes(),
-                    $context->getNormalizationContext()
-                );
-                $infoRecords['aggregatedData'] = $aggregatedData;
-                $context->setInfoRecords($infoRecords);
-            }
-        }
+        $infoRecords['aggregatedData'] = $this->normalizeAggregatedData(
+            $aggregatedData,
+            $context->get(self::AGGREGATION_DATA_TYPES) ?? [],
+            $context->getNormalizationContext()
+        );
+        $context->setInfoRecords($infoRecords);
+        $context->setProcessed(self::OPERATION_NAME);
     }
 
     private function normalizeAggregatedData(
@@ -60,6 +57,11 @@ class NormalizeSearchAggregatedData implements ProcessorInterface
         array $normalizationContext
     ): array {
         foreach ($aggregatedData as $name => $value) {
+            if (\is_array($value)) {
+                // "count" aggregation
+                $value = $this->normalizeCountValue($value);
+                $aggregatedData[$name] = $value;
+            }
             if (isset($dataTypes[$name]) && SearchQuery::TYPE_DATETIME === $dataTypes[$name]) {
                 $aggregatedData[$name] = $this->normalizeDateTimeValue($value, $normalizationContext);
             }
@@ -68,7 +70,17 @@ class NormalizeSearchAggregatedData implements ProcessorInterface
         return $aggregatedData;
     }
 
-    private function normalizeDateTimeValue(mixed $value, array $normalizationContext)
+    private function normalizeCountValue(array $value): array
+    {
+        $normalizedValue = [];
+        foreach ($value as $k => $v) {
+            $normalizedValue[] = ['value' => \is_string($k) && !$k ? null : $k, 'count' => $v];
+        }
+
+        return $normalizedValue;
+    }
+
+    private function normalizeDateTimeValue(mixed $value, array $normalizationContext): mixed
     {
         if (\is_array($value)) {
             // "count" aggregation
@@ -76,10 +88,11 @@ class NormalizeSearchAggregatedData implements ProcessorInterface
                 $val = $v['value'];
                 if (\is_numeric($val)) {
                     $value[$k]['value'] = $this->normalizeTimestampDateTime($val, $normalizationContext);
-                } elseif (\is_string($val)) {
+                } elseif (\is_string($val) && $val) {
                     $value[$k]['value'] = $this->normalizeStringDateTime($val, $normalizationContext);
                 }
             }
+
             return $value;
         }
 

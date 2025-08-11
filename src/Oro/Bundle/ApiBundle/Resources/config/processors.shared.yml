@@ -1,4 +1,9 @@
 services:
+    oro_api.association_sorters_provider:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\Provider\AssociationSortersProvider
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.config_provider'
 
     #
     # initialize
@@ -556,7 +561,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateSorting
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_api.config_provider'
+            - '@oro_api.association_sorters_provider'
             - '@oro_api.filter_names_registry'
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_input, priority: -100 }
@@ -702,6 +707,17 @@ services:
             - { name: oro.api.processor, action: get_subresource, group: build_query, collection: true, priority: -10 }
             - { name: oro.api.processor, action: get_relationship, group: build_query, collection: true, priority: -10 }
 
+    oro_api.normalize_sorting:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeSorting
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.association_sorters_provider'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: build_query, priority: -70 }
+            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -70 }
+            - { name: oro.api.processor, action: get_subresource, group: build_query, collection: true, priority: -70 }
+            - { name: oro.api.processor, action: get_relationship, group: build_query, collection: true, priority: -70 }
+
     oro_api.normalize_paging:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizePaging
         arguments:
@@ -723,7 +739,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildQuery
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_api.filter_names_registry'
+            - '@oro_api.load_entity_ids_query_executor'
         tags:
             - { name: oro.api.processor, action: get_list, group: build_query, priority: -100 }
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: -100 }

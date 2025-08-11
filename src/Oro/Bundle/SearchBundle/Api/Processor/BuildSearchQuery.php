@@ -3,42 +3,54 @@
 namespace Oro\Bundle\SearchBundle\Api\Processor;
 
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Collections\Expr;
+use Oro\Bundle\ApiBundle\Filter\FieldsFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
+use Oro\Bundle\ApiBundle\Filter\IncludeFilter;
+use Oro\Bundle\ApiBundle\Filter\MetaPropertyFilter;
+use Oro\Bundle\ApiBundle\Filter\PageNumberFilter;
+use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
+use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\ListContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\SearchBundle\Api\Filter\SearchAggregationFilter;
+use Oro\Bundle\SearchBundle\Api\Filter\SearchQueryFilter;
 use Oro\Bundle\SearchBundle\Api\Filter\SimpleSearchFilter;
 use Oro\Bundle\SearchBundle\Api\Model\LoadEntityIdsBySearchQuery;
+use Oro\Bundle\SearchBundle\Api\Model\SearchQueryExecutorInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
 use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
-use Oro\Bundle\SearchBundle\Query\Criteria\Criteria as SearchCriteria;
-use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
- * Builds a search query object that will be used to get entities by "searchText" filter.
+ * Builds a search query object that will be used to get entities via the search index.
  */
 class BuildSearchQuery implements ProcessorInterface
 {
+    public const SEARCH_QUERY = 'search_query';
+
     private DoctrineHelper $doctrineHelper;
     private SearchIndexer $searchIndexer;
+    private SearchQueryExecutorInterface $searchQueryExecutor;
     private AbstractSearchMappingProvider $searchMappingProvider;
     private AuthorizationCheckerInterface $authorizationChecker;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
         SearchIndexer $searchIndexer,
+        SearchQueryExecutorInterface $searchQueryExecutor,
         AbstractSearchMappingProvider $searchMappingProvider,
         AuthorizationCheckerInterface $authorizationChecker
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->searchIndexer = $searchIndexer;
+        $this->searchQueryExecutor = $searchQueryExecutor;
         $this->searchMappingProvider = $searchMappingProvider;
         $this->authorizationChecker = $authorizationChecker;
     }
@@ -60,94 +72,103 @@ class BuildSearchQuery implements ProcessorInterface
             return;
         }
 
-        $expr = $criteria->getWhereExpression();
-        if (null === $expr) {
+        if (!$this->hasSearchFilter($context->getFilters(), $context->getFilterValues())) {
             return;
         }
 
-        $searchText = $this->getSearchText($expr);
-        if (!$searchText) {
-            return;
-        }
-
-        if ($expr instanceof Expr\CompositeExpression && count($expr->getExpressionList()) !== 1) {
-            $context->addError(
-                Error::createValidationError(
-                    Constraint::FILTER,
-                    'This filter cannot be used together with other filters.'
-                )->setSource(ErrorSource::createByParameter($this->getSearchTextFilterName($context->getFilters())))
-            );
+        if ($this->hasNonSearchFilter($context->getFilters(), $context->getFilterValues())) {
+            $context->addError($this->createSearchFilterError(
+                'The search filter cannot be used together with other filters.',
+                $context
+            ));
 
             return;
         }
 
         if (!$this->authorizationChecker->isGranted('oro_search')) {
-            $context->addError(
-                Error::createValidationError(
-                    Constraint::FILTER,
-                    'This filter cannot be used because the search capability is disabled.'
-                )->setSource(ErrorSource::createByParameter($this->getSearchTextFilterName($context->getFilters())))
-            );
+            $context->addError($this->createSearchFilterError(
+                'This filter cannot be used because the search capability is disabled.',
+                $context
+            ));
 
             return;
         }
 
-        $context->setQuery(new LoadEntityIdsBySearchQuery(
+        $searchQuery = new LoadEntityIdsBySearchQuery(
             $this->searchIndexer,
-            $this->searchMappingProvider,
-            $context->getManageableEntityClass($this->doctrineHelper),
-            $searchText,
+            $this->searchQueryExecutor,
+            $this->searchMappingProvider->getEntityAlias(
+                $context->getManageableEntityClass($this->doctrineHelper)
+            ),
+            $criteria->getWhereExpression(),
             $criteria->getFirstResult(),
             $criteria->getMaxResults(),
             $criteria->getOrderings(),
-            $context->getConfig()->getHasMore()
-        ));
+            (bool)$context->getConfig()?->getHasMore()
+        );
+        $context->set(self::SEARCH_QUERY, $searchQuery);
+        $context->setQuery($searchQuery);
         $context->setCriteria($this->buildCriteria($criteria));
     }
 
-    private function getSearchTextFilterName(FilterCollection $filters): string
+    private function hasSearchFilter(FilterCollection $filters, FilterValueAccessorInterface $filterValues): bool
     {
-        /** @var FilterInterface $filter */
-        foreach ($filters as $filterKey => $filter) {
-            if ($filter instanceof SimpleSearchFilter) {
+        foreach ($filterValues->getAll() as $filterKey => $filterValue) {
+            if ($this->isSearchFilter($filters->get($filterKey))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function hasNonSearchFilter(FilterCollection $filters, FilterValueAccessorInterface $filterValues): bool
+    {
+        foreach ($filterValues->getAll() as $filterKey => $filterValue) {
+            $filter = $filters->get($filterKey);
+            if (!$this->isSearchFilter($filter) && !$this->isSpecialFilter($filter)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function isSearchFilter(?FilterInterface $filter): bool
+    {
+        return
+            $filter instanceof SimpleSearchFilter
+            || $filter instanceof SearchQueryFilter
+            || $filter instanceof SearchAggregationFilter;
+    }
+
+    private function isSpecialFilter(?FilterInterface $filter): bool
+    {
+        return
+            $filter instanceof PageNumberFilter
+            || $filter instanceof PageSizeFilter
+            || $filter instanceof SortFilter
+            || $filter instanceof MetaPropertyFilter
+            || $filter instanceof FieldsFilter
+            || $filter instanceof IncludeFilter;
+    }
+
+    private function createSearchFilterError(string $detail, ListContext $context): Error
+    {
+        return Error::createValidationError(Constraint::FILTER, $detail)
+            ->setSource(ErrorSource::createByParameter($this->getSearchFilterName($context)));
+    }
+
+    private function getSearchFilterName(ListContext $context): string
+    {
+        $filterValues = $context->getFilterValues()->getAll();
+        foreach ($filterValues as $filterKey => $filterValue) {
+            if ($this->isSearchFilter($context->getFilters()->get($filterKey))) {
                 return $filterKey;
             }
         }
 
-        throw new \LogicException('The "searchText" filter was not found.');
-    }
-
-    private function getSearchText(Expr\Expression $expr): ?string
-    {
-        if (!$expr instanceof Expr\CompositeExpression) {
-            return $this->extractSearchTextFromExpression($expr);
-        }
-
-        foreach ($expr->getExpressionList() as $childExpr) {
-            $searchText = $this->getSearchText($childExpr);
-            if ($searchText) {
-                return $searchText;
-            }
-        }
-
-        return null;
-    }
-
-    private function extractSearchTextFromExpression(Expr\Expression $expr): ?string
-    {
-        if ($expr instanceof Expr\Comparison
-            && $expr->getOperator() === Expr\Comparison::CONTAINS
-            && $expr->getField() === $this->getAllTextField()
-        ) {
-            return $expr->getValue()->getValue();
-        }
-
-        return null;
-    }
-
-    private function getAllTextField(): string
-    {
-        return SearchCriteria::implodeFieldTypeName(SearchQuery::TYPE_TEXT, SearchIndexer::TEXT_ALL_DATA_FIELD);
+        throw new \LogicException('Neither "searchText" nor "searchQuery" filter was found.');
     }
 
     private function buildCriteria(Criteria $criteria): Criteria

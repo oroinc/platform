@@ -4,14 +4,14 @@ namespace Oro\Bundle\SearchBundle\Api\Filter;
 
 use Oro\Bundle\ApiBundle\Exception\InvalidFilterException;
 use Oro\Bundle\SearchBundle\Query\Expression\FieldResolverInterface;
-use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 
 /**
- * Implements field names mapping for search filters.
+ * Implements mapping between field names and types in a search expression and search index.
  */
 class SearchFieldResolver implements FieldResolverInterface
 {
-    /** @var array [field name in search index => ['type' => field data-type, ...], ...] */
+    /** @var array [field name in search index => ['type' => field data-type], ...] */
     private array $searchFieldMappings;
     /** @var array [field name => field name in search index, ...] */
     private array $fieldMappings;
@@ -44,7 +44,7 @@ class SearchFieldResolver implements FieldResolverInterface
             return $this->searchFieldMappings[$fieldName]['type'];
         }
 
-        return Query::TYPE_TEXT;
+        return SearchQuery::TYPE_TEXT;
     }
 
     /**
@@ -105,7 +105,7 @@ class SearchFieldResolver implements FieldResolverInterface
                 if (is_numeric($key)) {
                     continue;
                 }
-                $placeholder = sprintf('{%s}', $key);
+                $placeholder = \sprintf('{%s}', $key);
                 $searchFieldName = str_replace($placeholder, $val, $searchFieldName);
                 $searchMappingFieldName = str_replace($placeholder, $key, $searchMappingFieldName);
             }
@@ -131,13 +131,13 @@ class SearchFieldResolver implements FieldResolverInterface
         $this->placeholderFieldMappings = [];
         foreach ($this->fieldMappings as $fieldName => $searchFieldName) {
             if (str_contains($fieldName, '(?')) {
-                $this->placeholderFieldMappings[sprintf('#%s#', $fieldName)] = $searchFieldName;
+                $this->placeholderFieldMappings[\sprintf('#%s#', $fieldName)] = $searchFieldName;
             }
         }
     }
 
     private function createFieldNotSupportedException(string $fieldName): InvalidFilterException
     {
-        return new InvalidFilterException(sprintf('The field "%s" is not supported.', $fieldName));
+        return new InvalidFilterException(\sprintf('The field "%s" is not supported.', $fieldName));
     }
 }

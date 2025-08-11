@@ -21,7 +21,7 @@ use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 class SearchQueryFilter extends StandaloneFilter implements FieldFilterInterface
 {
     private AbstractSearchMappingProvider $searchMappingProvider;
-    private SearchFieldResolverFactory $searchFieldResolverFactory;
+    private SearchFieldResolverFactoryInterface $searchFieldResolverFactory;
     private ?ExpressionVisitor $searchQueryCriteriaVisitor = null;
     private ?string $entityClass = null;
     /** @var array [field name => field name in search index, ...] */
@@ -32,7 +32,7 @@ class SearchQueryFilter extends StandaloneFilter implements FieldFilterInterface
         $this->searchMappingProvider = $searchMappingProvider;
     }
 
-    public function setSearchFieldResolverFactory(SearchFieldResolverFactory $searchFieldResolverFactory): void
+    public function setSearchFieldResolverFactory(SearchFieldResolverFactoryInterface $searchFieldResolverFactory): void
     {
         $this->searchFieldResolverFactory = $searchFieldResolverFactory;
     }

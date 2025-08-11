@@ -95,7 +95,7 @@ class DoctrineHelper implements ResetInterface
     public function getEntityIdentifier(object $entity): array
     {
         $entityClass = $this->getClass($entity);
-        $manager = $this->registry->getManagerForClass($entityClass);
+        $manager = $this->getEntityManagerForClass($entityClass, false);
         if (null !== $manager) {
             return $manager->getClassMetadata($entityClass)->getIdentifierValues($entity);
         }
@@ -115,19 +115,20 @@ class DoctrineHelper implements ResetInterface
     public function isNewEntity(object $entity): bool
     {
         $entityClass = $this->getClass($entity);
-        $manager = $this->registry->getManagerForClass($entityClass);
+        $manager = $this->getEntityManagerForClass($entityClass, false);
         if (null === $manager) {
             throw new Exception\NotManageableEntityException($entityClass);
         }
 
         $identifierValues = $manager->getClassMetadata($entityClass)->getIdentifierValues($entity);
 
-        return count($identifierValues) === 0;
+        return \count($identifierValues) === 0;
     }
 
     /**
      * Extracts the single identifier value of the given entity.
      *
+     * @throws Exception\NotManageableEntityException if an entity is not manageable and it doesn't have getId() method
      * @throws Exception\InvalidEntityException if the entity has several identifier fields and $throwException is TRUE
      */
     public function getSingleEntityIdentifier(object $entity, bool $throwException = true): mixed
@@ -135,9 +136,9 @@ class DoctrineHelper implements ResetInterface
         $entityIdentifier = $this->getEntityIdentifier($entity);
 
         $result = null;
-        if (count($entityIdentifier) > 1) {
+        if (\count($entityIdentifier) > 1) {
             if ($throwException) {
-                throw new Exception\InvalidEntityException(sprintf(
+                throw new Exception\InvalidEntityException(\sprintf(
                     'Can\'t get single identifier for "%s" entity.',
                     $this->getEntityClass($entity)
                 ));
@@ -259,6 +260,10 @@ class DoctrineHelper implements ResetInterface
      */
     public function isManageableEntity($entityOrClass)
     {
+        if (\is_string($entityOrClass)) {
+            return $this->isManageableEntityClass($entityOrClass);
+        }
+
         return null !== $this->getEntityManager($entityOrClass, false);
     }
 
@@ -304,14 +309,7 @@ class DoctrineHelper implements ResetInterface
      */
     public function getEntityMetadataForClass($entityClass, $throwException = true)
     {
-        $manager = $this->registry->getManagerForClass($entityClass);
-        if (null === $manager && $throwException) {
-            throw new Exception\NotManageableEntityException($entityClass);
-        }
-
-        return null !== $manager
-            ? $manager->getClassMetadata($entityClass)
-            : null;
+        return $this->getEntityManagerForClass($entityClass, $throwException)?->getClassMetadata($entityClass);
     }
 
     /**
@@ -345,10 +343,7 @@ class DoctrineHelper implements ResetInterface
      */
     public function getEntityManager($entityOrClass, $throwException = true)
     {
-        return $this->getEntityManagerForClass(
-            $this->getEntityClass($entityOrClass),
-            $throwException
-        );
+        return $this->getEntityManagerForClass($this->getEntityClass($entityOrClass), $throwException);
     }
 
     /**

@@ -11,7 +11,6 @@ api:
         Oro\Bundle\SearchBundle\Api\Model\SearchEntity:
             documentation_resource: '@OroSearchBundle/Resources/doc/api/search_entity.md'
             disable_meta_properties: true
-            disable_fieldset: true
             identifier_field_names: [id]
             fields:
                 id:
@@ -22,8 +21,23 @@ api:
                     data_type: string
                 searchable:
                     data_type: boolean
+                fields:
+                    data_type: objects
+                    fields:
+                        name:
+                            data_type: string
+                        type:
+                            data_type: string
+                        entityFields:
+                            data_type: strings
             filters:
                 fields:
+                    entityType:
+                        type: string
+                        data_type: entityClass
+                        allow_array: true
+                        operators: [ '=' ]
+                        property_path: _
                     searchable:
                         data_type: boolean
                         operators: [ '=' ]
@@ -32,7 +46,6 @@ api:
                 get_list:
                     page_size: -1 # disable paging
                     disable_sorting: true
-                get: false
                 create: false
                 update: false
                 delete: false
@@ -64,6 +77,15 @@ api:
                 fields:
                     searchText:
                         data_type: string
+                        operators: [ '=' ]
+                        property_path: _
+                    searchQuery:
+                        data_type: string
+                        operators: [ '=' ]
+                        property_path: _
+                    aggregations:
+                        data_type: string
+                        allow_array: true
                         operators: [ '=' ]
                         property_path: _
                     entities:
