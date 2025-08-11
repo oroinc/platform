@@ -148,7 +148,7 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
         $field4->fromArray('attribute', ['field_name' => 'color_custom_2']);
 
         return [
-            'unique labels' => [
+            'unique labels field labels' => [
                 'fields' => [
                     $field1,
                     $field2,
@@ -162,7 +162,7 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
                     'Size' => $field2->getId(),
                 ]
             ],
-            'non unique labels' => [
+            'non unique system and not system field labels' => [
                 'fields' => [
                     $field1,
                     $field2,
@@ -173,11 +173,51 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
                     $field1->getId() => ['isSystem' => false, 'label' => 'Color'],
                     $field2->getId() => ['isSystem' => false, 'label' => 'Size'],
                     $field3->getId() => ['isSystem' => true, 'label' => 'Color'],
+                    $field4->getId() => ['isSystem' => true, 'label' => 'Color'],
+                ],
+                'expectedChoices' => [
+                    'Size' => $field2->getId(),
+                    'Color(color, oro.entity_config.attribute.system)' => $field3->getId(),
+                    'Color(color_custom_1)' => $field1->getId(),
+                    'Color(color_custom_2, oro.entity_config.attribute.system)' => $field4->getId(),
+                ]
+            ],
+            'non unique system field labels' => [
+                'fields' => [
+                    $field1,
+                    $field2,
+                    $field3,
+                    $field4,
+                ],
+                'fieldsData' => [
+                    $field1->getId() => ['isSystem' => false, 'label' => 'Color'],
+                    $field2->getId() => ['isSystem' => false, 'label' => 'Size'],
+                    $field3->getId() => ['isSystem' => true, 'label' => 'Color'],
+                    $field4->getId() => ['isSystem' => true, 'label' => 'Color'],
+                ],
+                'expectedChoices' => [
+                    'Size' => $field2->getId(),
+                    'Color(color, oro.entity_config.attribute.system)' => $field3->getId(),
+                    'Color(color_custom_1)' => $field1->getId(),
+                    'Color(color_custom_2, oro.entity_config.attribute.system)' => $field4->getId(),
+                ]
+            ],
+            'non unique not system field labels' => [
+                'fields' => [
+                    $field1,
+                    $field2,
+                    $field3,
+                    $field4,
+                ],
+                'fieldsData' => [
+                    $field1->getId() => ['isSystem' => false, 'label' => 'Color'],
+                    $field2->getId() => ['isSystem' => false, 'label' => 'Size'],
+                    $field3->getId() => ['isSystem' => false, 'label' => 'Color'],
                     $field4->getId() => ['isSystem' => false, 'label' => 'Color'],
                 ],
                 'expectedChoices' => [
                     'Size' => $field2->getId(),
-                    'Color(oro.entity_config.attribute.system)' => $field3->getId(),
+                    'Color(color)' => $field3->getId(),
                     'Color(color_custom_1)' => $field1->getId(),
                     'Color(color_custom_2)' => $field4->getId(),
                 ]
