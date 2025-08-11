@@ -1,0 +1,157 @@
+openapi: 3.1.0
+info:
+  title: 'JSON:API'
+  description: '[The documentation](https://doc.oroinc.com/api/)'
+  version: 0.0.0
+paths:
+  /admin/api/businessunits:
+    get:
+      tags:
+        - businessunits
+      summary: 'Get Business Units'
+      description: '<p>Retrieve a collection of business unit records.</p><p>Business units represent a group of users with similar business or administrative tasks/roles.</p>'
+      operationId: businessunits-get
+      parameters:
+        -
+          $ref: '#/components/parameters/accept'
+        -
+          $ref: '#/components/parameters/xInclude'
+        -
+          $ref: '#/components/parameters/filterAggregations'
+        -
+          $ref: '#/components/parameters/filterEmail'
+        -
+          $ref: '#/components/parameters/filterEmailEq'
+        -
+          $ref: '#/components/parameters/filterEmailNeq'
+        -
+          $ref: '#/components/parameters/filterEmailExists'
+        -
+          $ref: '#/components/parameters/filterEmailNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterId'
+        -
+          $ref: '#/components/parameters/filterIdEq'
+        -
+          $ref: '#/components/parameters/filterIdNeq'
+        -
+          $ref: '#/components/parameters/filterIdLt'
+        -
+          $ref: '#/components/parameters/filterIdLte'
+        -
+          $ref: '#/components/parameters/filterIdGt'
+        -
+          $ref: '#/components/parameters/filterIdGte'
+        -
+          $ref: '#/components/parameters/filterName'
+        -
+          $ref: '#/components/parameters/filterNameEq'
+        -
+          $ref: '#/components/parameters/filterNameNeq'
+        -
+          $ref: '#/components/parameters/filterNameExists'
+        -
+          $ref: '#/components/parameters/filterNameNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterOrganization'
+        -
+          $ref: '#/components/parameters/filterOrganizationEq'
+        -
+          $ref: '#/components/parameters/filterOrganizationNeq'
+        -
+          $ref: '#/components/parameters/filterOrganizationExists'
+        -
+          $ref: '#/components/parameters/filterOrganizationNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterOwner'
+        -
+          $ref: '#/components/parameters/filterOwnerEq'
+        -
+          $ref: '#/components/parameters/filterOwnerNeq'
+        -
+          $ref: '#/components/parameters/filterOwnerExists'
+        -
+          $ref: '#/components/parameters/filterOwnerNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterSearchQuery'
+        -
+          $ref: '#/components/parameters/filterSearchText'
+        -
+          $ref: '#/components/parameters/filterUsers'
+        -
+          $ref: '#/components/parameters/filterUsersEq'
+        -
+          $ref: '#/components/parameters/filterUsersNeq'
+        -
+          $ref: '#/components/parameters/filterUsersExists'
+        -
+          $ref: '#/components/parameters/filterUsersNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterUsersContains'
+        -
+          $ref: '#/components/parameters/filterUsersNotContains'
+        -
+          $ref: '#/components/parameters/fieldsBusinessunits'
+        -
+          $ref: '#/components/parameters/fieldsOrganizations'
+        -
+          $ref: '#/components/parameters/fieldsUsers'
+        -
+          $ref: '#/components/parameters/include'
+        -
+          $ref: '#/components/parameters/meta'
+        -
+          $ref: '#/components/parameters/pageNumber'
+        -
+          $ref: '#/components/parameters/pageSize'
+        -
+          $ref: '#/components/parameters/sort'
+      responses:
+        200:
+          $ref: '#/components/responses/businessunitsCollectionModel'
+        403:
+          $ref: '#/components/responses/err403_1'
+        500:
+          $ref: '#/components/responses/err500_1'
+components:
+  schemas:
+    stringUnionArray:
+      oneOf:
+        -
+          type: string
+        -
+          $ref: '#/components/schemas/stringArray'
+    stringArray:
+      type: array
+      items:
+        type: string
+    orderBy_id:
+      type: string
+      format: orderBy
+      default: id
+      pattern: '-?[\w\.]+(,-?[\w\.]+)*'
+  parameters:
+    filterAggregations:
+      name: 'filter[aggregations]'
+      in: query
+      description: 'The filter that is used to request aggregated data. Available fields: allText, businessUnit, id, name, organization'
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterSearchQuery:
+      name: 'filter[searchQuery]'
+      in: query
+      description: 'Filter records by a search query. Available fields: allText, businessUnit, id, name, organization'
+      schema:
+        type: string
+    filterSearchText:
+      name: 'filter[searchText]'
+      in: query
+      description: 'Filter records by a search string.'
+      schema:
+        type: string
+    sort:
+      name: sort
+      in: query
+      description: "Result sorting. Comma-separated fields, e.g. 'field1,-field2'. Allowed fields: email, id, organization, owner, users. Allowed fields when a search filter is used: allText, businessUnit, id, name, organization."
+      schema:
+        $ref: '#/components/schemas/orderBy_id'

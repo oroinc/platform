@@ -1087,7 +1087,7 @@ paths:
         -
           $ref: '#/components/parameters/pageSize'
         -
-          $ref: '#/components/parameters/sort'
+          $ref: '#/components/parameters/sort1'
       responses:
         '200':
           $ref: '#/components/responses/testapicollectionsCollectionModel'
@@ -1410,7 +1410,7 @@ paths:
         -
           $ref: '#/components/parameters/pageSize'
         -
-          $ref: '#/components/parameters/sort'
+          $ref: '#/components/parameters/sort1'
       responses:
         '200':
           $ref: '#/components/responses/testapicollectionsCollectionModel'
@@ -1733,7 +1733,7 @@ paths:
         -
           $ref: '#/components/parameters/pageSize'
         -
-          $ref: '#/components/parameters/sort'
+          $ref: '#/components/parameters/sort1'
       responses:
         '200':
           $ref: '#/components/responses/testapicollectionsCollectionModel'
@@ -2056,7 +2056,7 @@ paths:
         -
           $ref: '#/components/parameters/pageSize'
         -
-          $ref: '#/components/parameters/sort'
+          $ref: '#/components/parameters/sort1'
       responses:
         '200':
           $ref: '#/components/responses/testapicollectionsCollectionModel'
@@ -2379,7 +2379,7 @@ paths:
         -
           $ref: '#/components/parameters/pageSize'
         -
-          $ref: '#/components/parameters/sort'
+          $ref: '#/components/parameters/sort1'
       responses:
         '200':
           $ref: '#/components/responses/testapicollectionsCollectionModel'
@@ -2702,7 +2702,7 @@ paths:
         -
           $ref: '#/components/parameters/pageSize'
         -
-          $ref: '#/components/parameters/sort'
+          $ref: '#/components/parameters/sort1'
       responses:
         '200':
           $ref: '#/components/responses/testapicollectionsCollectionModel'
@@ -3127,7 +3127,7 @@ paths:
         -
           $ref: '#/components/parameters/pageSize'
         -
-          $ref: '#/components/parameters/sort'
+          $ref: '#/components/parameters/sort1'
       responses:
         '200':
           $ref: '#/components/responses/testapicollectionsCollectionModel'
@@ -3450,7 +3450,7 @@ paths:
         -
           $ref: '#/components/parameters/pageSize'
         -
-          $ref: '#/components/parameters/sort'
+          $ref: '#/components/parameters/sort1'
       responses:
         '200':
           $ref: '#/components/responses/testapicollectionsCollectionModel'
@@ -3773,7 +3773,7 @@ paths:
         -
           $ref: '#/components/parameters/pageSize'
         -
-          $ref: '#/components/parameters/sort'
+          $ref: '#/components/parameters/sort1'
       responses:
         '200':
           $ref: '#/components/responses/testapicollectionsCollectionModel'
@@ -4096,7 +4096,7 @@ paths:
         -
           $ref: '#/components/parameters/pageSize'
         -
-          $ref: '#/components/parameters/sort'
+          $ref: '#/components/parameters/sort1'
       responses:
         '200':
           $ref: '#/components/responses/testapicollectionsCollectionModel'
@@ -4419,7 +4419,7 @@ paths:
         -
           $ref: '#/components/parameters/pageSize'
         -
-          $ref: '#/components/parameters/sort'
+          $ref: '#/components/parameters/sort1'
       responses:
         '200':
           $ref: '#/components/responses/testapicollectionsCollectionModel'
@@ -4742,7 +4742,7 @@ paths:
         -
           $ref: '#/components/parameters/pageSize'
         -
-          $ref: '#/components/parameters/sort'
+          $ref: '#/components/parameters/sort1'
       responses:
         '200':
           $ref: '#/components/responses/testapicollectionsCollectionModel'
@@ -6911,7 +6911,7 @@ paths:
         -
           $ref: '#/components/parameters/pageSize'
         -
-          $ref: '#/components/parameters/sort'
+          $ref: '#/components/parameters/sort1'
       responses:
         '200':
           $ref: '#/components/responses/testapicollectionsCollectionModel'
@@ -16459,7 +16459,13 @@ components:
     sort:
       name: sort
       in: query
-      description: "Result sorting. Comma-separated fields, e.g. 'field1,-field2'."
+      description: "Result sorting. Comma-separated fields, e.g. 'field1,-field2'. Allowed fields: extraLazyWithOrphanRemovalParent, extraLazyWithoutOrphanRemovalParent, id, inverseManyToManyExtraLazyWithOrphanRemovalParents, inverseManyToManyExtraLazyWithoutOrphanRemovalParents, inverseManyToManyLazyWithOrphanRemovalParents, inverseManyToManyLazyWithoutOrphanRemovalParents, inverseManyToManyWithOrphanRemovalParents, inverseManyToManyWithoutOrphanRemovalParents, lazyWithOrphanRemovalParent, lazyWithoutOrphanRemovalParent, manyToManyExtraLazyWithOrphanRemovalParents, manyToManyExtraLazyWithoutOrphanRemovalParents, manyToManyLazyWithOrphanRemovalParents, manyToManyLazyWithoutOrphanRemovalParents, manyToManyWithOrphanRemovalParents, manyToManyWithoutOrphanRemovalParents, withOrphanRemovalParent, withoutOrphanRemovalParent."
+      schema:
+        $ref: '#/components/schemas/orderBy_id'
+    sort1:
+      name: sort
+      in: query
+      description: "Result sorting. Comma-separated fields, e.g. 'field1,-field2'. Allowed fields: extraLazyWithOrphanRemovalItems, extraLazyWithoutOrphanRemovalItems, id, inverseManyToManyExtraLazyWithOrphanRemovalItems, inverseManyToManyExtraLazyWithoutOrphanRemovalItems, inverseManyToManyLazyWithOrphanRemovalItems, inverseManyToManyLazyWithoutOrphanRemovalItems, inverseManyToManyWithOrphanRemovalItems, inverseManyToManyWithoutOrphanRemovalItems, lazyWithOrphanRemovalItems, lazyWithoutOrphanRemovalItems, manyToManyExtraLazyWithOrphanRemovalItems, manyToManyExtraLazyWithoutOrphanRemovalItems, manyToManyLazyWithOrphanRemovalItems, manyToManyLazyWithoutOrphanRemovalItems, manyToManyWithOrphanRemovalItems, manyToManyWithoutOrphanRemovalItems, withOrphanRemovalItems, withoutOrphanRemovalItems."
       schema:
         $ref: '#/components/schemas/orderBy_id'
     contentType:

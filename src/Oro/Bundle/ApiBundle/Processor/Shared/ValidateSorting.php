@@ -20,24 +20,24 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ValidateSorting implements ProcessorInterface
 {
-    private DoctrineHelper $doctrineHelper;
-    private AssociationSortersProvider $associationSortersProvider;
-    private FilterNamesRegistry $filterNamesRegistry;
+    public const OPERATION_NAME = 'validate_sorting';
 
     public function __construct(
-        DoctrineHelper $doctrineHelper,
-        AssociationSortersProvider $associationSortersProvider,
-        FilterNamesRegistry $filterNamesRegistry
+        private readonly DoctrineHelper $doctrineHelper,
+        private readonly AssociationSortersProvider $associationSortersProvider,
+        private readonly FilterNamesRegistry $filterNamesRegistry
     ) {
-        $this->doctrineHelper = $doctrineHelper;
-        $this->associationSortersProvider = $associationSortersProvider;
-        $this->filterNamesRegistry = $filterNamesRegistry;
     }
 
     #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */
+
+        if ($context->isProcessed(self::OPERATION_NAME)) {
+            // the sorting validation was already performed
+            return;
+        }
 
         if ($context->hasQuery()) {
             // a query is already built
@@ -65,11 +65,12 @@ class ValidateSorting implements ProcessorInterface
                     ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey() ?: $filterName))
             );
         }
+        $context->setProcessed(self::OPERATION_NAME);
     }
 
     private function getValidationErrorMessage(array $unsupportedFields): string
     {
-        return sprintf(
+        return \sprintf(
             'Sorting by "%s" field%s not supported.',
             implode(', ', $unsupportedFields),
             \count($unsupportedFields) === 1 ? ' is' : 's are'
