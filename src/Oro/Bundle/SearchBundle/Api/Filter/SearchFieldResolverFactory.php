@@ -2,40 +2,32 @@
 
 namespace Oro\Bundle\SearchBundle\Api\Filter;
 
-use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
+use Oro\Bundle\SearchBundle\Api\SearchMappingProvider;
 
 /**
- * The factory to create SearchFieldResolver.
+ * The factory to create {@see SearchFieldResolver}.
  */
-class SearchFieldResolverFactory
+class SearchFieldResolverFactory implements SearchFieldResolverFactoryInterface
 {
-    private AbstractSearchMappingProvider $searchMappingProvider;
-
-    public function __construct(AbstractSearchMappingProvider $searchMappingProvider)
-    {
-        $this->searchMappingProvider = $searchMappingProvider;
+    public function __construct(
+        private readonly SearchMappingProvider $searchMappingProvider
+    ) {
     }
 
-    /**
-     * Creates a new instance of SearchFieldResolver.
-     *
-     * @param string $entityClass
-     * @param array  $fieldMappings [field name => field name in search index, ...]
-     *
-     * @return SearchFieldResolver
-     */
+    #[\Override]
     public function createFieldResolver(string $entityClass, array $fieldMappings): SearchFieldResolver
     {
-        return new SearchFieldResolver(
-            $this->getSearchFieldMappings($entityClass),
-            $fieldMappings
-        );
-    }
+        $fieldMappings = array_merge($this->searchMappingProvider->getFieldMappings($entityClass), $fieldMappings);
 
-    protected function getSearchFieldMappings(string $entityClass): array
-    {
-        $mapping = $this->searchMappingProvider->getEntityConfig($entityClass);
+        $searchFieldMappings = [];
+        $sortableFieldTypes = $this->searchMappingProvider->getSearchFieldTypes($entityClass);
+        foreach ($sortableFieldTypes as $fieldName => $fieldType) {
+            $searchFieldName = $fieldMappings[$fieldName] ?? $fieldName;
+            if (!isset($searchFieldMappings[$searchFieldName])) {
+                $searchFieldMappings[$searchFieldName] = ['type' => $fieldType];
+            }
+        }
 
-        return $mapping['fields'];
+        return new SearchFieldResolver($searchFieldMappings, $fieldMappings);
     }
 }

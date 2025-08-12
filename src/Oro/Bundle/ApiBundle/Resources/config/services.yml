@@ -335,6 +335,11 @@ services:
             - { name: kernel.event_listener, event: oro_featuretoggle.features.change, method: onFeaturesChange }
             - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: onEntityConfigPostFlush }
 
+    oro_api.load_entity_ids_query_executor:
+        class: Oro\Bundle\ApiBundle\Model\LoadEntityIdsQueryExecutor
+        arguments:
+            - '@oro_api.filter_names_registry'
+
     oro_api.listener.api_source.open_api:
         class: Oro\Bundle\ApiBundle\EventListener\OpenApiSourceListener
         arguments:
