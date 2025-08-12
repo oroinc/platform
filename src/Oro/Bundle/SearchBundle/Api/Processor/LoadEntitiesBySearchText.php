@@ -27,7 +27,6 @@ use Oro\Bundle\SearchBundle\Api\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
-use Oro\Bundle\SearchBundle\Query\Criteria\Criteria as SearchCriteria;
 use Oro\Bundle\SearchBundle\Query\Expression\Parser as SearchQueryParser;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\SearchBundle\Query\Result as SearchResult;
@@ -200,9 +199,7 @@ class LoadEntitiesBySearchText implements ProcessorInterface
             throw new InvalidFilterException($e->getMessage());
         }
         $query->from($entityAliases);
-        $query->addSelect(
-            SearchCriteria::implodeFieldTypeName(SearchQuery::TYPE_TEXT, SearchIndexer::NAME_FIELD) . ' as name'
-        );
+        $query->addSelect('text.system_entity_name as name');
 
         return $query;
     }
