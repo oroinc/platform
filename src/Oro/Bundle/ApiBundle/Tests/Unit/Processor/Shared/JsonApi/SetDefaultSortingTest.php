@@ -11,10 +11,14 @@ use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetDefaultSorting;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SetDefaultSortingTest extends GetListProcessorTestCase
 {
     private SetDefaultSorting $processor;
@@ -69,6 +73,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals(['id' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertEquals(
+            "Result sorting. Comma-separated fields, e.g. 'field1,-field2'. Allowed fields: id.",
+            $sortFilter->getDescription()
+        );
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
@@ -93,6 +101,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertSame([], $sortFilter->getDefaultValue());
+        self::assertEquals(
+            "Result sorting. Comma-separated fields, e.g. 'field1,-field2'.",
+            $sortFilter->getDescription()
+        );
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
@@ -117,6 +129,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals(['id' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertEquals(
+            "Result sorting. Comma-separated fields, e.g. 'field1,-field2'. Allowed fields: id.",
+            $sortFilter->getDescription()
+        );
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
@@ -143,6 +159,68 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertSame([], $sortFilter->getDefaultValue());
+        self::assertEquals(
+            "Result sorting. Comma-separated fields, e.g. 'field1,-field2'.",
+            $sortFilter->getDescription()
+        );
+        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
+    }
+
+    public function testProcessForEntityWithCompositeIdentifier(): void
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['id', 'title']);
+        $config->addField('id');
+        $config->addField('title');
+
+        $configOfSorters = new SortersConfig();
+        $configOfSorters->addField('id');
+        $configOfSorters->addField('title');
+
+        $this->context->setClassName(CompositeKeyEntity::class);
+        $this->context->setConfig($config);
+        $this->context->setConfigOfSorters($configOfSorters);
+        $this->processor->process($this->context);
+
+        $filters = $this->context->getFilters();
+        self::assertCount(1, $filters);
+        /** @var SortFilter $sortFilter */
+        $sortFilter = $filters->get('sort');
+        self::assertEquals('orderBy', $sortFilter->getDataType());
+        self::assertEquals(['id' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertEquals(
+            "Result sorting. Comma-separated fields, e.g. 'field1,-field2'. Allowed fields: id.",
+            $sortFilter->getDescription()
+        );
+        self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
+    }
+
+    public function testProcessForEntityWithCompositeIdentifierAndSorterForSomeIdentifierFieldsIsDisabled(): void
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['id', 'title']);
+        $config->addField('id');
+        $config->addField('title');
+
+        $configOfSorters = new SortersConfig();
+        $configOfSorters->addField('id')->setExcluded(true);
+        $configOfSorters->addField('title');
+
+        $this->context->setClassName(CompositeKeyEntity::class);
+        $this->context->setConfig($config);
+        $this->context->setConfigOfSorters($configOfSorters);
+        $this->processor->process($this->context);
+
+        $filters = $this->context->getFilters();
+        self::assertCount(1, $filters);
+        /** @var SortFilter $sortFilter */
+        $sortFilter = $filters->get('sort');
+        self::assertEquals('orderBy', $sortFilter->getDataType());
+        self::assertEquals([], $sortFilter->getDefaultValue());
+        self::assertEquals(
+            "Result sorting. Comma-separated fields, e.g. 'field1,-field2'.",
+            $sortFilter->getDescription()
+        );
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
@@ -150,7 +228,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
     {
         $config = new EntityDefinitionConfig();
         $config->setIdentifierFieldNames(['name']);
-        $config->setOrderBy(['label' => 'DESC']);
+        $config->setOrderBy(['name' => 'DESC']);
 
         $configOfSorters = new SortersConfig();
         $configOfSorters->addField('name');
@@ -166,7 +244,11 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         /** @var SortFilter $sortFilter */
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
-        self::assertEquals(['label' => 'DESC'], $sortFilter->getDefaultValue());
+        self::assertEquals(['name' => 'DESC'], $sortFilter->getDefaultValue());
+        self::assertEquals(
+            "Result sorting. Comma-separated fields, e.g. 'field1,-field2'. Allowed fields: id.",
+            $sortFilter->getDescription()
+        );
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
@@ -184,6 +266,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
         self::assertEquals([], $sortFilter->getDefaultValue());
+        self::assertEquals(
+            "Result sorting. Comma-separated fields, e.g. 'field1,-field2'.",
+            $sortFilter->getDescription()
+        );
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 

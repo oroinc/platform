@@ -307,12 +307,7 @@ class DoctrineHelper implements ResetInterface
      */
     public function getEntityMetadataForClass($entityClass, $throwException = true)
     {
-        $manager = $this->getEntityManagerForClass($entityClass, false);
-        if (null === $manager && $throwException) {
-            throw new Exception\NotManageableEntityException($entityClass);
-        }
-
-        return $manager?->getClassMetadata($entityClass);
+        return $this->getEntityManagerForClass($entityClass, $throwException)?->getClassMetadata($entityClass);
     }
 
     /**
@@ -346,10 +341,7 @@ class DoctrineHelper implements ResetInterface
      */
     public function getEntityManager($entityOrClass, $throwException = true)
     {
-        return $this->getEntityManagerForClass(
-            $this->getEntityClass($entityOrClass),
-            $throwException
-        );
+        return $this->getEntityManagerForClass($this->getEntityClass($entityOrClass), $throwException);
     }
 
     /**

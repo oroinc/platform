@@ -5,20 +5,17 @@ namespace Oro\Bundle\SearchBundle\Api;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
 
 /**
  * Provides class names for entities that can be searched via API.
  */
 class SearchEntityClassProvider implements SearchEntityClassProviderInterface
 {
-    private Indexer $searchIndexer;
-    private ResourcesProvider $resourcesProvider;
-
-    public function __construct(Indexer $searchIndexer, ResourcesProvider $resourcesProvider)
-    {
-        $this->searchIndexer = $searchIndexer;
-        $this->resourcesProvider = $resourcesProvider;
+    public function __construct(
+        private readonly SearchIndexer $searchIndexer,
+        private readonly ResourcesProvider $resourcesProvider
+    ) {
     }
 
     #[\Override]
