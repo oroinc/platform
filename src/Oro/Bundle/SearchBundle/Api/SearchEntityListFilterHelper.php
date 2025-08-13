@@ -95,7 +95,7 @@ class SearchEntityListFilterHelper
     ): Error {
         return Error::createValidationError(
             Constraint::FILTER,
-            sprintf(
+            \sprintf(
                 'The "%s" is not known entity. Known entities: %s',
                 $entityType,
                 implode(', ', $this->convertToEntityTypes($accessibleEntityClasses, $requestType))

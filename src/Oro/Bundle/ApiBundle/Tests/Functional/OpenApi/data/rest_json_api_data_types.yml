@@ -2604,7 +2604,7 @@ components:
     sort:
       name: sort
       in: query
-      description: "Result sorting. Comma-separated fields, e.g. 'field1,-field2'."
+      description: "Result sorting. Comma-separated fields, e.g. 'field1,-field2'. Allowed fields: fieldBackedEnumInt, fieldBackedEnumStr, fieldBigInt, fieldBoolean, fieldCurrency, fieldDate, fieldDateTime, fieldDecimal, fieldDecimalDefault, fieldDuration, fieldFloat, fieldGuid, fieldInt, fieldMoney, fieldMoneyValue, fieldPercent, fieldPercent100, fieldSmallInt, fieldString, fieldTime, id."
       schema:
         $ref: '#/components/schemas/orderBy_id'
     contentType:

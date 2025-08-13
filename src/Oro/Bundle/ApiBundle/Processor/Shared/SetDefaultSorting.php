@@ -52,6 +52,27 @@ class SetDefaultSorting implements ProcessorInterface
         return 'Result sorting. Comma-separated fields, e.g. \'field1,-field2\'.';
     }
 
+    protected function getAllowedSortFieldsDescription(
+        EntityDefinitionConfig $config,
+        SortersConfig $configOfSorters
+    ): ?string {
+        $fieldNames = [];
+        foreach ($configOfSorters->getFields() as $fieldName => $field) {
+            if (!$field->isExcluded()) {
+                $fieldNames[] = $fieldName;
+            }
+        }
+        if (!$fieldNames) {
+            return null;
+        }
+
+        if (\count($fieldNames) > 1) {
+            sort($fieldNames);
+        }
+
+        return 'Allowed fields: ' . implode(', ', $fieldNames) . '.';
+    }
+
     /**
      * @param EntityDefinitionConfig $config
      * @param SortersConfig|null     $configOfSorters
@@ -105,11 +126,18 @@ class SetDefaultSorting implements ProcessorInterface
         ?SortersConfig $configOfSorters
     ): void {
         if (!$filterCollection->has($filterName)) {
+            $filterDescription = $this->getSortFilterDescription();
+            if (null !== $configOfSorters) {
+                $allowedSortFieldsDescription = $this->getAllowedSortFieldsDescription($config, $configOfSorters);
+                if ($allowedSortFieldsDescription) {
+                    $filterDescription .= ' ' . $allowedSortFieldsDescription;
+                }
+            }
             $filterCollection->add(
                 $filterName,
                 new SortFilter(
                     DataType::ORDER_BY,
-                    $this->getSortFilterDescription(),
+                    $filterDescription,
                     function () use ($config, $configOfSorters) {
                         return $this->getDefaultValue($config, $configOfSorters);
                     },

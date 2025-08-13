@@ -1046,7 +1046,7 @@ components:
     sort:
       name: sort
       in: query
-      description: "Result sorting. Comma-separated fields, e.g. 'field1,-field2'."
+      description: "Result sorting. Comma-separated fields, e.g. 'field1,-field2'. Allowed fields: id."
       schema:
         $ref: '#/components/schemas/orderBy_id'
     contentType:

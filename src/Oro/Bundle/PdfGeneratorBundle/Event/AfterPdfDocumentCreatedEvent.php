@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\PdfGeneratorBundle\Event;
 
 use Oro\Bundle\PdfGeneratorBundle\PdfDocument\AbstractPdfDocument;
+use Oro\Bundle\PdfGeneratorBundle\PdfDocument\Demand\AbstractPdfDocumentDemand;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -14,10 +15,12 @@ class AfterPdfDocumentCreatedEvent extends Event
 {
     /**
      * @param AbstractPdfDocument $pdfDocument
+     * @param AbstractPdfDocumentDemand $pdfDocumentDemand
      * @param string $pdfDocumentGenerationMode The PDF document generation mode, {@see PdfDocumentGenerationMode}.
      */
     public function __construct(
         private readonly AbstractPdfDocument $pdfDocument,
+        private readonly AbstractPdfDocumentDemand $pdfDocumentDemand,
         private readonly string $pdfDocumentGenerationMode
     ) {
     }
@@ -25,6 +28,11 @@ class AfterPdfDocumentCreatedEvent extends Event
     public function getPdfDocument(): AbstractPdfDocument
     {
         return $this->pdfDocument;
+    }
+
+    public function getPdfDocumentDemand(): AbstractPdfDocumentDemand
+    {
+        return $this->pdfDocumentDemand;
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Api\Filter;
 
 use Doctrine\Common\Collections\Expr\ExpressionVisitor;
-use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolverFactory;
+use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolverFactoryInterface;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchQueryFilter;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchQueryFilterFactory;
 use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
@@ -13,14 +13,14 @@ use PHPUnit\Framework\TestCase;
 class SearchQueryFilterFactoryTest extends TestCase
 {
     private AbstractSearchMappingProvider&MockObject $searchMappingProvider;
-    private SearchFieldResolverFactory&MockObject $searchFieldResolverFactory;
+    private SearchFieldResolverFactoryInterface&MockObject $searchFieldResolverFactory;
     private ExpressionVisitor&MockObject $searchQueryCriteriaVisitor;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->searchMappingProvider = $this->createMock(AbstractSearchMappingProvider::class);
-        $this->searchFieldResolverFactory = $this->createMock(SearchFieldResolverFactory::class);
+        $this->searchFieldResolverFactory = $this->createMock(SearchFieldResolverFactoryInterface::class);
         $this->searchQueryCriteriaVisitor = $this->createMock(ExpressionVisitor::class);
     }
 

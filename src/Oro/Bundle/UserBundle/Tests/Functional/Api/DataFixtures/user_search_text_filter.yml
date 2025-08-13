@@ -1,14 +1,26 @@
 dependencies:
     - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
     - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser
     - Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadAllRolesData
 
 Oro\Bundle\UserBundle\Entity\User:
-    user{1..15}:
+    user{11..19}:
         firstName: 'Robert'
         lastName: 'Smith'
         username: 'user<current()>'
-        email: 'user<current()>.example.com'
+        email: 'user<current()>\@example.com'
+        password: ''
+        userRoles: ['@role.role_administrator']
+        organization: '@organization'
+        organizations: ['@organization']
+        owner: '@business_unit'
+        businessUnits: ['@business_unit']
+    user{21..26}:
+        firstName: 'Janet'
+        lastName: 'Smith'
+        username: 'user<current()>'
+        email: 'user<current()>\@example.com'
         password: ''
         userRoles: ['@role.role_administrator']
         organization: '@organization'

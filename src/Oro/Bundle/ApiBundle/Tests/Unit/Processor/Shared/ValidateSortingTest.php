@@ -84,26 +84,36 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         return $config;
     }
 
-    private function prepareFilters(string $sortBy): void
+    private function prepareFilters(?string $sortBy, bool $addSortFilter = true): void
     {
-        $filterValueAccessor = $this->context->getFilterValues();
-        $filterValueAccessor->set('sort', new FilterValue('sort', $sortBy));
-
-        // emulate sort normalizer
-        $orderBy = [];
-        $items = explode(',', $sortBy);
-        foreach ($items as $item) {
-            $item = trim($item);
-            if (str_starts_with($item, '-')) {
-                $orderBy[substr($item, 1)] = 'DESC';
-            } else {
-                $orderBy[$item] = 'ASC';
+        if (null !== $sortBy) {
+            $filterValueAccessor = $this->context->getFilterValues();
+            $filterValueAccessor->set('sort', new FilterValue('sort', $sortBy));
+            // emulate sort normalizer
+            $orderBy = [];
+            $items = explode(',', $sortBy);
+            foreach ($items as $item) {
+                $item = trim($item);
+                if (str_starts_with($item, '-')) {
+                    $orderBy[substr($item, 1)] = 'DESC';
+                } else {
+                    $orderBy[$item] = 'ASC';
+                }
             }
+            $filterValueAccessor->getOne('sort')->setValue($orderBy);
         }
-        $filterValueAccessor->getOne('sort')->setValue($orderBy);
+        if ($addSortFilter) {
+            $this->context->getFilters()->add('sort', new SortFilter(DataType::ORDER_BY));
+        }
+    }
 
-        $this->context->setFilterValues($filterValueAccessor);
-        $this->context->getFilters()->add('sort', new SortFilter(DataType::ORDER_BY));
+    public function testProcessWhenValidationAlreadyDone(): void
+    {
+        $this->context->setProcessed(ValidateSorting::OPERATION_NAME);
+        $this->processor->process($this->context);
+
+        self::assertEmpty($this->context->getErrors());
+        self::assertTrue($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
     }
 
     public function testProcessWhenQueryIsAlreadyBuilt(): void
@@ -114,6 +124,35 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
 
         self::assertSame($query, $this->context->getQuery());
+        self::assertFalse($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
+    }
+
+    public function testProcessWhenNoSortFilter(): void
+    {
+        $sortersConfig = $this->getSortersConfig(['id']);
+        $sortersConfig->getField('id');
+
+        $this->prepareFilters('-id', false);
+
+        $this->context->setConfigOfSorters($sortersConfig);
+        $this->processor->process($this->context);
+
+        self::assertEmpty($this->context->getErrors());
+        self::assertFalse($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
+    }
+
+    public function testProcessWhenSortingWasNotRequested(): void
+    {
+        $sortersConfig = $this->getSortersConfig(['id']);
+        $sortersConfig->getField('id');
+
+        $this->prepareFilters(null);
+
+        $this->context->setConfigOfSorters($sortersConfig);
+        $this->processor->process($this->context);
+
+        self::assertEmpty($this->context->getErrors());
+        self::assertFalse($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
     }
 
     public function testProcessWhenSortByExcludedFieldRequested(): void
@@ -133,6 +172,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
             ],
             $this->context->getErrors()
         );
+        self::assertTrue($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
     }
 
     public function testProcessWhenSortByExcludedFieldRequestedAndSortFilterHasSourceKey(): void
@@ -156,6 +196,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
             ],
             $this->context->getErrors()
         );
+        self::assertTrue($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
     }
 
     public function testProcessWhenNoSorters(): void
@@ -174,6 +215,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
             ],
             $this->context->getErrors()
         );
+        self::assertTrue($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
     }
 
     public function testProcessWhenSortByNotAllowedFieldRequested(): void
@@ -193,6 +235,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
             ],
             $this->context->getErrors()
         );
+        self::assertTrue($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
     }
 
     public function testProcessWhenSortBySeveralNotAllowedFieldRequested(): void
@@ -212,6 +255,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
             ],
             $this->context->getErrors()
         );
+        self::assertTrue($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
     }
 
     public function testProcessWhenSortByAllowedFieldRequested(): void
@@ -224,6 +268,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
 
         self::assertEmpty($this->context->getErrors());
+        self::assertTrue($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
     }
 
     public function testProcessWhenSortByAllowedRenamedFieldRequested(): void
@@ -242,6 +287,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
 
         self::assertEmpty($this->context->getErrors());
+        self::assertTrue($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
     }
 
     public function testProcessWhenSortByAllowedAssociationFieldRequested(): void
@@ -270,6 +316,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
 
         self::assertEmpty($this->context->getErrors());
+        self::assertTrue($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
     }
 
     public function testProcessWhenSortByAllowedRenamedAssociationRequested(): void
@@ -299,6 +346,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
 
         self::assertEmpty($this->context->getErrors());
+        self::assertTrue($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
     }
 
     public function testProcessWhenSortByAllowedRenamedAssociationAndRenamedRelatedFieldRequested(): void
@@ -331,6 +379,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
 
         self::assertEmpty($this->context->getErrors());
+        self::assertTrue($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
     }
 
     public function testProcessWhenSortByAllowedAssociationFieldRequestedForModelInheritedFromManageableEntity(): void
@@ -362,6 +411,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
 
         self::assertEmpty($this->context->getErrors());
+        self::assertTrue($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
     }
 
     public function testProcessWhenSortByNotAllowedAssociationFieldRequested(): void
@@ -396,6 +446,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
             ],
             $this->context->getErrors()
         );
+        self::assertTrue($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
     }
 
     public function testProcessWhenSortByUnknownAssociationConfigRequested(): void
@@ -419,6 +470,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
             ],
             $this->context->getErrors()
         );
+        self::assertTrue($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
     }
 
     public function testProcessWhenSortByUnknownAssociationRequested(): void
@@ -442,6 +494,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
             ],
             $this->context->getErrors()
         );
+        self::assertTrue($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
     }
 
     public function testProcessWhenSortByAssociationRequestedButForNotManageableEntity(): void
@@ -467,5 +520,6 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
             ],
             $this->context->getErrors()
         );
+        self::assertTrue($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
     }
 }
