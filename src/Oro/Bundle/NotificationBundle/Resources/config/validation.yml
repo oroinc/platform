@@ -12,4 +12,5 @@ Oro\Bundle\NotificationBundle\Entity\EmailNotification:
 Oro\Bundle\NotificationBundle\Entity\RecipientList:
     properties:
         email:
-            - Email: ~
+            - Email:
+                mode: strict
