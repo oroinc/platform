@@ -173,15 +173,34 @@ services:
         tags:
             - { name: 'cache.pool', namespace: 'oro_search_mapping_configuration' }
 
+    oro_search.cache.mapping_configuration.normalizer:
+        class: Oro\Bundle\SearchBundle\Provider\SearchMappingCacheNormalizer
+        arguments:
+            -
+                'a': 'alias'
+                't': 'search_template'
+                'l': 'label'
+                'm': 'mode'
+                'r': 'route'
+                'f': 'fields'
+            -
+                'n': 'name'
+                't': 'target_type'
+                'f': 'target_fields'
+                'a': 'target_fulltext'
+                'r': 'relation_fields'
+            - 'target_type'
+
     oro_search.provider.search_mapping:
         class: Oro\Bundle\SearchBundle\Provider\SearchMappingProvider
         arguments:
             - '@event_dispatcher'
             - '@oro_search.mapping_configuration.provider'
             - '@oro_search.cache.mapping_configuration'
+            - '@oro_search.cache.mapping_configuration.normalizer'
+            - 'oro_search.search_mapping_collect'
             - 'oro_search.mapping_config'
             - "@=service('oro_search.engine.parameters').getEngineName()"
-            - 'oro_search.search_mapping_collect'
 
     oro_search.cache.search_mapping.warmer:
         class: Oro\Bundle\SearchBundle\Cache\SearchProviderCacheWarmer

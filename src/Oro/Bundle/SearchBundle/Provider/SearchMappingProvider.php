@@ -18,26 +18,19 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
     WarmableConfigCacheInterface,
     ClearableConfigCacheInterface
 {
-    private EventDispatcherInterface $dispatcher;
-    private MappingConfigurationProviderAbstract $mappingConfigProvider;
-    private CacheItemPoolInterface $cache;
     private ?array $configuration = null;
     private string $cacheKey;
-    private string $eventName;
 
     public function __construct(
-        EventDispatcherInterface $dispatcher,
-        MappingConfigurationProviderAbstract $mappingConfigProvider,
-        CacheItemPoolInterface $cache,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly MappingConfigurationProviderAbstract $mappingConfigProvider,
+        private readonly CacheItemPoolInterface $cache,
+        private readonly SearchMappingCacheNormalizer $cacheNormalizer,
+        private readonly string $eventName,
         string $cacheKeyPrefix,
-        string $searchEngineName,
-        string $eventName
+        string $searchEngineName
     ) {
-        $this->dispatcher = $dispatcher;
-        $this->mappingConfigProvider = $mappingConfigProvider;
-        $this->cache = $cache;
         $this->cacheKey = $cacheKeyPrefix . ':' . $searchEngineName;
-        $this->eventName = $eventName;
     }
 
     #[\Override]
@@ -48,7 +41,9 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
             $config = $this->fetchMappingConfigFromCache($cacheItem);
             if (null === $config) {
                 $config = $this->loadMappingConfig();
-                $this->saveMappingConfigToCache($cacheItem, $config);
+                $this->saveMappingConfigToCache($cacheItem, $this->cacheNormalizer->normalize($config));
+            } else {
+                $config = $this->cacheNormalizer->denormalize($config);
             }
             $this->configuration = $config;
         }
