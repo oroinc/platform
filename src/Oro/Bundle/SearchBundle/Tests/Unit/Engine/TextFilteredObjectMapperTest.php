@@ -77,7 +77,7 @@ class TextFilteredObjectMapperTest extends ObjectMapperTest
             ->setName($productName)
             ->setDescription($productDescription);
 
-        $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
+        self::assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
     }
 
     #[\Override]
