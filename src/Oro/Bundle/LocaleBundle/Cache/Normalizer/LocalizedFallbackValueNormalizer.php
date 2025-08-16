@@ -5,6 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Cache\Normalizer;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Symfony\Contracts\Service\ResetInterface;
@@ -14,66 +15,51 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class LocalizedFallbackValueNormalizer implements ResetInterface
 {
-    private ManagerRegistry $managerRegistry;
+    private const string LOCALIZATION = 'localization';
 
-    private array $classMetadataCache = [];
+    private array $metadata = [];
 
-    public function __construct(ManagerRegistry $managerRegistry)
-    {
-        $this->managerRegistry = $managerRegistry;
+    public function __construct(
+        private readonly array $nameMap,
+        private readonly ManagerRegistry $doctrine
+    ) {
     }
 
-    /**
-     * @param AbstractLocalizedFallbackValue $localizedFallbackValue
-     *
-     * @return array
-     *  [
-     *      'string' => ?string,
-     *      'fallback' => ?string,
-     *      'localization' => ?array [
-     *          'id' => int
-     *      ],
-     *      // ...
-     *  ]
-     */
+    #[\Override]
+    public function reset(): void
+    {
+        $this->metadata = [];
+    }
+
     public function normalize(AbstractLocalizedFallbackValue $localizedFallbackValue): array
     {
-        $classMetadata = $this->getClassMetadata(ClassUtils::getRealClass(get_class($localizedFallbackValue)));
         $normalizedData = [];
+        $classMetadata = $this->getClassMetadata(ClassUtils::getClass($localizedFallbackValue));
         foreach ($classMetadata->getFieldNames() as $fieldName) {
             $value = $classMetadata->getFieldValue($localizedFallbackValue, $fieldName);
-            if ($value !== null) {
-                $normalizedData[$fieldName] = $value;
+            if (null !== $value) {
+                $normalizedData[$this->nameMap[$fieldName] ?? $fieldName] = $value;
             }
         }
 
         $localization = $localizedFallbackValue->getLocalization();
-        if ($localization !== null) {
-            $normalizedData['localization'] = ['id' => $localization->getId()];
+        if (null !== $localization) {
+            $normalizedData[$this->nameMap[self::LOCALIZATION] ?? self::LOCALIZATION] = $localization->getId();
         }
 
         return $normalizedData;
     }
 
-    /**
-     * @param array $normalizedData
-     *  [
-     *      'string' => ?string,
-     *      'fallback' => ?string,
-     *      'localization' => ?array [
-     *          'id' => int
-     *      ],
-     *      // ...
-     *  ]
-     * @param string $entityClass
-     *
-     * @return AbstractLocalizedFallbackValue
-     */
     public function denormalize(array $normalizedData, string $entityClass): AbstractLocalizedFallbackValue
     {
-        $entityClass = ClassUtils::getRealClass($entityClass);
-        $classMetadata = $this->getClassMetadata($entityClass);
+        foreach ($this->nameMap as $name => $key) {
+            if (isset($normalizedData[$key])) {
+                $normalizedData[$name] = $normalizedData[$key];
+                unset($normalizedData[$key]);
+            }
+        }
 
+        $classMetadata = $this->getClassMetadata(ClassUtils::getRealClass($entityClass));
         /** @var AbstractLocalizedFallbackValue $localizedFallbackValue */
         $localizedFallbackValue = $classMetadata->newInstance();
         foreach ($classMetadata->getFieldNames() as $fieldName) {
@@ -82,30 +68,28 @@ class LocalizedFallbackValueNormalizer implements ResetInterface
             }
         }
 
-        if (isset($normalizedData['localization']['id'])) {
-            $localization = $this->managerRegistry
-                ->getManagerForClass(Localization::class)
-                ->getReference(Localization::class, (int)$normalizedData['localization']['id']);
-            $localizedFallbackValue->setLocalization($localization);
+        $localizationData = $normalizedData[self::LOCALIZATION] ?? null;
+        if ($localizationData) {
+            $localizedFallbackValue->setLocalization($this->getEntityManager(Localization::class)->getReference(
+                Localization::class,
+                \is_array($localizationData) ? $localizationData['id'] : $localizationData
+            ));
         }
 
         return $localizedFallbackValue;
     }
 
-    private function getClassMetadata(string $className): ClassMetadata
+    private function getClassMetadata(string $entityClass): ClassMetadata
     {
-        if (!isset($this->classMetadataCache[$className])) {
-            $this->classMetadataCache[$className] = $this->managerRegistry
-                ->getManagerForClass($className)
-                ?->getClassMetadata($className);
+        if (!isset($this->metadata[$entityClass])) {
+            $this->metadata[$entityClass] = $this->getEntityManager($entityClass)?->getClassMetadata($entityClass);
         }
 
-        return $this->classMetadataCache[$className];
+        return $this->metadata[$entityClass];
     }
 
-    #[\Override]
-    public function reset(): void
+    private function getEntityManager(string $entityClass): ObjectManager
     {
-        $this->classMetadataCache = [];
+        return $this->doctrine->getManagerForClass($entityClass);
     }
 }
