@@ -7,9 +7,11 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Provider for getting deltas between segment snapshots and real state of segment.
@@ -18,22 +20,17 @@ class SegmentSnapshotDeltaProvider
 {
     private const BATCH_SIZE = 1000;
 
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var DynamicSegmentQueryBuilder */
-    private $segmentQueryBuilder;
-
     /** @var string[] */
     private $classIdentifiers = [];
 
     /** @var string[] */
     private $segmentRelationIdentifiers = [];
 
-    public function __construct(ManagerRegistry $doctrine, DynamicSegmentQueryBuilder $segmentQueryBuilder)
-    {
-        $this->doctrine = $doctrine;
-        $this->segmentQueryBuilder = $segmentQueryBuilder;
+    public function __construct(
+        private ManagerRegistry $doctrine,
+        private DynamicSegmentQueryBuilder $segmentQueryBuilder,
+        private OwnershipMetadataProviderInterface $metadataProvider
+    ) {
     }
 
     public function getAddedEntityIds(Segment $segment): iterable
@@ -44,6 +41,7 @@ class SegmentSnapshotDeltaProvider
         $identifierField = $rootAlias . '.' . $this->getIdentifierFieldName($segment->getEntity());
         $entitySegmentQueryBuilder->select($identifierField);
 
+        $this->applyOrganizationRestrictionIfOwnedEntity($segment, $entitySegmentQueryBuilder);
         $segmentSnapshotQueryBuilder = $this->getSegmentSnapshotQueryBuilder($segment);
         $entitySegmentQueryBuilder->andWhere(
             $entitySegmentQueryBuilder->expr()->notIn(
@@ -71,6 +69,7 @@ class SegmentSnapshotDeltaProvider
         $identifierField = $rootAlias . '.' . $this->getIdentifierFieldName($segment->getEntity());
         $entitySegmentQueryBuilder->select($identifierField);
 
+        $this->applyOrganizationRestrictionIfOwnedEntity($segment, $entitySegmentQueryBuilder);
         $segmentSnapshotQueryBuilder = $this->getSegmentSnapshotQueryBuilder($segment);
         $segmentSnapshotQueryBuilder->andWhere(
             $segmentSnapshotQueryBuilder->expr()->notIn(
@@ -97,6 +96,7 @@ class SegmentSnapshotDeltaProvider
         $rootAlias = reset($rootAliases);
         $identifierField = $rootAlias . '.' . $this->getIdentifierFieldName($segment->getEntity());
         $entitySegmentQueryBuilder->select($identifierField);
+        $this->applyOrganizationRestrictionIfOwnedEntity($segment, $entitySegmentQueryBuilder);
 
         return $this->getResultBatches(new BufferedIdentityQueryResultIterator($entitySegmentQueryBuilder));
     }
@@ -151,6 +151,23 @@ class SegmentSnapshotDeltaProvider
         }
 
         return $this->segmentRelationIdentifiers[$className];
+    }
+
+    private function applyOrganizationRestrictionIfOwnedEntity(Segment $segment, QueryBuilder $qb): void
+    {
+        $organizationId = $segment->getOrganization()?->getId();
+        $metadata = $this->metadataProvider->getMetadata($segment->getEntity());
+
+        if (!$metadata->hasOwner() || $organizationId === null) {
+            return;
+        }
+
+        $qb->andWhere(
+            $qb->expr()->eq(
+                QueryBuilderUtil::sprintf('%s.%s', $qb->getRootAliases()[0], $metadata->getOrganizationFieldName()),
+                ':segment_organization'
+            )
+        )->setParameter('segment_organization', $organizationId);
     }
 
     private function getEntityManager(string $entityClass): EntityManagerInterface
