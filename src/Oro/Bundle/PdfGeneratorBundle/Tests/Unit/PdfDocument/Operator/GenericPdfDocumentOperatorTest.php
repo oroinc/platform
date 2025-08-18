@@ -177,6 +177,7 @@ final class GenericPdfDocumentOperatorTest extends TestCase
 
         $afterEvent = new AfterPdfDocumentCreatedEvent(
             $pdfDocument,
+            $pdfDocumentDemand,
             $this->pdfDocumentGenerationMode
         );
 

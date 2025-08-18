@@ -2,7 +2,7 @@ services:
     oro_search.api.search_field_resolver_factory:
         class: Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolverFactory
         arguments:
-            - '@oro_search.provider.search_mapping'
+            - '@oro_search.api.search_mapping_provider'
 
     oro_search.api.filter_factory.search_query:
         class: Oro\Bundle\SearchBundle\Api\Filter\SearchQueryFilterFactory
@@ -14,6 +14,15 @@ services:
         class: Oro\Bundle\SearchBundle\Api\Filter\SearchAggregationFilterFactory
         arguments:
             - '@oro_search.api.search_field_resolver_factory'
+
+    oro_search.api.search_query_executor:
+        class: Oro\Bundle\SearchBundle\Api\Model\SearchQueryExecutor
+
+    oro_search.api.load_entity_ids_query_executor:
+        class: Oro\Bundle\SearchBundle\Api\Model\LoadEntityIdsQueryExecutor
+        decorates: oro_api.load_entity_ids_query_executor
+        arguments:
+            - '@.inner'
 
     oro_search.api.search_entity_class_provider:
         class: Oro\Bundle\SearchBundle\Api\SearchEntityClassProvider
@@ -27,6 +36,13 @@ services:
             - '@oro_search.api.search_entity_class_provider'
             - '@oro_api.value_normalizer'
 
+    oro_search.api.search_mapping_provider:
+        class: Oro\Bundle\SearchBundle\Api\SearchMappingProvider
+        arguments:
+            - '@oro_search.provider.search_mapping'
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.owner.metadata_provider.chain'
+
     oro_search.api.search_entity_repository:
         class: Oro\Bundle\SearchBundle\Api\Repository\SearchEntityRepository
         arguments:
@@ -34,6 +50,7 @@ services:
             - '@oro_api.value_normalizer'
             - '@oro_entity_config.config_manager'
             - '@translator'
+            - '@oro_search.api.search_mapping_provider'
 
     oro_search.api.add_search_entity_url_link:
         class: Oro\Bundle\SearchBundle\Api\Processor\AddSearchEntityUrlLink
@@ -48,6 +65,13 @@ services:
             - { name: oro.api.processor, action: get_list, group: security_check, class: Oro\Bundle\SearchBundle\Api\Model\SearchEntity }
             - { name: oro.api.processor, action: get_list, group: security_check, class: Oro\Bundle\SearchBundle\Api\Model\SearchItem }
 
+    oro_search.api.load_search_entity:
+        class: Oro\Bundle\SearchBundle\Api\Processor\LoadSearchEntity
+        arguments:
+            - '@oro_search.api.search_entity_repository'
+        tags:
+            - { name: oro.api.processor, action: get, group: load_data, class: Oro\Bundle\SearchBundle\Api\Model\SearchEntity }
+
     oro_search.api.load_search_entities:
         class: Oro\Bundle\SearchBundle\Api\Processor\LoadSearchEntities
         arguments:
@@ -58,9 +82,19 @@ services:
     oro_search.api.add_search_text_filter:
         class: Oro\Bundle\SearchBundle\Api\Processor\AddSearchTextFilter
         arguments:
-            - '@oro_search.provider.search_mapping'
+            - '@oro_search.api.search_mapping_provider'
         tags:
             - { name: oro.api.processor, action: get_config, extra: filters&!identifier_fields_only, priority: -90 }
+
+    oro_search.api.update_sort_filter_description:
+        class: Oro\Bundle\SearchBundle\Api\Processor\UpdateSortFilterDescription
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_search.api.search_mapping_provider'
+            - '@oro_api.filter_names_registry'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: initialize, priority: -110 }
+            - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, priority: -110 }
 
     oro_search.api.set_default_search_text_sorting:
         class: Oro\Bundle\SearchBundle\Api\Processor\SetDefaultSearchTextSorting
@@ -69,29 +103,52 @@ services:
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_input, priority: 95 }
 
-    oro_search.api.skip_default_search_text_ordering:
-        class: Oro\Bundle\SearchBundle\Api\Processor\SkipDefaultSearchTextOrdering
+    oro_search.api.validate_search_text_sorting:
+        class: Oro\Bundle\SearchBundle\Api\Processor\ValidateSearchTextSorting
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_search.api.search_mapping_provider'
+            - '@oro_api.filter_names_registry'
         tags:
-            - { name: oro.api.processor, action: get_list, group: build_query, priority: -5 }
-            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -5 }
+            - { name: oro.api.processor, action: get_list, group: normalize_input, priority: -95 }
 
     oro_search.api.build_search_query:
         class: Oro\Bundle\SearchBundle\Api\Processor\BuildSearchQuery
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_search.index'
+            - '@oro_search.api.search_query_executor'
             - '@oro_search.provider.search_mapping'
             - '@security.authorization_checker'
         tags:
             - { name: oro.api.processor, action: get_list, group: build_query, priority: -90 }
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: -90 }
 
+    oro_search.api.handle_aggregations_filter:
+        class: Oro\Bundle\SearchBundle\Api\Processor\HandleSearchAggregationFilter
+        tags:
+            - { name: oro.api.processor, action: get_list, group: build_query, priority: -95 }
+
     oro_search.api.load_entities_by_search_text:
         class: Oro\Bundle\SearchBundle\Api\Processor\LoadEntitiesBySearchText
         arguments:
             - '@oro_search.index'
+            - '@oro_search.api.search_query_executor'
             - '@oro_search.api.search_entity_list_filter_helper'
+            - '@oro_search.api.search_mapping_provider'
             - '@oro_api.value_normalizer'
             - '@event_dispatcher'
         tags:
             - { name: oro.api.processor, action: get_list, group: load_data, class: Oro\Bundle\SearchBundle\Api\Model\SearchItem }
+
+    oro_search.api.load_aggregated_data:
+        class: Oro\Bundle\SearchBundle\Api\Processor\LoadSearchAggregatedData
+        tags:
+            - { name: oro.api.processor, action: get_list, group: load_data, priority: -25 }
+
+    oro_search.api.normalize_aggregated_data:
+        class: Oro\Bundle\SearchBundle\Api\Processor\NormalizeSearchAggregatedData
+        arguments:
+            - '@oro_api.value_transformer'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: load_data, priority: -30 }

@@ -4,3 +4,12 @@ trusted_data:
         Oro\Bundle\PlatformBundle\MaterializedView\MaterializedViewRepository:
             createQueryBuilder:
                 materializedViewName: true
+
+    variables:
+        Oro\Bundle\PlatformBundle\Entity\Repository\NumberSequenceRepository:
+            upsertSequence:
+                sql: true
+
+    check_methods:
+        Oro\Bundle\PlatformBundle\Entity\Repository\NumberSequenceRepository:
+            upsertSequence: [4]

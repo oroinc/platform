@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Consumption\Extension;
 
+use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\MessageQueueBundle\Test\Async\ChangeConfigProcessor;
 use Oro\Bundle\MessageQueueBundle\Test\Async\Topic\ChangeConfigTestTopic;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
@@ -11,7 +12,10 @@ use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumedMessagesExtens
 
 class InterruptConsumptionExtensionTest extends WebTestCase
 {
+    use ConfigManagerAwareTestTrait;
     use MessageQueueExtension;
+
+    private ?string $initialTimezone;
 
     #[\Override]
     protected function setUp(): void
@@ -19,11 +23,20 @@ class InterruptConsumptionExtensionTest extends WebTestCase
         $this->initClient();
 
         self::purgeMessageQueue();
+
+        $this->initialTimezone = self::getConfigManager(null)->get('oro_locale.timezone');
     }
 
     #[\Override]
     protected function tearDown(): void
     {
+        $configManager = self::getConfigManager(null);
+        if ($configManager->get('oro_locale.timezone') !== $this->initialTimezone) {
+            $configManager->set('oro_locale.timezone', $this->initialTimezone);
+            $configManager->flush();
+            $configManager->reload();
+        }
+
         self::purgeMessageQueue();
     }
 

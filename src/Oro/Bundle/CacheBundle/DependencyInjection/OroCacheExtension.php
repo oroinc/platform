@@ -38,9 +38,10 @@ class OroCacheExtension extends Extension
         $loader = new Definition(LoaderChain::class, [$serializerFileLoaders]);
         $serializerLoaders = [$loader];
         $definition = new Definition(ClassMetadataFactory::class, $serializerLoaders);
-        $container->getDefinition('oro.cache.serializer.mapping.cache_warmer')->replaceArgument(0, $serializerLoaders);
+        $container->getDefinition('oro_cache.serializer.mapping.cache_warmer')
+            ->replaceArgument(0, $serializerLoaders);
         if ($container->getParameter('kernel.debug')) {
-            $container->removeDefinition('oro.cache.serializer.mapping.cache_warmer');
+            $container->removeDefinition('oro_cache.serializer.mapping.cache_warmer');
         }
         $container->setDefinition('oro.cache.serializer.mapping.factory.class_metadata', $definition);
     }

@@ -4,7 +4,6 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Cache\Normalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
@@ -31,7 +30,9 @@ class LocalizedFallbackValueCollectionNormalizerTest extends TestCase
         $this->entityManager->expects(self::any())
             ->method('getReference')
             ->with(Localization::class)
-            ->willReturnCallback(static fn ($class, $id) => new LocalizationStub($id));
+            ->willReturnCallback(function (string $class, int $id) {
+                return new LocalizationStub($id);
+            });
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())
@@ -39,8 +40,22 @@ class LocalizedFallbackValueCollectionNormalizerTest extends TestCase
             ->willReturn($this->entityManager);
 
         $this->collectionNormalizer = new LocalizedFallbackValueCollectionNormalizer(
-            new LocalizedFallbackValueNormalizer($doctrine)
+            new LocalizedFallbackValueNormalizer(
+                ['id' => 'i', 'string' => 's', 'localization' => 'l', 'fallback' => 'f'],
+                $doctrine
+            )
         );
+    }
+
+    private function createClassMetadata(string $className): ClassMetadata
+    {
+        $classMetadata = new ClassMetadata($className);
+        $classMetadata->mapField(['fieldName' => 'id']);
+        $classMetadata->mapField(['fieldName' => 'string']);
+        $classMetadata->mapField(['fieldName' => 'fallback']);
+        $classMetadata->wakeupReflection(new RuntimeReflectionService());
+
+        return $classMetadata;
     }
 
     public function testNormalizeWhenEmpty(): void
@@ -54,14 +69,12 @@ class LocalizedFallbackValueCollectionNormalizerTest extends TestCase
     /**
      * @dataProvider normalizeDataProvider
      */
-    public function testNormalize(iterable $localizedFallbackValues, array $expected): void
+    public function testNormalize(Collection $localizedFallbackValues, array $expected): void
     {
-        $className = ClassUtils::getRealClass(get_class($localizedFallbackValues[0]));
-
         $this->entityManager->expects(self::once())
             ->method('getClassMetadata')
-            ->with($className)
-            ->willReturn($this->createClassMetadata($className));
+            ->with(LocalizedFallbackValue::class)
+            ->willReturn($this->createClassMetadata(LocalizedFallbackValue::class));
 
         self::assertEquals($expected, $this->collectionNormalizer->normalize($localizedFallbackValues));
     }
@@ -73,7 +86,7 @@ class LocalizedFallbackValueCollectionNormalizerTest extends TestCase
                 'localizedFallbackValues' => new ArrayCollection(
                     [new LocalizedFallbackValue(), new LocalizedFallbackValue()]
                 ),
-                'expected' => [[], []],
+                'expected' => [[], []]
             ],
             'with fields' => [
                 'localizedFallbackValues' => new ArrayCollection([
@@ -82,18 +95,12 @@ class LocalizedFallbackValueCollectionNormalizerTest extends TestCase
                         ->setFallback(FallbackType::SYSTEM),
                     (new LocalizedFallbackValue())
                         ->setString('sample string2')
-                        ->setFallback(FallbackType::PARENT_LOCALIZATION),
+                        ->setFallback(FallbackType::PARENT_LOCALIZATION)
                 ]),
                 'expected' => [
-                    [
-                        'string' => 'sample string',
-                        'fallback' => FallbackType::SYSTEM,
-                    ],
-                    [
-                        'string' => 'sample string2',
-                        'fallback' => FallbackType::PARENT_LOCALIZATION,
-                    ]
-                ],
+                    ['s' => 'sample string', 'f' => FallbackType::SYSTEM],
+                    ['s' => 'sample string2', 'f' => FallbackType::PARENT_LOCALIZATION]
+                ]
             ],
             'with localization' => [
                 'localizedFallbackValues' => new ArrayCollection([
@@ -103,20 +110,13 @@ class LocalizedFallbackValueCollectionNormalizerTest extends TestCase
                     (new LocalizedFallbackValue())
                         ->setString('sample string2')
                         ->setFallback(FallbackType::PARENT_LOCALIZATION)
-                        ->setLocalization(new LocalizationStub(42)),
+                        ->setLocalization(new LocalizationStub(42))
                 ]),
                 'expected' => [
-                    [
-                        'string' => 'sample string',
-                        'fallback' => FallbackType::SYSTEM,
-                    ],
-                    [
-                        'string' => 'sample string2',
-                        'fallback' => FallbackType::PARENT_LOCALIZATION,
-                        'localization' => ['id' => 42]
-                    ]
-                ],
-            ],
+                    ['s' => 'sample string', 'f' => FallbackType::SYSTEM],
+                    ['s' => 'sample string2', 'f' => FallbackType::PARENT_LOCALIZATION, 'l' => 42]
+                ]
+            ]
         ];
     }
 
@@ -147,6 +147,9 @@ class LocalizedFallbackValueCollectionNormalizerTest extends TestCase
         self::assertEquals($expected, $this->collectionNormalizer->denormalize($normalizedData, $className));
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function denormalizeDataProvider(): array
     {
         return [
@@ -157,14 +160,8 @@ class LocalizedFallbackValueCollectionNormalizerTest extends TestCase
             ],
             'with fields' => [
                 'normalizedData' => [
-                    [
-                        'string' => 'sample string',
-                        'fallback' => FallbackType::SYSTEM,
-                    ],
-                    [
-                        'string' => 'sample string2',
-                        'fallback' => FallbackType::PARENT_LOCALIZATION,
-                    ]
+                    ['s' => 'sample string', 'f' => FallbackType::SYSTEM],
+                    ['s' => 'sample string2', 'f' => FallbackType::PARENT_LOCALIZATION]
                 ],
                 'className' => LocalizedFallbackValue::class,
                 'expected' => new ArrayCollection([
@@ -176,12 +173,40 @@ class LocalizedFallbackValueCollectionNormalizerTest extends TestCase
                         ->setFallback(FallbackType::PARENT_LOCALIZATION)
                 ]),
             ],
+            'with fields (old format)' => [
+                'normalizedData' => [
+                    ['string' => 'sample string', 'fallback' => FallbackType::SYSTEM],
+                    ['string' => 'sample string2', 'fallback' => FallbackType::PARENT_LOCALIZATION]
+                ],
+                'className' => LocalizedFallbackValue::class,
+                'expected' => new ArrayCollection([
+                    (new LocalizedFallbackValue())
+                        ->setString('sample string')
+                        ->setFallback(FallbackType::SYSTEM),
+                    (new LocalizedFallbackValue())
+                        ->setString('sample string2')
+                        ->setFallback(FallbackType::PARENT_LOCALIZATION)
+                ])
+            ],
             'with localization' => [
                 'normalizedData' => [
-                    [
-                        'string' => 'sample string',
-                        'fallback' => FallbackType::SYSTEM,
-                    ],
+                    ['s' => 'sample string', 'f' => FallbackType::SYSTEM],
+                    ['s' => 'sample string2', 'f' => FallbackType::PARENT_LOCALIZATION, 'l' => 42]
+                ],
+                'className' => LocalizedFallbackValue::class,
+                'expected' => new ArrayCollection([
+                    (new LocalizedFallbackValue())
+                        ->setString('sample string')
+                        ->setFallback(FallbackType::SYSTEM),
+                    (new LocalizedFallbackValue())
+                        ->setString('sample string2')
+                        ->setFallback(FallbackType::PARENT_LOCALIZATION)
+                        ->setLocalization(new LocalizationStub(42))
+                ])
+            ],
+            'with localization (old format)' => [
+                'normalizedData' => [
+                    ['string' => 'sample string', 'fallback' => FallbackType::SYSTEM],
                     [
                         'string' => 'sample string2',
                         'fallback' => FallbackType::PARENT_LOCALIZATION,
@@ -197,14 +222,27 @@ class LocalizedFallbackValueCollectionNormalizerTest extends TestCase
                         ->setString('sample string2')
                         ->setFallback(FallbackType::PARENT_LOCALIZATION)
                         ->setLocalization(new LocalizationStub(42))
-                ]),
+                ])
             ],
             'with custom class' => [
                 'normalizedData' => [
-                    [
-                        'string' => 'sample string',
-                        'fallback' => FallbackType::SYSTEM,
-                    ],
+                    ['s' => 'sample string', 'f' => FallbackType::SYSTEM],
+                    ['s' => 'sample string2', 'f' => FallbackType::PARENT_LOCALIZATION, 'l' => 42]
+                ],
+                'className' => CustomLocalizedFallbackValueStub::class,
+                'expected' => new ArrayCollection([
+                    (new CustomLocalizedFallbackValueStub())
+                        ->setString('sample string')
+                        ->setFallback(FallbackType::SYSTEM),
+                    (new CustomLocalizedFallbackValueStub())
+                        ->setString('sample string2')
+                        ->setFallback(FallbackType::PARENT_LOCALIZATION)
+                        ->setLocalization(new LocalizationStub(42))
+                ])
+            ],
+            'with custom class (old format)' => [
+                'normalizedData' => [
+                    ['string' => 'sample string', 'fallback' => FallbackType::SYSTEM],
                     [
                         'string' => 'sample string2',
                         'fallback' => FallbackType::PARENT_LOCALIZATION,
@@ -220,20 +258,8 @@ class LocalizedFallbackValueCollectionNormalizerTest extends TestCase
                         ->setString('sample string2')
                         ->setFallback(FallbackType::PARENT_LOCALIZATION)
                         ->setLocalization(new LocalizationStub(42))
-                ]),
-            ],
+                ])
+            ]
         ];
-    }
-
-    private function createClassMetadata(string $className): ClassMetadata
-    {
-        $classMetadata = new ClassMetadata($className);
-
-        $classMetadata->mapField(['fieldName' => 'id']);
-        $classMetadata->mapField(['fieldName' => 'string']);
-        $classMetadata->mapField(['fieldName' => 'fallback']);
-        $classMetadata->wakeupReflection(new RuntimeReflectionService());
-
-        return $classMetadata;
     }
 }

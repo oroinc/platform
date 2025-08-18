@@ -10,6 +10,9 @@ use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadAllRolesData;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * @group search
+ */
 class AnonymousRoleAccessTest extends RestJsonApiTestCase
 {
     use SearchExtensionTrait;

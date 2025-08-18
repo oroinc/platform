@@ -2,80 +2,87 @@
 
 namespace Oro\Bundle\SearchBundle\Api\Model;
 
-use Oro\Bundle\ApiBundle\Exception\InvalidSorterException;
+use Doctrine\Common\Collections\Expr;
 use Oro\Bundle\ApiBundle\Model\LoadEntityIdsQueryInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
-use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
-use Oro\Bundle\SearchBundle\Query\Criteria\Criteria as SearchCriteria;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\SearchBundle\Query\Result as SearchResult;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
 
 /**
- * A query to load identifiers of entities by a search index.
+ * A query to load identifiers of entities by the search index.
  */
 class LoadEntityIdsBySearchQuery implements LoadEntityIdsQueryInterface
 {
-    private SearchIndexer $searchIndexer;
-    private AbstractSearchMappingProvider $searchMappingProvider;
-    private string $entityClass;
-    private string $searchText;
-    private ?int $firstResult;
-    private ?int $maxResults;
-    private array $orderBy;
-    private bool $hasMore;
+    private ?SearchQuery $searchQuery = null;
     private ?SearchResult $searchResult = null;
 
     public function __construct(
-        SearchIndexer $searchIndexer,
-        AbstractSearchMappingProvider $searchMappingProvider,
-        string $entityClass,
-        string $searchText,
-        ?int $firstResult,
-        ?int $maxResults,
-        array $orderBy,
-        bool $hasMore
+        private readonly SearchIndexer $searchIndexer,
+        private readonly SearchQueryExecutorInterface $searchQueryExecutor,
+        private readonly string $entityAlias,
+        private readonly ?Expr\Expression $searchExpression,
+        private readonly ?int $firstResult,
+        private readonly ?int $maxResults,
+        private readonly array $orderBy,
+        private readonly bool $hasMore
     ) {
-        $this->searchIndexer = $searchIndexer;
-        $this->searchMappingProvider = $searchMappingProvider;
-        $this->entityClass = $entityClass;
-        $this->searchText = $searchText;
-        $this->firstResult = $firstResult;
-        $this->maxResults = $maxResults;
-        $this->orderBy = $orderBy;
-        $this->hasMore = $hasMore;
     }
 
     #[\Override]
     public function getEntityIds(): array
     {
-        $entityIds = [];
-        /** @var SearchResultItem[] $records */
-        $records = $this->getSearchResult()->toArray();
-        foreach ($records as $record) {
-            $entityIds[] = $record->getRecordId();
-        }
+        return $this->searchQueryExecutor->execute(function () {
+            $entityIds = [];
+            /** @var SearchResultItem[] $records */
+            $records = $this->getSearchResult()->toArray();
+            foreach ($records as $record) {
+                $entityIds[] = $record->getRecordId();
+            }
 
-        return $entityIds;
+            return $entityIds;
+        });
     }
 
     #[\Override]
     public function getEntityTotalCount(): int
     {
-        return $this->getSearchResult()->getRecordsCount();
+        return $this->searchQueryExecutor->execute(function () {
+            return $this->getSearchResult()->getRecordsCount();
+        });
+    }
+
+    /**
+     * Gets aggregated data collected when execution the query.
+     * Format for the "count" function: [aggregating name => [field value => count value, ...], ...]
+     * Format for mathematical functions: [aggregating name => aggregated value, ...]
+     */
+    public function getAggregatedData(): array
+    {
+        return $this->searchQueryExecutor->execute(function () {
+            return $this->getSearchResult()->getAggregatedData();
+        });
+    }
+
+    public function getSearchQuery(): SearchQuery
+    {
+        if (null === $this->searchQuery) {
+            $this->searchQuery = $this->searchIndexer
+                ->select()
+                ->from([$this->entityAlias]);
+        }
+
+        return $this->searchQuery;
     }
 
     private function getSearchResult(): SearchResult
     {
         if (null === $this->searchResult) {
-            $query = $this->searchIndexer
-                ->select()
-                ->from([$this->searchMappingProvider->getEntityAlias($this->entityClass)]);
-            $criteria = $query->getCriteria();
-            $criteria->where(SearchCriteria::expr()->contains(
-                SearchCriteria::implodeFieldTypeName(SearchQuery::TYPE_TEXT, SearchIndexer::TEXT_ALL_DATA_FIELD),
-                $this->searchText
-            ));
+            $searchQuery = $this->getSearchQuery();
+            $criteria = $searchQuery->getCriteria();
+            if (null !== $this->searchExpression) {
+                $criteria->andWhere($this->searchExpression);
+            }
             if ($this->firstResult > 0) {
                 $criteria->setFirstResult($this->firstResult);
             }
@@ -84,10 +91,9 @@ class LoadEntityIdsBySearchQuery implements LoadEntityIdsQueryInterface
                 $criteria->setMaxResults($maxResults);
             }
             if ($this->orderBy) {
-                $criteria->orderBy($this->getOrderBy());
+                $criteria->orderBy($this->orderBy);
             }
-
-            $this->searchResult = $this->searchIndexer->query($query);
+            $this->searchResult = $this->searchIndexer->query($searchQuery);
         }
 
         return $this->searchResult;
@@ -95,43 +101,8 @@ class LoadEntityIdsBySearchQuery implements LoadEntityIdsQueryInterface
 
     private function getMaxResults(): ?int
     {
-        return (null !== $this->maxResults && $this->hasMore) ? $this->maxResults + 1 : $this->maxResults;
-    }
-
-    private function getOrderBy(): array
-    {
-        $result = [];
-        $mapping = $this->searchMappingProvider->getEntityConfig($this->entityClass);
-        foreach ($this->orderBy as $fieldName => $direction) {
-            $searchFieldName = $this->findSearchFieldName($fieldName, $mapping);
-            if (null === $searchFieldName) {
-                throw new InvalidSorterException(sprintf('Sorting by "%s" field is not supported.', $fieldName));
-            }
-            $result[$searchFieldName] = $direction;
-        }
-
-        return $result;
-    }
-
-    private function findSearchFieldName(string $fieldName, array $mapping): ?string
-    {
-        if (empty($mapping['fields'])) {
-            return null;
-        }
-
-        foreach ($mapping['fields'] as $field) {
-            if (empty($field['target_fields'])) {
-                continue;
-            }
-            $targetFields = $field['target_fields'];
-            if (count($targetFields) !== 1) {
-                continue;
-            }
-            if ($field['name'] === $fieldName) {
-                return SearchCriteria::implodeFieldTypeName($field['target_type'], reset($targetFields));
-            }
-        }
-
-        return null;
+        return (null !== $this->maxResults && $this->hasMore)
+            ? $this->maxResults + 1
+            : $this->maxResults;
     }
 }

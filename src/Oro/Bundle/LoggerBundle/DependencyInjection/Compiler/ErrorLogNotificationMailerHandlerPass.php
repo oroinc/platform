@@ -18,21 +18,16 @@ class ErrorLogNotificationMailerHandlerPass implements CompilerPassInterface
     {
         $configuration = $container->getExtension('monolog')->getConfiguration([], $container);
         $config = (new Processor())->processConfiguration($configuration, $container->getExtensionConfig('monolog'));
-
         foreach ($config['handlers'] as $handlerName => $handlerConfig) {
             if ($handlerConfig['type'] === 'symfony_mailer') {
                 $handlerId = 'monolog.handler.' . $handlerName;
-
                 $wrapperServiceId = $handlerId . '.error_log_notification_handler_wrapper';
-
                 $container
                     ->register($wrapperServiceId, ErrorLogNotificationHandlerWrapper::class)
-                    ->setArguments(
-                        [
-                            new Reference('.inner'),
-                            new Reference('oro_logger.provider.error_log_notification_recipients'),
-                        ]
-                    )
+                    ->setArguments([
+                        new Reference('.inner'),
+                        new Reference('oro_logger.provider.error_log_notification_recipients'),
+                    ])
                     ->addMethodCall('setLogger', [new Reference('logger')])
                     // Priority is set to 32 to make sure it is applied before decorators
                     // from {@see ConfigurableLoggerPass}.

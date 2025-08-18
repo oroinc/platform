@@ -18,7 +18,8 @@ Oro\Bundle\UserBundle\Entity\User:
                 min: 6
                 max: 255
                 groups: [UserForm, Registration]
-            - Email:        ~
+            - Email:
+                mode: strict
         plainPassword:
             - NotBlank:
                 groups:     [Registration, ResetPassword]
@@ -80,4 +81,5 @@ Oro\Bundle\UserBundle\Entity\Email:
         user:
             - NotBlank: ~
         email:
-            - Email: ~
+            - Email:
+                mode: strict

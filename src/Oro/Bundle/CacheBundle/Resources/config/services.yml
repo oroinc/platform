@@ -63,7 +63,19 @@ services:
             -
                 json: '@serializer.encoder.json'
 
-    oro.cache.serializer.mapping.cache_warmer:
+    oro_cache.serializer.cache:
+        parent: cache.system
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_serializer' }
+
+    oro_cache.serializer.mapping.cache:
+        class: Psr\Cache\CacheItemPoolInterface
+        factory: [Symfony\Component\Cache\Adapter\PhpArrayAdapter, create]
+        arguments:
+            - '%kernel.cache_dir%/oro/cache_serializers.php'
+            - "@oro_cache.serializer.cache"
+
+    oro_cache.serializer.mapping.cache_warmer:
         class: Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer
         arguments:
             - [] # Loaders injected by the OroCacheExtension
@@ -71,24 +83,12 @@ services:
         tags:
             - kernel.cache_warmer
 
-    oro.cache.serializer_pool:
-        parent: cache.system
-        tags:
-            - cache.pool
-
-    oro.cache.serializer.mapping.cache:
-        class: Psr\Cache\CacheItemPoolInterface
-        factory: [Symfony\Component\Cache\Adapter\PhpArrayAdapter, create]
-        arguments:
-            - '%kernel.cache_dir%/oro/cache_serializers.php'
-            - "@oro.cache.serializer_pool"
-
     oro.cache.serializer.mapping.factory.cache_class_metadata:
         decorates: oro.cache.serializer.mapping.factory.class_metadata
         class: Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory
         arguments:
             - "@.inner"
-            - "@oro.cache.serializer.mapping.cache"
+            - "@oro_cache.serializer.mapping.cache"
 
     oro.cache.serializer.normalizer:
         class: Oro\Bundle\CacheBundle\Serializer\Normalizer\GetSetMethodNormalizer

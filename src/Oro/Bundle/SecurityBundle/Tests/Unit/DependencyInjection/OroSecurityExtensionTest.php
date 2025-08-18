@@ -24,6 +24,7 @@ class OroSecurityExtensionTest extends TestCase
                     'settings' => [
                         'resolved' => true,
                         'symfony_profiler_collection_of_voter_decisions' => ['value' => false, 'scope' => 'app'],
+                        'system_check_symmetric_crypter_key' => ['value' => '', 'scope' => 'app']
                     ],
                 ],
             ],

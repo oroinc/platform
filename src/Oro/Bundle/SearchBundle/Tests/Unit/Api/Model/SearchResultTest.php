@@ -5,6 +5,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Api\Model;
 use Doctrine\DBAL\Driver\PDOException;
 use Doctrine\DBAL\Exception\DriverException;
 use Oro\Bundle\SearchBundle\Api\Exception\InvalidSearchQueryException;
+use Oro\Bundle\SearchBundle\Api\Model\SearchQueryExecutor;
 use Oro\Bundle\SearchBundle\Api\Model\SearchResult;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
@@ -25,9 +26,14 @@ class SearchResultTest extends TestCase
         $this->query = $this->createMock(SearchQueryInterface::class);
     }
 
+    private function getSearchResult(bool $hasMore = false): SearchResult
+    {
+        return new SearchResult($this->query, new SearchQueryExecutor(), $hasMore);
+    }
+
     public function testGetRecords(): void
     {
-        $searchResult = new SearchResult($this->query);
+        $searchResult = $this->getSearchResult();
         $records = [new Item()];
         $result = $this->createMock(Result::class);
 
@@ -45,7 +51,7 @@ class SearchResultTest extends TestCase
 
     public function testGetRecordsWhenHasMoreRequestedAndHasMoreRecords(): void
     {
-        $searchResult = new SearchResult($this->query, true);
+        $searchResult = $this->getSearchResult(true);
         $records = [
             new Item('Test\Entity', '1'),
             new Item('Test\Entity', '2'),
@@ -76,7 +82,7 @@ class SearchResultTest extends TestCase
 
     public function testGetRecordsWhenHasMoreRequestedAndNoMoreRecords(): void
     {
-        $searchResult = new SearchResult($this->query, true);
+        $searchResult = $this->getSearchResult(true);
         $records = [
             new Item('Test\Entity', '1'),
             new Item('Test\Entity', '2')
@@ -101,7 +107,7 @@ class SearchResultTest extends TestCase
 
     public function testGetRecordsWhenHasMoreRequestedButMaxResultsIsNotSet(): void
     {
-        $searchResult = new SearchResult($this->query, true);
+        $searchResult = $this->getSearchResult(true);
         $records = [
             new Item('Test\Entity', '1'),
             new Item('Test\Entity', '2')
@@ -126,7 +132,7 @@ class SearchResultTest extends TestCase
     public function testGetRecordsForInvalidQuery(): void
     {
         $this->expectException(InvalidSearchQueryException::class);
-        $searchResult = new SearchResult($this->query);
+        $searchResult = $this->getSearchResult();
 
         $this->query->expects(self::once())
             ->method('getResult')
@@ -138,7 +144,7 @@ class SearchResultTest extends TestCase
     public function testGetRecordsForInvalidQueryAndLazyResult(): void
     {
         $this->expectException(InvalidSearchQueryException::class);
-        $searchResult = new SearchResult($this->query);
+        $searchResult = $this->getSearchResult();
         $result = $this->createMock(Result::class);
 
         $this->query->expects(self::once())
@@ -154,7 +160,7 @@ class SearchResultTest extends TestCase
     public function testGetRecordsForUnexpectedException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $searchResult = new SearchResult($this->query);
+        $searchResult = $this->getSearchResult();
 
         $this->query->expects(self::once())
             ->method('getResult')
@@ -165,7 +171,7 @@ class SearchResultTest extends TestCase
 
     public function testGetRecordsCount(): void
     {
-        $searchResult = new SearchResult($this->query);
+        $searchResult = $this->getSearchResult();
         $recordsCount = 123;
         $result = $this->createMock(Result::class);
 
@@ -184,7 +190,7 @@ class SearchResultTest extends TestCase
     public function testGetRecordsCountForInvalidQuery(): void
     {
         $this->expectException(InvalidSearchQueryException::class);
-        $searchResult = new SearchResult($this->query);
+        $searchResult = $this->getSearchResult();
 
         $this->query->expects(self::once())
             ->method('getResult')
@@ -196,7 +202,7 @@ class SearchResultTest extends TestCase
     public function testGetRecordsCountForUnexpectedException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $searchResult = new SearchResult($this->query);
+        $searchResult = $this->getSearchResult();
 
         $this->query->expects(self::once())
             ->method('getResult')
@@ -207,7 +213,7 @@ class SearchResultTest extends TestCase
 
     public function testGetAggregatedData(): void
     {
-        $searchResult = new SearchResult($this->query);
+        $searchResult = $this->getSearchResult();
         $aggregatedData = [
             'fieldSum'   => 123,
             'fieldCount' => [
@@ -224,22 +230,15 @@ class SearchResultTest extends TestCase
             ->method('getAggregatedData')
             ->willReturn($aggregatedData);
 
-        $expectedAggregatedData = [
-            'fieldSum'   => 123,
-            'fieldCount' => [
-                ['value' => 'val1', 'count' => 1],
-                ['value' => 'val2', 'count' => 10]
-            ]
-        ];
-        self::assertSame($expectedAggregatedData, $searchResult->getAggregatedData());
+        self::assertSame($aggregatedData, $searchResult->getAggregatedData());
         // test that the query is executed only once
-        self::assertSame($expectedAggregatedData, $searchResult->getAggregatedData());
+        self::assertSame($aggregatedData, $searchResult->getAggregatedData());
     }
 
     public function testGetAggregatedDataForInvalidQuery(): void
     {
         $this->expectException(InvalidSearchQueryException::class);
-        $searchResult = new SearchResult($this->query);
+        $searchResult = $this->getSearchResult();
 
         $this->query->expects(self::once())
             ->method('getResult')
@@ -251,7 +250,7 @@ class SearchResultTest extends TestCase
     public function testGetAggregatedDataForUnexpectedException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $searchResult = new SearchResult($this->query);
+        $searchResult = $this->getSearchResult();
 
         $this->query->expects(self::once())
             ->method('getResult')

@@ -8,21 +8,20 @@ use Oro\Bundle\ApiBundle\Filter\FieldFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\SearchBundle\Query\Expression\TokenInfo;
-use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
+use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 
 /**
  * A filter that can be used to requests aggregated data from a search index.
  */
 class SearchAggregationFilter extends StandaloneFilter implements FieldFilterInterface
 {
-    private SearchFieldResolverFactory $searchFieldResolverFactory;
+    private SearchFieldResolverFactoryInterface $searchFieldResolverFactory;
     private string $entityClass;
     /** @var array [field name => field name in search index, ...] */
     private array $fieldMappings = [];
-    /** @var string[] */
     private array $aggregations;
 
-    public function setSearchFieldResolverFactory(SearchFieldResolverFactory $searchFieldResolverFactory): void
+    public function setSearchFieldResolverFactory(SearchFieldResolverFactoryInterface $searchFieldResolverFactory): void
     {
         $this->searchFieldResolverFactory = $searchFieldResolverFactory;
     }
@@ -60,7 +59,7 @@ class SearchAggregationFilter extends StandaloneFilter implements FieldFilterInt
         }
     }
 
-    public function applyToSearchQuery(SearchQueryInterface $query): void
+    public function applyToSearchQuery(SearchQuery $query): void
     {
         foreach ($this->aggregations as [$fieldName, $fieldType, $function, $alias]) {
             $query->addAggregate($alias, $fieldType . '.' . $fieldName, $function);
@@ -81,9 +80,6 @@ class SearchAggregationFilter extends StandaloneFilter implements FieldFilterInt
     }
 
     /**
-     * @param string              $aggregate
-     * @param SearchFieldResolver $fieldResolver
-     *
      * @return array [field name, field type, function, alias]
      */
     private function parseAggregate(string $aggregate, SearchFieldResolver $fieldResolver): array

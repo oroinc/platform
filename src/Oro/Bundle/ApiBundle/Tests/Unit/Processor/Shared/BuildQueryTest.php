@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Model\LoadEntityIdsQueryExecutor;
 use Oro\Bundle\ApiBundle\Model\LoadEntityIdsQueryInterface;
 use Oro\Bundle\ApiBundle\Processor\Shared\BuildQuery;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadEntitiesByEntitySerializer;
@@ -34,7 +35,10 @@ class BuildQueryTest extends GetListProcessorOrmRelatedTestCase
 
         $this->filterNamesRegistry = $this->createMock(FilterNamesRegistry::class);
 
-        $this->processor = new BuildQuery($this->doctrineHelper, $this->filterNamesRegistry);
+        $this->processor = new BuildQuery(
+            $this->doctrineHelper,
+            new LoadEntityIdsQueryExecutor($this->filterNamesRegistry)
+        );
     }
 
     public function testProcessWhenDataAlreadyExist(): void
@@ -253,7 +257,6 @@ class BuildQueryTest extends GetListProcessorOrmRelatedTestCase
         self::assertEquals(
             [
                 Error::createValidationError(Constraint::SORT, 'Invalid sorting')
-                    ->setSource(ErrorSource::createByParameter('sort_filter'))
             ],
             $this->context->getErrors()
         );

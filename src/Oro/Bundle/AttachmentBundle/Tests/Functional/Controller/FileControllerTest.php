@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Controller;
 
+use Oro\Bundle\AttachmentBundle\Controller\FileController;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tests\Functional\DataFixtures\LoadFileData;
 use Oro\Bundle\AttachmentBundle\Tests\Functional\DataFixtures\LoadImageData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -158,6 +160,12 @@ class FileControllerTest extends WebTestCase
 
         self::assertResponseContentTypeEquals($result, $file->getMimeType());
         self::assertResponseStatusCodeEquals($result, 200);
+        self::assertResponseHeaderNotExists($result, AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER);
+        self::assertResponseHeader(
+            $result,
+            'Cache-Control',
+            sprintf('max-age=%d, public', FileController::CACHE_CONTROL_DEFAULT_MAX_AGE)
+        );
     }
 
     public function testGetResizedAttachmentImageReturnsWebpImageWhenFormatIsWebp(): void

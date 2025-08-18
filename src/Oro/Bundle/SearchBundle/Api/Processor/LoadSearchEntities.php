@@ -12,11 +12,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class LoadSearchEntities implements ProcessorInterface
 {
-    private SearchEntityRepository $searchEntityRepository;
-
-    public function __construct(SearchEntityRepository $searchEntityRepository)
-    {
-        $this->searchEntityRepository = $searchEntityRepository;
+    public function __construct(
+        private readonly SearchEntityRepository $searchEntityRepository
+    ) {
     }
 
     #[\Override]
@@ -29,10 +27,15 @@ class LoadSearchEntities implements ProcessorInterface
             return;
         }
 
+        $entityClasses = $context->getFilterValues()->getOne('entityType')?->getValue();
+        if (\is_string($entityClasses)) {
+            $entityClasses = [$entityClasses];
+        }
         $context->setResult(
             $this->searchEntityRepository->getSearchEntities(
                 $context->getVersion(),
                 $context->getRequestType(),
+                $entityClasses,
                 $context->getFilterValues()->getOne('searchable')?->getValue()
             )
         );

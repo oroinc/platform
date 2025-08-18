@@ -898,8 +898,7 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
      */
     public function changeExportBatchSize(int $size): void
     {
-        // oro_importexport.test.cache service is defined in ImportExportBundle/Tests/Behat/parameters.yml
-        $cache = $this->getAppContainer()->get('oro_importexport.test.cache');
+        $cache = $this->getAppContainer()->get('oro_importexport.behat.cache');
         $item = $cache->getItem(PreExportMessageProcessor::BATCH_SIZE_KEY);
         $item->set($size);
         $cache->save($item);

@@ -304,7 +304,6 @@ services:
             - { name: form.type, alias: pagestate }
 
     oro_navigation.route_collection.cache:
-        public: false
         parent: oro.data.cache
         tags:
             - { name: 'cache.pool', namespace: 'oro_navigation_route_collection' }
@@ -560,15 +559,15 @@ services:
     oro_navigation.data_provider.title:
         class: Oro\Bundle\NavigationBundle\Layout\DataProvider\NavigationTitleProvider
         arguments:
-          - '@oro_navigation.title_service'
-          - '@oro_config.user'
+            - '@oro_navigation.title_service'
+            - '@oro_config.user'
         tags:
             - { name: layout.data_provider, alias: title_provider }
 
     oro_navigation.data_provider.breadcrumb:
         class: Oro\Bundle\NavigationBundle\Layout\DataProvider\BreadcrumbProvider
         arguments:
-          - '@oro_navigation.chain_breadcrumb_manager'
+            - '@oro_navigation.chain_breadcrumb_manager'
         tags:
             - { name: layout.data_provider, alias: breadcrumb_provider }
 
