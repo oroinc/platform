@@ -10,6 +10,7 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 
 class LoadSegmentDeltaData extends AbstractFixture implements DependentFixtureInterface
 {
@@ -66,6 +67,7 @@ class LoadSegmentDeltaData extends AbstractFixture implements DependentFixtureIn
         $segment->setEntity(Segment::class);
         $segment->setType($segmentType);
         $segment->setDefinition(QueryDefinitionUtil::encodeDefinition(self::SEGMENT_DEFINITION));
+        $segment->setOrganization($this->getReference(LoadOrganization::ORGANIZATION));
         $manager->persist($segment);
         $this->setReference(self::SEGMENT, $segment);
 
