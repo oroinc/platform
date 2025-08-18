@@ -29,16 +29,22 @@ class ImportExportResultRepositoryTest extends WebTestCase
 
     public function testUpdateExpiredRecords()
     {
+        /** @var ImportExportResult $expiredResult */
+        $expiredResult = $this->getReference(LoadImportExportResultData::EXPIRED_IMPORT_EXPORT_RESULT);
+        self::assertTrue($expiredResult->isExpired());
+
         /** @var ImportExportResult $notExpiredResult */
         $notExpiredResult = $this->getReference(LoadImportExportResultData::NOT_EXPIRED_IMPORT_EXPORT_RESULT);
-        $this->assertFalse($notExpiredResult->isExpired());
+        self::assertFalse($notExpiredResult->isExpired());
 
         $from = new \DateTime('yesterday', new \DateTimeZone('UTC'));
         $to = new \DateTime('tomorrow', new \DateTimeZone('UTC'));
 
-        $this->getRepository()->updateExpiredRecords($from, $to);
+        $affectedCount = $this->getRepository()->updateExpiredRecordsAndReturnCount($from, $to);
+        self::assertEquals(1, $affectedCount);
+
         $this->getManager()->refresh($notExpiredResult);
 
-        $this->assertTrue($notExpiredResult->isExpired());
+        self::assertTrue($notExpiredResult->isExpired());
     }
 }
