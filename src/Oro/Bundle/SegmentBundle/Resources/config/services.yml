@@ -143,6 +143,8 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_segment.query.dynamic_segment.query_builder'
+        calls:
+            - [setMetadataProvider, ['@oro_security.owner.metadata_provider.chain']]
 
     oro_segment.placeholder.segment_condition_filter:
         class: Oro\Bundle\SegmentBundle\Placeholder\SegmentConditionFilter
