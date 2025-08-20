@@ -5,6 +5,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Provider;
 use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Oro\Bundle\SearchBundle\Configuration\MappingConfigurationProvider;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingCacheNormalizer;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -19,16 +20,16 @@ class SearchMappingProviderTest extends TestCase
 {
     private array $testMapping = [
         'Oro\TestBundle\Entity\TestEntity' => [
-            'alias'  => 'test_entity',
+            'alias' => 'test_entity',
             'fields' => [
                 [
-                    'name'           => 'firstname',
-                    'target_type'    => 'text',
+                    'name' => 'firstname',
+                    'target_type' => 'text',
                     'target_columns' => ['firstname']
                 ],
                 [
-                    'name'           => 'qty',
-                    'target_type'    => 'integer',
+                    'name' => 'qty',
+                    'target_type' => 'integer',
                     'target_columns' => ['qty']
                 ]
             ]
@@ -48,14 +49,14 @@ class SearchMappingProviderTest extends TestCase
         $this->cacheItem = $this->createMock(CacheItemInterface::class);
         $this->configProvider = $this->createMock(MappingConfigurationProvider::class);
 
-        $this->configProvider->expects($this->any())
+        $this->configProvider->expects(self::any())
             ->method('getConfiguration')
             ->willReturn($this->testMapping);
     }
 
     public function testGetEntitiesListAliases(): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             ['Oro\TestBundle\Entity\TestEntity' => 'test_entity'],
             $this->getProvider()->getEntitiesListAliases()
         );
@@ -63,7 +64,7 @@ class SearchMappingProviderTest extends TestCase
 
     public function testGetEntityAliases(): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             ['Oro\TestBundle\Entity\TestEntity' => 'test_entity'],
             $this->getProvider()->getEntityAliases(['Oro\TestBundle\Entity\TestEntity'])
         );
@@ -83,7 +84,7 @@ class SearchMappingProviderTest extends TestCase
 
     public function testGetEntityAliasesForEmptyClassNames(): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             ['Oro\TestBundle\Entity\TestEntity' => 'test_entity'],
             $this->getProvider()->getEntityAliases()
         );
@@ -91,7 +92,7 @@ class SearchMappingProviderTest extends TestCase
 
     public function testGetEntityAlias(): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             'test_entity',
             $this->getProvider()->getEntityAlias('Oro\TestBundle\Entity\TestEntity')
         );
@@ -99,14 +100,14 @@ class SearchMappingProviderTest extends TestCase
 
     public function testGetEntityAliasForUnknownEntity(): void
     {
-        $this->assertNull(
+        self::assertNull(
             $this->getProvider()->getEntityAlias('Oro\TestBundle\Entity\UnknownEntity')
         );
     }
 
     public function testGetEntityClasses(): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             ['Oro\TestBundle\Entity\TestEntity'],
             $this->getProvider()->getEntityClasses()
         );
@@ -116,34 +117,34 @@ class SearchMappingProviderTest extends TestCase
     {
         $provider = $this->getProvider();
 
-        $this->assertTrue($provider->isClassSupported('Oro\TestBundle\Entity\TestEntity'));
-        $this->assertFalse($provider->isClassSupported('Oro\TestBundle\Entity\BadEntity'));
+        self::assertTrue($provider->isClassSupported('Oro\TestBundle\Entity\TestEntity'));
+        self::assertFalse($provider->isClassSupported('Oro\TestBundle\Entity\BadEntity'));
     }
 
     public function testHasFieldsMapping(): void
     {
         $provider = $this->getProvider();
 
-        $this->assertTrue($provider->hasFieldsMapping('Oro\TestBundle\Entity\TestEntity'));
-        $this->assertFalse($provider->hasFieldsMapping('Oro\TestBundle\Entity\BadEntity'));
+        self::assertTrue($provider->hasFieldsMapping('Oro\TestBundle\Entity\TestEntity'));
+        self::assertFalse($provider->hasFieldsMapping('Oro\TestBundle\Entity\BadEntity'));
     }
 
     public function testGetEntityMapParameter(): void
     {
         $provider = $this->getProvider();
 
-        $this->assertEquals(
+        self::assertEquals(
             'test_entity',
             $provider->getEntityMapParameter('Oro\TestBundle\Entity\TestEntity', 'alias')
         );
-        $this->assertFalse(
-            $provider->getEntityMapParameter('Oro\TestBundle\Entity\TestEntity', 'badParameter', false)
+        self::assertFalse(
+            $provider->getEntityMapParameter('Oro\TestBundle\Entity\TestEntity', 'badParameter')
         );
     }
 
     public function testGetEntityClass(): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             'Oro\TestBundle\Entity\TestEntity',
             $this->getProvider()->getEntityClass('test_entity')
         );
@@ -151,26 +152,26 @@ class SearchMappingProviderTest extends TestCase
 
     public function testGetEntityClassForUnknownAlias(): void
     {
-        $this->assertNull(
+        self::assertNull(
             $this->getProvider()->getEntityClass('unknown_entity')
         );
     }
 
     public function testGetMappingConfigCached(): void
     {
-        $this->eventDispatcher->expects($this->never())
+        $this->eventDispatcher->expects(self::never())
             ->method('dispatch');
 
-        $this->assertEquals($this->testMapping, $this->getProvider()->getMappingConfig());
+        self::assertEquals($this->testMapping, $this->getProvider()->getMappingConfig());
     }
 
     public function testGetMappingConfigWhenConfigurationNotLoaded(): void
     {
         $configTimestamp = 20;
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('isCacheFresh');
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getCacheTimestamp')
             ->willReturn($configTimestamp);
 
@@ -188,24 +189,24 @@ class SearchMappingProviderTest extends TestCase
             )
             ->willReturn($this->cacheItem);
 
-        $this->eventDispatcher->expects($this->once())
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->willReturnCallback(function (SearchMappingCollectEvent $event, $eventName) {
-                $this->assertEquals('oro_search.search_mapping_collect', $eventName);
-                $this->assertEquals($this->testMapping, $event->getMappingConfig());
+                self::assertEquals('oro_search.search_mapping_collect', $eventName);
+                self::assertEquals($this->testMapping, $event->getMappingConfig());
 
                 $event->setMappingConfig([]);
 
                 return $event;
             });
 
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('save')
             ->with($this->cacheItem);
 
         $provider = $this->getProvider(false);
-        $this->assertEquals([], $provider->getMappingConfig());
-        $this->assertEquals([], $provider->getMappingConfig());
+        self::assertEquals([], $provider->getMappingConfig());
+        self::assertEquals([], $provider->getMappingConfig());
     }
 
     public function testGetMappingConfigWhenConfigurationChanged(): void
@@ -213,11 +214,11 @@ class SearchMappingProviderTest extends TestCase
         $cacheTimestamp = 10;
         $configTimestamp = 20;
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('isCacheFresh')
             ->with($cacheTimestamp)
             ->willReturn(false);
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getCacheTimestamp')
             ->willReturn($configTimestamp);
 
@@ -236,35 +237,35 @@ class SearchMappingProviderTest extends TestCase
             ->with([$configTimestamp, []])
             ->willReturn($this->cacheItem);
 
-        $this->eventDispatcher->expects($this->once())
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->willReturnCallback(function (SearchMappingCollectEvent $event, $eventName) {
-                $this->assertEquals('oro_search.search_mapping_collect', $eventName);
-                $this->assertEquals($this->testMapping, $event->getMappingConfig());
+                self::assertEquals('oro_search.search_mapping_collect', $eventName);
+                self::assertEquals($this->testMapping, $event->getMappingConfig());
 
                 $event->setMappingConfig([]);
 
                 return $event;
             });
 
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('save')
             ->with($this->cacheItem);
 
         $provider = $this->getProvider(false);
-        $this->assertEquals([], $provider->getMappingConfig());
-        $this->assertEquals([], $provider->getMappingConfig());
+        self::assertEquals([], $provider->getMappingConfig());
+        self::assertEquals([], $provider->getMappingConfig());
     }
 
     public function testGetMappingConfigWhenConfigurationNotChanged(): void
     {
         $cacheTimestamp = 10;
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('isCacheFresh')
             ->with($cacheTimestamp)
             ->willReturn(true);
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getCacheTimestamp');
 
         $this->cache->expects(self::once())
@@ -278,15 +279,15 @@ class SearchMappingProviderTest extends TestCase
             ->method('get')
             ->willReturn([$cacheTimestamp, []]);
 
-        $this->eventDispatcher->expects($this->never())
+        $this->eventDispatcher->expects(self::never())
             ->method('dispatch');
 
-        $this->cache->expects($this->never())
+        $this->cache->expects(self::never())
             ->method('save');
 
         $provider = $this->getProvider(false);
-        $this->assertEquals([], $provider->getMappingConfig());
-        $this->assertEquals([], $provider->getMappingConfig());
+        self::assertEquals([], $provider->getMappingConfig());
+        self::assertEquals([], $provider->getMappingConfig());
     }
 
     public function testClearCache(): void
@@ -369,16 +370,17 @@ class SearchMappingProviderTest extends TestCase
             $this->eventDispatcher,
             $this->configProvider,
             $this->cache,
+            new SearchMappingCacheNormalizer([], [], 'target_type'),
+            'oro_search.search_mapping_collect',
             'oro_search.mapping_config',
-            'search_engine',
-            'oro_search.search_mapping_collect'
+            'search_engine'
         );
         if ($mockFetch) {
-            $this->configProvider->expects($this->once())
+            $this->configProvider->expects(self::once())
                 ->method('isCacheFresh')
                 ->with(self::isNull())
                 ->willReturn(true);
-            $this->cache->expects($this->once())
+            $this->cache->expects(self::once())
                 ->method('getItem')
                 ->with(UniversalCacheKeyGenerator::normalizeCacheKey('oro_search.mapping_config:search_engine'))
                 ->willReturn($this->cacheItem);

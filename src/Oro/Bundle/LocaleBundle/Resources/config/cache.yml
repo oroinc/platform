@@ -19,6 +19,13 @@ services:
     oro_locale.cache.normalizer.localized_fallback_value:
         class: Oro\Bundle\LocaleBundle\Cache\Normalizer\LocalizedFallbackValueNormalizer
         arguments:
+            -
+                'id': 'i'
+                'string': 's'
+                'text': 't'
+                'fallback': 'f'
+                'localization': 'l'
+                'serialized_data': 'd'
             - '@doctrine'
 
     oro_locale.cache.normalizer.localized_fallback_value_collection:
