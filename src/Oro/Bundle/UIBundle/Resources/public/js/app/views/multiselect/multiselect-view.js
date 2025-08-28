@@ -13,7 +13,7 @@ import MultiselectSearchView, {cssConfig as searchCssConfig}
 
 export const cssConfig = {
     main: 'multiselect-view',
-    sourceSelectHide: 'hidden',
+    sourceSelectHide: 'hide',
     ...collectionCssConfig,
     ...headerCssConfig,
     ...footerCssConfig,
@@ -138,6 +138,12 @@ const MultiSelectView = BaseMultiSelectView.extend({
         return this;
     },
 
+    resetSearch() {
+        if (this.subview('multiselect-search')) {
+            this.subview('multiselect-search').clearSearchInput();
+        }
+    },
+
     getCollectionOptions() {
         return {
             defaultState: this.defaultOptions
@@ -151,7 +157,7 @@ const MultiSelectView = BaseMultiSelectView.extend({
      */
     renderCollection() {
         this.subview('multiselect-collection', new this.CollectionView(this.collectionViewRenderOptions()));
-        this.listenTo(this.subview('multiselect-collection'), 'change reset', this.onCollectionChange);
+        this.listenTo(this.subview('multiselect-collection'), 'change:selected reset', this.onCollectionChange);
 
         return this;
     },
@@ -268,12 +274,34 @@ const MultiSelectView = BaseMultiSelectView.extend({
      *   - {string} id - The ID of the option or generated ID in format 'selectable-item-{value}'
      */
     getSelectOptions(select) {
-        return [...select.options].map(option => ({
-            label: option.innerHTML,
-            selected: option.selected,
-            disabled: option.disabled,
-            value: option.value
-        }));
+        return [...select.children].map(option => {
+            if (option instanceof HTMLOptionElement) {
+                const data = option.dataset;
+                const opts = {};
+                for (const key in data) {
+                    if (key.startsWith('option')) {
+                        opts[key] = data[key];
+                    }
+                }
+
+                return {
+                    label: option.innerHTML,
+                    selected: option.selected,
+                    disabled: option.disabled,
+                    ...opts,
+                    value: option.value
+                };
+            }
+
+            if (option instanceof HTMLOptGroupElement) {
+                return {
+                    type: 'optgroup',
+                    label: option.label,
+                    value: option.label.toLowerCase().replace(/\s/, '_'),
+                    options: this.getSelectOptions(option)
+                };
+            }
+        });
     },
 
     /**
@@ -301,7 +329,7 @@ const MultiSelectView = BaseMultiSelectView.extend({
      * It will re-render the view and update the state of the collection
      */
     refresh() {
-        this.setState(this.collectionItems(this.model.get('options')));
+        this.setState(null);
     },
 
     /**

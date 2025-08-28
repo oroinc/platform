@@ -11,11 +11,30 @@ const MultiselectDropdownViewModel = MultiSelectViewModel.extend({
         dropdownAriaLabel: null,
         tooltipTitle: null,
         tooltipPlacement: 'top-center',
-        enabledTooltip: true
+        enabledTooltip: true,
+        showSelectedInLabel: true
     },
 
     constructor: function MultiselectDropdownViewModel(...args) {
         MultiselectDropdownViewModel.__super__.constructor.apply(this, args);
+    },
+
+    initialize(attrs, options) {
+        if (this.get('showSelectedInLabel') && attrs.dropdownToggleLabel) {
+            this.set('defaultToggleLabel', attrs.dropdownToggleLabel);
+        }
+
+        MultiselectDropdownViewModel.__super__.initialize.call(this, attrs, options);
+    },
+
+    onItemSelected() {
+        MultiselectDropdownViewModel.__super__.onItemSelected.call(this);
+
+        if (this.get('showSelectedInLabel')) {
+            this.set('dropdownToggleLabel', this.collection.getLabels({
+                defaults: this.get('defaultToggleLabel')
+            }));
+        }
     }
 });
 

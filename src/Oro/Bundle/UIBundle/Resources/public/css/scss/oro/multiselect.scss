@@ -1,0 +1,75 @@
+/* @theme: admin.oro; */
+
+.multiselect {
+    &__list {
+        display: grid;
+        list-style: none;
+        max-height: 350px;
+        min-width: 150px;
+        overflow-y: auto;
+
+        margin-inline: -#{$content-padding-small};
+        padding-inline: $content-padding-small;
+    }
+
+    &--offset {
+        padding-left: $content-padding;
+    }
+
+    &__item-checkbox {
+        align-items: center;
+        display: inline-flex;
+    }
+
+    &__dropdown-menu {
+        padding: $content-padding;
+    }
+
+    &__search {
+        position: relative;
+
+        .clear-search {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+
+        input[type=search] {
+            width: 100%;
+        }
+    }
+
+    &__search-icon {
+        position: absolute;
+        top: 0;
+        left: $content-padding-medium;
+        bottom: 0;
+        margin: auto;
+    }
+
+    &__search-input {
+        padding-inline: 40px;
+    }
+
+    &__no-found {
+        margin-top: $content-padding-small;
+        text-align: center;
+    }
+
+    &__optgroup {
+        &-label {
+            font-weight: font-weight('bold');
+            font-size: $base-font-size;
+            cursor: pointer;
+
+            text-align: center;
+            border-bottom: 1px solid;
+            margin: 1px 0;
+            padding: 3px;
+        }
+
+        &-options {
+            width: auto;
+        }
+    }
+}

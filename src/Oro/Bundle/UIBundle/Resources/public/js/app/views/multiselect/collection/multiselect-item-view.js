@@ -1,3 +1,4 @@
+import {debounce} from 'underscore';
 import BaseMultiSelectView from 'oroui/js/app/views/multiselect/base-multiselect-view';
 import template from 'tpl-loader!oroui/templates/multiselect/collection/item.html';
 import manageFocus from 'oroui/js/tools/manage-focus';
@@ -5,7 +6,8 @@ import manageFocus from 'oroui/js/tools/manage-focus';
 export const cssConfig = {
     item: 'multiselect__item',
     itemCheckboxLabel: 'checkbox-label multiselect__item-checkbox',
-    itemHidden: 'hidden'
+    itemCheckbox: '',
+    itemHidden: 'hide'
 };
 
 /**
@@ -23,10 +25,15 @@ const MultiSelectItemView = BaseMultiSelectView.extend({
         return this.cssConfig.item;
     },
 
+    multiple: true,
+
     template,
 
-    events: {
-        'change input[type="checkbox"]': 'onCheckboxChanged'
+    events() {
+        return {
+            [`change input[type="${this.model.get('multiple') ? 'checkbox' : 'radio'}"]`]: 'onCheckboxChanged',
+            click: 'onClickHandler'
+        };
     },
 
     listen: {
@@ -34,6 +41,7 @@ const MultiSelectItemView = BaseMultiSelectView.extend({
     },
 
     constructor: function MultiSelectItemView(...args) {
+        this.toggleState = debounce(this.toggleState);
         MultiSelectItemView.__super__.constructor.apply(this, args);
     },
 
@@ -43,8 +51,26 @@ const MultiSelectItemView = BaseMultiSelectView.extend({
         MultiSelectItemView.__super__.initialize.call(this, options);
     },
 
+    onClickHandler() {
+        if (this.model.isActive()) {
+            this.toggleState(true);
+        }
+    },
+
     onCheckboxChanged(event) {
-        this.model.set('selected', event.currentTarget.checked);
+        this.toggleState(event.currentTarget.checked);
+    },
+
+    toggleState(state, options = {}) {
+        if (this.model.get('multiple') === false) {
+            this.model.collection.each(model => model.setState({
+                selected: false
+            }, {
+                silent: true
+            }));
+        }
+
+        this.model.set('selected', state, options);
     },
 
     render() {

@@ -186,6 +186,7 @@ map:
         underscore: oroui/js/extend/underscore
         util.js: bootstrap-util
         oroui/templates/delete-confirmation.html: oroui/templates/modal-dialog.html
+        oroui/templates/multiselect/parts/search/multiselect-search-view.html: oroui/templates/multiselect-backoffice/parts/search/multiselect-search-view.html
     chaplin:
         backbone: backbone
     extend-popper:

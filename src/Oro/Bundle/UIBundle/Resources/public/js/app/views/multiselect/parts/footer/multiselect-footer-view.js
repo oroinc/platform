@@ -5,7 +5,7 @@ import MultiselectFooterModel from 'oroui/js/app/views/multiselect/parts/footer/
 export const cssConfig = {
     footer: `multiselect__footer`,
     footerResetBtn: 'btn btn--flat',
-    footerHidden: 'hidden'
+    footerHidden: 'hide'
 };
 
 /**

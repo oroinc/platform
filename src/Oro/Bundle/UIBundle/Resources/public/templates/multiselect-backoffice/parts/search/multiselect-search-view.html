@@ -1,0 +1,18 @@
+<% let oroui = _.macros('oroui') %>
+
+<input
+    type="search"
+    <% if (placeholder) { %>placeholder="<%- placeholder %>"<% } %>
+    <% if (searchFieldAriaLabel) { %> aria-label="<%- searchFieldAriaLabel %>"<% } %>
+    class="<%- cssConfig.searchInput %>"
+    data-role="search-input"
+>
+
+<button
+    type="button"
+    class="<%- cssConfig.searchResetBtn %> <%- cssConfig.searchResetBtnHide %>"
+    data-role="clear"
+    <% if (searchResetBtnAriaLabel) { %> aria-label="<%- searchResetBtnAriaLabel %>"<% } %>
+>
+    <span class="fa-close"></span>
+</button>

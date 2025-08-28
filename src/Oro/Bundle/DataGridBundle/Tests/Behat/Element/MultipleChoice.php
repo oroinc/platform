@@ -13,7 +13,7 @@ class MultipleChoice extends AbstractGridFilterItem
     {
         $this->open();
         $widget = $this->getWidget();
-        $inputs = $widget->findAll('css', 'li > label');
+        $inputs = $widget->findAll('css', '.multiselect__item > label');
 
         foreach ($values as $value) {
             $item = $this->findElementByText($inputs, $value);
@@ -55,7 +55,7 @@ class MultipleChoice extends AbstractGridFilterItem
     {
         $this->open();
         $widget = $this->getWidget();
-        $inputs = $widget->findAll('css', 'li > label');
+        $inputs = $widget->findAll('css', '.multiselect__item > label');
 
         foreach ($values as $value) {
             $item = $this->findElementByTextStrict($inputs, $value);
@@ -78,7 +78,7 @@ class MultipleChoice extends AbstractGridFilterItem
     {
         $this->open();
         $widget = $this->getWidget();
-        $inputs = $widget->findAll('css', 'li > label');
+        $inputs = $widget->findAll('css', '.multiselect__item > label');
         $item = $this->findElementByText($inputs, $value);
 
         self::assertNotNull($item, sprintf('Could not find checkbox with "%s" text', $value));
@@ -97,7 +97,7 @@ class MultipleChoice extends AbstractGridFilterItem
      */
     protected function getWidget()
     {
-        $widgets = $this->getPage()->findAll('css', 'body div.filter-container ul.ui-multiselect-checkboxes');
+        $widgets = $this->getPage()->findAll('css', 'body div.filter-container .multiselect-view');
 
         /** @var NodeElement $widget */
         foreach ($widgets as $widget) {

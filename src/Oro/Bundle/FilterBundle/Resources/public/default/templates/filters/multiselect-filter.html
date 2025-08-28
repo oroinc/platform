@@ -1,34 +1,8 @@
 <% var selectorId = _.uniqueId('selector-'); %>
 <% var criteriaId = _.uniqueId('criteria-'); %>
 <% let oroui = _.macros('oroui') %>
-<div class="filter-item" data-multiselect-filter-template>
-    <%
-        var criteriaClasses = 'filter-select filter-criteria-selector';
-        if (obj.isEmpty) {
-            criteriaClasses += ' filter-default-value';
-        }
-        if (obj.criteriaClass) {
-            criteriaClasses += obj.criteriaClass;
-        }
-    %>
-    <button id="<%- selectorId %>"
-        class="<%- criteriaClasses %>"
-        type="button"
-    <% if (renderMode === 'toggle-mode') { %>
-        aria-controls="<%- criteriaId %>"
-    <% } %>
-    >
-        <% if (renderMode === 'toggle-mode') { %>
-            <%= oroui.renderIcon({
-                name: 'chevron-down',
-                extraClass: 'filter-criteria-selector-icon'
-            }) %>
-        <% } %>
-        <% if (showLabel) { %><span class="filter-item-label"><%- label %></span><% } %>
-    </button>
-    <select multiple
-            data-skip-input-widgets
-    >
+<div class="multiselect-filter filter-select">
+    <select multiple data-skip-input-widgets>
     <% _.each(options, function (option) { %>
         <option value="<%- option.value %>"
                 title="<%- option.label %>"
@@ -51,7 +25,14 @@
             ><%- option.label %></option>
     <% }); %>
     </select>
-    <% if (renderMode === 'toggle-mode') { %>
-        <div id="<%- criteriaId %>" class="filter-criteria" aria-labelledby="<%- selectorId %>"></div>
+</div>
+
+<div class="filter-action-row">
+    <% if (allowClearButtonInFilter) { %>
+        <button type="button"
+            data-role="clear-filter"
+            class="btn btn--flat filter-clear hidden"
+            aria-label="<%- clearFilterButtonAriaLabel %>"
+        ><%- _.__("oro.filter.clearFilterButton.text") %></button>
     <% } %>
 </div>

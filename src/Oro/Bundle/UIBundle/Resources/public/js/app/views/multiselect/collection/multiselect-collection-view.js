@@ -3,6 +3,7 @@ import BaseCollectionView from 'oroui/js/app/views/base/collection-view';
 import MultiSelectCollection from 'oroui/js/app/views/multiselect/collection/multiselect-collection';
 import MultiSelectItemView, {cssConfig as itemCssConfig}
     from 'oroui/js/app/views/multiselect/collection/multiselect-item-view';
+import MultiSelectItemGroupView from './multiselect-item-group-view';
 import manageFocus from 'oroui/js/tools/manage-focus';
 import KEY_CODES from 'oroui/js/tools/keyboard-key-codes';
 import notFoundTemplate from 'tpl-loader!oroui/templates/multiselect/collection/not-found.html';
@@ -27,7 +28,13 @@ const MultiSelectCollectionView = BaseCollectionView.extend({
 
     cssConfig,
 
-    itemView: MultiSelectItemView,
+    itemView(model) {
+        if (model.isGroup()) {
+            return MultiSelectItemGroupView;
+        }
+
+        return MultiSelectItemView;
+    },
 
     className() {
         const classes = [this.cssConfig.list];
@@ -75,9 +82,13 @@ const MultiSelectCollectionView = BaseCollectionView.extend({
 
     initItemView(model) {
         if (this.itemView) {
-            return new this.itemView({
+            model.set('multiple', this.model.get('multiple'));
+
+            const View = this.itemView(model);
+
+            return new View({
                 autoRender: false,
-                model: model,
+                model,
                 cssConfig: this.cssConfig
             });
         } else {
@@ -106,7 +117,9 @@ const MultiSelectCollectionView = BaseCollectionView.extend({
      * Set state of the collection
      */
     setState(state, options = {}) {
+        this.stopEmit = true;
         this.collection.setState(state, options);
+        this.stopEmit = false;
     },
 
     /**
@@ -120,6 +133,10 @@ const MultiSelectCollectionView = BaseCollectionView.extend({
      * Proxy collection events to view
      */
     onCollectionEvent(eventName, ...args) {
+        if (this.stopEmit) {
+            return;
+        }
+
         this.trigger(eventName, this.collection, eventName, ...args);
     },
 
@@ -149,7 +166,7 @@ const MultiSelectCollectionView = BaseCollectionView.extend({
      * @param {Array[MultiSelectModel]} visibleItems
      */
     toggleNotToShowBlock(visibleItems) {
-        if (visibleItems.length === 0) {
+        if (visibleItems.length === 0 && this.collection.getAllItemsCount() > 0) {
             !this.$('[data-role="no-data"]').length && this.$el.append(notFoundTemplate(this.model.toJSON()));
         } else {
             this.$('[data-role="no-data"]').remove();
@@ -165,6 +182,18 @@ const MultiSelectCollectionView = BaseCollectionView.extend({
         this.toggleNotToShowBlock(this.visibleItems);
 
         return this;
+    },
+
+    getItemViews() {
+        return Object.values(MultiSelectCollectionView.__super__.getItemViews.call(this)).reduce((views, view) => {
+            if (view instanceof MultiSelectItemGroupView) {
+                Object.assign(views, view.getItemViews());
+            }
+
+            views[view.model.cid] = view;
+
+            return views;
+        }, {});
     },
 
     getViewByModel(model) {
@@ -183,7 +212,7 @@ const MultiSelectCollectionView = BaseCollectionView.extend({
      * @returns {MultiSelectModel|null}
      */
     getModelByTarget(target) {
-        return this.collection.get(this.collection.model.getAlias(target.value));
+        return this.collection.getAllItems().find(model => model.get('value') === target.value);
     },
 
     /**

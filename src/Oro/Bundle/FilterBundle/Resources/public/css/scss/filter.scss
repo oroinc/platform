@@ -198,12 +198,6 @@
         }
     }
 
-    .filter-select {
-        .select-filter-widget.select-widget-trigger {
-            display: none;
-        }
-    }
-
     .filter-item {
         margin-right: $filter-box-item-offset-right;
         margin-bottom: $filter-box-item-offset-bottom;
@@ -374,6 +368,12 @@
             }
         }
 
+        &:not(.open-filter) {
+            .select-filter {
+                display: none;
+            }
+        }
+
         .divider {
             background: $filter-item-divider-background;
             line-height: $filter-item-divider-line-height;
@@ -436,10 +436,6 @@
             color: $neutral-white;
         }
     }
-}
-
-.ui-multiselect-checkboxes {
-    overflow-x: $ui-multiselect-checkboxes-overflow-x;
 }
 
 .filter-select {
@@ -526,124 +522,6 @@
 
 .filter-select .select-filter-widget .ui-icon {
     margin-top: $filter-select-offset-top;
-}
-
-.ui-multiselect-menu {
-    &.select-filter-widget {
-        z-index: $filter-box-criteria-z-index;
-
-        padding: $select-filter-widget-inner-offset;
-
-        ul {
-            max-height: $select-filter-widget-max-height;
-        }
-
-        .ui-multiselect-close {
-            display: $select-filter-widget-close-display;
-        }
-
-        .ui-multiselect-checkboxes {
-            label {
-                white-space: $select-filter-widget-checkboxes-label-white-space;
-                margin: $select-filter-widget-checkboxes-label-offset;
-                padding: $select-filter-widget-checkboxes-label-inner-offset;
-
-                float: $select-filter-widget-checkboxes-label-float;
-                text-align: $select-filter-widget-checkboxes-label-text-align;
-                display: flex;
-                gap: 8px;
-            }
-
-            // Override style of ui-multiselect
-            input {
-                // stylelint-disable-next-line declaration-no-important
-                position: static !important;
-                // stylelint-disable-next-line declaration-no-important
-                left: auto !important;
-            }
-
-            li {
-                font-size: $select-filter-widget-li-font-size;
-                padding: $select-filter-widget-li-inner-offset;
-
-                &:last-child {
-                    padding-bottom: $select-filter-widget-checkboxes-list-offset-vertical;
-                }
-
-                &::after {
-                    content: $select-filter-widget-li-after-content;
-                    display: $select-filter-widget-li-after-display;
-                    clear: $select-filter-widget-li-after-clear;
-                }
-
-                &.hidden-item {
-                    height: $select-filter-widget-li-hidden-item-height;
-                }
-            }
-
-            &.fixed-li {
-                li > label {
-                    float: $select-filter-widget-label-float;
-
-                    &.ui-state-hover {
-                        background-image: $select-filter-widget-label-state-hover-background-image;
-                        background-color: $select-filter-widget-label-state-hover-background-color;
-                    }
-
-                    &.ui-state-active {
-                        background-image: $select-filter-widget-label-state-active-background-image;
-                        background-color: $select-filter-widget-label-state-active-background-color;
-                    }
-                }
-            }
-        }
-
-        input[type='search'] {
-            margin: $select-filter-widget-search-offset;
-            width: $select-filter-widget-search-width;
-        }
-
-        .ui-multiselect-header {
-            min-height: $select-filter-widget-checkboxes-list-offset-vertical;
-            padding: $select-filter-widget-header-inner-offset;
-            margin: $select-filter-widget-header-offset;
-            position: relative;
-
-            > div {
-                padding: $select-filter-widget-header-child-inner-offset;
-            }
-
-            .clear-search {
-                position: absolute;
-                right: 8px;
-                top: 8px;
-
-                border-radius: 0;
-            }
-
-            .input-with-search {
-                padding-right: $btn-icon-width;
-            }
-
-            .ui-helper-reset {
-                display: $select-filter-widget-header-reset-display;
-            }
-        }
-
-        .ui-multiselect-footer {
-            display: $select-filter-widget-footer-display;
-        }
-
-        &:hover {
-            a {
-                color: $link-color-hover;
-            }
-        }
-
-        .no-data {
-            margin-top: 0;
-        }
-    }
 }
 
 .filter-items {

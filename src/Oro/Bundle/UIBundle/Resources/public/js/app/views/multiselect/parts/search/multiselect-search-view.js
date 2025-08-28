@@ -6,7 +6,8 @@ export const cssConfig = {
     searchMain: 'multiselect__search',
     searchInput: 'input input--full input-with-search multiselect__search-input',
     searchResetBtn: 'btn btn--simple-colored clear-search-button',
-    searchResetBtnHide: 'hidden',
+    searchResetBtnHide: 'hide',
+    searchHide: 'hide',
     searchIcon: 'multiselect__search-icon'
 };
 
@@ -53,16 +54,16 @@ const MultiselectSearchView = BaseMultiSelectView.extend({
 
         const searchValue = event.currentTarget.value.toLowerCase();
 
-        this.collection.each(model => {
+        this.collection.getAllItems().forEach(model => {
             const isVisible = model.get('label').toLowerCase().includes(searchValue);
-            model.set('hidden', !isVisible);
+            model.setHidden(!isVisible);
         });
 
         this.collection.visibilityChange();
     },
 
     resetSearch() {
-        this.collection.each(model => model.set('hidden', false));
+        this.collection.each(model => model.setHidden(false));
 
         this.collection.visibilityChange();
     },
@@ -78,7 +79,9 @@ const MultiselectSearchView = BaseMultiSelectView.extend({
     },
 
     checkSearchVisibility() {
-        this.$el.toggleClass('hidden', this.collection.length <= this.model.get('maxItemsForShowSearchBar'));
+        this.$el.toggleClass(this.cssConfig.searchHide,
+            this.collection.getAllItemsCount() < this.model.get('maxItemsForShowSearchBar')
+        );
     }
 });
 

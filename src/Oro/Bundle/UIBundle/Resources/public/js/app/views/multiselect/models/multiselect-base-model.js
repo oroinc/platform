@@ -9,6 +9,7 @@ import BaseModel from 'oroui/js/app/models/base/model';
 const MultiSelectBaseModel = BaseModel.extend({
     defaults: {
         selectedCount: 0,
+        multiple: true,
         cssConfig: null
     },
 

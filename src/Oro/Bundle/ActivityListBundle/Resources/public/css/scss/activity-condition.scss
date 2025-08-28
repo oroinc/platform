@@ -3,6 +3,11 @@
 .condition-item.condition-activity {
     .activity-choice-container,
     .type-choice-container {
+        .multiselect-filter,
+        .multiselect-view {
+            display: contents;
+        }
+
         .dropdown,
         .filter-item,
         .filter-select {

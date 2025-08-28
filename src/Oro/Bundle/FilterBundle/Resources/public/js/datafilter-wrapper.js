@@ -36,7 +36,7 @@ define(function(require) {
 
             this._appendFilter($filter);
 
-            const events = ['click', 'multiselectbeforeopen', 'show.bs.dropdown', 'clearMenus']
+            const events = ['click', 'show.bs.dropdown', 'clearMenus']
                 .map(eventName => eventName + this._eventNamespace())
                 .join(' ');
 

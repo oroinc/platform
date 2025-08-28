@@ -93,7 +93,6 @@ dynamic-imports:
         - oroui/js/app/components/viewport-component
         - oroui/js/app/components/widget-component
         - oroui/js/app/components/widget-form-component
-        - oroui/js/app/components/multiselect-component
         - oroui/js/app/plugins/base/plugin
         - oroui/js/app/views/datepicker/datepicker-view
         - oroui/js/app/views/datepicker/datetimepicker-view
@@ -117,6 +116,8 @@ dynamic-imports:
         - oroui/js/standart-confirmation
         - oroui/js/tools
         - oroui/js/tools/api-accessor
+    multiselect:
+        - oroui/js/app/components/multiselect-component
 map:
     '*':
         alert.js: bootstrap-alert

@@ -679,21 +679,6 @@ a.sync-btn span.dots {
     text-align: left;
 }
 
-.ui-multiselect-menu.select-filter-widget.multiselect-origin-folder {
-    .ui-multiselect-checkboxes {
-        li.ui-multiselect-optgroup-label {
-            border-bottom: none;
-            text-align: left;
-            padding-left: 5px;
-
-            a {
-                color: $additional-lighten;
-                font-size: 13px;
-            }
-        }
-    }
-}
-
 .folder-tree {
     .folder-label {
         margin-left: 5px;

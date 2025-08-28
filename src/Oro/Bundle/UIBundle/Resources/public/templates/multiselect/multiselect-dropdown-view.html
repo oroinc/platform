@@ -16,7 +16,9 @@
                 name: dropdownToggleIcon
             }) %>
         <% } %>
-        <%- dropdownToggleLabel %>
+        <span data-role="toggle-label">
+            <%- dropdownToggleLabel %>
+        </span>
     </button>
 
     <div class="<%- cssConfig.dropdownMenu %>"

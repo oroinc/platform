@@ -9,10 +9,13 @@ import BaseModel from 'oroui/js/app/models/base/model';
 const MultiSelectItemModel = BaseModel.extend({
     defaults: {
         label: '',
+        name: '',
         value: undefined,
         selected: false,
         disabled: false,
-        hidden: false
+        hidden: false,
+        multiple: true,
+        optionCount: null
     },
 
     idAttribute: 'value',
@@ -40,10 +43,10 @@ const MultiSelectItemModel = BaseModel.extend({
      *
      * @returns {MultiSelectItemModel}
      */
-    setState(state = {}) {
+    setState(state = {}, options = {}) {
         return this.set({
             ...state
-        });
+        }, options);
     },
 
     /**
@@ -120,6 +123,39 @@ const MultiSelectItemModel = BaseModel.extend({
      */
     isActive() {
         return !this.get('disabled') && !this.get('hidden');
+    },
+
+    isSelected() {
+        return this.get('selected') === true;
+    },
+
+    getValue() {
+        return this.get('value');
+    },
+
+    setHidden(hidden) {
+        return this.set('hidden', hidden);
+    },
+
+    getLabel() {
+        return this.get('label');
+    },
+
+    getAllItemsCount() {
+        return 1;
+    },
+
+    isGroup() {
+        return false;
+    },
+
+    getItems() {
+        return [this];
+    }
+}, {
+    TYPES: {
+        OPTION: 'option',
+        GROUP: 'optgroup'
     }
 });
 

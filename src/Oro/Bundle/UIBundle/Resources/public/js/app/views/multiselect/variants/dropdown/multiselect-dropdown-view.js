@@ -24,7 +24,8 @@ const MultiselectDropdownView = MultiselectView.extend({
     template,
 
     listen: {
-        'change:enabledTooltip model': 'initTooltip'
+        'change:enabledTooltip model': 'initTooltip',
+        'change:dropdownToggleLabel model': 'updateBtnLabel'
     },
 
     constructor: function MultiselectDropdownView(...args) {
@@ -45,6 +46,10 @@ const MultiselectDropdownView = MultiselectView.extend({
         this.initTooltip();
 
         return this;
+    },
+
+    updateBtnLabel() {
+        this.$('[data-role="toggle-label"]').text(this.model.get('dropdownToggleLabel'));
     },
 
     initTooltip() {
@@ -70,6 +75,14 @@ const MultiselectDropdownView = MultiselectView.extend({
 
     getToogleButton() {
         return this.$('[data-toggle="dropdown"]');
+    },
+
+    show() {
+        this.getToogleButton().dropdown('show');
+    },
+
+    hide() {
+        this.getToogleButton().dropdown('hide');
     }
 });
 

@@ -1,5 +1,6 @@
 import BaseCollection from 'oroui/js/app/models/base/collection';
 import MultiSelectItemModel from 'oroui/js/app/views/multiselect/collection/multiselect-item-model';
+import MultiSelectItemGroupModel from 'oroui/js/app/views/multiselect/collection/multiselect-item-group-model';
 
 /**
  * Multiselect collection
@@ -8,7 +9,21 @@ import MultiSelectItemModel from 'oroui/js/app/views/multiselect/collection/mult
  * @class MultiSelectCollection
  */
 const MultiSelectCollection = BaseCollection.extend({
-    model: MultiSelectItemModel,
+    model(attrs, options) {
+        if (attrs.type === MultiSelectItemGroupModel.TYPES.GROUP) {
+            return new MultiSelectItemGroupModel(attrs, options);
+        }
+
+        return new MultiSelectItemModel(attrs, options);
+    },
+
+    modelId(attrs) {
+        if (attrs.type === MultiSelectItemGroupModel.TYPES.GROUP) {
+            return attrs[MultiSelectItemGroupModel.prototype.idAttribute || 'id'];
+        }
+
+        return attrs[MultiSelectItemModel.prototype.idAttribute || 'id'];
+    },
 
     constructor: function MultiSelectCollection(...args) {
         MultiSelectCollection.__super__.constructor.apply(this, args);
@@ -25,6 +40,14 @@ const MultiSelectCollection = BaseCollection.extend({
         }
 
         MultiSelectCollection.__super__.initialize.call(this, data, options);
+    },
+
+    _prepareModel(attrs, options) {
+        if (attrs && !attrs.name) {
+            attrs.name = `multiselect-item-${this.cid}`;
+        }
+
+        return MultiSelectCollection.__super__._prepareModel.call(this, attrs, options);
     },
 
     /**
@@ -63,8 +86,12 @@ const MultiSelectCollection = BaseCollection.extend({
         this.invoke('setUnSelected');
     },
 
+    /**
+     * Get all active items from the collection
+     * @returns {Array<MultiSelectItemModel>} Array of active items
+     */
     getActiveItems() {
-        return this.filter(model => model.isActive());
+        return this.getAllItems().filter(model => model.isActive());
     },
 
     /**
@@ -117,7 +144,7 @@ const MultiSelectCollection = BaseCollection.extend({
      * @returns {Array<string>}
      */
     getSelectedValues() {
-        return this.filter(model => model.get('selected')).map(model => model.get('value'));
+        return this.filter(model => model.isSelected()).map(model => model.getValue()).flat();
     },
 
     /**
@@ -167,6 +194,37 @@ const MultiSelectCollection = BaseCollection.extend({
      */
     getState() {
         return this.map(model => model.getState());
+    },
+
+    /**
+     * Gets labels for selected items
+     * @param {Object} options - Options for label formatting
+     * @param {string} [options.separator=', '] - Separator between labels
+     * @param {string} [options.defaults=''] - Default value if no items selected
+     * @returns {string} Concatenated labels of selected items
+     */
+    getLabels({separator = ', ', defaults = ''} = {}) {
+        const selected = this.getSelected();
+        return selected.length ? selected.map(model => model.getLabel()).join(separator) : defaults;
+    },
+
+    /**
+     * Gets all items from the collection including nested items in groups
+     * @returns {(MultiSelectItemModel|MultiSelectItemGroupModel)[]} Array of all items
+     */
+    getAllItems() {
+        return this.reduce((items, model) => {
+            items.push(...model.getItems());
+            return items;
+        }, []);
+    },
+
+    /**
+     * Gets total count of all items in collection
+     * @returns {number} Total number of items
+     */
+    getAllItemsCount() {
+        return this.getAllItems().length;
     }
 });
 

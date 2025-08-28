@@ -9,6 +9,7 @@ define(function(require) {
     const CustomsetFieldChoiceView = require('oroentity/js/app/views/customset-field-choice-view');
     const ChoiceFilter = require('oro/filter/choice-filter');
     const MultiSelectFilter = require('oro/filter/multiselect-filter');
+    const {MultiselectDropdown} = require('oroui/js/app/views/multiselect');
     const activityConditionTemplate = require('tpl-loader!oroactivitylist/templates/activity-condition.html');
 
     const ActivityConditionView = FieldConditionView.extend({
@@ -102,9 +103,17 @@ define(function(require) {
             const typeChoices = _.mapObject(listOptions, _.property('label'));
 
             this.typeFilter = new MultiSelectFilter({
+                className: 'filter-item',
                 showLabel: false,
                 choices: typeChoices,
+                View: MultiselectDropdown,
                 widgetOptions: {
+                    dropdownToggleLabel: __('All'),
+                    cssConfig: {
+                        strategy: 'override',
+                        dropdown: 'dropdown filter-select',
+                        dropdownToggleBtn: 'select-filter-widget ui-multiselect'
+                    },
                     refreshNotOpened: true
                 }
             });

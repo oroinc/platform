@@ -5,7 +5,7 @@ import MultiselectHeaderModel from 'oroui/js/app/views/multiselect/parts/header/
 export const cssConfig = {
     header: `multiselect__header`,
     headerCheckboxLabel: 'checkbox-label multiselect__item-checkbox',
-    headerHidden: 'hidden',
+    headerHidden: 'hide',
     selectAll: 'multiselect__select-none',
     selectNone: 'multiselect__select-all'
 };
@@ -45,17 +45,11 @@ const MultiselectHeaderView = BaseMultiSelectView.extend({
 
     /**
      * Handle checkbox change event
-     *
-     * @param {InputEvent} event
      */
-    onChanged(event) {
-        console.log(event);
-
+    onChanged() {
         if (!this.model.isFullSelected()) {
             this.model.selectAll();
         } else {
-            console.log('dwadwa');
-
             this.model.unSelectAll();
         }
     },
