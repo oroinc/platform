@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
 use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -89,13 +90,24 @@ class PasswordTooltipProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    private function getConfigProvider(array $configMap): PasswordComplexityConfigProvider
-    {
+    private function getConfigProvider(
+        array $configMap,
+        bool $loginFormFeatureEnabled = true
+    ): PasswordComplexityConfigProvider {
         $configManager = $this->createMock(ConfigManager::class);
-        $configManager->expects($this->any())
+        $configManager->expects(self::any())
             ->method('get')
             ->willReturnMap($configMap);
 
-        return new PasswordComplexityConfigProvider($configManager);
+        $featureChecker = $this->createMock(FeatureChecker::class);
+        $featureChecker->expects(self::any())
+            ->method('isFeatureEnabled')
+            ->with('user_login_password')
+            ->willReturn($loginFormFeatureEnabled);
+
+        $configProvider =  new PasswordComplexityConfigProvider($configManager);
+        $configProvider->setFeatureChecker($featureChecker);
+
+        return $configProvider;
     }
 }

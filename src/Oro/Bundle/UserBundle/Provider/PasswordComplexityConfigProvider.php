@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 /**
  * Generates a tooltip text for the system configured password complexity requirements
@@ -29,19 +30,28 @@ class PasswordComplexityConfigProvider
     /** @var ConfigManager */
     protected $configManager;
 
+    private FeatureChecker $featureChecker;
+
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
     }
 
+    public function setFeatureChecker(FeatureChecker $featureChecker): void
+    {
+        $this->featureChecker = $featureChecker;
+    }
+
     /**
      * Return a map of configured rules with typecasted values
-     *
-     * @return array
      */
-    public function getAllRules()
+    public function getAllRules(): array
     {
         $parts = [];
+
+        if (!$this->featureChecker->isFeatureEnabled('user_login_password')) {
+            return $parts;
+        }
 
         foreach (self::$configKeys as $configKey => $type) {
             $value = $this->configManager->get($configKey);
@@ -54,51 +64,47 @@ class PasswordComplexityConfigProvider
 
     /**
      * Get the min length requirement for passwords
-     *
-     * @return int
      */
-    public function getMinLength()
+    public function getMinLength(): int
     {
-        return (int) $this->configManager->get(self::CONFIG_MIN_LENGTH);
+        return $this->featureChecker->isFeatureEnabled('user_login_password')
+            ? (int) $this->configManager->get(self::CONFIG_MIN_LENGTH)
+            : 0;
     }
 
     /**
      * Get the lower case requirement for passwords
-     *
-     * @return bool
      */
-    public function getLowerCase()
+    public function getLowerCase(): bool
     {
-        return (bool) $this->configManager->get(self::CONFIG_LOWER_CASE);
+        return $this->featureChecker->isFeatureEnabled('user_login_password')
+            && $this->configManager->get(self::CONFIG_LOWER_CASE);
     }
 
     /**
      * Get the upper case requirement for passwords
-     *
-     * @return bool
      */
-    public function getUpperCase()
+    public function getUpperCase(): bool
     {
-        return (bool) $this->configManager->get(self::CONFIG_UPPER_CASE);
+        return $this->featureChecker->isFeatureEnabled('user_login_password')
+            && $this->configManager->get(self::CONFIG_UPPER_CASE);
     }
 
     /**
      * Get the upper case requirement for passwords
-     *
-     * @return bool
      */
-    public function getNumbers()
+    public function getNumbers(): bool
     {
-        return (bool) $this->configManager->get(self::CONFIG_NUMBERS);
+        return $this->featureChecker->isFeatureEnabled('user_login_password')
+            && $this->configManager->get(self::CONFIG_NUMBERS);
     }
 
     /**
      * Get the upper case requirement for passwords
-     *
-     * @return bool
      */
-    public function getSpecialChars()
+    public function getSpecialChars(): bool
     {
-        return (bool) $this->configManager->get(self::CONFIG_SPECIAL_CHARS);
+        return $this->featureChecker->isFeatureEnabled('user_login_password')
+            && $this->configManager->get(self::CONFIG_SPECIAL_CHARS);
     }
 }

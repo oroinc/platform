@@ -114,7 +114,7 @@ Feature: Password complexity feature
   Scenario: Uncheck all user password complexity options (dashboard user)
     Given I proceed as the Admin
     And I go to System/Configuration
-    And I follow "System Configuration/General Setup/User Settings" on configuration sidebar
+    And I follow "System Configuration/General Setup/User Login" on configuration sidebar
     And uncheck "Use default" for "Require a number" field
     And uncheck "Use default" for "Require a lower case letter" field
     And uncheck "Use default" for "Require an upper case letter" field

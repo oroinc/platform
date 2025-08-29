@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Form\Type\OroBirthdayType;
 use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationsSelectType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -36,8 +37,8 @@ class UserType extends AbstractType
     private TokenAccessorInterface $tokenAccessor;
     private PasswordFieldOptionsProvider $optionsProvider;
     private RolesChoicesForUserProviderInterface $choicesForUserProvider;
-
-    private bool $isMyProfilePage;
+    private FeatureChecker $featureChecker;
+    private RequestStack $requestStack;
 
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
@@ -48,9 +49,14 @@ class UserType extends AbstractType
     ) {
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenAccessor = $tokenAccessor;
-        $this->isMyProfilePage = $requestStack->getCurrentRequest()->get('_route') === 'oro_user_profile_update';
+        $this->requestStack = $requestStack;
         $this->optionsProvider = $optionsProvider;
         $this->choicesForUserProvider = $choicesForUserProvider;
+    }
+
+    public function setFeatureChecker(FeatureChecker $featureChecker): void
+    {
+        $this->featureChecker = $featureChecker;
     }
 
     /**
@@ -68,7 +74,7 @@ class UserType extends AbstractType
         $this->setDefaultUserFields($builder);
 
         $attr = [];
-        if ($this->isMyProfilePage) {
+        if ($this->isMyProfilePage()) {
             $attr['readonly'] = true;
         }
 
@@ -85,9 +91,9 @@ class UserType extends AbstractType
                     'choices'       => $this->choicesForUserProvider->getRoles(),
                     'multiple'      => true,
                     'expanded'      => true,
-                    'required'      => !$this->isMyProfilePage,
+                    'required'      => !$this->isMyProfilePage(),
                     'translatable_options' => false,
-                    'attr' => $attr
+                    'attr' => $attr,
                 ]
             );
         }
@@ -103,7 +109,7 @@ class UserType extends AbstractType
                     'expanded'  => true,
                     'required'  => false,
                     'translatable_options' => false,
-                    'attr' => $attr
+                    'attr' => $attr,
                 ]
             );
         }
@@ -120,13 +126,15 @@ class UserType extends AbstractType
                     'allow_delete'   => true,
                     'by_reference'   => false,
                     'prototype'      => true,
-                    'prototype_name' => 'tag__name__'
+                    'prototype_name' => 'tag__name__',
                 ]
             )
             ->add('change_password', ChangePasswordType::class)
             ->add('avatar', ImageType::class, ['label' => 'oro.user.avatar.label', 'required' => false]);
 
-        $this->addInviteUserField($builder);
+        if ($this->featureChecker->isFeatureEnabled('user_login_password')) {
+            $this->addInviteUserField($builder);
+        }
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData'], 10);
     }
@@ -141,6 +149,10 @@ class UserType extends AbstractType
             return;
         }
 
+        if (!$this->featureChecker->isFeatureEnabled('user_login_password')) {
+            return;
+        }
+
         $passwordOptions = [
             'invalid_message' => 'oro.user.message.password_mismatch',
             'type' => PasswordType::class,
@@ -151,7 +163,7 @@ class UserType extends AbstractType
                 'attr' => [
                     'data-validation' => $this->optionsProvider->getDataValidationOption(),
                     'autocomplete' => 'new-password',
-                ]
+                ],
             ],
             'second_options' => ['label' => 'oro.user.password_re.label'],
         ];
@@ -164,7 +176,7 @@ class UserType extends AbstractType
                     [
                         'required' => false,
                         'label' => 'oro.user.password.password_generate.label',
-                        'mapped' => false
+                        'mapped' => false,
                     ]
                 );
 
@@ -189,7 +201,7 @@ class UserType extends AbstractType
             'data_class'         => User::class,
             'csrf_token_id'      => 'user',
             'validation_groups'  => ['Roles', 'UserForm', 'Default'],
-            'ownership_disabled' => $this->isMyProfilePage
+            'ownership_disabled' => $this->isMyProfilePage(),
         ]);
     }
 
@@ -239,7 +251,7 @@ class UserType extends AbstractType
                 'mapped'   => false,
                 'required' => false,
                 'tooltip'  => 'oro.user.invite.tooltip',
-                'data'     => true
+                'data'     => true,
             ]
         );
     }
@@ -257,5 +269,10 @@ class UserType extends AbstractType
                 ]
             );
         }
+    }
+
+    private function isMyProfilePage(): bool
+    {
+        return $this->requestStack->getCurrentRequest()->get('_route') === 'oro_user_profile_update';
     }
 }

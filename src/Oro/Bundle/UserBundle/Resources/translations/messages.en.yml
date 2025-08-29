@@ -437,6 +437,14 @@ oro:
                 user_settings.title: User Settings
                 password_complexity_rules.title: Password restrictions
                 email_settings.title: Email Settings
+                login_options:
+                    label: User Login
+                user_login_form:
+                    title: User Login Form
+                    description: |
+                        Turning off "Usernane with Password Login" will disable password-based login for all users,
+                        including you and other administrators. Make sure at least one external authentication method
+                        is properly configured, or you may lose access to the system.
             fields:
                 password_min_length.label: Minimal password length
                 password_numbers.label: Require a number
@@ -452,6 +460,9 @@ oro:
                 case_insensitive_email_addresses_enabled:
                     label: 'Case-Insensitive Email Addresses'
                     tooltip: 'Enable the option to ignore the letter case when comparing email addresses. In this case, john.doe@example.com and John.Doe@example.com are considered equal.'
+                user_login_password:
+                    label: Enable Username/Password Login
+                    tooltip: Turning off this option disables password-based login. Only external authentication providers can be used.
         mass_actions:
             enable_users:
                 success_message: '%count% user(s) were enabled'
@@ -464,10 +475,11 @@ oro:
         login_source:
             default: Default
             impersonation: Impersonation
-
         usage_stats:
             users.label: 'Back-Office Users'
-
+        user_login_password_feature:
+            label: User Login form
+            Description: When disabled, user will not be able to log in via login form
     scope:
         user.label: User
 

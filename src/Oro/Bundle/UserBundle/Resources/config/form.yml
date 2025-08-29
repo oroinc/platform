@@ -70,6 +70,8 @@ services:
             - '@request_stack'
             - '@oro_user.form.provider.password_field_options_provider'
             - '@oro_user.form.provider.roles_choices_for_user'
+        calls:
+            - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
         tags:
             - { name: form.type, alias: oro_user_user }
 
@@ -83,6 +85,7 @@ services:
             - '@oro_user.form.provider.roles_choices_for_user'
         calls:
             - [setUserConfigManager, ["@oro_config.user"]]
+            - [ setFeatureChecker, [ '@oro_featuretoggle.checker.feature_checker' ] ]
         tags:
             - { name: form.type, alias: user }
 
@@ -199,6 +202,8 @@ services:
             - '@oro_config.user'
             - '@translator'
             - '@logger'
+        calls:
+            - [ setFeatureChecker, [ '@oro_featuretoggle.checker.feature_checker' ] ]
 
     oro_user.form.handler.user.api:
         class: Oro\Bundle\UserBundle\Form\Handler\UserHandler
@@ -207,6 +212,8 @@ services:
             - '@oro_user.form.user.api'
             - '@request_stack'
             - '@oro_user.manager'
+        calls:
+            - [ setFeatureChecker, [ '@oro_featuretoggle.checker.feature_checker' ] ]
 
     oro_user.form.handler.role.api:
         class: Oro\Bundle\UserBundle\Form\Handler\RoleHandler

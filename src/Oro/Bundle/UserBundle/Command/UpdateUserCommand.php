@@ -64,6 +64,8 @@ HELP
             ->addUsage('--user-name=<new-username> <old-username>')
             // @codingStandardsIgnoreEnd
         ;
+
+        $this->addOption('user-password', null, InputOption::VALUE_REQUIRED, 'Password');
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */

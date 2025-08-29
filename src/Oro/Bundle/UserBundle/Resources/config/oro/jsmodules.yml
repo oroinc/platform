@@ -24,3 +24,4 @@ dynamic-imports:
         - orouser/js/tools/acl-users-search-api-accessor
         - orouser/js/views/role-view
         - orouser/js/views/user-apikey-gen-view
+        - orouser/js/components/config-single-unit-component

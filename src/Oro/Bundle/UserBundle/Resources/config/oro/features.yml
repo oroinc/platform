@@ -83,3 +83,19 @@ features:
             - oro_user_login_attempts
         navigation_items:
             - application_menu.system_tab.users_management.login_attempts
+
+    user_login_password:
+        label: oro.user.user_login_password_feature.label
+        description: oro.user.user_login_password_feature.description
+        toggle: oro_user.user_login_password
+        allow_if_all_abstain: true
+        routes:
+            - oro_user_reset_email
+            - oro_user_send_forced_password_reset_email
+            - oro_user_mass_password_reset
+            - oro_user_reset_reset
+            - oro_user_reset_set_password
+            - oro_user_reset_check_email
+            - oro_user_reset_request
+        operations:
+            - reset_password

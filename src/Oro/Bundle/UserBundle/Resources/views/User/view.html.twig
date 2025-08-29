@@ -83,6 +83,7 @@
             {{ UI.badge('oro.user.enabled.disabled'|trans, 'disabled') }}
         {% endif %}
 
+        {% if feature_enabled('user_login_password') %}
         {% if entity.authStatus.id == 'expired' %}
             {{ UI.badge(entity.authStatus.name, 'disabled', 'fa-unlock-alt') }}
         {% elseif entity.authStatus.id == 'active' %}
@@ -90,6 +91,8 @@
         {% else %}
             {{ UI.badge(entity.authStatus.name, 'tentatively', 'fa-lock') }}
         {% endif %}
+        {% endif %}
+
         {% placeholder view_page_title_status with {entity: entity} %}
     </span>
 {% endblock breadcrumbs %}
