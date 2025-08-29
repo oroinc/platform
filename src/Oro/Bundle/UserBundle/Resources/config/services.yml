@@ -472,6 +472,7 @@ services:
         class: Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider
         arguments:
             - '@oro_config.user'
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_user.validator.user_without_role:
         class: Oro\Bundle\UserBundle\Validator\Constraints\UserWithoutRoleValidator
@@ -620,3 +621,10 @@ services:
             - '@oro_organization.organization_restriction_provider'
         tags:
             - { name: oro_platform.usage_stats_provider, priority: 90 }
+
+    oro_user.event_listener.user_password_grid_listener:
+        class: Oro\Bundle\UserBundle\EventListener\UserPasswordGridListener
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.users-grid, method: onBuildAfter }

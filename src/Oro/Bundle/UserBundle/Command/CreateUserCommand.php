@@ -7,6 +7,7 @@ namespace Oro\Bundle\UserBundle\Command;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NoResultException;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Role;
@@ -28,11 +29,16 @@ class CreateUserCommand extends Command
 
     protected UserManager $userManager;
     protected EntityManagerInterface $entityManager;
+    protected FeatureChecker $featureChecker;
 
-    public function __construct(UserManager $userManager, EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        UserManager $userManager,
+        EntityManagerInterface $entityManager,
+        FeatureChecker $featureChecker
+    ) {
         $this->userManager = $userManager;
         $this->entityManager = $entityManager;
+        $this->featureChecker = $featureChecker;
         parent::__construct();
     }
 
@@ -47,7 +53,6 @@ class CreateUserCommand extends Command
             ->addOption('user-email', null, InputOption::VALUE_REQUIRED, 'Email')
             ->addOption('user-firstname', null, InputOption::VALUE_REQUIRED, 'First name')
             ->addOption('user-lastname', null, InputOption::VALUE_REQUIRED, 'Last name')
-            ->addOption('user-password', null, InputOption::VALUE_REQUIRED, 'Password')
             ->addOption(
                 'user-organizations',
                 null,
@@ -76,6 +81,10 @@ HELP
             ->addUsage('--user-name=<username> --user-email=<email> --user-password=<password> --user-business-unit=<business-unit-id> --user-firstname=<firstname> --user-lastname=<lastname> --user-role=<role>')
             // @codingStandardsIgnoreEnd
         ;
+
+        if ($this->featureChecker->isFeatureEnabled('user_login_password')) {
+            $this->addOption('user-password', null, InputOption::VALUE_REQUIRED, 'Password');
+        }
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -113,9 +122,12 @@ HELP
         $requiredOptions = [
             'user-business-unit',
             'user-name',
-            'user-email',
-            'user-password'
+            'user-email'
         ];
+
+        if ($this->featureChecker->isFeatureEnabled('user_login_password')) {
+            $requiredOptions[] = 'user-password';
+        }
 
         foreach ($requiredOptions as $requiredOption) {
             if (empty($options[$requiredOption])) {

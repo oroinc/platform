@@ -65,6 +65,10 @@ HELP
             ->addUsage('--user-name=<new-username> <old-username>')
             // @codingStandardsIgnoreEnd
         ;
+
+        if ($this->featureChecker->isFeatureEnabled('user_login_password')) {
+            $this->addOption('user-password', null, InputOption::VALUE_REQUIRED, 'Password');
+        }
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */

@@ -23,3 +23,4 @@ dynamic-imports:
         - orouser/js/components/role/entity-category-tabs-component
         - orouser/js/tools/acl-users-search-api-accessor
         - orouser/js/views/role-view
+        - orouser/js/components/config-single-unit-component
