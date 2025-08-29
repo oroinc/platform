@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
 use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
 use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexityValidator;
@@ -23,7 +24,16 @@ class PasswordComplexityValidatorTest extends ConstraintValidatorTestCase
     #[\Override]
     protected function createValidator()
     {
-        return new PasswordComplexityValidator(new PasswordComplexityConfigProvider($this->configManager));
+        $featureChecker = $this->createMock(FeatureChecker::class);
+        $featureChecker->expects(self::any())
+            ->method('isFeatureEnabled')
+            ->with('user_login_password')
+            ->willReturn(true);
+
+        return new PasswordComplexityValidator(new PasswordComplexityConfigProvider(
+            $this->configManager,
+            $featureChecker
+        ));
     }
 
     /**
