@@ -10,7 +10,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Computes values for the following fields for Email entity:
+ * Computes values of the following fields for Email entity:
  * * "from", "toRecipients", "ccRecipients", "bccRecipients"
  * * "importance"
  * * "type" for the email body
