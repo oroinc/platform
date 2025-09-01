@@ -12,7 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
 
 /**
- * Computes values for multi files and multi images associations.
+ * Computes values of multi files and multi images associations.
  */
 class ComputeMultiFileAssociations implements ProcessorInterface
 {

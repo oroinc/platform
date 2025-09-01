@@ -217,3 +217,10 @@ services:
             - '@oro_message_queue.job.runner'
         tags:
             - { name: 'oro_message_queue.consumption.extension'}
+
+    oro_message_queue.migration.query_executor:
+        class: Oro\Bundle\MessageQueueBundle\Migration\MessageQueueMigrationQueryExecutor
+        decorates: oro_migration.migrations.query_executor
+        arguments:
+            - '@.inner'
+            - '@oro_message_queue.message_producer'
