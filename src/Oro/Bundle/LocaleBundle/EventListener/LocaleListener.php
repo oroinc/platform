@@ -96,6 +96,12 @@ class LocaleListener implements EventSubscriberInterface
             return;
         }
 
+        // Set localization for the consumer in the extension
+        // @Oro\Bundle\MessageQueueBundle\Consumption\Extension\LocaleExtension
+        if (CommandExecutor::isCurrentCommand('oro:message-queue:consume')) {
+            return;
+        }
+
         $isForced = $event->getInput()->hasParameterOption('--force');
         if ($isForced) {
             $this->installed = false;

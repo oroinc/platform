@@ -411,14 +411,24 @@ class ConfigManager
      * @param bool $skipChanges
      *
      * @return mixed
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function getValue($name, $default = false, $full = false, $scopeIdentifier = null, $skipChanges = false)
     {
-        $scopeId = $this->resolveIdentifier($scopeIdentifier);
-        $managers = $this->getScopeManagersToGetValue($default);
+        $resolvedScope = null;
+        $resolvedScopeId = null;
         $settingValue = null;
+        $managers = $this->getScopeManagersToGetValue($default);
+
         foreach ($managers as $scopeName => $manager) {
-            $settingValue = $manager->getSettingValue($name, true, $scopeIdentifier, $skipChanges);
+            $resolvedScopeId = $manager->resolveIdentifier($scopeIdentifier);
+            if ($resolvedScopeId) {
+                $resolvedScope = $scopeName;
+            }
+
+            $settingValue = $manager->getSettingValue($name, true, $resolvedScopeId, $skipChanges);
             if (null !== $settingValue) {
                 // in case if we get value not from current scope,
                 // we should mark value that it was get from another scope
@@ -428,19 +438,25 @@ class ConfigManager
                 break;
             }
         }
+        if (null === $resolvedScope) {
+            $resolvedScope = $this->scope;
+        }
+        if (null === $resolvedScopeId) {
+            $resolvedScopeId = $this->managers[$resolvedScope]->getScopeId();
+        }
 
         $value = $settingValue;
-        if ($settingValue !== null && !$full) {
+        if (null !== $settingValue && !$full) {
             $value = $settingValue[self::VALUE_KEY];
         }
 
-        $event = new ConfigGetEvent($this, $name, $value, $full, $scopeId);
+        $event = new ConfigGetEvent($this, $name, $value, $full, $resolvedScopeId);
         $this->eventDispatcher->dispatch($event, ConfigGetEvent::NAME);
         $this->eventDispatcher->dispatch($event, sprintf('%s.%s', ConfigGetEvent::NAME, $name));
 
         $value = $event->getValue();
 
-        if (null === $value && $settingValue === null) {
+        if (null === $value && null === $settingValue) {
             return $this->getSettingsDefaults($name, $full);
         }
 
@@ -460,29 +476,29 @@ class ConfigManager
         string $name,
         bool $default = false,
         bool $full = false,
-        $scopeIdentifier = null,
+        object|int|null $scopeIdentifier = null,
         bool $skipChanges = false
     ): string {
-        if (is_object($scopeIdentifier)) {
-            $managers = $this->getScopeManagersToGetValue($default);
-            $scopedEntityName = '';
-            $resolvedScopeId = null;
-            foreach ($managers as $manager) {
-                if ($resolvedScopeId = $manager->getScopeIdFromEntity($scopeIdentifier)) {
-                    $scopedEntityName = $manager->getScopedEntityName();
-                    break;
-                }
+        $scopeManager = $this->getScopeManager();
+        $scope = $scopeManager->getScopedEntityName();
+        $resolvedScope = null;
+        $resolvedScopeId = null;
+        $managers = $this->getScopeManagersToGetValue($default);
+
+        foreach ($managers as $scopeName => $manager) {
+            $resolvedScopeId = $manager->resolveIdentifier($scopeIdentifier);
+            if ($resolvedScopeId) {
+                $resolvedScope = $scopeName;
+
+                break;
             }
-        } else {
-            $scopedEntityName = $this->getScopeEntityName();
-            $resolvedScopeId = $this->resolveIdentifier($scopeIdentifier);
         }
 
         return sprintf(
             '%s|%s|%d|%s|%d|%d|%d',
-            $this->getScopeEntityName(),
-            $scopedEntityName,
-            (int)$resolvedScopeId,
+            $scope,
+            $resolvedScope,
+            $resolvedScopeId,
             $name,
             (int)$default,
             (int)$full,
