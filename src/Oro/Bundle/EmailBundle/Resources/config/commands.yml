@@ -38,6 +38,9 @@ services:
             - '@oro_email.provider.email_template'
             - '@oro_email.email_renderer'
             - '@mailer'
+        calls:
+            - [ 'setEmailModelFromEmailTemplateFactory', [ '@oro_email.factory.email_model_from_email_template' ] ]
+            - [ 'setEmailModelSender', [ '@oro_email.sender.email_model_sender' ] ]
         tags:
             - { name: console.command }
 
@@ -52,11 +55,16 @@ services:
     Oro\Bundle\EmailBundle\Command\EmailTemplatesExportCommand:
         arguments:
             - '@Oro\Bundle\EntityBundle\ORM\DoctrineHelper'
+        calls:
+            - [ 'setPropertyAccessor', [ '@property_accessor' ] ]
         tags:
             - { name: console.command }
 
     Oro\Bundle\EmailBundle\Command\EmailTemplatesImportCommand:
         arguments:
             - '@Oro\Bundle\EntityBundle\ORM\DoctrineHelper'
+        calls:
+            - [ 'setEmailTemplateRawDataParser', [ '@oro_email.email_template_hydrator.raw_data_parser' ] ]
+            - [ 'setEmailTemplateFromRawDataHydrator', [ '@oro_email.email_template_hydrator.from_array' ] ]
         tags:
             - { name: console.command }

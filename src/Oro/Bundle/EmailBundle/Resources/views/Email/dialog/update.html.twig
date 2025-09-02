@@ -43,7 +43,10 @@
                         bcc: entity.bcc,
                         appendSignature: appendSignature,
                         minimalWysiwygEditorHeight: 150,
-                        isSignatureEditable: is_granted('oro_user_user_update')
+                        isSignatureEditable: is_granted('oro_user_user_update'),
+                        editorComponentName: form.body.vars.attr['data-page-component-name'] is defined
+                        ? form.body.vars.attr['data-page-component-name']
+                        : form.body.vars.attr['data-ftid']
                     } %}
                     <fieldset class="form-horizontal"
                               data-page-component-module="oroemail/js/app/components/email-editor-component"
@@ -77,17 +80,17 @@
                             </div>
                         </div>
 
-                        {# To transfer data from php attachment model to JS modify oro_email_attachments_row Form block widget. See: "Form/fields.html.twig" #}
-                        {% set emailAttachmentOptions = {
-                            popupTriggerButton: '.attach-file',
-                            uploadNewButton: '.upload-new',
-                            popupContentEl: '.attachment-list-popup',
-                            entityAttachments: entity.attachments.toArray,
-                            attachmentsAvailable: entity.attachmentsAvailable
-                        } %}
-                        {{ form_row(form.attachments, {options: emailAttachmentOptions}) }}
+                        {{ form_row(form.attachments) }}
+                        {{ form_row(form.contexts) }}
 
-                        {{ form_rest(form) }}
+                        {% if form.organization is defined %}
+                            {{ form_row(form.organization) }}
+                        {% endif %}
+
+                        <div class="hide">
+                            {{ form_rest(form) }}
+                        </div>
+
                         <div class="widget-actions form-actions" style="display: none;">
                             {% block page_container_form_actions %}
                                 <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>

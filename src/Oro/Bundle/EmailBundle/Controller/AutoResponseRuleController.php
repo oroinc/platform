@@ -64,6 +64,21 @@ class AutoResponseRuleController extends AbstractController
         return $this->update($request, $rule);
     }
 
+    /**
+     * Will be removed in 7.0, use {@link editTemplateAction} with empty id instead.
+     */
+    #[Route(path: '/template/empty', options: ['expose' => true])]
+    #[Template('@OroEmail/AutoResponseRule/editTemplate.html.twig')]
+    #[AclAncestor('oro_email_emailtemplate_update')]
+    public function emptyTemplateAction(): array
+    {
+        $form = $this->createForm(AutoResponseTemplateType::class);
+
+        return [
+            'form' => $form->createView()
+        ];
+    }
+
     #[Route(path: '/template/{id}', options: ['expose' => true])]
     #[Template('@OroEmail/AutoResponseRule/editTemplate.html.twig')]
     #[AclAncestor('oro_email_emailtemplate_update')]

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\EmailBundle\Command;
 
+use Oro\Bundle\EmailBundle\EmailTemplateHydrator\EmailTemplateFromArrayHydrator;
+use Oro\Bundle\EmailBundle\EmailTemplateHydrator\EmailTemplateRawDataParser;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -30,6 +32,10 @@ class EmailTemplatesImportCommand extends Command
 
     private DoctrineHelper $doctrineHelper;
 
+    private ?EmailTemplateRawDataParser $emailTemplateRawDataParser = null;
+
+    private ?EmailTemplateFromArrayHydrator $emailTemplateFromRawDataHydrator = null;
+
     private ?Organization $organization = null;
 
     private ?User $adminUser = null;
@@ -39,6 +45,17 @@ class EmailTemplatesImportCommand extends Command
         parent::__construct();
 
         $this->doctrineHelper = $doctrineHelper;
+    }
+
+    public function setEmailTemplateRawDataParser(?EmailTemplateRawDataParser $emailTemplateRawDataParser): void
+    {
+        $this->emailTemplateRawDataParser = $emailTemplateRawDataParser;
+    }
+
+    public function setEmailTemplateFromRawDataHydrator(
+        ?EmailTemplateFromArrayHydrator $emailTemplateFromRawDataHydrator
+    ): void {
+        $this->emailTemplateFromRawDataHydrator = $emailTemplateFromRawDataHydrator;
     }
 
     #[\Override]
@@ -54,31 +71,19 @@ class EmailTemplatesImportCommand extends Command
     {
         $source = $input->getArgument('source');
 
-        if ((!is_dir($source) && !is_file($source)) || !is_readable($source)) {
+        if (!$this->isValidSource($source)) {
             $output->writeln(sprintf('<error>Source path "%s" should exist and be readable</error>', $source));
-
             return Command::FAILURE;
         }
 
         $templates = $this->getRawTemplates($source);
         $output->writeln(sprintf('Found %d templates', count($templates)));
 
-        foreach ($templates as $fileName => $file) {
-            $template = file_get_contents($file['path']);
-            $parsedTemplate = EmailTemplate::parseContent($template);
-            $templateName = $parsedTemplate['params']['name'] ?? $fileName;
-            $existingTemplate = $this->findExistingTemplate($templateName);
-
-            if ($existingTemplate) {
-                if ($input->getOption('force')) {
-                    $output->writeln(sprintf('"%s" updated', $existingTemplate->getName()));
-                    $this->updateExistingTemplate($existingTemplate, $parsedTemplate);
-                } else {
-                    $output->writeln(sprintf('"%s" updates skipped', $existingTemplate->getName()));
-                }
-            } else {
-                $this->loadNewTemplate($fileName, $file);
-            }
+        // BC layer.
+        if (!$this->emailTemplateRawDataParser || !$this->emailTemplateFromRawDataHydrator) {
+            $this->bcProcessTemplates($templates, $input, $output);
+        } else {
+            $this->processTemplates($templates, $input->getOption('force'), $output);
         }
 
         $this->doctrineHelper->getEntityManagerForClass(EmailTemplate::class)->flush();
@@ -86,12 +91,120 @@ class EmailTemplatesImportCommand extends Command
         return Command::SUCCESS;
     }
 
+    private function isValidSource(string $source): bool
+    {
+        return (is_dir($source) || is_file($source)) && is_readable($source);
+    }
+
     /**
-     * @param $name
-     *
-     * @return null|EmailTemplate
+     * @param array<string,array{path: string, format: string}> $templates
+     * @param bool $forceUpdate
+     * @param OutputInterface $output
      */
-    private function findExistingTemplate($name)
+    private function processTemplates(array $templates, bool $forceUpdate, OutputInterface $output): void
+    {
+        foreach ($templates as $fileName => $file) {
+            $arrayData = $this->prepareTemplateData($file, $fileName);
+
+            if (!$this->validateTemplateData($arrayData, $fileName, $file['path'], $output)) {
+                continue;
+            }
+
+            $emailTemplate = $this->findExistingTemplate($arrayData['name']) ?? new EmailTemplate();
+
+            if ($emailTemplate->getId()) {
+                $this->processExistingTemplate($emailTemplate, $arrayData, $forceUpdate, $output);
+            } else {
+                $this->processNewTemplate($emailTemplate, $arrayData, $output);
+            }
+        }
+    }
+
+    /**
+     * @param array{path: string, format: string} $file
+     * @param string $fileName
+     *
+     * @return array<string,mixed>
+     */
+    private function prepareTemplateData(array $file, string $fileName): array
+    {
+        $rawData = file_get_contents($file['path']);
+        $arrayData = $this->emailTemplateRawDataParser->parseRawData($rawData);
+
+        if (empty($arrayData['name'])) {
+            $arrayData['name'] = $fileName;
+        }
+
+        if (empty($arrayData['type'])) {
+            $arrayData['type'] = $file['format'];
+        }
+
+        return $arrayData;
+    }
+
+    private function validateTemplateData(
+        array $arrayData,
+        string $fileName,
+        string $filePath,
+        OutputInterface $output
+    ): bool {
+        if (empty($arrayData['name'])) {
+            $output->writeln(
+                sprintf('Skipping "%s": email template name is expected to be non empty', $filePath)
+            );
+            return false;
+        }
+
+        if ($arrayData['name'] !== $fileName) {
+            $output->writeln(
+                sprintf('Skipping "%s": email template name is expected to be equal to its filename', $filePath)
+            );
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param EmailTemplate $emailTemplate
+     * @param array<string,mixed> $arrayData
+     * @param bool $forceUpdate
+     * @param OutputInterface $output
+     */
+    private function processExistingTemplate(
+        EmailTemplate $emailTemplate,
+        array $arrayData,
+        bool $forceUpdate,
+        OutputInterface $output
+    ): void {
+        if ($forceUpdate) {
+            $this->emailTemplateFromRawDataHydrator->hydrateFromArray($emailTemplate, $arrayData);
+            $output->writeln(sprintf('"%s" updated', $emailTemplate->getName()));
+        } else {
+            $output->writeln(sprintf('"%s" updates skipped', $emailTemplate->getName()));
+        }
+    }
+
+    /**
+     * @param EmailTemplate $emailTemplate
+     * @param array<string,mixed> $arrayData
+     * @param OutputInterface $output
+     */
+    private function processNewTemplate(
+        EmailTemplate $emailTemplate,
+        array $arrayData,
+        OutputInterface $output
+    ): void {
+        $this->emailTemplateFromRawDataHydrator->hydrateFromArray($emailTemplate, $arrayData);
+
+        $emailTemplate->setOwner($this->getAdminUser());
+        $emailTemplate->setOrganization($this->getOrganization());
+        $this->doctrineHelper->getEntityManagerForClass(EmailTemplate::class)->persist($emailTemplate);
+
+        $output->writeln(sprintf('"%s" created', $emailTemplate->getName()));
+    }
+
+    private function findExistingTemplate(string $name): ?EmailTemplate
     {
         return $this->doctrineHelper->getEntityRepositoryForClass(EmailTemplate::class)->findOneBy([
             'name' => $name,
@@ -99,12 +212,11 @@ class EmailTemplatesImportCommand extends Command
     }
 
     /**
-     * @param $source
+     * @param string $source
      *
-     * @return array
-     * @throws \InvalidArgumentException
+     * @return array<string,array{path: string, format: string}>
      */
-    private function getRawTemplates($source)
+    private function getRawTemplates(string $source): array
     {
         if (is_dir($source)) {
             $finder = new Finder();
@@ -129,6 +241,27 @@ class EmailTemplatesImportCommand extends Command
         }
 
         return $templates;
+    }
+
+    private function bcProcessTemplates(array $templates, InputInterface $input, OutputInterface $output): void
+    {
+        foreach ($templates as $fileName => $file) {
+            $template = file_get_contents($file['path']);
+            $parsedTemplate = EmailTemplate::parseContent($template);
+            $templateName = $parsedTemplate['params']['name'] ?? $fileName;
+            $existingTemplate = $this->findExistingTemplate($templateName);
+
+            if ($existingTemplate) {
+                if ($input->getOption('force')) {
+                    $output->writeln(sprintf('"%s" updated', $existingTemplate->getName()));
+                    $this->updateExistingTemplate($existingTemplate, $parsedTemplate);
+                } else {
+                    $output->writeln(sprintf('"%s" updates skipped', $existingTemplate->getName()));
+                }
+            } else {
+                $this->loadNewTemplate($fileName, $file);
+            }
+        }
     }
 
     /**

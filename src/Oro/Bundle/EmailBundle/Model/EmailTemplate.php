@@ -17,17 +17,23 @@ class EmailTemplate implements EmailTemplateInterface
 
     protected ?string $content = '';
 
+    protected iterable $attachments = [];
+
     public function __construct(
         string $name = '',
         string $content = '',
         string $type = EmailTemplateInterface::TYPE_HTML
     ) {
         $this->name = $name;
+        $this->content = $content;
         $this->type = $type;
 
         $this->fillFromContent($content);
     }
 
+    /**
+     * Will be removed in 7.0, use {@link EmailTemplateFromRawDataFactory}
+     */
     public static function createFromContent(string $content): self
     {
         $emailTemplate = new self();
@@ -36,6 +42,9 @@ class EmailTemplate implements EmailTemplateInterface
         return $emailTemplate;
     }
 
+    /**
+     * Will be removed in 7.0, use {@link EmailTemplateFromArrayHydrator}
+     */
     protected function fillFromContent(string $content): void
     {
         ['content' => $parsedContent, 'params' => $params] = self::parseContent($content);
@@ -53,6 +62,8 @@ class EmailTemplate implements EmailTemplateInterface
      * @param string $content
      *
      * @return array{content: string, params: array<string,string|bool>}
+     *
+     * Will be removed in 7.0, use {@link EmailTemplateRawDataParser}
      */
     public static function parseContent(string $content): array
     {
@@ -137,6 +148,34 @@ class EmailTemplate implements EmailTemplateInterface
     public function setContent(?string $content): self
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    public function getAttachments(): iterable
+    {
+        return $this->attachments;
+    }
+
+    public function setAttachments(iterable $attachments): self
+    {
+        $this->attachments = $attachments;
+
+        return $this;
+    }
+
+    public function addAttachment(EmailTemplateAttachmentModel $attachment): self
+    {
+        $this->attachments[] = $attachment;
+
+        return $this;
+    }
+
+    public function removeAttachment(EmailTemplateAttachmentModel $attachment): self
+    {
+        if (($key = array_search($attachment, $this->attachments, false)) !== false) {
+            unset($this->attachments[$key]);
+        }
 
         return $this;
     }

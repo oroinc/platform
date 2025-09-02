@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Migrations\Data\ORM;
 
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\EmailBundle\EmailTemplateHydrator\EmailTemplateRawDataParser;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Migrations\Data\ORM\AbstractEmailFixture;
 use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
@@ -57,10 +58,13 @@ class LoadEmailTemplates extends AbstractEmailFixture implements
             return;
         }
 
-        $oldTemplate = file_get_contents($oldTemplates[$emailTemplate->getName()]['path']);
-        $oldTemplate = EmailTemplate::parseContent($oldTemplate);
+        /** @var EmailTemplateRawDataParser $emailTemplateRawDataParser */
+        $emailTemplateRawDataParser = $this->container->get('oro_email.email_template_hydrator.raw_data_parser');
 
-        if (md5($oldTemplate['content']) === md5($emailTemplate->getContent())) {
+        $oldRawData = file_get_contents($oldTemplates[$emailTemplate->getName()]['path']);
+        $oldArrayData = $emailTemplateRawDataParser->parseRawData($oldRawData);
+
+        if (md5($oldArrayData['content']) === md5($emailTemplate->getContent())) {
             parent::updateExistingTemplate($emailTemplate, $template);
         }
     }

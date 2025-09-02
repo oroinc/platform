@@ -7,6 +7,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+use Oro\Bundle\EmailBundle\Form\DataMapper\EmailTemplateDataMapperFactory;
 use Oro\Bundle\EmailBundle\Form\DataMapper\LocalizationAwareEmailTemplateDataMapper;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
@@ -31,6 +32,7 @@ class AutoResponseTemplateType extends AbstractType
     private ManagerRegistry $doctrine;
     private LocalizationManager $localizationManager;
     private HtmlTagHelper $htmlTagHelper;
+    private ?EmailTemplateDataMapperFactory $emailTemplateDataMapperFactory = null;
 
     public function __construct(
         ConfigManager $configManager,
@@ -44,6 +46,12 @@ class AutoResponseTemplateType extends AbstractType
         $this->doctrine = $doctrine;
         $this->localizationManager = $localizationManager;
         $this->htmlTagHelper = $htmlTagHelper;
+    }
+
+    public function setEmailTemplateDataMapperFactory(
+        ?EmailTemplateDataMapperFactory $emailTemplateDataMapperFactory
+    ): void {
+        $this->emailTemplateDataMapperFactory = $emailTemplateDataMapperFactory;
     }
 
     #[\Override]
@@ -110,7 +118,12 @@ class AutoResponseTemplateType extends AbstractType
             $template->setName($proposedName);
         });
 
-        $builder->setDataMapper(new LocalizationAwareEmailTemplateDataMapper($builder->getDataMapper()));
+        // BC layer.
+        if (!$this->emailTemplateDataMapperFactory) {
+            $builder->setDataMapper(new LocalizationAwareEmailTemplateDataMapper($builder->getDataMapper()));
+        } else {
+            $builder->setDataMapper($this->emailTemplateDataMapperFactory->createDataMapper($builder->getDataMapper()));
+        }
     }
 
     #[\Override]

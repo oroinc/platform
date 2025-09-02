@@ -4,7 +4,10 @@ namespace Oro\Bundle\EmailBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareTrait;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_35\EmailMessageIdIndexQuery;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
@@ -15,14 +18,15 @@ use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInterface
+class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInterface, AttachmentExtensionAwareInterface
 {
     use DatabasePlatformAwareTrait;
+    use AttachmentExtensionAwareTrait;
 
     #[\Override]
     public function getMigrationVersion(): string
     {
-        return 'v1_37';
+        return 'v6_1_5_0';
     }
 
     #[\Override]
@@ -44,6 +48,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
         $this->createOroEmailTable($schema);
         $this->createOroEmailAutoResponseRuleTable($schema);
         $this->createOroEmailTemplateLocalizedTable($schema);
+        $this->createOroEmailTemplateAttachmentTable($schema);
         $this->createOroEmailAddressVisibilityTable($schema);
 
         /** Foreign keys generation **/
@@ -59,6 +64,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
         $this->addOroEmailForeignKeys($schema);
         $this->addOroEmailAutoResponseRuleForeignKeys($schema);
         $this->addOroEmailTemplateLocalizedForeignKeys($schema);
+        $this->addOroEmailTemplateAttachmentForeignKeys($schema);
         $this->addOroEmailAddressVisibilityForeignKeys($schema);
 
         $queries->addPostQuery(new EmailMessageIdIndexQuery());
@@ -334,7 +340,44 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
         $table->addColumn('subject_fallback', 'boolean', ['notnull' => true, 'default' => true]);
         $table->addColumn('content', 'text', ['notnull' => false]);
         $table->addColumn('content_fallback', 'boolean', ['notnull' => true, 'default' => true]);
+        $table->addColumn('attachments_fallback', 'boolean', ['notnull' => true, 'default' => true]);
         $table->setPrimaryKey(['id']);
+    }
+
+    /**
+     * Create oro_email_template_attachment table.
+     */
+    private function createOroEmailTemplateAttachmentTable(Schema $schema): void
+    {
+        $table = $schema->createTable('oro_email_template_attachment');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('template_id', 'integer', ['notnull' => false]);
+        $table->addColumn('translation_id', 'integer', ['notnull' => false]);
+        $table->addColumn('file_placeholder', 'string', ['notnull' => false, 'length' => 255]);
+        $table->setPrimaryKey(['id']);
+
+        $this->attachmentExtension->addFileRelation(
+            $schema,
+            'oro_email_template_attachment',
+            'file',
+            [
+                'attachment' => ['acl_protected' => true, 'file_applications' => ['default'], 'use_dam' => false],
+                'view' => ['immutable' => true, 'is_displayable' => false],
+                'form' => ['immutable' => true, 'is_enabled' => false],
+                'email' => [
+                    'immutable' => true,
+                    'available_in_template' => false,
+                ],
+                'extend' => [
+                    'is_extend' => true,
+                    'owner' => ExtendScope::OWNER_CUSTOM,
+                    'cascade' => ['persist', 'remove'],
+                    'without_default' => true,
+                    'on_delete' => 'SET NULL',
+                ],
+            ],
+            10
+        );
     }
 
     /**
@@ -568,6 +611,32 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
             ['template_id'],
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'CASCADE']
+        );
+    }
+
+    /**
+     * Add oro_email_template_attachment foreign keys.
+     */
+    private function addOroEmailTemplateAttachmentForeignKeys(Schema $schema): void
+    {
+        $table = $schema->getTable('oro_email_template_attachment');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_email_template'),
+            ['template_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_email_template_localized'),
+            ['translation_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_attachment_file'),
+            ['file_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'SET NULL']
         );
     }
 

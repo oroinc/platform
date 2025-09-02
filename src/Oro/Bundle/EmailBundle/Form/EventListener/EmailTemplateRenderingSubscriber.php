@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Oro\Bundle\EmailBundle\Form\EventListener;
 
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
+use Oro\Bundle\EmailBundle\Factory\EmailAttachmentModelFromEmailTemplateAttachmentFactory;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Provider\EmailTemplateContextProvider;
@@ -29,6 +31,8 @@ class EmailTemplateRenderingSubscriber implements EventSubscriberInterface
 
     private EmailRenderer $emailRenderer;
 
+    private ?EmailAttachmentModelFromEmailTemplateAttachmentFactory $emailAttachmentModelFactory = null;
+
     public function __construct(
         EmailModelBuilderHelper $emailModelBuilderHelper,
         TranslatedEmailTemplateProvider $translatedEmailTemplateProvider,
@@ -39,6 +43,12 @@ class EmailTemplateRenderingSubscriber implements EventSubscriberInterface
         $this->translatedEmailTemplateProvider = $translatedEmailTemplateProvider;
         $this->emailTemplateContextProvider = $emailTemplateContextProvider;
         $this->emailRenderer = $emailRenderer;
+    }
+
+    public function setEmailAttachmentModelFactory(
+        ?EmailAttachmentModelFromEmailTemplateAttachmentFactory $emailAttachmentModelFactory
+    ): void {
+        $this->emailAttachmentModelFactory = $emailAttachmentModelFactory;
     }
 
     #[\Override]
@@ -53,15 +63,7 @@ class EmailTemplateRenderingSubscriber implements EventSubscriberInterface
     {
         /** @var EmailModel|null $emailModel */
         $emailModel = $event->getData();
-        if (!$emailModel instanceof EmailModel || !$emailModel->getTemplate()) {
-            return;
-        }
-
-        if ($emailModel->getSubject() !== null && $emailModel->getBody() !== null) {
-            return;
-        }
-
-        if (!$emailModel->getEntityClass() || !$emailModel->getEntityId()) {
+        if (!$this->isApplicable($emailModel)) {
             return;
         }
 
@@ -78,17 +80,60 @@ class EmailTemplateRenderingSubscriber implements EventSubscriberInterface
             $templateParams
         );
 
-        $translatedEmailTemplate = $this->translatedEmailTemplateProvider
+        $translatedEmailTemplateModel = $this->translatedEmailTemplateProvider
             ->getTranslatedEmailTemplate($emailTemplate, $templateContext['localization'] ?? null);
 
         $renderedEmailTemplate = $this->emailRenderer
-            ->renderEmailTemplate($translatedEmailTemplate, $templateParams, $templateContext);
+            ->renderEmailTemplate($translatedEmailTemplateModel, $templateParams, $templateContext);
 
         if (null === $emailModel->getSubject()) {
             $emailModel->setSubject($renderedEmailTemplate->getSubject());
         }
+
         if (null === $emailModel->getBody()) {
             $emailModel->setBody($renderedEmailTemplate->getContent());
+        }
+
+        // BC layer.
+        if (!$this->emailAttachmentModelFactory) {
+            return;
+        }
+
+        $this->addEmailAttachments($renderedEmailTemplate, $templateParams, $emailModel);
+    }
+
+    private function isApplicable(?object $emailModel): bool
+    {
+        if (!$emailModel instanceof EmailModel || !$emailModel->getTemplate()) {
+            return false;
+        }
+
+        if ($emailModel->getSubject() !== null && $emailModel->getBody() !== null) {
+            return false;
+        }
+
+        if (!$emailModel->getEntityClass() || !$emailModel->getEntityId()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function addEmailAttachments(
+        EmailTemplateInterface $renderedEmailTemplate,
+        array $templateParams,
+        EmailModel $emailModel
+    ): void {
+        foreach ($renderedEmailTemplate->getAttachments() as $emailTemplateAttachment) {
+            $emailAttachmentModels = $this->emailAttachmentModelFactory
+                ->createEmailAttachmentModels($emailTemplateAttachment, $templateParams);
+            if (!$emailAttachmentModels) {
+                continue;
+            }
+
+            foreach ($emailAttachmentModels as $emailAttachmentModel) {
+                $emailModel->addAttachment($emailAttachmentModel);
+            }
         }
     }
 

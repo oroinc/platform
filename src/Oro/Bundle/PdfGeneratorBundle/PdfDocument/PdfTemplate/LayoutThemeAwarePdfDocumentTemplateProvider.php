@@ -53,6 +53,10 @@ class LayoutThemeAwarePdfDocumentTemplateProvider implements PdfDocumentTemplate
     private function getTemplatePathFromThemeConfig(string $pdfDocumentType, string $templateType): ?string
     {
         $themeName = $this->themeConfigurationProvider->getThemeName();
+        if ($themeName === null) {
+            return null;
+        }
+
         $themes = $this->themeManager->getThemesHierarchy($themeName);
 
         foreach (array_reverse($themes) as $theme) {

@@ -122,16 +122,16 @@ oro_behat_extension:
         mapping:
           Subject:
             type: 'css'
-            locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__subject"]'
+            locator: 'div[class^="emailtemplate-translatation-fields"].tab-pane.active [data-name="field__subject"]'
           Subject Fallback:
             type: 'css'
-            locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__subject-fallback"]'
+            locator: 'div[class^="emailtemplate-translatation-fields"].tab-pane.active [data-name="field__subject-fallback"]'
           Content:
             type: 'css'
-            locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__content"]'
+            locator: 'div[class^="emailtemplate-translatation-fields"].tab-pane.active [data-name="field__content"]'
           Content Fallback:
             type: 'css'
-            locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__content-fallback"]'
+            locator: 'div[class^="emailtemplate-translatation-fields"].tab-pane.active [data-name="field__content-fallback"]'
 
     EmailNotificationLink:
       selector: 'a.email-notification-icon'
@@ -200,6 +200,9 @@ oro_behat_extension:
 
     Email Template Login Absolute Link:
       selector: 'a.oro_email_template_login_link[href="http://localhost/admin/user/login"]'
+
+    Add Autoresponse Rule Submit:
+      selector: 'div.form-actions button[type="submit"]'
 
   pages:
     User Emails:

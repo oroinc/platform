@@ -10,7 +10,7 @@
                 {{ form_widget(form.emptyFile) }}
             </div>
         </div>
-        {% if value is not empty and value.id and not value.emptyFile %}
+        {% if value is not empty and value.filename and not value.emptyFile %}
             {% set filename = value.originalFilename|default(value.filename) %}
             <div class="control-group file-widget-preview">
                 <div class="controls">

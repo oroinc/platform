@@ -24,6 +24,8 @@ services:
             - '@doctrine'
             - '@oro_locale.manager.localization'
             - '@oro_ui.html_tag_helper'
+        calls:
+            - [ 'setEmailTemplateDataMapperFactory', [ '@oro_email.form.data_mapper.email_template_data_mapper_factory' ] ]
         tags:
             - { name: form.type, alias: oro_email_autoresponse_template }
 
@@ -48,11 +50,19 @@ services:
         factory: ['@form.factory', createNamed]
         arguments: ["oro_email_emailtemplate", Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType, null]
 
+    oro_email.form.data_mapper.email_template_data_mapper_factory:
+        class: Oro\Bundle\EmailBundle\Form\DataMapper\EmailTemplateDataMapperFactory
+        arguments:
+            - '@oro_email.provider.email_template_translation_resolver'
+            - '@oro_attachment.file_manager'
+
     oro_email.form.type.emailtemplate:
         class: Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType
         arguments:
             - '@oro_config.user'
             - '@oro_locale.manager.localization'
+        calls:
+            - [ 'setEmailTemplateDataMapperFactory', [ '@oro_email.form.data_mapper.email_template_data_mapper_factory' ] ]
         tags:
             - { name: form.type, alias: oro_email_emailtemplate }
 
@@ -121,6 +131,8 @@ services:
             - '@oro_email.provider.translated_email_template'
             - '@oro_email.provider.email_template_context'
             - '@oro_email.email_renderer'
+        calls:
+            - [ 'setEmailAttachmentModelFactory', [ '@oro_email.factory.email_attachment_model_from_email_template_attachment' ] ]
 
     oro_email.form.handler.email.api:
         class: Oro\Bundle\EmailBundle\Form\Handler\EmailApiHandler
@@ -270,5 +282,12 @@ services:
         class: Oro\Bundle\EmailBundle\Form\Type\EmailTemplateEntityChoiceType
         arguments:
             - '@oro_email.email_template_entity_provider'
+        tags:
+            - { name: form.type }
+
+    oro_email.form.type.email_template_attachment:
+        class: Oro\Bundle\EmailBundle\Form\Type\EmailTemplateAttachmentType
+        arguments:
+            - '@oro_email.twig.email_template_attachment_variables_provider'
         tags:
             - { name: form.type }

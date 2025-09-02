@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroEmailBundle_Entity_EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Model\EmailTemplate as EmailTemplateModel;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateAttachmentModel;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
@@ -36,11 +37,11 @@ use Oro\Bundle\UserBundle\Entity\User;
             'owner_field_name' => 'owner',
             'owner_column_name' => 'user_owner_id',
             'organization_field_name' => 'organization',
-            'organization_column_name' => 'organization_id'
+            'organization_column_name' => 'organization_id',
         ],
         'security' => ['type' => 'ACL', 'group_name' => '', 'category' => 'account_management'],
         'activity' => ['immutable' => true],
-        'attachment' => ['immutable' => true]
+        'attachment' => ['immutable' => true],
     ]
 )]
 class EmailTemplate extends EmailTemplateModel implements ExtendEntityInterface
@@ -86,13 +87,26 @@ class EmailTemplate extends EmailTemplateModel implements ExtendEntityInterface
     protected ?string $type = EmailTemplateInterface::TYPE_HTML;
 
     /**
+     * @var Collection<EmailTemplateAttachment>
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'template',
+        targetEntity: EmailTemplateAttachment::class,
+        cascade: ['persist', 'remove'],
+        fetch: 'EXTRA_LAZY',
+        orphanRemoval: true
+    )]
+    protected iterable $attachments;
+
+    /**
      * @var Collection<int, EmailTemplateTranslation>
      */
     #[ORM\OneToMany(
         mappedBy: 'template',
         targetEntity: EmailTemplateTranslation::class,
         cascade: ['persist', 'remove'],
-        fetch: 'EXTRA_LAZY'
+        fetch: 'EXTRA_LAZY',
+        indexBy: 'localization_id',
     )]
     protected ?Collection $translations = null;
 
@@ -120,6 +134,7 @@ class EmailTemplate extends EmailTemplateModel implements ExtendEntityInterface
         }
 
         $this->translations = new ArrayCollection();
+        $this->attachments = new ArrayCollection();
     }
 
     /**
@@ -320,9 +335,45 @@ class EmailTemplate extends EmailTemplateModel implements ExtendEntityInterface
         return $this;
     }
 
-    /**
-     * Clone template
-     */
+    #[\Override]
+    public function setAttachments(iterable $attachments): EmailTemplate
+    {
+        $this->attachments->clear();
+
+        foreach ($attachments as $attachment) {
+            $this->addAttachment($attachment);
+        }
+
+        return $this;
+    }
+
+    #[\Override]
+    public function addAttachment(EmailTemplateAttachment|EmailTemplateAttachmentModel $attachment): self
+    {
+        if (!$attachment instanceof EmailTemplateAttachment) {
+            $attachment = (new EmailTemplateAttachment())
+                ->setFile($attachment->getFile())
+                ->setFilePlaceholder($attachment->getFilePlaceholder());
+        }
+
+        if (!$this->attachments->contains($attachment)) {
+            $this->attachments->add($attachment);
+
+            $attachment->setTemplate($this);
+            $attachment->setTranslation(null);
+        }
+
+        return $this;
+    }
+
+    #[\Override]
+    public function removeAttachment(EmailTemplateAttachment|EmailTemplateAttachmentModel $attachment): self
+    {
+        $this->attachments->removeElement($attachment);
+
+        return $this;
+    }
+
     public function __clone()
     {
         // cloned entity will be child
@@ -337,14 +388,17 @@ class EmailTemplate extends EmailTemplateModel implements ExtendEntityInterface
         foreach ($originalTranslations as $translation) {
             $this->addTranslation(clone $translation);
         }
+
+        $originalAttachments = $this->getAttachments();
+
+        $this->attachments = new ArrayCollection();
+        foreach ($originalAttachments as $attachment) {
+            $this->addAttachment(clone $attachment);
+        }
+
         $this->cloneExtendEntityStorage();
     }
 
-    /**
-     * Convert entity to string
-     *
-     * @return string
-     */
     #[\Override]
     public function __toString()
     {
