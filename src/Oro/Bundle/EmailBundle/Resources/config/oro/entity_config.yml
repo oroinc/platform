@@ -6,7 +6,7 @@ entity_config:
                 available_in_template:
                     options:
                         value_type:         boolean
-                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, file, image, ref-one, manyToOne, simple_array, guid]
+                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, file, image, multiFile, multiImage, ref-one, manyToOne, simple_array, guid]
                     form:
                         type:               Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:

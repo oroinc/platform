@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplateAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
@@ -14,7 +15,7 @@ class EmailTemplateTranslationTest extends TestCase
 
     public function testProperties(): void
     {
-        $this->assertPropertyAccessors(new EmailTemplateTranslation(), [
+        self::assertPropertyAccessors(new EmailTemplateTranslation(), [
             ['id', 1],
             ['template', new EmailTemplate()],
             ['localization', new Localization()],
@@ -22,6 +23,13 @@ class EmailTemplateTranslationTest extends TestCase
             ['subjectFallback', false],
             ['content', 'Test content'],
             ['contentFallback', false],
+            ['attachmentsFallback', false],
         ]);
+
+        self::assertPropertyCollection(
+            new EmailTemplateTranslation(),
+            'attachments',
+            new EmailTemplateAttachment()
+        );
     }
 }

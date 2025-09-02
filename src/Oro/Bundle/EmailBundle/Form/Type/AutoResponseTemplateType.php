@@ -7,7 +7,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
-use Oro\Bundle\EmailBundle\Form\DataMapper\LocalizationAwareEmailTemplateDataMapper;
+use Oro\Bundle\EmailBundle\Form\DataMapper\EmailTemplateDataMapperFactory;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
@@ -26,24 +26,14 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class AutoResponseTemplateType extends AbstractType
 {
-    private ConfigManager $configManager;
-    private ConfigManager $userConfig;
-    private ManagerRegistry $doctrine;
-    private LocalizationManager $localizationManager;
-    private HtmlTagHelper $htmlTagHelper;
-
     public function __construct(
-        ConfigManager $configManager,
-        ConfigManager $userConfig,
-        ManagerRegistry $doctrine,
-        LocalizationManager $localizationManager,
-        HtmlTagHelper $htmlTagHelper
+        private readonly ConfigManager $configManager,
+        private readonly ConfigManager $userConfig,
+        private readonly ManagerRegistry $doctrine,
+        private readonly LocalizationManager $localizationManager,
+        private readonly EmailTemplateDataMapperFactory $emailTemplateDataMapperFactory,
+        private readonly HtmlTagHelper $htmlTagHelper
     ) {
-        $this->configManager = $configManager;
-        $this->userConfig = $userConfig;
-        $this->doctrine = $doctrine;
-        $this->localizationManager = $localizationManager;
-        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     #[\Override]
@@ -110,7 +100,7 @@ class AutoResponseTemplateType extends AbstractType
             $template->setName($proposedName);
         });
 
-        $builder->setDataMapper(new LocalizationAwareEmailTemplateDataMapper($builder->getDataMapper()));
+        $builder->setDataMapper($this->emailTemplateDataMapperFactory->createDataMapper($builder->getDataMapper()));
     }
 
     #[\Override]

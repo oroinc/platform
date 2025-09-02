@@ -3,8 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EmailBundle\Form\DataMapper\LocalizationAwareEmailTemplateDataMapper;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Form\DataMapper\EmailTemplateDataMapperFactory;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
+use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
@@ -21,16 +23,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class EmailTemplateType extends AbstractType
 {
-    /** @var ConfigManager */
-    private $userConfig;
-
-    /** @var LocalizationManager */
-    private $localizationManager;
-
-    public function __construct(ConfigManager $userConfig, LocalizationManager $localizationManager)
-    {
-        $this->userConfig = $userConfig;
-        $this->localizationManager = $localizationManager;
+    public function __construct(
+        private readonly ConfigManager $userConfig,
+        private readonly LocalizationManager $localizationManager,
+        private readonly EmailTemplateDataMapperFactory $emailTemplateDataMapperFactory
+    ) {
     }
 
     #[\Override]
@@ -119,7 +116,38 @@ class EmailTemplateType extends AbstractType
             }
         );
 
-        $builder->setDataMapper(new LocalizationAwareEmailTemplateDataMapper($builder->getDataMapper()));
+        $builder->setDataMapper($this->emailTemplateDataMapperFactory->createDataMapper($builder->getDataMapper()));
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, $this->onPreSetDataTranslationsField(...));
+        $builder->get('entityName')->addEventListener(
+            FormEvents::POST_SUBMIT,
+            $this->onPostSubmitTranslationsField(...)
+        );
+    }
+
+    private function onPreSetDataTranslationsField(FormEvent $event): void
+    {
+        /** @var EmailTemplate $emailTemplate */
+        $emailTemplate = $event->getData();
+        $entityClass = $emailTemplate?->getEntityName();
+        if ($entityClass === null) {
+            return;
+        }
+
+        FormUtils::replaceField($event->getForm(), 'translations', [
+            'entity_class' => $entityClass
+        ]);
+    }
+
+    private function onPostSubmitTranslationsField(FormEvent $event): void
+    {
+        $data = $event->getData();
+
+        if (!empty($data)) {
+            FormUtils::replaceField($event->getForm()->getParent(), 'translations', [
+                'entity_class' => $data,
+            ]);
+        }
     }
 
     #[\Override]
@@ -129,6 +157,9 @@ class EmailTemplateType extends AbstractType
             [
                 'data_class' => 'Oro\Bundle\EmailBundle\Entity\EmailTemplate',
                 'csrf_token_id' => 'emailtemplate',
+                'error_mapping' => [
+                    'attachments' => 'translations.default.attachments',
+                ],
             ]
         );
     }

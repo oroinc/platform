@@ -3,7 +3,9 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig\EmailTemplateLoader;
 
 use Oro\Bundle\EmailBundle\Model\EmailTemplate as EmailTemplateModel;
+use Oro\Bundle\EmailBundle\Model\Factory\EmailTemplateFromRawDataFactoryInterface;
 use Oro\Bundle\LayoutBundle\Twig\EmailTemplateLoader\LayoutThemeEmailTemplateLoader;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Twig\Loader\FilesystemLoader;
 use Twig\Source;
@@ -15,12 +17,16 @@ class LayoutThemeEmailTemplateLoaderTest extends TestCase
 {
     private LayoutThemeEmailTemplateLoader $loader;
 
+    private MockObject&EmailTemplateFromRawDataFactoryInterface $emailTemplateFromRawDataFactory;
+
     #[\Override]
     protected function setUp(): void
     {
         $this->filesystemLoader = $this->createMock(FilesystemLoader::class);
+        $this->emailTemplateFromRawDataFactory = $this->createMock(EmailTemplateFromRawDataFactoryInterface::class);
 
         $this->loader = new LayoutThemeEmailTemplateLoader([], __DIR__);
+        $this->loader->setEmailTemplateFromRawDataFactory($this->emailTemplateFromRawDataFactory);
     }
 
     public function testGetPaths(): void
@@ -141,8 +147,14 @@ class LayoutThemeEmailTemplateLoaderTest extends TestCase
 
         $path = implode(DIRECTORY_SEPARATOR, [__DIR__, 'email-templates1', 'template1.html.twig']);
 
-        $emailTemplateModel = EmailTemplateModel::createFromContent(file_get_contents($path));
+        $rawData = file_get_contents($path);
+        $expectedEmailTemplate = (new EmailTemplateModel())->setContent($rawData);
+        $this->emailTemplateFromRawDataFactory
+            ->expects(self::once())
+            ->method('createFromRawData')
+            ->with($rawData)
+            ->willReturn($expectedEmailTemplate);
 
-        self::assertEquals($emailTemplateModel, $this->loader->getEmailTemplate($name));
+        self::assertEquals($expectedEmailTemplate, $this->loader->getEmailTemplate($name));
     }
 }
