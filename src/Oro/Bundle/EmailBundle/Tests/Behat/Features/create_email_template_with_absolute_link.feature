@@ -33,7 +33,7 @@ Feature: Create email template with absolute link
       | Type          | html                                                    |
       | Subject       | Test Template With Absolute Link via auto-response rule |
     And I fill in WYSIWYG "Autoresponse Rule Default Content" with "<p>Hello User, please login through - <a class='oro_email_template_login_link' title='Login form' href='http://localhost/admin/user/login'>Login form</a></p>"
-    And I click "Add"
+    And I click "Add Autoresponse Rule Submit"
     And go to System/ Emails/ Templates
     Then I should see alert with message "You have unsaved changes, are you sure you want to leave this page?"
     And I accept alert

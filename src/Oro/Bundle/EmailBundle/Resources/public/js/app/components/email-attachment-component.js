@@ -1,6 +1,7 @@
 define(function(require) {
     'use strict';
 
+    const _ = require('underscore');
     const BaseComponent = require('oroui/js/app/components/base/component');
     const EmailAttachmentSelectView = require('oroemail/js/app/views/email-attachment-select-view');
     const EmailAttachmentCollection = require('oroemail/js/app/models/email-attachment-collection');
@@ -10,6 +11,17 @@ define(function(require) {
      * @exports EmailAttachmentComponent
      */
     const EmailAttachmentComponent = BaseComponent.extend({
+        options: _.extend({}, BaseComponent.prototype.options, {
+            popupTriggerButton: '[data-role="attachment-choose"]',
+            uploadNewButton: '[data-role="attachment-upload"]',
+            popupContentEl: '[data-role="attachment-popup"]',
+            containerId: null,
+            inputName: null,
+            fileIcons: [],
+            attachmentsAvailable: [],
+            entityAttachments: []
+        }),
+
         /**
          * @type {EmailAttachmentCollection}
          */
@@ -56,23 +68,43 @@ define(function(require) {
          * @inheritdoc
          */
         initialize: function(options) {
-            this.popupCollection = new EmailAttachmentCollection(options.attachmentsAvailable || []);
-            this.collection = new EmailAttachmentCollection(options.entityAttachments || []);
+            this.options = _.defaults(options || {}, this.options);
+            this.$el = options._sourceElement;
+
+            this.popupCollection = new EmailAttachmentCollection(this.options.attachmentsAvailable || []);
+            this.collection = new EmailAttachmentCollection(
+                _.map(
+                    this.options.entityAttachments || [],
+                    (value, index) => {
+                        return {index, ...value};
+                    }
+                )
+            );
             this.collectionView = new EmailAttachmentCollectionView({
                 collection: this.collection,
-                el: options._sourceElement,
-                listSelector: '#' + options.containerId,
-                inputName: options.inputName,
-                fileIcons: options.fileIcons
+                el: this.$el,
+                listSelector: '#' + this.options.containerId,
+                inputName: this.options.inputName,
+                fileIcons: this.options.fileIcons
             });
 
-            this.$uploadNewButton = this.findControlElement(options._sourceElement, options.uploadNewButton);
-            this.$popupSelectButton = this.findControlElement(options._sourceElement, options.popupTriggerButton);
-            this.$popupContentEl = this.findControlElement(options._sourceElement, options.popupContentEl);
+            this.$uploadNewButton = this.findControlElement(this.$el, this.options.uploadNewButton);
+            this.$popupSelectButton = this.findControlElement(this.$el, this.options.popupTriggerButton);
+            this.$popupContentEl = this.findControlElement(this.$el, this.options.popupContentEl);
             if (this.$popupSelectButton.length && this.$popupContentEl.length) {
                 this.bindEvents();
             }
-            this.$form = options._sourceElement.closest('form');
+            this.$form = this.$el.closest('form');
+            this.$form.on('email-template:loaded.' + this.cid, (event, emailData) => {
+                this.collection.set(
+                    _.map(
+                        emailData.attachments || [],
+                        (value, index) => {
+                            return {index, ...value};
+                        }
+                    )
+                );
+            });
             this.applyAttachmentValidation();
         },
 

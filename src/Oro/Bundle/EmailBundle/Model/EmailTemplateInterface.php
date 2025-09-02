@@ -17,4 +17,9 @@ interface EmailTemplateInterface
     public function getSubject(): ?string;
 
     public function getContent(): ?string;
+
+    /**
+     * @return iterable<EmailTemplateAttachmentModel>
+     */
+    public function getAttachments(): iterable;
 }

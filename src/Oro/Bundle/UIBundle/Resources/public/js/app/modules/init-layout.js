@@ -309,6 +309,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         const rowsHtml = generateOroCollectionRows($listContainer, rowCountAdd);
         const {htmlProcessor = html => html} = e;
         $listContainer.append(htmlProcessor(rowsHtml)).trigger('content:changed');
+        $listContainer.trigger('row-collection:updated');
 
         $listContainer.find('input.position-input').each((i, el) => $(el).val(i));
 

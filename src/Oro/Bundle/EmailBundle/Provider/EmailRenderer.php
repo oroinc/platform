@@ -8,6 +8,7 @@ use Oro\Bundle\EmailBundle\Exception\EmailTemplateCompilationException;
 use Oro\Bundle\EmailBundle\Model\EmailTemplate as EmailTemplateModel;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateRenderingContext;
+use Oro\Bundle\EmailBundle\Twig\EmailTemplateAttachmentProcessor;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRenderer;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Psr\Log\LoggerAwareInterface;
@@ -27,6 +28,8 @@ class EmailRenderer implements LoggerAwareInterface
 
     private TemplateRenderer $templateRenderer;
 
+    private EmailTemplateAttachmentProcessor $emailTemplateAttachmentProcessor;
+
     private TwigEnvironment $twigEnvironment;
 
     private EmailTemplateRenderingContext $emailTemplateRenderingContext;
@@ -41,6 +44,7 @@ class EmailRenderer implements LoggerAwareInterface
 
     public function __construct(
         TemplateRenderer $templateRenderer,
+        EmailTemplateAttachmentProcessor $emailTemplateAttachmentProcessor,
         TwigEnvironment $twigEnvironment,
         EmailTemplateRenderingContext $emailTemplateRenderingContext,
         EventDispatcherInterface $eventDispatcher,
@@ -48,6 +52,7 @@ class EmailRenderer implements LoggerAwareInterface
         HtmlTagHelper $htmlTagHelper
     ) {
         $this->templateRenderer = $templateRenderer;
+        $this->emailTemplateAttachmentProcessor = $emailTemplateAttachmentProcessor;
         $this->twigEnvironment = $twigEnvironment;
         $this->emailTemplateRenderingContext = $emailTemplateRenderingContext;
         $this->eventDispatcher = $eventDispatcher;
@@ -81,6 +86,15 @@ class EmailRenderer implements LoggerAwareInterface
                 if ($fieldValue) {
                     $rendered = $this->templateRenderer->renderTemplate($fieldValue, $templateParams);
                     $this->propertyAccessor->setValue($renderedEmailTemplate, $fieldName, $rendered);
+                }
+            }
+
+            foreach ($emailTemplate->getAttachments() as $emailTemplateAttachment) {
+                $processedAttachment = $this->emailTemplateAttachmentProcessor
+                    ->processAttachment($emailTemplateAttachment, $templateParams);
+
+                if ($processedAttachment) {
+                    $renderedEmailTemplate->addAttachment($processedAttachment);
                 }
             }
         } catch (Error $exception) {

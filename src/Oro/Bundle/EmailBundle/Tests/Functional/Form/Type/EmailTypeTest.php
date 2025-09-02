@@ -60,6 +60,8 @@ class EmailTypeTest extends WebTestCase
             'data_class' => EmailModel::class,
             'csrf_token_id' => 'email',
             'csrf_protection' => true,
+            'include_non_entity_templates' => true,
+            'include_system_templates' => true,
         ]);
 
         self::assertFormHasField($form, 'gridName', HiddenType::class, ['required' => false]);
@@ -118,6 +120,7 @@ class EmailTypeTest extends WebTestCase
                         . 'span[style]',
                     'custom_elements' => 'style'
                 ],
+                'block_prefix' => 'oro_email_email_body',
             ]
         );
         self::assertFormHasField(
@@ -128,6 +131,8 @@ class EmailTypeTest extends WebTestCase
                 'label' => 'oro.email.template.label',
                 'required' => false,
                 'depends_on_parent_field' => 'entityClass',
+                'include_non_entity_templates' => true,
+                'include_system_templates' => true,
                 'configs' => [
                     'allowClear' => true,
                 ],

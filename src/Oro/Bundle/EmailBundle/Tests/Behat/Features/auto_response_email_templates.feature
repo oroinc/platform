@@ -30,7 +30,7 @@ Feature: Auto response email templates
     When I fill "Add Autoresponse Rule Form" with:
       | Name              | Rule 1                |
       | Response Template | email_entity_template |
-    And I click "Add"
+    And I click "Add Autoresponse Rule Submit"
     Then I should see following "Autoresponse Rules Grid" grid:
       | Name   |
       | Rule 1 |
@@ -39,7 +39,7 @@ Feature: Auto response email templates
     When I click "Add Rule"
     And I fill "Add Autoresponse Rule Form" with:
       | Name | Rule invalid |
-    And I click "Add"
+    And I click "Add Autoresponse Rule Submit"
     Then I should see "Add Autoresponse Rule Form" validation errors:
       | Default Subject | This value should not be blank. |
     And I close ui dialog
@@ -53,7 +53,7 @@ Feature: Auto response email templates
     And I fill "Add Autoresponse Rule Form" with:
       | English Subject Fallback | false |
       | English Subject          |       |
-    And I click "Add"
+    And I click "Add Autoresponse Rule Submit"
     And I click "English"
     Then I should see "Add Autoresponse Rule Form" validation errors:
       | English Subject | This value should not be blank. |
@@ -64,7 +64,7 @@ Feature: Auto response email templates
     And I fill "Add Autoresponse Rule Form" with:
       | Name            | Rule 2       |
       | Default Subject | Test subject |
-    And I click "Add"
+    And I click "Add Autoresponse Rule Submit"
     Then I should see following "Autoresponse Rules Grid" grid:
       | Name   |
       | Rule 1 |

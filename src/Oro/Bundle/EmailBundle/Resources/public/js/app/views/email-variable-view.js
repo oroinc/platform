@@ -18,7 +18,11 @@ define(function(require) {
             sectionTemplateSelector: null,
             sectionContentSelector: null,
             sectionTabSelector: null,
-            fieldsSelectors: ['input[type="text"][name*="subject"]', 'textarea[name*="content"]'],
+            fieldsSelectors: [
+                'input[type="text"][name*="subject"]',
+                'textarea[name*="content"]',
+                'select[name*="filePlaceholder"]'
+            ],
             defaultFieldIndex: 1 // index in fieldsSelectors
         },
 
@@ -90,10 +94,17 @@ define(function(require) {
          * @returns {boolean}
          */
         isEmpty: function() {
+            this.fields = $(this.options.fieldsSelectors.join(','));
+
             let result = true;
             _.each(this.fields, function(el) {
                 if (el.value) {
-                    result = false;
+                    const $el = $(el);
+                    if ($el.data('select2') && $el.val() === '__upload_file__') {
+                        result = true;
+                    } else {
+                        result = false;
+                    }
                 }
             });
             return result;
@@ -103,12 +114,19 @@ define(function(require) {
          * Sets empty string as a value for all fields
          */
         clear: function() {
+            this.fields = $(this.options.fieldsSelectors.join(','));
+
             _.each(this.fields, function(el) {
+                const $el = $(el);
                 const editor = tinyMCE.get(el.id);
                 if (editor) {
                     editor.setContent('');
-                } else if (el.value) {
-                    el.value = '';
+                } else if ($el.data('select2')) {
+                    if ($el.val() !== '__upload_file__') {
+                        $el.val('').trigger('change');
+                    }
+                } else if ($el.val()) {
+                    $el.val('');
                 }
             });
         },

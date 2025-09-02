@@ -164,6 +164,9 @@ define(function(require) {
             this.domCache.type.find('input[value=' + emailData.type + ']')
                 .prop('checked', true)
                 .trigger('change');
+
+            const $formEl = this.$el.closest('form');
+            $formEl.trigger('email-template:loaded', emailData);
         },
 
         onTypeChange: function(e) {

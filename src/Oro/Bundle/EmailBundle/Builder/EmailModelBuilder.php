@@ -43,12 +43,7 @@ class EmailModelBuilder
     ) {
     }
 
-    /**
-     * @param EmailModel|null $emailModel
-     *
-     * @return EmailModel
-     */
-    public function createEmailModel(?EmailModel $emailModel = null)
+    public function createEmailModel(?EmailModel $emailModel = null): EmailModel
     {
         if (!$emailModel) {
             $emailModel = $this->factory->getEmail();

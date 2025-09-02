@@ -10,7 +10,7 @@
     {% set separateLayoutContent %}
         {% if separateLayout %} data-layout="separate"{% endif %}
     {% endset %}
-    <div id="{{ elementId }}" {{ UI.renderWidgetAttributes(widgetComponentOptions) }}{{ separateLayoutContent }}>
+    <div id="{{ elementId }}" {{ UI.renderWidgetAttributes(widgetComponentOptions) }}{{ separateLayoutContent }}{{ UI.attributes(options.widgetContainerAttributes|default({})) }}>
         {% if options.elementFirst %}
             {{ content|raw }}
         {% endif %}

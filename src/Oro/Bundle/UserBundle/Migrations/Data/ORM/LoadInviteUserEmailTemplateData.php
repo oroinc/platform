@@ -15,18 +15,18 @@ class LoadInviteUserEmailTemplateData extends AbstractEmailFixture
     #[\Override]
     protected function findExistingTemplate(ObjectManager $manager, array $template): ?EmailTemplate
     {
-        if (empty($template['params']['name'])) {
+        if (empty($template['name'])) {
             return null;
         }
 
         return $manager->getRepository(EmailTemplate::class)->findOneBy([
-            'name' => $template['params']['name'],
+            'name' => $template['name'],
             'entityName' => User::class
         ]);
     }
 
     #[\Override]
-    protected function updateExistingTemplate(EmailTemplate $emailTemplate, array $template): void
+    protected function updateExistingTemplate(EmailTemplate $emailTemplate, array $arrayData): void
     {
         // Skip if such template exists
     }

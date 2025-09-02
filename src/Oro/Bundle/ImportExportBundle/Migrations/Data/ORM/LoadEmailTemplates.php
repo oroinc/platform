@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Migrations\Data\ORM;
 
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\EmailBundle\EmailTemplateHydrator\EmailTemplateRawDataParser;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Migrations\Data\ORM\AbstractEmailFixture;
 use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
@@ -32,12 +33,12 @@ class LoadEmailTemplates extends AbstractEmailFixture implements
     #[\Override]
     protected function findExistingTemplate(ObjectManager $manager, array $template): ?EmailTemplate
     {
-        if (empty($template['params']['name'])) {
+        if (empty($template['name'])) {
             return null;
         }
 
         return $manager->getRepository(EmailTemplate::class)->findOneBy([
-            'name' => $template['params']['name']
+            'name' => $template['name']
         ]);
     }
 
@@ -50,18 +51,21 @@ class LoadEmailTemplates extends AbstractEmailFixture implements
     }
 
     #[\Override]
-    protected function updateExistingTemplate(EmailTemplate $emailTemplate, array $template): void
+    protected function updateExistingTemplate(EmailTemplate $emailTemplate, array $arrayData): void
     {
         $oldTemplates = $this->getEmailTemplatesList($this->getPreviousEmailsDir());
         if (!isset($oldTemplates[$emailTemplate->getName()])) {
             return;
         }
 
-        $oldTemplate = file_get_contents($oldTemplates[$emailTemplate->getName()]['path']);
-        $oldTemplate = EmailTemplate::parseContent($oldTemplate);
+        /** @var EmailTemplateRawDataParser $emailTemplateRawDataParser */
+        $emailTemplateRawDataParser = $this->container->get('oro_email.email_template_hydrator.raw_data_parser');
 
-        if (md5($oldTemplate['content']) === md5($emailTemplate->getContent())) {
-            parent::updateExistingTemplate($emailTemplate, $template);
+        $oldRawData = file_get_contents($oldTemplates[$emailTemplate->getName()]['path']);
+        $oldArrayData = $emailTemplateRawDataParser->parseRawData($oldRawData);
+
+        if (md5($oldArrayData['content']) === md5($emailTemplate->getContent())) {
+            parent::updateExistingTemplate($emailTemplate, $arrayData);
         }
     }
 
