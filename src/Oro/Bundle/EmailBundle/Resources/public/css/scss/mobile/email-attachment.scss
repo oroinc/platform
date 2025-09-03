@@ -1,0 +1,20 @@
+/* @theme: admin.oro; */
+
+.email-attachment {
+    width: calc(100% - #{$btn-icon-mobile-width + $btn-square-border-width});
+    max-width: calc(100% - #{$btn-icon-mobile-width + $btn-square-border-width});
+}
+
+.emailtemplate-translatation-fields {
+    &:has(.email-attachment):has([data-name='field__attachments-fallback']:checked) {
+        .email-template-collection {
+            + .control-group-checkbox {
+                display: block;
+
+                > .controls {
+                    margin-left: 0;
+                }
+            }
+        }
+    }
+}

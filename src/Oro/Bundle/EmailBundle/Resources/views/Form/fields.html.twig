@@ -71,14 +71,9 @@
 
     {% import '@OroUI/macros.html.twig' as UI %}
 
-    {% if form.parent.parent is not null %}
-        {% set parentId = form.parent.parent.vars.id %}
-    {% else %}
-        {% set parentId = form.parent.vars.id %}
-    {% endif %}
     {% set options = {
         targetSelector: '#' ~ id,
-        _sourceElement: '#' ~ parentId ~ ' [name$="[' ~ depends_on_parent_field ~ ']"]',
+        _sourceElement: '#' ~ dependee_field_id,
         collectionOptions: {
             route: data_route,
             routeId: data_route_parameter,
@@ -109,50 +104,42 @@
     }) }}></div>
 {% endblock %}
 
+{% block oro_email_email_body_row %}
+    {{ form_row(form) }}
+
+    <div class="control-group email-body-actions">
+        <div class="controls">
+            <span class="email-body-action"><a id="add-signature" href="#">{{ 'oro.email.form.add_signature'|trans }}</a></span>
+
+            <span>{{ 'oro.email.form.attach_file'|trans }}: </span>
+            <div class="dropup" style="display: inline-block">
+                <a class="attach-file dropdown-toggle" href="#" aria-expanded="true" data-role="attachment-choose">{{ 'oro.email.form.from_record'|trans }}</a>
+                <div class="dropdown-menu attachment-list-popup" role="menu" aria-labelledby="attach-file" data-role="attachment-popup"></div>
+            </div>
+            <a class="upload-new divider" href="#" data-role="attachment-upload">{{ 'oro.email.form.upload'|trans }}</a>
+        </div>
+    </div>
+{% endblock %}
+
 {% block oro_email_attachments_row %}
-    {% set entityAttachmentsArray = [] %}
-    {% for attachment in options.entityAttachments %}
-        {% set entityAttachmentArray = {
-            'id': attachment.id,
-            'type': attachment.type,
-            'fileName': attachment.fileName,
-            'icon': attachment.icon,
-            'errors': attachment.errors
-        } %}
-        {% set entityAttachmentsArray = entityAttachmentsArray|merge([entityAttachmentArray]) %}
-    {% endfor %}
-
-    {% set attachmentsAvailableArray = [] %}
-    {% for attachment in options.attachmentsAvailable %}
-        {% set attachmentAvailableArray = {
-            'id': attachment.id,
-            'type': attachment.type,
-            'fileName': attachment.fileName,
-            'fileSize': attachment.fileSize,
-            'modified': attachment.modified,
-            'icon': attachment.icon,
-            'preview': attachment.preview
-        } %}
-        {% set attachmentsAvailableArray = attachmentsAvailableArray|merge([attachmentAvailableArray]) %}
-    {% endfor %}
-
-    {% set options = options|merge({
+    {% set options = options|default([])|merge({
         containerId: id,
         inputName: full_name,
-        entityAttachments: entityAttachmentsArray,
-        attachmentsAvailable: attachmentsAvailableArray,
+        entityAttachments: entity_attachments_array|default([]),
+        attachmentsAvailable: attachments_available_array|default([]),
         fileIcons: oro_file_icons_config()
     }) %}
 
     <div data-page-component-module="oroemail/js/app/components/email-attachment-component"
          data-page-component-options="{{ options|json_encode }}"
-         class="attachment-container">
+         class="attachment-container"
+         data-role="attachment-container">
         {{ form_row(form) }}
     </div>
 {% endblock %}
 
 {% block oro_email_emailtemplate_localizations_widget %}
-    {% import _self as emailFormFealds %}
+    {% import _self as emailFormFields %}
 
     {% import '@OroUI/macros.html.twig' as UI %}
     <div class="emailtemplate-translatation oro-tabs tabbable" {{ UI.renderPageComponentAttributes({
@@ -166,7 +153,7 @@
             <ul class="nav nav-tabs" role="tablist">
                 {% apply spaceless %}
                     {% for templateLocalization in form %}
-                        {{ emailFormFealds.renderTabNavItem(templateLocalization, loop.first, tabId ~ '-' ~ loop.index) }}
+                        {{ emailFormFields.renderTabNavItem(templateLocalization, loop.first, tabId ~ '-' ~ loop.index) }}
                     {% endfor %}
                 {% endapply %}
             </ul>
@@ -175,7 +162,7 @@
             <div class="tab-content">
                 {% apply spaceless %}
                     {% for templateLocalization in form %}
-                        {{ emailFormFealds.renderTab(templateLocalization, loop.first, tabContentId ~ '-' ~ loop.index) }}
+                        {{ emailFormFields.renderTab(templateLocalization, loop.first, tabContentId ~ '-' ~ loop.index) }}
                     {% endfor %}
                 {% endapply %}
             </div>
@@ -190,7 +177,7 @@
 {% endblock %}
 
 {% block oro_email_email_folder_tree_widget %}
-    {% import _self as emailFormFealds %}
+    {% import _self as emailFormFields %}
 
     {% set options = {
         dataInputSelector: 'input[name="' ~ full_name ~ '"]',
@@ -209,7 +196,7 @@
         <div class="folder-list">
             {% for key, folder in form.vars.value %}
                 {% if folder.parentFolder is null and folder.outdatedAt is null %}
-                    {{ emailFormFealds.renderFolder(key, folder, form.vars.full_name) }}
+                    {{ emailFormFields.renderFolder(key, folder, form.vars.full_name) }}
                 {% endif %}
             {% endfor %}
         </div>
@@ -320,16 +307,31 @@
         {% if form.contentFallback is defined %}
             {{- form_row(form.contentFallback) }}
         {% endif %}
+        {{ form_row(form.attachments, { 'label': 'oro.email.emailtemplate.attachments.label'|trans, attr: {'class': 'email-template-collection'}}) }}
+        {% if form.attachmentsFallback is defined %}
+            {{- form_row(form.attachmentsFallback) }}
+        {% endif %}
     </div>
 {% endblock %}
 
 {% block _oro_email_emailtemplate_translations_template_fallback_checkbox_row %}
     <div class="control-group control-group-checkbox">
-        <div class="control-label wrap">&nbsp;</div>
         <div class="controls">
             {{ form_widget(form) }}
             {{ form_label(form) }}
         </div>
+    </div>
+{% endblock %}
+
+{% block oro_email_emailtemplate_attachment_widget %}
+    <div class="email-attachment" data-role="email-template-attachment" data-page-component-view="oroemail/js/app/views/email-template-attachment-view">
+        <div data-role="email-template-attachment-file-placeholder" class="{{ form.filePlaceholder.vars.choices|length == 1 ? 'hide' : '' }}">
+            {{ form_row(form.filePlaceholder, { 'label': false }) }}
+        </div>
+        <div data-role="email-template-attachment-file" class="{{ form.filePlaceholder.vars.value != constant('Oro\\Bundle\\EmailBundle\\Form\\Type\\EmailTemplateAttachmentType::UPLOAD_FILE') ? 'hide' : '' }}">
+            {{ form_widget(form.file) }}
+        </div>
+        {{ form_errors(form) }}
     </div>
 {% endblock %}
 
@@ -384,7 +386,7 @@
 {% macro renderTab(form, isActive = false, uniqid = null) %}
     {% import '@OroUI/macros.html.twig' as UI %}
 
-    <div class="emailtemplate-translatation-fields-{{ form.vars.name }} tab-pane{% if isActive %} active{% endif %}"
+    <div class="emailtemplate-translatation-fields emailtemplate-translatation-fields-{{ form.vars.name }} tab-pane{% if isActive %} active{% endif %}"
          role="tabpanel"
             {% if uniqid %}
                 id="{{ uniqid }}"
@@ -405,7 +407,7 @@
 {% endmacro %}
 
 {% macro renderFolder(key, folder, namePrefix, maxDepth = 10) %}
-    {% import _self as emailFormFealds %}
+    {% import _self as emailFormFields %}
     {% if maxDepth %}
         <div>
             <label class="folder-label">
@@ -418,7 +420,7 @@
             {% if maxDepth > 1 and folder.subFolders|length > 0 %}
                 <div class="folder-sub-folders">
                     {% for subKey, subFolder in folder.subFolders %}
-                        {{ emailFormFealds.renderFolder(subKey, subFolder, namePrefix ~ '[' ~ key ~ '][subFolders]', maxDepth - 1) }}
+                        {{ emailFormFields.renderFolder(subKey, subFolder, namePrefix ~ '[' ~ key ~ '][subFolders]', maxDepth - 1) }}
                     {% endfor %}
                 </div>
             {% endif %}

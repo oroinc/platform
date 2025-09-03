@@ -8,6 +8,7 @@ define(function(require) {
      */
     const EmailAttachmentModel = BaseModel.extend({
         defaults: {
+            index: null,
             id: null,
             type: '',
             title: '',

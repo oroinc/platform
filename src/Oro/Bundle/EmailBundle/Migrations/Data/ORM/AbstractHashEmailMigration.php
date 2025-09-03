@@ -34,24 +34,24 @@ abstract class AbstractHashEmailMigration extends AbstractEmailFixture
     #[\Override]
     protected function findExistingTemplate(ObjectManager $manager, array $template)
     {
-        if (empty($template['params']['name'])) {
+        if (empty($template['name'])) {
             return null;
         }
 
         return $manager->getRepository(EmailTemplate::class)->findOneBy([
-            'name' => $template['params']['name'],
-            'entityName' => $template['params']['entityName'] ?? null,
+            'name' => $template['name'],
+            'entityName' => $template['entityName'] ?? null,
         ]);
     }
 
     #[\Override]
-    protected function updateExistingTemplate(EmailTemplate $emailTemplate, array $template)
+    protected function updateExistingTemplate(EmailTemplate $emailTemplate, array $arrayData)
     {
         foreach ($this->getEmailHashesToUpdate() as $templateName => $contentHashes) {
             if ($emailTemplate->getName() === $templateName
                 && ($contentHashes === true || \in_array(md5($emailTemplate->getContent()), $contentHashes, true))
             ) {
-                parent::updateExistingTemplate($emailTemplate, $template);
+                parent::updateExistingTemplate($emailTemplate, $arrayData);
             }
         }
     }

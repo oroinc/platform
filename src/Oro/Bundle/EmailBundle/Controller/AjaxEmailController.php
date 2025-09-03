@@ -34,7 +34,7 @@ class AjaxEmailController extends AbstractController
     {
         $emailModel = $this->getEmailModelBuilder()->createEmailModel();
         $emailHandler = $this->getEmailModelHandler();
-        $form = $emailHandler->createForm(
+        $emailForm = $emailHandler->createForm(
             $emailModel,
             [
                 'csrf_protection' => false, // CSRF protection is enabled for the whole method.
@@ -42,12 +42,12 @@ class AjaxEmailController extends AbstractController
                 // a rendered email model.
             ]
         );
-        $emailHandler->handleRequest($form, $request);
+        $emailHandler->handleRequest($emailForm, $request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($emailForm->isSubmitted() && $emailForm->isValid()) {
             try {
                 // Builds form again using the submitted email model.
-                $emailHandler->createForm($emailModel);
+                $emailForm = $emailHandler->createForm($emailModel);
             } catch (EmailTemplateCompilationException $exception) {
                 return new JsonResponse(
                     [
@@ -60,11 +60,14 @@ class AjaxEmailController extends AbstractController
             }
         }
 
+        $attachmentsFormView = $emailForm->get('attachments')->createView();
+
         return new JsonResponse(
             [
                 'subject' => $emailModel->getSubject(),
                 'body' => $emailModel->getBody(),
                 'type' => $emailModel->getType(),
+                'attachments' => $attachmentsFormView->vars['entity_attachments_array'] ?? [],
             ],
             Response::HTTP_OK
         );

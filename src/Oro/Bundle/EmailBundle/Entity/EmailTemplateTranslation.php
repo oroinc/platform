@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Extend\Entity\Autocomplete\OroEmailBundle_Entity_EmailTemplateTranslation;
@@ -46,6 +48,26 @@ class EmailTemplateTranslation implements ExtendEntityInterface
 
     #[ORM\Column(name: 'content_fallback', type: Types::BOOLEAN, options: ['default' => true])]
     private ?bool $contentFallback = true;
+
+    /**
+     * @var Collection<EmailTemplateAttachment>
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'translation',
+        targetEntity: EmailTemplateAttachment::class,
+        cascade: ['persist', 'remove'],
+        fetch: 'EXTRA_LAZY',
+        orphanRemoval: true
+    )]
+    private Collection $attachments;
+
+    #[ORM\Column(name: 'attachments_fallback', type: Types::BOOLEAN, options: ['default' => true])]
+    private ?bool $attachmentsFallback = true;
+
+    public function __construct()
+    {
+        $this->attachments = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -115,6 +137,44 @@ class EmailTemplateTranslation implements ExtendEntityInterface
     public function setContentFallback(bool $contentFallback): self
     {
         $this->contentFallback = $contentFallback;
+        return $this;
+    }
+
+    /**
+     * @return Collection<EmailTemplateAttachment>
+     */
+    public function getAttachments(): Collection
+    {
+        return $this->attachments;
+    }
+
+    public function addAttachment(EmailTemplateAttachment $emailTemplateAttachment): self
+    {
+        if (!$this->attachments->contains($emailTemplateAttachment)) {
+            $this->attachments->add($emailTemplateAttachment);
+
+            $emailTemplateAttachment->setTranslation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAttachment(EmailTemplateAttachment $emailTemplateAttachment): self
+    {
+        $this->attachments->removeElement($emailTemplateAttachment);
+
+        return $this;
+    }
+
+    public function isAttachmentsFallback(): ?bool
+    {
+        return $this->attachmentsFallback;
+    }
+
+    public function setAttachmentsFallback(?bool $attachmentsFallback): self
+    {
+        $this->attachmentsFallback = $attachmentsFallback;
+
         return $this;
     }
 }

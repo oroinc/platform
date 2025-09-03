@@ -37,7 +37,8 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_email.provider.email_template'
             - '@oro_email.email_renderer'
-            - '@mailer'
+            - '@oro_email.factory.email_model_from_email_template'
+            - '@oro_email.sender.email_model_sender'
         tags:
             - { name: console.command }
 
@@ -52,11 +53,14 @@ services:
     Oro\Bundle\EmailBundle\Command\EmailTemplatesExportCommand:
         arguments:
             - '@Oro\Bundle\EntityBundle\ORM\DoctrineHelper'
+            - '@property_accessor'
         tags:
             - { name: console.command }
 
     Oro\Bundle\EmailBundle\Command\EmailTemplatesImportCommand:
         arguments:
             - '@Oro\Bundle\EntityBundle\ORM\DoctrineHelper'
+            - '@oro_email.email_template_hydrator.raw_data_parser'
+            - '@oro_email.email_template_hydrator.from_array'
         tags:
             - { name: console.command }

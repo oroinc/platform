@@ -39,6 +39,9 @@ oro:
             no_attachments:                      No available attachments
             thread_attachments:                  Thread Attachments
             record_attachments:                  Record Attachments
+            btn:
+                send: 'Send'
+                cancel: 'Cancel'
 
             tooltip:
                 attachment_sync:
@@ -166,6 +169,7 @@ oro:
             entity_name.tooltip: Choose an entity this template is related to or keep it empty if this template is not related to any entity.
             type.label:          Type
             translations.label: Email Template Translations
+            attachments.label: Attachments
             organization.label:  Organization
             visible.label:       Visible
 
@@ -217,11 +221,41 @@ oro:
             content_fallback.label: 'Fallback content'
             localization.label: 'Localization'
             template.label: 'Template'
+            attachments.label: 'Attachments'
+            attachments_fallback.label: 'Fallback attachments'
 
             form:
                 default_localization: 'Default'
                 use_parent_localization: 'Use %name% (Parent Localization)'
                 use_default_localization: 'Use Default Localization'
+
+        emailtemplateattachment:
+            entity_label: 'Email Template Attachment'
+            entity_plural_label: 'Email Template Attachments'
+            entity_grid_all_view_label: 'All %entity_plural_label%'
+
+            id.label: 'Id'
+            template.label: 'Template'
+            translation.label: 'Translation'
+            name:
+                label: 'Name'
+                description: 'The name of the attachment to be used in email template.'
+            content:
+                label: 'Content'
+                description: 'The content of the attachment to be used in email template.'
+            content_type:
+                label: 'Content Type'
+                description: 'The MIME type of the file to be used in email template.'
+            file:
+                label: 'File'
+                description: 'The file entity to be used in email template.'
+            file_placeholder:
+                label: 'File Placeholder'
+                description: 'The placeholder for the file to be used in email template.'
+                placeholder: 'Select a placeholder or upload a file'
+                choices:
+                    upload_file_group: '-'
+                    upload_file: 'Upload File'
 
         attachment:
             copy_to_record: Copy to Record

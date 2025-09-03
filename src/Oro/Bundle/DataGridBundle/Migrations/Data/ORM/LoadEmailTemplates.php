@@ -21,12 +21,12 @@ class LoadEmailTemplates extends AbstractEmailFixture implements VersionedFixtur
     #[\Override]
     protected function findExistingTemplate(ObjectManager $manager, array $template): ?EmailTemplate
     {
-        if (empty($template['params']['name'])) {
+        if (empty($template['name'])) {
             return null;
         }
 
         return $manager->getRepository(EmailTemplate::class)->findOneBy([
-            'name' => $template['params']['name']
+            'name' => $template['name']
         ]);
     }
 

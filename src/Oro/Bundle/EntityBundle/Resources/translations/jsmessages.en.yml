@@ -3,6 +3,7 @@ oro:
         field_choice:
             fields:           Fields
             relations:        Related entities
+            attachments:      Attachments
             none:             none
         form:
             choose_entity_field:    Choose a field...

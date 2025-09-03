@@ -17,16 +17,27 @@ define(function(require) {
             fields: {
                 subject: {
                     input: 'input[data-name="field__subject"]',
-                    fallback: 'input[data-name="field__subject-fallback"]'
+                    fallback: 'input[data-name="field__subject-fallback"]',
+                    syncValue: true
                 },
                 content: {
                     input: 'textarea[data-name="field__content"]',
-                    fallback: 'input[data-name="field__content-fallback"]'
+                    fallback: 'input[data-name="field__content-fallback"]',
+                    syncValue: true
+                },
+                attachments: {
+                    input: 'select[data-name="field__file-placeholder"], input[type="file"][data-name="field__file"]',
+                    fallback: 'input[data-name="field__attachments-fallback"]',
+                    syncValue: false
                 }
             }
         },
 
         fields: null,
+
+        events: {
+            'row-collection:updated': 'onContentAdded'
+        },
 
         /**
          * @inheritdoc
@@ -40,6 +51,7 @@ define(function(require) {
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
+            this.fields = {};
 
             mediator.on(
                 this.eventToParent('localized-template:field-change'),
@@ -53,50 +65,21 @@ define(function(require) {
                 this
             );
 
-            this.fields = {};
-            for (const fieldName in this.options.fields) {
-                if (this.options.fields.hasOwnProperty(fieldName)) {
-                    const field = {
-                        $input: this.$el.find(this.options.fields[fieldName].input),
-                        $fallback: this.$el.find(this.options.fields[fieldName].fallback)
-                    };
-
-                    this.fields[fieldName] = field;
-
-                    if (field.$fallback.length) {
-                        field.$fallback.on(
-                            'change' + this.eventNamespace(),
-                            this.processFallback.bind(this, fieldName)
-                        );
-                    }
-
-                    if (field.$input.length) {
-                        field.$input.on(
-                            'change' + this.eventNamespace(),
-                            this.onChangeInput.bind(this, fieldName)
-                        );
-                        // Re-rendering process when enable or disable tinyMCE
-                        field.$input.on('rendered', () => {
-                            this.operateWithEditor(fieldName, editor => {
-                                editor.on('Change', this.onChangeInput.bind(this, fieldName));
-                            });
-                            this.processFallback(fieldName);
-                        });
-
-                        this.operateWithEditor(fieldName, editor => {
-                            editor.on('Change', this.onChangeInput.bind(this, fieldName));
-                        });
-                    }
-
-                    this.processFallback(fieldName);
-                }
-            }
+            this.addFieldsEventHandlers();
 
             EmailTemplateLocalizationView.__super__.initialize.call(this, options);
         },
 
         /**
-         * Do any operations with tinyMCE editor if it is exists
+         * Event handler on item is added to a row collection
+         */
+        onContentAdded() {
+            this.removeFieldsEventHandlers();
+            this.addFieldsEventHandlers();
+        },
+
+        /**
+         * Do any operations with tinyMCE editor if it exists
          * @param fieldName
          * @param callback
          * @return {Object|null}
@@ -115,7 +98,7 @@ define(function(require) {
             const field = this.fields[fieldName];
 
             if (this.isFieldFallback(fieldName)) {
-                field.$input.attr('disabled', 'disabled');
+                field.$input.prop('disabled', 'disabled');
 
                 this.operateWithEditor(fieldName, editor => {
                     editor.mode.set('readonly');
@@ -136,6 +119,7 @@ define(function(require) {
 
                 this.onChangeInput(fieldName);
             }
+            field.$input.inputWidget('refresh');
         },
 
         onChangeInput: function(fieldName) {
@@ -147,8 +131,10 @@ define(function(require) {
         },
 
         onParentFieldChange: function(fieldName, content) {
-            if (this.isFieldFallback(fieldName)) {
-                this.fields[fieldName].$input.val(content);
+            if (this.isFieldFallback(fieldName) && this.fields[fieldName].syncValue) {
+                this.fields[fieldName].$input.filter((i, el) => {
+                    return $(el).attr('type') !== 'file';
+                }).val(content);
 
                 this.operateWithEditor(fieldName, editor => {
                     editor.setContent(content);
@@ -171,6 +157,65 @@ define(function(require) {
         },
 
         /**
+         * Collect fields and start listen to change events
+         */
+        addFieldsEventHandlers() {
+            this.removeFieldsEventHandlers();
+
+            this.fields = {};
+            for (const fieldName in this.options.fields) {
+                if (this.options.fields.hasOwnProperty(fieldName)) {
+                    const field = {
+                        $input: this.$el.find(this.options.fields[fieldName].input),
+                        $fallback: this.$el.find(this.options.fields[fieldName].fallback),
+                        syncValue: this.options.fields[fieldName].syncValue
+                    };
+
+                    this.fields[fieldName] = field;
+
+                    if (field.$fallback.length) {
+                        field.$fallback.on(
+                            'change' + this.eventNamespace(),
+                            this.processFallback.bind(this, fieldName)
+                        );
+                    }
+
+                    if (field.$input.length) {
+                        field.$input.on(
+                            'change' + this.eventNamespace(),
+                            this.onChangeInput.bind(this, fieldName)
+                        );
+                        // Re-rendering process when enable or disable tinyMCE
+                        field.$input.on('rendered', () => {
+                            this.operateWithEditor(fieldName, editor => {
+                                editor.on('change', this.onChangeInput.bind(this, fieldName));
+                            });
+                            this.processFallback(fieldName);
+                        });
+
+                        this.operateWithEditor(fieldName, editor => {
+                            editor.on('change', this.onChangeInput.bind(this, fieldName));
+                        });
+                    }
+
+                    this.processFallback(fieldName);
+                }
+            }
+        },
+
+        /**
+         * Remove event listeners
+         */
+        removeFieldsEventHandlers() {
+            for (const fieldName in this.fields) {
+                if (this.fields.hasOwnProperty(fieldName)) {
+                    this.fields[fieldName].$input.off(this.eventNamespace());
+                    this.fields[fieldName].$fallback.off(this.eventNamespace());
+                }
+            }
+        },
+
+        /**
          * @inheritdoc
          */
         dispose: function() {
@@ -178,14 +223,9 @@ define(function(require) {
                 return;
             }
 
-            for (const fieldName in this.fields) {
-                if (this.fields.hasOwnProperty(fieldName)) {
-                    this.fields[fieldName].$input.off(this.eventNamespace());
-                    this.fields[fieldName].$fallback.off(this.eventNamespace());
-                }
-            }
-
+            this.removeFieldsEventHandlers();
             mediator.off(null, null, this);
+            delete this.fields;
             EmailTemplateLocalizationView.__super__.dispose.call(this);
         }
     });
