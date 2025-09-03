@@ -76,6 +76,8 @@ The <info>--user-name</info>, <info>--user-email</info>, <info>--user-password</
 The <info>--user-firstname</info>, <info>--user-lastname</info> and <info>--user-role</info> options can be used to provide additional details:
 
   <info>php %command.full_name% --user-name=<username> --user-email=<email> --user-password=<password> --user-business-unit=<business-unit-id> --user-firstname=<firstname> --user-lastname=<lastname> --user-role=<role></info>
+  
+  <comment>If the Enable Username/Password Login feature is disabled, the <info>--user-password</info> option will be disabled.</comment>
 
 HELP
             )
@@ -90,6 +92,12 @@ HELP
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$this->featureChecker->isFeatureEnabled('user_login_password')
+            && $input->hasOption('user-password')
+        ) {
+            throw new InvalidArgumentException('--user-password option does not exist.');
+        }
+
         /** @var User $user */
         $user = $this->userManager->createUser();
         $user->setEnabled(true);

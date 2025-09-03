@@ -56,6 +56,8 @@ The <info>--user-name</info> option can be used to change the username.
 The provided value becomes the new username:
 
   <info>php %command.full_name% --user-name=<new-username> <old-username></info>
+  
+  <comment>If the Enable Username/Password Login feature is disabled, the <info>--user-password</info> option will be disabled.</comment>
 
 HELP
             )
@@ -71,6 +73,12 @@ HELP
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$this->featureChecker->isFeatureEnabled('user_login_password')
+            && $input->hasOption('user-password')
+        ) {
+            throw new InvalidArgumentException('--user-password option does not exist.');
+        }
+
         $username = $input->getArgument('user-name');
         /** @var User $user */
         $user     = $this->userManager->findUserByUsername($username);
