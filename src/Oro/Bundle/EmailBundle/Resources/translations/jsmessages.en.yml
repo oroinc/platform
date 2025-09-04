@@ -15,6 +15,10 @@ oro:
             apply_template_confirmation_title: Apply Template Confirmation
             apply_template_confirmation_content: The body content will be replaced by a template. Are you sure you want to proceed?
             cannot_insert_variable: Cannot insert variable, please put the cursor into the subject or the content of the template.
+        emailtemplateattachment:
+            file_placeholder:
+                choices:
+                    upload_file_group: '-'
         thread:
             load_error: Sorry, email thread was not loaded correctly.
             no_signature: You don't have a signature yet. Please add it in <a href="{{ url }}">My Configuration</a>.

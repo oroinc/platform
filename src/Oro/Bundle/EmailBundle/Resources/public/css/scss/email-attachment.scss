@@ -1,0 +1,48 @@
+/* @theme: admin.oro; */
+
+.email-attachment {
+    display: inline-flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    row-gap: $form-container-control-row-space / 2;
+
+    width: $select2-container-horizontal-width;
+    max-width: $select2-container-horizontal-max-width;
+
+    .control-group .controls:first-child {
+        margin-left: 0;
+    }
+}
+
+.row-oro.oro-multiselect-holder:has(.email-attachment) {
+    display: flex;
+    padding: 10px;
+    margin-bottom: $form-container-control-row-space;
+
+    background: $primary-900;
+    border-radius: $border-radius;
+
+    .removeRow {
+        margin-left: auto;
+    }
+}
+
+.emailtemplate-translatation-fields {
+    &:has([data-name='field__attachments-fallback']:checked) {
+        .email-template-collection {
+            display: inline-flex;
+
+            > .controls {
+                display: none;
+            }
+
+            + .control-group-checkbox {
+                display: inline-flex;
+
+                > .controls {
+                    margin-left: $form-horizontal-control-margin-start;
+                }
+            }
+        }
+    }
+}

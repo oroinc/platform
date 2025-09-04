@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Form\Type\OroBirthdayType;
 use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationsSelectType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -131,12 +132,20 @@ class UserTypeTest extends TestCase
 
         $requestStack = new RequestStack();
         $requestStack->push($request);
+
+        $featureChecker = $this->createMock(FeatureChecker::class);
+        $featureChecker->expects(self::any())
+            ->method('isFeatureEnabled')
+            ->with('user_login_password')
+            ->willReturn(true);
+
         $type = new UserType(
             $this->authorizationChecker,
             $this->tokenAccessor,
             $requestStack,
             $this->optionsProvider,
-            $this->rolesChoicesForUserProvider
+            $this->rolesChoicesForUserProvider,
+            $featureChecker
         );
         $type->buildForm($builder, []);
     }
@@ -208,12 +217,20 @@ class UserTypeTest extends TestCase
             ->method('setDefaults');
         $requestStack = new RequestStack();
         $requestStack->push(new Request());
+
+        $featureChecker = $this->createMock(FeatureChecker::class);
+        $featureChecker->expects(self::any())
+            ->method('isFeatureEnabled')
+            ->with('user_login_password')
+            ->willReturn(true);
+
         $type = new UserType(
             $this->authorizationChecker,
             $this->tokenAccessor,
             $requestStack,
             $this->optionsProvider,
-            $this->rolesChoicesForUserProvider
+            $this->rolesChoicesForUserProvider,
+            $featureChecker
         );
         $type->configureOptions($resolver);
     }

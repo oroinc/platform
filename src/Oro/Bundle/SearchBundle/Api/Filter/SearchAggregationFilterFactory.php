@@ -7,11 +7,9 @@ namespace Oro\Bundle\SearchBundle\Api\Filter;
  */
 class SearchAggregationFilterFactory
 {
-    private SearchFieldResolverFactory $searchFieldResolverFactory;
-
-    public function __construct(SearchFieldResolverFactory $searchFieldResolverFactory)
-    {
-        $this->searchFieldResolverFactory = $searchFieldResolverFactory;
+    public function __construct(
+        private readonly SearchFieldResolverFactoryInterface $searchFieldResolverFactory
+    ) {
     }
 
     /**

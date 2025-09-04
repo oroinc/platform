@@ -69,7 +69,7 @@ class MailboxType extends AbstractType
             'label'       => 'oro.email.mailbox.email.label',
             'constraints' => [
                 new NotNull(),
-                new Email(),
+                new Email(['mode' => Email::VALIDATION_MODE_STRICT]),
             ],
         ]);
 

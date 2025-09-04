@@ -12,6 +12,7 @@ use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 use Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingCacheNormalizer;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Test\Unit\SearchMappingTypeCastingHandlersTestTrait;
@@ -51,28 +52,28 @@ class ObjectMapperTest extends TestCase
         Manufacturer::class => [
             'fields' => [
                 [
-                    'name'        => 'name',
+                    'name' => 'name',
                     'target_type' => 'text'
                 ],
                 [
-                    'name'            => 'products',
-                    'relation_type'   => 'one-to-many',
+                    'name' => 'products',
+                    'relation_type' => 'one-to-many',
                     'relation_fields' => [
                         [   // test that 'target_fields' is set to ['products']
-                            'name'        => 'name',
+                            'name' => 'name',
                             'target_type' => 'text'
                         ],
                         [
-                            'name'            => 'categories',
-                            'relation_type'   => 'one-to-many',
+                            'name' => 'categories',
+                            'relation_type' => 'one-to-many',
                             'relation_fields' => [
                                 [   // test that 'target_fields' is set to ['categories']
-                                    'name'        => 'name',
+                                    'name' => 'name',
                                     'target_type' => 'text'
                                 ],
                                 [
-                                    'name'          => 'name',
-                                    'target_type'   => 'text',
+                                    'name' => 'name',
+                                    'target_type' => 'text',
                                     'target_fields' => ['category']
                                 ]
                             ]
@@ -80,83 +81,83 @@ class ObjectMapperTest extends TestCase
                     ]
                 ],
                 [
-                    'name'            => 'parent',
-                    'relation_type'   => 'one-to-many',
+                    'name' => 'parent',
+                    'relation_type' => 'one-to-many',
                     'relation_fields' => [
                         []
                     ]
                 ]
             ]
         ],
-        Product::class      => [
-            'alias'        => 'test_product',
-            'label'        => 'test product',
-            'route'        => [
-                'name'       => 'test_route',
+        Product::class => [
+            'alias' => 'test_product',
+            'label' => 'test product',
+            'route' => [
+                'name' => 'test_route',
                 'parameters' => [
                     'id' => 'id'
                 ]
             ],
-            'fields'       => [
+            'fields' => [
                 [
-                    'name'          => 'name',
-                    'target_type'   => 'text',
+                    'name' => 'name',
+                    'target_type' => 'text',
                     'target_fields' => ['name', 'all_data']
                 ],
                 [
-                    'name'          => 'description',
-                    'target_type'   => 'text',
+                    'name' => 'description',
+                    'target_type' => 'text',
                     'target_fields' => ['description', 'all_data']
                 ],
                 [
-                    'name'          => 'price',
-                    'target_type'   => 'decimal',
+                    'name' => 'price',
+                    'target_type' => 'decimal',
                     'target_fields' => ['price']
                 ],
                 [
-                    'name'          => 'createDate',
-                    'target_type'   => 'datetime',
+                    'name' => 'createDate',
+                    'target_type' => 'datetime',
                     'target_fields' => ['createDate']
                 ],
                 [   // test that 'target_fields' is set to ['count']
-                    'name'        => 'count',
+                    'name' => 'count',
                     'target_type' => 'integer'
                 ],
                 [
-                    'name'            => 'manufacturer',
-                    'relation_type'   => 'many-to-one',
+                    'name' => 'manufacturer',
+                    'relation_type' => 'many-to-one',
                     'relation_fields' => [
                         [
-                            'name'          => 'name',
-                            'target_type'   => 'text',
+                            'name' => 'name',
+                            'target_type' => 'text',
                             'target_fields' => ['manufacturer', 'all_data']
                         ]
                     ]
                 ]
             ]
         ],
-        Category::class     => [
+        Category::class => [
             'fields' => [
                 [
-                    'name'          => 'name',
-                    'target_type'   => 'text',
+                    'name' => 'name',
+                    'target_type' => 'text',
                     'target_fields' => ['name']
                 ],
                 [
-                    'name'            => 'products',
-                    'relation_type'   => 'many-to-many',
+                    'name' => 'products',
+                    'relation_type' => 'many-to-many',
                     'relation_fields' => [
                         [   // test that 'target_fields' is set to ['products']
-                            'name'        => 'name',
+                            'name' => 'name',
                             'target_type' => 'text'
                         ],
                         [
-                            'name'            => 'manufacturer',
-                            'relation_type'   => 'one-to-one',
+                            'name' => 'manufacturer',
+                            'relation_type' => 'one-to-one',
                             'relation_fields' => [
                                 [
-                                    'name'          => 'name',
-                                    'target_type'   => 'text',
+                                    'name' => 'name',
+                                    'target_type' => 'text',
                                     'target_fields' => ['manufacturers']
                                 ]
                             ]
@@ -203,7 +204,7 @@ class ObjectMapperTest extends TestCase
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->nameResolver = $this->createMock(EntityNameResolver::class);
-        $this->nameResolver->expects($this->any())
+        $this->nameResolver->expects(self::any())
             ->method('getName')
             ->with($this->isType('object'), EntityNameProviderInterface::FULL)
             ->willReturnCallback(function ($entity) {
@@ -211,7 +212,7 @@ class ObjectMapperTest extends TestCase
             });
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects(self::any())
             ->method('getSingleEntityIdentifier')
             ->with($this->isType('object'))
             ->willReturnCallback(function ($entity) {
@@ -219,36 +220,37 @@ class ObjectMapperTest extends TestCase
             });
 
         $configProvider = $this->createMock(MappingConfigurationProvider::class);
-        $configProvider->expects($this->any())
+        $configProvider->expects(self::any())
             ->method('getConfiguration')
             ->willReturn($this->mappingConfig);
         $cache = $this->createMock(CacheItemPoolInterface::class);
         $cacheItem = $this->createMock(CacheItemInterface::class);
-        $cache->expects($this->any())
+        $cache->expects(self::any())
             ->method('getItem')
             ->willReturn($cacheItem);
-        $cacheItem->expects($this->any())
+        $cacheItem->expects(self::any())
             ->method('isHit')
             ->willReturn(false);
-        $cacheItem->expects($this->any())
+        $cacheItem->expects(self::any())
             ->method('set')
             ->willReturn($cacheItem);
         $this->mappingProvider = new SearchMappingProvider(
             $this->dispatcher,
             $configProvider,
             $cache,
+            new SearchMappingCacheNormalizer([], [], 'target_type'),
             'test',
             'test',
             'test'
         );
 
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
-        $this->htmlTagHelper->expects($this->any())
+        $this->htmlTagHelper->expects(self::any())
             ->method('stripTags')
             ->willReturnCallback(function ($value) {
                 return trim(strip_tags($value));
             });
-        $this->htmlTagHelper->expects($this->any())
+        $this->htmlTagHelper->expects(self::any())
             ->method('stripLongWords')
             ->willReturnCallback(function ($value) {
                 $words = preg_split('/\s+/', $value);
@@ -289,12 +291,12 @@ class ObjectMapperTest extends TestCase
         $allTextData = sprintf('%s %s %s', $productName, $productDescription, $manufacturerName);
 
         $expectedMapping = [
-            'text'    => $this->clearTextData([
-                Indexer::NAME_FIELD          => $productName,
-                'name'                       => $productName,
-                'description'                => $productDescription,
-                'manufacturer'               => $manufacturerName,
-                'all_data'                   => $allTextData,
+            'text' => $this->clearTextData([
+                Indexer::NAME_FIELD => $productName,
+                'name' => $productName,
+                'description' => $productDescription,
+                'manufacturer' => $manufacturerName,
+                'all_data' => $allTextData,
                 Indexer::TEXT_ALL_DATA_FIELD => $allTextData,
             ]),
             'decimal' => [
@@ -302,14 +304,14 @@ class ObjectMapperTest extends TestCase
             ],
             'integer' => [
                 'system_entity_id' => self::TEST_ID,
-                'count'            => $this->product->getCount(),
+                'count' => $this->product->getCount(),
             ],
             'datetime' => [
                 'createDate' => $this->product->getCreateDate()
             ]
         ];
 
-        $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
+        self::assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
     }
 
     public function testAllTextLimitation(): void
@@ -330,13 +332,13 @@ class ObjectMapperTest extends TestCase
         $allTextData = sprintf('%s %s %s', $expectedProductName, $productDescription, $manufacturerName);
 
         $expectedMapping = [
-            'text'    => $this->clearTextData(
+            'text' => $this->clearTextData(
                 [
-                    Indexer::NAME_FIELD          => $productName,
-                    'name'                       => $productName,
-                    'description'                => $productDescription,
-                    'manufacturer'               => $manufacturerName,
-                    'all_data'                   => $allData,
+                    Indexer::NAME_FIELD => $productName,
+                    'name' => $productName,
+                    'description' => $productDescription,
+                    'manufacturer' => $manufacturerName,
+                    'all_data' => $allData,
                     Indexer::TEXT_ALL_DATA_FIELD => $allTextData
                 ]
             ),
@@ -345,7 +347,7 @@ class ObjectMapperTest extends TestCase
             ],
             'integer' => [
                 'system_entity_id' => self::TEST_ID,
-                'count'            => $this->product->getCount(),
+                'count' => $this->product->getCount(),
             ],
             'datetime' => [
                 'createDate' => $this->product->getCreateDate()
@@ -356,7 +358,7 @@ class ObjectMapperTest extends TestCase
             ->setName($productName)
             ->setDescription($productDescription);
 
-        $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
+        self::assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
     }
 
     public function testNullFieldValues(): void
@@ -373,10 +375,10 @@ class ObjectMapperTest extends TestCase
         $expectedMapping = [
             'text' => $this->clearTextData(
                 [
-                    Indexer::NAME_FIELD          => '',
-                    'description'                => $this->product->getDescription(),
-                    'manufacturer'               => $this->product->getManufacturer()->getName(),
-                    'all_data'                   => $allTextData,
+                    Indexer::NAME_FIELD => '',
+                    'description' => $this->product->getDescription(),
+                    'manufacturer' => $this->product->getManufacturer()->getName(),
+                    'all_data' => $allTextData,
                     Indexer::TEXT_ALL_DATA_FIELD => $allTextData
                 ]
             ),
@@ -388,7 +390,7 @@ class ObjectMapperTest extends TestCase
             ]
         ];
 
-        $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
+        self::assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
     }
 
     public function testZeroNumberAndEmptyStringFieldValues(): void
@@ -403,12 +405,12 @@ class ObjectMapperTest extends TestCase
             $this->product->getManufacturer()->getName()
         );
         $expectedMapping = [
-            'text'    => $this->clearTextData(
+            'text' => $this->clearTextData(
                 [
-                    Indexer::NAME_FIELD          => '',
-                    'description'                => $this->product->getDescription(),
-                    'manufacturer'               => $this->product->getManufacturer()->getName(),
-                    'all_data'                   => $allTextData,
+                    Indexer::NAME_FIELD => '',
+                    'description' => $this->product->getDescription(),
+                    'manufacturer' => $this->product->getManufacturer()->getName(),
+                    'all_data' => $allTextData,
                     Indexer::TEXT_ALL_DATA_FIELD => $allTextData
                 ]
             ),
@@ -417,14 +419,14 @@ class ObjectMapperTest extends TestCase
             ],
             'integer' => [
                 'system_entity_id' => self::TEST_ID,
-                'count'            => 0,
+                'count' => 0,
             ],
             'datetime' => [
                 'createDate' => $this->product->getCreateDate()
             ]
         ];
 
-        $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
+        self::assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
     }
 
     /**
@@ -441,11 +443,11 @@ class ObjectMapperTest extends TestCase
 
         $expectedMapping = [
             'text' => $this->clearTextData([
-                Indexer::NAME_FIELD          => $this->manufacturer->getName(),
-                'name'                       => '<p>adidas</p>',
-                'products'                   => $productName,
-                'categories'                 => implode(' ', $this->categories),
-                'category'                   => implode(' ', $this->categories),
+                Indexer::NAME_FIELD => $this->manufacturer->getName(),
+                'name' => '<p>adidas</p>',
+                'products' => $productName,
+                'categories' => implode(' ', $this->categories),
+                'category' => implode(' ', $this->categories),
                 Indexer::TEXT_ALL_DATA_FIELD => sprintf(
                     '%s %s %s',
                     $this->manufacturer->getName(),
@@ -457,7 +459,7 @@ class ObjectMapperTest extends TestCase
                 'system_entity_id' => $this->manufacturer->getId(),
             ],
         ];
-        $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->manufacturer));
+        self::assertEquals($expectedMapping, $this->mapper->mapObject($this->manufacturer));
     }
 
     /**
@@ -474,22 +476,22 @@ class ObjectMapperTest extends TestCase
 
         $expectedMapping = [
             'text' => $this->clearTextData([
-                Indexer::NAME_FIELD          => $categoryName,
-                'name'                       => $categoryName,
-                'products'                   => $productName,
-                'manufacturers'              => $manufacturerName,
+                Indexer::NAME_FIELD => $categoryName,
+                'name' => $categoryName,
+                'products' => $productName,
+                'manufacturers' => $manufacturerName,
                 Indexer::TEXT_ALL_DATA_FIELD => $categoryName . ' ' . $productName . ' ' . $manufacturerName
             ]),
             'integer' => [
                 'system_entity_id' => $this->category->getId(),
             ],
         ];
-        $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->category));
+        self::assertEquals($expectedMapping, $this->mapper->mapObject($this->category));
     }
 
     public function testMapObjectForNull(): void
     {
-        $this->assertEquals([], $this->mapper->mapObject(null));
+        self::assertEquals([], $this->mapper->mapObject(null));
     }
 
     public function testMapObjectForNullFieldsAndManyToOneRelation(): void
@@ -500,16 +502,16 @@ class ObjectMapperTest extends TestCase
 
         $expectedMapping = [
             'text' => [
-                Indexer::NAME_FIELD          => $product->getName(),
-                'name'                       => $product->getName(),
-                'all_data'                   => $product->getName(),
+                Indexer::NAME_FIELD => $product->getName(),
+                'name' => $product->getName(),
+                'all_data' => $product->getName(),
                 Indexer::TEXT_ALL_DATA_FIELD => $product->getName()
             ],
             'integer' => [
                 'system_entity_id' => $product->getId(),
             ],
         ];
-        $this->assertEquals($expectedMapping, $this->mapper->mapObject($product));
+        self::assertEquals($expectedMapping, $this->mapper->mapObject($product));
     }
 
     public function testMapObjectForNullManyToManyRelation(): void
@@ -520,15 +522,15 @@ class ObjectMapperTest extends TestCase
 
         $expectedMapping = [
             'text' => [
-                Indexer::NAME_FIELD          => $category->getName(),
-                'name'                       => $category->getName(),
+                Indexer::NAME_FIELD => $category->getName(),
+                'name' => $category->getName(),
                 Indexer::TEXT_ALL_DATA_FIELD => $category->getName()
             ],
             'integer' => [
                 'system_entity_id' => $category->getId(),
             ],
         ];
-        $this->assertEquals($expectedMapping, $this->mapper->mapObject($category));
+        self::assertEquals($expectedMapping, $this->mapper->mapObject($category));
     }
 
     /**
@@ -542,7 +544,7 @@ class ObjectMapperTest extends TestCase
         $product->setName('test product');
         $product->setDescription('short description');
 
-        $this->dispatcher->expects($this->exactly(2))
+        $this->dispatcher->expects(self::exactly(2))
             ->method('dispatch')
             ->withConsecutive(
                 [$this->isInstanceOf(SearchMappingCollectEvent::class)],
@@ -564,7 +566,7 @@ class ObjectMapperTest extends TestCase
 
         $mapping = $this->mapper->mapObject($product);
 
-        $this->assertEquals(
+        self::assertEquals(
             'custom text test product with changed title short description',
             $mapping[Query::TYPE_TEXT][Indexer::TEXT_ALL_DATA_FIELD]
         );
@@ -574,22 +576,22 @@ class ObjectMapperTest extends TestCase
     {
         $data = $this->mapper->getEntitiesListAliases();
 
-        $this->assertEquals('test_product', $data[Product::class]);
+        self::assertEquals('test_product', $data[Product::class]);
     }
 
     public function testGetMappingConfig(): void
     {
-        $this->assertEquals($this->mappingConfig, $this->mapper->getMappingConfig());
+        self::assertEquals($this->mappingConfig, $this->mapper->getMappingConfig());
     }
 
     public function testGetEntityMapParameter(): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             'test_product',
             $this->mapper->getEntityMapParameter(Product::class, 'alias')
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             false,
             $this->mapper->getEntityMapParameter(Product::class, 'non exists parameter')
         );
@@ -598,49 +600,49 @@ class ObjectMapperTest extends TestCase
     public function testGetEntities(): void
     {
         $entities = $this->mapper->getEntities();
-        $this->assertEquals(Product::class, $entities[1]);
+        self::assertEquals(Product::class, $entities[1]);
     }
 
     public function testNonExistsConfig(): void
     {
-        $this->assertEquals([], $this->mapper->getEntityConfig('non exists entity'));
+        self::assertEquals([], $this->mapper->getEntityConfig('non exists entity'));
     }
 
     public function testSelectedData(): void
     {
         $query = $this->createMock(Query::class);
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('getSelectDataFields')
             ->willReturn([
-                'text.sku'             => 'sku',
-                'text.defaultName'     => 'defaultName',
+                'text.sku' => 'sku',
+                'text.defaultName' => 'defaultName',
                 'integer.integerField' => 'integerValue',
                 'decimal.decimalField' => 'decimalValue',
-                'datetime.updated'     => 'updatedAt',
-                'notExistingField'     => 'notExistingField'
+                'datetime.updated' => 'updatedAt',
+                'notExistingField' => 'notExistingField'
             ]);
 
         $item = [
-            'item'         => [
-                'id'       => 50,
+            'item' => [
+                'id' => 50,
                 'recordId' => 29
             ],
-            'sku'          => '2GH80',
-            'defaultName'  => 'Example Headlamp',
+            'sku' => '2GH80',
+            'defaultName' => 'Example Headlamp',
             'integerField' => '42',
             'decimalField' => '12.34',
-            'updated'      => new \DateTime('2022-12-12 12:13:14', new \DateTimeZone('UTC')),
+            'updated' => new \DateTime('2022-12-12 12:13:14', new \DateTimeZone('UTC')),
         ];
 
         $result = $this->mapper->mapSelectedData($query, $item);
 
-        $this->assertSame(
+        self::assertSame(
             [
-                'sku'              => '2GH80',
-                'defaultName'      => 'Example Headlamp',
-                'integerValue'     => 42,
-                'decimalValue'     => 12.34,
-                'updatedAt'        => '2022-12-12 12:13:14',
+                'sku' => '2GH80',
+                'defaultName' => 'Example Headlamp',
+                'integerValue' => 42,
+                'decimalValue' => 12.34,
+                'updatedAt' => '2022-12-12 12:13:14',
                 'notExistingField' => '',
             ],
             $result
@@ -652,10 +654,10 @@ class ObjectMapperTest extends TestCase
         $allData = '';
 
         $allData = $this->mapper->buildAllDataField($allData, 'first second');
-        $this->assertEquals('first second', $allData);
+        self::assertEquals('first second', $allData);
 
         $allData = $this->mapper->buildAllDataField($allData, 'second third');
-        $this->assertEquals('first second third', $allData);
+        self::assertEquals('first second third', $allData);
     }
 
     protected function clearTextData(array $fields): array

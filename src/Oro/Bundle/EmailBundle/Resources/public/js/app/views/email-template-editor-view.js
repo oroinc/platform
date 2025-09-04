@@ -6,13 +6,16 @@ define(function(require) {
     const __ = require('orotranslation/js/translator');
     const BaseView = require('oroui/js/app/views/base/view');
     const DialogWidget = require('oro/dialog-widget');
+    const routing = require('routing');
+    const mediator = require('oroui/js/mediator');
 
     const EmailTemplateEditorView = BaseView.extend({
         options: {
             typeSwitcher: 'input[name*="type"]', // type (Html or Plain) switcher selector
             hasWysiwyg: false, // is wysiwyg editor enabled in System->Configuration
             isWysiwygEnabled: false, // true if 'type' is set to 'Html'
-            emailVariableView: {} // link to app/views/email-variable-view
+            emailVariableView: {}, // link to app/views/email-variable-view
+            getAttachmentsRoute: 'oro_email_emailtemplate_ajax_get_attachment_choices'
         },
 
         listen: {
@@ -21,8 +24,19 @@ define(function(require) {
 
         events: {
             'change input[name*=type]': '_onTypeChange',
+            'change select[name*=entityName]': '_onEntityNameChange',
             'click .dialog-form-renderer': '_onPreview'
         },
+
+        /**
+         * @property {jQuery.Element|null}
+         */
+        $entityNameEl: null,
+
+        /**
+         * @property {Array|null}
+         */
+        attachmentChoices: null,
 
         /**
          * @inheritdoc
@@ -38,12 +52,13 @@ define(function(require) {
             EmailTemplateEditorView.__super__.initialize.call(this, options);
 
             this.options = _.defaults(options || {}, this.options);
+            this.$entityNameEl = this.$el.find(':input[data-name="field__entity-name"]');
 
             this.render();
         },
 
         render: function() {
-            this.initLayout().then(this.afterLayoutInit.bind(this));
+            this.initLayout({emailTemplateEditorView: this}).then(this.afterLayoutInit.bind(this));
         },
 
         afterLayoutInit: function() {
@@ -168,6 +183,60 @@ define(function(require) {
                     this.listenToOnce(view, 'TinyMCE:initialized', this._onEditorBlur.bind(this));
                 }
             });
+        },
+
+        _onEntityNameChange: function() {
+            this.reloadAttachmentChoices();
+        },
+
+        reloadAttachmentChoices: function() {
+            const entityName = this.$entityNameEl.val();
+            if (!entityName) {
+                this.attachmentChoices = [];
+                this.trigger('attachments:choices:loaded', {choices: this.attachmentChoices});
+
+                return;
+            }
+
+            mediator.execute('showLoading');
+            $.post(
+                routing.generate(this.options.getAttachmentsRoute, {entityName: entityName})
+            ).done(response => {
+                if (this.disposed) {
+                    return;
+                }
+
+                if (!response.successful) {
+                    return;
+                }
+
+                this.attachmentChoices = response.choices || [];
+
+                this.trigger('attachments:choices:loaded', {choices: this.attachmentChoices});
+            }).always(() => {
+                mediator.execute('hideLoading');
+            });
+        },
+
+        /**
+         * @returns {Array<{value: string, label: string}>|null} List of available attachments choices or null
+         *  if choices are not loaded.
+         */
+        getAttachmentChoices() {
+            return this.attachmentChoices;
+        },
+
+        /**
+         * @inheritdoc
+         */
+        dispose() {
+            if (this.disposed) {
+                return;
+            }
+
+            delete this.attachmentChoices;
+
+            EmailTemplateEditorView.__super__.dispose.call(this);
         }
     });
 

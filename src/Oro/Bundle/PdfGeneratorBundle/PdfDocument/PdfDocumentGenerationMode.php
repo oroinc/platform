@@ -14,4 +14,6 @@ class PdfDocumentGenerationMode
     public const string INSTANT = 'instant';
     // Deferred generation mode: PDF documents are generated when explicitly requested, e.g. via controller.
     public const string DEFERRED = 'deferred';
+    // External generation mode: PDF documents are generated externally to be explicitly uploaded to the application.
+    public const string EXTERNAL = 'external';
 }

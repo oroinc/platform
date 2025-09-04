@@ -131,10 +131,6 @@ define(function(require) {
          * @private
          */
         _retrieveEntityData: function(e) {
-            if (!this._isInMode(this.MODE_EDIT) || !e.val) {
-                return;
-            }
-
             const route = routing.generate(this.editRoute, {id: e.val});
 
             this._setLoading(true);
@@ -211,47 +207,35 @@ define(function(require) {
          */
         _setNewEntityForm: function(data) {
             const $data = $(data);
-            /*
-             * For each input element in added form, create new name to match naming scheme.
-             */
-            $data.find(':input').each((index, element) => {
-                const $element = $(element);
-                let inputName = $element.attr('name');
-                inputName = inputName.substr(inputName.indexOf('['));
 
-                let $modifiedField = this.$newEntity.find('[name$="' + inputName + '"]');
-
-                if ($element.is(':checkbox') || $element.is(':radio')) {
-                    $modifiedField = this.$newEntity.find(
-                        '[name$="' + inputName + '"][value="' + $element.val() + '"]'
-                    );
-                    $modifiedField.prop('checked', $element.is(':checked')).trigger('change');
-                } else {
-                    const editor = tinyMCE.get($modifiedField.attr('id'));
-                    if (editor) {
-                        editor.setContent($element.val());
-                    } else {
-                        $modifiedField.val($element.val()).trigger('change');
+            this.$newEntity.trigger('content:remove');
+            this.$newEntity.html($data);
+            this.$newEntity.trigger('content:changed', {
+                onInitialized: () => {
+                    if (!this.disabledEditForm || this._isInMode(this.MODE_CREATE)) {
+                        return;
                     }
+
+                    this.$newEntity.find(':input').each(function() {
+                        const $input = $(this);
+                        const editor = tinyMCE.get($input.attr('id'));
+
+                        $input.data('saved-disabled', $input.prop('disabled'));
+                        $input.prop('disabled', true);
+
+                        if (editor && !$input.data('saved-disabled')) {
+                            editor.mode.set('readonly');
+                            $(editor.editorContainer).addClass('disabled');
+                            $(editor.editorContainer).children('.disabled-overlay').remove();
+                            $(editor.editorContainer).append('<div class="disabled-overlay"></div>');
+                        }
+
+                        $input.inputWidget('refresh');
+                    });
+
+                    this.$newEntity.find('.add-list-item').addClass('hide');
                 }
             });
-
-            if (this.disabledEditForm) {
-                this.$newEntity.find(':input').each(function() {
-                    const $input = $(this);
-                    const editor = tinyMCE.get($input.attr('id'));
-
-                    $input.data('saved-disabled', $input.prop('disabled'));
-                    $input.prop('disabled', true);
-
-                    if (editor && !$input.data('saved-disabled')) {
-                        editor.mode.set('readonly');
-                        $(editor.editorContainer).addClass('disabled');
-                        $(editor.editorContainer).children('.disabled-overlay').remove();
-                        $(editor.editorContainer).append('<div class="disabled-overlay"></div>');
-                    }
-                });
-            }
         },
 
         /**

@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Exports email templates
@@ -24,11 +25,14 @@ class EmailTemplatesExportCommand extends Command
 {
     private DoctrineHelper $doctrineHelper;
 
-    public function __construct(DoctrineHelper $doctrineHelper)
+    private PropertyAccessorInterface $propertyAccessor;
+
+    public function __construct(DoctrineHelper $doctrineHelper, PropertyAccessorInterface $propertyAccessor)
     {
         parent::__construct();
 
         $this->doctrineHelper = $doctrineHelper;
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     #[\Override]
@@ -53,15 +57,22 @@ class EmailTemplatesExportCommand extends Command
         $templates = $this->getEmailTemplates($input->getOption('template'));
         $output->writeln(sprintf('Found %d templates for export', count($templates)));
 
-        /** @var EmailTemplate $template */
         foreach ($templates as $template) {
+            $templateMetadata = [];
+            foreach (['name', 'entityName', 'subject', 'attachments', 'isSystem', 'isEditable'] as $property) {
+                $value = $this->propertyAccessor->getValue($template, $property);
+                if (is_iterable($value)) {
+                    if ($value instanceof \Traversable) {
+                        $value = iterator_to_array($value);
+                    }
+                    $value = json_encode(array_map(static fn ($each) => (string)$each, $value), JSON_THROW_ON_ERROR);
+                }
+                $templateMetadata[] = '@' . $property . ' = ' . $value;
+            }
+
             $content = sprintf(
-                "@name = %s\n@entityName = %s\n@subject = %s\n@isSystem = %d\n@isEditable = %d\n\n%s",
-                $template->getName(),
-                $template->getEntityName(),
-                $template->getSubject(),
-                $template->getIsSystem(),
-                $template->getIsEditable(),
+                "%s\n\n%s",
+                implode("\n", $templateMetadata),
                 $template->getContent()
             );
 

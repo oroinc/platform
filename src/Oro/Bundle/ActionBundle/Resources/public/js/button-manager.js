@@ -102,7 +102,15 @@ define(function(require) {
         },
 
         hasConfirmDialog: function() {
-            return !_.isEmpty(this.options.confirmation) || !_.isEmpty(this.options.message);
+            if (_.isEmpty(this.options.confirmation) && _.isEmpty(this.options.message)) {
+                return false;
+            }
+
+            if (this.options.confirmation.hasOwnProperty('enabled') && !this.options.confirmation.enabled) {
+                return false;
+            }
+
+            return true;
         },
 
         /**

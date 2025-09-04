@@ -10,18 +10,11 @@ use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
  */
 class SearchQueryFilterFactory
 {
-    private AbstractSearchMappingProvider $searchMappingProvider;
-    private SearchFieldResolverFactory $searchFieldResolverFactory;
-    private ?ExpressionVisitor $searchQueryCriteriaVisitor;
-
     public function __construct(
-        AbstractSearchMappingProvider $searchMappingProvider,
-        SearchFieldResolverFactory $searchFieldResolverFactory,
-        ?ExpressionVisitor $searchQueryCriteriaVisitor = null
+        private readonly AbstractSearchMappingProvider $searchMappingProvider,
+        private readonly SearchFieldResolverFactoryInterface $searchFieldResolverFactory,
+        private readonly ?ExpressionVisitor $searchQueryCriteriaVisitor = null
     ) {
-        $this->searchMappingProvider = $searchMappingProvider;
-        $this->searchFieldResolverFactory = $searchFieldResolverFactory;
-        $this->searchQueryCriteriaVisitor = $searchQueryCriteriaVisitor;
     }
 
     /**

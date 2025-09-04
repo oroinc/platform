@@ -6,6 +6,7 @@ services:
         arguments:
             - '@oro_user.manager'
             - '@doctrine.orm.entity_manager'
+            - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: console.command }
 

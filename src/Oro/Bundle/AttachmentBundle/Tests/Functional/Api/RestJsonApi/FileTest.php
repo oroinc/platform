@@ -20,21 +20,21 @@ class FileTest extends RestJsonApiTestCase
     private const string BLANK_FILE_CONTENT = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA'
         . '1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII=';
 
-    private string $externalFileAllowedUrlsRegExp;
+    private string $initialExternalFileAllowedUrlsRegExp;
 
     #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
         $this->loadFixtures([LoadUser::class, LoadFileData::class]);
-        $this->externalFileAllowedUrlsRegExp = self::getConfigManager()
+        $this->initialExternalFileAllowedUrlsRegExp = self::getConfigManager()
             ->get('oro_attachment.external_file_allowed_urls_regexp');
     }
 
     #[\Override]
     protected function tearDown(): void
     {
-        $this->setExternalFileAllowedUrlsRegExp($this->externalFileAllowedUrlsRegExp);
+        $this->setExternalFileAllowedUrlsRegExp($this->initialExternalFileAllowedUrlsRegExp);
         $this->setIsStoredExternally(false);
         parent::tearDown();
     }

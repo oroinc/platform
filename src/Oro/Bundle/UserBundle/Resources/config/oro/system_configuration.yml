@@ -1,13 +1,23 @@
 system_configuration:
     groups:
         user_settings:
-            icon:  fa-key
+            icon:  fa-user
             title: oro.user.system_configuration.groups.user_settings.title
         password_complexity_rules:
             icon:  fa-usd
             title: oro.user.system_configuration.groups.password_complexity_rules.title
+#            options:
+#                attr:
+#                    'data-depends-on-field': 'user_login_password'
         email_settings:
             title: oro.user.system_configuration.groups.email_settings.title
+        login_options:
+            title: oro.user.system_configuration.groups.login_options.label
+            icon:  fa-key
+        user_login_form:
+            title: oro.user.system_configuration.groups.user_login_form.title
+            description: oro.user.system_configuration.groups.user_login_form.description
+            description_style: warning
     fields:
         oro_user.password_min_length:
             data_type: integer
@@ -23,6 +33,8 @@ system_configuration:
                         min: 1
                     - Type:
                         type: integer
+                attr:
+                    'data-depends-on-field': 'user_login_password'
 
         oro_user.password_numbers:
             data_type: boolean
@@ -31,6 +43,8 @@ system_configuration:
             options:
                 label: oro.user.system_configuration.fields.password_numbers.label
                 required: false
+                attr:
+                    'data-depends-on-field': 'user_login_password'
 
         oro_user.password_lower_case:
             data_type: boolean
@@ -39,6 +53,8 @@ system_configuration:
             options:
                 label: oro.user.system_configuration.fields.password_lower_case.label
                 required: false
+                attr:
+                    'data-depends-on-field': 'user_login_password'
 
         oro_user.password_upper_case:
             data_type: boolean
@@ -47,6 +63,8 @@ system_configuration:
             options:
                 label: oro.user.system_configuration.fields.password_upper_case.label
                 required: false
+                attr:
+                    'data-depends-on-field': 'user_login_password'
 
         oro_user.password_special_chars:
             data_type: boolean
@@ -56,6 +74,8 @@ system_configuration:
                 label: oro.user.system_configuration.fields.password_special_chars.label
                 tooltip: oro.user.system_configuration.fields.password_special_chars.tooltip
                 required: false
+                attr:
+                    'data-depends-on-field': 'user_login_password'
 
         oro_user.send_password_in_invitation_email:
             data_type: boolean
@@ -76,6 +96,16 @@ system_configuration:
                 resettable: false
                 constraints:
                     - Oro\Bundle\UserBundle\Validator\Constraints\EmailCaseInsensitiveOption: ~
+        oro_user.user_login_password:
+            data_type: boolean
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
+            options:
+                label: oro.user.system_configuration.fields.user_login_password.label
+                tooltip: oro.user.system_configuration.fields.user_login_password.tooltip
+                required: false
+                attr:
+                    'data-page-component-module': 'orouser/js/components/config-single-unit-component'
+                    'data-dependency-id': 'user_login_password'
 
     tree:
         system_configuration:
@@ -86,6 +116,15 @@ system_configuration:
                             user_settings:
                                 priority: 100
                                 children:
+                                    email_settings:
+                                        children:
+                                            - oro_user.case_insensitive_email_addresses_enabled
+                            login_options:
+                                priority: 100
+                                children:
+                                    user_login_form:
+                                        children:
+                                            - oro_user.user_login_password
                                     password_complexity_rules:
                                         children:
                                             - oro_user.password_min_length
@@ -95,6 +134,3 @@ system_configuration:
                                             - oro_user.password_special_chars
                                             # The backend user should not be able to enable this option in the UI
                                             #- oro_user.send_password_in_invitation_email
-                                    email_settings:
-                                        children:
-                                            - oro_user.case_insensitive_email_addresses_enabled

@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SearchBundle\Query\Expression;
 
+/**
+ * Represents a search query token.
+ */
 class Token
 {
     public $value;
@@ -19,7 +22,7 @@ class Token
     /**
      * Constructor.
      *
-     * @param int    $type   The type of the token
+     * @param string $type   The type of the token
      * @param string $value  The token value
      * @param int    $cursor The cursor position in the source
      */
@@ -44,7 +47,7 @@ class Token
     /**
      * Tests the current token for a type and/or a value.
      *
-     * @param array|int   $type  The type to test
+     * @param string      $type  The type to test
      * @param string|null $value The token value
      *
      * @return bool

@@ -18,6 +18,8 @@ Oro\Bundle\EmailBundle\Entity\EmailTemplate:
             - NotBlank: ~
         translations:
             - Valid: ~
+        attachments:
+            - Valid: ~
 
 Oro\Bundle\EmailBundle\Form\Model\Email:
     constraints:
@@ -46,7 +48,8 @@ Oro\Bundle\EmailBundle\Entity\Mailbox:
             - Valid: ~
         email:
             - NotBlank: ~
-            - Email: ~
+            - Email:
+                mode: strict
 
 Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation:
     constraints:
@@ -55,6 +58,12 @@ Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation:
         subject:
             - Length:
                 max: 255
+        attachments:
+            - Valid: ~
+
+Oro\Bundle\EmailBundle\Entity\EmailTemplateAttachment:
+    constraints:
+        - Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateAttachmentNotBlank: ~
 
 Oro\Bundle\EmailBundle\Entity\AutoResponseRule:
     properties:

@@ -93,12 +93,6 @@ class WampClient implements ClientInterface, LoggerAwareInterface
     private $gosClient;
 
     /**
-     * @var int Time to wait when polling a stream for data, in microseconds.
-     *  1000 = 0.001 sec
-     */
-    private int $streamWaitTimeoutInMicroseconds = 1000;
-
-    /**
      * @var int Max time to wait for data in a stream, in microseconds.
      *  1000000 = 1 sec
      */
@@ -136,12 +130,10 @@ class WampClient implements ClientInterface, LoggerAwareInterface
 
     /**
      * @param int $maxWaitTimeoutInMicroseconds Max time to wait for data in a stream, in microseconds.
-     * @param int $streamWaitTimeoutInMicroseconds Time to wait when polling a stream for data, in microseconds.
      */
-    public function setStreamTimeouts(int $maxWaitTimeoutInMicroseconds, int $streamWaitTimeoutInMicroseconds): void
+    public function setStreamTimeouts(int $maxWaitTimeoutInMicroseconds): void
     {
         $this->maxWaitTimeoutInMicroseconds = $maxWaitTimeoutInMicroseconds;
-        $this->streamWaitTimeoutInMicroseconds = $streamWaitTimeoutInMicroseconds;
     }
 
     /**
@@ -335,46 +327,27 @@ class WampClient implements ClientInterface, LoggerAwareInterface
 
     /**
      * @param int $maxWaitTimeoutInMicroseconds
-     * @param int $streamWaitTimeoutInMicroseconds
      *
      * @return string
      */
-    protected function streamGetContents(
-        int $maxWaitTimeoutInMicroseconds,
-        int $streamWaitTimeoutInMicroseconds
-    ): string {
+    protected function streamGetContents(int $maxWaitTimeoutInMicroseconds): string
+    {
         $streamBody = '';
         try {
             $maxTimeoutInSeconds = $maxWaitTimeoutInMicroseconds / 1000000;
             $start = microtime(true);
-            $ready = false;
-            // Polls the stream for data until it runs out or timeout elapses.
             while (microtime(true) - $start < $maxTimeoutInSeconds) {
-                $read = [$this->socket];
-                $write = [];
-                $except = [];
-                $result = stream_select($read, $write, $except, 0, $streamWaitTimeoutInMicroseconds);
-                if ($result === false) {
-                    // Error happened. Should be logged in catch() block as \ErrorException.
+                if (feof($this->socket)) {
                     break;
                 }
 
-                if ($result > 0) {
-                    // Stream is ready to read.
-                    $contents = stream_get_contents($this->socket, $this->bufferSize);
-                    if ($contents === false) {
-                        // Error happened. Should be logged in catch() block as \ErrorException.
-                        break;
-                    }
-
-                    if ($contents !== '') {
-                        $streamBody .= $contents;
-                        $ready = true;
-                    }
-                } elseif ($ready === true) {
-                    // No more data to read.
+                // Stream is ready to read.
+                $contents = stream_get_contents($this->socket, $this->bufferSize);
+                if ($contents == '' && $streamBody) {
                     break;
                 }
+
+                $streamBody .= $contents;
             }
         } catch (\Throwable $throwable) {
             $this->logger->error(
@@ -537,7 +510,7 @@ class WampClient implements ClientInterface, LoggerAwareInterface
 
         fwrite($this->socket, $out);
 
-        return $this->streamGetContents($this->maxWaitTimeoutInMicroseconds, $this->streamWaitTimeoutInMicroseconds);
+        return $this->streamGetContents($this->maxWaitTimeoutInMicroseconds);
     }
 
     /**

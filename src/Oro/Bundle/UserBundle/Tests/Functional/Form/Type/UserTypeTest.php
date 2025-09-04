@@ -71,6 +71,7 @@ class UserTypeTest extends WebTestCase
         $this->initClient([], self::generateBasicAuthHeader());
 
         $configManager = self::getConfigManager();
+        $initialSendPassword = $configManager->get('oro_user.send_password_in_invitation_email');
         $configManager->set('oro_user.send_password_in_invitation_email', $sendPassword);
         $configManager->flush();
 
@@ -109,6 +110,9 @@ class UserTypeTest extends WebTestCase
 
         self::assertHtmlResponseStatusCodeEquals($result, 200);
         self::assertStringContainsString('User saved', $crawler->html());
+
+        $configManager->set('oro_user.send_password_in_invitation_email', $initialSendPassword);
+        $configManager->flush();
     }
 
     public function testUserChangeUsernameToAnotherUserUsername(): void
@@ -121,7 +125,7 @@ class UserTypeTest extends WebTestCase
 
         $form['oro_user_user_form[username]'] = 'admin';
 
-        $this->client->followRedirects(true);
+        $this->client->followRedirects();
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();

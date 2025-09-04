@@ -11,6 +11,7 @@ use Oro\Bundle\SearchBundle\Engine\ExtendedEngineInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingCacheNormalizer;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
@@ -41,40 +42,40 @@ class IndexerTest extends TestCase
         $this->engine = $this->createMock(ExtendedEngineInterface::class);
 
         $configProvider = $this->createMock(MappingConfigurationProvider::class);
-        $configProvider->expects($this->any())
+        $configProvider->expects(self::any())
             ->method('getConfiguration')
             ->willReturn($this->config);
         $cache = $this->createMock(CacheItemPoolInterface::class);
         $cacheItem = $this->createMock(CacheItemInterface::class);
-        $cache->expects($this->any())
+        $cache->expects(self::any())
             ->method('getItem')
             ->willReturn($cacheItem);
-        $cacheItem->expects($this->any())
+        $cacheItem->expects(self::any())
             ->method('isHit')
             ->willReturn(false);
-        $cacheItem->expects($this->any())
+        $cacheItem->expects(self::any())
             ->method('set')
             ->willReturn($cacheItem);
-        $eventDispatcher = $this->createMock(EventDispatcher::class);
         $mappingProvider = new SearchMappingProvider(
-            $eventDispatcher,
+            $this->createMock(EventDispatcher::class),
             $configProvider,
             $cache,
+            new SearchMappingCacheNormalizer([], [], 'target_type'),
             'test',
             'test',
             'test'
         );
 
         $securityProvider = $this->createMock(SecurityProvider::class);
-        $securityProvider->expects($this->any())
+        $securityProvider->expects(self::any())
             ->method('isGranted')
             ->willReturn(true);
-        $securityProvider->expects($this->any())
+        $securityProvider->expects(self::any())
             ->method('isProtectedEntity')
             ->willReturn(true);
 
         $searchAclHelper = $this->createMock(AclHelper::class);
-        $searchAclHelper->expects($this->any())
+        $searchAclHelper->expects(self::any())
             ->method('apply')
             ->willReturnCallback(function ($query) {
                 return $query;
@@ -103,7 +104,7 @@ class IndexerTest extends TestCase
     {
         $query = $this->indexService->select();
 
-        $this->assertEquals($this->config, $query->getMappingConfig());
+        self::assertEquals($this->config, $query->getMappingConfig());
     }
 
     public function testQuery(): void
@@ -113,91 +114,15 @@ class IndexerTest extends TestCase
         $resultItem = new Item();
         $searchResults = [$resultItem];
 
-        $this->engine->expects($this->once())
+        $this->engine->expects(self::once())
             ->method('search')
             ->willReturnCallback(function (Query $query) use ($searchResults) {
                 return new Result($query, $searchResults, count($searchResults));
             });
 
         $result = $this->indexService->query($select);
-        $this->assertEquals($searchResults, $result->getElements());
-        $this->assertEquals(count($searchResults), $result->getRecordsCount());
-    }
-
-    public function simpleSearchDataProvider(): array
-    {
-        return [
-            'no extra parameters' => [
-                'expectedQuery' =>
-                    'select text.system_entity_name from * where text all_text ~ "qwerty"',
-                'string'        => 'qwerty',
-            ],
-            'custom offset' => [
-                'expectedQuery' =>
-                    'select text.system_entity_name from * where text all_text ~ "qwerty" offset 10',
-                'string'        => 'qwerty',
-                'offset'        => 10,
-            ],
-            'custom offset custom maxResults' => [
-                'expectedQuery' =>
-                    'select text.system_entity_name from * where text all_text ~ "qwerty" limit 200 offset 10',
-                'string'        => 'qwerty',
-                'offset'        => 10,
-                'maxResults'    => 200,
-            ],
-            'custom from' => [
-                'expectedQuery' =>
-                    'select text.system_entity_name from test_customer where text all_text ~ "qwerty"',
-                'string'        => 'qwerty',
-                'offset'        => 0,
-                'maxResults'    => 0,
-                'from'          => 'test_customer',
-            ],
-            'all custom parameters' => [
-                'expectedQuery' =>
-                    'select text.system_entity_name from test_customer ' .
-                    'where text all_text ~ "qwerty" limit 200 offset 400',
-                'string'        => 'qwerty',
-                'offset'        => 10,
-                'maxResults'    => 200,
-                'from'          => 'test_customer',
-                'page'          => 3,
-            ],
-            'search by inherited entity' => [
-                'expectedQuery' =>
-                    'select text.system_entity_name from concrete_customer where text all_text ~ "qwerty"',
-                'string'        => 'qwerty',
-                'offset'        => null,
-                'maxResults'    => null,
-                'from'          => 'concrete_customer',
-            ],
-            'search by superclass entity, mode including descendants' => [
-                'expectedQuery' =>
-                    'select text.system_entity_name from customer, concrete_customer ' .
-                    'where text all_text ~ "qwerty"',
-                'string'        => 'qwerty',
-                'offset'        => null,
-                'maxResults'    => null,
-                'from'          => 'customer',
-            ],
-            'search by abstract entity, mode descendants only' => [
-                'expectedQuery' =>
-                    'select text.system_entity_name from repeatable_task, scheduled_task ' .
-                    'where text all_text ~ "qwerty"',
-                'string'        => 'qwerty',
-                'offset'        => null,
-                'maxResults'    => null,
-                'from'          => 'task',
-            ],
-            'unknown from' => [
-                'expectedQuery' =>
-                    'select text.system_entity_name from unknown_entity where text all_text ~ "qwerty"',
-                'string'        => 'qwerty',
-                'offset'        => 0,
-                'maxResults'    => 0,
-                'from'          => 'unknown_entity',
-            ],
-        ];
+        self::assertEquals($searchResults, $result->getElements());
+        self::assertEquals(count($searchResults), $result->getRecordsCount());
     }
 
     /**
@@ -206,14 +131,14 @@ class IndexerTest extends TestCase
     public function testSimpleSearch(
         string $expectedQuery,
         string $string,
-        ?int $offset = 0,
-        ?int $maxResults = 0,
-        ?string $from = null,
-        int $page = 0
+        ?int $offset,
+        ?int $maxResults,
+        ?string $from,
+        int $page
     ): void {
         $searchResults = ['one', 'two', 'three'];
 
-        $this->engine->expects($this->any())
+        $this->engine->expects(self::any())
             ->method('search')
             ->willReturnCallback(function (Query $query) use ($searchResults) {
                 return new Result($query, $searchResults, count($searchResults));
@@ -223,37 +148,127 @@ class IndexerTest extends TestCase
         $actualQuery = $result->getQuery()->getStringQuery();
 
         if ($result->getQuery()->getFrom()) {
-            $this->assertEquals($searchResults, $result->getElements());
-            $this->assertEquals(count($searchResults), $result->getRecordsCount());
+            self::assertEquals($searchResults, $result->getElements());
+            self::assertEquals(count($searchResults), $result->getRecordsCount());
         } else {
-            $this->assertEmpty($result->getElements());
-            $this->assertEquals(0, $result->getRecordsCount());
+            self::assertEmpty($result->getElements());
+            self::assertEquals(0, $result->getRecordsCount());
         }
 
-        $this->assertEquals($actualQuery, $expectedQuery);
+        self::assertEquals($actualQuery, $expectedQuery);
+    }
+
+    public function simpleSearchDataProvider(): array
+    {
+        return [
+            'no extra parameters' => [
+                'expectedQuery' =>
+                    'select text.system_entity_name from * where text all_text ~ "qwerty"',
+                'string' => 'qwerty',
+                'offset' => 0,
+                'maxResults' => 0,
+                'from' => null,
+                'page' => 0
+            ],
+            'custom offset' => [
+                'expectedQuery' =>
+                    'select text.system_entity_name from * where text all_text ~ "qwerty" offset 10',
+                'string' => 'qwerty',
+                'offset' => 10,
+                'maxResults' => 0,
+                'from' => null,
+                'page' => 0
+            ],
+            'custom offset custom maxResults' => [
+                'expectedQuery' =>
+                    'select text.system_entity_name from * where text all_text ~ "qwerty" limit 200 offset 10',
+                'string' => 'qwerty',
+                'offset' => 10,
+                'maxResults' => 200,
+                'from' => null,
+                'page' => 0
+            ],
+            'custom from' => [
+                'expectedQuery' =>
+                    'select text.system_entity_name from test_customer where text all_text ~ "qwerty"',
+                'string' => 'qwerty',
+                'offset' => 0,
+                'maxResults' => 0,
+                'from' => 'test_customer',
+                'page' => 0
+            ],
+            'all custom parameters' => [
+                'expectedQuery' =>
+                    'select text.system_entity_name from test_customer'
+                    . ' where text all_text ~ "qwerty" limit 200 offset 400',
+                'string' => 'qwerty',
+                'offset' => 10,
+                'maxResults' => 200,
+                'from' => 'test_customer',
+                'page' => 3
+            ],
+            'search by inherited entity' => [
+                'expectedQuery' =>
+                    'select text.system_entity_name from concrete_customer where text all_text ~ "qwerty"',
+                'string' => 'qwerty',
+                'offset' => null,
+                'maxResults' => null,
+                'from' => 'concrete_customer',
+                'page' => 0
+            ],
+            'search by superclass entity, mode including descendants' => [
+                'expectedQuery' =>
+                    'select text.system_entity_name from customer, concrete_customer'
+                    . ' where text all_text ~ "qwerty"',
+                'string' => 'qwerty',
+                'offset' => null,
+                'maxResults' => null,
+                'from' => 'customer',
+                'page' => 0
+            ],
+            'search by abstract entity, mode descendants only' => [
+                'expectedQuery' =>
+                    'select text.system_entity_name from repeatable_task, scheduled_task'
+                    . ' where text all_text ~ "qwerty"',
+                'string' => 'qwerty',
+                'offset' => null,
+                'maxResults' => null,
+                'from' => 'task',
+                'page' => 0
+            ],
+            'unknown from' => [
+                'expectedQuery' =>
+                    'select text.system_entity_name from unknown_entity where text all_text ~ "qwerty"',
+                'string' => 'qwerty',
+                'offset' => 0,
+                'maxResults' => 0,
+                'from' => 'unknown_entity',
+                'page' => 0
+            ],
+        ];
     }
 
     public function testAdvancedSearch(): void
     {
         $searchResults = ['one', 'two', 'three'];
 
-        $this->engine->expects($this->any())
+        $this->engine->expects(self::any())
             ->method('search')
             ->willReturnCallback(function (Query $query) use ($searchResults) {
                 return new Result($query, $searchResults, count($searchResults));
             });
 
-        $sourceQuery = 'from test_product' .
-            ' where (name ~ "test string" and integer count > 10 and (decimal price = 10 or integer qty in (2, 5)))' .
-            ' order_by decimal price desc offset 10 max_results 5';
-        $expectedQuery = 'from test_product where ((integer qty in (2, 5) or decimal price = 10) '
-            .'and integer count > 10 and text name ~ "test string") order by price DESC limit 5 offset 10';
+        $sourceQuery = 'from test_product'
+            . ' where (name ~ "test string" and integer count > 10 and (decimal price = 10 or integer qty in (2, 5)))'
+            . ' order_by decimal price desc offset 10 max_results 5';
+        $expectedQuery = 'from test_product where ((integer qty in (2, 5) or decimal price = 10)'
+            . ' and integer count > 10 and text name ~ "test string") order by price DESC limit 5 offset 10';
 
         $result = $this->indexService->advancedSearch($sourceQuery);
         $actualQuery = $result->getQuery()->getStringQuery();
 
-        $this->assertEquals($searchResults, $result->getElements());
-        $this->assertEquals(count($searchResults), $result->getRecordsCount());
-        $this->assertEquals($expectedQuery, $actualQuery);
+        self::assertEquals($searchResults, $result->getElements());
+        self::assertEquals(count($searchResults), $result->getRecordsCount());
+        self::assertEquals($expectedQuery, $actualQuery);
     }
 }

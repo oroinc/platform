@@ -11,60 +11,27 @@ use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
  */
 class LocalizedFallbackValueCollectionNormalizer
 {
-    private LocalizedFallbackValueNormalizer $localizedFallbackValueNormalizer;
-
-    public function __construct(LocalizedFallbackValueNormalizer $localizedFallbackValueNormalizer)
-    {
-        $this->localizedFallbackValueNormalizer = $localizedFallbackValueNormalizer;
+    public function __construct(
+        private readonly LocalizedFallbackValueNormalizer $localizedFallbackValueNormalizer
+    ) {
     }
 
-    /**
-     * @param iterable<AbstractLocalizedFallbackValue> $localizedFallbackValues
-     * @return array
-     *  [
-     *      [
-     *          'string' => ?string,
-     *          'fallback' => ?string,
-     *          'localization' => ?array [
-     *              'id' => int
-     *          ],
-     *          // ...
-     *      ],
-     *      // ...
-     *  ]
-     */
     public function normalize(iterable $localizedFallbackValues): array
     {
         $normalizedData = [];
-        foreach ($localizedFallbackValues as $localizedFallbackValue) {
-            $normalizedData[] = $this->localizedFallbackValueNormalizer->normalize($localizedFallbackValue);
+        /** @var AbstractLocalizedFallbackValue $val */
+        foreach ($localizedFallbackValues as $val) {
+            $normalizedData[] = $this->localizedFallbackValueNormalizer->normalize($val);
         }
 
         return $normalizedData;
     }
 
-    /**
-     * @param array $normalizedData
-     *  [
-     *      [
-     *          'string' => ?string,
-     *          'fallback' => ?string,
-     *          'localization' => ?array [
-     *              'id' => int
-     *          ],
-     *          // ...
-     *      ],
-     *      // ...
-     *  ]
-     * @param string $entityClass
-     *
-     * @return Collection
-     */
     public function denormalize(array $normalizedData, string $entityClass): Collection
     {
         $collection = [];
-        foreach ($normalizedData as $normalizedDatum) {
-            $collection[] = $this->localizedFallbackValueNormalizer->denormalize($normalizedDatum, $entityClass);
+        foreach ($normalizedData as $item) {
+            $collection[] = $this->localizedFallbackValueNormalizer->denormalize($item, $entityClass);
         }
 
         return new ArrayCollection($collection);

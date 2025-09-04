@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\PlatformBundle\NumberSequence\Manager;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\PlatformBundle\Entity\NumberSequence;
 use Oro\Bundle\PlatformBundle\Entity\Repository\NumberSequenceRepository;
@@ -46,23 +45,12 @@ class GenericNumberSequenceManager implements NumberSequenceManagerInterface
     #[\Override]
     public function nextNumber(): int
     {
-        $entityManager = $this->getEntityManager();
-        $entityManager->beginTransaction();
+        /** @var NumberSequenceRepository $numberSequenceRepository */
+        $numberSequenceRepository = $this->doctrine->getRepository(NumberSequence::class);
+        $numberSequence = $numberSequenceRepository
+            ->incrementSequence($this->sequenceType, $this->discriminatorType, $this->discriminatorValue);
 
-        try {
-            $numberSequence = $this->getOrCreateLockedSequence($entityManager);
-            $nextNumber = $numberSequence->getNumber() + 1;
-            $numberSequence->setNumber($nextNumber);
-
-            $entityManager->flush();
-            $entityManager->commit();
-
-            return $nextNumber;
-        } catch (\Exception $exception) {
-            $entityManager->rollback();
-
-            throw $exception;
-        }
+        return $numberSequence->getNumber();
     }
 
     /**
@@ -82,19 +70,10 @@ class GenericNumberSequenceManager implements NumberSequenceManagerInterface
             throw new \InvalidArgumentException('Sequence number must be a positive integer.');
         }
 
-        $entityManager = $this->getEntityManager();
-        $entityManager->beginTransaction();
-
-        try {
-            $numberSequence = $this->getOrCreateLockedSequence($entityManager);
-            $numberSequence->setNumber($number);
-
-            $entityManager->flush();
-            $entityManager->commit();
-        } catch (\Exception $e) {
-            $entityManager->rollback();
-            throw $e;
-        }
+        /** @var NumberSequenceRepository $numberSequenceRepository */
+        $numberSequenceRepository = $this->doctrine->getRepository(NumberSequence::class);
+        $numberSequenceRepository
+            ->resetSequence($this->sequenceType, $this->discriminatorType, $this->discriminatorValue, $number);
     }
 
     /**
@@ -116,66 +95,14 @@ class GenericNumberSequenceManager implements NumberSequenceManagerInterface
             throw new \InvalidArgumentException('Size must be a positive integer.');
         }
 
-        $entityManager = $this->getEntityManager();
-        $entityManager->beginTransaction();
+        /** @var NumberSequenceRepository $numberSequenceRepository */
+        $numberSequenceRepository = $this->doctrine->getRepository(NumberSequence::class);
+        $numberSequence = $numberSequenceRepository
+            ->incrementSequence($this->sequenceType, $this->discriminatorType, $this->discriminatorValue, $size);
 
-        try {
-            $numberSequence = $this->getOrCreateLockedSequence($entityManager);
+        $start = $numberSequence->getNumber() - $size + 1;
+        $end = $numberSequence->getNumber();
 
-            $start = $numberSequence->getNumber() + 1;
-            $end = $start + $size - 1;
-            $numberSequence->setNumber($end);
-
-            $entityManager->flush();
-            $entityManager->commit();
-
-            return range($start, $end);
-        } catch (\Exception $e) {
-            $entityManager->rollback();
-            throw $e;
-        }
-    }
-
-    /**
-     * Gets the EntityManager for the NumberSequence entity.
-     *
-     * @return EntityManagerInterface The entity manager instance.
-     */
-    private function getEntityManager(): EntityManagerInterface
-    {
-        return $this->doctrine->getManagerForClass(NumberSequence::class);
-    }
-
-    /**
-     * Retrieves an existing number sequence with row-level locking or creates a new one if not found.
-     *
-     * The method uses a custom repository to fetch the sequence with a database lock.
-     *
-     * @param EntityManagerInterface $entityManager The active entity manager.
-     *
-     * @return NumberSequence The locked or newly created sequence entity.
-     */
-    private function getOrCreateLockedSequence(EntityManagerInterface $entityManager): NumberSequence
-    {
-        /** @var NumberSequenceRepository $repository */
-        $repository = $entityManager->getRepository(NumberSequence::class);
-
-        $sequence = $repository->getLockedSequence(
-            $this->sequenceType,
-            $this->discriminatorType,
-            $this->discriminatorValue
-        );
-
-        if (!$sequence) {
-            $sequence = (new NumberSequence())
-                ->setSequenceType($this->sequenceType)
-                ->setDiscriminatorType($this->discriminatorType)
-                ->setDiscriminatorValue($this->discriminatorValue)
-                ->setNumber(0);
-
-            $entityManager->persist($sequence);
-        }
-
-        return $sequence;
+        return range($start, $end);
     }
 }

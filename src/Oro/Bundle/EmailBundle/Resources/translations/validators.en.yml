@@ -14,3 +14,5 @@ oro.email:
         email_template:
             unique_entity:
                 message: 'This name is already used. The combination of the following fields must be unique: {{ unique_fields }}'
+        email_template_attachment:
+            one_field_not_blank: 'One of the following fields should be not blank: File, File Placeholder'

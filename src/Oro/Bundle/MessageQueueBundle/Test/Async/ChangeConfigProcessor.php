@@ -17,18 +17,13 @@ class ChangeConfigProcessor implements MessageProcessorInterface, TopicSubscribe
     public const COMMAND_NOOP = 'noop';
     public const COMMAND_CHANGE_CACHE = 'change';
 
-    /**
-     * @var ConfigManager
-     */
-    private $configManager;
-
-    public function __construct(ConfigManager $configManager)
-    {
-        $this->configManager = $configManager;
+    public function __construct(
+        private readonly ConfigManager $configManager
+    ) {
     }
 
     #[\Override]
-    public function process(MessageInterface $message, SessionInterface $session)
+    public function process(MessageInterface $message, SessionInterface $session): string
     {
         usleep(2000000); // Remove after BAP-16453 is fixed
         $messageBody = $message->getBody();
@@ -41,7 +36,7 @@ class ChangeConfigProcessor implements MessageProcessorInterface, TopicSubscribe
     }
 
     #[\Override]
-    public static function getSubscribedTopics()
+    public static function getSubscribedTopics(): array
     {
         return [ChangeConfigTestTopic::getName()];
     }

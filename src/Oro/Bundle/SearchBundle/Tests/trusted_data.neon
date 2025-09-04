@@ -25,6 +25,14 @@ trusted_data:
                 data: true
             applyWhereToQB:
                 whereCondition: true
+        Oro\Bundle\SearchBundle\Api\Filter\SearchAggregationFilter:
+            applyToSearchQuery:
+                fieldType: true
+                fieldName: true
+        Oro\Bundle\SearchBundle\Api\Processor\LoadEntitiesBySearchText:
+            processSearchQuery:
+                fieldType: true
+                fieldName: true
         Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql:
             setTextOrderBy:
                 index: true
@@ -32,6 +40,10 @@ trusted_data:
         Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver:
             createQueryBuilder:
                 entityName: true
+        Oro\Bundle\SearchBundle\Api\Model\LoadEntityIdsBySearchQuery:
+            getSearchResult:
+                searchExpression: true
+                orderBy: true
     safe_methods:
         Oro\Bundle\SearchBundle\Formatter\ResultFormatter:
             getEntityIdentifier: true
