@@ -62,6 +62,10 @@ class EmailTemplateTranslationType extends AbstractType
                 'required' => false,
                 'wysiwyg_enabled' => $options['wysiwyg_enabled'],
                 'wysiwyg_options' => $options['wysiwyg_options'],
+            ])
+            ->add('attachments', EmailTemplateAttachmentCollectionType::class, [
+                'required' => false,
+                'entity_class' => $options['entity_class']
             ]);
 
         if ($options['localization']) {
@@ -77,8 +81,22 @@ class EmailTemplateTranslationType extends AbstractType
                     'label' => $fallbackLabel,
                     'required' => false,
                     'block_name' => 'fallback_checkbox',
+                ])
+                ->add('attachmentsFallback', CheckboxType::class, [
+                    'label' => $fallbackLabel,
+                    'required' => false,
+                    'block_name' => 'fallback_checkbox',
                 ]);
         }
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, static function (FormEvent $event) use ($options) {
+            /** @var EmailTemplateTranslation|null $data */
+            $emailTemplateTranslation = $event->getData();
+            if ($emailTemplateTranslation?->isAttachmentsFallback()) {
+                // Attachments field must be empty and disabled when attachmentsFallback is on.
+                FormUtils::replaceField($event->getForm(), 'attachments', ['data' => [], 'disabled' => true]);
+            }
+        });
 
         $builder->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) use ($options) {
             $form = $event->getForm();
@@ -91,6 +109,13 @@ class EmailTemplateTranslationType extends AbstractType
 
             if ($notNullRequired) {
                 FormUtils::replaceField($form, 'subject', ['constraints' => [new NotBlank()]]);
+            }
+
+            FormUtils::replaceField($form, 'attachments', [], ['disabled']);
+
+            if (!empty($data['attachmentsFallback'])) {
+                $data['attachments'] = [];
+                $event->setData($data);
             }
         });
         $builder->addViewTransformer($this->getViewTransformer($options));
@@ -124,12 +149,15 @@ class EmailTemplateTranslationType extends AbstractType
             'localization' => null,
             'wysiwyg_enabled' => false,
             'wysiwyg_options' => [],
+            'entity_class' => null,
         ]);
 
+        $resolver->setDefined('entity_class');
         $resolver->setRequired('allow_extra_fields');
         $resolver->setAllowedTypes('localization', ['null', Localization::class]);
         $resolver->setAllowedTypes('wysiwyg_enabled', ['bool']);
         $resolver->setAllowedTypes('wysiwyg_options', ['array']);
+        $resolver->setAllowedTypes('entity_class', ['string', 'null']);
     }
 
     #[\Override]

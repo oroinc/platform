@@ -39,6 +39,12 @@ services:
             - { name: container.service_subscriber }
             - { name: container.service_subscriber, id: oro_email.form.emailtemplate }
 
+    Oro\Bundle\EmailBundle\Controller\EmailTemplateAttachmentsController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+
     Oro\Bundle\EmailBundle\Controller\Configuration\MailboxController:
         calls:
             - ['setContainer', ['@Psr\Container\ContainerInterface']]

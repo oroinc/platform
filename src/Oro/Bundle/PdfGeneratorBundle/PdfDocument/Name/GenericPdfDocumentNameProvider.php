@@ -7,6 +7,7 @@ namespace Oro\Bundle\PdfGeneratorBundle\PdfDocument\Name;
 use Oro\Bundle\AttachmentBundle\Tools\FilenameSanitizer;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Provider\PreferredLocalizationProviderInterface;
 
 /**
  * Provides a name for the PDF document based on the source entity.
@@ -15,9 +16,17 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
  */
 class GenericPdfDocumentNameProvider implements PdfDocumentNameProviderInterface
 {
+    private ?PreferredLocalizationProviderInterface $preferredLocalizationProvider = null;
+
     public function __construct(
         private readonly EntityNameResolver $entityNameResolver
     ) {
+    }
+
+    public function setPreferredLocalizationProvider(
+        ?PreferredLocalizationProviderInterface $preferredLocalizationProvider
+    ): void {
+        $this->preferredLocalizationProvider = $preferredLocalizationProvider;
     }
 
     #[\Override]
@@ -26,7 +35,9 @@ class GenericPdfDocumentNameProvider implements PdfDocumentNameProviderInterface
         ?string $format = null,
         Localization|string|null $locale = null
     ): string {
-        $pdfDocumentName = $this->entityNameResolver->getName($sourceEntity, $format, $locale);
+        $locale ??= $this->preferredLocalizationProvider?->getPreferredLocalization($sourceEntity);
+
+        $pdfDocumentName = (string) $this->entityNameResolver->getName($sourceEntity, $format, $locale);
         $pdfDocumentName = FilenameSanitizer::sanitizeFilename($pdfDocumentName);
 
         return mb_strtolower($pdfDocumentName);

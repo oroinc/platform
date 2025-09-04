@@ -4,6 +4,10 @@ namespace Oro\Bundle\EmailBundle\Model;
 
 /**
  * Represents an email message template
+ *
+ * Will be added in v7.0:
+ *
+ * @method getAttachments(): iterable<EmailTemplateAttachmentModel>
  */
 interface EmailTemplateInterface
 {

@@ -65,18 +65,18 @@ class GenericPdfDocumentOperator implements PdfDocumentOperatorInterface
 
         $pdfDocument = $this->pdfDocumentFactory->createPdfDocument($pdfDocumentDemand);
 
-        $this->eventDispatcher->dispatch(
-            new AfterPdfDocumentCreatedEvent($pdfDocument, $this->pdfDocumentGenerationMode)
-        );
-
-        /** @var EntityManagerInterface|null $entityManager */
-        $entityManager = $this->doctrine->getManagerForClass(ClassUtils::getClass($pdfDocument));
-        $entityManager?->persist($pdfDocument);
+        $event = new AfterPdfDocumentCreatedEvent($pdfDocument, $this->pdfDocumentGenerationMode);
+        $event->setPdfDocumentDemand($pdfDocumentDemand);
+        $this->eventDispatcher->dispatch($event);
 
         $pdfDocument->setPdfDocumentGenerationMode($this->pdfDocumentGenerationMode);
         $pdfDocument->setPdfDocumentState(PdfDocumentState::PENDING);
 
         $this->resolvePdfDocument($pdfDocument);
+
+        /** @var EntityManagerInterface|null $entityManager */
+        $entityManager = $this->doctrine->getManagerForClass(ClassUtils::getClass($pdfDocument));
+        $entityManager?->persist($pdfDocument);
 
         return $pdfDocument;
     }

@@ -493,6 +493,7 @@ services:
             - '@property_accessor'
             - '@oro_ui.html_tag_helper'
         calls:
+            - ['setEmailTemplateAttachmentProcessor', ['@oro_email.twig.email_template_attachment_processor']]
             - ['setLogger', ['@logger']]
         tags:
             - { name: monolog.logger, channel: oro_email }
@@ -1067,6 +1068,8 @@ services:
             - '@oro_attachment.file_manager'
             - '@oro_attachment.manager'
             - '@oro_email.manager.email_attachment_manager'
+        calls:
+            - [ 'setEmailAttachmentEntityFactory', [ '@oro_email.factory.email_attachment_entity_from_email_template_attachment' ] ]
 
     oro_email.email_importance_transformer:
         class: Oro\Bundle\EmailBundle\Form\DataTransformer\EmailImportanceApiTransformer
@@ -1508,10 +1511,17 @@ services:
         tags:
             - { name: monolog.logger, channel: oro_email }
 
+    oro_email.provider.email_template_translation_resolver:
+        class: 'Oro\Bundle\EmailBundle\Provider\EmailTemplateTranslationResolver'
+        arguments:
+            - '@property_accessor'
+
     oro_email.provider.translated_email_template:
         class: 'Oro\Bundle\EmailBundle\Provider\TranslatedEmailTemplateProvider'
         arguments:
             - '@property_accessor'
+        calls:
+            - [ 'setEmailTemplateTranslationResolver', [ '@oro_email.provider.email_template_translation_resolver' ] ]
 
     Oro\Bundle\EmailBundle\Provider\TranslatedEmailTemplateProvider:
         alias: oro_email.provider.translated_email_template
@@ -1524,6 +1534,9 @@ services:
             - '@oro_email.form.factory'
             - '@oro_email.tools.email_origin_helper'
             - '@oro_security.owner.entity_owner_accessor'
+        calls:
+            - [ 'setEmailAttachmentModelFactory', [ '@oro_email.factory.email_attachment_model_from_email_template_attachment' ] ]
+            - [ 'setEmailAttachmentEntityFactory', [ '@oro_email.factory.email_attachment_entity_from_email_template_attachment' ] ]
 
     oro_email.provider.email_template_context:
         class: Oro\Bundle\EmailBundle\Provider\EmailTemplateContextProvider
@@ -1667,3 +1680,65 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
+
+    oro_email.email_template_hydrator.raw_data_parser:
+        class: Oro\Bundle\EmailBundle\EmailTemplateHydrator\EmailTemplateRawDataParser
+
+    oro_email.email_template_hydrator.from_array:
+        class: Oro\Bundle\EmailBundle\EmailTemplateHydrator\EmailTemplateFromArrayHydrator
+        arguments:
+            - '@property_accessor'
+            - '@event_dispatcher'
+
+    oro_email.event_listener.create_email_template_attachment_from_raw_data:
+        class: Oro\Bundle\EmailBundle\EventListener\CreateEmailTemplateAttachmentFromRawDataListener
+        arguments:
+            - '@oro_attachment.file_manager'
+            - '@mime_types'
+            - 'Oro\Bundle\EmailBundle\Entity\EmailTemplate'
+            - 'Oro\Bundle\EmailBundle\Entity\EmailTemplateAttachment'
+        tags:
+            - { name: kernel.event_listener, event: Oro\Bundle\EmailBundle\Event\EmailTemplateFromArrayHydrateBeforeEvent, method: onEmailTemplateFromRawDataHydrateBeforeEvent }
+
+    oro_email.model.factory.email_template_model_from_raw_data:
+        class: Oro\Bundle\EmailBundle\Model\Factory\EmailTemplateFromRawDataFactory
+        arguments:
+            - '@oro_email.email_template_hydrator.raw_data_parser'
+            - '@oro_email.email_template_hydrator.from_array'
+            - 'Oro\Bundle\EmailBundle\Model\EmailTemplate'
+
+    oro_email.twig.email_template_attachment_processor:
+        class: Oro\Bundle\EmailBundle\Twig\EmailTemplateAttachmentProcessor
+        lazy: true
+        arguments:
+            - '@oro_email.twig.sandbox.template_data_factory'
+        calls:
+            - ['setLogger', ['@logger']]
+        tags:
+            - { name: monolog.logger, channel: oro_email }
+
+    oro_email.twig.email_template_attachment_variables_provider:
+        class: Oro\Bundle\EmailBundle\Twig\EmailTemplateAttachmentVariablesProvider
+        arguments:
+            - '@oro_email.emailtemplate.variable_provider'
+
+    Oro\Bundle\EmailBundle\Twig\EmailTemplateAttachmentVariablesProvider:
+        alias: oro_email.twig.email_template_attachment_variables_provider
+
+    oro_email.factory.email_attachment_model_from_email_template_attachment:
+        class: Oro\Bundle\EmailBundle\Factory\EmailAttachmentModelFromEmailTemplateAttachmentFactory
+        arguments:
+            - '@oro_email.form.factory'
+            - '@oro_email.twig.email_template_attachment_processor'
+            - '@oro_attachment.manager'
+
+    oro_email.factory.email_attachment_entity_from_email_template_attachment:
+        class: Oro\Bundle\EmailBundle\Factory\EmailAttachmentEntityFromEmailTemplateAttachmentFactory
+        arguments:
+            - '@oro_email.email.entity.builder'
+            - '@oro_email.twig.email_template_attachment_processor'
+            - '@oro_attachment.file_manager'
+        calls:
+            - ['setLogger', ['@logger']]
+        tags:
+            - { name: monolog.logger, channel: oro_email }

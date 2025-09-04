@@ -17,11 +17,19 @@ class TranslatedEmailTemplateProvider
 {
     private PropertyAccessorInterface $propertyAccessor;
 
-    private array $translatableFields = ['subject', 'content'];
+    private ?EmailTemplateTranslationResolver $emailTemplateTranslationResolver = null;
+
+    private array $translatableFields = ['subject', 'content', 'attachments'];
 
     public function __construct(PropertyAccessorInterface $propertyAccessor)
     {
         $this->propertyAccessor = $propertyAccessor;
+    }
+
+    public function setEmailTemplateTranslationResolver(
+        ?EmailTemplateTranslationResolver $emailTemplateTranslationResolver
+    ): void {
+        $this->emailTemplateTranslationResolver = $emailTemplateTranslationResolver;
     }
 
     public function setTranslatableFields(array $translatableFields): void
@@ -38,18 +46,30 @@ class TranslatedEmailTemplateProvider
             ->setEntityName($emailTemplateEntity->getEntityName())
             ->setType($emailTemplateEntity->getType());
 
-        $templateTranslationsByLocalization = [];
-        foreach ($emailTemplateEntity->getTranslations() as $translation) {
-            $templateTranslationsByLocalization[$translation->getLocalization()->getId()] = $translation;
+        // BC layer.
+        if (!$this->emailTemplateTranslationResolver) {
+            $templateTranslationsByLocalization = [];
+            foreach ($emailTemplateEntity->getTranslations() as $translation) {
+                $templateTranslationsByLocalization[$translation->getLocalization()->getId()] = $translation;
+            }
+
+            foreach ($this->translatableFields as $fieldName) {
+                $translatedValue = $this->getTranslatedValue(
+                    $templateTranslationsByLocalization,
+                    $localization,
+                    $emailTemplateEntity,
+                    $fieldName
+                );
+
+                $this->propertyAccessor->setValue($emailTemplateModel, $fieldName, $translatedValue);
+            }
+
+            return $emailTemplateModel;
         }
 
         foreach ($this->translatableFields as $fieldName) {
-            $translatedValue = $this->getTranslatedValue(
-                $templateTranslationsByLocalization,
-                $localization,
-                $emailTemplateEntity,
-                $fieldName
-            );
+            $translatedValue = $this->emailTemplateTranslationResolver
+                ->resolveTranslation($emailTemplateEntity, $fieldName, $localization);
 
             $this->propertyAccessor->setValue($emailTemplateModel, $fieldName, $translatedValue);
         }
@@ -67,7 +87,7 @@ class TranslatedEmailTemplateProvider
         ?Localization $localization,
         EmailTemplateEntity $emailTemplateEntity,
         string $fieldName
-    ): string {
+    ): mixed {
         $attributeFallback = $fieldName . 'Fallback';
 
         while ($templateTranslation = $this->findTranslation($templateTranslationsByLocalization, $localization)) {

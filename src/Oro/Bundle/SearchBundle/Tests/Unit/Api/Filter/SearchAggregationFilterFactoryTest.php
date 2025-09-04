@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Api\Filter;
 
 use Oro\Bundle\SearchBundle\Api\Filter\SearchAggregationFilter;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchAggregationFilterFactory;
-use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolverFactory;
+use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolverFactoryInterface;
 
 class SearchAggregationFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -17,7 +17,7 @@ class SearchAggregationFilterFactoryTest extends \PHPUnit\Framework\TestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->searchFieldResolverFactory = $this->createMock(SearchFieldResolverFactory::class);
+        $this->searchFieldResolverFactory = $this->createMock(SearchFieldResolverFactoryInterface::class);
 
         $this->factory = new SearchAggregationFilterFactory(
             $this->searchFieldResolverFactory

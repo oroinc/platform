@@ -25,6 +25,32 @@ class SetDefaultSorting extends BaseSetDefaultSorting
         return $orderBy;
     }
 
+    #[\Override]
+    protected function getAllowedSortFieldsDescription(
+        EntityDefinitionConfig $config,
+        SortersConfig $configOfSorters
+    ): ?string {
+        $fieldNames = [];
+        if ($this->isSorterByIdEnabled($config, $configOfSorters)) {
+            $fieldNames[] = JsonApiDoc::ID;
+        }
+        $idFieldNames = $config->getIdentifierFieldNames();
+        foreach ($configOfSorters->getFields() as $fieldName => $field) {
+            if (!$field->isExcluded() && !\in_array($fieldName, $idFieldNames, true)) {
+                $fieldNames[] = $fieldName;
+            }
+        }
+        if (!$fieldNames) {
+            return null;
+        }
+
+        if (\count($fieldNames) > 1) {
+            sort($fieldNames);
+        }
+
+        return 'Allowed fields: ' . implode(', ', $fieldNames) . '.';
+    }
+
     private function isSorterByIdEnabled(EntityDefinitionConfig $config, ?SortersConfig $configOfSorters): bool
     {
         $idFieldNames = $config->getIdentifierFieldNames();

@@ -70,6 +70,7 @@ services:
             - '@request_stack'
             - '@oro_user.form.provider.password_field_options_provider'
             - '@oro_user.form.provider.roles_choices_for_user'
+            - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: form.type, alias: oro_user_user }
 
@@ -81,6 +82,7 @@ services:
             - '@request_stack'
             - '@oro_user.form.provider.password_field_options_provider'
             - '@oro_user.form.provider.roles_choices_for_user'
+            - '@oro_featuretoggle.checker.feature_checker'
         calls:
             - [setUserConfigManager, ["@oro_config.user"]]
         tags:
@@ -199,6 +201,7 @@ services:
             - '@oro_config.user'
             - '@translator'
             - '@logger'
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_user.form.handler.user.api:
         class: Oro\Bundle\UserBundle\Form\Handler\UserHandler

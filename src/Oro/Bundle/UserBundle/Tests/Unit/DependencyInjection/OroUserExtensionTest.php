@@ -29,6 +29,7 @@ class OroUserExtensionTest extends \PHPUnit\Framework\TestCase
                         'password_special_chars' => ['value' => false, 'scope' => 'app'],
                         'send_password_in_invitation_email' => ['value' => false, 'scope' => 'app'],
                         'case_insensitive_email_addresses_enabled' => ['value' => false, 'scope' => 'app'],
+                        'user_login_password' => ['value' => true, 'scope' => 'app']
                     ]
                 ]
             ],

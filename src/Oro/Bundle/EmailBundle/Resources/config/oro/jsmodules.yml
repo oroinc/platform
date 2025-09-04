@@ -35,6 +35,7 @@ dynamic-imports:
         - oroemail/js/app/views/email-field-condition-view
         - oroemail/js/app/views/email-sync-view
         - oroemail/js/app/views/email-template-editor-view
+        - oroemail/js/app/views/email-template-attachment-view
         - oroemail/js/app/views/email-template-view
         - oroemail/js/app/views/email-thread-view
         - oroemail/js/app/views/email-translation-view

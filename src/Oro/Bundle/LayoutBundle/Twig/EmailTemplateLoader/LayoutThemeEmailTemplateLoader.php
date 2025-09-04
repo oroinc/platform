@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Twig\EmailTemplateLoader;
 
 use Oro\Bundle\EmailBundle\Model\EmailTemplate as EmailTemplateModel;
+use Oro\Bundle\EmailBundle\Model\Factory\EmailTemplateFromRawDataFactoryInterface;
 use Oro\Bundle\EmailBundle\Twig\EmailTemplateLoader\EmailTemplateLoaderInterface;
 use Oro\Bundle\EmailBundle\Twig\EmailTemplateLoader\EmailTemplateLoaderParsingTrait;
 use Twig\Loader\FilesystemLoader;
@@ -17,6 +18,14 @@ use Twig\Source;
 class LayoutThemeEmailTemplateLoader extends FilesystemLoader implements EmailTemplateLoaderInterface
 {
     use EmailTemplateLoaderParsingTrait;
+
+    private ?EmailTemplateFromRawDataFactoryInterface $emailTemplateFromRawDataFactory = null;
+
+    public function setEmailTemplateFromRawDataFactory(
+        ?EmailTemplateFromRawDataFactoryInterface $emailTemplateFromRawDataFactory = null
+    ): void {
+        $this->emailTemplateFromRawDataFactory = $emailTemplateFromRawDataFactory;
+    }
 
     #[\Override]
     public function exists($name): bool
@@ -76,8 +85,13 @@ class LayoutThemeEmailTemplateLoader extends FilesystemLoader implements EmailTe
     #[\Override]
     public function getEmailTemplate(string $name): EmailTemplateModel
     {
-        return EmailTemplateModel::createFromContent(
-            $this->getSourceContext($name)->getCode()
-        );
+        // BC layer.
+        if (!$this->emailTemplateFromRawDataFactory) {
+            return EmailTemplateModel::createFromContent(
+                $this->getSourceContext($name)->getCode()
+            );
+        }
+
+        return $this->emailTemplateFromRawDataFactory->createFromRawData($this->getSourceContext($name)->getCode());
     }
 }

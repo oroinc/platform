@@ -45,22 +45,22 @@ class EmailTemplateSelectType extends AbstractType
 
         $resolver->setDefaults(
             array(
-                'label'                   => null,
-                'class'                   => EmailTemplate::class,
-                'choice_label'            => 'name',
-                'query_builder'           => null,
+                'label' => null,
+                'class' => EmailTemplate::class,
+                'choice_label' => 'name',
+                'query_builder' => null,
                 'depends_on_parent_field' => 'entityName',
-                'target_field'            => null,
-                'selectedEntity'          => null,
-                'choices'                 => $choices,
-                'configs'                 => $defaultConfigs,
-                'placeholder'             => '',
-                'empty_data'              => null,
-                'required'                => true,
-                'data_route'              => 'oro_api_get_emailtemplates',
-                'data_route_parameter'    => 'entityName',
-                'includeNonEntity'        => false,
-                'includeSystemTemplates'  => true
+                'target_field' => null,
+                'selectedEntity' => null,
+                'choices' => $choices,
+                'configs' => $defaultConfigs,
+                'placeholder' => '',
+                'empty_data' => null,
+                'required' => true,
+                'data_route' => 'oro_api_get_emailtemplates',
+                'data_route_parameter' => 'entityName',
+                'includeNonEntity' => false,
+                'includeSystemTemplates' => true
             )
         );
         $resolver->setNormalizer('configs', $configsNormalizer);
@@ -70,7 +70,18 @@ class EmailTemplateSelectType extends AbstractType
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $config = $form->getConfig();
-        $view->vars['depends_on_parent_field'] = $config->getOption('depends_on_parent_field');
+        $dependeeFieldName = $config->getOption('depends_on_parent_field');
+        $view->vars['depends_on_parent_field'] = $dependeeFieldName;
+
+        // Searches for the dependee field.
+        $parentView = $view;
+        while ($parentView->parent !== null) {
+            $parentView = $parentView->parent;
+            if (isset($parentView->children[$dependeeFieldName])) {
+                $view->vars['dependee_field_id'] = $parentView->children[$dependeeFieldName]->vars['id'];
+            }
+        }
+
         $view->vars['data_route'] = $config->getOption('data_route');
         $view->vars['data_route_parameter'] = $config->getOption('data_route_parameter');
         $view->vars['includeNonEntity'] = (bool)$config->getOption('includeNonEntity');

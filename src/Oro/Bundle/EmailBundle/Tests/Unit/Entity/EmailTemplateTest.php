@@ -3,34 +3,37 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplateAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class EmailTemplateTest extends \PHPUnit\Framework\TestCase
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
+class EmailTemplateTest extends TestCase
 {
     use EntityTestCaseTrait;
 
     public function testConstruct(): void
     {
-        $template = new EmailTemplate('update_entity.html.twig', "@subject = sdfdsf\n abc");
+        $template = new EmailTemplate('update_entity.html.twig', 'Sample content');
 
-        $this->assertSame('sdfdsf', $template->getSubject());
-        $this->assertSame('abc', $template->getContent());
-
-        // Default values
-        $this->assertFalse($template->getIsSystem());
-        $this->assertTrue($template->getIsEditable());
-        $this->assertSame(EmailTemplateInterface::TYPE_HTML, $template->getType());
+        self::assertSame('update_entity.html.twig', $template->getName());
+        self::assertSame('Sample content', $template->getContent());
+        self::assertSame(EmailTemplateInterface::TYPE_HTML, $template->getType());
+        self::assertFalse($template->getIsSystem());
+        self::assertTrue($template->getIsEditable());
     }
 
     public function testProperties(): void
     {
         $template = new EmailTemplate();
-        $this->assertPropertyAccessors($template, [
+        self::assertPropertyAccessors($template, [
             ['id', 1],
             ['isSystem', true, false],
             ['isEditable', true, false],
@@ -42,11 +45,12 @@ class EmailTemplateTest extends \PHPUnit\Framework\TestCase
             ['type', EmailTemplateInterface::TYPE_HTML],
             ['owner', new User()],
             ['organization', new Organization()],
-            ['visible', true]
+            ['visible', true],
         ]);
 
-        $this->assertPropertyCollections($template, [
+        self::assertPropertyCollections($template, [
             ['translations', new EmailTemplateTranslation()],
+            ['attachments', new EmailTemplateAttachment()],
         ]);
     }
 
@@ -61,18 +65,18 @@ class EmailTemplateTest extends \PHPUnit\Framework\TestCase
 
         $clone = clone $template;
 
-        $this->assertNull($clone->getId());
-        $this->assertEquals($clone->getParent(), $template->getId());
-        $this->assertSame('original_name', $clone->getName());
-        $this->assertSame('original content', $clone->getContent());
-        $this->assertSame(EmailTemplateInterface::TYPE_TEXT, $clone->getType());
+        self::assertNull($clone->getId());
+        self::assertEquals($clone->getParent(), $template->getId());
+        self::assertSame('original_name', $clone->getName());
+        self::assertSame('original content', $clone->getContent());
+        self::assertSame(EmailTemplateInterface::TYPE_TEXT, $clone->getType());
 
-        $this->assertFalse($clone->getIsSystem());
-        $this->assertTrue($clone->getIsEditable());
+        self::assertFalse($clone->getIsSystem());
+        self::assertTrue($clone->getIsEditable());
 
         $clonedLocalization = $clone->getTranslations()->first();
-        $this->assertNotSame($originalLocalization, $clonedLocalization);
-        $this->assertSame($clone, $clonedLocalization->getTemplate());
+        self::assertNotSame($originalLocalization, $clonedLocalization);
+        self::assertSame($clone, $clonedLocalization->getTemplate());
     }
 
     public function testParse(): void
@@ -94,6 +98,6 @@ class EmailTemplateTest extends \PHPUnit\Framework\TestCase
     public function testToString(): void
     {
         $template = new EmailTemplate('template_name');
-        $this->assertSame('template_name', (string)$template);
+        self::assertSame('template_name', (string)$template);
     }
 }

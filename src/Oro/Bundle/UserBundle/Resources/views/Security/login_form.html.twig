@@ -2,7 +2,11 @@
 {% set passwordLabel = 'Password'|trans %}
 {% set showLabels = (usernameLabel|length <= 9) and (passwordLabel|length <= 9) %}
 {% set layoutName = showLabels ? 'form-row-layout' : 'form-column-layout' %}
+{% if feature_enabled('user_login_password') %}
 <form id="login-form" action="{{ loginFormActionPath|default(path('oro_user_security_check')) }}" method="post" class="form-signin form-signin--login {{ layoutName }}">
+{% else %}
+<div id="login-form" class="form-signin form-signin--login {{ layoutName }}">
+{% endif %}
     <div class="form-description">
         {% if oro_theme_logo() %}
             <div class="form-description__logo">
@@ -14,6 +18,7 @@
         <div class="form-description__main">{{ description_main }}</div>
         <div class="form-description__text">{{ description_text }}</div>
     </div>
+    {% if feature_enabled('user_login_password') %}
     <div class="title-box">
         <h2 class="title">{{ 'Login'|trans }}</h2>
     </div>
@@ -58,7 +63,22 @@
     </fieldset>
     <input type="hidden" name="_target_path" value="{{ loginFormTargetPath|default('') }}">
     <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+    {% else %}
+        {% if error %}
+            <div class="alert alert-error" role="alert">
+                <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            </div>
+        {% endif %}
+        {{ messagesContent }}
+        <div>
+            {% placeholder oro_user_login_form %}
+        </div>
+    {% endif %}
+{% if feature_enabled('user_login_password') %}
 </form>
+{% else %}
+</div>
+{% endif %}
 <script type="text/javascript">
     document.getElementById('login-form').addEventListener('submit', function (event) {
         var buttons = event.target.getElementsByTagName('button');

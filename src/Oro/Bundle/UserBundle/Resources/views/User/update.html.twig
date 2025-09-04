@@ -91,7 +91,7 @@
         form_row(form.nameSuffix),
         form_row(form.birthday),
         form_row(form.avatar),
-        form.vars.value.id ? '' : form_row(form.inviteUser),
+        form.vars.value.id or not feature_enabled('user_login_password') ? '' : form_row(form.inviteUser),
     ] %}
 
     {% if form.passwordGenerate is defined %}

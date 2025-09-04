@@ -7,9 +7,11 @@ use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
+use Oro\Bundle\EmailBundle\Factory\EmailAttachmentEntityFromEmailTemplateAttachmentFactory;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as EmailAttachmentModel;
-use Oro\Bundle\EmailBundle\Form\Model\Factory;
+use Oro\Bundle\EmailBundle\Form\Model\Factory as EmailModelFactory;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateAttachmentModel;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -21,28 +23,32 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class EmailAttachmentTransformer
 {
-    /** @var Factory */
-    private $factory;
+    private EmailModelFactory $factory;
 
-    /** @var FileManager */
-    private $fileManager;
+    private FileManager $fileManager;
 
-    /** @var AttachmentManager */
-    private $manager;
+    private AttachmentManager $attachmentManager;
 
-    /** @var EmailAttachmentManager */
-    private $emailAttachmentManager;
+    private EmailAttachmentManager $emailAttachmentManager;
+
+    private ?EmailAttachmentEntityFromEmailTemplateAttachmentFactory $emailAttachmentEntityFactory = null;
 
     public function __construct(
-        Factory $factory,
+        EmailModelFactory $factory,
         FileManager $fileManager,
         AttachmentManager $manager,
         EmailAttachmentManager $emailAttachmentManager
     ) {
         $this->factory = $factory;
         $this->fileManager = $fileManager;
-        $this->manager = $manager;
+        $this->attachmentManager = $manager;
         $this->emailAttachmentManager = $emailAttachmentManager;
+    }
+
+    public function setEmailAttachmentEntityFactory(
+        ?EmailAttachmentEntityFromEmailTemplateAttachmentFactory $emailAttachmentEntityFactory
+    ): void {
+        $this->emailAttachmentEntityFactory = $emailAttachmentEntityFactory;
     }
 
     public function entityToModel(EmailAttachment $emailAttachment): EmailAttachmentModel
@@ -57,8 +63,8 @@ class EmailAttachmentTransformer
         $attachmentModel->setFileSize($emailAttachment->getSize());
         $attachmentModel->setMimeType($mimeType);
         $attachmentModel->setModified($emailAttachment->getEmailBody()->getCreated());
-        $attachmentModel->setIcon($this->manager->getAttachmentIconClass($emailAttachment));
-        if ($this->manager->isImageType($mimeType)) {
+        $attachmentModel->setIcon($this->attachmentManager->getAttachmentIconClass($emailAttachment));
+        if ($this->attachmentManager->isImageType($mimeType)) {
             $attachmentModel->setPreview(
                 $this->emailAttachmentManager->getResizedImageUrl(
                     $emailAttachment,
@@ -83,10 +89,10 @@ class EmailAttachmentTransformer
         $attachmentModel->setFileSize($attachment->getFile()->getFileSize());
         $attachmentModel->setMimeType($mimeType);
         $attachmentModel->setModified($attachment->getCreatedAt());
-        $attachmentModel->setIcon($this->manager->getAttachmentIconClass($attachment->getFile()));
-        if ($this->manager->isImageType($mimeType)) {
+        $attachmentModel->setIcon($this->attachmentManager->getAttachmentIconClass($attachment->getFile()));
+        if ($this->attachmentManager->isImageType($mimeType)) {
             $attachmentModel->setPreview(
-                $this->manager->getResizedImageUrl(
+                $this->attachmentManager->getResizedImageUrl(
                     $attachment->getFile(),
                     AttachmentManager::THUMBNAIL_WIDTH,
                     AttachmentManager::THUMBNAIL_HEIGHT
@@ -135,5 +141,26 @@ class EmailAttachmentTransformer
         $emailAttachment->setFileName($uploadedFile->getClientOriginalName());
 
         return $emailAttachment;
+    }
+
+    /**
+     * Creates an EmailAttachment entity from an EmailTemplateAttachmentModel.
+     *
+     * @param EmailTemplateAttachmentModel $emailTemplateAttachment
+     * @param array<string,mixed> $templateParams
+     *
+     * @return array<EmailAttachment>
+     */
+    public function entityFromEmailTemplateAttachment(
+        EmailTemplateAttachmentModel $emailTemplateAttachment,
+        array $templateParams = []
+    ): array {
+        // BC layer.
+        if (!$this->emailAttachmentEntityFactory) {
+            return [];
+        }
+
+        return $this->emailAttachmentEntityFactory
+            ->createEmailAttachmentEntities($emailTemplateAttachment, $templateParams);
     }
 }

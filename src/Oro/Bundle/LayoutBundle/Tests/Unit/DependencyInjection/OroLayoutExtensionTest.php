@@ -4,6 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\LayoutBundle\DependencyInjection\OroLayoutExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -162,13 +163,21 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             [
                 [
+                    'setEmailTemplateFromRawDataFactory',
+                    [new Reference('oro_email.model.factory.email_template_model_from_raw_data')],
+                ],
+                [
                     'setPaths',
                     [
                         [
                             implode(
                                 DIRECTORY_SEPARATOR,
                                 [
-                                    $twigPath, 'layouts', 'base', 'email-templates', '',
+                                    $twigPath,
+                                    'layouts',
+                                    'base',
+                                    'email-templates',
+                                    '',
                                 ]
                             ),
                             implode(
@@ -199,7 +208,12 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->load([], $this->container);
 
         self::assertEquals(
-            [],
+            [
+                [
+                    'setEmailTemplateFromRawDataFactory',
+                    [new Reference('oro_email.model.factory.email_template_model_from_raw_data')],
+                ],
+            ],
             $this->container
                 ->getDefinition('oro_layout.twig.email_template_loader.layout_theme_template_loader')
                 ->getMethodCalls()

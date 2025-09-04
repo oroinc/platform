@@ -343,6 +343,8 @@ services:
         arguments:
             - []
             - '%kernel.project_dir%'
+        calls:
+            - ['setEmailTemplateFromRawDataFactory', ['@oro_email.model.factory.email_template_model_from_raw_data']]
         tags:
             - { name: oro_email.twig.email_template_loader, priority: 10 }
 

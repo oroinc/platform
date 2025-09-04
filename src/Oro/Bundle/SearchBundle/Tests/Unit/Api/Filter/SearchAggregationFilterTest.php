@@ -8,9 +8,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchAggregationFilter;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolver;
-use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolverFactory;
-use Oro\Bundle\SearchBundle\Engine\Indexer;
-use Oro\Bundle\SearchBundle\Query\IndexerQuery;
+use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolverFactoryInterface;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 
 /**
@@ -45,7 +43,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
                 return $fieldTypes[$fieldName] ?? 'text';
             });
 
-        $searchFieldResolverFactory = $this->createMock(SearchFieldResolverFactory::class);
+        $searchFieldResolverFactory = $this->createMock(SearchFieldResolverFactoryInterface::class);
         $searchFieldResolverFactory->expects(self::any())
             ->method('createFieldResolver')
             ->with(self::ENTITY_CLASS, $fieldMappings)
@@ -73,7 +71,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
      */
     public function testValidFilter(?FilterValue $filterValue, array $expectedAggregations)
     {
-        $query = new IndexerQuery($this->createMock(Indexer::class), new SearchQuery());
+        $query = new SearchQuery();
         $this->filter->apply(new Criteria(), $filterValue);
         $this->filter->applyToSearchQuery($query);
 
@@ -83,27 +81,24 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
     public function validFilterDataProvider(): array
     {
         return [
-            'no filter value'       => [
-                null,
-                []
-            ],
-            'field with mapping'    => [
-                new FilterValue('path', 'field1 count'),
-                ['field1Count' => ['field' => 'integer.field_1', 'function' => 'count', 'parameters' => []]]
-            ],
+            'no filter value' => [null, []],
             'field without mapping' => [
                 new FilterValue('path', 'field2 count'),
                 ['field2Count' => ['field' => 'text.field2', 'function' => 'count', 'parameters' => []]]
             ],
-            'custom field alias'    => [
+            'field with mapping' => [
+                new FilterValue('path', 'field1 count'),
+                ['field1Count' => ['field' => 'integer.field_1', 'function' => 'count', 'parameters' => []]]
+            ],
+            'custom field alias' => [
                 new FilterValue('path', 'field2 count myCount'),
                 ['myCount' => ['field' => 'text.field2', 'function' => 'count', 'parameters' => []]]
             ],
-            'several aggregations'  => [
+            'several aggregations' => [
                 new FilterValue('path', ['field2 count', 'field1 sum']),
                 [
                     'field2Count' => ['field' => 'text.field2', 'function' => 'count', 'parameters' => []],
-                    'field1Sum'   => ['field' => 'integer.field_1', 'function' => 'sum', 'parameters' => []]
+                    'field1Sum' => ['field' => 'integer.field_1', 'function' => 'sum', 'parameters' => []]
                 ]
             ]
         ];

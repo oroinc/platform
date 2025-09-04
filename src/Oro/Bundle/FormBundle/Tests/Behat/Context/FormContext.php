@@ -70,7 +70,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
             $form->fill($table);
 
             return true;
-        }, 3);
+        }, 5);
     }
 
     //@codingStandardsIgnoreStart
@@ -119,6 +119,25 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         }
 
         $field->clear();
+    }
+
+    /**
+     * Programmatically clears the textarea field.
+     * Use this step before filling new text when the textarea contains big amount of text - to avoid
+     * the performance impact caused by the way how selenium clears form fields (it triggers backspace for each
+     * symbol in the field - {@see \Behat\Mink\Driver\Selenium2Driver::setValue}).
+     *
+     * @When /^(?:|I )clear "(?P<fieldName>[\w\s]*)" textarea in form "(?P<formName>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )clear "(?P<fieldName>[\w\s]*)" textarea$/
+     */
+    public function iClearTextArea($fieldName, $formName = 'OroForm'): void
+    {
+        $field = $this->getFieldInForm($fieldName, $formName);
+        $xpath = $field->getXpath();
+        $oroSelenium2Driver = $this->getDriver();
+        $oroSelenium2Driver->focus($xpath);
+        $oroSelenium2Driver->executeJsOnXpath($xpath, '{{ELEMENT}}.value = "";');
+        $oroSelenium2Driver->blur($xpath);
     }
 
     /**

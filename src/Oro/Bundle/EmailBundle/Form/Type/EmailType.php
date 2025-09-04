@@ -97,6 +97,7 @@ class EmailType extends AbstractType
                     'required' => false,
                     'label' => 'oro.email.email_body.label',
                     'wysiwyg_options' => $this->getWysiwygOptions(),
+                    'block_prefix' => 'oro_email_email_body',
                 ]
             )
             ->add(
@@ -106,6 +107,8 @@ class EmailType extends AbstractType
                     'label' => 'oro.email.template.label',
                     'required' => false,
                     'depends_on_parent_field' => 'entityClass',
+                    'includeNonEntity' => $options['include_non_entity_templates'],
+                    'includeSystemTemplates' => $options['include_system_templates'],
                     'configs' => [
                         'allowClear' => true
                     ]
@@ -224,17 +227,20 @@ class EmailType extends AbstractType
         $entityClass = is_object($data) ? $data->getEntityClass() : $data['entityClass'];
         $organization = $this->emailTemplateOrganizationProvider->getOrganization();
 
+        $options = $form->getConfig()->getOptions();
+
         FormUtils::replaceField(
             $form,
             'template',
             [
                 'selectedEntity' => $entityClass,
                 'query_builder'  =>
-                    function (EmailTemplateRepository $templateRepository) use ($entityClass, $organization) {
+                    function (EmailTemplateRepository $templateRepository) use ($entityClass, $organization, $options) {
                         return $templateRepository->getEntityTemplatesQueryBuilder(
                             $entityClass,
                             $organization,
-                            true
+                            $options['include_non_entity_templates'],
+                            $options['include_system_templates'],
                         );
                     },
             ],
@@ -247,9 +253,11 @@ class EmailType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\Email',
-                'csrf_token_id'      => 'email',
-                'csrf_protection'    => true,
+                'data_class' => Email::class,
+                'csrf_token_id' => 'email',
+                'csrf_protection' => true,
+                'include_non_entity_templates' => true,
+                'include_system_templates' => true,
             ]
         );
     }

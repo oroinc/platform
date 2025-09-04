@@ -9,26 +9,24 @@ use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
+use Oro\Bundle\EmailBundle\Factory\EmailAttachmentEntityFromEmailTemplateAttachmentFactory;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as EmailAttachmentModel;
 use Oro\Bundle\EmailBundle\Form\Model\Factory;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateAttachmentModel;
 use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
+class EmailAttachmentTransformerTest extends TestCase
 {
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var AttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var EmailAttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAttachmentManager;
-
-    /** @var EmailAttachmentTransformer */
-    private $emailAttachmentTransformer;
+    private FileManager&MockObject $fileManager;
+    private AttachmentManager&MockObject $manager;
+    private EmailAttachmentManager&MockObject $emailAttachmentManager;
+    private EmailAttachmentEntityFromEmailTemplateAttachmentFactory&MockObject $emailAttachmentEntityFactory;
+    private EmailAttachmentTransformer $emailAttachmentTransformer;
 
     #[\Override]
     protected function setUp(): void
@@ -36,6 +34,8 @@ class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
         $this->fileManager = $this->createMock(FileManager::class);
         $this->manager = $this->createMock(AttachmentManager::class);
         $this->emailAttachmentManager = $this->createMock(EmailAttachmentManager::class);
+        $this->emailAttachmentEntityFactory =
+            $this->createMock(EmailAttachmentEntityFromEmailTemplateAttachmentFactory::class);
 
         $this->emailAttachmentTransformer = new EmailAttachmentTransformer(
             new Factory(),
@@ -43,9 +43,10 @@ class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
             $this->manager,
             $this->emailAttachmentManager
         );
+        $this->emailAttachmentTransformer->setEmailAttachmentEntityFactory($this->emailAttachmentEntityFactory);
     }
 
-    public function testEntityToModel()
+    public function testEntityToModel(): void
     {
         $emailAttachment = $this->createMock(EmailAttachment::class);
         $emailAttachment->expects($this->once())
@@ -93,7 +94,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(12, $attachmentModel->getFileSize());
     }
 
-    public function testAttachmentEntityToModel()
+    public function testAttachmentEntityToModel(): void
     {
         $file = new File();
         $file->setOriginalFilename('filename.txt');
@@ -134,7 +135,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(100, $attachmentModel->getFileSize());
     }
 
-    public function testAttachmentEntityToEntity()
+    public function testAttachmentEntityToEntity(): void
     {
         $file = new File();
         $file->setOriginalFilename('filename.txt');
@@ -161,7 +162,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('filename.txt', $emailAttachment->getFileName());
     }
 
-    public function testEntityFromUploadedFile()
+    public function testEntityFromUploadedFile(): void
     {
         $fileContent = "test attachment\n";
 
@@ -191,5 +192,108 @@ class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('text/plain', $emailAttachment->getContentType());
         $this->assertEquals('test.txt', $emailAttachment->getFileName());
+    }
+
+    public function testEntityFromEmailTemplateAttachment(): void
+    {
+        $emailTemplateAttachment = new EmailTemplateAttachmentModel();
+        $emailTemplateAttachment->setId(123);
+        $emailTemplateAttachment->setFilePlaceholder('{{ entity.file }}');
+
+        $templateParams = ['entity' => ['file' => new File()]];
+
+        $expectedEmailAttachment = new EmailAttachment();
+        $expectedEmailAttachment->setFileName('test.pdf');
+        $expectedEmailAttachment->setContentType('application/pdf');
+
+        $this->emailAttachmentEntityFactory
+            ->expects(self::once())
+            ->method('createEmailAttachmentEntities')
+            ->with($emailTemplateAttachment, $templateParams)
+            ->willReturn([$expectedEmailAttachment]);
+
+        $result = $this->emailAttachmentTransformer
+            ->entityFromEmailTemplateAttachment($emailTemplateAttachment, $templateParams);
+
+        self::assertIsArray($result);
+        self::assertCount(1, $result);
+        self::assertSame($expectedEmailAttachment, $result[0]);
+    }
+
+    public function testEntityFromEmailTemplateAttachmentWithMultipleAttachments(): void
+    {
+        $emailTemplateAttachment = new EmailTemplateAttachmentModel();
+        $emailTemplateAttachment->setId(789);
+        $emailTemplateAttachment->setFilePlaceholder('{{ entity.fileCollection }}');
+
+        $templateParams = ['entity' => ['fileCollection' => []]];
+
+        $expectedEmailAttachment1 = new EmailAttachment();
+        $expectedEmailAttachment1->setFileName('file1.pdf');
+        $expectedEmailAttachment1->setContentType('application/pdf');
+
+        $expectedEmailAttachment2 = new EmailAttachment();
+        $expectedEmailAttachment2->setFileName('file2.txt');
+        $expectedEmailAttachment2->setContentType('text/plain');
+
+        $expectedAttachments = [$expectedEmailAttachment1, $expectedEmailAttachment2];
+
+        $this->emailAttachmentEntityFactory
+            ->expects(self::once())
+            ->method('createEmailAttachmentEntities')
+            ->with($emailTemplateAttachment, $templateParams)
+            ->willReturn($expectedAttachments);
+
+        $result = $this->emailAttachmentTransformer
+            ->entityFromEmailTemplateAttachment($emailTemplateAttachment, $templateParams);
+
+        self::assertIsArray($result);
+        self::assertCount(2, $result);
+        self::assertSame($expectedEmailAttachment1, $result[0]);
+        self::assertSame($expectedEmailAttachment2, $result[1]);
+    }
+
+    public function testEntityFromEmailTemplateAttachmentWithEmptyResult(): void
+    {
+        $emailTemplateAttachment = new EmailTemplateAttachmentModel();
+        $emailTemplateAttachment->setId(999);
+        $emailTemplateAttachment->setFilePlaceholder('{{ entity.nonExistentFile }}');
+
+        $templateParams = ['entity' => []];
+
+        $this->emailAttachmentEntityFactory
+            ->expects(self::once())
+            ->method('createEmailAttachmentEntities')
+            ->with($emailTemplateAttachment, $templateParams)
+            ->willReturn([]);
+
+        $result = $this->emailAttachmentTransformer
+            ->entityFromEmailTemplateAttachment($emailTemplateAttachment, $templateParams);
+
+        self::assertIsArray($result);
+        self::assertEmpty($result);
+    }
+
+    public function testEntityFromEmailTemplateAttachmentWithNullFactory(): void
+    {
+        // Create transformer without setting factory
+        $transformer = new EmailAttachmentTransformer(
+            new Factory(),
+            $this->fileManager,
+            $this->manager,
+            $this->emailAttachmentManager
+        );
+
+        $emailTemplateAttachment = new EmailTemplateAttachmentModel();
+        $emailTemplateAttachment->setId(123);
+        $emailTemplateAttachment->setFilePlaceholder('{{ entity.file }}');
+
+        $templateParams = ['entity' => ['file' => new File()]];
+
+        $result = $transformer->entityFromEmailTemplateAttachment($emailTemplateAttachment, $templateParams);
+
+        // Verify BC layer returns empty array when factory is null
+        self::assertIsArray($result);
+        self::assertEmpty($result);
     }
 }

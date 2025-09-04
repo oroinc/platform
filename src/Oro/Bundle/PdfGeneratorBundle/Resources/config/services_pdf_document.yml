@@ -71,6 +71,16 @@ services:
         tags:
             - { name: 'oro_pdf_generator.pdf_document.resolver' }
             - { name: 'monolog.logger', channel: 'oro_pdf_generator' }
+    
+    oro_pdf_generator.pdf_document.resolver.external:
+        class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Resolver\ExternalPdfDocumentResolver'
+        arguments:
+            $doctrine: '@doctrine'
+        calls:
+            - [ 'setLogger', [ '@logger' ] ]
+        tags:
+            - { name: 'oro_pdf_generator.pdf_document.resolver' }
+            - { name: 'monolog.logger', channel: 'oro_pdf_generator' }
 
     oro_pdf_generator.pdf_document.url_generator:
         class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\UrlGenerator\PdfDocumentUrlGenerator'
@@ -87,6 +97,8 @@ services:
         class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Name\GenericPdfDocumentNameProvider'
         arguments:
             $entityNameResolver: '@oro_entity.entity_name_resolver'
+        calls:
+            - [ 'setPreferredLocalizationProvider', [ '@oro_locale.provider.preferred_localization_provider' ] ]
 
     # Abstract definition for the deferred PDF document operator.
     oro_pdf_generator.pdf_document.operator.deferred.abstract:
@@ -126,6 +138,25 @@ services:
                 entity_class: !php/const 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Operator\PdfDocumentOperatorRegistry::DEFAULT'
                 mode: !php/const 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\PdfDocumentGenerationMode::INSTANT'
 
+    # Abstract definition for the external PDF document operator.
+    oro_pdf_generator.pdf_document.operator.external.abstract:
+        abstract: true
+        class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Operator\GenericPdfDocumentOperator'
+        arguments:
+            $doctrine: '@doctrine'
+            $pdfDocumentFactory: '@oro_pdf_generator.pdf_document.factory.generic'
+            $pdfDocumentResolver: '@oro_pdf_generator.pdf_document.resolver.external'
+            $eventDispatcher: '@event_dispatcher'
+            $pdfDocumentGenerationMode: !php/const 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\PdfDocumentGenerationMode::EXTERNAL'
+
+    # Default definition for the external PDF document operator.
+    oro_pdf_generator.pdf_document.operator.external.default:
+        parent: oro_pdf_generator.pdf_document.operator.external.abstract
+        tags:
+            -   name: 'oro_pdf_generator.pdf_document.operator'
+                entity_class: !php/const 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Operator\PdfDocumentOperatorRegistry::DEFAULT'
+                mode: !php/const 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\PdfDocumentGenerationMode::EXTERNAL'
+    
     # The main entry point to retrieve a PDF document operator.
     oro_pdf_generator.pdf_document.operator.registry:
         class: 'Oro\Bundle\PdfGeneratorBundle\PdfDocument\Operator\PdfDocumentOperatorRegistry'
@@ -134,3 +165,12 @@ services:
 
     Oro\Bundle\PdfGeneratorBundle\PdfDocument\Operator\PdfDocumentOperatorRegistry:
         alias: 'oro_pdf_generator.pdf_document.operator.registry'
+
+    oro_pdf_generator.event_listener.doctrine.set_source_entity_for_pdf_document:
+        class: 'Oro\Bundle\PdfGeneratorBundle\EventListener\Doctrine\SetSourceEntityForPdfDocumentListener'
+        arguments:
+            $doctrineHelper: '@oro_entity.doctrine_helper'
+        tags:
+            - { name: 'kernel.event_listener', event: 'Oro\Bundle\PdfGeneratorBundle\Event\AfterPdfDocumentCreatedEvent', method: 'onAfterPdfDocumentCreated' }
+            - { name: 'doctrine.event_listener', event: 'postFlush' }
+            - { name: 'doctrine.event_listener', event: 'onClear' }

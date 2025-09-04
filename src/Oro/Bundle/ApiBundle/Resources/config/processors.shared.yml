@@ -755,7 +755,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildQuery
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@oro_api.filter_names_registry'
+            - '@oro_api.load_entity_ids_query_executor'
         tags:
             - { name: oro.api.processor, action: get_list, group: build_query, priority: -100 }
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: -100 }

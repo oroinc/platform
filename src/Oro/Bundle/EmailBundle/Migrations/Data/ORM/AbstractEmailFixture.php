@@ -5,6 +5,8 @@ namespace Oro\Bundle\EmailBundle\Migrations\Data\ORM;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\EmailBundle\EmailTemplateHydrator\EmailTemplateFromArrayHydrator;
+use Oro\Bundle\EmailBundle\EmailTemplateHydrator\EmailTemplateRawDataParser;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Role;
@@ -82,22 +84,35 @@ abstract class AbstractEmailFixture extends AbstractFixture implements
      */
     protected function loadTemplate(ObjectManager $manager, $fileName, array $file)
     {
-        $template = file_get_contents($file['path']);
-        $parsedTemplate = EmailTemplate::parseContent($template);
-        if (empty($parsedTemplate['params']['name'])) {
+        /** @var EmailTemplateRawDataParser $emailTemplateRawDataParser */
+        $emailTemplateRawDataParser = $this->container->get('oro_email.email_template_hydrator.raw_data_parser');
+
+        $rawData = file_get_contents($file['path']);
+        $arrayData = $emailTemplateRawDataParser->parseRawData($rawData);
+
+        if (empty($arrayData['type'])) {
+            $arrayData['type'] = $file['format'];
+        }
+
+        if (empty($arrayData['name'])) {
             throw new \LogicException(sprintf('Email template name is expected to be non empty in file %s', $fileName));
         }
 
-        if ($parsedTemplate['params']['name'] !== $this->getBasename($fileName)) {
+        if ($arrayData['name'] !== $this->getBasename($fileName)) {
             throw new \LogicException(
                 sprintf(
                     'Email template name is expected to be equal to its filename: "%s" is not equal to "%s"',
-                    $parsedTemplate['params']['name'],
+                    $arrayData['name'],
                     $this->getBasename($fileName)
                 )
             );
         }
 
+        // Keeping the legacy array structure for BC.
+        $parsedTemplate = [
+            'content' => $arrayData['content'] ?? '',
+            'params' => $arrayData,
+        ];
         $existingTemplate = $this->findExistingTemplate($manager, $parsedTemplate);
 
         if ($existingTemplate) {
@@ -114,20 +129,30 @@ abstract class AbstractEmailFixture extends AbstractFixture implements
      */
     protected function loadNewTemplate(ObjectManager $manager, $fileName, $file)
     {
-        $template = file_get_contents($file['path']);
-        $emailTemplate = new EmailTemplate($fileName, $template, $file['format']);
+        /** @var EmailTemplateRawDataParser $emailTemplateRawDataParser */
+        $emailTemplateRawDataParser = $this->container->get('oro_email.email_template_hydrator.raw_data_parser');
+
+        /** @var EmailTemplateFromArrayHydrator $emailTemplateFromArrayHydrator */
+        $emailTemplateFromArrayHydrator = $this->container->get('oro_email.email_template_hydrator.from_array');
+
+        $rawData = file_get_contents($file['path']);
+        $arrayData = $emailTemplateRawDataParser->parseRawData($rawData);
+
+        $emailTemplate = new EmailTemplate();
+        $emailTemplateFromArrayHydrator->hydrateFromArray($emailTemplate, $arrayData);
+
         $emailTemplate->setOwner($this->getAdminUser($manager));
         $emailTemplate->setOrganization($this->getOrganization($manager));
+
         $manager->persist($emailTemplate);
     }
 
     protected function updateExistingTemplate(EmailTemplate $emailTemplate, array $template)
     {
-        $emailTemplate->setContent($template['content']);
-        foreach ($template['params'] as $param => $value) {
-            $setter = sprintf('set%s', ucfirst($param));
-            $emailTemplate->$setter($value);
-        }
+        /** @var EmailTemplateFromArrayHydrator $emailTemplateFromArrayHydrator */
+        $emailTemplateFromArrayHydrator = $this->container->get('oro_email.email_template_hydrator.from_array');
+
+        $emailTemplateFromArrayHydrator->hydrateFromArray($emailTemplate, $template['params']);
     }
 
     /**

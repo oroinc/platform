@@ -9,6 +9,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Adding default localization for fields from the EmailTemplate entity
+ *
+ * Will be removed in 7.0, use {@link EmailTemplateDataMapper}.
  */
 class LocalizationAwareEmailTemplateDataMapper implements DataMapperInterface
 {

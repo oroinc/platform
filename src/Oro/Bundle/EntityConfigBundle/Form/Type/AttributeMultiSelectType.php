@@ -78,18 +78,20 @@ class AttributeMultiSelectType extends AbstractType
 
     private function getFieldNameByFieldId(int $id): string
     {
-        if ($this->isSystem($id)) {
-            return $this->translator->trans('oro.entity_config.attribute.system');
-        }
         /** @var FieldConfigModel $field */
         $field = $this->configFields[$id];
+        $fieldName = $field->getFieldName();
         $fieldAttributes = $field->toArray('attribute');
 
         if (!empty($fieldAttributes['field_name'])) {
-            return $fieldAttributes['field_name'];
+            $fieldName = $fieldAttributes['field_name'];
         }
 
-        return $field->getFieldName();
+        if ($this->isSystem($id)) {
+            $fieldName = sprintf('%s, %s', $fieldName, $this->translator->trans('oro.entity_config.attribute.system'));
+        }
+
+        return $fieldName;
     }
 
     #[\Override]

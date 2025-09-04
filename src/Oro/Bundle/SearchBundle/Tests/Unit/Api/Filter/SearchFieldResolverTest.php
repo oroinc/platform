@@ -18,16 +18,16 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
     {
         $this->fieldResolver = new SearchFieldResolver(
             [
-                'field_1'    => ['type' => 'integer'],
-                'field2'     => ['type' => 'decimal'],
-                'field3'     => ['type' => null],
-                'field4'     => [],
+                'field_1' => ['type' => 'integer'],
+                'field2' => ['type' => 'decimal'],
+                'field3' => ['type' => null],
+                'field4' => [],
                 'price_UNIT' => ['type' => 'decimal']
             ],
             [
-                'field1'               => 'field_1',
-                'another'              => 'another_field',
-                'price_(?<UNIT>\w+)'   => 'price_{UNIT}',
+                'field1' => 'field_1',
+                'another' => 'another_field',
+                'price_(?<UNIT>\w+)' => 'price_{UNIT}',
                 'another_(?<UNIT>\w+)' => 'another_{UNIT}'
             ]
         );
