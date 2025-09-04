@@ -191,7 +191,7 @@ class AclHelper
         if (\is_array($owners)) {
             return \count($owners) === 1
                 ? $expressionBuilder->eq('integer.' . $filterField, reset($owners))
-                : $expressionBuilder->in('integer.' . $filterField, $owners);
+                : $expressionBuilder->in('integer.' . $filterField, array_values($owners));
         }
 
         return $expressionBuilder->eq('integer.' . $filterField, $owners);
