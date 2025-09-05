@@ -2,7 +2,7 @@
 
 @use 'sass:color';
 
-$jstree-actions-display: none !default;
+$jstree-actions-display: initial !default;
 
 $jstree-actions-handle-offset: 0 3px !default;
 $jstree-actions-handle-color: $primary-400 !default;
