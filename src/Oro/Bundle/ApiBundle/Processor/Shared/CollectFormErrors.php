@@ -182,14 +182,18 @@ class CollectFormErrors implements ProcessorInterface
          */
         foreach ($foundErrors as [$parentForm, $error]) {
             $errorSource = $error->getSource();
-            if (null === $errorSource || !str_contains($errorSource->getPropertyPath(), ConfigUtil::PATH_DELIMITER)) {
+            if (null === $errorSource) {
+                continue;
+            }
+            $errorSourcePropertyPath = $errorSource->getPropertyPath();
+            if (!str_contains($errorSourcePropertyPath, ConfigUtil::PATH_DELIMITER)) {
                 continue;
             }
 
             $this->fixErrorPathRecursively(
                 $parentForm,
                 $parentForm->getData(),
-                ConfigUtil::explodePropertyPath($error->getSource()->getPropertyPath()),
+                ConfigUtil::explodePropertyPath($errorSourcePropertyPath),
                 0,
                 $error,
                 $requestType,
@@ -212,6 +216,7 @@ class CollectFormErrors implements ProcessorInterface
      * @param IncludedEntityCollection|null $includedEntities
      *
      * @return void
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function fixErrorPathRecursively(
         FormInterface $form,
@@ -222,8 +227,11 @@ class CollectFormErrors implements ProcessorInterface
         RequestType $requestType,
         ?IncludedEntityCollection $includedEntities
     ): void {
-        $max = \count($propertyPath);
+        if (!\is_object($formData)) {
+            return;
+        }
 
+        $max = \count($propertyPath);
         if ($max - $propertyPathKey > 1) {
             if ($formData instanceof Collection) {
                 foreach ($formData as $key => $item) {

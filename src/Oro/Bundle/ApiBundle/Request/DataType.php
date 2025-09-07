@@ -79,7 +79,7 @@ final class DataType
      * Usually, to increase readability, "scalar" and "object" data-types are used for "to-one" associations
      * and "array", "objects", "strings" or "data-type[]" data-types are used for "to-many" associations.
      * The "scalar" is usually used if a value of the field contains a scalar value.
-     * The "array" "scalar-data-type[]" (e.g. "scalar[]", "string[]", "integer[]", etc.) is usually used
+     * The "array" or "scalar-data-type[]" (e.g. "scalar[]", "string[]", "integer[]", etc.) is usually used
      * if a value of the field contains a list of scalar values.
      * The "object" is usually used if a value of the field contains several properties.
      * The "objects" or "object[]" is usually used if a value of the field contains a list of items
