@@ -13,6 +13,7 @@ use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
+use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
@@ -317,7 +318,7 @@ class DashboardController extends AbstractController
         $renderParams = $request->get('renderParams', []);
 
         $viewId = $this->container->get(WidgetConfigs::class)->getWidgetOptions()->get('gridView');
-        if ($viewId && null !== $view = $this->findView($viewId)) {
+        if ($viewId && null !== $view = $this->findView($gridName, $viewId)) {
             $params = array_merge(
                 $params,
                 [
@@ -352,13 +353,14 @@ class DashboardController extends AbstractController
     }
 
     /**
-     * @param int $id
+     * @param string $gridName
+     * @param mixed $id
      *
      * @return GridView
      */
-    protected function findView($id)
+    protected function findView(string $gridName, $id)
     {
-        return $this->container->get('doctrine')->getRepository(GridView::class)->find($id);
+        return $this->container->get(GridViewManager::class)->getView($id, true, $gridName);
     }
 
     /**
@@ -387,7 +389,8 @@ class DashboardController extends AbstractController
             WidgetConfigurationFormProvider::class,
             Manager::class,
             ConfigurationProviderInterface::class,
-            'doctrine' => ManagerRegistry::class
+            'doctrine' => ManagerRegistry::class,
+            GridViewManager::class
         ]);
     }
 }
