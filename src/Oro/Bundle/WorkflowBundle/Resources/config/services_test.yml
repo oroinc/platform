@@ -1,4 +1,11 @@
 services:
+    oro_workflow.test.configuration.provider.process_config:
+        class: Oro\Bundle\WorkflowBundle\Tests\Functional\Stub\ProcessConfigurationProviderStub
+        public: true
+        decorates: oro_workflow.configuration.provider.process_config
+        parent: oro_workflow.configuration.provider.process_config
+        decoration_priority: 100
+
     oro_workflow.tests.entity_manager_clearer_stub:
         class: Oro\Bundle\WorkflowBundle\Tests\Functional\Stub\EntityManagerClearerStub
         public: true
