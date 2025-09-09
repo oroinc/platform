@@ -6,17 +6,26 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Oro\Component\Testing\ReflectionUtil;
 
 class LoadProcessConfigurationCommandTest extends WebTestCase
 {
+    private string $oldConfigDirectory;
+
     #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
+        $provider = $this->getContainer()->get('oro_workflow.test.configuration.provider.process_config');
+        $this->oldConfigDirectory = $provider->getConfigDirectory();
+        $provider->setConfigDirectory('/Tests/Functional/Command/DataFixtures/');
+    }
 
-        $provider = $this->getContainer()->get('oro_workflow.configuration.provider.process_config');
-        ReflectionUtil::setPropertyValue($provider, 'configDirectory', '/Tests/Functional/Command/DataFixtures/');
+    #[\Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        $provider = $this->getContainer()->get('oro_workflow.test.configuration.provider.process_config');
+        $provider->setConfigDirectory($this->oldConfigDirectory);
     }
 
     /**
