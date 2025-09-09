@@ -65,7 +65,7 @@ class AclHelperTest extends TestCase
             'alias'        => 'testOrder',
             'aclCondition' => [
                 'owner',
-                [3, 5, 4, 6]
+                ['qwe' => 3, 1 => 5, '2' => 4, 'a' => 6] // array keys should be stripped
             ]
         ],
         'Oro\Test\Entity\BusinessUnit'   => [

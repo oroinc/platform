@@ -43,6 +43,7 @@ define(function(require) {
 
         getTemplateData() {
             const data = EmailAttachmentView.__super__.getTemplateData.call(this);
+            data.index = this.model.get('index');
             data.cid = this.model.cid;
             data.inputName = this.inputName;
 

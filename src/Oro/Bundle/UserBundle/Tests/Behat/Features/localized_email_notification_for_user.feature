@@ -12,7 +12,7 @@ Feature: Localized email notification for user
     And I follow "System Configuration/General Setup/Localization" on configuration sidebar
     And I fill form with:
       | Enabled Localizations | [English (United States), German Localization, French Localization] |
-      | Default Localization  | French Localization                                 |
+      | Default Localization  | French Localization                                                 |
     And I submit form
     Then I should see "Configuration saved" flash message
     When I go to System / User Management / Organizations
@@ -35,16 +35,19 @@ Feature: Localized email notification for user
     Given I go to System / Emails / Templates
     When I filter Template Name as is equal to "invite_user"
     And I click "edit" on first row in grid
+    And I clear "Content" textarea in form "Email Template Form"
     And fill "Email Template Form" with:
       | Subject | English Invite Subject |
       | Content | English Invite Body    |
     And I click "French"
+    And I clear "Content" textarea in form "Email Template Form"
     And fill "Email Template Form" with:
       | Subject Fallback | false                 |
       | Content Fallback | false                 |
       | Subject          | French Invite Subject |
       | Content          | French Invite Body    |
     And I click "German"
+    And I clear "Content" textarea in form "Email Template Form"
     And fill "Email Template Form" with:
       | Subject Fallback | false                 |
       | Content Fallback | false                 |
@@ -73,16 +76,19 @@ Feature: Localized email notification for user
     Given I go to System / Emails / Templates
     When I filter Template Name as is equal to "user_change_password"
     And I click "edit" on first row in grid
+    And I clear "Content" textarea in form "Email Template Form"
     And fill "Email Template Form" with:
       | Subject | English Change Password Subject |
       | Content | English Change Password Body    |
     And I click "French"
+    And I clear "Content" textarea in form "Email Template Form"
     And fill "Email Template Form" with:
       | Subject Fallback | false                          |
       | Content Fallback | false                          |
       | Subject          | French Change Password Subject |
       | Content          | French Change Password Body    |
     And I click "German"
+    And I clear "Content" textarea in form "Email Template Form"
     And fill "Email Template Form" with:
       | Subject Fallback | false                          |
       | Content Fallback | false                          |
@@ -106,21 +112,26 @@ Feature: Localized email notification for user
     Given I go to System / Emails / Templates
     When I filter Template Name as is equal to "force_reset_password"
     And I click "edit" on first row in grid
+    And I clear "Content" textarea in form "Email Template Form"
     And fill "Email Template Form" with:
       | Subject | English Reset Password Subject |
       | Content | English Reset Password Body    |
     And I click "French"
     And fill "Email Template Form" with:
-      | Subject Fallback | false                         |
-      | Content Fallback | false                         |
-      | Subject          | French Reset Password Subject |
-      | Content          | French Reset Password Body    |
+      | Subject Fallback | false |
+      | Content Fallback | false |
+    And I clear "Content" textarea in form "Email Template Form"
+    And fill "Email Template Form" with:
+      | Subject | French Reset Password Subject |
+      | Content | French Reset Password Body    |
     And I click "German"
     And fill "Email Template Form" with:
-      | Subject Fallback | false                         |
-      | Content Fallback | false                         |
-      | Subject          | German Reset Password Subject |
-      | Content          | German Reset Password Body    |
+      | Subject Fallback | false |
+      | Content Fallback | false |
+    And I clear "Content" textarea in form "Email Template Form"
+    And fill "Email Template Form" with:
+      | Subject | German Reset Password Subject |
+      | Content | German Reset Password Body    |
     And I submit form
     Then I should see "Template saved" flash message
     When I go to System / User Management / Users

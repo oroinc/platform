@@ -64,10 +64,10 @@ class AutoResponseRuleController extends AbstractController
         return $this->update($request, $rule);
     }
 
-    #[Route(path: '/template/{id}', options: ['expose' => true])]
+    #[Route(path: '/template/{id}', defaults: ['id' => 0], options: ['expose' => true])]
     #[Template('@OroEmail/AutoResponseRule/editTemplate.html.twig')]
     #[AclAncestor('oro_email_emailtemplate_update')]
-    public function editTemplateAction(EmailTemplate $template): array
+    public function editTemplateAction(?EmailTemplate $template = null): array
     {
         $form = $this->createForm(AutoResponseTemplateType::class, $template);
 

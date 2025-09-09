@@ -6,7 +6,11 @@ use Oro\Bundle\DashboardBundle\Event\WidgetConfigurationLoadEvent;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
+/**
+ * Sets datagrid grid views options for the datagrid widget
+ */
 class WidgetConfigurationLoadListener
 {
     /** @var ServiceLink */
@@ -40,10 +44,10 @@ class WidgetConfigurationLoadListener
         $datagrid = $this->datagridBuilder->build($gridConfiguration, new ParameterBag($gridParams));
         $metadata = $datagrid->getMetadata();
 
-        $choices = $metadata->offsetGetByPath('[gridViews][choices]', []);
+        $choices = $metadata->offsetGetByPath('[gridViews][views]', []);
         $viewChoices = [];
         foreach ($choices as $choice) {
-            $viewChoices[$choice['label']] = $choice['value'];
+            $viewChoices[$choice['label']] = $choice['name'];
         }
         if (!isset($configuration['fields'])) {
             $configuration['fields'] = [];
@@ -53,7 +57,7 @@ class WidgetConfigurationLoadListener
             $configuration['configuration'],
             [
                 'gridView' => [
-                    'type' => 'choice',
+                    'type' => ChoiceType::class,
                     'options' => [
                         'label' => 'oro.dashboard.grid.fields.grid_view.label',
                         'choices' => $viewChoices,

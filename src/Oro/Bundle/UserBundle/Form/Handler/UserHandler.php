@@ -6,6 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Sender\EmailTemplateSender;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
@@ -32,6 +33,8 @@ class UserHandler extends AbstractUserHandler
     /** @var ConfigManager */
     protected $userConfigManager;
 
+    private ?FeatureChecker $featureChecker;
+
     private ?EmailTemplateSender $emailTemplateSender;
 
     public function __construct(
@@ -41,7 +44,8 @@ class UserHandler extends AbstractUserHandler
         ?EmailTemplateSender $emailTemplateSender = null,
         ?ConfigManager $userConfigManager = null,
         ?TranslatorInterface $translator = null,
-        ?LoggerInterface $logger = null
+        ?LoggerInterface $logger = null,
+        ?FeatureChecker $featureChecker = null
     ) {
         parent::__construct($form, $requestStack, $manager);
 
@@ -49,6 +53,7 @@ class UserHandler extends AbstractUserHandler
         $this->userConfigManager = $userConfigManager;
         $this->translator = $translator;
         $this->logger = $logger;
+        $this->featureChecker = $featureChecker;
     }
 
     #[\Override]
@@ -113,18 +118,31 @@ class UserHandler extends AbstractUserHandler
             return '';
         }
 
-        $sendPasswordInEmail = $this->userConfigManager &&
-            $this->userConfigManager->get('oro_user.send_password_in_invitation_email');
+        $usePasswords = $this->isUsePassword();
+        $sendPasswordInEmail = $usePasswords
+            && $this->userConfigManager
+            && $this->userConfigManager->get('oro_user.send_password_in_invitation_email');
 
-        if (!$sendPasswordInEmail && !$user->getConfirmationToken()) {
+        if ($usePasswords && !$sendPasswordInEmail && !$user->getConfirmationToken()) {
             $user->setConfirmationToken($user->generateToken());
         }
 
-        if ($this->form->has('passwordGenerate') && $this->form->get('passwordGenerate')->getData()) {
+        if ($this->isPasswordShouldBeGenerated($usePasswords)) {
             $user->setPlainPassword($this->manager->generatePassword(10));
         }
 
         return $sendPasswordInEmail ? $user->getPlainPassword() : '';
+    }
+
+    protected function isPasswordShouldBeGenerated(bool $usePasswords): bool
+    {
+        return !$usePasswords
+            || ($this->form->has('passwordGenerate') && $this->form->get('passwordGenerate')->getData());
+    }
+
+    private function isUsePassword(): bool
+    {
+        return !$this->featureChecker || $this->featureChecker->isFeatureEnabled('user_login_password');
     }
 
     /**

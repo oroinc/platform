@@ -354,4 +354,58 @@ final class LayoutThemeAwarePdfDocumentTemplateProviderTest extends TestCase
 
         self::assertNull($result);
     }
+
+    public function testGetContentTemplateReturnsNullWhenThemeNameIsNull(): void
+    {
+        $pdfDocumentType = 'sample';
+
+        $this->themeConfigurationProvider
+            ->expects(self::once())
+            ->method('getThemeName')
+            ->willReturn(null);
+
+        $this->themeManager
+            ->expects(self::never())
+            ->method('getThemesHierarchy');
+
+        $result = $this->provider->getContentTemplate($pdfDocumentType);
+
+        self::assertNull($result);
+    }
+
+    public function testGetHeaderTemplateReturnsNullWhenThemeNameIsNull(): void
+    {
+        $pdfDocumentType = 'sample';
+
+        $this->themeConfigurationProvider
+            ->expects(self::once())
+            ->method('getThemeName')
+            ->willReturn(null);
+
+        $this->themeManager
+            ->expects(self::never())
+            ->method('getThemesHierarchy');
+
+        $result = $this->provider->getHeaderTemplate($pdfDocumentType);
+
+        self::assertNull($result);
+    }
+
+    public function testGetFooterTemplateReturnsNullWhenThemeNameIsNull(): void
+    {
+        $pdfDocumentType = 'sample';
+
+        $this->themeConfigurationProvider
+            ->expects(self::once())
+            ->method('getThemeName')
+            ->willReturn(null);
+
+        $this->themeManager
+            ->expects(self::never())
+            ->method('getThemesHierarchy');
+
+        $result = $this->provider->getFooterTemplate($pdfDocumentType);
+
+        self::assertNull($result);
+    }
 }

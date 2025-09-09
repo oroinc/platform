@@ -42,6 +42,7 @@ aliases:
     module-config$: oroui/js/app/services/module-config
     oro/block-widget$: oroui/js/widget/block-widget
     oro/buttons-widget$: oroui/js/widget/buttons-widget
+    oro/inline-widget$: oroui/js/widget/inline-widget
     oro/page-widget$: oroui/js/widget/page-widget
     oroui/js/widget-manager$: oroui/js/widget/widget-manager
     overlayScrollbars$: overlayscrollbars/js/OverlayScrollbars

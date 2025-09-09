@@ -196,6 +196,9 @@ services:
             - '@oro_datagrid.datagrid.manager'
             - '@oro_datagrid.datagrid.board.restriction_manager'
 
+    Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager:
+        alias: oro_datagrid.grid_view.manager
+
     oro_datagrid.appearance_type.manager:
         class: Oro\Bundle\DataGridBundle\Entity\Manager\AppearanceTypeManager
         arguments:

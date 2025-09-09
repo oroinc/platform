@@ -43,7 +43,10 @@
                         bcc: entity.bcc,
                         appendSignature: appendSignature,
                         minimalWysiwygEditorHeight: 150,
-                        isSignatureEditable: is_granted('oro_user_user_update')
+                        isSignatureEditable: is_granted('oro_user_user_update'),
+                        editorComponentName: form.body.vars.attr['data-page-component-name'] is defined
+                        ? form.body.vars.attr['data-page-component-name']
+                        : form.body.vars.attr['data-ftid']
                     } %}
                     <fieldset class="form-horizontal"
                               data-page-component-module="oroemail/js/app/components/email-editor-component"
@@ -63,35 +66,19 @@
 
                         {{ form_row(form.type) }}
                         {{ form_row(form.body) }}
-
-                        <div class="control-group email-body-actions">
-                            <div class="controls">
-                                <span class="email-body-action"><a id="add-signature" href="#">{{ 'oro.email.form.add_signature'|trans }}</a></span>
-
-                                <span>{{ 'oro.email.form.attach_file'|trans }}: </span>
-                                <div class="dropup" style="display: inline-block">
-                                    <a class="attach-file dropdown-toggle" href="#" aria-expanded="true">{{ 'oro.email.form.from_record'|trans }}</a>
-                                    <div class="dropdown-menu attachment-list-popup" role="menu" aria-labelledby="attach-file"></div>
-                                </div>
-                                <a class="upload-new divider" href="#">{{ 'oro.email.form.upload'|trans }}</a>
-                            </div>
+                        {{ form_row(form.attachments) }}
+                        {{ form_row(form.contexts) }}
+                        {% if form.organization is defined %}
+                            {{ form_row(form.organization) }}
+                        {% endif %}
+                        <div class="hide">
+                            {{ form_rest(form) }}
                         </div>
 
-                        {# To transfer data from php attachment model to JS modify oro_email_attachments_row Form block widget. See: "Form/fields.html.twig" #}
-                        {% set emailAttachmentOptions = {
-                            popupTriggerButton: '.attach-file',
-                            uploadNewButton: '.upload-new',
-                            popupContentEl: '.attachment-list-popup',
-                            entityAttachments: entity.attachments.toArray,
-                            attachmentsAvailable: entity.attachmentsAvailable
-                        } %}
-                        {{ form_row(form.attachments, {options: emailAttachmentOptions}) }}
-
-                        {{ form_rest(form) }}
                         <div class="widget-actions form-actions" style="display: none;">
                             {% block page_container_form_actions %}
-                                <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
-                                <button class="btn btn-success" type="submit">{{ 'Send'|trans }}</button>
+                                <button class="btn" type="reset">{{ 'oro.email.form.btn.cancel'|trans }}</button>
+                                <button class="btn btn-success" type="submit">{{ 'oro.email.form.btn.send'|trans }}</button>
                             {% endblock %}
                         </div>
                     </fieldset>

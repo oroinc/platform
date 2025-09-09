@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Form\Model;
 
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment as EmailAttachmentEntity;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateAttachmentModel;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -10,12 +11,13 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class EmailAttachment
 {
-    const TYPE_ATTACHMENT       = 1; // oro attachment (OroAttachmentBundle)
-    const TYPE_EMAIL_ATTACHMENT = 2; // email attachment
-    const TYPE_UPLOADED         = 3; // new uploaded file
+    public const int TYPE_ATTACHMENT = 1; // oro attachment (OroAttachmentBundle)
+    public const int TYPE_EMAIL_ATTACHMENT = 2; // email attachment
+    public const int TYPE_UPLOADED = 3; // new uploaded file
+    public const int TYPE_EMAIL_TEMPLATE_ATTACHMENT = 4; // email template attachment
 
     /**
-     * @var int
+     * @var int|string
      */
     protected $id;
 
@@ -40,9 +42,11 @@ class EmailAttachment
     protected $modified;
 
     /**
-     * @var EmailAttachment
+     * @var EmailAttachmentEntity
      */
     protected $emailAttachment;
+
+    protected ?EmailTemplateAttachmentModel $emailTemplateAttachment = null;
 
     /**
      * @var UploadedFile
@@ -70,7 +74,7 @@ class EmailAttachment
     protected $errors = [];
 
     /**
-     * @return int
+     * @return int|string
      */
     public function getId()
     {
@@ -78,7 +82,7 @@ class EmailAttachment
     }
 
     /**
-     * @param int $id
+     * @param int|string $id
      *
      * @return $this
      */
@@ -128,6 +132,18 @@ class EmailAttachment
         if ($this->emailAttachment) {
             $this->setFileName($this->emailAttachment->getFileName());
         }
+
+        return $this;
+    }
+
+    public function getEmailTemplateAttachment(): ?EmailTemplateAttachmentModel
+    {
+        return $this->emailTemplateAttachment;
+    }
+
+    public function setEmailTemplateAttachment(?EmailTemplateAttachmentModel $emailTemplateAttachment): self
+    {
+        $this->emailTemplateAttachment = $emailTemplateAttachment;
 
         return $this;
     }

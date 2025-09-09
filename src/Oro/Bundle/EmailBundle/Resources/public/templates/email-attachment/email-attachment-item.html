@@ -14,8 +14,8 @@
         <% } %>
     <% } %>
     <div class="attachment-item__form-rest">
-        <input name="<%- inputName %>[<%- cid %>][id]" type="text" value="<%- id %>"/>
-        <input name="<%- inputName %>[<%- cid %>][type]" type="text" value="<%- type %>" class="attachment-type"/>
-        <input name="<%- inputName %>[<%- cid %>][file]" class="no-uniform" type="file"/>
+        <input name="<%- inputName %>[<%- index ?? cid %>][id]" type="text" value="<%- id %>"/>
+        <input name="<%- inputName %>[<%- index ?? cid %>][type]" type="text" value="<%- type %>" class="attachment-type"/>
+        <input name="<%- inputName %>[<%- index ?? cid %>][file]" class="no-uniform" type="file"/>
     </div>
 </div>

@@ -18,6 +18,7 @@ class EmailTemplateTranslationCollectionType extends AbstractType
             'wysiwyg_enabled' => $options['wysiwyg_enabled'],
             'wysiwyg_options' => $options['wysiwyg_options'],
             'block_name' => 'template',
+            'entity_class' => $options['entity_class'],
         ]);
 
         foreach ($options['localizations'] as $localization) {
@@ -26,6 +27,7 @@ class EmailTemplateTranslationCollectionType extends AbstractType
                 'wysiwyg_enabled' => $options['wysiwyg_enabled'],
                 'wysiwyg_options' => $options['wysiwyg_options'],
                 'block_name' => 'template',
+                'entity_class' => $options['entity_class'],
             ]);
         }
     }
@@ -38,6 +40,12 @@ class EmailTemplateTranslationCollectionType extends AbstractType
             'wysiwyg_enabled' => false,
             'wysiwyg_options' => [],
         ]);
+
+        $resolver
+            ->define('entity_class')
+            ->default(null)
+            ->allowedTypes('string', 'null')
+            ->info('FQCN of the entity to fetch available email template attachment variables from.');
     }
 
     #[\Override]
