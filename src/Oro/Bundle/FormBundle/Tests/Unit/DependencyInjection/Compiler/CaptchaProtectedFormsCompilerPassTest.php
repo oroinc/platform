@@ -17,17 +17,17 @@ class CaptchaProtectedFormsCompilerPassTest extends TestCase
             ->setArgument('$protectedForms', new AbstractArgument());
         $container->register('form_1_service')
             ->addTag('form.type')
-            ->addTag('oro_form.captcha_protected', ['form_name' => 'form_1']);
+            ->addTag('oro_form.captcha_protected', ['form_name' => 'form_1', 'scope_restriction' => 'all']);
         $container->register('form_2_service')
             ->addTag('form.type')
-            ->addTag('oro_form.captcha_protected', ['form_name' => 'form_2']);
+            ->addTag('oro_form.captcha_protected', ['form_name' => 'form_2', 'scope_restriction' => 'global']);
         $container->register('form_3_service')
             ->addTag('form.type');
 
         $compiler = new CaptchaProtectedFormsCompilerPass();
         $compiler->process($container);
 
-        self::assertEquals(['form_1', 'form_2'], $registry->getArgument('$protectedForms'));
+        self::assertEquals(['form_1' => 'all', 'form_2' => 'global'], $registry->getArgument('$protectedForms'));
     }
 
     public function testProcessWhenFormNameAttributeIsMissing(): void
