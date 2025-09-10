@@ -27,6 +27,7 @@ class OroFormBundle extends Bundle
         $container->addCompilerPass(new Compiler\AutocompleteCompilerPass());
         $container->addCompilerPass(new Compiler\FormGuesserCompilerPass());
         $container->addCompilerPass(new PublicFormServicesPass());
+        $container->addCompilerPass(new Compiler\CaptchaProtectedFormsCompilerPass());
         $container->addCompilerPass(new PriorityTaggedLocatorCompilerPass(
             'oro_form.registry.form_template_data_provider',
             'oro_form.form_template_data_provider',

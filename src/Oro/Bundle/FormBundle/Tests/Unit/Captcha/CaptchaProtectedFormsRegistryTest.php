@@ -37,4 +37,13 @@ class CaptchaProtectedFormsRegistryTest extends TestCase
 
         $this->assertSame(['form1', 'form2'], $registry->getProtectedForms());
     }
+
+    public function testProtectedFormsByScope(): void
+    {
+        $registry = new CaptchaProtectedFormsRegistry(
+            ['form1' => 'all', 'form2' => 'global', 'form3' => 'all']
+        );
+
+        $this->assertEquals(['form1', 'form2', 'form3'], $registry->getProtectedFormsByScope('app'));
+    }
 }

@@ -16,6 +16,6 @@ class AddLoginFormToCaptchaProtected implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $protectedFormsRegistry = $container->getDefinition('oro_form.captcha.protected_forms_registry');
-        $protectedFormsRegistry->addMethodCall('protectForm', ['oro_user_form_login']);
+        $protectedFormsRegistry->addMethodCall('protectFormWithRestrictions', ['oro_user_form_login', 'global']);
     }
 }

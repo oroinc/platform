@@ -55,7 +55,7 @@ services:
     oro_form.captcha.protected_forms_registry:
         class: Oro\Bundle\FormBundle\Captcha\CaptchaProtectedFormsRegistry
         arguments:
-            - !tagged_iterator { tag: 'oro_form.captcha_protected', index_by: 'form_name' }
+            - !abstract '$protectedForms defined in Oro\Bundle\FormBundle\DependencyInjection\Compiler\CaptchaProtectedFormsCompilerPass'
 
     oro_form.captcha.form_extension:
         class: Oro\Bundle\FormBundle\Form\Extension\CaptchaExtension
