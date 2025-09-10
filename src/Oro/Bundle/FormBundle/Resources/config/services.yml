@@ -121,3 +121,8 @@ services:
             - !service
                 class: Oro\Component\ExpressionLanguage\ExpressionLanguage
             - '@property_accessor'
+
+    oro_form.event_listener.captcha_protected_forms_config_listener:
+        class: Oro\Bundle\FormBundle\EventListener\CaptchaProtectedFormsConfigListener
+        tags:
+            - { name: kernel.event_listener, event: oro_config.settings_form_options_set, method: setConfig }

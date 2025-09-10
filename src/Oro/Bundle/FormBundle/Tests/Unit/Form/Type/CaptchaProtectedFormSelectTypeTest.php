@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
 use Oro\Bundle\FormBundle\Captcha\CaptchaProtectedFormsRegistry;
 use Oro\Bundle\FormBundle\Form\Type\CaptchaProtectedFormSelectType;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -25,7 +26,8 @@ class CaptchaProtectedFormSelectTypeTest extends TypeTestCase
         $protectedForms = ['form1', 'form2'];
 
         $this->formsRegistry->expects($this->once())
-            ->method('getProtectedForms')
+            ->method('getProtectedFormsByScope')
+            ->with(GlobalScopeManager::SCOPE_NAME)
             ->willReturn($protectedForms);
 
         $type = new CaptchaProtectedFormSelectType($this->formsRegistry);

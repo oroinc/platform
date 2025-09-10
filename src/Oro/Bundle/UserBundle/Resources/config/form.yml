@@ -47,7 +47,7 @@ services:
         class: Oro\Bundle\UserBundle\Form\Type\UserPasswordResetRequestType
         tags:
             - { name: form.type, alias: oro_user_password_request }
-            - { name: oro_form.captcha_protected, form_name: oro_user_password_request }
+            - { name: oro_form.captcha_protected, form_name: oro_user_password_request, scope_restriction: 'global' }
 
     Oro\Bundle\UserBundle\Form\Handler\UserPasswordResetHandler:
         arguments:
