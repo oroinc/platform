@@ -12,7 +12,10 @@ class ApiRequestHelperTest extends TestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->apiRequestHelper = new ApiRequestHelper('^/api/(?!(rest|doc)($|/.*))');
+        $this->apiRequestHelper = new ApiRequestHelper([
+            '^/api/(?!(rest|doc)($|/.*))',
+            '^/another_api/(?!(rest|doc)($|/.*))'
+        ]);
     }
 
     /**
@@ -30,7 +33,8 @@ class ApiRequestHelperTest extends TestCase
     {
         return [
             ['/product/view/1', false],
-            ['/api/products/1', true]
+            ['/api/products/1', true],
+            ['/another_api/products/1', true]
         ];
     }
 }
