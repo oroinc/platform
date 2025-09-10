@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\FormBundle\Captcha\CaptchaProtectedFormsRegistry;
 use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -21,10 +22,16 @@ class CaptchaProtectedFormsCompilerPass implements CompilerPassInterface
         $protectedForms = [];
         foreach ($container->findTaggedServiceIds(self::TAG_NAME) as $id => $tags) {
             foreach ($tags as $attributes) {
-                $protectedForms[] = $this->getRequiredAttribute($attributes, 'form_name', $id, self::TAG_NAME);
+                $formName = $this->getRequiredAttribute($attributes, 'form_name', $id, self::TAG_NAME);
+                $scopeRestriction = $this->getAttribute(
+                    $attributes,
+                    'scope_restriction',
+                    CaptchaProtectedFormsRegistry::ALL
+                );
+                $protectedForms[$formName] = $scopeRestriction;
             }
         }
         $container->getDefinition('oro_form.captcha.protected_forms_registry')
-            ->setArgument('$protectedForms', array_unique($protectedForms));
+            ->setArgument('$protectedForms', $protectedForms);
     }
 }
