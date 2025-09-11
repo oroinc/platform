@@ -32,7 +32,7 @@ class EntityAliasStorage extends BaseEntityAliasStorage
 
         $configFiles = array_map(
             function ($fileName) {
-                return sprintf('"Resources/config/oro/%s"', $fileName);
+                return \sprintf('"Resources/config/oro/%s"', $fileName);
             },
             $this->configFiles
         );
@@ -54,12 +54,12 @@ class EntityAliasStorage extends BaseEntityAliasStorage
      */
     protected function validateAlias($entityClass, $value, $isPluralAlias)
     {
-        if (!preg_match('/^[a-z][a-z0-9\-\_]*$/D', $value)) {
-            throw new InvalidEntityAliasException(sprintf(
+        if (!preg_match('/^[a-zA-Z][a-zA-Z0-9\-_]*$/D', $value)) {
+            throw new InvalidEntityAliasException(\sprintf(
                 'The string "%s" cannot be used as %s for the "%s" entity '
                 . 'because it contains illegal characters. '
-                . 'The valid alias should start with a letter and only contain '
-                . 'lower case letters, numbers, hyphens ("-") and underscores ("_").',
+                . 'The valid alias should start with a latin letter and only contain '
+                . 'latin letters, digits, underscores ("_") and hyphens ("-").',
                 $value,
                 $isPluralAlias ? 'the plural alias' : 'the alias',
                 $entityClass
