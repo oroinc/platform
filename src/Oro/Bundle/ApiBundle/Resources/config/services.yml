@@ -175,7 +175,7 @@ services:
     oro_api.request_helper:
         class: Oro\Bundle\ApiBundle\Request\ApiRequestHelper
         arguments:
-            - '%oro_api.rest.pattern%'
+            - ['%oro_api.rest.pattern%']
 
     oro_api.value_normalizer:
         class: Oro\Bundle\ApiBundle\Request\ValueNormalizer
@@ -787,7 +787,8 @@ services:
     oro_api.rest.routing_options_resolver.prefix:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestPrefixRouteOptionsResolver
         arguments:
-            - '@service_container'
+            - '%oro_api.rest.prefix%'
+            - '%%oro_api.rest.prefix%%'
         tags:
             - { name: routing.options_resolver, priority: -255 }
 

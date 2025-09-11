@@ -2,24 +2,19 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
-use Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 
 /**
- * Resolves "oro_api.rest.prefix" DIC parameter in route path and "override_path" option.
+ * Resolves API prefix in route path and "override_path" option.
  */
 class RestPrefixRouteOptionsResolver implements RouteOptionsResolverInterface
 {
-    private const PREFIX = '%' . OroApiExtension::REST_API_PREFIX_PARAMETER_NAME . '%';
-
-    private ContainerInterface $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private readonly string $apiPrefix,
+        private readonly string $apiPrefixPlaceholder
+    ) {
     }
 
     #[\Override]
@@ -37,18 +32,11 @@ class RestPrefixRouteOptionsResolver implements RouteOptionsResolverInterface
 
     private function hasPrefix(string $value): bool
     {
-        return str_contains($value, self::PREFIX);
+        return str_contains($value, $this->apiPrefixPlaceholder);
     }
 
-    /**
-     * Replaces %parameter% with it's value.
-     */
     private function resolvePrefix(string $value): string
     {
-        return str_replace(
-            self::PREFIX,
-            $this->container->getParameter(OroApiExtension::REST_API_PREFIX_PARAMETER_NAME),
-            $value
-        );
+        return str_replace($this->apiPrefixPlaceholder, $this->apiPrefix, $value);
     }
 }

@@ -6,7 +6,6 @@ use Oro\Bundle\ApiBundle\ApiDoc\RestPrefixRouteOptionsResolver;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Routing\Route;
 
 class RestPrefixRouteOptionsResolverTest extends TestCase
@@ -17,10 +16,8 @@ class RestPrefixRouteOptionsResolverTest extends TestCase
     #[\Override]
     protected function setUp(): void
     {
-        $container = new Container();
-        $container->setParameter('oro_api.rest.prefix', '/api/');
         $this->routeCollectionAccessor = $this->createMock(RouteCollectionAccessor::class);
-        $this->routeOptionsResolver = new RestPrefixRouteOptionsResolver($container);
+        $this->routeOptionsResolver = new RestPrefixRouteOptionsResolver('/api/', '%oro_api.rest.prefix%');
     }
 
     public function testResolvePath(): void
