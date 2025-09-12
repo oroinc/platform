@@ -8,7 +8,7 @@ namespace Oro\Bundle\ApiBundle\Filter;
 class FilterNames
 {
     public function __construct(
-        private readonly string $sortFilterName,
+        private readonly ?string $sortFilterName,
         private readonly string $pageNumberFilterName,
         private readonly string $pageSizeFilterName,
         private readonly ?string $metaPropertyFilterName = null,
@@ -22,7 +22,7 @@ class FilterNames
      * Gets the name of a filter that can be used to specify how a result collection should be sorted.
      * @see \Oro\Bundle\ApiBundle\Filter\SortFilter
      */
-    public function getSortFilterName(): string
+    public function getSortFilterName(): ?string
     {
         return $this->sortFilterName;
     }
