@@ -14,6 +14,9 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class RemoveMetaPropertyFilterTest extends GetProcessorTestCase
 {
+    /** @var FilterNames|\PHPUnit\Framework\MockObject\MockObject */
+    private $filterNames;
+
     /** @var RemoveMetaPropertyFilter */
     private $processor;
 
@@ -22,15 +25,12 @@ class RemoveMetaPropertyFilterTest extends GetProcessorTestCase
     {
         parent::setUp();
 
-        $filterNames = $this->createMock(FilterNames::class);
-        $filterNames->expects(self::any())
-            ->method('getMetaPropertyFilterName')
-            ->willReturn('meta');
+        $this->filterNames = $this->createMock(FilterNames::class);
 
         $this->processor = new RemoveMetaPropertyFilter(
             new FilterNamesRegistry(
                 [['filter_names', null]],
-                TestContainerBuilder::create()->add('filter_names', $filterNames)->getContainer($this),
+                TestContainerBuilder::create()->add('filter_names', $this->filterNames)->getContainer($this),
                 new RequestExpressionMatcher()
             )
         );
@@ -40,6 +40,9 @@ class RemoveMetaPropertyFilterTest extends GetProcessorTestCase
     {
         $filter = new MetaPropertyFilter(DataType::STRING);
 
+        $this->filterNames->expects(self::never())
+            ->method('getMetaPropertyFilterName');
+
         $this->context->setConfig(null);
         $this->context->getFilters()->add('meta', $filter);
         $this->processor->process($this->context);
@@ -47,11 +50,32 @@ class RemoveMetaPropertyFilterTest extends GetProcessorTestCase
         self::assertSame($filter, $this->context->getFilters()->get('meta'));
     }
 
+    public function testProcessWhenMetaFilterIsNotSupported()
+    {
+        $filter = new MetaPropertyFilter(DataType::STRING);
+        $config = new EntityDefinitionConfig();
+        $config->disableMetaProperties();
+
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('');
+
+        $this->context->setConfig($config);
+        $this->context->getFilters()->add('meta', $filter);
+        $this->processor->process($this->context);
+
+        self::assertTrue($this->context->getFilters()->has('meta'));
+    }
+
     public function testProcessWhenMetaFilterIsDisabled()
     {
         $filter = new MetaPropertyFilter(DataType::STRING);
         $config = new EntityDefinitionConfig();
         $config->disableMetaProperties();
+
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
 
         $this->context->setConfig($config);
         $this->context->getFilters()->add('meta', $filter);
@@ -64,6 +88,9 @@ class RemoveMetaPropertyFilterTest extends GetProcessorTestCase
     {
         $filter = new MetaPropertyFilter(DataType::STRING);
         $config = new EntityDefinitionConfig();
+
+        $this->filterNames->expects(self::never())
+            ->method('getMetaPropertyFilterName');
 
         $this->context->setConfig($config);
         $this->context->getFilters()->add('meta', $filter);

@@ -18,6 +18,9 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class ValidateMetaPropertyFilterSupportedTest extends GetProcessorTestCase
 {
+    /** @var FilterNames|\PHPUnit\Framework\MockObject\MockObject */
+    private $filterNames;
+
     private ValidateMetaPropertyFilterSupported $processor;
 
     #[\Override]
@@ -25,24 +28,51 @@ class ValidateMetaPropertyFilterSupportedTest extends GetProcessorTestCase
     {
         parent::setUp();
 
-        $filterNames = $this->createMock(FilterNames::class);
-        $filterNames->expects(self::any())
-            ->method('getMetaPropertyFilterName')
-            ->willReturn('meta');
+        $this->filterNames = $this->createMock(FilterNames::class);
 
         $this->processor = new ValidateMetaPropertyFilterSupported(
             new FilterNamesRegistry(
                 [['filter_names', null]],
-                TestContainerBuilder::create()->add('filter_names', $filterNames)->getContainer($this),
+                TestContainerBuilder::create()->add('filter_names', $this->filterNames)->getContainer($this),
                 new RequestExpressionMatcher()
             )
         );
+    }
+
+    public function testProcessWhenMetaFilterIsNotSupported(): void
+    {
+        $config = new EntityDefinitionConfig();
+        $config->enableMetaProperties();
+        $config->disableMetaProperty('test2');
+
+        $configExtra = new MetaPropertiesConfigExtra();
+        $configExtra->addMetaProperty('test2', 'string');
+
+        $filter = new MetaPropertyFilter('string');
+        $filter->addAllowedMetaProperty('test1', 'string');
+        $filter->addAllowedMetaProperty('test2', 'string');
+
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('');
+
+        $this->context->setConfig($config);
+        $this->context->addConfigExtra($configExtra);
+        $this->context->getFilters()->add('meta', $filter);
+        $this->context->getFilterValues()->set('meta', new FilterValue('meta', 'test2'));
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
     }
 
     public function testProcessWhenNoMetaFilterValue(): void
     {
         $config = new EntityDefinitionConfig();
         $config->enableMetaProperties();
+
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
 
         $this->context->setConfig($config);
         $this->processor->process($this->context);
@@ -55,6 +85,10 @@ class ValidateMetaPropertyFilterSupportedTest extends GetProcessorTestCase
         $config = new EntityDefinitionConfig();
         $config->enableMetaProperties();
 
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
+
         $this->context->setConfig($config);
         $this->context->getFilterValues()->set('meta', new FilterValue('meta', 'test'));
         $this->processor->process($this->context);
@@ -66,6 +100,10 @@ class ValidateMetaPropertyFilterSupportedTest extends GetProcessorTestCase
     {
         $config = new EntityDefinitionConfig();
         $config->disableMetaProperties();
+
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
 
         $this->context->setConfig($config);
         $this->context->getFilterValues()->set('meta', new FilterValue('meta', 'test'));
@@ -93,6 +131,10 @@ class ValidateMetaPropertyFilterSupportedTest extends GetProcessorTestCase
         $filter->addAllowedMetaProperty('test1', 'string');
         $filter->addAllowedMetaProperty('test2', 'string');
 
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
+
         $this->context->setConfig($config);
         $this->context->addConfigExtra($configExtra);
         $this->context->getFilters()->add('meta', $filter);
@@ -114,6 +156,10 @@ class ValidateMetaPropertyFilterSupportedTest extends GetProcessorTestCase
         $filter->addAllowedMetaProperty('test1', 'string');
         $filter->addAllowedMetaProperty('test2', 'string');
 
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
+
         $this->context->setConfig($config);
         $this->context->addConfigExtra($configExtra);
         $this->context->getFilters()->add('meta', $filter);
@@ -132,6 +178,10 @@ class ValidateMetaPropertyFilterSupportedTest extends GetProcessorTestCase
         $filter = new MetaPropertyFilter('string');
         $filter->addAllowedMetaProperty('test1', 'string');
         $filter->addAllowedMetaProperty('test2', 'string');
+
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
 
         $this->context->setConfig($config);
         $this->context->getFilters()->add('meta', $filter);
@@ -153,6 +203,10 @@ class ValidateMetaPropertyFilterSupportedTest extends GetProcessorTestCase
         $filter = new MetaPropertyFilter('string');
         $filter->addAllowedMetaProperty('test1', 'string');
         $filter->addAllowedMetaProperty('test2', 'string');
+
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
 
         $this->context->setConfig($config);
         $this->context->addConfigExtra($configExtra);
@@ -179,6 +233,10 @@ class ValidateMetaPropertyFilterSupportedTest extends GetProcessorTestCase
 
         $configExtra = new MetaPropertiesConfigExtra();
         $configExtra->addMetaProperty('test2', 'string');
+
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
 
         $this->context->setConfig($config);
         $this->context->addConfigExtra($configExtra);
@@ -208,6 +266,10 @@ class ValidateMetaPropertyFilterSupportedTest extends GetProcessorTestCase
         $filter = new MetaPropertyFilter('string');
         $filter->addAllowedMetaProperty('test1', 'string');
         $filter->addAllowedMetaProperty('test2', 'string');
+
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
 
         $this->context->setConfig($config);
         $this->context->addConfigExtra($configExtra);

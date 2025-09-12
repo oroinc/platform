@@ -24,7 +24,7 @@ services:
             - 'limit'
             - 'meta'
         tags:
-            - { name: oro.api.filter_names, requestType: rest&!json_api, priority: -10 }
+            - { name: oro.api.filter_names, requestType: rest, priority: -10 }
 
     oro_api.filter_names.json_api:
         class: Oro\Bundle\ApiBundle\Filter\FilterNames
