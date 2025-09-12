@@ -7,30 +7,15 @@ namespace Oro\Bundle\ApiBundle\Filter;
  */
 class FilterNames
 {
-    private string $sortFilterName;
-    private string $pageNumberFilterName;
-    private string $pageSizeFilterName;
-    private string $metaPropertyFilterName;
-    private ?string $dataFilterGroupName;
-    private ?string $fieldsFilterGroupName;
-    private ?string $includeFilterName;
-
     public function __construct(
-        string $sortFilterName,
-        string $pageNumberFilterName,
-        string $pageSizeFilterName,
-        string $metaPropertyFilterName,
-        ?string $dataFilterGroupName = null,
-        ?string $fieldsFilterGroupName = null,
-        ?string $includeFilterName = null
+        private readonly string $sortFilterName,
+        private readonly string $pageNumberFilterName,
+        private readonly string $pageSizeFilterName,
+        private readonly ?string $metaPropertyFilterName = null,
+        private readonly ?string $dataFilterGroupName = null,
+        private readonly ?string $fieldsFilterGroupName = null,
+        private readonly ?string $includeFilterName = null
     ) {
-        $this->sortFilterName = $sortFilterName;
-        $this->pageNumberFilterName = $pageNumberFilterName;
-        $this->pageSizeFilterName = $pageSizeFilterName;
-        $this->metaPropertyFilterName = $metaPropertyFilterName;
-        $this->dataFilterGroupName = $dataFilterGroupName;
-        $this->fieldsFilterGroupName = $fieldsFilterGroupName;
-        $this->includeFilterName = $includeFilterName;
     }
 
     /**
@@ -68,7 +53,7 @@ class FilterNames
      * @see \Oro\Bundle\ApiBundle\Processor\Shared\AddMetaPropertyFilter
      * @see \Oro\Bundle\ApiBundle\Processor\Shared\HandleMetaPropertyFilter
      */
-    public function getMetaPropertyFilterName(): string
+    public function getMetaPropertyFilterName(): ?string
     {
         return $this->metaPropertyFilterName;
     }

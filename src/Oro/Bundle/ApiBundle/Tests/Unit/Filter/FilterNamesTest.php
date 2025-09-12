@@ -33,13 +33,12 @@ class FilterNamesTest extends TestCase
         $filterNames = new FilterNames(
             'sort',
             'page[number]',
-            'page[size]',
-            'meta'
+            'page[size]'
         );
         self::assertEquals('sort', $filterNames->getSortFilterName());
         self::assertEquals('page[number]', $filterNames->getPageNumberFilterName());
         self::assertEquals('page[size]', $filterNames->getPageSizeFilterName());
-        self::assertEquals('meta', $filterNames->getMetaPropertyFilterName());
+        self::assertNull($filterNames->getMetaPropertyFilterName());
         self::assertNull($filterNames->getDataFilterGroupName());
         self::assertNull($filterNames->getFieldsFilterGroupName());
         self::assertNull($filterNames->getFieldsFilterTemplate());
