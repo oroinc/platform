@@ -650,7 +650,7 @@ services:
             - '@oro_api.entity_id_transformer_registry'
             - '@logger'
         tags:
-            - { name: oro.api.document_builder, requestType: rest&!json_api, priority: -10 }
+            - { name: oro.api.document_builder, requestType: rest, priority: -10 }
             - { name: monolog.logger, channel: api }
 
     oro_api.rest.error_completer:
@@ -659,7 +659,7 @@ services:
             - '@oro_api.error_title_override_provider'
             - '@oro_api.exception_text_extractor'
         tags:
-            - { name: oro.api.error_completer, requestType: rest&!json_api, priority: -10 }
+            - { name: oro.api.error_completer, requestType: rest, priority: -10 }
 
     oro_api.json_api.document_builder:
         class: Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder

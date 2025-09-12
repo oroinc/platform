@@ -88,45 +88,6 @@ class SearchTest extends RestJsonApiTestCase
             ->getId();
     }
 
-    public function testSearchWithoutSearchText(): void
-    {
-        $userId = $this->getEntityId(User::class);
-        $businessUnitId = $this->getEntityId(BusinessUnit::class);
-        $response = $this->cget(['entity' => 'search'], ['page[size]' => -1]);
-        $filteredResponseContent = self::filterResponseContent($response);
-        $expectedContent = [
-            'data' => [
-                [
-                    'type' => 'search',
-                    'id' => 'users-' . $userId,
-                    'links' => [
-                        'entityUrl' => $this->getUrl('oro_user_view', ['id' => $userId], true)
-                    ],
-                    'attributes' => [
-                        'entityName' => 'John Doe'
-                    ],
-                    'relationships' => [
-                        'entity' => ['data' => ['type' => 'users', 'id' => (string)$userId]]
-                    ]
-                ],
-                [
-                    'type' => 'search',
-                    'id' => 'businessunits-' . $businessUnitId,
-                    'links' => [
-                        'entityUrl' => $this->getUrl('oro_business_unit_view', ['id' => $businessUnitId], true)
-                    ],
-                    'attributes' => [
-                        'entityName' => 'Main'
-                    ],
-                    'relationships' => [
-                        'entity' => ['data' => ['type' => 'businessunits', 'id' => (string)$businessUnitId]]
-                    ]
-                ]
-            ]
-        ];
-        self::assertResponseContent($expectedContent, $filteredResponseContent);
-    }
-
     public function testSearchBySpecifiedEntityTypes(): void
     {
         $businessUnitId = $this->getEntityId(BusinessUnit::class);

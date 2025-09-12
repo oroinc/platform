@@ -41,6 +41,10 @@ class HandleMetaPropertyFilter implements ProcessorInterface
         $filterName = $this->filterNamesRegistry
             ->getFilterNames($requestType)
             ->getMetaPropertyFilterName();
+        if (!$filterName) {
+            // the "meta" filter is not supported
+            return;
+        }
 
         /** @var MetaPropertyFilter|null $filter */
         $filter = $context->getFilters()->get($filterName);

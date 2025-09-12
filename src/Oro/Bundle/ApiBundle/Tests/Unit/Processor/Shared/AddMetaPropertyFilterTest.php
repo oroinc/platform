@@ -14,6 +14,9 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class AddMetaPropertyFilterTest extends GetProcessorTestCase
 {
+    /** @var FilterNames|\PHPUnit\Framework\MockObject\MockObject */
+    private $filterNames;
+
     /** @var AddMetaPropertyFilter */
     private $processor;
 
@@ -21,23 +24,35 @@ class AddMetaPropertyFilterTest extends GetProcessorTestCase
     {
         parent::setUp();
 
-        $filterNames = $this->createMock(FilterNames::class);
-        $filterNames->expects(self::any())
-            ->method('getMetaPropertyFilterName')
-            ->willReturn('meta');
+        $this->filterNames = $this->createMock(FilterNames::class);
 
         $this->processor = new AddMetaPropertyFilter(
             new FilterNamesRegistry(
                 [['filter_names', null]],
-                TestContainerBuilder::create()->add('filter_names', $filterNames)->getContainer($this),
+                TestContainerBuilder::create()->add('filter_names', $this->filterNames)->getContainer($this),
                 new RequestExpressionMatcher()
             )
         );
     }
 
+    public function testProcessWhenMetaFilterIsNotSupported()
+    {
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('');
+
+        $this->processor->process($this->context);
+
+        self::assertEquals(0, $this->context->getFilters()->count());
+    }
+
     public function testProcessWhenMetaFilterAlreadyAdded()
     {
         $filter = new MetaPropertyFilter(DataType::STRING);
+
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
 
         $this->context->getFilters()->add('meta', $filter);
         $this->processor->process($this->context);
@@ -48,6 +63,10 @@ class AddMetaPropertyFilterTest extends GetProcessorTestCase
     public function testProcessWhenMetaFilterShouldBeAdded()
     {
         $config = new EntityDefinitionConfig();
+
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
 
         $this->context->setConfig($config);
         $this->processor->process($this->context);

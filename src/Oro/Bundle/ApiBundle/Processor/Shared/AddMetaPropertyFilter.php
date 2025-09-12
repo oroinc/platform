@@ -37,6 +37,11 @@ class AddMetaPropertyFilter implements ProcessorInterface
         $filterName = $this->filterNamesRegistry
             ->getFilterNames($context->getRequestType())
             ->getMetaPropertyFilterName();
+        if (!$filterName) {
+            // the "meta" filter is not supported
+            return;
+        }
+
         $filters = $context->getFilters();
         if ($filters->has($filterName)) {
             // the "meta" filter is already added
