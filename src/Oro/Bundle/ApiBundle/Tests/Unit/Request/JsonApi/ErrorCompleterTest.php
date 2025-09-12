@@ -34,6 +34,7 @@ class ErrorCompleterTest extends TestCase
 {
     private ExceptionTextExtractorInterface&MockObject $exceptionTextExtractor;
     private ValueNormalizer&MockObject $valueNormalizer;
+    private FilterNames&MockObject $filterNames;
     private RequestType $requestType;
     private ErrorCompleter $errorCompleter;
 
@@ -44,13 +45,10 @@ class ErrorCompleterTest extends TestCase
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
         $this->requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
-        $filterNames = $this->createMock(FilterNames::class);
-        $filterNames->expects(self::any())
+        $this->filterNames = $this->createMock(FilterNames::class);
+        $this->filterNames->expects(self::any())
             ->method('getIncludeFilterName')
             ->willReturn('include');
-        $filterNames->expects(self::any())
-            ->method('getFieldsFilterTemplate')
-            ->willReturn('fields[%s]');
 
         $this->errorCompleter = new ErrorCompleter(
             new ErrorTitleOverrideProvider(['test title alias' => 'test title']),
@@ -58,7 +56,7 @@ class ErrorCompleterTest extends TestCase
             $this->valueNormalizer,
             new FilterNamesRegistry(
                 [['filter_names', RequestType::JSON_API]],
-                TestContainerBuilder::create()->add('filter_names', $filterNames)->getContainer($this),
+                TestContainerBuilder::create()->add('filter_names', $this->filterNames)->getContainer($this),
                 new RequestExpressionMatcher()
             )
         );
@@ -696,6 +694,57 @@ class ErrorCompleterTest extends TestCase
             ->method('normalizeValue')
             ->with('Test\Class', DataType::ENTITY_TYPE, self::identicalTo($this->requestType))
             ->willReturn('test_entity');
+
+        $this->filterNames->expects(self::once())
+            ->method('getFieldsFilterTemplate')
+            ->willReturn('fields[%s]');
+        $this->filterNames->expects(self::never())
+            ->method('getFieldsFilterGroupName');
+
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForFilterFieldsConfigFilterConstraintWhenNoFieldsFilterTemplate(): void
+    {
+        $exception = new NotSupportedConfigOperationException(
+            'Test\Class',
+            FilterFieldsConfigExtra::NAME
+        );
+
+        $error = new Error();
+        $error->setInnerException($exception);
+
+        $expectedError = new Error();
+        $expectedError->setStatusCode(400);
+        $expectedError->setCode('test code');
+        $expectedError->setTitle('filter constraint');
+        $expectedError->setDetail('The filter is not supported.');
+        $expectedError->setSource(ErrorSource::createByParameter('fields'));
+        $expectedError->setInnerException($exception);
+
+        $this->exceptionTextExtractor->expects(self::once())
+            ->method('getExceptionStatusCode')
+            ->with(self::identicalTo($exception))
+            ->willReturn(400);
+        $this->exceptionTextExtractor->expects(self::once())
+            ->method('getExceptionCode')
+            ->with(self::identicalTo($exception))
+            ->willReturn('test code');
+        $this->exceptionTextExtractor->expects(self::never())
+            ->method('getExceptionType');
+        $this->exceptionTextExtractor->expects(self::never())
+            ->method('getExceptionText');
+
+        $this->valueNormalizer->expects(self::never())
+            ->method('normalizeValue');
+
+        $this->filterNames->expects(self::once())
+            ->method('getFieldsFilterTemplate')
+            ->willReturn(null);
+        $this->filterNames->expects(self::once())
+            ->method('getFieldsFilterGroupName')
+            ->willReturn('fields');
 
         $this->errorCompleter->complete($error, $this->requestType);
         self::assertEquals($expectedError, $error);

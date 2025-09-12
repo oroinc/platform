@@ -44,4 +44,17 @@ class FilterNamesTest extends TestCase
         self::assertNull($filterNames->getFieldsFilterTemplate());
         self::assertNull($filterNames->getIncludeFilterName());
     }
+
+    public function testGetFieldsFilterTemplateWhenNoIncludeFilterName(): void
+    {
+        $filterNames = new FilterNames(
+            'sort',
+            'page[number]',
+            'page[size]',
+            'meta',
+            'filter',
+            'fields'
+        );
+        self::assertNull($filterNames->getFieldsFilterTemplate());
+    }
 }
