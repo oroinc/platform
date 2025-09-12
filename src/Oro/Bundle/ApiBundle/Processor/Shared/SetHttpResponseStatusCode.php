@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\ErrorResponseStatusCodeTrait;
 use Oro\Bundle\ApiBundle\Request\ErrorStatusCodesWithoutContentTrait;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -15,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 class SetHttpResponseStatusCode implements ProcessorInterface
 {
     use ErrorStatusCodesWithoutContentTrait;
+    use ErrorResponseStatusCodeTrait;
 
     private int $defaultSuccessStatusCode;
 
@@ -40,7 +42,9 @@ class SetHttpResponseStatusCode implements ProcessorInterface
     {
         $statusCode = $this->defaultSuccessStatusCode;
         if ($context->hasErrors()) {
-            $statusCode = $this->computeErrorStatusCode($context->getErrors());
+            $statusCode = $this->computeResponseStatusCode(array_map(static function (Error $error): int {
+                return $error->getStatusCode() ?: Response::HTTP_INTERNAL_SERVER_ERROR;
+            }, $context->getErrors()));
         } elseif (!$context->hasResult() && !$this->isResponseWithoutContent($statusCode)) {
             $statusCode = Response::HTTP_NO_CONTENT;
         }
@@ -53,37 +57,5 @@ class SetHttpResponseStatusCode implements ProcessorInterface
         return
             Response::HTTP_NO_CONTENT === $statusCode
             || $this->isErrorResponseWithoutContent($statusCode);
-    }
-
-    /**
-     * @param Error[] $errors
-     *
-     * @return int
-     */
-    private function computeErrorStatusCode(array $errors): int
-    {
-        $groupedCodes = [];
-        foreach ($errors as $error) {
-            $code = $error->getStatusCode() ?: Response::HTTP_INTERNAL_SERVER_ERROR;
-            /** @var int $groupCode */
-            $groupCode = (int)floor($code / 100) * 100;
-
-            if (!\array_key_exists($groupCode, $groupedCodes)
-                || !\in_array($code, $groupedCodes[$groupCode], true)
-            ) {
-                $groupedCodes[$groupCode][] = $code;
-            }
-        }
-
-        $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
-        if (!empty($groupedCodes)) {
-            $maxGroup = max(array_keys($groupedCodes));
-            $statusCode = $maxGroup;
-            if (\count($groupedCodes[$maxGroup]) === 1) {
-                $statusCode = reset($groupedCodes[$maxGroup]);
-            }
-        }
-
-        return $statusCode;
     }
 }

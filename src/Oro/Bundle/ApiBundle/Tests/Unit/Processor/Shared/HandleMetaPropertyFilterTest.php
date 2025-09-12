@@ -21,6 +21,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 class HandleMetaPropertyFilterTest extends GetProcessorTestCase
 {
     private ValueNormalizer&MockObject $valueNormalizer;
+    private FilterNames&MockObject $filterNames;
     private HandleMetaPropertyFilter $processor;
 
     #[\Override]
@@ -30,23 +31,44 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
 
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
-        $filterNames = $this->createMock(FilterNames::class);
-        $filterNames->expects(self::any())
-            ->method('getMetaPropertyFilterName')
-            ->willReturn('meta');
+        $this->filterNames = $this->createMock(FilterNames::class);
 
         $this->processor = new HandleMetaPropertyFilter(
             new FilterNamesRegistry(
                 [['filter_names', null]],
-                TestContainerBuilder::create()->add('filter_names', $filterNames)->getContainer($this),
+                TestContainerBuilder::create()->add('filter_names', $this->filterNames)->getContainer($this),
                 new RequestExpressionMatcher()
             ),
             $this->valueNormalizer
         );
     }
 
+    public function testProcessWhenMetaFilterIsNotSupported(): void
+    {
+        $filterValue = FilterValue::createFromSource('meta', 'meta', 'test1,test2');
+        $filter = new MetaPropertyFilter('string');
+        $filter->addAllowedMetaProperty('test1', 'string');
+
+        $this->valueNormalizer->expects(self::never())
+            ->method('normalizeValue');
+
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn(null);
+
+        $this->context->getFilterValues()->set('meta', $filterValue);
+        $this->context->getFilters()->set('meta', $filter);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasConfigExtra(MetaPropertiesConfigExtra::NAME));
+    }
+
     public function testProcessWhenNoMetaFilterValue(): void
     {
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
+
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasConfigExtra(MetaPropertiesConfigExtra::NAME));
@@ -55,6 +77,10 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
     public function testProcessWhenNoMetaFilter(): void
     {
         $filterValue = FilterValue::createFromSource('meta', 'meta', 'test');
+
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
 
         $this->context->getFilterValues()->set('meta', $filterValue);
         $this->processor->process($this->context);
@@ -73,6 +99,10 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
             ->method('normalizeValue')
             ->with('test1,test2', DataType::STRING, $this->context->getRequestType(), true, false, [])
             ->willReturn(['test1', 'test2']);
+
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
 
         $this->context->getFilterValues()->set('meta', $filterValue);
         $this->context->getFilters()->set('meta', $filter);
@@ -102,6 +132,10 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
             ->with('test1,', DataType::STRING, $this->context->getRequestType(), true, false, [])
             ->willThrowException($exception);
 
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
+
         $this->context->getFilterValues()->set('meta', $filterValue);
         $this->context->getFilters()->set('meta', $filter);
         $this->processor->process($this->context);
@@ -127,6 +161,10 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
             ->method('normalizeValue')
             ->with('test1,test2', DataType::STRING, $this->context->getRequestType(), true, false, [])
             ->willReturn(['test1', 'test2']);
+
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
 
         $this->context->getFilterValues()->set('meta', $filterValue);
         $this->context->getFilters()->set('meta', $filter);
@@ -158,6 +196,10 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
             ->method('normalizeValue')
             ->with('test1,test2', DataType::STRING, $this->context->getRequestType(), true, false, [])
             ->willReturn(['test1', 'test2']);
+
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
 
         $this->context->getFilterValues()->set('meta', $filterValue);
         $this->context->getFilters()->set('meta', $filter);
