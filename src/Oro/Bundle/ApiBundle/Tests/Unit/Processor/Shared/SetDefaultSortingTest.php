@@ -21,6 +21,9 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
  */
 class SetDefaultSortingTest extends GetListProcessorTestCase
 {
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FilterNames */
+    private $filterNames;
+
     /** @var SetDefaultSorting */
     private $processor;
 
@@ -28,15 +31,12 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
     {
         parent::setUp();
 
-        $filterNames = $this->createMock(FilterNames::class);
-        $filterNames->expects(self::any())
-            ->method('getSortFilterName')
-            ->willReturn('sort');
+        $this->filterNames = $this->createMock(FilterNames::class);
 
         $this->processor = new SetDefaultSorting(
             new FilterNamesRegistry(
                 [['filter_names', null]],
-                TestContainerBuilder::create()->add('filter_names', $filterNames)->getContainer($this),
+                TestContainerBuilder::create()->add('filter_names', $this->filterNames)->getContainer($this),
                 new RequestExpressionMatcher()
             )
         );
@@ -52,6 +52,27 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         self::assertSame($query, $this->context->getQuery());
     }
 
+    public function testProcessWhenSortingIsNotSupported()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['id']);
+        $config->addField('id');
+
+        $configOfSorters = new SortersConfig();
+        $configOfSorters->addField('id');
+
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('');
+
+        $this->context->setClassName(User::class);
+        $this->context->setConfig($config);
+        $this->context->setConfigOfSorters($configOfSorters);
+        $this->processor->process($this->context);
+
+        self::assertCount(0, $this->context->getFilters());
+    }
+
     public function testProcessForEntityWithIdentifierNamedId()
     {
         $config = new EntityDefinitionConfig();
@@ -60,6 +81,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
 
         $configOfSorters = new SortersConfig();
         $configOfSorters->addField('id');
+
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
 
         $this->context->setClassName(User::class);
         $this->context->setConfig($config);
@@ -88,6 +113,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $configOfSorters = new SortersConfig();
         $configOfSorters->addField('name');
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
         $this->context->setClassName(Category::class);
         $this->context->setConfig($config);
         $this->context->setConfigOfSorters($configOfSorters);
@@ -114,6 +143,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
 
         $configOfSorters = new SortersConfig();
         $configOfSorters->addField('id')->setExcluded(true);
+
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
 
         $this->context->setClassName(User::class);
         $this->context->setConfig($config);
@@ -144,6 +177,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $configOfSorters->addField('id');
         $configOfSorters->addField('title');
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
         $this->context->setClassName(CompositeKeyEntity::class);
         $this->context->setConfig($config);
         $this->context->setConfigOfSorters($configOfSorters);
@@ -173,6 +210,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $configOfSorters->addField('id')->setExcluded(true);
         $configOfSorters->addField('title');
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
         $this->context->setClassName(CompositeKeyEntity::class);
         $this->context->setConfig($config);
         $this->context->setConfigOfSorters($configOfSorters);
@@ -198,6 +239,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
 
         $configOfSorters = new SortersConfig();
         $configOfSorters->addField('id');
+
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
 
         $this->context->setClassName(User::class);
         $this->context->setConfig($config);
@@ -226,6 +271,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $configOfSorters = new SortersConfig();
         $configOfSorters->addField('name');
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
         $this->context->setClassName(User::class);
         $this->context->setConfig($config);
         $this->context->setConfigOfSorters($configOfSorters);
@@ -248,6 +297,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
     {
         $config = new EntityDefinitionConfig();
         $configOfSorters = new SortersConfig();
+
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
 
         $this->context->setClassName(User::class);
         $this->context->setConfig($config);
@@ -278,6 +331,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         $sorterConfig->setPropertyPath('id');
         $sorterConfig->setExcluded(true);
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
         $this->context->setClassName(User::class);
         $this->context->setConfig($config);
         $this->context->setConfigOfSorters($configOfSorters);
@@ -300,6 +357,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
     {
         $sortFilter = new SortFilter(DataType::ORDER_BY);
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
         $this->context->setClassName(Category::class);
         $this->context->setConfig(new EntityDefinitionConfig());
         $this->context->getFilters()->add('sort', $sortFilter, false);
@@ -313,6 +374,10 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
     {
         $config = new EntityDefinitionConfig();
         $config->disableSorting();
+
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
 
         $this->context->setConfig($config);
         $this->processor->process($this->context);

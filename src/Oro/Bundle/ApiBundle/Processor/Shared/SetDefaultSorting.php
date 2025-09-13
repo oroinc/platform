@@ -38,10 +38,18 @@ class SetDefaultSorting implements ProcessorInterface
             return;
         }
 
+        $sortFilterName = $this->filterNamesRegistry
+            ->getFilterNames($context->getRequestType())
+            ->getSortFilterName();
+        if (!$sortFilterName) {
+            // the "sort" filter is not supported
+            return;
+        }
+
         $config = $context->getConfig();
         if (null !== $config && $config->isSortingEnabled()) {
             $this->addSortFilter(
-                $this->filterNamesRegistry->getFilterNames($context->getRequestType())->getSortFilterName(),
+                $sortFilterName,
                 $context->getFilters(),
                 $config,
                 $context->getConfigOfSorters()
