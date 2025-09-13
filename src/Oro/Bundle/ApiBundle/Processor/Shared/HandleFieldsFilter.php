@@ -46,9 +46,8 @@ class HandleFieldsFilter implements ProcessorInterface
         }
 
         $requestType = $context->getRequestType();
-        $filterGroupName = $this->filterNamesRegistry
-            ->getFilterNames($requestType)
-            ->getFieldsFilterGroupName();
+        $filterNames = $this->filterNamesRegistry->getFilterNames($requestType);
+        $filterGroupName = $filterNames->getFieldsFilterGroupName();
         if (!$filterGroupName) {
             // the "fields" filter is not supported
             return;
@@ -60,7 +59,13 @@ class HandleFieldsFilter implements ProcessorInterface
             return;
         }
 
-        $fields = $this->processFilterValues($filterValues, $filterGroupName, $requestType, $context);
+        $fields = $this->processFilterValues(
+            $filterValues,
+            $filterGroupName,
+            !$filterNames->getFieldsFilterTemplate(),
+            $requestType,
+            $context
+        );
         if ($context->hasErrors()) {
             // detected errors in the filter value
             return;
@@ -72,6 +77,7 @@ class HandleFieldsFilter implements ProcessorInterface
     /**
      * @param FilterValue[] $filterValues
      * @param string        $filterGroupName
+     * @param bool          $isApplicableToPrimaryEntityOnly
      * @param RequestType   $requestType
      * @param Context       $context
      *
@@ -80,6 +86,7 @@ class HandleFieldsFilter implements ProcessorInterface
     private function processFilterValues(
         array $filterValues,
         string $filterGroupName,
+        bool $isApplicableToPrimaryEntityOnly,
         RequestType $requestType,
         Context $context
     ): array {
@@ -87,18 +94,27 @@ class HandleFieldsFilter implements ProcessorInterface
         foreach ($filterValues as $filterValue) {
             $path = $filterValue->getPath();
             if (!$path || ($path === $filterGroupName && $filterValue->getSourceKey() === $path)) {
+                if ($isApplicableToPrimaryEntityOnly) {
+                    $path = ValueNormalizerUtil::convertToEntityType(
+                        $this->valueNormalizer,
+                        $context->getClassName(),
+                        $requestType
+                    );
+                } else {
+                    $context->addError(
+                        $this->createFilterValidationError($filterValue, 'An entity type is not specified.')
+                    );
+                    continue;
+                }
+            } elseif ($isApplicableToPrimaryEntityOnly) {
                 $context->addError(
-                    Error::createValidationError(Constraint::FILTER)
-                        ->setDetail('An entity type is not specified.')
-                        ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey()))
+                    $this->createFilterValidationError($filterValue, 'The filter is not supported.')
                 );
                 continue;
             }
             if (!$this->isKnownEntityType($path, $requestType)) {
                 $context->addError(
-                    Error::createValidationError(Constraint::FILTER)
-                        ->setDetail('An entity type is not known.')
-                        ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey()))
+                    $this->createFilterValidationError($filterValue, 'An entity type is not known.')
                 );
                 continue;
             }
@@ -107,14 +123,18 @@ class HandleFieldsFilter implements ProcessorInterface
                 $fields[$path] = $this->normalizeFilterValue($filterValue, $requestType);
             } catch (\Exception $e) {
                 $context->addError(
-                    Error::createValidationError(Constraint::FILTER)
-                        ->setInnerException($e)
-                        ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey()))
+                    $this->createFilterValidationError($filterValue)->setInnerException($e)
                 );
             }
         }
 
         return $fields;
+    }
+
+    private function createFilterValidationError(FilterValue $filterValue, ?string $detail = null): Error
+    {
+        return Error::createValidationError(Constraint::FILTER, $detail)
+            ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey()));
     }
 
     private function isKnownEntityType(string $entityType, RequestType $requestType): bool

@@ -22,6 +22,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class AddFieldsFilter implements ProcessorInterface
 {
+    public const FILTER_DESCRIPTION = 'A list of fields that will be returned in the response.';
     public const FILTER_DESCRIPTION_TEMPLATE =
         'A list of fields of \'%s\' entity that will be returned in the response.';
 
@@ -36,6 +37,7 @@ class AddFieldsFilter implements ProcessorInterface
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function process(ContextInterface $context): void
     {
@@ -61,21 +63,39 @@ class AddFieldsFilter implements ProcessorInterface
         }
 
         $filterTemplate = $filterNames->getFieldsFilterTemplate();
-        if (ApiActionGroup::INITIALIZE === $context->getLastGroup()) {
-            // add "fields" filters for the primary entity and all associated entities,
-            // it is required to display them on the API Sandbox
-            $this->addFiltersForDocumentation($context, $filterTemplate);
-        } else {
-            // add all requested "fields" filters
-            $filterValues = $context->getFilterValues()->getGroup($filterGroupName);
-            foreach ($filterValues as $filterValue) {
-                $this->addFilter($filterTemplate, $filters, $filterValue->getPath());
+        if ($filterTemplate) {
+            if (ApiActionGroup::INITIALIZE === $context->getLastGroup()) {
+                // add "fields" filters for the primary entity and all associated entities,
+                // it is required to display them on the API Sandbox
+                $this->addFiltersForDocumentation($context, $filterTemplate, $config->isInclusionEnabled());
+            } else {
+                // add all requested "fields" filters
+                $filterValues = $context->getFilterValues()->getGroup($filterGroupName);
+                foreach ($filterValues as $filterValue) {
+                    $this->addFilter($filterTemplate, $filters, $filterValue->getPath());
+                }
+            }
+        } elseif (ApiActionGroup::INITIALIZE === $context->getLastGroup()) {
+            // add "fields" filter for the primary entity,
+            // it is required to display it on the API Sandbox
+            $metadata = $context->getMetadata();
+            if (null !== $metadata && null === $filters->get($filterGroupName)) {
+                $filters->add($filterGroupName, $this->createFilter(self::FILTER_DESCRIPTION), false);
+            }
+        } elseif (null === $filters->get($filterGroupName)) {
+            // add requested "fields" filter
+            $filterValues = $context->getFilterValues()->get($filterGroupName);
+            if ($filterValues) {
+                $filters->add($filterGroupName, $this->createFilter(self::FILTER_DESCRIPTION), false);
             }
         }
     }
 
-    private function addFiltersForDocumentation(Context $context, string $filterTemplate): void
-    {
+    private function addFiltersForDocumentation(
+        Context $context,
+        string $filterTemplate,
+        bool $isInclusionEnabled
+    ): void {
         $metadata = $context->getMetadata();
         if (null === $metadata) {
             // the metadata does not exist
@@ -89,6 +109,9 @@ class AddFieldsFilter implements ProcessorInterface
         $this->addFilterForEntityClass($filterTemplate, $filters, $context->getClassName(), $requestType);
 
         // the "fields" filters for associated entities
+        if (!$isInclusionEnabled) {
+            return;
+        }
         $config = $context->getConfig();
         $associations = $metadata->getAssociations();
         foreach ($associations as $associationName => $association) {
@@ -117,12 +140,22 @@ class AddFieldsFilter implements ProcessorInterface
 
     private function addFilter(string $filterTemplate, FilterCollection $filters, string $entityType): void
     {
-        $filter = new FieldsFilter(
-            DataType::STRING,
-            sprintf(self::FILTER_DESCRIPTION_TEMPLATE, $entityType)
-        );
+        $key = \sprintf($filterTemplate, $entityType);
+        if (null === $filters->get($key)) {
+            $filters->add(
+                $key,
+                $this->createFilter(\sprintf(self::FILTER_DESCRIPTION_TEMPLATE, $entityType)),
+                false
+            );
+        }
+    }
+
+    private function createFilter(string $description): FieldsFilter
+    {
+        $filter = new FieldsFilter(DataType::STRING, $description);
         $filter->setArrayAllowed(true);
-        $filters->add(sprintf($filterTemplate, $entityType), $filter, false);
+
+        return $filter;
     }
 
     private function convertToEntityType(string $entityClass, RequestType $requestType): ?string

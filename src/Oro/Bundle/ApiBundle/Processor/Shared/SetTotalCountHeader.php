@@ -2,22 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Doctrine\ORM\Query;
-use Doctrine\ORM\Query\Expr;
-use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\ListContext;
+use Oro\Bundle\ApiBundle\Processor\Shared\Provider\TotalCountCalculator;
 use Oro\Bundle\ApiBundle\Processor\Subresource\GetRelationship\GetRelationshipContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\GetSubresourceContext;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
-use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Component\DoctrineUtils\ORM\QueryUtil;
-use Oro\Component\DoctrineUtils\ORM\SqlQuery;
-use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Component\EntitySerializer\QueryResolver;
 
 /**
@@ -68,7 +61,7 @@ class SetTotalCountHeader implements ProcessorInterface
     private function getTotalCount(ContextInterface $context, ?callable $totalCountCallback): ?int
     {
         if (null !== $totalCountCallback) {
-            return $this->executeTotalCountCallback($totalCountCallback);
+            return $this->getTotalCountCalculator()->executeTotalCountCallback($totalCountCallback);
         }
 
         if ($context->getAction() !== ApiAction::DELETE_LIST && $context->getConfig()?->getPageSize() === -1) {
@@ -77,24 +70,16 @@ class SetTotalCountHeader implements ProcessorInterface
         }
 
         $query = $context->getQuery();
-        if (null !== $query) {
-            return $this->calculateTotalCount($query, $context->getConfig());
+        if (null === $query) {
+            return $this->calculateResultCount($context);
         }
 
-        return $this->calculateResultCount($context);
+        return $this->getTotalCountCalculator()->calculateTotalCount($query, $context->getConfig());
     }
 
-    private function executeTotalCountCallback(callable $callback): int
+    private function getTotalCountCalculator(): TotalCountCalculator
     {
-        $totalCount = $callback();
-        if (!\is_int($totalCount)) {
-            throw new \RuntimeException(sprintf(
-                'Expected integer as result of "totalCount" callback, "%s" given.',
-                get_debug_type($totalCount)
-            ));
-        }
-
-        return $totalCount;
+        return new TotalCountCalculator($this->countQueryBuilderOptimizer, $this->queryResolver);
     }
 
     private function calculateResultCount(Context $context): ?int
@@ -109,72 +94,5 @@ class SetTotalCountHeader implements ProcessorInterface
         }
 
         return \count($data);
-    }
-
-    private function calculateTotalCount(mixed $query, ?EntityDefinitionConfig $config): int
-    {
-        $useCountDistinct = false;
-        if ($query instanceof QueryBuilder) {
-            $useCountDistinct = !$this->hasComputedFields($query);
-            $countQuery = $this->countQueryBuilderOptimizer
-                ->getCountQueryBuilder($query)
-                ->getQuery()
-                ->setMaxResults(null)
-                ->setFirstResult(null);
-            $this->resolveQuery($countQuery, $config);
-        } elseif ($query instanceof Query) {
-            $useCountDistinct = true;
-            $countQuery = QueryUtil::cloneQuery($query)
-                ->setMaxResults(null)
-                ->setFirstResult(null);
-            $this->resolveQuery($countQuery, $config);
-        } elseif ($query instanceof SqlQueryBuilder) {
-            $countQuery = (clone $query)
-                ->setMaxResults(null)
-                ->setFirstResult(null)
-                ->getQuery();
-        } elseif ($query instanceof SqlQuery) {
-            $countQuery = (clone $query)
-                ->getQueryBuilder()
-                ->setMaxResults(null)
-                ->setFirstResult(null);
-        } else {
-            throw new \RuntimeException(sprintf(
-                'Expected instance of %s, %s, %s or %s, "%s" given.',
-                QueryBuilder::class,
-                Query::class,
-                SqlQueryBuilder::class,
-                SqlQuery::class,
-                get_debug_type($query)
-            ));
-        }
-
-        if ($useCountDistinct) {
-            return QueryCountCalculator::calculateCountDistinct($countQuery);
-        }
-
-        return QueryCountCalculator::calculateCount($countQuery);
-    }
-
-    private function resolveQuery(Query $query, ?EntityDefinitionConfig $config): void
-    {
-        if (null !== $config) {
-            $this->queryResolver->resolveQuery($query, $config);
-        }
-    }
-
-    private function hasComputedFields(QueryBuilder $query): bool
-    {
-        /** @var Expr\Select[] $selectPart */
-        $selectPart = $query->getDQLPart('select');
-        foreach ($selectPart as $select) {
-            foreach ($select->getParts() as $part) {
-                if (preg_match('/.+ AS [\w\-]+$/i', $part) === 1) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 }

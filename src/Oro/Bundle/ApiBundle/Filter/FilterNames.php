@@ -102,7 +102,7 @@ class FilterNames
      */
     public function getFieldsFilterTemplate(): ?string
     {
-        if (!$this->fieldsFilterGroupName) {
+        if (!$this->fieldsFilterGroupName || !$this->includeFilterName) {
             return null;
         }
 
