@@ -25,6 +25,9 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     private $valueNormalizer;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FilterNames */
+    private $filterNames;
+
     /** @var CorrectSortValue */
     private $processor;
 
@@ -34,18 +37,14 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
         parent::setUp();
 
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
-
-        $filterNames = $this->createMock(FilterNames::class);
-        $filterNames->expects(self::any())
-            ->method('getSortFilterName')
-            ->willReturn('sort');
+        $this->filterNames = $this->createMock(FilterNames::class);
 
         $this->processor = new CorrectSortValue(
             $this->doctrineHelper,
             $this->valueNormalizer,
             new FilterNamesRegistry(
                 [['filter_names', null]],
-                TestContainerBuilder::create()->add('filter_names', $filterNames)->getContainer($this),
+                TestContainerBuilder::create()->add('filter_names', $this->filterNames)->getContainer($this),
                 new RequestExpressionMatcher()
             )
         );
@@ -80,6 +79,24 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
         self::assertNull($this->context->getQuery());
     }
 
+    public function testProcessWhenSortingIsNotSupported(): void
+    {
+        $filterValueAccessor = $this->createMock(FilterValueAccessorInterface::class);
+        $filterValueAccessor->expects(self::never())
+            ->method(self::anything());
+
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('');
+
+        $this->context->setConfig($this->createConfigObject([]));
+        $this->context->setFilterValues($filterValueAccessor);
+        $this->context->setClassName(Entity\User::class);
+        $this->processor->process($this->context);
+
+        self::assertNull($this->context->getQuery());
+    }
+
     /**
      * @dataProvider processProvider
      */
@@ -91,6 +108,10 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
             ->method('getOne')
             ->with('sort')
             ->willReturn($sortFilterValue);
+
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
 
         $this->context->setConfig($this->createConfigObject($config ?? []));
         $this->context->setFilterValues($filterValueAccessor);
@@ -251,6 +272,10 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
                 $sortFilterValue = $value;
             });
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
         $this->context->setConfig($this->createConfigObject($config ?? []));
         $this->context->setFilterValues($filterValueAccessor);
         $this->context->setClassName($className);
@@ -308,6 +333,10 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessNoDefaultValue()
     {
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
         $this->context->getFilters()->add(
             'sort',
             new SortFilter(DataType::ORDER_BY)
@@ -320,6 +349,10 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessNoFilter()
     {
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
         $this->context->setClassName(Entity\User::class);
         $this->processor->process($this->context);
 

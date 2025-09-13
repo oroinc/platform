@@ -57,6 +57,9 @@ class LoadEntityIdsQueryExecutor implements LoadEntityIdsQueryExecutorInterface
         $sortFilterName = $this->filterNamesRegistry
             ->getFilterNames($requestType)
             ->getSortFilterName();
+        if (!$sortFilterName) {
+            return null;
+        }
 
         return $filterValues->getOne($sortFilterName)?->getSourceKey();
     }
