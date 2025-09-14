@@ -24,6 +24,10 @@ class TagEntitiesAssociationHandler
      */
     public function handleAdd(FormInterface $form, string $associationName): void
     {
+        if (!$form->has($associationName)) {
+            return;
+        }
+
         $fieldForm = $form->get($associationName);
         if (!FormUtil::isSubmittedAndValid($fieldForm)) {
             return;
@@ -42,6 +46,10 @@ class TagEntitiesAssociationHandler
      */
     public function handleDelete(FormInterface $form, string $associationName): void
     {
+        if (!$form->has($associationName)) {
+            return;
+        }
+
         $fieldForm = $form->get($associationName);
         if (!FormUtil::isSubmittedAndValid($fieldForm)) {
             return;
@@ -60,6 +68,10 @@ class TagEntitiesAssociationHandler
      */
     public function handleUpdate(FormInterface $form, string $associationName, bool $flush = false): void
     {
+        if (!$form->has($associationName)) {
+            return;
+        }
+
         $fieldForm = $form->get($associationName);
         if (!FormUtil::isSubmittedAndValid($fieldForm)) {
             return;
