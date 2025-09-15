@@ -24,12 +24,14 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 {
+    private FilterNames&MockObject $filterNames;
     private ValidateSorting $processor;
 
     #[\Override]
@@ -39,17 +41,14 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->context->setAction(ApiAction::GET_LIST);
 
-        $filterNames = $this->createMock(FilterNames::class);
-        $filterNames->expects(self::any())
-            ->method('getSortFilterName')
-            ->willReturn('sort');
+        $this->filterNames = $this->createMock(FilterNames::class);
 
         $this->processor = new ValidateSorting(
             $this->doctrineHelper,
             new AssociationSortersProvider($this->doctrineHelper, $this->configProvider),
             new FilterNamesRegistry(
                 [['filter_names', null]],
-                TestContainerBuilder::create()->add('filter_names', $filterNames)->getContainer($this),
+                TestContainerBuilder::create()->add('filter_names', $this->filterNames)->getContainer($this),
                 new RequestExpressionMatcher()
             )
         );
@@ -127,12 +126,34 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         self::assertFalse($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
     }
 
+    public function testProcessWhenSortingIsNotSupported(): void
+    {
+        $sortersConfig = $this->getSortersConfig(['id']);
+        $sortersConfig->getField('id');
+
+        $this->prepareFilters('-id', false);
+
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn(null);
+
+        $this->context->setConfigOfSorters($sortersConfig);
+        $this->processor->process($this->context);
+
+        self::assertEmpty($this->context->getErrors());
+        self::assertFalse($this->context->isProcessed(ValidateSorting::OPERATION_NAME));
+    }
+
     public function testProcessWhenNoSortFilter(): void
     {
         $sortersConfig = $this->getSortersConfig(['id']);
         $sortersConfig->getField('id');
 
         $this->prepareFilters('-id', false);
+
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
 
         $this->context->setConfigOfSorters($sortersConfig);
         $this->processor->process($this->context);
@@ -148,6 +169,10 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->prepareFilters(null);
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
         $this->context->setConfigOfSorters($sortersConfig);
         $this->processor->process($this->context);
 
@@ -161,6 +186,10 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $sortersConfig->getField('id')->setExcluded();
 
         $this->prepareFilters('-id');
+
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
 
         $this->context->setConfigOfSorters($sortersConfig);
         $this->processor->process($this->context);
@@ -186,6 +215,10 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
             FilterValue::createFromSource('sortFilterSourceKey', $sortFilterValue->getPath(), '')
         );
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
         $this->context->setConfigOfSorters($sortersConfig);
         $this->processor->process($this->context);
 
@@ -204,6 +237,10 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $sortersConfig = $this->getSortersConfig();
 
         $this->prepareFilters('-id');
+
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
 
         $this->context->setConfigOfSorters($sortersConfig);
         $this->processor->process($this->context);
@@ -225,6 +262,10 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->prepareFilters('-id');
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
         $this->context->setConfigOfSorters($sortersConfig);
         $this->processor->process($this->context);
 
@@ -245,6 +286,10 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->prepareFilters('id,-label');
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
         $this->context->setConfigOfSorters($sortersConfig);
         $this->processor->process($this->context);
 
@@ -264,6 +309,10 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->prepareFilters('-id');
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
         $this->context->setConfigOfSorters($sortersConfig);
         $this->processor->process($this->context);
 
@@ -280,10 +329,13 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->prepareFilters('name1');
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
         $this->context->setClassName(User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfSorters($primarySortersConfig);
-
         $this->processor->process($this->context);
 
         self::assertEmpty($this->context->getErrors());
@@ -296,9 +348,6 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $categoryConfig = $this->getConfig(['name'], ['name']);
 
         $this->prepareFilters('category.name');
-
-        $this->context->setClassName(User::class);
-        $this->context->setConfig($primaryEntityConfig);
 
         $this->configProvider->expects(self::once())
             ->method('getConfig')
@@ -313,6 +362,12 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
             )
             ->willReturn($categoryConfig);
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
+        $this->context->setClassName(User::class);
+        $this->context->setConfig($primaryEntityConfig);
         $this->processor->process($this->context);
 
         self::assertEmpty($this->context->getErrors());
@@ -327,9 +382,6 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->prepareFilters('category1.name');
 
-        $this->context->setClassName(User::class);
-        $this->context->setConfig($primaryEntityConfig);
-
         $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
@@ -343,6 +395,12 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
             )
             ->willReturn($categoryConfig);
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
+        $this->context->setClassName(User::class);
+        $this->context->setConfig($primaryEntityConfig);
         $this->processor->process($this->context);
 
         self::assertEmpty($this->context->getErrors());
@@ -360,9 +418,6 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->prepareFilters('category1.name1');
 
-        $this->context->setClassName(User::class);
-        $this->context->setConfig($primaryEntityConfig);
-
         $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
@@ -376,6 +431,12 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
             )
             ->willReturn($categoryConfig);
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
+        $this->context->setClassName(User::class);
+        $this->context->setConfig($primaryEntityConfig);
         $this->processor->process($this->context);
 
         self::assertEmpty($this->context->getErrors());
@@ -387,13 +448,10 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $this->notManageableClassNames = [UserProfile::class];
 
         $primaryEntityConfig = $this->getEntityDefinitionConfig(['category']);
+        $primaryEntityConfig->setParentResourceClass(User::class);
         $categoryConfig = $this->getConfig(['name'], ['name']);
 
         $this->prepareFilters('category.name');
-
-        $this->context->setClassName(UserProfile::class);
-        $this->context->setConfig($primaryEntityConfig);
-        $primaryEntityConfig->setParentResourceClass(User::class);
 
         $this->configProvider->expects(self::once())
             ->method('getConfig')
@@ -408,6 +466,12 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
             )
             ->willReturn($categoryConfig);
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
+        $this->context->setClassName(UserProfile::class);
+        $this->context->setConfig($primaryEntityConfig);
         $this->processor->process($this->context);
 
         self::assertEmpty($this->context->getErrors());
@@ -421,9 +485,6 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->prepareFilters('category.name');
 
-        $this->context->setClassName(User::class);
-        $this->context->setConfig($primaryEntityConfig);
-
         $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
@@ -437,6 +498,12 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
             )
             ->willReturn($categoryConfig);
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
+        $this->context->setClassName(User::class);
+        $this->context->setConfig($primaryEntityConfig);
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -455,12 +522,15 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->prepareFilters('category1.name');
 
-        $this->context->setClassName(User::class);
-        $this->context->setConfig($primaryEntityConfig);
-
         $this->configProvider->expects(self::never())
             ->method('getConfig');
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
+        $this->context->setClassName(User::class);
+        $this->context->setConfig($primaryEntityConfig);
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -479,12 +549,15 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->prepareFilters('category1.name');
 
-        $this->context->setClassName(User::class);
-        $this->context->setConfig($primaryEntityConfig);
-
         $this->configProvider->expects(self::never())
             ->method('getConfig');
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
+        $this->context->setClassName(User::class);
+        $this->context->setConfig($primaryEntityConfig);
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -505,12 +578,15 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         $this->prepareFilters('category.name');
 
-        $this->context->setClassName(User::class);
-        $this->context->setConfig($primaryEntityConfig);
-
         $this->configProvider->expects(self::never())
             ->method('getConfig');
 
+        $this->filterNames->expects(self::once())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
+        $this->context->setClassName(User::class);
+        $this->context->setConfig($primaryEntityConfig);
         $this->processor->process($this->context);
 
         self::assertEquals(

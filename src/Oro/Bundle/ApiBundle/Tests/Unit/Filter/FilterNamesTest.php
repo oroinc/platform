@@ -31,11 +31,11 @@ class FilterNamesTest extends TestCase
     public function testOptionalNames(): void
     {
         $filterNames = new FilterNames(
-            'sort',
+            null,
             'page[number]',
             'page[size]'
         );
-        self::assertEquals('sort', $filterNames->getSortFilterName());
+        self::assertNull($filterNames->getSortFilterName());
         self::assertEquals('page[number]', $filterNames->getPageNumberFilterName());
         self::assertEquals('page[size]', $filterNames->getPageSizeFilterName());
         self::assertNull($filterNames->getMetaPropertyFilterName());

@@ -47,6 +47,11 @@ class ValidateSorting implements ProcessorInterface
         $filterName = $this->filterNamesRegistry
             ->getFilterNames($context->getRequestType())
             ->getSortFilterName();
+        if (!$filterName) {
+            // the "sort" filter is not supported
+            return;
+        }
+
         if (!$context->getFilters()->has($filterName)) {
             // no sort filter
             return;
