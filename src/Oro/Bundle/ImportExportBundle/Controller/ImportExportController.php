@@ -26,8 +26,8 @@ use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -345,9 +345,10 @@ class ImportExportController extends AbstractController
         name: 'oro_importexport_export_download',
         requirements: ['jobId' => '\d+']
     )]
-    #[ParamConverter('result', options: ['mapping' => ['jobId' => 'jobId']])]
-    public function downloadExportResultAction(ImportExportResult $result): Response
-    {
+    public function downloadExportResultAction(
+        #[MapEntity(mapping: ['jobId' => 'jobId'])]
+        ImportExportResult $result
+    ): Response {
         if (!$this->isGranted('VIEW', $result)) {
             throw new AccessDeniedException('Insufficient permission');
         }
@@ -364,9 +365,10 @@ class ImportExportController extends AbstractController
         name: 'oro_importexport_job_error_log',
         requirements: ['jobId' => '\d+']
     )]
-    #[ParamConverter('result', options: ['mapping' => ['jobId' => 'jobId']])]
-    public function importExportJobErrorLogAction(ImportExportResult $result): Response
-    {
+    public function importExportJobErrorLogAction(
+        #[MapEntity(mapping: ['jobId' => 'jobId'])]
+        ImportExportResult $result
+    ): Response {
         if (!$this->isGranted('VIEW', $result)) {
             throw new AccessDeniedException('Insufficient permission');
         }

@@ -3,13 +3,13 @@
 namespace Oro\Bundle\LayoutBundle\Attribute;
 
 use Attribute;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ConfigurationAnnotation;
+use Oro\Bundle\PlatformBundle\Interface\PHPAttributeConfigurationInterface;
 
 /**
  * The Layout class handles the #[Layout] attribute parts.
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-class Layout extends ConfigurationAnnotation
+class Layout implements PHPAttributeConfigurationInterface
 {
     /**
      * $action - The controller action type.
@@ -23,7 +23,6 @@ class Layout extends ConfigurationAnnotation
         private string $theme = '',
         private ?array $vars = null,
     ) {
-        parent::__construct([]);
     }
 
     /**
@@ -119,13 +118,13 @@ class Layout extends ConfigurationAnnotation
     }
 
     #[\Override]
-    public function getAliasName()
+    public function getAliasName(): string
     {
         return 'layout';
     }
 
     #[\Override]
-    public function allowArray()
+    public function allowArray(): bool
     {
         return false;
     }

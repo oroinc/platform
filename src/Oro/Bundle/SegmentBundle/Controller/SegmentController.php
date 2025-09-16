@@ -15,7 +15,7 @@ use Oro\Bundle\SegmentBundle\Form\Type\SegmentType;
 use Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider;
 use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
 use Oro\Bundle\UIBundle\Route\Router;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -37,7 +37,7 @@ class SegmentController extends AbstractController
         requirements: ['_format' => 'html|json'],
         defaults: ['_format' => 'html']
     )]
-    #[Template]
+    #[Template('@OroSegment/Segment/index.html.twig')]
     #[AclAncestor('oro_segment_view')]
     public function indexAction()
     {
@@ -49,7 +49,7 @@ class SegmentController extends AbstractController
      * @return array
      */
     #[Route(path: '/view/{id}', name: 'oro_segment_view', requirements: ['id' => '\d+'])]
-    #[Template]
+    #[Template('@OroSegment/Segment/view.html.twig')]
     #[Acl(id: 'oro_segment_view', type: 'entity', class: Segment::class, permission: 'VIEW')]
     public function viewAction(Segment $entity)
     {
@@ -90,7 +90,7 @@ class SegmentController extends AbstractController
      * @return array
      */
     #[Route(path: '/update/{id}', name: 'oro_segment_update', requirements: ['id' => '\d+'])]
-    #[Template]
+    #[Template('@OroSegment/Segment/update.html.twig')]
     #[Acl(id: 'oro_segment_update', type: 'entity', class: Segment::class, permission: 'EDIT')]
     public function updateAction(Segment $entity, Request $request)
     {

@@ -11,7 +11,7 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -37,7 +37,7 @@ class RoleController extends AbstractController
      * @return array
      */
     #[Route(path: '/view/{id}', name: 'oro_user_role_view', requirements: ['id' => '\d+'])]
-    #[Template]
+    #[Template('@OroUser/Role/view.html.twig')]
     #[Acl(id: 'oro_user_role_view', type: 'entity', class: Role::class, permission: 'VIEW')]
     public function viewAction(Role $role)
     {
@@ -61,7 +61,7 @@ class RoleController extends AbstractController
      * @return array
      */
     #[Route(path: '/update/{id}', name: 'oro_user_role_update', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
-    #[Template]
+    #[Template('@OroUser/Role/update.html.twig')]
     #[Acl(id: 'oro_user_role_update', type: 'entity', class: Role::class, permission: 'EDIT')]
     public function updateAction(Role $entity, Request $request)
     {
@@ -74,7 +74,7 @@ class RoleController extends AbstractController
         requirements: ['_format' => 'html|json'],
         defaults: ['_format' => 'html']
     )]
-    #[Template]
+    #[Template('@OroUser/Role/index.html.twig')]
     #[Acl(id: 'oro_user_role_view', type: 'entity', class: Role::class, permission: 'VIEW')]
     public function indexAction()
     {

@@ -6,7 +6,7 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\Iterator\RecursiveItemIterator;
 use Knp\Menu\MenuItem;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -20,7 +20,7 @@ class ShortcutController extends AbstractController
     protected $uris = [];
 
     #[Route(path: 'actionslist', name: 'oro_shortcut_actionslist')]
-    #[Template]
+    #[Template('@OroNavigation/Shortcut/actionslist.html.twig')]
     public function actionslistAction()
     {
         $provider = $this->container->get(BuilderChainProvider::class);

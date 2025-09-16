@@ -13,7 +13,7 @@ use Oro\Bundle\EntityMergeBundle\Form\Type\MergeType;
 use Oro\Bundle\EntityMergeBundle\Model\EntityMergerInterface;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -58,7 +58,7 @@ class MergeController extends AbstractController
      * @return array|RedirectResponse
      */
     #[Route(name: 'oro_entity_merge')]
-    #[Template]
+    #[Template('@OroEntityMerge/Merge/merge.html.twig')]
     #[Acl(id: 'oro_entity_merge', label: 'oro.entity_merge.acl.merge', type: 'action', category: 'entity')]
     public function mergeAction(Request $request, ?EntityData $entityData = null)
     {

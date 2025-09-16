@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Provider\PageData\StartTransitionPageDataProvider;
 use Oro\Bundle\WorkflowBundle\Provider\PageData\TransitionPageDataProvider;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,9 +43,11 @@ class WorkflowController extends AbstractController
      * @throws \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
      */
     #[Route(path: '/transit/{workflowItemId}/{transitionName}', name: 'oro_workflow_transition_form')]
-    #[ParamConverter('workflowItem', options: ['id' => 'workflowItemId'])]
-    public function transitionAction($transitionName, WorkflowItem $workflowItem)
-    {
+    public function transitionAction(
+        $transitionName,
+        #[MapEntity(id: 'workflowItemId')]
+        WorkflowItem $workflowItem
+    ) {
         return $this->buildResponse(
             $this->container->get(TransitionPageDataProvider::class)->getData($transitionName, $workflowItem)
         );

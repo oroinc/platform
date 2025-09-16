@@ -13,7 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Bundle\UIBundle\Route\Router;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,7 +36,7 @@ class EntitiesController extends AbstractController
      * @return array
      */
     #[Route(path: '/{entityName}', name: 'oro_entity_index')]
-    #[Template]
+    #[Template('@OroEntity/Entities/index.html.twig')]
     public function indexAction($entityName)
     {
         $entityClass = $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
@@ -76,7 +76,7 @@ class EntitiesController extends AbstractController
         name: 'oro_entity_detailed',
         defaults: ['id' => 0, 'fieldName' => '']
     )]
-    #[Template]
+    #[Template('@OroEntity/Entities/detailed.html.twig')]
     public function detailedAction($id, $entityName, $fieldName)
     {
         $entityClass = $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
@@ -144,7 +144,7 @@ class EntitiesController extends AbstractController
         name: 'oro_entity_relation',
         defaults: ['id' => 0, 'className' => '', 'fieldName' => '']
     )]
-    #[Template]
+    #[Template('@OroEntity/Entities/relation.html.twig')]
     public function relationAction($id, $entityName, $fieldName)
     {
         $entityClass = $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
@@ -187,7 +187,7 @@ class EntitiesController extends AbstractController
      * @return array
      */
     #[Route(path: '/view/{entityName}/item/{id}', name: 'oro_entity_view')]
-    #[Template]
+    #[Template('@OroEntity/Entities/view.html.twig')]
     public function viewAction($entityName, $id)
     {
         $entityClass = $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
@@ -225,7 +225,7 @@ class EntitiesController extends AbstractController
      * @return array
      */
     #[Route(path: '/update/{entityName}/item/{id}', name: 'oro_entity_update', defaults: ['id' => 0])]
-    #[Template]
+    #[Template('@OroEntity/Entities/update.html.twig')]
     public function updateAction(Request $request, $entityName, $id)
     {
         $entityClass = $this->container->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);

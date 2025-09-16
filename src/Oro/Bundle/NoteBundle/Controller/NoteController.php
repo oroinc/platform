@@ -8,7 +8,7 @@ use Oro\Bundle\NoteBundle\Entity\Manager\NoteManager;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Form\Handler\NoteHandler;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
@@ -131,7 +131,7 @@ class NoteController extends AbstractController
     }
 
     #[Route(path: '/update/{id}', name: 'oro_note_update', requirements: ['id' => '\d+'])]
-    #[Template]
+    #[Template('@OroNote/Note/update.html.twig')]
     #[AclAncestor('oro_note_update')]
     public function updateAction(Note $entity)
     {

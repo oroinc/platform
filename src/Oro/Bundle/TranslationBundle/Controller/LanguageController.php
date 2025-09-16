@@ -4,7 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Controller;
 
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\TranslationBundle\Entity\Language;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -18,7 +18,7 @@ class LanguageController extends AbstractController
      * @return array
      */
     #[Route(path: '/', name: 'oro_translation_language_index')]
-    #[Template]
+    #[Template('@OroTranslation/Language/index.html.twig')]
     #[AclAncestor('oro_translation_language_view')]
     public function indexAction()
     {

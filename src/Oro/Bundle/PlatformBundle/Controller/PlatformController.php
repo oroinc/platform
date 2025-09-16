@@ -6,7 +6,7 @@ use Oro\Bundle\PlatformBundle\Provider\DeploymentVariableProvider;
 use Oro\Bundle\PlatformBundle\Provider\PackageProvider;
 use Oro\Bundle\PlatformBundle\Provider\UsageStats\UsageStatsProvider;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
@@ -32,7 +32,7 @@ class PlatformController
     }
 
     #[Route(path: '/information', name: 'oro_platform_system_info')]
-    #[Template]
+    #[Template('@OroPlatform/Platform/systemInfo.html.twig')]
     #[Acl(
         id: 'oro_platform_system_info',
         label: 'oro.platform.acl.action.system_info.label',

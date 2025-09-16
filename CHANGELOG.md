@@ -20,7 +20,17 @@ The current file describes significant changes in the code that may affect the u
 #### SearchBundle
 * Added a new `addOrderBy` method to the `Oro\Bundle\SearchBundle\Query\SearchQueryInterface` interface.
 
+#### PlatformBundle
+* Added new `Oro\Bundle\PlatformBundle\Interface\PHPAttributeConfigurationInterface` to provide the functionality previously
+provided by `Sensio\Bundle\FrameworkExtraBundle\Configuration\ConfigurationInterface`.
+* Added new `Oro\Bundle\PlatformBundle\EventListener\Controller\ControllerListener` to modify the Request object to apply configuration information
+found in the PHP attributes implementing `PHPAttributeConfigurationInterface`
+
 ### Removed
+
+* Removed SensioFrameworkExtraBundle dependency because it is not supported by Symfony 7.
+  All the annotations provided by this bundle are now built-in in Symfony as PHP attributes.
+  Custom ParamConverters should be rewritten into custom ValueResolvers.[[p]](#upgrade-toolkit-coverage)
 
 #### ApiBundle
 * Removed `fieldName` option for the `nestedAssociation` filter, use the existing `field` option instead.
@@ -28,6 +38,14 @@ The current file describes significant changes in the code that may affect the u
 
 #### LayoutBundle
 * Removed `oro_layout.provider.svg_icons_support` service, now it should be used `getThemeOption` method from `oro_layout.theme_manager` service.
+
+#### EntityBundle
+* Сlass `Oro\Bundle\EntityBundle\Request\ParamConverter\DoctrineParamConverterDecorator` was removed.
+    It was replaced with `Oro\Bundle\EntityBundle\EventListener\ExceptionListener`.
+
+#### SecurityBundle
+* Сlass `Oro\Bundle\SecurityBundle\Request\ParamConverter\DoctrineParamConverter` was removed.
+  Moved logic from `DoctrineParamConverter::apply` to `Oro\Bundle\SecurityBundle\EventListener\ControllerListener::checkEntityAccess`.
 
 ## Changes in the Platform package versions
 

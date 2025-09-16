@@ -2,18 +2,17 @@
 
 namespace Oro\Bundle\NavigationBundle\Attribute;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ConfigurationAnnotation;
+use Oro\Bundle\PlatformBundle\Interface\PHPAttributeConfigurationInterface;
 
 /**
  * Title service attribute parser
  * @package Oro\Bundle\NavigationBundle\Attribute
  */
 #[\Attribute(\Attribute::TARGET_METHOD)]
-class TitleTemplate extends ConfigurationAnnotation
+class TitleTemplate implements PHPAttributeConfigurationInterface
 {
     public function __construct(private string $value)
     {
-        parent::__construct(['value' => $value]);
     }
 
     /**
@@ -30,13 +29,13 @@ class TitleTemplate extends ConfigurationAnnotation
     }
 
     #[\Override]
-    public function getAliasName()
+    public function getAliasName(): string
     {
         return 'title_template';
     }
 
     #[\Override]
-    public function allowArray()
+    public function allowArray(): bool
     {
         return false;
     }

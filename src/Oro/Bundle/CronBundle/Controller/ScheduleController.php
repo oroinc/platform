@@ -4,7 +4,7 @@ namespace Oro\Bundle\CronBundle\Controller;
 
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class ScheduleController extends AbstractController
 {
     #[Route(path: '/', name: 'oro_cron_schedule_index')]
-    #[Template]
+    #[Template('@OroCron/Schedule/index.html.twig')]
     #[Acl(id: 'oro_cron_schedule_view', type: 'entity', class: Schedule::class, permission: 'VIEW')]
     public function indexAction()
     {

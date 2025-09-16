@@ -19,7 +19,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationsDatagridLinksProvider;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,7 +38,7 @@ class WorkflowDefinitionController extends AbstractController
      * @return array
      */
     #[Route(name: 'oro_workflow_definition_index')]
-    #[Template]
+    #[Template('@OroWorkflow/WorkflowDefinition/index.html.twig')]
     #[Acl(id: 'oro_workflow_definition_view', type: 'entity', class: WorkflowDefinition::class, permission: 'VIEW')]
     public function indexAction()
     {
@@ -108,7 +108,7 @@ class WorkflowDefinitionController extends AbstractController
      * @throws AccessDeniedException
      */
     #[Route(path: '/configure/{name}', name: 'oro_workflow_definition_configure')]
-    #[Template]
+    #[Template('@OroWorkflow/WorkflowDefinition/configure.html.twig')]
     #[Acl(
         id: 'oro_workflow_definition_configure',
         type: 'entity',

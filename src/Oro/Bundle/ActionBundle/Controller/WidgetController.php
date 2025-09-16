@@ -6,7 +6,7 @@ use Oro\Bundle\ActionBundle\Handler\OperationFormHandler;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +25,7 @@ class WidgetController extends AbstractController
      * @return array
      */
     #[Route(path: '/buttons', name: 'oro_action_widget_buttons')]
-    #[Template]
+    #[Template('@OroAction/Widget/buttons.html.twig')]
     public function buttonsAction()
     {
         $buttonSearchContext = $this->container->get(ButtonSearchContextProvider::class)->getButtonSearchContext();

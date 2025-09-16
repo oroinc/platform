@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Controller;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -48,7 +48,7 @@ class AccountController extends AbstractController
         "name" => "oro_cms_user_view",
         "requirements" => ["id" => "\d+"]
     ])]
-    #[Template]
+    #[Template('@OroSecurity/Account/view.html.twig')]
     public function viewAction(CmsUser $cmsUser): array
     {
         return [];

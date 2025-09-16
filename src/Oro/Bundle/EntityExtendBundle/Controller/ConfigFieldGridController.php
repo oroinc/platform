@@ -13,7 +13,7 @@ use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,7 +48,7 @@ class ConfigFieldGridController extends AbstractController
         class: EntityConfigModel::class,
         permission: BasicPermission::EDIT
     )]
-    #[Template]
+    #[Template('@OroEntityExtend/ConfigFieldGrid/create.html.twig')]
     public function createAction(Request $request, EntityConfigModel $entityConfigModel)
     {
         if (!$this->getExtendConfigProvider()->getConfig($entityConfigModel->getClassName())->is('is_extend')) {

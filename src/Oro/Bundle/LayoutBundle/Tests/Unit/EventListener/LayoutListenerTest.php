@@ -16,7 +16,7 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -201,7 +201,7 @@ class LayoutListenerTest extends TestCase
         );
 
         $responseEvent = $this->createResponseForControllerResultEvent(
-            ['_layout' => new LayoutAttribute(), '_template' => new Template([])],
+            ['_layout' => new LayoutAttribute(), '_template' => new Template('')],
             []
         );
         $this->listener->onKernelView($responseEvent);

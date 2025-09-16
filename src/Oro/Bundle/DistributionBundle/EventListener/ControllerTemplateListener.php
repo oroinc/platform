@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\DistributionBundle\EventListener;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -36,12 +36,6 @@ class ControllerTemplateListener implements EventSubscriberInterface
             $templateOverride = $request->attributes->get($this->attributeName);
             if (!$templateOverride instanceof Template) {
                 $templateOverride = new Template($templateOverride);
-
-                $controller = $event->getController();
-                if (!\is_array($controller) && method_exists($controller, '__invoke')) {
-                    $controller = [$controller, '__invoke'];
-                }
-                $templateOverride->setOwner($controller);
             }
 
             $request->attributes->set('_template', $templateOverride);

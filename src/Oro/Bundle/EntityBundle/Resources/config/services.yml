@@ -68,12 +68,10 @@ services:
         tags:
             - { name: oro_entity.delete_handler_extension, entity: default }
 
-    oro_entity.converter.doctrine.orm.decorator:
-        class: 'Oro\Bundle\EntityBundle\Request\ParamConverter\DoctrineParamConverterDecorator'
-        decorates: 'sensio_framework_extra.converter.doctrine.orm'
-        decoration_priority: -256 # should be at the top of the decoration chain
-        arguments:
-            - '@.inner'
+    oro_entity.listener.exception_listener:
+        class: Oro\Bundle\EntityBundle\EventListener\ExceptionListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException, priority: 1000 }
 
     oro_entity.listener.navigation_listener:
         class: Oro\Bundle\EntityBundle\EventListener\NavigationListener

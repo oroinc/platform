@@ -7,7 +7,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
@@ -33,7 +33,7 @@ class AclPermissionController
         requirements: ['oid' => '[\w]+:[\w\:\(\)\|]+', 'permission' => '[\w/]+'],
         defaults: ['_format' => 'json', 'permission' => null]
     )]
-    #[Template]
+    #[Template('@OroSecurity/AclPermission/aclAccessLevels.json.twig')]
     public function aclAccessLevelsAction(string $oid, ?string $permission = null): array
     {
         if (ObjectIdentityHelper::getExtensionKeyFromIdentityString($oid) === EntityAclExtension::NAME) {
