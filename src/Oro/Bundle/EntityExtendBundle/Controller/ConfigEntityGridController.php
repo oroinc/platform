@@ -13,7 +13,7 @@ use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\UIBundle\Route\Router;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -43,7 +43,7 @@ class ConfigEntityGridController extends AbstractController
         requirements: ['id' => '\d+'],
         defaults: ['id' => 0]
     )]
-    #[Template]
+    #[Template('@OroEntityExtend/ConfigEntityGrid/unique.html.twig')]
     public function uniqueAction(Request $request, EntityConfigModel $entity): RedirectResponse|array
     {
         $className = $entity->getClassName();
@@ -83,7 +83,7 @@ class ConfigEntityGridController extends AbstractController
      * @return array|RedirectResponse
      */
     #[Route(path: '/create', name: 'oro_entityextend_entity_create')]
-    #[Template]
+    #[Template('@OroEntityExtend/ConfigEntityGrid/create.html.twig')]
     public function createAction(Request $request): RedirectResponse|array
     {
         $configManager = $this->getConfigManager();

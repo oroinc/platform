@@ -18,7 +18,7 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\UIBundle\Route\Router;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,7 +39,7 @@ class DashboardController extends AbstractController
         requirements: ['_format' => 'html|json'],
         defaults: ['_format' => 'html']
     )]
-    #[Template]
+    #[Template('@OroDashboard/Dashboard/index.html.twig')]
     #[Acl(id: 'oro_dashboard_view', type: 'entity', class: Dashboard::class, permission: 'VIEW')]
     public function indexAction()
     {
@@ -131,7 +131,7 @@ class DashboardController extends AbstractController
      * @return array
      */
     #[Route(path: '/update/{id}', name: 'oro_dashboard_update', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
-    #[Template]
+    #[Template('@OroDashboard/Dashboard/update.html.twig')]
     #[Acl(id: 'oro_dashboard_update', type: 'entity', class: Dashboard::class, permission: 'EDIT')]
     public function updateAction(Request $request, Dashboard $dashboard)
     {

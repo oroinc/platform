@@ -4,7 +4,7 @@ namespace Oro\Bundle\MessageQueueBundle\Controller;
 
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class JobController extends AbstractController
 {
     #[Route(path: '/', name: 'oro_message_queue_root_jobs')]
-    #[Template]
+    #[Template('@OroMessageQueue/Job/rootJobs.html.twig')]
     #[AclAncestor('oro_message_queue_job')]
     public function rootJobsAction()
     {
@@ -27,7 +27,7 @@ class JobController extends AbstractController
      * @return array
      */
     #[Route(path: '/{id}', name: 'oro_message_queue_child_jobs', requirements: ['id' => '\d+'])]
-    #[Template]
+    #[Template('@OroMessageQueue/Job/childJobs.html.twig')]
     #[AclAncestor('oro_message_queue_job')]
     public function childJobsAction(Job $job)
     {

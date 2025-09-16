@@ -3,13 +3,13 @@
 namespace Oro\Bundle\HelpBundle\Attribute;
 
 use Attribute;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ConfigurationInterface;
+use Oro\Bundle\PlatformBundle\Interface\PHPAttributeConfigurationInterface;
 
 /**
  * The attribute for setting the tooltips for entity form fields.
  */
 #[Attribute()]
-class Help implements ConfigurationInterface
+class Help implements PHPAttributeConfigurationInterface
 {
     public const ALIAS = 'oro_help';
 

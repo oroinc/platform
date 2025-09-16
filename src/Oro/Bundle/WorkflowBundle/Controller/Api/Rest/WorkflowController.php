@@ -17,7 +17,7 @@ use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -149,11 +149,12 @@ class WorkflowController extends AbstractFOSRestController
      * @param string $transitionName
      * @return Response
      */
-    #[ParamConverter('workflowItem', options: ['id' => 'workflowItemId'])]
-    public function transitAction(WorkflowItem $workflowItem, $transitionName)
-    {
+    public function transitAction(
+        #[MapEntity(id: 'workflowItemId')]
+        WorkflowItem $workflowItem,
+        $transitionName
+    ) {
         $errors = new ArrayCollection();
-
         try {
             $this->container->get('oro_workflow.manager')->transit($workflowItem, $transitionName, $errors);
         } catch (WorkflowNotFoundException $e) {
@@ -165,13 +166,11 @@ class WorkflowController extends AbstractFOSRestController
         } catch (\Exception $e) {
             return $this->handleError($this->buildMessageString($errors, $e), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
         $data = ['workflowItem' => $this->serializeWorkflowItem($workflowItem)];
         $redirectUrl = $workflowItem->getResult()->redirectUrl;
         if ($redirectUrl) {
             $data['redirectUrl'] = $redirectUrl;
         }
-
         return $this->handleView($this->view($data, Response::HTTP_OK));
     }
 
@@ -184,9 +183,10 @@ class WorkflowController extends AbstractFOSRestController
      * @param WorkflowItem $workflowItem
      * @return Response
      */
-    #[ParamConverter('workflowItem', options: ['id' => 'workflowItemId'])]
-    public function getAction(WorkflowItem $workflowItem)
-    {
+    public function getAction(
+        #[MapEntity(id: 'workflowItemId')]
+        WorkflowItem $workflowItem
+    ) {
         return $this->handleView(
             $this->view(['workflowItem' => $this->serializeWorkflowItem($workflowItem)], Response::HTTP_OK)
         );
@@ -203,11 +203,11 @@ class WorkflowController extends AbstractFOSRestController
      * @param WorkflowItem $workflowItem
      * @return Response
      */
-    #[ParamConverter('workflowItem', options: ['id' => 'workflowItemId'])]
-    public function deleteAction(WorkflowItem $workflowItem)
-    {
+    public function deleteAction(
+        #[MapEntity(id: 'workflowItemId')]
+        WorkflowItem $workflowItem
+    ) {
         $this->container->get('oro_workflow.manager')->resetWorkflowItem($workflowItem);
-
         return $this->handleView($this->view(null, Response::HTTP_NO_CONTENT));
     }
 

@@ -6,7 +6,6 @@ bundles:
     - { name: Symfony\Bundle\MonologBundle\MonologBundle, priority: -240 }
     - { name: Doctrine\Bundle\DoctrineBundle\DoctrineBundle, priority: -225 }
     - { name: Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle, priority: -220 }
-    - { name: Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle, priority: -215 }
     - { name: JMS\SerializerBundle\JMSSerializerBundle, kernel: true, priority: -210, optional: true }
     - { name: Knp\Bundle\MenuBundle\KnpMenuBundle, priority: -200 }
     - { name: FOS\RestBundle\FOSRestBundle, priority: -195 }

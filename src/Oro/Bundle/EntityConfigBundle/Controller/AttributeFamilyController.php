@@ -14,7 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
 use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -95,7 +95,7 @@ class AttributeFamilyController extends AbstractController
     }
 
     #[Route(path: '/index/{alias}', name: 'oro_attribute_family_index')]
-    #[Template]
+    #[Template('@OroEntityConfig/AttributeFamily/index.html.twig')]
     public function indexAction(string $alias): array|RedirectResponse
     {
         $entityClass = $this->container->get(EntityAliasResolver::class)->getClassByAlias($alias);
@@ -131,7 +131,7 @@ class AttributeFamilyController extends AbstractController
     }
 
     #[Route(path: '/view/{id}', name: 'oro_attribute_family_view', requirements: ['id' => '\d+'])]
-    #[Template]
+    #[Template('@OroEntityConfig/AttributeFamily/view.html.twig')]
     public function viewAction(AttributeFamily $attributeFamily): array
     {
         $aliasResolver = $this->container->get(EntityAliasResolver::class);

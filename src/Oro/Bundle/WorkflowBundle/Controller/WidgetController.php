@@ -15,8 +15,8 @@ use Oro\Bundle\WorkflowBundle\Processor\TransitActionProcessor;
 use Oro\Bundle\WorkflowBundle\Provider\TransitionDataProvider;
 use Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider;
 use Oro\Bundle\WorkflowBundle\Translation\Helper\TransitionTranslationHelper;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,7 +37,7 @@ class WidgetController extends AbstractController
      * @return array
      */
     #[Route(path: '/entity-workflows/{entityClass}/{entityId}', name: 'oro_workflow_widget_entity_workflows')]
-    #[Template]
+    #[Template('@OroWorkflow/Widget/entityWorkflows.html.twig')]
     public function entityWorkflowsAction($entityClass, $entityId)
     {
         $entity = $this->container->get(TransitionWidgetHelper::class)
@@ -121,9 +121,12 @@ class WidgetController extends AbstractController
         path: '/transition/edit/attributes/{workflowItemId}/{transitionName}',
         name: 'oro_workflow_widget_transition_form'
     )]
-    #[ParamConverter('workflowItem', options: ['id' => 'workflowItemId'])]
-    public function transitionFormAction($transitionName, WorkflowItem $workflowItem, Request $request)
-    {
+    public function transitionFormAction(
+        $transitionName,
+        #[MapEntity(id: 'workflowItemId')]
+        WorkflowItem $workflowItem,
+        Request $request
+    ) {
         $processor = $this->container->get(TransitActionProcessor::class);
 
         $context = $this->createProcessorContext($processor, $request, $transitionName);
@@ -160,7 +163,7 @@ class WidgetController extends AbstractController
      * @return array
      */
     #[Route(path: '/buttons/{entityClass}/{entityId}', name: 'oro_workflow_widget_buttons')]
-    #[Template]
+    #[Template('@OroWorkflow/Widget/buttons.html.twig')]
     public function buttonsAction($entityClass, $entityId)
     {
         $workflowsData = [];

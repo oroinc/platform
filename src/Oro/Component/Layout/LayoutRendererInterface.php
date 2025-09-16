@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 
 /**
  * Renders the block and sets the theme(s) to be used for rendering a view and its children

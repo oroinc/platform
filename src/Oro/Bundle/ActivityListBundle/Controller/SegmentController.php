@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Controller;
 
 use Oro\Bundle\ActivityListBundle\Controller\Api\Rest\ActivityListController as RestActivityListController;
 use Oro\Bundle\ActivityListBundle\Event\ActivityConditionOptionsLoadEvent;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class SegmentController extends AbstractController
 {
     #[Route(path: '/activity-condition')]
-    #[Template]
+    #[Template('@OroActivityList/Segment/activityCondition.html.twig')]
     public function activityConditionAction(Request $request)
     {
         $params = $request->attributes->get('params', []);

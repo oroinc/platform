@@ -4,7 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -20,7 +20,7 @@ class GlobalMenuController extends AbstractMenuController
      * @return array
      */
     #[Route(path: '/', name: 'oro_navigation_global_menu_index')]
-    #[Template]
+    #[Template('@OroNavigation/GlobalMenu/index.html.twig')]
     public function indexAction()
     {
         return $this->index();
@@ -33,7 +33,7 @@ class GlobalMenuController extends AbstractMenuController
      * @return array
      */
     #[Route(path: '/{menuName}', name: 'oro_navigation_global_menu_view')]
-    #[Template]
+    #[Template('@OroNavigation/GlobalMenu/view.html.twig')]
     public function viewAction($menuName)
     {
         return $this->view($menuName);
@@ -61,7 +61,7 @@ class GlobalMenuController extends AbstractMenuController
      * @return array|RedirectResponse
      */
     #[Route(path: '/{menuName}/update/{key}', name: 'oro_navigation_global_menu_update')]
-    #[Template]
+    #[Template('@OroNavigation/GlobalMenu/update.html.twig')]
     public function updateAction($menuName, $key)
     {
         return parent::update($menuName, $key);

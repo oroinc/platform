@@ -13,7 +13,7 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider;
 use Psr\Container\ContainerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -38,7 +38,7 @@ class ConfigurationController implements ServiceSubscriberInterface
         requirements: ['id' => '\d+'],
         defaults: ['activeGroup' => null, 'activeSubGroup' => null]
     )]
-    #[Template]
+    #[Template('@OroUser/Configuration/userConfig.html.twig')]
     #[Acl(id: 'oro_user_user_config', type: 'entity', class: User::class, permission: 'CONFIGURE')]
     public function userConfigAction(
         User $entity,

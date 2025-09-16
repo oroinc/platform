@@ -13,7 +13,7 @@ use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Psr\Log\LoggerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,7 +35,7 @@ class GridController extends AbstractController
      * @return array
      */
     #[Route(path: '/widget/{gridName}', name: 'oro_datagrid_widget', requirements: ['gridName' => '[\w\:-]+'])]
-    #[Template]
+    #[Template('@OroDataGrid/Grid/widget.html.twig')]
     public function widgetAction(Request $request, $gridName)
     {
         return [

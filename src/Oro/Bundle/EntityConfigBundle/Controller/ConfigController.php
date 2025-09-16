@@ -21,7 +21,7 @@ use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\UIBundle\Route\Router;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,7 +43,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ConfigController extends AbstractController
 {
     #[Route(path: '/', name: 'oro_entityconfig_index')]
-    #[Template]
+    #[Template('@OroEntityConfig/Config/index.html.twig')]
     public function indexAction()
     {
         $actions = [];
@@ -91,7 +91,7 @@ class ConfigController extends AbstractController
         class: EntityConfigModel::class,
         permission: BasicPermission::EDIT
     )]
-    #[Template]
+    #[Template('@OroEntityConfig/Config/update.html.twig')]
     public function updateAction(Request $request, EntityConfigModel $entity)
     {
         $form = $this->createForm(
@@ -129,7 +129,7 @@ class ConfigController extends AbstractController
      * @return array
      */
     #[Route(path: '/view/{id}', name: 'oro_entityconfig_view')]
-    #[Template]
+    #[Template('@OroEntityConfig/Config/view.html.twig')]
     public function viewAction(EntityConfigModel $entity)
     {
         [, $entityName] = ConfigHelper::getModuleAndEntityNames($entity->getClassName());
@@ -159,7 +159,7 @@ class ConfigController extends AbstractController
         requirements: ['id' => '\d+'],
         defaults: ['id' => 0]
     )]
-    #[Template]
+    #[Template('@OroEntityConfig/Config/fields.html.twig')]
     public function fieldsAction($id)
     {
         $entity = $this->getConfigManager()
@@ -190,7 +190,7 @@ class ConfigController extends AbstractController
         class: FieldConfigModel::class,
         permission: BasicPermission::EDIT
     )]
-    #[Template]
+    #[Template('@OroEntityConfig/Config/fieldUpdate.html.twig')]
     public function fieldUpdateAction(FieldConfigModel $fieldConfigModel)
     {
         $formAction = $this->generateUrl('oro_entityconfig_field_update', ['id' => $fieldConfigModel->getId()]);
@@ -268,7 +268,7 @@ class ConfigController extends AbstractController
      * @return array
      */
     #[Route(path: '/widget/unique_keys/{id}', name: 'oro_entityconfig_widget_unique_keys')]
-    #[Template]
+    #[Template('@OroEntityConfig/Config/uniqueKeys.html.twig')]
     public function uniqueKeysAction(EntityConfigModel $entity)
     {
         $className = $entity->getClassName();
@@ -303,7 +303,7 @@ class ConfigController extends AbstractController
      * @return array
      */
     #[Route(path: '/widget/entity_fields/{id}', name: 'oro_entityconfig_widget_entity_fields')]
-    #[Template]
+    #[Template('@OroEntityConfig/Config/entityFields.html.twig')]
     public function entityFieldsAction(EntityConfigModel $entity)
     {
         return ['entity' => $entity];

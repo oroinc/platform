@@ -335,8 +335,9 @@ services:
         arguments:
             - '@oro_security.class_authorization_checker'
             - '@logger'
+            - '@oro_security.request_authorization_checker'
         tags:
-            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: -1 }
+            - { name: kernel.event_listener, event: kernel.controller_arguments, method: onKernelControllerArguments, priority: -1 }
             - { name: monolog.logger, channel: security }
 
     oro_security.twig.security_extension:
@@ -675,13 +676,6 @@ services:
         class: Oro\Bundle\SecurityBundle\Request\CsrfProtectedRequestHelper
         arguments:
             - '@oro_security.csrf_request_manager'
-
-    oro_security.framework_extra.converter.doctrine.orm_decorator:
-        class: Oro\Bundle\SecurityBundle\Request\ParamConverter\DoctrineParamConverter
-        decorates: sensio_framework_extra.converter.doctrine.orm
-        parent: sensio_framework_extra.converter.doctrine.orm
-        arguments:
-            - '@oro_security.request_authorization_checker'
 
     oro_security.security.acl.security_identity_retrieval_strategy.cacheable:
         class: Oro\Bundle\SecurityBundle\Acl\Domain\CacheableSecurityIdentityRetrievalStrategy

@@ -5,7 +5,7 @@ namespace Oro\Bundle\NotificationBundle\Controller;
 use Oro\Bundle\NotificationBundle\Entity\MassNotification;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -22,7 +22,7 @@ class MassNotificationController extends AbstractController
         requirements: ['_format' => 'html|json'],
         defaults: ['_format' => 'html']
     )]
-    #[Template]
+    #[Template('@OroNotification/MassNotification/index.html.twig')]
     #[Acl(
         id: 'oro_notification_massnotification_view',
         type: 'entity',
@@ -37,7 +37,7 @@ class MassNotificationController extends AbstractController
     }
 
     #[Route(path: '/view/{id}', name: 'oro_notification_massnotification_view', requirements: ['id' => '\d+'])]
-    #[Template]
+    #[Template('@OroNotification/MassNotification/view.html.twig')]
     #[AclAncestor('oro_notification_massnotification_view')]
     public function viewAction(MassNotification $massNotification)
     {
@@ -47,7 +47,7 @@ class MassNotificationController extends AbstractController
     }
 
     #[Route(path: '/info/{id}', name: 'oro_notification_massnotification_info', requirements: ['id' => '\d+'])]
-    #[Template]
+    #[Template('@OroNotification/MassNotification/info.html.twig')]
     #[AclAncestor('oro_notification_massnotification_view')]
     public function infoAction(MassNotification $massNotification)
     {
