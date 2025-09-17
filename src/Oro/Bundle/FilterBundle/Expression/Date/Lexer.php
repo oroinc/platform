@@ -73,7 +73,7 @@ class Lexer
                 $cursor += strlen($match[0]);
             } elseif (preg_match(self::REGEXP_INTEGER . 'A', $string, $match, PREG_NO_ERROR, $cursor)) {
                 // integers
-                $tokens[] = new Token(Token::TYPE_INTEGER, $match[0]);
+                $tokens[] = new Token(Token::TYPE_INTEGER, (int)$match[0]);
                 $cursor += strlen($match[0]);
             } elseif (str_contains('(', $current)) {
                 // opening bracket
