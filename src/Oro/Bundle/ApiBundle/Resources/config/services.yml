@@ -968,10 +968,17 @@ services:
         arguments:
             - '@file_locator'
 
+    oro_api.config.api_doc_file_locator:
+        class: Oro\Bundle\ApiBundle\Config\ApiDocFileLocator
+        arguments:
+            - '@kernel'
+        calls:
+            - [setPaths, [['%kernel.project_dir%']]]
+
     oro_api.resource_doc_parser.default:
         class: Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser
         arguments:
-            - '@file_locator'
+            - '@oro_api.config.api_doc_file_locator'
         tags:
             - { name: oro.api.resource_doc_parser, requestType: rest&json_api, priority: -10 }
             - { name: oro.api.resource_doc_parser, requestType: rest, priority: -20 }
@@ -1357,3 +1364,18 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
             - { name: monolog.logger, channel: api }
+
+    oro_api.collector.warnings_collector:
+        class: Oro\Bundle\ApiBundle\Collector\ApiDocWarningsCollector
+
+    oro_api.monolog.handler.api_doc_collecting:
+        class: Oro\Bundle\ApiBundle\Monolog\Handler\ApiDocCollectingHandler
+        arguments:
+            - '@oro_api.collector.warnings_collector'
+
+    oro_api.listener.api_doc_cache_clear:
+        class: Oro\Bundle\ApiBundle\EventListener\ApiDocCacheClearListener
+        arguments:
+            - '@oro_api.collector.warnings_collector'
+        tags:
+            - { name: kernel.event_subscriber }
