@@ -976,6 +976,41 @@ class OroMainContext extends MinkContext implements
      */
     public function assertDefinedElementContainsPlaceholder($locator, $value)
     {
+        [$locator, $value, $field] = $this->getPreparedDataForElementPlaceholder($locator, $value);
+        $placeholder = $field->getAttribute('placeholder');
+
+        if ($placeholder === null) {
+            $placeholder = $field->getAttribute('data-placeholder');
+        }
+
+        static::assertStringContainsString(
+            $value,
+            $placeholder,
+            \sprintf('Element %s does not contains placeholder %s', $locator, $value)
+        );
+    }
+
+    /**
+     * Example: Then I should see that multiple select2 "Header" contains "Some Text" placeholder
+     * @Then /^(?:|I )should see that multiple select2 "(?P<elementName>[^"]*)" contains "(?P<text>[^"]*)" placeholder$/
+     *
+     * @param string $locator
+     * @param string $value
+     */
+    public function assertMultipleSelect2ElementContainsPlaceholder($locator, $value)
+    {
+        [$locator, $value, $field] = $this->getPreparedDataForElementPlaceholder($locator, $value);
+        $placeholder = $field->getValue();
+
+        static::assertStringContainsString(
+            $value,
+            $placeholder,
+            \sprintf('Element %s does not contains placeholder %s', $locator, $value)
+        );
+    }
+
+    private function getPreparedDataForElementPlaceholder($locator, $value): array
+    {
         $locator = $this->fixStepArgument($locator);
         $value = $this->fixStepArgument($value);
         $field = $this->getPage()->find('named', ['field', $locator]);
@@ -995,19 +1030,8 @@ class OroMainContext extends MinkContext implements
             );
         }
 
-        $placeholder = $field->getAttribute('placeholder');
-
-        if ($placeholder === null) {
-            $placeholder = $field->getAttribute('data-placeholder');
-        }
-
-        static::assertStringContainsString(
-            $value,
-            $placeholder,
-            \sprintf('Element %s does not contains placeholder %s', $locator, $value)
-        );
+        return [$locator, $value, $field];
     }
-
     /**
      * Example: Then I should see that "Header" does not contain "Some Text" placeholder
      * @Then /^I should see that "(?P<elementName>[^"]*)" does not contain "(?P<text>[^"]*)" placeholder$/
