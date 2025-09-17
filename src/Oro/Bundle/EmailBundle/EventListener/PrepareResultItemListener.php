@@ -31,9 +31,12 @@ class PrepareResultItemListener
         $resultItem = $event->getResultItem();
 
         $emailId = $this->doctrine->getManagerForClass(EmailUser::class)
-            ->find(EmailUser::class, $resultItem->getId())
-            ->getEmail()
-            ->getId();
+            ?->find(EmailUser::class, $resultItem->getId())
+            ?->getEmail()
+            ?->getId();
+        if (!$emailId) {
+            return;
+        }
 
         $resultItem->setRecordId($emailId);
         $resultItem->setEntityName(Email::class);
