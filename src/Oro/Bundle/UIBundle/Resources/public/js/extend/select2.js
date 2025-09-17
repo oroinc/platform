@@ -1064,5 +1064,62 @@ define(function(require) {
             original.call(this, initial);
             makeExtraElementsAccessible(this.results);
         });
+
+        /**
+         * Override clearSearch method for MultiSelect2 to properly handle HTML entities in placeholder text
+         *
+         * PROBLEM:
+         * The original Select2 multiselect placeholder handling has a critical issue with HTML entities.
+         * When placeholder text contains HTML entities (e.g., "Please select MIM&#039;E type..."),
+         * the original implementation displays them as literal text instead of decoded characters.
+         * This creates poor UX where users see "MIM&#039;E" instead of "MIM'E".
+         *
+         * ROOT CAUSE:
+         * The original clearSearch() method directly sets placeholder text via .val() without
+         * decoding HTML entities. Since placeholder text often comes from server-side templates
+         * or databases where special characters are HTML-escaped for security, the raw entities
+         * end up being displayed to users.
+         *
+         * SOLUTION:
+         * This override adds proper HTML entity decoding before setting placeholder text:
+         * 1. Uses _.unescape() to decode standard entities
+         * 2. Adds manual replacements for entities that _.unescape() might miss:
+         *    - &quot; → " (double quotes in some encoding scenarios)
+         *    - &#039; → ' (apostrophe in decimal numeric entity format)
+         * 3. Elements which could be used in xss attack will be still escaped (&lt;, &gt;, etc.).
+         *
+         *
+         * COMPATIBILITY:
+         * This override maintains full compatibility with original Select2 behavior while
+         * fixing the entity display issue. All other clearSearch() functionality remains unchanged.
+         *
+         * EXAMPLES:
+         * Before: "Please select MIM&#039;E type..." displays as literal text
+         * After:  "Please select MIM'E type..." displays correctly with apostrophe
+         *
+         * Text in translation: "Please <> &; select"
+         * Text in select2 placeholder:  "Please &lt;&gt; &amp; select"
+         */
+        /* original private Select2 methods */
+        /* eslint-disable */
+        prototype.clearSearch = function () {
+            var placeholder = this.getPlaceholder(),
+                maxWidth = this.getMaxSearchWidth();
+
+            if (placeholder !== undefined  && this.getVal().length === 0 && this.search.hasClass("select2-focused") === false) {
+                // Decode HTML entities in placeholder text for proper display
+                // Uses _.unescape() for standard entities + manual replacements for edge cases
+                const decodedPlaceholder = _.unescape(placeholder).replace(/&quot;/g, '\"').replace(/&#039;/g, '\'');
+                this.search.val(decodedPlaceholder).addClass("select2-default");
+
+                // stretch the search box to full width of the container so as much of the placeholder is visible as possible
+                // we could call this.resizeSearch(), but we do not because that requires a sizer and we do not want to create one so early because of a firefox bug, see #944
+                this.search.width(maxWidth > 0 ? maxWidth : this.container.css("width"));
+            } else {
+                this.search.val("").width(10);
+            }
+        }
+        /* eslint-enable */
+        /* original private Select2 methods:end */
     }(Select2['class'].multi.prototype));
 });
