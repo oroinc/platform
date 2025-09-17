@@ -1387,3 +1387,18 @@ services:
 
     oro_api.security.http.entry_point.api:
         class:  Oro\Bundle\ApiBundle\Security\Http\EntryPoint\ApiEntryPoint
+
+    oro_api.collector.warnings_collector:
+        class: Oro\Bundle\ApiBundle\Collector\ApiDocWarningsCollector
+
+    oro_api.monolog.handler.api_doc_collecting:
+        class: Oro\Bundle\ApiBundle\Monolog\Handler\ApiDocCollectingHandler
+        arguments:
+            - '@oro_api.collector.warnings_collector'
+
+    oro_api.listener.api_doc_cache_clear:
+        class: Oro\Bundle\ApiBundle\EventListener\ApiDocCacheClearListener
+        arguments:
+            - '@oro_api.collector.warnings_collector'
+        tags:
+            - { name: kernel.event_subscriber }
