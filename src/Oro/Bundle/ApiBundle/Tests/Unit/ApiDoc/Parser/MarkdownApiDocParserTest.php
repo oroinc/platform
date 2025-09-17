@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Component\Testing\ReflectionUtil;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\Yaml\Yaml;
 
@@ -96,6 +97,43 @@ class MarkdownApiDocParserTest extends TestCase
         $expected = Yaml::parse(file_get_contents(__DIR__ . '/Fixtures/replace.yml'));
 
         $this->assertLoadedData($expected, $apiDocParser);
+    }
+
+    /**
+     * @dataProvider fileLocatorExceptionProvider
+     */
+    public function testRegisterDocumentationResourceHandlesFileLocatorExceptions(
+        \Exception $originalException,
+        string $resource,
+        string $expectedMessage
+    ): void {
+        $fileLocator = $this->createMock(FileLocator::class);
+        $fileLocator->expects(self::once())
+            ->method('locate')
+            ->with($resource)
+            ->willThrowException($originalException);
+
+        $apiDocParser = new MarkdownApiDocParser($fileLocator);
+
+        $this->expectException(FileLocatorFileNotFoundException::class);
+        $this->expectExceptionMessage($expectedMessage);
+        $apiDocParser->registerDocumentationResource($resource);
+    }
+
+    public function fileLocatorExceptionProvider(): array
+    {
+        return [
+            'file not found' => [
+                new \InvalidArgumentException('File not found'),
+                'non-existent-file.md',
+                'File not found'
+            ],
+            'permission denied' => [
+                new \RuntimeException('Permission denied'),
+                'restricted-file.md',
+                'Permission denied'
+            ]
+        ];
     }
 
     /**

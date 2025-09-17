@@ -103,6 +103,10 @@ services:
             - '@oro_api.complete_descriptions_helper.identifier'
             - '%oro_api.max_entities%'
             - '%oro_api.max_delete_entities%'
+        calls:
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: api_doc }
 
     oro_api.complete_descriptions_helper.fields:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\FieldsDescriptionHelper

@@ -6,6 +6,7 @@ use Michelf\MarkdownExtra;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\InheritDocUtil;
+use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\Config\FileLocatorInterface;
 
 /**
@@ -93,8 +94,17 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
             return false;
         }
 
-        /** @var string $filePath */
-        $filePath = $this->fileLocator->locate($resource);
+        try {
+            /** @var string $filePath */
+            $filePath = $this->fileLocator->locate($resource);
+        } catch (\Exception $e) {
+            // Convert any FileLocator exception to FileLocatorFileNotFoundException for consistent handling.
+            // This ensures that all path-related errors (invalid bundle notation, missing files,
+            // permission issues, malformed paths, etc.) are handled uniformly by calling code.
+            // The original exception is preserved as previous exception for debugging purposes.
+            throw new FileLocatorFileNotFoundException($e->getMessage(), $e->getCode(), $e);
+        }
+
         if (!isset($this->parsedFiles[$filePath])) {
             $existingData = $this->loadedData;
             $this->loadedData = [];
