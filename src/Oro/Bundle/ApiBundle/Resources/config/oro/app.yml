@@ -17,6 +17,18 @@ nelmio_api_doc:
     cache:
         enabled: true
 
+monolog:
+    # API documentation logger is needed to collect warnings/errors from both HTTP and CLI contexts
+    # during API documentation generation. It has a custom handler that displays collected
+    # issues in console output for oro:api:doc:cache:clear command.
+    channels: ['api_doc']
+    handlers:
+        api_doc_collector:
+            type: service
+            id: 'oro_api.monolog.handler.api_doc_collecting'
+            level: warning
+            channels: ['api_doc']
+
 security:
     firewalls:
         api_options:
