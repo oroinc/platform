@@ -73,7 +73,7 @@ define(function(require, exports, module) {
          *
          * @property
          */
-        buttonSelector: '.ui-multiselect.filter-list',
+        buttonSelector: '.filter-list',
 
         /**
          * jQuery object that will be target for append multiselect dropdown menus

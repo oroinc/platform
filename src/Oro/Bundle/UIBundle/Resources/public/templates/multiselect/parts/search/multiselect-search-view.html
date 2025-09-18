@@ -8,6 +8,7 @@
     data-role="search-input"
 >
 
+<% if (hideResetButton != true) { %>
 <button
     type="button"
     class="<%- cssConfig.searchResetBtn %> <%- cssConfig.searchResetBtnHide %>"
@@ -18,6 +19,7 @@
         name: 'close'
     }) %>
 </button>
+<% } %>
 
 <%= oroui.renderIcon({
     name: 'search',

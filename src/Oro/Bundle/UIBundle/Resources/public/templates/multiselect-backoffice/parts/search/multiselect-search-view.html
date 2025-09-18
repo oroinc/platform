@@ -7,7 +7,7 @@
     class="<%- cssConfig.searchInput %>"
     data-role="search-input"
 >
-
+<% if (hideResetButton != true) { %>
 <button
     type="button"
     class="<%- cssConfig.searchResetBtn %> <%- cssConfig.searchResetBtnHide %>"
@@ -16,3 +16,4 @@
 >
     <span class="fa-close"></span>
 </button>
+<% } %>

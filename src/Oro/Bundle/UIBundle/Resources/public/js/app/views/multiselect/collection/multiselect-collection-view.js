@@ -47,7 +47,9 @@ const MultiSelectCollectionView = BaseCollectionView.extend({
     },
 
     attributes() {
-        const attrs = {};
+        const attrs = {
+            'data-role': 'items'
+        };
 
         if (this.model.get('listAriaLabel')) {
             attrs['aria-label'] = this.model.get('listAriaLabel');

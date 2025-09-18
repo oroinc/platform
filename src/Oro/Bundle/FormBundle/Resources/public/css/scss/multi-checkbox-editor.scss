@@ -1,21 +1,12 @@
 /* @theme: admin.oro; */
 
 .inline-editor-wrapper.multi-checkbox-editor {
-    // stylelint-disable-next-line declaration-no-important
-    z-index: auto !important;
     min-width: 190px;
+}
 
-    .inline-editor__fields {
-        height: 0;
-        overflow: hidden;
-    }
-
-    button.ui-multiselect {
-        // stylelint-disable-next-line declaration-no-important
-        width: 100% !important;
-        height: 0;
-        border: 0 none;
-        padding: 0;
-        overflow: hidden;
-    }
+.multiselect-view.multi-checkbox-editor {
+    position: relative;
+    min-width: 222px;
+    background-color: $primary-inverse;
+    padding: 6px $content-padding-small;
 }

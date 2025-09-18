@@ -440,15 +440,12 @@
 
 .filter-select {
     .select-filter-widget {
-        &,
-        &.ui-multiselect {
-            font-weight: $filter-multiselect-font-weight;
-            color: $filter-multiselect-color;
-            padding: $filter-multiselect-inner-offset;
-            background: $filter-multiselect-background;
-            border: $filter-multiselect-border;
-            margin-left: $filter-multiselect-offset-left;
-        }
+        font-weight: $filter-multiselect-font-weight;
+        color: $filter-multiselect-color;
+        padding: $filter-multiselect-inner-offset;
+        background: $filter-multiselect-background;
+        border: $filter-multiselect-border;
+        margin-left: $filter-multiselect-offset-left;
     }
 
     &.filter-default-value .multiselect-filter-widget {
@@ -541,27 +538,6 @@
     }
 }
 
-.ui-multiselect {
-    &.filter-list {
-        &.ui-state-hover {
-            color: $ui-multiselect-filter-list-color;
-            text-decoration: $ui-multiselect-filter-list-text-decoration;
-        }
-    }
-
-    &.select-filter-widget {
-        .ui-state-hover {
-            text-decoration: $select-filter-widget-text-decoration;
-        }
-    }
-
-    .select-filter-widget {
-        // Rewrite inline styles for filter manager
-        // stylelint-disable-next-line declaration-no-important
-        width: $select-filter-widget-width !important;
-    }
-}
-
 .date-visual-element {
     width: $date-visual-element-width;
 }
@@ -590,7 +566,6 @@
     }
 }
 
-.ui-multiselect.multiselect-filter-widget span,
 .filter-item .filter-criteria-hint {
     max-width: $filter-criteria-hint-max-width;
     display: $filter-criteria-hint-display;

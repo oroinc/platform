@@ -7,7 +7,8 @@ const MultiselectSearchModel = MultiSelectBaseModel.extend({
         placeholder: __('oro.ui.multiselect.search.placeholder'),
         searchFieldAriaLabel: __('oro.ui.multiselect.search.aria_label'),
         searchResetBtnAriaLabel: __('oro.ui.multiselect.search.reset_btn.aria_label'),
-        maxItemsForShowSearchBar: 7
+        maxItemsForShowSearchBar: 7,
+        hideResetButton: false
     },
 
     constructor: function MultiselectSearchModel(...args) {
