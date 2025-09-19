@@ -6,7 +6,7 @@ use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Form\Handler\GroupHandler;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,7 +40,7 @@ class GroupController extends AbstractController
      * @return array
      */
     #[Route(path: '/update/{id}', name: 'oro_user_group_update', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
-    #[Template]
+    #[Template('@OroUser/Group/update.html.twig')]
     #[Acl(id: 'oro_user_group_update', type: 'entity', class: Group::class, permission: 'EDIT')]
     public function updateAction(Request $request, Group $entity)
     {
@@ -53,7 +53,7 @@ class GroupController extends AbstractController
         requirements: ['_format' => 'html|json'],
         defaults: ['_format' => 'html']
     )]
-    #[Template]
+    #[Template('@OroUser/Group/index.html.twig')]
     #[Acl(id: 'oro_user_group_view', type: 'entity', class: Group::class, permission: 'VIEW')]
     public function indexAction(Request $request)
     {

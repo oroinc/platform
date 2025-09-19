@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UserBundle\Controller;
 
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;

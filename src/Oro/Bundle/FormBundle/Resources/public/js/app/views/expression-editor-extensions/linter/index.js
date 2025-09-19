@@ -1,5 +1,4 @@
-import {linter} from '@codemirror/lint';
-import {syntaxTree} from '@codemirror/language';
+import {linter, syntaxTree} from '@oroinc/codemirror-expression-editor';
 import * as rules from './rules';
 import linterPanel from './linter-panel';
 

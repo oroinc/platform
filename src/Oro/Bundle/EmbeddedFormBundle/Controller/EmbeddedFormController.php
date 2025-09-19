@@ -10,7 +10,7 @@ use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Bundle\UIBundle\Route\Router;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -25,7 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EmbeddedFormController extends AbstractController
 {
     #[Route(name: 'oro_embedded_form_list')]
-    #[Template]
+    #[Template('@OroEmbeddedForm/EmbeddedForm/index.html.twig')]
     #[AclAncestor('oro_embedded_form_view')]
     public function indexAction()
     {
@@ -76,7 +76,7 @@ class EmbeddedFormController extends AbstractController
     }
 
     #[Route(path: 'update/{id}', name: 'oro_embedded_form_update', requirements: ['id' => '[-\d\w]+'])]
-    #[Template]
+    #[Template('@OroEmbeddedForm/EmbeddedForm/update.html.twig')]
     #[Acl(id: 'oro_embedded_form_update', type: 'entity', class: EmbeddedForm::class, permission: 'EDIT')]
     public function updateAction(EmbeddedForm $entity, Request $request)
     {
@@ -84,7 +84,7 @@ class EmbeddedFormController extends AbstractController
     }
 
     #[Route(path: 'view/{id}', name: 'oro_embedded_form_view', requirements: ['id' => '[-\d\w]+'])]
-    #[Template]
+    #[Template('@OroEmbeddedForm/EmbeddedForm/view.html.twig')]
     #[Acl(id: 'oro_embedded_form_view', type: 'entity', class: EmbeddedForm::class, permission: 'VIEW')]
     public function viewAction(EmbeddedForm $entity)
     {
@@ -95,7 +95,7 @@ class EmbeddedFormController extends AbstractController
     }
 
     #[Route(path: 'info/{id}', name: 'oro_embedded_form_info', requirements: ['id' => '[-\d\w]+'])]
-    #[Template]
+    #[Template('@OroEmbeddedForm/EmbeddedForm/info.html.twig')]
     #[AclAncestor('oro_embedded_form_view')]
     public function infoAction(EmbeddedForm $entity)
     {

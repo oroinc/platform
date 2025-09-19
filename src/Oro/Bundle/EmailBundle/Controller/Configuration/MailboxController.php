@@ -10,8 +10,8 @@ use Oro\Bundle\EmailBundle\Form\Handler\MailboxHandler;
 use Oro\Bundle\FormBundle\Autocomplete\Security;
 use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
 use Oro\Bundle\UIBundle\Route\Router;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -36,10 +36,12 @@ class MailboxController extends AbstractController
     private const ACTIVE_SUBGROUP = 'email_configuration';
 
     #[Route(path: '/mailbox/update/{id}', name: 'oro_email_mailbox_update')]
-    #[ParamConverter('mailbox', class: Mailbox::class)]
     #[Template('@OroEmail/Configuration/Mailbox/update.html.twig')]
-    public function updateAction(Mailbox $mailbox, Request $request): array|RedirectResponse
-    {
+    public function updateAction(
+        #[MapEntity]
+        Mailbox $mailbox,
+        Request $request
+    ): array|RedirectResponse {
         return $this->update($mailbox, $request);
     }
 
@@ -85,9 +87,10 @@ class MailboxController extends AbstractController
     }
 
     #[Route(path: '/mailbox/delete/{id}', name: 'oro_email_mailbox_delete', methods: ['DELETE'])]
-    #[ParamConverter('mailbox', class: Mailbox::class)]
-    public function deleteAction(Mailbox $mailbox): Response
-    {
+    public function deleteAction(
+        #[MapEntity]
+        Mailbox $mailbox
+    ): Response {
         $mailboxManager = $this->container->get('doctrine')->getManagerForClass(Mailbox::class);
         $mailboxManager->remove($mailbox);
         $mailboxManager->flush();

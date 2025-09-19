@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataAuditBundle\Controller;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -25,7 +25,7 @@ class AuditController extends AbstractController
         requirements: ['_format' => 'html|json'],
         defaults: ['_format' => 'html']
     )]
-    #[Template]
+    #[Template('@OroDataAudit/Audit/index.html.twig')]
     #[AclAncestor('oro_dataaudit_view')]
     public function indexAction(Request $request)
     {
@@ -43,7 +43,7 @@ class AuditController extends AbstractController
         requirements: ['entity' => '[a-zA-Z0-9_]+', 'id' => '[a-zA-Z0-9_-]+'],
         defaults: ['entity' => 'entity', 'id' => 0, '_format' => 'html']
     )]
-    #[Template]
+    #[Template('@OroDataAudit/Audit/history.html.twig')]
     #[Acl(id: 'oro_dataaudit_view', type: 'entity', class: AbstractAudit::class, permission: 'VIEW')]
     public function historyAction($entity, $id)
     {

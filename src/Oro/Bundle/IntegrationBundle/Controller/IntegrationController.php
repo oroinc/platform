@@ -11,7 +11,7 @@ use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SecurityBundle\Attribute\CsrfProtection;
 use Oro\Bundle\UIBundle\Route\Router;
 use Psr\Log\LoggerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,7 +29,7 @@ class IntegrationController extends AbstractController
     use RequestHandlerTrait;
 
     #[Route(path: '/', name: 'oro_integration_index')]
-    #[Template]
+    #[Template('@OroIntegration/Integration/index.html.twig')]
     #[Acl(id: 'oro_integration_view', type: 'entity', class: Integration::class, permission: 'VIEW')]
     public function indexAction()
     {
@@ -47,7 +47,7 @@ class IntegrationController extends AbstractController
     }
 
     #[Route(path: '/update/{id}', name: 'oro_integration_update', requirements: ['id' => '\d+'])]
-    #[Template]
+    #[Template('@OroIntegration/Integration/update.html.twig')]
     #[Acl(id: 'oro_integration_update', type: 'entity', class: Integration::class, permission: 'EDIT')]
     public function updateAction(Request $request, Integration $integration)
     {

@@ -16,7 +16,7 @@ use Oro\Bundle\UserBundle\Form\Handler\UserPasswordResetHandler;
 use Oro\Bundle\UserBundle\Form\Type\UserPasswordResetRequestType;
 use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
 use Psr\Log\LoggerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,7 +39,7 @@ class ResetController extends AbstractController
             '_target_route' => 'oro_user_reset_check_email'
         ]
     )]
-    #[Template]
+    #[Template('@OroUser/Reset/request.html.twig')]
     public function requestAction(Request $request)
     {
         $form = $this->createForm(UserPasswordResetRequestType::class);
@@ -141,7 +141,7 @@ class ResetController extends AbstractController
      * Tell the user to check his email provider
      */
     #[Route(path: '/check-email', name: 'oro_user_reset_check_email', methods: ['GET'])]
-    #[Template]
+    #[Template('@OroUser/Reset/checkEmail.html.twig')]
     public function checkEmailAction(Request $request)
     {
         $session = $request->getSession();
@@ -168,7 +168,7 @@ class ResetController extends AbstractController
         requirements: ['token' => '\w+'],
         methods: ['GET', 'POST']
     )]
-    #[Template]
+    #[Template('@OroUser/Reset/reset.html.twig')]
     public function resetAction(string $token, Request $request)
     {
         $user = $this->getUserManager()->findUserByConfirmationToken($token);

@@ -11,9 +11,11 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class AddMetaPropertyFilterTest extends GetProcessorTestCase
 {
+    private FilterNames&MockObject $filterNames;
     private AddMetaPropertyFilter $processor;
 
     #[\Override]
@@ -21,23 +23,35 @@ class AddMetaPropertyFilterTest extends GetProcessorTestCase
     {
         parent::setUp();
 
-        $filterNames = $this->createMock(FilterNames::class);
-        $filterNames->expects(self::any())
-            ->method('getMetaPropertyFilterName')
-            ->willReturn('meta');
+        $this->filterNames = $this->createMock(FilterNames::class);
 
         $this->processor = new AddMetaPropertyFilter(
             new FilterNamesRegistry(
                 [['filter_names', null]],
-                TestContainerBuilder::create()->add('filter_names', $filterNames)->getContainer($this),
+                TestContainerBuilder::create()->add('filter_names', $this->filterNames)->getContainer($this),
                 new RequestExpressionMatcher()
             )
         );
     }
 
+    public function testProcessWhenMetaFilterIsNotSupported(): void
+    {
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn(null);
+
+        $this->processor->process($this->context);
+
+        self::assertEquals(0, $this->context->getFilters()->count());
+    }
+
     public function testProcessWhenMetaFilterAlreadyAdded(): void
     {
         $filter = new MetaPropertyFilter(DataType::STRING);
+
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
 
         $this->context->getFilters()->add('meta', $filter);
         $this->processor->process($this->context);
@@ -48,6 +62,10 @@ class AddMetaPropertyFilterTest extends GetProcessorTestCase
     public function testProcessWhenMetaFilterShouldBeAdded(): void
     {
         $config = new EntityDefinitionConfig();
+
+        $this->filterNames->expects(self::once())
+            ->method('getMetaPropertyFilterName')
+            ->willReturn('meta');
 
         $this->context->setConfig($config);
         $this->processor->process($this->context);

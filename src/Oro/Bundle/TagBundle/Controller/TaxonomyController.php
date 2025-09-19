@@ -7,7 +7,7 @@ use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\TagBundle\Entity\Taxonomy;
 use Oro\Bundle\TagBundle\Form\Handler\TaxonomyHandler;
 use Oro\Bundle\UIBundle\Route\Router;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -26,7 +26,7 @@ class TaxonomyController extends AbstractController
         requirements: ['_format' => 'html|json'],
         defaults: ['_format' => 'html']
     )]
-    #[Template]
+    #[Template('@OroTag/Taxonomy/index.html.twig')]
     #[Acl(id: 'oro_taxonomy_view', type: 'entity', class: Taxonomy::class, permission: 'VIEW')]
     public function indexAction()
     {
@@ -44,7 +44,7 @@ class TaxonomyController extends AbstractController
     }
 
     #[Route(path: '/update/{id}', name: 'oro_taxonomy_update', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
-    #[Template]
+    #[Template('@OroTag/Taxonomy/update.html.twig')]
     #[Acl(id: 'oro_taxonomy_update', type: 'entity', class: Taxonomy::class, permission: 'EDIT')]
     public function updateAction(Taxonomy $entity, Request $request)
     {
@@ -52,7 +52,7 @@ class TaxonomyController extends AbstractController
     }
 
     #[Route(path: '/view/{id}', name: 'oro_taxonomy_view', requirements: ['id' => '\d+'])]
-    #[Template]
+    #[Template('@OroTag/Taxonomy/view.html.twig')]
     #[Acl(id: 'oro_taxonomy_view', type: 'entity', class: Taxonomy::class, permission: 'VIEW')]
     public function viewAction(Taxonomy $entity)
     {
@@ -62,7 +62,7 @@ class TaxonomyController extends AbstractController
     }
 
     #[Route(path: '/widget/info/{id}', name: 'oro_taxonomy_widget_info', requirements: ['id' => '\d+'])]
-    #[Template]
+    #[Template('@OroTag/Taxonomy/info.html.twig')]
     #[AclAncestor('oro_taxonomy_view')]
     public function infoAction(Taxonomy $taxonomy)
     {

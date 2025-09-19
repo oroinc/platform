@@ -51,6 +51,11 @@ class CorrectSortValue implements ProcessorInterface
         $sortFilterName = $this->filterNamesRegistry
             ->getFilterNames($context->getRequestType())
             ->getSortFilterName();
+        if (!$sortFilterName) {
+            // the "sort" filter is not supported
+            return;
+        }
+
         $filterValueAccessor = $context->getFilterValues();
         $sortFilterValue = $filterValueAccessor->getOne($sortFilterName);
         if (null === $sortFilterValue) {

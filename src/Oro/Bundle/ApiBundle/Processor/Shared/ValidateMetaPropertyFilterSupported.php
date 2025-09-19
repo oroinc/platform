@@ -33,6 +33,11 @@ class ValidateMetaPropertyFilterSupported implements ProcessorInterface
         $filterName = $this->filterNamesRegistry
             ->getFilterNames($context->getRequestType())
             ->getMetaPropertyFilterName();
+        if (!$filterName) {
+            // the "meta" filter is not supported
+            return;
+        }
+
         if (!$context->getFilterValues()->has($filterName)) {
             // nothing to validate because meta properties were not requested
             return;

@@ -8,7 +8,7 @@ use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -23,7 +23,7 @@ class ProcessDefinitionController extends AbstractController
      * @return array
      */
     #[Route(name: 'oro_process_definition_index')]
-    #[Template]
+    #[Template('@OroWorkflow/ProcessDefinition/index.html.twig')]
     #[Acl(id: 'oro_process_definition_view', type: 'entity', class: ProcessDefinition::class, permission: 'VIEW')]
     public function indexAction()
     {

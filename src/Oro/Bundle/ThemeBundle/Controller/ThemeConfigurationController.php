@@ -7,7 +7,7 @@ use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration;
 use Oro\Bundle\ThemeBundle\Form\Handler\ThemeConfigurationHandler;
 use Oro\Bundle\ThemeBundle\Form\Type\ThemeConfigurationType;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +22,7 @@ class ThemeConfigurationController extends AbstractController
 {
     #[AclAncestor("oro_theme_configuration_view")]
     #[Route("/", name: "index")]
-    #[Template]
+    #[Template('@OroTheme/ThemeConfiguration/index.html.twig')]
     public function indexAction(): array
     {
         return [
@@ -32,7 +32,7 @@ class ThemeConfigurationController extends AbstractController
 
     #[AclAncestor("oro_theme_configuration_view")]
     #[Route("/view/{id}", name: "view", requirements: ["id" => "\d+"])]
-    #[Template]
+    #[Template('@OroTheme/ThemeConfiguration/view.html.twig')]
     public function viewAction(ThemeConfiguration $entity): array
     {
         return [
@@ -54,7 +54,7 @@ class ThemeConfigurationController extends AbstractController
 
     #[AclAncestor("oro_theme_configuration_update")]
     #[Route("/update/{id}", name: "update", requirements: ["id" => "\d+"])]
-    #[Template]
+    #[Template('@OroTheme/ThemeConfiguration/update.html.twig')]
     public function updateAction(
         ThemeConfiguration $entity,
         Request $request

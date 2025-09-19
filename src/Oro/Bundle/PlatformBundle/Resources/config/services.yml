@@ -13,6 +13,25 @@ parameters:
         - 'oro:install'
 
 services:
+    # Explicit EntityValueResolver registration to prevent inlining
+    # Can be removed when the doctrine/doctrine-bundle will be updated to 2.9.x and up
+    # https://github.com/symfony/symfony/issues/50081
+    # https://github.com/doctrine/DoctrineBundle/pull/1624/files
+    Symfony\Bridge\Doctrine\ArgumentResolver\EntityValueResolver:
+        arguments:
+            - '@doctrine'
+            - '@doctrine.orm.entity_value_resolver.expression_language'
+        tags:
+            - { name: controller.argument_value_resolver, priority: 110 }
+        public: true
+
+    oro_platform.argument_resolver:
+        class: Oro\Bundle\PlatformBundle\ArgumentResolver\ArgumentResolver
+        decorates: 'argument_resolver'
+        decoration_priority: -10
+        arguments:
+            - '@.inner'
+
     oro_platform.psr7.http_factory:
         class: GuzzleHttp\Psr7\HttpFactory
     # provide default implementations for PSR-17 based on guzzlehttp/psr7
@@ -215,3 +234,10 @@ services:
         class: Oro\Bundle\PlatformBundle\Provider\UsageStats\UsageStatsProvider
         arguments:
             - '@oro_platform.provider.usage_stats.usage_stats_provider_registry'
+
+    oro_platform.event_listener.controller.controller_listener:
+        class: Oro\Bundle\PlatformBundle\EventListener\Controller\ControllerListener
+        arguments:
+            - '@oro_platform.attribute_reader'
+        tags:
+            - { name: kernel.event_subscriber }

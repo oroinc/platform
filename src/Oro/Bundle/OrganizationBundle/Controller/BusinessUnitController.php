@@ -9,7 +9,7 @@ use Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\UIBundle\Route\Router;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,7 +35,7 @@ class BusinessUnitController extends AbstractController
     }
 
     #[Route(path: '/view/{id}', name: 'oro_business_unit_view', requirements: ['id' => '\d+'])]
-    #[Template]
+    #[Template('@OroOrganization/BusinessUnit/view.html.twig')]
     #[Acl(id: 'oro_business_unit_view', type: 'entity', class: BusinessUnit::class, permission: 'VIEW')]
     public function viewAction(BusinessUnit $entity)
     {
@@ -71,7 +71,7 @@ class BusinessUnitController extends AbstractController
         requirements: ['id' => '\d+'],
         defaults: ['id' => 0]
     )]
-    #[Template]
+    #[Template('@OroOrganization/BusinessUnit/update.html.twig')]
     #[Acl(id: 'oro_business_unit_update', type: 'entity', class: BusinessUnit::class, permission: 'EDIT')]
     public function updateAction(BusinessUnit $entity, Request $request)
     {
@@ -84,7 +84,7 @@ class BusinessUnitController extends AbstractController
         requirements: ['_format' => 'html|json'],
         defaults: ['_format' => 'html']
     )]
-    #[Template]
+    #[Template('@OroOrganization/BusinessUnit/index.html.twig')]
     #[AclAncestor('oro_business_unit_view')]
     public function indexAction()
     {
@@ -115,7 +115,7 @@ class BusinessUnitController extends AbstractController
     }
 
     #[Route(path: '/widget/info/{id}', name: 'oro_business_unit_widget_info', requirements: ['id' => '\d+'])]
-    #[Template]
+    #[Template('@OroOrganization/BusinessUnit/info.html.twig')]
     #[AclAncestor('oro_business_unit_view')]
     public function infoAction(BusinessUnit $entity)
     {
@@ -123,7 +123,7 @@ class BusinessUnitController extends AbstractController
     }
 
     #[Route(path: '/widget/users/{id}', name: 'oro_business_unit_widget_users', requirements: ['id' => '\d+'])]
-    #[Template]
+    #[Template('@OroOrganization/BusinessUnit/users.html.twig')]
     #[AclAncestor('oro_user_user_view')]
     public function usersAction(BusinessUnit $entity)
     {

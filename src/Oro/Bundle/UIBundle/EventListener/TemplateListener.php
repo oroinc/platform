@@ -4,7 +4,7 @@ namespace Oro\Bundle\UIBundle\EventListener;
 
 use Doctrine\Inflector\Inflector;
 use Psr\Container\ContainerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
@@ -31,16 +31,17 @@ class TemplateListener implements ServiceSubscriberInterface
 
     public function onKernelView(ViewEvent $event): void
     {
+        $templateReference = $this->getTemplateReference($event);
         $request = $event->getRequest();
-        $templateReference = $this->getTemplateReference($request);
+
         if ($templateReference) {
             $this->resolveControllerDir($templateReference);
             $this->injectWidgetContainer($templateReference, $request);
 
-            if (!$this->getTwig()->getLoader()->exists($templateReference->getTemplate())) {
+            if (!$this->getTwig()->getLoader()->exists($templateReference->template)) {
                 $template = $request->attributes->get('_template');
                 if ($template instanceof Template) {
-                    $template->setTemplate($templateReference->getTemplate());
+                    $template->template = $templateReference->template;
                 }
             }
         }
@@ -49,18 +50,26 @@ class TemplateListener implements ServiceSubscriberInterface
     /**
      * Find template reference in request attributes
      */
-    private function getTemplateReference(Request $request): ?Template
+    private function getTemplateReference(ViewEvent $event): ?Template
     {
-        $template = $request->attributes->get('_template');
+        $template = $event->getRequest()->attributes->get('_template');
+        if (!$template instanceof Template
+            && !$template = $event->controllerArgumentsEvent?->getAttributes()[Template::class][0] ?? null
+        ) {
+            return null;
+        }
 
         if ($template instanceof Template) {
+            if (!$event->getRequest()->attributes->get('_template')) {
+                $event->getRequest()->attributes->set('_template', $template);
+            }
+
             return $template;
         }
 
         if (is_string($template)) {
-            $parsedTemplate = new Template();
-            $parsedTemplate->setTemplate($template);
-            $request->attributes->set('_template', $parsedTemplate);
+            $parsedTemplate = new Template($template);
+            $event->getRequest()->attributes->set('_template', $parsedTemplate);
 
             return $parsedTemplate;
         }
@@ -99,12 +108,12 @@ class TemplateListener implements ServiceSubscriberInterface
             }
 
             if (file_exists($path . DIRECTORY_SEPARATOR . $legacyController)) {
-                $templateReference->setTemplate(sprintf(
+                $templateReference->template = sprintf(
                     '@%s/%s/%s',
                     $parts['bundle'],
                     $legacyController,
                     $this->resolveActionName($parts['name'])
-                ));
+                );
 
                 return;
             }
@@ -141,7 +150,7 @@ class TemplateListener implements ServiceSubscriberInterface
         if ($parts) {
             $templateName = $parts['path'] . $container . '/' . $parts['name'];
             if ($this->getTwig()->getLoader()->exists($templateName)) {
-                $templateReference->setTemplate($templateName);
+                $templateReference->template = $templateName;
                 return true;
             }
 
@@ -151,7 +160,7 @@ class TemplateListener implements ServiceSubscriberInterface
                  */
                 $templateName = $parts['path'] . $parts['widget'] . '/'. $container . '/' . $parts['template'];
                 if ($this->getTwig()->getLoader()->exists($templateName)) {
-                    $templateReference->setTemplate($templateName);
+                    $templateReference->template = $templateName;
 
                     return true;
                 }
@@ -163,14 +172,14 @@ class TemplateListener implements ServiceSubscriberInterface
 
     private function parseTemplateReference(Template $template): ?array
     {
-        if (!$template->getTemplate()) {
+        if (!$template->template) {
             return null;
         }
 
         $pattern = '/^(?<path>@?(?<bundle>[^\/:]+)[\/:]{1}(?<controller>[^\/:]+)[\/:]{1})'
             . '((?<widget>.*)[\/:]{1})?(?<template>.*)$/';
 
-        $parts = \preg_match($pattern, $template->getTemplate(), $parts) ? $parts : null;
+        $parts = \preg_match($pattern, $template->template, $parts) ? $parts : null;
         if ($parts) {
             $parts['name'] = $parts['widget'] ? $parts['widget'] . '/' . $parts['template'] : $parts['template'];
         }

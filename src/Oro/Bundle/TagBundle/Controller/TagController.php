@@ -8,7 +8,7 @@ use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Form\Handler\TagHandler;
 use Oro\Bundle\TagBundle\Provider\StatisticProvider;
 use Oro\Bundle\UIBundle\Route\Router;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -27,7 +27,7 @@ class TagController extends AbstractController
         requirements: ['_format' => 'html|json'],
         defaults: ['_format' => 'html']
     )]
-    #[Template]
+    #[Template('@OroTag/Tag/index.html.twig')]
     #[Acl(id: 'oro_tag_view', type: 'entity', class: Tag::class, permission: 'VIEW')]
     public function indexAction()
     {
@@ -45,7 +45,7 @@ class TagController extends AbstractController
     }
 
     #[Route(path: '/update/{id}', name: 'oro_tag_update', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
-    #[Template]
+    #[Template('@OroTag/Tag/update.html.twig')]
     #[Acl(id: 'oro_tag_update', type: 'entity', class: Tag::class, permission: 'EDIT')]
     public function updateAction(Tag $entity, Request $request)
     {
@@ -53,7 +53,7 @@ class TagController extends AbstractController
     }
 
     #[Route(path: '/search/{id}', name: 'oro_tag_search', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
-    #[Template]
+    #[Template('@OroTag/Tag/search.html.twig')]
     #[AclAncestor('oro_tag_view')]
     public function searchAction(Tag $entity, Request $request)
     {

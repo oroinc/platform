@@ -538,8 +538,6 @@ services:
         arguments:
             - '@oro_api.value_normalizer'
             - '@oro_api.entity_id_transformer_registry'
-            - '@oro_api.config_provider'
-            - '@oro_api.metadata_provider'
         tags:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, priority: -50 }
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: -50 }

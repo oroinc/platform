@@ -67,24 +67,24 @@ class ScriptHandler
             ->dumpFile('package.json', json_encode($packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
 
         $isVerbose = $event->getIO()->isVerbose();
-        if (!$filesystem->exists('package-lock.json')) {
+        if (!$filesystem->exists('pnpm-lock.yaml')) {
             // Creates lock file, installs assets.
-            self::npmInstall($event->getIO(), $options['process-timeout'], $isVerbose);
+            self::pnpmInstall($event->getIO(), $options['process-timeout'], $isVerbose);
         } else {
             // Installs assets using lock file.
-            self::npmCi($event->getIO(), $options['process-timeout'], $isVerbose);
+            self::pnpmCi($event->getIO(), $options['process-timeout'], $isVerbose);
         }
     }
 
     /**
-     * Updates npm assets
+     * Updates pnpm assets
      *
      * @param Event $event A instance
      */
     public static function updateAssets(Event $event): void
     {
         $filesystem = new Filesystem();
-        $filesystem->remove('package-lock.json');
+        $filesystem->remove('pnpm-lock.yaml');
 
         self::installAssets($event);
     }
@@ -261,18 +261,18 @@ class ScriptHandler
     }
 
     /**
-     * Runs "npm install", updates package-lock.json, installs assets to "node_modules/"
+     * Runs "pnpm install", updates pnpm-lock.yaml, installs assets to "node_modules/"
      */
-    private static function npmInstall(
+    private static function pnpmInstall(
         IOInterface $inputOutput,
         int $timeout = 60,
         bool $verbose = false
     ): void {
         $logLevel = $verbose ? 'info' : 'error';
-        $npmInstallCmd = ['npm', 'install', '--no-audit', '--save-exact', '--loglevel', $logLevel];
+        $pnpmInstallCmd = ['pnpm', 'install', '--no-frozen-lockfile', '--loglevel', $logLevel];
 
-        if (self::runProcess($inputOutput, $npmInstallCmd, $timeout) !== 0) {
-            throw new \RuntimeException('Failed to generate package-lock.json');
+        if (self::runProcess($inputOutput, $pnpmInstallCmd, $timeout) !== 0) {
+            throw new \RuntimeException('Failed to generate pnpm-lock.yaml');
         }
     }
 
@@ -280,8 +280,8 @@ class ScriptHandler
     {
         $inputOutput->write(implode(' ', $cmd));
 
-        $npmInstall = new Process($cmd, null, null, null, $timeout);
-        $npmInstall->run(function ($outputType, string $data) use ($inputOutput) {
+        $pnpmInstall = new Process($cmd, null, null, null, $timeout);
+        $pnpmInstall->run(function ($outputType, string $data) use ($inputOutput) {
             if ($outputType === Process::OUT) {
                 $inputOutput->write($data, false);
             } else {
@@ -289,19 +289,19 @@ class ScriptHandler
             }
         });
 
-        return $npmInstall->getExitCode();
+        return $pnpmInstall->getExitCode();
     }
 
     /**
-     * Runs "npm ci", installs assets to "node_modules/" using only package-lock.json
+     * Runs "pnpm install", installs assets to "node_modules/" using only pnpm-lock.yaml
      */
-    private static function npmCi(IOInterface $inputOutput, int $timeout = 60, bool $verbose = false): void
+    private static function pnpmCi(IOInterface $inputOutput, int $timeout = 60, bool $verbose = false): void
     {
         $logLevel = $verbose ? 'info' : 'error';
-        $npmCiCmd = ['npm', 'ci', '--loglevel', $logLevel];
+        $npmCiCmd = ['pnpm', 'install', '--lockfile-only', '--loglevel', $logLevel];
 
         if (self::runProcess($inputOutput, $npmCiCmd, $timeout) !== 0) {
-            throw new \RuntimeException('Failed to install npm assets');
+            throw new \RuntimeException('Failed to install pnpm assets');
         }
     }
 

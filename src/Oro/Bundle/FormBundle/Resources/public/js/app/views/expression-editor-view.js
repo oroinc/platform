@@ -2,10 +2,9 @@ import $ from 'jquery';
 import _ from 'underscore';
 import BaseView from 'oroui/js/app/views/base/view';
 
-import {EditorState} from '@codemirror/state';
-import {EditorView} from '@codemirror/view';
-
+import {createEditor, EditorView} from '@oroinc/codemirror-expression-editor';
 import expressionEditorExtensions from 'oroform/js/app/views/expression-editor-extensions';
+import {operatorsDetailMap} from 'oroform/js/app/views/expression-editor-extensions/utils/operators';
 
 const ExpressionEditorView = BaseView.extend({
     optionNames: BaseView.prototype.optionNames.concat([
@@ -72,27 +71,28 @@ const ExpressionEditorView = BaseView.extend({
     render() {
         this._toggleErrorState(this.isValid());
 
-        const startState = EditorState.create({
+        const {editorView} = createEditor(this.el.parentNode, {
             doc: this.util.normalizePropertyNamesExpression(this.el.value),
             extensions: expressionEditorExtensions({
                 util: this.util,
                 operationButtons: this.operationButtons,
-                interactionDelay: this.interactionDelay,
-                linterDelay: this.linterDelay,
-                dataSource: this.dataSource,
-                getDataSourceCallback: this.showDataSourceElement.bind(this)
+                linterDelay: this.linterDelay
             }).concat([
                 EditorView.updateListener.of(this.editorUpdateListener.bind(this)),
                 EditorView.editorAttributes.of({
                     'data-name': this.$el.attr('name')
                 })
-            ])
+            ]),
+            extensionsOptions: {
+                util: this.util,
+                interactionDelay: this.interactionDelay,
+                dataSource: this.dataSource,
+                operatorsDetailMap,
+                getDataSourceCallback: this.showDataSourceElement.bind(this)
+            }
         });
 
-        this.editorView = new EditorView({
-            state: startState,
-            parent: this.el.parentNode
-        });
+        this.editorView = editorView;
 
         this.$el.addClass('hidden-textarea');
         this.$el.after(this.editorView.dom);

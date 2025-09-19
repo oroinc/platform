@@ -31,18 +31,30 @@ class FilterNamesTest extends TestCase
     public function testOptionalNames(): void
     {
         $filterNames = new FilterNames(
-            'sort',
+            null,
             'page[number]',
-            'page[size]',
-            'meta'
+            'page[size]'
         );
-        self::assertEquals('sort', $filterNames->getSortFilterName());
+        self::assertNull($filterNames->getSortFilterName());
         self::assertEquals('page[number]', $filterNames->getPageNumberFilterName());
         self::assertEquals('page[size]', $filterNames->getPageSizeFilterName());
-        self::assertEquals('meta', $filterNames->getMetaPropertyFilterName());
+        self::assertNull($filterNames->getMetaPropertyFilterName());
         self::assertNull($filterNames->getDataFilterGroupName());
         self::assertNull($filterNames->getFieldsFilterGroupName());
         self::assertNull($filterNames->getFieldsFilterTemplate());
         self::assertNull($filterNames->getIncludeFilterName());
+    }
+
+    public function testGetFieldsFilterTemplateWhenNoIncludeFilterName(): void
+    {
+        $filterNames = new FilterNames(
+            'sort',
+            'page[number]',
+            'page[size]',
+            'meta',
+            'filter',
+            'fields'
+        );
+        self::assertNull($filterNames->getFieldsFilterTemplate());
     }
 }

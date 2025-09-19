@@ -8,7 +8,7 @@ use Oro\Bundle\DataGridBundle\Provider\MultiGridProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\UIBundle\Provider\ChainWidgetProvider;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

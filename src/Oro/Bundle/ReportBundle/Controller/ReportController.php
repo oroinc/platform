@@ -23,7 +23,7 @@ use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
 use Oro\Bundle\UIBundle\Route\Router;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -125,7 +125,7 @@ class ReportController extends AbstractController
      * @return array
      */
     #[Route(path: '/view/{gridName}', name: 'oro_report_view_grid', requirements: ['gridName' => '[-\w]+'])]
-    #[Template]
+    #[Template('@OroReport/Report/viewFromGrid.html.twig')]
     #[Acl(id: 'oro_report_view', type: 'entity', class: Report::class, permission: 'VIEW')]
     public function viewFromGridAction($gridName)
     {
@@ -154,7 +154,7 @@ class ReportController extends AbstractController
      * @return array
      */
     #[Route(path: '/update/{id}', name: 'oro_report_update', requirements: ['id' => '\d+'])]
-    #[Template]
+    #[Template('@OroReport/Report/update.html.twig')]
     #[Acl(id: 'oro_report_update', type: 'entity', class: Report::class, permission: 'EDIT')]
     public function updateAction(Report $entity, Request $request)
     {
@@ -194,7 +194,7 @@ class ReportController extends AbstractController
         requirements: ['_format' => 'html|json'],
         defaults: ['_format' => 'html']
     )]
-    #[Template]
+    #[Template('@OroReport/Report/index.html.twig')]
     #[AclAncestor('oro_report_view')]
     public function indexAction()
     {

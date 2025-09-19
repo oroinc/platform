@@ -3,14 +3,14 @@
 namespace Oro\Bundle\SecurityBundle\Attribute;
 
 use Attribute;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ConfigurationInterface;
+use Oro\Bundle\PlatformBundle\Interface\PHPAttributeConfigurationInterface;
 
 /**
- * The CsrfProtection class handles the #[CsrfProtection} attribute
+ * The CsrfProtection class handles the #[CsrfProtection] attribute
  *
  */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
-class CsrfProtection implements ConfigurationInterface
+class CsrfProtection implements PHPAttributeConfigurationInterface
 {
     public const ALIAS_NAME = 'csrf_protection';
 
@@ -21,13 +21,13 @@ class CsrfProtection implements ConfigurationInterface
     }
 
     #[\Override]
-    public function getAliasName()
+    public function getAliasName(): string
     {
         return self::ALIAS_NAME;
     }
 
     #[\Override]
-    public function allowArray()
+    public function allowArray(): bool
     {
         return false;
     }

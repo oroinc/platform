@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
 use Oro\Bundle\FormBundle\Captcha\CaptchaProtectedFormsRegistry;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -29,14 +31,21 @@ class CaptchaProtectedFormSelectType extends AbstractType
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('choice_loader', new CallbackChoiceLoader(function () {
-            $choices = [];
-            foreach ($this->formsRegistry->getProtectedForms() as $protectedFormName) {
-                $choices[self::TRANSLATION_PREFIX . $protectedFormName] = $protectedFormName;
-            }
+        $resolver->define('scope')
+            ->allowedTypes('string')
+            ->default(GlobalScopeManager::SCOPE_NAME);
 
-            return $choices;
-        }));
+        $resolver->setDefault('choice_loader', function (Options $options) {
+            return new CallbackChoiceLoader(function () use ($options) {
+                $choices = [];
+                $protectedFormNames = $this->formsRegistry->getProtectedFormsByScope($options['scope']);
+                foreach ($protectedFormNames as $protectedFormName) {
+                    $choices[self::TRANSLATION_PREFIX . $protectedFormName] = $protectedFormName;
+                }
+
+                return $choices;
+            });
+        });
         $resolver->setDefault('multiple', true);
         $resolver->setDefault('expanded', true);
     }

@@ -20,9 +20,9 @@ services:
         arguments:
             - '@oro_asset.asset_command_process_factory'
             - '@oro_asset_bundle.asset_config.cache'
-            - '%oro_asset.npm_path%'
+            - '%oro_asset.pnpm_path%'
             - '%oro_asset.build_timeout%'
-            - '%oro_asset.npm_install_timeout%'
+            - '%oro_asset.pnpm_install_timeout%'
             - '%oro_asset.with_babel%'
             - '@oro_layout.theme_manager'
         tags:
@@ -37,7 +37,7 @@ services:
     oro_asset.asset_command_process_factory:
         class: Oro\Bundle\AssetBundle\AssetCommandProcessFactory
         arguments:
-            - '%oro_asset.npm_path%'
+            - '%oro_asset.pnpm_path%'
 
     oro_asset.webpack_server:
         class: Oro\Bundle\AssetBundle\Webpack\WebpackServer

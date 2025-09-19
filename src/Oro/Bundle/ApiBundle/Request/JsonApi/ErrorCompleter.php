@@ -200,14 +200,14 @@ class ErrorCompleter extends AbstractErrorCompleter
     private function appendSourceToMessage(?string $message, string $source): string
     {
         if (!$message) {
-            return sprintf('Source: %s.', $source);
+            return \sprintf('Source: %s.', $source);
         }
 
         if (!str_ends_with($message, '.')) {
             $message .= '.';
         }
 
-        return sprintf('%s Source: %s.', $message, $source);
+        return \sprintf('%s Source: %s.', $message, $source);
     }
 
     private function getConfigFilterConstraintParameter(Error $error, RequestType $requestType): string
@@ -219,13 +219,18 @@ class ErrorCompleter extends AbstractErrorCompleter
             return $filterNames->getIncludeFilterName();
         }
         if (FilterFieldsConfigExtra::NAME === $e->getOperation()) {
-            return sprintf(
-                $filterNames->getFieldsFilterTemplate(),
+            $fieldsFilterTemplate = $filterNames->getFieldsFilterTemplate();
+            if (!$fieldsFilterTemplate) {
+                return $filterNames->getFieldsFilterGroupName();
+            }
+
+            return \sprintf(
+                $fieldsFilterTemplate,
                 $this->getEntityType($e->getClassName(), $requestType)
             );
         }
 
-        throw new \LogicException(sprintf(
+        throw new \LogicException(\sprintf(
             'Unexpected type of NotSupportedConfigOperationException: %s.',
             $e->getOperation()
         ));

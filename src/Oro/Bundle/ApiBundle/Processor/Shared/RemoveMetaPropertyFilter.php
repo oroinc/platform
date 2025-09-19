@@ -34,6 +34,11 @@ class RemoveMetaPropertyFilter implements ProcessorInterface
         $filterName = $this->filterNamesRegistry
             ->getFilterNames($context->getRequestType())
             ->getMetaPropertyFilterName();
+        if (!$filterName) {
+            // the "meta" filter is not supported
+            return;
+        }
+
         $filterCollection = $context->getFilters();
         if ($filterCollection->has($filterName)) {
             $filterCollection->remove($filterName);

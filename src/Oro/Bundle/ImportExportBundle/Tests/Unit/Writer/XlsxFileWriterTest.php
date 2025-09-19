@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
-use Box\Spout\Common\Type;
-use Box\Spout\Reader\Common\Creator\ReaderFactory;
-use Box\Spout\Reader\XLSX\Sheet;
+use OpenSpout\Reader\XLSX\Reader as XLSXReader;
+use OpenSpout\Reader\XLSX\Sheet;
 use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
@@ -181,12 +180,12 @@ class XlsxFileWriterTest extends TestCase
 
     private function assertXlsx(string $expectedPath, string $actualPath): void
     {
-        $exceptedReader = ReaderFactory::createFromType(Type::XLSX);
+        $exceptedReader = new XLSXReader();
         $exceptedReader->open($expectedPath);
         /** @var Sheet[] $exceptedSheets */
         $exceptedSheets = iterator_to_array($exceptedReader->getSheetIterator());
 
-        $actualReader = ReaderFactory::createFromType(Type::XLSX);
+        $actualReader = new XLSXReader();
         $actualReader->open($actualPath);
         /** @var Sheet[] $actualSheets */
         $actualSheets = iterator_to_array($actualReader->getSheetIterator());

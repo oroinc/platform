@@ -6,7 +6,7 @@ use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationType;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -22,7 +22,7 @@ class EmailNotificationController extends AbstractController
      * @return array
      */
     #[Route(path: '/{_format}', requirements: ['_format' => 'html|json'], defaults: ['_format' => 'html'])]
-    #[Template]
+    #[Template('@OroNotification/EmailNotification/index.html.twig')]
     #[Acl(
         id: 'oro_notification_emailnotification_view',
         type: 'entity',
@@ -44,7 +44,7 @@ class EmailNotificationController extends AbstractController
      * @return array
      */
     #[Route(path: '/update/{id}', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
-    #[Template]
+    #[Template('@OroNotification/EmailNotification/update.html.twig')]
     #[Acl(
         id: 'oro_notification_emailnotification_update',
         type: 'entity',

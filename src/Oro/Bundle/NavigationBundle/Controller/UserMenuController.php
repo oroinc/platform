@@ -6,7 +6,7 @@ use Knp\Menu\ItemInterface;
 use Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -22,7 +22,7 @@ class UserMenuController extends AbstractMenuController
      * @return array
      */
     #[Route(path: '/', name: 'oro_navigation_user_menu_index')]
-    #[Template]
+    #[Template('@OroNavigation/UserMenu/index.html.twig')]
     public function indexAction()
     {
         return parent::index($this->getContext());
@@ -35,7 +35,7 @@ class UserMenuController extends AbstractMenuController
      * @return array
      */
     #[Route(path: '/{menuName}', name: 'oro_navigation_user_menu_view')]
-    #[Template]
+    #[Template('@OroNavigation/UserMenu/view.html.twig')]
     public function viewAction($menuName)
     {
         return parent::view($menuName, $this->getContext());
@@ -63,7 +63,7 @@ class UserMenuController extends AbstractMenuController
      * @return array|RedirectResponse
      */
     #[Route(path: '/{menuName}/update/{key}', name: 'oro_navigation_user_menu_update')]
-    #[Template]
+    #[Template('@OroNavigation/UserMenu/update.html.twig')]
     public function updateAction($menuName, $key)
     {
         return parent::update($menuName, $key, $this->getContext());

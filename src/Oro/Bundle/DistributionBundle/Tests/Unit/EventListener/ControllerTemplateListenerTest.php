@@ -6,7 +6,7 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\DistributionBundle\EventListener\ControllerTemplateListener;
 use PHPUnit\Framework\TestCase;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -53,8 +53,7 @@ final class ControllerTemplateListenerTest extends TestCase
 
         $template = $this->request->attributes->get('_template');
         self::assertInstanceOf(Template::class, $template);
-        self::assertEquals($templateOverride, $template->getTemplate());
-        self::assertEquals([$this->controller, '__invoke'], $template->getOwner());
+        self::assertEquals($templateOverride, $template->template);
     }
 
     public function testOnKernelControllerWithTemplateOverrideAsTemplateInstance(): void
@@ -80,7 +79,6 @@ final class ControllerTemplateListenerTest extends TestCase
 
         $template = $this->request->attributes->get('_template');
         self::assertInstanceOf(Template::class, $template);
-        self::assertEquals($templateOverride, $template->getTemplate());
-        self::assertEquals([$this->controller, '__invoke'], $template->getOwner());
+        self::assertEquals($templateOverride, $template->template);
     }
 }

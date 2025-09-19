@@ -30,6 +30,7 @@ class EntityAliasStorageTest extends TestCase
     {
         return [
             ['alias'],
+            ['Alias'],
             ['my-alias'],
             ['my_alias']
         ];
@@ -47,8 +48,8 @@ class EntityAliasStorageTest extends TestCase
             sprintf(
                 'The string "%s" cannot be used as the alias for the "Test\Entity1" entity '
                 . 'because it contains illegal characters. '
-                . 'The valid alias should start with a letter and only contain '
-                . 'lower case letters, numbers, hyphens ("-") and underscores ("_").',
+                . 'The valid alias should start with a latin letter and only contain '
+                . 'latin letters, digits, underscores ("_") and hyphens ("-").',
                 $value
             )
         );
@@ -71,8 +72,8 @@ class EntityAliasStorageTest extends TestCase
             sprintf(
                 'The string "%s" cannot be used as the plural alias for the "Test\Entity1" entity '
                 . 'because it contains illegal characters. '
-                . 'The valid alias should start with a letter and only contain '
-                . 'lower case letters, numbers, hyphens ("-") and underscores ("_").',
+                . 'The valid alias should start with a latin letter and only contain '
+                . 'latin letters, digits, underscores ("_") and hyphens ("-").',
                 $value
             )
         );
@@ -86,7 +87,7 @@ class EntityAliasStorageTest extends TestCase
     public function invalidAliasDataProvider(): array
     {
         return [
-            ['Alias'],
+            ['aliasй'],
             ['my alias'],
             ['1alias'],
             ['alias@']

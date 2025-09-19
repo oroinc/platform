@@ -12,7 +12,7 @@ use Oro\Bundle\EntityBundle\Twig\Sandbox\VariablesProvider;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Attribute\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Error\LoaderError;
@@ -141,10 +141,12 @@ class EmailTemplateController extends RestController
      * )
      * @return Response
      */
-    #[ParamConverter('emailTemplate', class: EmailTemplate::class)]
     #[AclAncestor('oro_email_emailtemplate_view')]
-    public function getCompiledAction(EmailTemplate $emailTemplate, $entityId = null)
-    {
+    public function getCompiledAction(
+        #[MapEntity]
+        EmailTemplate $emailTemplate,
+        $entityId = null
+    ) {
         $templateParams = [];
 
         if ($entityId && $emailTemplate->getEntityName()) {

@@ -22,6 +22,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 class HandleFieldsFilterTest extends GetProcessorTestCase
 {
     private ValueNormalizer&MockObject $valueNormalizer;
+    private FilterNames&MockObject $filterNames;
     private HandleFieldsFilter $processor;
 
     #[\Override]
@@ -31,15 +32,15 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
 
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
-        $filterNames = $this->createMock(FilterNames::class);
-        $filterNames->expects(self::any())
+        $this->filterNames = $this->createMock(FilterNames::class);
+        $this->filterNames->expects(self::any())
             ->method('getFieldsFilterGroupName')
             ->willReturn('fields');
 
         $this->processor = new HandleFieldsFilter(
             new FilterNamesRegistry(
                 [['filter_names', null]],
-                TestContainerBuilder::create()->add('filter_names', $filterNames)->getContainer($this),
+                TestContainerBuilder::create()->add('filter_names', $this->filterNames)->getContainer($this),
                 new RequestExpressionMatcher()
             ),
             $this->valueNormalizer
@@ -50,6 +51,7 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
     {
         $configExtra = new FilterFieldsConfigExtra([]);
         $this->context->addConfigExtra($configExtra);
+        $this->context->setClassName('Test\PrimaryEntity');
         $this->processor->process($this->context);
 
         self::assertSame($configExtra, $this->context->getConfigExtra(FilterFieldsConfigExtra::NAME));
@@ -57,6 +59,7 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
 
     public function testProcessWhenNoFieldsFilterValue(): void
     {
+        $this->context->setClassName('Test\PrimaryEntity');
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasConfigExtra(FilterFieldsConfigExtra::NAME));
@@ -71,7 +74,12 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
             ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn('Test\Entity');
 
+        $this->filterNames->expects(self::once())
+            ->method('getFieldsFilterTemplate')
+            ->willReturn('fields[%s]');
+
         $this->context->getFilterValues()->set('fields[entity]', $filterValue);
+        $this->context->setClassName('Test\PrimaryEntity');
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -94,7 +102,12 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
                 ['field1', DataType::STRING, $requestType, true, false, [], 'field1']
             ]);
 
+        $this->filterNames->expects(self::once())
+            ->method('getFieldsFilterTemplate')
+            ->willReturn('fields[%s]');
+
         $this->context->getFilterValues()->set('fields[entity]', $filterValue);
+        $this->context->setClassName('Test\PrimaryEntity');
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -114,7 +127,12 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
             ->with('entity', DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willThrowException(new EntityAliasNotFoundException('unknown entity type'));
 
+        $this->filterNames->expects(self::once())
+            ->method('getFieldsFilterTemplate')
+            ->willReturn('fields[%s]');
+
         $this->context->getFilterValues()->set('fields[entity]', $filterValue);
+        $this->context->setClassName('Test\PrimaryEntity');
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasConfigExtra(FilterFieldsConfigExtra::NAME));
@@ -166,7 +184,12 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
                 }
             );
 
+        $this->filterNames->expects(self::once())
+            ->method('getFieldsFilterTemplate')
+            ->willReturn('fields[%s]');
+
         $this->context->getFilterValues()->set('fields[entity]', $filterValue);
+        $this->context->setClassName('Test\PrimaryEntity');
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasConfigExtra(FilterFieldsConfigExtra::NAME));
@@ -187,7 +210,12 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
         $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
 
+        $this->filterNames->expects(self::once())
+            ->method('getFieldsFilterTemplate')
+            ->willReturn('fields[%s]');
+
         $this->context->getFilterValues()->set('fields[]', $filterValue);
+        $this->context->setClassName('Test\PrimaryEntity');
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasConfigExtra(FilterFieldsConfigExtra::NAME));
@@ -208,7 +236,12 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
         $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
 
+        $this->filterNames->expects(self::once())
+            ->method('getFieldsFilterTemplate')
+            ->willReturn('fields[%s]');
+
         $this->context->getFilterValues()->set('fields', $filterValue);
+        $this->context->setClassName('Test\PrimaryEntity');
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasConfigExtra(FilterFieldsConfigExtra::NAME));
@@ -216,6 +249,61 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
             [
                 Error::createValidationError(Constraint::FILTER)
                     ->setDetail('An entity type is not specified.')
+                    ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey()))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessForFieldsFilterWhenItIsApplicableToPrimaryEntityOnly(): void
+    {
+        $filterValue = FilterValue::createFromSource('fields', 'fields', 'field1');
+
+        $requestType = $this->context->getRequestType();
+        $this->valueNormalizer->expects(self::exactly(3))
+            ->method('normalizeValue')
+            ->willReturnMap([
+                ['Test\PrimaryEntity', DataType::ENTITY_TYPE, $requestType, false, false, [], 'primaryEntity'],
+                ['primaryEntity', DataType::ENTITY_CLASS, $requestType, false, false, [], 'Test\PrimaryEntity'],
+                ['field1', DataType::STRING, $requestType, true, false, [], 'field1']
+            ]);
+
+        $this->filterNames->expects(self::once())
+            ->method('getFieldsFilterTemplate')
+            ->willReturn(null);
+
+        $this->context->getFilterValues()->set('fields[entity]', $filterValue);
+        $this->context->setClassName('Test\PrimaryEntity');
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            new FilterFieldsConfigExtra([
+                'primaryEntity' => ['field1']
+            ]),
+            $this->context->getConfigExtra(FilterFieldsConfigExtra::NAME)
+        );
+    }
+
+    public function testProcessForGroupedFieldsFilterValueWhenFieldsFilterIsApplicableToPrimaryEntityOnly(): void
+    {
+        $filterValue = FilterValue::createFromSource('fields[entity]', 'entity', 'field1');
+
+        $this->valueNormalizer->expects(self::never())
+            ->method('normalizeValue');
+
+        $this->filterNames->expects(self::once())
+            ->method('getFieldsFilterTemplate')
+            ->willReturn(null);
+
+        $this->context->getFilterValues()->set('fields[]', $filterValue);
+        $this->context->setClassName('Test\PrimaryEntity');
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasConfigExtra(FilterFieldsConfigExtra::NAME));
+        self::assertEquals(
+            [
+                Error::createValidationError(Constraint::FILTER)
+                    ->setDetail('The filter is not supported.')
                     ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey()))
             ],
             $this->context->getErrors()

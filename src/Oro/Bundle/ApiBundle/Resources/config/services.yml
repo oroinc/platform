@@ -175,7 +175,7 @@ services:
     oro_api.request_helper:
         class: Oro\Bundle\ApiBundle\Request\ApiRequestHelper
         arguments:
-            - '%oro_api.rest.pattern%'
+            - ['%oro_api.rest.pattern%']
 
     oro_api.value_normalizer:
         class: Oro\Bundle\ApiBundle\Request\ValueNormalizer
@@ -669,7 +669,7 @@ services:
             - '@oro_api.entity_id_transformer_registry'
             - '@logger'
         tags:
-            - { name: oro.api.document_builder, requestType: rest&!json_api, priority: -10 }
+            - { name: oro.api.document_builder, requestType: rest, priority: -10 }
             - { name: monolog.logger, channel: api }
 
     oro_api.rest.error_completer:
@@ -679,7 +679,7 @@ services:
             - '@oro_api.exception_text_extractor'
             - '@oro_api.value_normalizer'
         tags:
-            - { name: oro.api.error_completer, requestType: rest&!json_api, priority: -10 }
+            - { name: oro.api.error_completer, requestType: rest, priority: -10 }
 
     oro_api.json_api.document_builder:
         class: Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder
@@ -787,7 +787,8 @@ services:
     oro_api.rest.routing_options_resolver.prefix:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestPrefixRouteOptionsResolver
         arguments:
-            - '@service_container'
+            - '%oro_api.rest.prefix%'
+            - '%%oro_api.rest.prefix%%'
         tags:
             - { name: routing.options_resolver, priority: -255 }
 
@@ -1386,3 +1387,18 @@ services:
 
     oro_api.security.http.entry_point.api:
         class:  Oro\Bundle\ApiBundle\Security\Http\EntryPoint\ApiEntryPoint
+
+    oro_api.collector.warnings_collector:
+        class: Oro\Bundle\ApiBundle\Collector\ApiDocWarningsCollector
+
+    oro_api.monolog.handler.api_doc_collecting:
+        class: Oro\Bundle\ApiBundle\Monolog\Handler\ApiDocCollectingHandler
+        arguments:
+            - '@oro_api.collector.warnings_collector'
+
+    oro_api.listener.api_doc_cache_clear:
+        class: Oro\Bundle\ApiBundle\EventListener\ApiDocCacheClearListener
+        arguments:
+            - '@oro_api.collector.warnings_collector'
+        tags:
+            - { name: kernel.event_subscriber }

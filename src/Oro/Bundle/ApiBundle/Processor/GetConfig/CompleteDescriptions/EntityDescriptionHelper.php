@@ -10,6 +10,8 @@ use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\InheritDocUtil;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -33,6 +35,7 @@ class EntityDescriptionHelper implements ResetInterface
     private ResourceDocParserProvider $resourceDocParserProvider;
     private DescriptionProcessor $descriptionProcessor;
     private IdentifierDescriptionHelper $identifierDescriptionHelper;
+    private ?LoggerInterface $logger = null;
     private int $maxEntitiesLimit;
     private int $maxDeleteEntitiesLimit;
 
@@ -63,6 +66,13 @@ class EntityDescriptionHelper implements ResetInterface
         $this->identifierDescriptionHelper = $identifierDescriptionHelper;
         $this->maxEntitiesLimit = $maxEntitiesLimit;
         $this->maxDeleteEntitiesLimit = $maxDeleteEntitiesLimit;
+    }
+
+    public function setLogger(LoggerInterface $logger): self
+    {
+        $this->logger = $logger;
+
+        return $this;
     }
 
     #[\Override]
@@ -319,7 +329,15 @@ class EntityDescriptionHelper implements ResetInterface
         $documentationResources = $definition->getDocumentationResources();
         foreach ($documentationResources as $resource) {
             if (\is_string($resource) && !empty($resource)) {
-                $resourceDocParser->registerDocumentationResource($resource);
+                try {
+                    $resourceDocParser->registerDocumentationResource($resource);
+                } catch (FileLocatorFileNotFoundException) {
+                    $this->logger?->critical('API documentation file not found: {resource}', ['resource' => $resource]);
+                    // Skip missing documentation resource files to allow graceful degradation.
+                    // The system will fall back to configuration-based descriptions or system-wide
+                    // entity/field descriptions instead of breaking the API documentation completely.
+                    continue;
+                }
             }
         }
     }

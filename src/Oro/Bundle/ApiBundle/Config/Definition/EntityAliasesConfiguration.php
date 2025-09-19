@@ -20,16 +20,14 @@ class EntityAliasesConfiguration
                 ->isRequired()
                 ->cannotBeEmpty()
                 ->validate()
-                    ->ifTrue(
-                        function ($v) {
-                            return !preg_match('/^[a-z][a-z0-9\_]*$/D', $v);
-                        }
-                    )
+                    ->ifTrue(function ($v) {
+                        return !preg_match('/^[a-zA-Z][a-zA-Z0-9\-_]*$/D', $v);
+                    })
                     ->thenInvalid(
                         'The value "%s" cannot be used as an entity alias '
                         . 'because it contains illegal characters. '
-                        . 'The valid alias should start with a letter and only contain '
-                        . 'lower case letters, numbers and underscores ("_").'
+                        . 'The valid alias should start with a latin letter and only contain '
+                        . 'latin letters, digits, underscores ("_") and hyphens ("-").'
                     )
                 ->end()
             ->end()
@@ -38,16 +36,14 @@ class EntityAliasesConfiguration
                 ->isRequired()
                 ->cannotBeEmpty()
                 ->validate()
-                    ->ifTrue(
-                        function ($v) {
-                            return !preg_match('/^[a-z][a-z0-9\_]*$/D', $v);
-                        }
-                    )
+                    ->ifTrue(function ($v) {
+                        return !preg_match('/^[a-zA-Z][a-zA-Z0-9\-_]*$/D', $v);
+                    })
                     ->thenInvalid(
                         'The value "%s" cannot be used as an entity plural alias '
                         . 'because it contains illegal characters. '
-                        . 'The valid alias should start with a letter and only contain '
-                        . 'lower case letters, numbers and underscores ("_").'
+                        . 'The valid alias should start with a latin letter and only contain '
+                        . 'latin letters, digits, underscores ("_") and hyphens ("-").'
                     )
                 ->end()
             ->end()
@@ -64,7 +60,7 @@ class EntityAliasesConfiguration
                         if (\array_key_exists('override_class', $aliases)) {
                             $substitutedEntityClass = $aliases['override_class'];
                             if (isset($entitySubstitutions[$substitutedEntityClass])) {
-                                throw new \InvalidArgumentException(sprintf(
+                                throw new \InvalidArgumentException(\sprintf(
                                     'The entity class "%s" can be overridden only once,'
                                     . ' but this class is used in "override_class" option for "%s" and "%s".',
                                     $substitutedEntityClass,
