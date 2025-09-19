@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Box\Spout\Common\Type;
-use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
-use Box\Spout\Writer\Common\Creator\WriterFactory;
-use Box\Spout\Writer\WriterInterface;
+use OpenSpout\Common\Entity\Cell;
+use OpenSpout\Common\Entity\Row;
+use OpenSpout\Common\Entity\Style\Style;
+use OpenSpout\Writer\WriterInterface;
+use OpenSpout\Writer\XLSX\Writer as XLSXWriter;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 
 /**
@@ -25,7 +26,7 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
     public function getWriter(): WriterInterface
     {
         if (!$this->writer) {
-            $this->writer = WriterFactory::createFromType(Type::XLSX);
+            $this->writer = new XLSXWriter();
             $this->writer->openToFile($this->filePath);
         }
 
@@ -37,7 +38,7 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
     {
         $rows = [];
         foreach ($items as $item) {
-            $rows[] = WriterEntityFactory::createRowFromArray($item);
+            $rows[] = self::createRowFromArray($item);
         }
         // write a header if needed
         if ($this->firstLineIsHeader && $this->currentRow === 0) {
@@ -46,7 +47,7 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
             }
 
             if ($this->header) {
-                $header = WriterEntityFactory::createRowFromArray($this->header);
+                $header = self::createRowFromArray($this->header);
                 array_unshift($rows, $header);
             }
         }
@@ -79,5 +80,14 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
             $this->header = null;
             $this->currentRow = 0;
         }
+    }
+
+    protected static function createRowFromArray(array $cellValues = [], Style $rowStyle = null): Row
+    {
+        $cells = array_map(function ($cellValue) {
+            return Cell::fromValue($cellValue);
+        }, $cellValues);
+
+        return new Row($cells, $rowStyle);
     }
 }

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
-use Box\Spout\Common\Type;
-use Box\Spout\Reader\Common\Creator\ReaderFactory;
-use Box\Spout\Reader\ReaderInterface;
-use Box\Spout\Reader\XLSX\RowIterator;
-use Box\Spout\Reader\XLSX\Sheet;
+use OpenSpout\Reader\ReaderInterface;
+use OpenSpout\Reader\XLSX\Reader as XLSXReader;
+use OpenSpout\Reader\XLSX\RowIterator;
+use OpenSpout\Reader\XLSX\Sheet;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 
 /**
@@ -68,7 +67,7 @@ class XlsxFileReader extends AbstractFileReader
     {
         parent::initializeByContext($context);
 
-        $this->fileReader = ReaderFactory::createFromType(Type::XLSX);
+        $this->fileReader = new XLSXReader();
         $this->fileReader->open($this->fileInfo->getPathname());
 
         $sheetIterator = $this->fileReader->getSheetIterator();
