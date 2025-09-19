@@ -23,14 +23,14 @@ class ConfigurationTest extends TestCase
         $this->assertArrayHasKey('build_timeout', $result);
         $this->assertNull($result['build_timeout']);
 
-        $this->assertArrayHasKey('npm_install_timeout', $result);
-        $this->assertNull($result['npm_install_timeout']);
+        $this->assertArrayHasKey('pnpm_install_timeout', $result);
+        $this->assertNull($result['pnpm_install_timeout']);
 
         $this->assertArrayHasKey('nodejs_path', $result);
         $this->assertIsString($result['nodejs_path']);
 
-        $this->assertArrayHasKey('npm_path', $result);
-        $this->assertIsString($result['npm_path']);
+        $this->assertArrayHasKey('pnpm_path', $result);
+        $this->assertIsString($result['pnpm_path']);
     }
 
     /**
@@ -47,14 +47,14 @@ class ConfigurationTest extends TestCase
             [
                 'options' => [
                     'nodejs_path' => 'nodejs',
-                    'npm_path' => 'npm',
+                    'pnpm_path' => 'pnpm',
                 ],
                 'expects' => [
                     'with_babel' => false,
                     'nodejs_path' => 'nodejs',
-                    'npm_path' => 'npm',
+                    'pnpm_path' => 'pnpm',
                     'build_timeout' => null,
-                    'npm_install_timeout' => null,
+                    'pnpm_install_timeout' => null,
                     'webpack_dev_server' => [
                         'enable_hmr' => '%kernel.debug%',
                         'host' => 'localhost',
@@ -75,9 +75,9 @@ class ConfigurationTest extends TestCase
                 'options' => [
                     'with_babel' => false,
                     'nodejs_path' => 'node',
-                    'npm_path' => '/usr/local/bin/npm',
+                    'pnpm_path' => '/usr/local/bin/pnpm',
                     'build_timeout' => 300,
-                    'npm_install_timeout' => null,
+                    'pnpm_install_timeout' => null,
                     'webpack_dev_server' => [
                         'enable_hmr' => true,
                         'host' => 'http://example.local',
@@ -100,9 +100,9 @@ class ConfigurationTest extends TestCase
                 'expects' => [
                     'with_babel' => false,
                     'nodejs_path' => 'node',
-                    'npm_path' => '/usr/local/bin/npm',
+                    'pnpm_path' => '/usr/local/bin/pnpm',
                     'build_timeout' => 300,
-                    'npm_install_timeout' => null,
+                    'pnpm_install_timeout' => null,
                     'webpack_dev_server' => [
                         'enable_hmr' => true,
                         'host' => 'http://example.local',

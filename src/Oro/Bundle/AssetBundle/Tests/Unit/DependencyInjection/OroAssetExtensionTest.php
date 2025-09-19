@@ -19,9 +19,9 @@ class OroAssetExtensionTest extends TestCase
 
         self::assertFalse($container->getParameter('oro_asset.with_babel'));
         self::assertIsString($container->getParameter('oro_asset.nodejs_path'));
-        self::assertIsString($container->getParameter('oro_asset.npm_path'));
+        self::assertIsString($container->getParameter('oro_asset.pnpm_path'));
         self::assertNull($container->getParameter('oro_asset.build_timeout'));
-        self::assertNull($container->getParameter('oro_asset.npm_install_timeout'));
+        self::assertNull($container->getParameter('oro_asset.pnpm_install_timeout'));
         self::assertSame(
             [
                 'enable_hmr' => '%kernel.debug%',

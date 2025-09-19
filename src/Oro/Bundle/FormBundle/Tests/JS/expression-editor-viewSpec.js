@@ -16,11 +16,11 @@ import {
     acceptCompletion,
     snippet,
     moveCompletionSelection,
-    currentCompletions
-} from '@codemirror/autocomplete';
-import {syntaxTree} from '@codemirror/language';
-import {forEachDiagnostic} from '@codemirror/lint';
-import defaultOperations from 'oroform/js/app/views/expression-editor-extensions/side-panel/default-operations.js';
+    currentCompletions,
+    forEachDiagnostic,
+    syntaxTree
+} from '@oroinc/codemirror-expression-editor';
+import defaultOperations from 'oroform/js/app/views/expression-editor-extensions/side-panel/default-operations';
 
 // variables
 let expressionEditorView = null;

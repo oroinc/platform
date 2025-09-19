@@ -33,8 +33,8 @@ class NodeJsExecutableFinder
         return null;
     }
 
-    public function findNpm(): ?string
+    public function findPnpm(): ?string
     {
-        return $this->executableFinder->find('npm');
+        return $this->executableFinder->find('pnpm');
     }
 }

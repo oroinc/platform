@@ -28,16 +28,16 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('nodejs_path')
                     ->info('Path to NodeJs executable')
                 ->end()
-                ->scalarNode('npm_path')
-                    ->info('Path to NPM executable')
+                ->scalarNode('pnpm_path')
+                    ->info('Path to PNPM executable')
                 ->end()
                 ->scalarNode('build_timeout')
                     ->defaultValue(null)
                     ->info('Assets build timeout in seconds, null to disable timeout')
                 ->end()
-                ->scalarNode('npm_install_timeout')
+                ->scalarNode('pnpm_install_timeout')
                     ->defaultValue(null)
-                    ->info('Npm installation timeout in seconds, null to disable timeout')
+                    ->info('PNPM installation timeout in seconds, null to disable timeout')
                 ->end()
                 ->arrayNode('external_resources')
                     ->useAttributeAsKey('name')
@@ -107,8 +107,9 @@ class Configuration implements ConfigurationInterface
                         if (!isset($value['nodejs_path'])) {
                             $value['nodejs_path'] = (string)$finder->findNodeJs();
                         }
-                        if (!isset($value['npm_path'])) {
-                            $value['npm_path'] = (string)$finder->findNpm();
+
+                        if (!isset($value['pnpm_path'])) {
+                            $value['pnpm_path'] = (string)$finder->findPnpm();
                         }
 
                         return $value;

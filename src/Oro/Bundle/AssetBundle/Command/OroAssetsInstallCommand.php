@@ -57,7 +57,7 @@ You may run individual steps if necessary as follows:
 
   <info>php {$_SERVER['PHP_SELF']} oro:localization:dump</info>
   <info>php {$_SERVER['PHP_SELF']} assets:install [--symlink][--relative-symlink]</info>
-  <info>php {$_SERVER['PHP_SELF']} oro:assets:build --npm-install</info>
+  <info>php {$_SERVER['PHP_SELF']} oro:assets:build --pnpm-install</info>
 
 HELP
             )

@@ -1,7 +1,5 @@
 import __ from 'orotranslation/js/translator';
-import {showPanel} from '@codemirror/view';
-import {StateField} from '@codemirror/state';
-import {diagnosticCount} from '@codemirror/lint';
+import {showPanel, StateField, diagnosticCount} from '@oroinc/codemirror-expression-editor';
 
 function createLinterPanel(view) {
     const dom = document.createElement('div');
