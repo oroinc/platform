@@ -6,6 +6,10 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### AssetBundle
+* The options `npm_path` and `npm_install_timeout` renamed to `pnpm_path` and `pnpm_install_timeout` respectfully due to using PNPM Package manager.
+* `package/platform/src/Oro/Bundle/AssetBundle/NodeJsExecutableFinder.php` the `findNpm` method renamed to `findPnpm`.
+
 ### Layout Component
 * Added `Oro\Component\Layout\Extension\Theme\Model\ThemeManagerInterface` interface that represents a manager for layout themes.
 * Added `ThemeConfigOptionGetEvent` and `ThemeOptionGetEvent` events that are fired when a theme option or theme config value is retrieved.

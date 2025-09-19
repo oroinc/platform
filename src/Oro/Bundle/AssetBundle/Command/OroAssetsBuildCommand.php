@@ -49,13 +49,13 @@ class OroAssetsBuildCommand extends Command
     private AssetCommandProcessFactory $nodeProcessFactory;
     private AssetConfigCache $cache;
 
-    private string $npmPath;
+    private string $pnpmPath;
 
     /** @var int|float|null */
     private $buildTimeout;
 
     /** @var int|float|null */
-    private $npmInstallTimeout;
+    private $installTimeout;
 
     private bool $withBabel;
 
@@ -64,26 +64,26 @@ class OroAssetsBuildCommand extends Command
     /**
      * @param AssetCommandProcessFactory $nodeProcessFactory
      * @param AssetConfigCache $cache
-     * @param string $npmPath
+     * @param string $pnpmPath
      * @param int|float|null $buildTimeout
-     * @param int|float|null $npmInstallTimeout
+     * @param int|float|null $installTimeout
      * @param bool $withBabel
      * @param ThemeManager $themeManager
      */
     public function __construct(
         AssetCommandProcessFactory $nodeProcessFactory,
         AssetConfigCache $cache,
-        string $npmPath,
+        string $pnpmPath,
         $buildTimeout,
-        $npmInstallTimeout,
+        $installTimeout,
         bool $withBabel,
         ThemeManager $themeManager
     ) {
         $this->nodeProcessFactory = $nodeProcessFactory;
         $this->cache = $cache;
-        $this->npmPath = $npmPath;
+        $this->pnpmPath = $pnpmPath;
         $this->buildTimeout = $buildTimeout;
-        $this->npmInstallTimeout = $npmInstallTimeout;
+        $this->installTimeout = $installTimeout;
         $this->withBabel = $withBabel;
         $this->themeManager = $themeManager;
 
@@ -107,7 +107,7 @@ class OroAssetsBuildCommand extends Command
             ->addOption('pfx', null, InputOption::VALUE_REQUIRED, 'Path to SSL certificate .pfx file')
             ->addOption('pfxPassphrase', null, InputOption::VALUE_REQUIRED, 'Passphrase to the .pfx file')
             ->addOption('force-warmup', 'f', InputOption::VALUE_NONE, 'Warm up the asset-config.json cache')
-            ->addOption('npm-install', 'i', InputOption::VALUE_NONE, 'Reinstall npm dependencies')
+            ->addOption('pnpm-install', 'i', InputOption::VALUE_NONE, 'Reinstall pnpm dependencies')
             ->addOption('skip-css', null, InputOption::VALUE_NONE, 'Skip build of CSS assets')
             ->addOption('skip-js', null, InputOption::VALUE_NONE, 'Skip build of JS assets')
             ->addOption('with-babel', null, InputOption::VALUE_NONE, 'Transpile code with Babel')
@@ -162,11 +162,11 @@ The <info>--force-warmup</info> option can be used to warm up the <comment>asset
 
   <info>php %command.full_name% --force-warmup</info>
 
-The <info>--npm-install</info> option can be used to reinstall npm dependencies
+The <info>--pnpm-install</info> option can be used to reinstall pnpm dependencies
 in <comment>vendor/oro/platform/build</comment> folder. It may be required when
 <comment>node_modules</comment> contents become corrupted:
 
-  <info>php %command.full_name% --npm-install</info>
+  <info>php %command.full_name% --pnpm-install</info>
 
 The <info>--skip-css</info>, <info>--skip-js</info>, <info>--with-babel</info>, <info>--skip-sourcemap</info> and <info>--skip-rtl</info> <info>--skip-svg</info> options allow to
 skip building CSS and JavaScript files, and transpiling Javascript with Babel,
@@ -204,7 +204,7 @@ HELP
             ->addUsage('--hot blank')
             ->addUsage('--hot --key=<path> --cert=<path> --cacert=<path> --pfx=<path> --pfxPassphrase=<passphrase>')
             ->addUsage('--force-warmup')
-            ->addUsage('--npm-install')
+            ->addUsage('--pnpm-install')
             ->addUsage('--skip-css')
             ->addUsage('--skip-js')
             ->addUsage('--skip-sourcemap')
@@ -230,9 +230,9 @@ HELP
         }
 
         $nodeModulesDir = $kernel->getProjectDir() . DIRECTORY_SEPARATOR . 'node_modules';
-        if (!file_exists($nodeModulesDir) || $input->getOption('npm-install')) {
-            $output->writeln('<info>Installing npm dependencies.</info>');
-            $this->npmInstall($output);
+        if (!file_exists($nodeModulesDir) || $input->getOption('pnpm-install')) {
+            $output->writeln('<info>Installing PNPM dependencies.</info>');
+            $this->pnpmInstall($output);
         }
 
         $output->writeln('<info>Building assets.</info>');
@@ -367,18 +367,14 @@ HELP
         \pcntl_signal(SIGTERM, $killNodeProcess);
     }
 
-    protected function npmInstall(OutputInterface $output): void
+    protected function pnpmInstall(OutputInterface $output): void
     {
         $path = $this->getKernel()->getProjectDir();
-        if (\file_exists($path . DIRECTORY_SEPARATOR . 'package-lock.json')) {
-            $logLevel = $output->isVerbose() ? 'info' : 'error';
-            $command = [$this->npmPath, 'ci', '--loglevel ' . $logLevel];
-        } else {
-            $command = [$this->npmPath, '--no-audit', 'install'];
-        }
+        $logLevel = $output->isVerbose() ? 'info' : 'error';
+        $command = [$this->pnpmPath, 'install', '--loglevel', $logLevel];
         $output->writeln(implode(' ', $command));
         $process = new Process($command, $path);
-        $process->setTimeout($this->npmInstallTimeout);
+        $process->setTimeout($this->installTimeout);
 
         $process->run();
 

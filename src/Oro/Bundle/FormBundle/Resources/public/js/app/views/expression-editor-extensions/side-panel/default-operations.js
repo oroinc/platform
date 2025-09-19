@@ -1,5 +1,5 @@
 import __ from 'orotranslation/js/translator';
-import {getResolvedSnippetByName} from '../utils/operators';
+import {getResolvedSnippetByName} from '@oroinc/codemirror-expression-editor';
 
 export const isNeedSpace = cm => {
     const {state} = cm;
