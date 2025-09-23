@@ -20,6 +20,8 @@ define(function(require) {
 
         entityLabel: '',
 
+        widgetTitle: '',
+
         existingEntityGridId: null,
 
         dialogWidget: null,
@@ -45,7 +47,10 @@ define(function(require) {
          */
         initialize(options) {
             SelectCreateInlineTypeView.__super__.initialize.call(this, options);
-            _.extend(this, _.pick(options, 'urlParts', 'entityLabel', 'existingEntityGridId', 'inputSelector'));
+            _.extend(
+                this,
+                _.pick(options, 'urlParts', 'entityLabel', 'existingEntityGridId', 'inputSelector', 'widgetTitle')
+            );
         },
 
         buildRouteParams(routeType) {
@@ -71,7 +76,7 @@ define(function(require) {
             const routeName = _.result(this.urlParts.grid, 'gridWidgetView') || this.urlParts.grid.route;
             const routeParams = this.buildRouteParams('grid');
             this.dialogWidget = new DialogWidget({
-                title: __('Select {{ entity }}', {entity: this.entityLabel}),
+                title: this.widgetTitle ? this.dialogueTitle : __('Select {{ entity }}', {entity: this.entityLabel}),
                 url: routing.generate(routeName, routeParams),
                 stateEnabled: false,
                 incrementalPosition: true,

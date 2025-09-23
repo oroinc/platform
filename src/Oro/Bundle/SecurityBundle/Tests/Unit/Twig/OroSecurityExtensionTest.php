@@ -3,7 +3,10 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Twig;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
@@ -22,6 +25,7 @@ class OroSecurityExtensionTest extends TestCase
     private TokenAccessorInterface&MockObject $tokenAccessor;
     private PermissionManager&MockObject $permissionManager;
     private UriSecurityHelper&MockObject $uriSecurityHelper;
+    private ManagerRegistry&MockObject $doctrine;
     private OroSecurityExtension $extension;
 
     #[\Override]
@@ -30,11 +34,13 @@ class OroSecurityExtensionTest extends TestCase
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->permissionManager = $this->createMock(PermissionManager::class);
         $this->uriSecurityHelper = $this->createMock(UriSecurityHelper::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
         $container = self::getContainerBuilder()
             ->add(TokenAccessorInterface::class, $this->tokenAccessor)
             ->add('oro_security.acl.permission_manager', $this->permissionManager)
             ->add('oro_security.util.uri_security_helper', $this->uriSecurityHelper)
+            ->add('doctrine', $this->doctrine)
             ->getContainer($this);
 
         $this->extension = new OroSecurityExtension($container);
@@ -63,6 +69,42 @@ class OroSecurityExtensionTest extends TestCase
             ],
             self::callTwigFunction($this->extension, 'get_enabled_organizations', [])
         );
+    }
+
+    public function testGetUserOrganizationsCountWithoutUserInToken(): void
+    {
+        $this->tokenAccessor->expects(self::once())
+            ->method('getUser')
+            ->willReturn(null);
+
+        self::assertEquals(0, self::callTwigFunction($this->extension, 'get_user_organizations_count', []));
+    }
+
+    public function testGetUserOrganizationsCount(): void
+    {
+        $user = new User();
+
+        $this->tokenAccessor->expects(self::once())
+            ->method('getUser')
+            ->willReturn($user);
+
+        $repository = $this->createMock(OrganizationRepository::class);
+        $repository->expects(self::once())
+            ->method('getUserOrganizationsCount')
+            ->with($user)
+            ->willReturn(23);
+
+        $manager = $this->createMock(ObjectManager::class);
+        $manager->expects(self::once())
+            ->method('getRepository')
+            ->willReturn($repository);
+
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with(Organization::class)
+            ->willReturn($manager);
+
+        self::assertEquals(23, self::callTwigFunction($this->extension, 'get_user_organizations_count', []));
     }
 
     public function testGetCurrentOrganization(): void

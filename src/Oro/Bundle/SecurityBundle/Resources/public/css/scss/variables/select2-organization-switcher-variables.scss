@@ -1,0 +1,24 @@
+/* @theme: admin.oro; */
+
+$select2-organization-switcher-max-width: 136px !default;
+$select2-organization-switcher-border-color: transparent !default;
+
+$select2-organization-switcher-select2-chosen-font-weight: font-weight('medium') !default;
+$select2-organization-switcher-select2-chosen-text-transform: uppercase !default;
+$select2-organization-switcher-select2-chosen-padding-inline-start: 0 !default;
+$select2-organization-switcher-select2-chosen-margin-left: 5px;
+
+$select2-organization-switcher-select2-arrow-color: inherit !default;
+
+$select2-organization-switcher-dropdown-transform: translateY(10px) !default;
+
+$select2-organization-switcher-dropdown-after-content: '' !default;
+$select2-organization-switcher-dropdown-after-position: absolute !default;
+$select2-organization-switcher-dropdown-after-bottom: 100% !default;
+$select2-organization-switcher-dropdown-after-left: 9px !default;
+$select2-organization-switcher-dropdown-after-border-bottom: 6px solid $primary-inverse !default;
+$select2-organization-switcher-dropdown-after-border-left: 6px solid transparent !default;
+$select2-organization-switcher-dropdown-after-border-right: 6px solid transparent !default;
+$select2-organization-switcher-dropdown-after-pointer-events: none !default;
+
+$select2-organization-switcher-select2-search-display: none !default;

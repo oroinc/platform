@@ -2,15 +2,20 @@
 
 namespace Oro\Bundle\SecurityBundle\Twig;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\CustomerBundle\Entity\CustomerVisitor;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
+use Oro\Bundle\SecurityBundle\Form\Type\SwitchOrganizationType;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Util\UriSecurityHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -43,6 +48,8 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
             new TwigFunction('get_current_organization', [$this, 'getCurrentOrganization']),
             new TwigFunction('acl_permission', [$this, 'getPermission']),
             new TwigFunction('is_authenticated', [$this, 'isAuthenticated']),
+            new TwigFunction('get_organization_selector_form', [$this, 'getOrganizationSelectorForm']),
+            new TwigFunction('get_user_organizations_count', [$this, 'getUserOrganizationsCount']),
         ];
     }
 
@@ -67,6 +74,34 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
         }
 
         return $this->formatUserOrganizations($user->getOrganizations(true)->toArray());
+    }
+
+    public function getUserOrganizationsCount(): int
+    {
+        $user = $this->getTokenAccessor()->getUser();
+        if (!$user instanceof User) {
+            return 0;
+        }
+
+        return $this->container->get('doctrine')
+            ->getManagerForClass(Organization::class)
+            ->getRepository(Organization::class)
+            ->getUserOrganizationsCount($user);
+    }
+
+    public function getOrganizationSelectorForm(): FormView
+    {
+        $form = $this->container->get(FormFactoryInterface::class)
+            ->createNamedBuilder('', FormType::class, [], ['csrf_protection' => false])
+            ->add(
+                'organization',
+                SwitchOrganizationType::class
+            )
+            ->setMethod('GET')
+            ->getForm()
+            ->createView();
+
+        return $form;
     }
 
     public function getCurrentOrganization(): ?Organization
@@ -120,6 +155,8 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
             'oro_security.util.uri_security_helper' => UriSecurityHelper::class,
             'oro_security.acl.permission_manager' => PermissionManager::class,
             TokenAccessorInterface::class,
+            FormFactoryInterface::class,
+            'doctrine' => ManagerRegistry::class,
         ];
     }
 
