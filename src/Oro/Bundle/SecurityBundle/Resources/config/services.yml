@@ -761,6 +761,7 @@ services:
         arguments:
             - '@security.csrf.token_generator'
             - '@oro_security.csrf.cookie_token_storage'
+            - '@request_stack'
 
     oro_security.csrf_request_manager:
         class: Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager
@@ -921,3 +922,10 @@ services:
             - '@oro_security.encoder.default'
         tags:
             - { name: oro.requirements_provider }
+
+    oro_security.form.type.switch_organization:
+        class: Oro\Bundle\SecurityBundle\Form\Type\SwitchOrganizationType
+        arguments:
+            - "@oro_security.token_accessor"
+        tags:
+            - { name: form.type, alias: oro_user_switch_organization }

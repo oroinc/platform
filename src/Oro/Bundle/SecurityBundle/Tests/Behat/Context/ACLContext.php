@@ -47,13 +47,32 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware
      * Example: Given I login as administrator
      *          And I am logged in under System organization
      *
-     * @Given /^(?:|I am )logged in under (?P<organization>(\D*)) organization$/
+     * @Given /^(?:|I am )logged in under (?P<organization>(.*)) organization$/
      */
     public function iAmLoggedInUnderSystemOrganization($organization)
     {
         $page = $this->getSession()->getPage();
-        $page->find('css', '.btn-organization-switcher')->click();
-        $page->find('css', '.dropdown-organization-switcher')->clickLink($organization);
+        $page->find('css', '.organization-switcher')->click();
+
+        $clickElement = $page->find(
+            'xpath',
+            sprintf(
+                '//div[contains(@class, "select2-organization-switcher__dropdown")]//ul//li//div[text()="%s"]',
+                $organization
+            )
+        );
+        if (null === $clickElement) {
+            $this->getSession()->wait(1600);
+            $clickElement = $page->find(
+                'xpath',
+                sprintf(
+                    '//div[contains(@class, "select2-organization-switcher__dropdown")]//ul//li//div[text()="%s"]',
+                    $organization
+                )
+            );
+        }
+
+        $clickElement->click();
     }
 
     //@codingStandardsIgnoreStart

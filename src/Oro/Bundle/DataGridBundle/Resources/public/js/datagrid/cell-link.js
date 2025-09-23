@@ -44,6 +44,12 @@ const CellLinkView = BaseView.extend({
         this.$el.css('-moz-user-select', 'auto');
         this.$el.append(this.inner);
 
+        const $tooltip = this.container.find('[data-toggle="tooltip"]');
+
+        if ($tooltip.length) {
+            this.$el.tooltip($tooltip.data('bs.tooltip')?.config ?? {});
+        }
+
         CellLinkView.__super__.render.call(this);
     },
 

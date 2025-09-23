@@ -2,7 +2,7 @@
 {% import _self as organizationSelector %}
 
 {% set curr_organization = get_current_organization() %}
-{% set organizations = get_enabled_organizations() %}
+{% set organizationsCount = get_user_organizations_count() %}
 
 {% set organization_name %}
 {% apply spaceless %}
@@ -11,41 +11,20 @@
 {% endset %}
 
 {% if isDesktopVersion() %}
-    {% if organizations|length > 1 %}
+    {% if organizationsCount > 1 %}
         <div class="nav logo-wrapper dropdown"
-            {{ UI.renderPageComponentAttributes({
-                module: 'orosecurity/js/app/components/switch-organization-component',
-                options: {
-                    currentOrganizationId: curr_organization.getId()
-                }
-            }) }}
+           {{ UI.renderPageComponentAttributes({
+               module: 'orosecurity/js/app/components/switch-organization-component',
+               options: {
+                   currentOrganizationId: curr_organization.getId()
+               }
+           }) }}
         >
-            {{ UI.app_logo(organization_name) }}
-            {{ organizationSelector.organization_name_and_logo(organization_name) }}
-            {% set togglerId = 'dropdown-'|uniqid %}
-            <span id="{{ togglerId }}" class="dropdown-toggle btn-organization-switcher" data-toggle="dropdown" data-inherit-parent-width="strictly"
-                  role="button" aria-label="{{ 'oro.security.organization.switch'|trans }}" aria-haspopup="true" aria-expanded="false"></span>
-            <ul class="dropdown-menu dropdown-organization-switcher" role="menu" aria-labelledby="{{ togglerId }}">
-                {% for organization in organizations %}
-                    <li>
-                        {% if curr_organization and curr_organization.getId() == organization.id %}
-                        <span class="dropdown-item-text selected" aria-selected="true"><b>{{- organization.name|trim -}}</b></span>
-                        {% else %}
-                        <a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}"
-                           class="dropdown-item organization-switcher no-hash">
-                            {{- organization.name|trim -}}
-                        </a>
-                        {% endif %}
-                    </li>
-                    {% if not loop.last %}
-                    <li>
-                        <div class="dropdown-divider"></div>
-                    </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
+
+            {% set selectorForm = get_organization_selector_form() %}
+            {{ form_widget(selectorForm.organization) }}
         </div>
-    {% else %}{# if organizations|length == 1 #}
+    {% else %}{# if organizationsCount == 1 #}
         <div class="nav logo-wrapper">
             {{ UI.app_logo(organization_name) }}
             {{ organizationSelector.organization_name_and_logo(organization_name) }}
@@ -53,7 +32,7 @@
     {% endif %}
 {% else %}
     {# Mobile view #}
-    {% if organizations|length > 1 %}
+    {% if organizationsCount > 1 %}
         <div class="organization-switcher dropdown"
             {{ UI.renderPageComponentAttributes({
                 module: 'orosecurity/js/app/components/switch-organization-component',
@@ -62,24 +41,10 @@
                 }
             }) }}
         >
-            {% set togglerId = 'dropdown-'|uniqid %}
-            <a id="{{ togglerId }}" href="#" role="button" class="logo dropdown-toggle btn-organization-switcher" data-toggle="dropdown"
-                aria-label="{{ 'oro.security.organization.switch'|trans }}" aria-haspopup="true" aria-expanded="false">
-                <span class="organization-name">{{- organization_name -}}</span>
-            </a>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="{{ togglerId }}">
-                {% for organization in organizations %}
-                    {% set is_current_organization = curr_organization and curr_organization.getId() == organization.id %}
-                    <li {% if is_current_organization %}class="current"{% endif %}>
-                        <a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}" class="dropdown-item no-hash"
-                           {% if is_current_organization %}aria-selected="true"{% endif %}>
-                            {{- organization.name -}}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
+            {% set selectorForm = get_organization_selector_form() %}
+            {{ form_widget(selectorForm.organization) }}
         </div>
-    {% else %}{# if organizations|length == 1 #}
+    {% else %}{# if organizationsCount == 1 #}
         <h1 class="logo">
             <a href="{{ path('oro_default') }}" title="{{ organization_name|striptags|trim }}" class="organization-name">
                 {{- organization_name -}}
