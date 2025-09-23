@@ -1,0 +1,38 @@
+/* @theme: admin.oro; */
+
+.select2-organization-switcher {
+    max-width: $select2-organization-switcher-max-width;
+    border-color: $select2-organization-switcher-border-color;
+
+    .select2-chosen {
+        font-weight: $select2-organization-switcher-select2-chosen-font-weight;
+        text-transform: $select2-organization-switcher-select2-chosen-text-transform;
+        padding-inline-start: $select2-organization-switcher-select2-chosen-padding-inline-start;
+        margin-left: $select2-organization-switcher-select2-chosen-margin-left;
+    }
+
+    .select2-arrow {
+        color: $select2-organization-switcher-select2-arrow-color;
+    }
+
+    &__dropdown {
+        transform: $select2-organization-switcher-dropdown-transform;
+
+        &::after {
+            content: $select2-organization-switcher-dropdown-after-content;
+            position: $select2-organization-switcher-dropdown-after-position;
+            bottom: $select2-organization-switcher-dropdown-after-bottom;
+            left: $select2-organization-switcher-dropdown-after-left;
+            border-bottom: $select2-organization-switcher-dropdown-after-border-bottom;
+            border-left: $select2-organization-switcher-dropdown-after-border-left;
+            border-right: $select2-organization-switcher-dropdown-after-border-right;
+            pointer-events: $select2-organization-switcher-dropdown-after-pointer-events;
+        }
+
+        &:has(.select2-results > .select2-searching:only-child) {
+            .select2-search {
+                display: $select2-organization-switcher-select2-search-display;
+            }
+        }
+    }
+}
