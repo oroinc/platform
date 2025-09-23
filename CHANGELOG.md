@@ -6,6 +6,15 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### EmailBundle
+* Added ability to add attachments to email template:
+  * Added `\Oro\Bundle\EmailBundle\Model\EmailTemplateAttachmentModel` and `\Oro\Bundle\EmailBundle\Entity\EmailTemplateAttachment` to represent an email template attachment.
+  * Added `attachments` field to `Oro\Bundle\EmailBundle\Entity\EmailTemplate` entity.
+  * Added `attachments` field to `Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation` entity.
+  * Added `\Oro\Bundle\EmailBundle\Twig\EmailTemplateAttachmentVariablesProvider` that provides entity variable definitions that could be used as email template attachments.
+  * Added `\Oro\Bundle\EmailBundle\Factory\EmailAttachmentEntityFromEmailTemplateAttachmentFactory` to create email attachment entity from email template attachment.
+  * Added `\Oro\Bundle\EmailBundle\Factory\EmailAttachmentModelFromEmailTemplateAttachmentFactory` to create email attachment model from email template attachment.
+
 #### AssetBundle
 * The options `npm_path` and `npm_install_timeout` renamed to `pnpm_path` and `pnpm_install_timeout` respectfully due to using PNPM Package manager.
 * `package/platform/src/Oro/Bundle/AssetBundle/NodeJsExecutableFinder.php` the `findNpm` method renamed to `findPnpm`.
@@ -29,6 +38,16 @@ The current file describes significant changes in the code that may affect the u
 provided by `Sensio\Bundle\FrameworkExtraBundle\Configuration\ConfigurationInterface`.
 * Added new `Oro\Bundle\PlatformBundle\EventListener\Controller\ControllerListener` to modify the Request object to apply configuration information
 found in the PHP attributes implementing `PHPAttributeConfigurationInterface`
+
+### Changed
+* Decomposed `\Oro\Bundle\EmailBundle\Model\EmailTemplate` model into smaller classes responsible for parsing and creating an email template:
+    * `\Oro\Bundle\EmailBundle\Model\Factory\EmailTemplateFromRawDataFactory`
+    * `\Oro\Bundle\EmailBundle\EmailTemplateHydrator\EmailTemplateRawDataParser`
+    * `\Oro\Bundle\EmailBundle\EmailTemplateHydrator\EmailTemplateFromArrayHydrator`
+* Updated `\Oro\Bundle\EmailBundle\Migrations\Data\ORM\AbstractEmailFixture` to make use of `\Oro\Bundle\EmailBundle\EmailTemplateHydrator\EmailTemplateRawDataParser` and `\Oro\Bundle\EmailBundle\EmailTemplateHydrator\EmailTemplateFromArrayHydrator`.
+* Updated `\Oro\Bundle\EmailBundle\Provider\EmailRenderer` to process email template attachments by `\Oro\Bundle\EmailBundle\Twig\EmailTemplateAttachmentProcessor`.
+* Updated `\Oro\Bundle\EmailBundle\Factory\EmailModelFromEmailTemplateFactory` to process email template attachments.
+* Updated `\Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType` and `\Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType` with `attachments` field to manage email template attachments in the UI.
 
 ### Removed
 
