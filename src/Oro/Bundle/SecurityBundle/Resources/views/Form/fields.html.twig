@@ -116,3 +116,18 @@
         </tr>
     {% endfor %}
 {% endblock %}
+
+{% block oro_acl_switch_organization_widget %}
+    <div class="organization-switcher" data-page-component-view="orosecurity/js/app/views/switch-organization-view">
+        {{ form_widget(form.organization, {
+            attr: {
+                isButtonsEnabled: false,
+            },
+            'configs': form.organization.vars.configs|default({})|merge({
+                containerCssClass: 'select2-organization-switcher',
+                dropdownCssClass: 'select2-organization-switcher__dropdown',
+                minimumResultsForSearch: 8
+            })
+        }) }}
+    </div>
+{% endblock %}

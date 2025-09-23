@@ -1,0 +1,45 @@
+/* @theme: admin.oro; */
+
+.select2-organization-switcher {
+    background: $select2-organization-switcher-mobile-background;
+
+    .select2-chosen {
+        font-size: $select2-organization-switcher-select2-chosen-mobile-font-size;
+        font-weight: $select2-organization-switcher-select2-chosen-mobile-font-weight;
+    }
+
+    .select2-choice {
+        color: $select2-organization-switcher-select2-choice-mobile-color;
+
+        .select2-chosen {
+            padding-inline-start: $select2-organization-switcher-select2-chosen-mobile-padding-inline-start;
+        }
+    }
+
+    &__dropdown {
+        transform: $select2-organization-switcher-dropdown-mobile-transform;
+
+        .select2-search-hidden + .select2-results,
+        .select2-results:has(.select2-searching) {
+            margin-top: $select2-organization-switcher-select2-results-mobile-margin-top;
+        }
+    }
+}
+
+@media (max-width: 420px) {
+    .select2-organization-switcher {
+        &__dropdown {
+            // Important need to override inline styles
+            /* stylelint-disable declaration-no-important */
+            width: auto !important;
+            max-width: initial !important;
+            inset-inline: 0 !important;
+            bottom: 0 !important;
+            /* stylelint-enable declaration-no-important */
+
+            &::after {
+                left: 50px;
+            }
+        }
+    }
+}

@@ -232,4 +232,16 @@ class OrganizationRepository extends EntityRepository
 
         return $qb->getQuery()->getSingleScalarResult();
     }
+
+    public function getUserOrganizationsCount(User $user): int
+    {
+        $qb = $this->createQueryBuilder('organization');
+        $qb
+            ->select('COUNT(organization.id)')
+            ->where('organization.enabled = true')
+            ->andWhere(($qb->expr()->isMemberOf(':user', 'organization.users')))
+            ->setParameter('user', $user);
+
+        return $qb->getQuery()->getSingleScalarResult();
+    }
 }

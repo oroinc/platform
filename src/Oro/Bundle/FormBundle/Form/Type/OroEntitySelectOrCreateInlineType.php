@@ -99,6 +99,7 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
             'new_item_property_name'        => null,
             'new_item_allow_empty_property' => false,
             'new_item_value_path'           => 'value',
+            'widget_title'                  => null,
         ]);
 
         $this->setCreateEnabledNormalizer($resolver);
@@ -239,6 +240,7 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
         $view->vars['create_form_route'] = $options['create_form_route'];
         $view->vars['create_form_route_parameters'] = $options['create_form_route_parameters'];
         $view->vars['grid_view_widget_route'] = $options['grid_view_widget_route'];
+        $view->vars['widget_title'] = $options['widget_title'];
     }
 
     private function createDefaultTransformer(

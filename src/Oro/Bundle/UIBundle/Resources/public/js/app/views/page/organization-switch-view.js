@@ -13,9 +13,7 @@ define([
          */
         constructor: function OrganizationSwitchView(options) {
             OrganizationSwitchView.__super__.constructor.call(this, options);
-        },
-
-        pageItems: ['organization_switch']
+        }
     });
 
     return OrganizationSwitchView;

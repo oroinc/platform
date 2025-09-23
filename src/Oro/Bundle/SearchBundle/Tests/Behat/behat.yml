@@ -1,13 +1,13 @@
 oro_behat_extension:
   elements:
     TypeSelectElement:
-      selector: '.select2-choice'
+      selector: '.header-search .select2-choice'
 
     TypeSelectList:
       selector: '.select2-results'
 
     SearchSuggestionList:
-      selector: '.search-suggestion-list'
+      selector: '.header-search .search-suggestion-list'
 
     Search Form:
       selector: '#oro_website_search_search'

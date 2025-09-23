@@ -1616,9 +1616,16 @@ JS;
         if ($overlay?->isVisible()) {
             $overlay->click();
         } else {
-            $container = $this->getPage()->find('css', '#container');
-            if ($container?->isVisible()) {
-                $container->click();
+            try {
+                $container = $this->getPage()->find('css', '#container');
+                if ($container?->isVisible()) {
+                    $container->click();
+                }
+            } catch (\Exception $e) {
+                $dropMask = $this->getPage()->find('css', '#select2-drop-mask');
+                if ($dropMask?->isVisible()) {
+                    $dropMask->click();
+                }
             }
         }
     }
