@@ -132,6 +132,14 @@ oro_behat_extension:
           Content Fallback:
             type: 'css'
             locator: 'div[class^="emailtemplate-translatation-fields"].tab-pane.active [data-name="field__content-fallback"]'
+          Attachments:
+            type: 'css'
+            locator: 'div[class^="emailtemplate-translatation-fields"].tab-pane.active [data-name="field__file-placeholder"]'
+
+    Remove Email Template Attachment File Button:
+      selector:
+        locator: "//div[contains(@class,'email-attachment')]/following-sibling::button[contains(@class,'removeRow')]"
+        type: xpath
 
     EmailNotificationLink:
       selector: 'a.email-notification-icon'

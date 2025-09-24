@@ -148,7 +148,7 @@ class EmailContext extends OroFeatureContext
         $messagesData = [];
         foreach ($messages as $message) {
             $item = [];
-            foreach (['From', 'To', 'Subject', 'Body'] as $field) {
+            foreach (['From', 'To', 'Subject', 'Body', 'Attachments'] as $field) {
                 $item[$field] = $this->getMessageData($message, $field);
             }
             $messagesData[] = $item;
@@ -419,6 +419,9 @@ class EmailContext extends OroFeatureContext
         if (array_key_exists($fieldName, $message)) {
             if ($fieldName === 'body') {
                 return html_entity_decode(strip_tags($message[$fieldName]), ENT_QUOTES);
+            }
+            if ($fieldName === 'attachments') {
+                return $message[$fieldName][0]['filename'] ?? '';
             }
 
             return $message[$fieldName];
