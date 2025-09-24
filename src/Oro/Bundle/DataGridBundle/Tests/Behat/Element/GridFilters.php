@@ -15,9 +15,9 @@ class GridFilters extends Element
      *
      * @return AbstractGridFilterItem|Element
      */
-    public function getFilterItem($name, $text, $strict = false)
+    public function getFilterItem($name, $text, $strict = false, $frontend = false)
     {
-        $filterItem = $this->findItem($name, $text, $strict);
+        $filterItem = $this->findItem($name, $text, $strict, $frontend);
 
         if (null === $filterItem || !$filterItem->isValid()) {
             self::fail(sprintf('Can\'t find filter with "%s" name', $text));
@@ -47,7 +47,7 @@ class GridFilters extends Element
      *
      * @return null|AbstractGridFilterItem|Element
      */
-    private function findItem($name, $text, $strict = false)
+    private function findItem($name, $text, $strict = false, $frontend = false)
     {
         $filterItem = null;
 
@@ -67,11 +67,9 @@ class GridFilters extends Element
                     // For example fill State filter
                     // and there are Country filter containing United States of America string and State filter
                     $selector = $this->selectorManipulator->getContainsXPathSelector(
-                        "child::div[(@class " .
-                        "and contains(concat(' ', normalize-space(@class), ' '), ' filter-criteria-selector '))]" .
-                        "/self::*",
+                        "//*[contains(concat(' ', normalize-space(@class), ' '), ' filter-criteria-selector ')]",
                         $text,
-                        false
+                        $frontend
                     );
                     $filterItem = $this->elementFactory->wrapElement(
                         $name,

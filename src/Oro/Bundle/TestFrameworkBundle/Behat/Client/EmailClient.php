@@ -24,7 +24,8 @@ class EmailClient
     }
 
     /**
-     * @return array<int, array{from: string, to: string, subject: string, body: string, rawBody: string}>
+     * @return array<int, array{from: string, to: string, subject: string, body: string, rawBody: string,
+     *     attachments: array}>
      */
     public function getMessages(): array
     {
@@ -49,6 +50,7 @@ class EmailClient
                 'to' => implode(' ', $message['recipients']),
                 'subject' => $message['subject'],
                 'body' => $mimeMessage->getParts()[0]->getRawContent(),
+                'attachments' => $message['attachments'],
             ];
         }
 
