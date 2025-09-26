@@ -1,0 +1,22 @@
+invoice_pdf:
+    inputs:
+        # Settings
+        - 'bundles/oroui/css/scss/settings/global-settings.scss'
+
+        - 'bundles/oropdfgenerator/css/scss/components/pdf/reset.scss'
+        - 'bundles/oropdfgenerator/css/scss/components/pdf/utilities.scss'
+    output: 'css/invoice-pdf.css'
+    auto_rtl_inputs:
+        - 'bundles/oro*/**'
+
+invoice_footer_pdf:
+    inputs:
+        # Settings
+        - 'bundles/oroui/css/scss/settings/global-settings.scss'
+
+        - 'bundles/oropdfgenerator/css/scss/components/pdf/reset.scss'
+        - 'bundles/oropdfgenerator/css/scss/components/pdf/utilities.scss'
+
+    output: 'css/invoice-footer-pdf.css'
+    auto_rtl_inputs:
+        - 'bundles/oro*/**'
