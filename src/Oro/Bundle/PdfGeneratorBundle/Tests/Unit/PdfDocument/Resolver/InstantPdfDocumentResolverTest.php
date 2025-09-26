@@ -212,4 +212,52 @@ final class InstantPdfDocumentResolverTest extends TestCase
         self::assertSame(PdfDocumentState::FAILED, $pdfDocument->getPdfDocumentState());
         self::assertNull($pdfDocument->getPdfDocumentFile());
     }
+
+    public function testResolvePdfDocumentHandlesPdfGeneratorExceptionWhenDebugTrue(): void
+    {
+        $this->resolver->setDebug(true);
+
+        $pdfDocument = new PdfDocument();
+        ReflectionUtil::setId($pdfDocument, 42);
+        $pdfDocument
+            ->setPdfDocumentName('sample-document')
+            ->setPdfDocumentType('default_order')
+            ->setPdfOptionsPreset(PdfOptionsPreset::DEFAULT)
+            ->setPdfDocumentState(PdfDocumentState::PENDING);
+
+        $exception = new PdfGeneratorException('PDF generation error');
+        $this->pdfDocumentGeneratorComposite
+            ->expects(self::once())
+            ->method('generatePdfFile')
+            ->with($pdfDocument)
+            ->willThrowException($exception);
+
+        $this->fileFromPdfFileFactory
+            ->expects(self::never())
+            ->method('createFile');
+
+        $this->doctrine
+            ->expects(self::never())
+            ->method('getManagerForClass');
+
+        $this->loggerMock
+            ->expects(self::once())
+            ->method('error')
+            ->with(
+                'PDF generation failed for PDF document {pdfDocumentId}: {message}',
+                [
+                    'pdfDocumentId' => $pdfDocument->getId(),
+                    'message' => $exception->getMessage(),
+                    'exception' => $exception,
+                ]
+            );
+
+        $this->expectException(PdfGeneratorException::class);
+        $this->expectExceptionMessage('PDF generation error');
+
+        $this->resolver->resolvePdfDocument($pdfDocument);
+
+        self::assertSame(PdfDocumentState::FAILED, $pdfDocument->getPdfDocumentState());
+        self::assertNull($pdfDocument->getPdfDocumentFile());
+    }
 }

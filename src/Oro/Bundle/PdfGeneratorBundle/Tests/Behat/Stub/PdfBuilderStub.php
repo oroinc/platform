@@ -46,7 +46,7 @@ class PdfBuilderStub implements PdfBuilderInterface
         if ($this->entity !== null) {
             $name = $this->entityNameResolver->getName($this->entity);
 
-            if ($name === 'Failure Invoice #InvoiceFailure') {
+            if (str_contains($name, '#PdfFailure')) {
                 throw new PdfGeneratorException('Failed to generate PDF in StubPdfBuilder.');
             }
 

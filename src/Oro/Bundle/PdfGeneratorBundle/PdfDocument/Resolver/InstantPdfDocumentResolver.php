@@ -30,6 +30,11 @@ class InstantPdfDocumentResolver implements PdfDocumentResolverInterface, Logger
         PdfDocumentState::FAILED,
     ];
 
+    /**
+     * @var bool Whether to throw an exception if PDF generation fails.
+     */
+    private bool $debug = false;
+
     public function __construct(
         private readonly ManagerRegistry $doctrine,
         private readonly PdfDocumentGeneratorInterface $pdfDocumentGenerator,
@@ -44,6 +49,15 @@ class InstantPdfDocumentResolver implements PdfDocumentResolverInterface, Logger
     public function setApplicablePdfDocumentStates(array $applicablePdfDocumentStates): void
     {
         $this->applicablePdfDocumentStates = $applicablePdfDocumentStates;
+    }
+
+    /**
+     * Sets whether to throw an exception if PDF generation fails.
+     * If set to false, the exception will be only logged.
+     */
+    public function setDebug(bool $debug): void
+    {
+        $this->debug = $debug;
     }
 
     #[\Override]
@@ -76,6 +90,10 @@ class InstantPdfDocumentResolver implements PdfDocumentResolverInterface, Logger
                     'exception' => $exception,
                 ]
             );
+
+            if ($this->debug) {
+                throw $exception;
+            }
         }
     }
 
