@@ -176,4 +176,22 @@ class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
             self::callTwigFilter($this->extension, 'oro_format_time', [$value, $options])
         );
     }
+
+    public function testFormatDateTimeMedium(): void
+    {
+        $value    = new \DateTime('2025-12-31 00:00:00');
+        $timeZone = 'America/Los_Angeles';
+        $locale   = 'en_US';
+        $expected = '12/31/25, 12:00:00 AM';
+
+        $this->formatter->expects(self::once())
+            ->method('format')
+            ->with($value, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, $locale, $timeZone)
+            ->willReturn($expected);
+
+        self::assertSame(
+            $expected,
+            self::callTwigFilter($this->extension, 'oro_format_datetime_medium', [$value, $locale, $timeZone])
+        );
+    }
 }
