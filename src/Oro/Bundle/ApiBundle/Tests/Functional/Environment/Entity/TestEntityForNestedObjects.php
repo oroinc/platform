@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'test_api_nested_objects')]
@@ -21,6 +22,10 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
      * @var TestNestedName
      */
     protected $name;
+
+    #[ORM\Column(name: 'display_name', type: Types::STRING, nullable: true)]
+    #[Assert\NotBlank]
+    protected ?string $displayName = null;
 
     #[ORM\Column(name: 'first_name', type: Types::STRING, nullable: true)]
     protected ?string $firstName = null;
@@ -91,6 +96,26 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
     public function setId($id)
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDisplayName()
+    {
+        return $this->displayName;
+    }
+
+    /**
+     * @param string $displayName
+     *
+     * @return self
+     */
+    public function setDisplayName($displayName)
+    {
+        $this->displayName = $displayName;
 
         return $this;
     }
