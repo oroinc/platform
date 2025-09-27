@@ -4,6 +4,7 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier:
         name: 'Item 1'
 Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNestedObjects:
     test_entity:
+        displayName: 'display name'
         firstName: 'first name'
         lastName: 'last name'
         linked: '@test_linked1'

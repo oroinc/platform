@@ -1470,7 +1470,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
                     'type' => $entityType,
                     'id' => (string)$entity->getId(),
                     'meta' => [
-                        'title' => 'Entity 1 ' . TestRelatedEntity::class
+                        'title' => '- Entity 1 ' . TestRelatedEntity::class
                     ],
                     'attributes' => [
                         'name' => ['firstName' => null, 'lastName' => 'Entity 1']
@@ -1510,7 +1510,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
                     'type' => $entityType,
                     'id' => (string)$entity->getId(),
                     'meta' => [
-                        'title' => 'Entity 2 ' . TestRelatedEntityWithCustomId::class
+                        'title' => '- Entity 2 ' . TestRelatedEntityWithCustomId::class
                     ],
                     'attributes' => [
                         'name' => ['firstName' => null, 'lastName' => 'Entity 2']
@@ -1644,6 +1644,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
             [
                 'data' => [
                     'type' => $entityType,
+                    'attributes' => ['formatted' => ['value' => '-']],
                     'relationships' => [
                         'relatedEntity' => [
                             'data' => [
@@ -1692,6 +1693,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
             [
                 'data' => [
                     'type' => $entityType,
+                    'attributes' => ['formatted' => ['value' => '-']],
                     'relationships' => [
                         'relatedEntity' => [
                             'data' => [
@@ -1735,7 +1737,8 @@ class NestedAssociationTest extends RestJsonApiTestCase
             ['entity' => $entityType],
             [
                 'data' => [
-                    'type' => $entityType
+                    'type' => $entityType,
+                    'attributes' => ['formatted' => ['value' => '-']]
                 ]
             ]
         );
@@ -1760,7 +1763,8 @@ class NestedAssociationTest extends RestJsonApiTestCase
             ['entity' => $entityType],
             [
                 'data' => [
-                    'type' => $entityType
+                    'type' => $entityType,
+                    'attributes' => ['formatted' => ['value' => '-']]
                 ]
             ]
         );
