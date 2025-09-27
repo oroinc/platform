@@ -164,6 +164,7 @@ class TestEntitiesMigration implements
 
         $table = $schema->createTable('test_api_nested_objects');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('display_name', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('first_name', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('last_name', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('middle_name', 'string', ['notnull' => false, 'length' => 255]);

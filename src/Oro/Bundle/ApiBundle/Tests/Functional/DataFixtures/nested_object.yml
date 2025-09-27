@@ -1,5 +1,6 @@
 Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNestedObjects:
     test_entity:
+        displayName: 'display name'
         firstName: 'first name'
         lastName: 'last name'
         middleName: 'middle name'
@@ -7,6 +8,7 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNestedObje
         nameSuffix: 'name suffix'
         contactedAt: '<(new DateTime("2010-11-01 10:12:13 UTC"))>'
     test_empty_entity:
+        displayName: '-'
         firstName: ''
         lastName: ''
         middleName: ''

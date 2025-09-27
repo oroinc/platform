@@ -29,6 +29,10 @@ trait ErrorResponseStatusCodeTrait
             $statusCode = $maxGroup;
             if (\count($groupedCodes[$maxGroup]) === 1) {
                 $statusCode = reset($groupedCodes[$maxGroup]);
+            } elseif (Response::HTTP_BAD_REQUEST === $maxGroup
+                && \in_array(Response::HTTP_CONFLICT, $groupedCodes[$maxGroup], true)
+            ) {
+                $statusCode = Response::HTTP_CONFLICT;
             }
         }
 

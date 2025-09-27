@@ -34,6 +34,7 @@ class CollectFormErrors implements ProcessorInterface
     protected ConstraintTextExtractorInterface $constraintTextExtractor;
     protected ErrorCompleterRegistry $errorCompleterRegistry;
     protected PropertyAccessorInterface $propertyAccessor;
+    private ?bool $isExistingEntity = null;
 
     public function __construct(
         ConstraintTextExtractorInterface $constraintTextExtractor,
@@ -71,7 +72,9 @@ class CollectFormErrors implements ProcessorInterface
     {
         $form = $context->getForm();
         if (null !== $form && $form->isSubmitted() && !$form->isValid()) {
+            $this->isExistingEntity = $context->isExisting();
             $this->processForm($form, $context);
+            $this->isExistingEntity = null;
         }
     }
 
@@ -100,7 +103,9 @@ class CollectFormErrors implements ProcessorInterface
             $includedData = $includedEntities->getData($includedEntity);
             $includedForm = $includedData->getForm();
             if (null !== $includedForm && $includedForm->isSubmitted() && !$includedForm->isValid()) {
+                $this->isExistingEntity = $includedData->isExisting();
                 $this->processForm($includedForm, $context);
+                $this->isExistingEntity = null;
                 if ($context->hasErrors()) {
                     foreach ($context->getErrors() as $error) {
                         $errorCompleter->fixIncludedEntityPath(
@@ -147,18 +152,20 @@ class CollectFormErrors implements ProcessorInterface
     {
         /** @var FormInterface $child */
         foreach ($form as $child) {
-            if ($child->isSubmitted() && !$child->isValid()) {
-                foreach ($child->getErrors() as $error) {
-                    $errorObject = $this->createErrorObject(
-                        $error,
-                        $this->getFieldErrorPropertyPath($error, $child)
-                    );
-                    $context->addError($errorObject);
-                    $foundErrors[] = [$form, $errorObject];
-                }
-                if ($this->isCompoundForm($child)) {
-                    $this->processChildren($child, $context, $foundErrors);
-                }
+            if ($this->isExistingEntity && !($child->isSubmitted() && !$child->isValid())) {
+                continue;
+            }
+            $errors = $child->getErrors();
+            foreach ($errors as $error) {
+                $errorObject = $this->createErrorObject(
+                    $error,
+                    $this->getFieldErrorPropertyPath($error, $child)
+                );
+                $context->addError($errorObject);
+                $foundErrors[] = [$form, $errorObject];
+            }
+            if ($this->isCompoundForm($child)) {
+                $this->processChildren($child, $context, $foundErrors);
             }
         }
     }

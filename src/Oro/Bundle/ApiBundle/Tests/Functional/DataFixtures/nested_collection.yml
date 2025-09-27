@@ -10,4 +10,5 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier:
         name: 'Item 3'
 Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNestedObjects:
     test_entity:
+        displayName: 'display name'
         links: ['@test_link1', '@test_link2']

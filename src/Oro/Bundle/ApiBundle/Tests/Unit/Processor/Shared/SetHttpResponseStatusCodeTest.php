@@ -60,39 +60,47 @@ class SetHttpResponseStatusCodeTest extends GetListProcessorTestCase
     public function processHasErrorsDataProvider(): array
     {
         return [
-            'one error without code'                                                                    => [
+            'one error without code' => [
                 [
                     $this->getError()
                 ],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             ],
-            'one error'                                                                                 => [
+            'one error' => [
                 [
                     $this->getError(Response::HTTP_NOT_ACCEPTABLE)
                 ],
                 Response::HTTP_NOT_ACCEPTABLE
             ],
-            'one error (parent code of a group)'                                                        => [
+            'one error (parent code of a group)' => [
                 [
                     $this->getError(Response::HTTP_BAD_REQUEST)
                 ],
                 Response::HTTP_BAD_REQUEST
             ],
-            'several errors from one group'                                                             => [
+            'several errors from one group' => [
                 [
-                    $this->getError(Response::HTTP_NOT_ACCEPTABLE),
-                    $this->getError(Response::HTTP_CONFLICT)
+                    $this->getError(Response::HTTP_NOT_FOUND),
+                    $this->getError(Response::HTTP_NOT_ACCEPTABLE)
                 ],
                 Response::HTTP_BAD_REQUEST
             ],
-            'several errors with the same status code from one group'                                   => [
+            'several errors with the same status code from one group' => [
                 [
-                    $this->getError(Response::HTTP_CONFLICT),
+                    $this->getError(Response::HTTP_NOT_ACCEPTABLE),
+                    $this->getError(Response::HTTP_NOT_ACCEPTABLE)
+                ],
+                Response::HTTP_NOT_ACCEPTABLE
+            ],
+            'several errors from one group and one one of error is 409 (Conflict)' => [
+                [
+                    $this->getError(Response::HTTP_BAD_REQUEST),
+                    $this->getError(Response::HTTP_NOT_ACCEPTABLE),
                     $this->getError(Response::HTTP_CONFLICT)
                 ],
                 Response::HTTP_CONFLICT
             ],
-            'several errors from different groups (one error in a group with higher severity)'          => [
+            'several errors from different groups (one error in a group with higher severity)' => [
                 [
                     $this->getError(Response::HTTP_NOT_ACCEPTABLE),
                     $this->getError(Response::HTTP_CONFLICT),
@@ -108,7 +116,7 @@ class SetHttpResponseStatusCodeTest extends GetListProcessorTestCase
                 ],
                 Response::HTTP_NOT_IMPLEMENTED
             ],
-            'several errors from different groups (one error in a group with lower severity)'           => [
+            'several errors from different groups (one error in a group with lower severity)' => [
                 [
                     $this->getError(Response::HTTP_NOT_ACCEPTABLE),
                     $this->getError(Response::HTTP_SERVICE_UNAVAILABLE),
@@ -116,7 +124,7 @@ class SetHttpResponseStatusCodeTest extends GetListProcessorTestCase
                 ],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             ],
-            'several errors from different groups (one error in a group with lower severity), reverse'  => [
+            'several errors from different groups (one error in a group with lower severity), reverse' => [
                 [
                     $this->getError(Response::HTTP_SERVICE_UNAVAILABLE),
                     $this->getError(Response::HTTP_NOT_IMPLEMENTED),

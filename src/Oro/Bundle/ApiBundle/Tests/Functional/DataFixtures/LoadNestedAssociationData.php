@@ -79,6 +79,7 @@ class LoadNestedAssociationData extends AbstractFixture
         ?int $relatedId
     ): TestEntity {
         $entity = new TestEntity();
+        $entity->setDisplayName('-');
         $entity->setLastName($name);
         $entity->setRelatedClass($relatedClass);
         $entity->setRelatedId($relatedId);
