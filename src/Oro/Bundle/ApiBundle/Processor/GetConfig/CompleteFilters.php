@@ -197,8 +197,12 @@ class CompleteFilters extends CompleteSection
 
                 $field = $definition->getField($fieldName);
                 $targetDefinition = $field->getTargetEntity();
+                $targetClass = $field->getTargetClass();
                 if (null !== $targetDefinition) {
-                    $dataType = $this->getExactType($targetDefinition, $field->getTargetClass(), $dataType);
+                    $dataType = $this->getExactType($targetDefinition, $targetClass, $dataType);
+                    if ($targetClass && ExtendHelper::isOutdatedEnumOptionEntity($targetClass)) {
+                        $filter->setArrayAllowed();
+                    }
                 }
 
                 if (!$filter->hasDataType()) {
