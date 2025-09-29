@@ -80,3 +80,28 @@ data:
                 data:
                     type: regions
                     id: '<toString(@region_israel_telaviv->combinedCode)>'
+    -
+        type: addresses
+        id: '<toString(@address4->id)>'
+        attributes:
+            label: 'Address 4'
+            street: null
+            street2: null
+            city: 'Some City'
+            postalCode: null
+            organization: null
+            namePrefix: null
+            firstName: John
+            middleName: null
+            lastName: Smith
+            nameSuffix: null
+            createdAt: '@address4->created->format("Y-m-d\TH:i:s\Z")'
+            updatedAt: '@address4->updated->format("Y-m-d\TH:i:s\Z")'
+            customRegion: 'Some Region'
+        relationships:
+            country:
+                data:
+                    type: countries
+                    id: '<toString(@country_isle_of_man->iso2Code)>'
+            region:
+                data: null

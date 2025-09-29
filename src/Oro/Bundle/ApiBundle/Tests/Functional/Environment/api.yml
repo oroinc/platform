@@ -105,6 +105,15 @@ api:
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDefaultAndNull: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNestedObjects:
             fields:
+                formatted:
+                    data_type: nestedObject
+                    form_options:
+                        inherit_data: true
+                    fields:
+                        value:
+                            property_path: displayName
+                displayName:
+                    exclude: true
                 name:
                     data_type: nestedObject
                     form_options:

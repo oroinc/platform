@@ -32,8 +32,8 @@ class NestedCollectionTest extends RestJsonApiTestCase
         self::assertEquals((string)$entity->getId(), $result['data']['id']);
         self::assertArrayContains(
             [
-                ['firstName' => 'Item 1', 'lastName'  => 'item1'],
-                ['firstName' => 'Item 2', 'lastName'  => 'item2']
+                ['firstName' => 'Item 1', 'lastName' => 'item1'],
+                ['firstName' => 'Item 2', 'lastName' => 'item2']
             ],
             $result['data']['attributes']['links']
         );
@@ -46,11 +46,12 @@ class NestedCollectionTest extends RestJsonApiTestCase
 
         $data = [
             'data' => [
-                'type'       => $entityType,
+                'type' => $entityType,
                 'attributes' => [
+                    'formatted' => ['value' => '-'],
                     'links' => [
-                        ['firstName' => 'New Item 1', 'lastName'  => 'new_item1'],
-                        ['firstName' => 'New Item 2', 'lastName'  => 'new_item2']
+                        ['firstName' => 'New Item 1', 'lastName' => 'new_item1'],
+                        ['firstName' => 'New Item 2', 'lastName' => 'new_item2']
                     ]
                 ]
             ]
@@ -61,8 +62,8 @@ class NestedCollectionTest extends RestJsonApiTestCase
         $result = self::jsonToArray($response->getContent());
         self::assertArrayContains(
             [
-                ['firstName' => 'New Item 1', 'lastName'  => 'new_item1'],
-                ['firstName' => 'New Item 2', 'lastName'  => 'new_item2']
+                ['firstName' => 'New Item 1', 'lastName' => 'new_item1'],
+                ['firstName' => 'New Item 2', 'lastName' => 'new_item2']
             ],
             $result['data']['attributes']['links']
         );
@@ -86,7 +87,8 @@ class NestedCollectionTest extends RestJsonApiTestCase
 
         $data = [
             'data' => [
-                'type' => $entityType
+                'type' => $entityType,
+                'attributes' => ['formatted' => ['value' => '-']]
             ]
         ];
 
@@ -112,12 +114,12 @@ class NestedCollectionTest extends RestJsonApiTestCase
 
         $data = [
             'data' => [
-                'type'       => $entityType,
-                'id'         => (string)$entity->getId(),
+                'type' => $entityType,
+                'id' => (string)$entity->getId(),
                 'attributes' => [
                     'links' => [
-                        ['firstName' => 'New Item 2', 'lastName'  => 'new_item2'],
-                        ['firstName' => 'New Item 3', 'lastName'  => 'new_item3']
+                        ['firstName' => 'New Item 2', 'lastName' => 'new_item2'],
+                        ['firstName' => 'New Item 3', 'lastName' => 'new_item3']
                     ]
                 ]
             ]
@@ -131,8 +133,8 @@ class NestedCollectionTest extends RestJsonApiTestCase
         $result = self::jsonToArray($response->getContent());
         self::assertArrayContains(
             [
-                ['firstName' => 'New Item 2', 'lastName'  => 'new_item2'],
-                ['firstName' => 'New Item 3', 'lastName'  => 'new_item3']
+                ['firstName' => 'New Item 2', 'lastName' => 'new_item2'],
+                ['firstName' => 'New Item 3', 'lastName' => 'new_item3']
             ],
             $result['data']['attributes']['links']
         );
@@ -158,8 +160,8 @@ class NestedCollectionTest extends RestJsonApiTestCase
 
         $data = [
             'data' => [
-                'type'       => $entityType,
-                'id'         => (string)$entity->getId(),
+                'type' => $entityType,
+                'id' => (string)$entity->getId(),
                 'attributes' => [
                     'links' => []
                 ]
