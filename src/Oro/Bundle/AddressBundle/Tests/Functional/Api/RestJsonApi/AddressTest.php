@@ -7,14 +7,15 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class AddressTest extends RestJsonApiTestCase
 {
     use AddressCountryAndRegionTestTrait;
 
-    private const ENTITY_CLASS               = Address::class;
-    private const ENTITY_TYPE                = 'addresses';
-    private const IS_REGION_REQUIRED         = false;
+    private const ENTITY_CLASS = Address::class;
+    private const ENTITY_TYPE = 'addresses';
+    private const IS_REGION_REQUIRED = false;
     private const COUNTRY_REGION_ADDRESS_REF = 'address1';
 
     protected function setUp(): void
@@ -50,6 +51,16 @@ class AddressTest extends RestJsonApiTestCase
         );
 
         $this->assertResponseContains('cget_address_filter_region.yml', $response);
+    }
+
+    public function testGetListFilterByCustomRegion()
+    {
+        $response = $this->cget(
+            ['entity' => 'addresses'],
+            ['filter' => ['customRegion' => 'Some Region']]
+        );
+
+        $this->assertResponseContains('cget_address_filter_custom_region.yml', $response);
     }
 
     public function testGet()

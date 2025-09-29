@@ -33,3 +33,10 @@ Oro\Bundle\AddressBundle\Entity\Address:
         region: '@region_israel_telaviv'
         firstName: 'John'
         lastName: 'Smith'
+    address4:
+        label: 'Address 4'
+        city: 'Some City'
+        country: '@country_isle_of_man'
+        regionText: 'Some Region'
+        firstName: 'John'
+        lastName: 'Smith'
