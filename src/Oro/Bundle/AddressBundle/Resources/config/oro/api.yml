@@ -10,6 +10,10 @@ api:
                 customRegion:
                     exclude: false # set manually because this field is marked as excluded in entity.yml
                     property_path: regionText
+            filters:
+                fields:
+                    customRegion:
+                        exclude: false
 
         Oro\Bundle\AddressBundle\Entity\AddressType:
             documentation_resource: '@OroAddressBundle/Resources/doc/api/address.md'
