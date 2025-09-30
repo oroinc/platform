@@ -5,6 +5,7 @@ namespace Oro\Bundle\DistributionBundle\Handler;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
+use Psr\Log\LoggerInterface;
 
 /**
  * This service is used to find out whether the application was installed or not.
@@ -14,7 +15,8 @@ class ApplicationState
     private bool $installed = false;
 
     public function __construct(
-        private Connection $connection
+        private Connection $connection,
+        protected LoggerInterface $logger
     ) {
     }
 
@@ -28,6 +30,7 @@ class ApplicationState
                     [Types::STRING, Types::STRING]
                 );
             } catch (Exception $e) {
+                $this->logger->error('Exception during database query in application install', ['exception' => $e]);
                 $this->installed = false;
             }
         }
@@ -73,6 +76,7 @@ class ApplicationState
                 );
                 $this->installed = true;
             } catch (Exception $e) {
+                $this->logger->error('Exception during database query in application install', ['exception' => $e]);
                 $this->installed = false;
             }
         }
