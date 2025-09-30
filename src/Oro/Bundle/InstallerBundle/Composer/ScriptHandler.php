@@ -70,10 +70,17 @@ class ScriptHandler
         if (!$filesystem->exists('pnpm-lock.yaml')) {
             // Creates lock file, installs assets.
             self::pnpmInstall($event->getIO(), $options['process-timeout'], $isVerbose);
-        } else {
-            // Installs assets using lock file.
-            self::pnpmCi($event->getIO(), $options['process-timeout'], $isVerbose);
+            return;
         }
+
+        if ($filesystem->exists('../../pnpm-workspace.yaml')) {
+            // In case of monorepo we need to run pnpm install in the monorepo root
+            self::pnpmInstallMonorepo($event->getIO(), $options['process-timeout'], $isVerbose);
+            return;
+        }
+
+        // Installs assets using lock file.
+        self::pnpmCi($event->getIO(), $options['process-timeout'], $isVerbose);
     }
 
     /**
@@ -261,6 +268,24 @@ class ScriptHandler
     }
 
     /**
+     * Runs "pnpm install" and "pnpm run build --no-private" in the monorepo root,
+     */
+    private static function pnpmInstallMonorepo(
+        IOInterface $inputOutput,
+        int $timeout = 60,
+        bool $verbose = false
+    ): void {
+        $logLevel = $verbose ? 'info' : 'error';
+
+        $pnpmInstallCmd = ['pnpm', 'install', '--prefer-offline', '--loglevel', $logLevel];
+
+        $monorepoRoot = dirname(getcwd(), 2);
+        if (self::runProcess($inputOutput, $pnpmInstallCmd, $timeout, $monorepoRoot) !== 0) {
+            throw new \RuntimeException('Failed to install pnpm assets in monorepo');
+        }
+    }
+
+    /**
      * Runs "pnpm install", updates pnpm-lock.yaml, installs assets to "node_modules/"
      */
     private static function pnpmInstall(
@@ -276,11 +301,11 @@ class ScriptHandler
         }
     }
 
-    private static function runProcess(IOInterface $inputOutput, array $cmd, int $timeout): int
+    private static function runProcess(IOInterface $inputOutput, array $cmd, int $timeout, string $cwd = null): int
     {
         $inputOutput->write(implode(' ', $cmd));
 
-        $pnpmInstall = new Process($cmd, null, null, null, $timeout);
+        $pnpmInstall = new Process($cmd, $cwd, null, null, $timeout);
         $pnpmInstall->run(function ($outputType, string $data) use ($inputOutput) {
             if ($outputType === Process::OUT) {
                 $inputOutput->write($data, false);
