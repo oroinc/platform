@@ -1,7 +1,8 @@
 /* @theme: default; */
 
 .validation-failed,
-.validation-error {
+.validation-error,
+.validation-warning {
     padding: $validation-failed-inner-offset;
 
     font-size: $validation-failed-font-size;
@@ -23,7 +24,10 @@
         background: $validation-failed-icon-url;
         margin: $validation-failed-icon-offset;
     }
+}
 
+.validation-failed,
+.validation-error {
     /* Following css rule covers case when a few inputs has the same place for errors (e.g. datetime picker).
      * `id` is used to cover only auto-generated jQuery.validate labels and leave posibility to show a few messages
      * when it rendered intentionally */
@@ -34,6 +38,14 @@
 
 .validation-warning {
     @extend %base-notification-warning;
+
+    &__icon {
+        width: $validation-failed-icon-size;
+        height: $validation-failed-icon-size;
+        flex-shrink: 0;
+        background: $validation-failed-icon-url;
+        margin: $validation-failed-icon-offset;
+    }
 }
 
 .validation-passed {

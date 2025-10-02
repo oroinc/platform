@@ -14,12 +14,8 @@ use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Session;
 use Behat\MinkExtension\Context\MinkContext;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
-use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Client\FileDownloader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AppKernelAwareInterface;
@@ -3385,49 +3381,6 @@ JS;
     public function followRememberedUrl(): void
     {
         $this->visitPath($this->rememberedURL);
-    }
-
-    /**
-     * And I wait for a "oro_product.reindex_products_by_attributes" job
-     *
-     * @Then /^(?:|I )wait for a "(?P<jobName>(?:[^"]|\\")*)" job$/
-     */
-    public function waitForJobSuccess($jobName)
-    {
-        $activeJobStatuses = [Job::STATUS_NEW, Job::STATUS_RUNNING, Job::STATUS_FAILED_REDELIVERED];
-
-        /** @var ManagerRegistry $doctrine */
-        $doctrine = $this->getAppContainer()->get('doctrine');
-        /** @var Connection $connection */
-        $connection = $doctrine->getManagerForClass(Job::class)->getConnection();
-
-        $endTime = new \DateTime('+30 seconds');
-        while (true) {
-            $hasJob = $connection->fetchOne(
-                'SELECT j.id FROM oro_message_queue_job j WHERE j.name like ? LIMIT 1',
-                ['%'.$jobName.'%'],
-                [Types::STRING]
-            );
-
-            if ($hasJob) {
-                $activeJobs = $connection->fetchOne(
-                    'SELECT j.id FROM oro_message_queue_job j WHERE j.status IN (?) AND j.name like ? LIMIT 1',
-                    [$activeJobStatuses, '%'.$jobName.'%'],
-                    [Connection::PARAM_STR_ARRAY, Types::STRING]
-                );
-
-                if (!$activeJobs) {
-                    return;
-                }
-            }
-
-            usleep(100000);
-
-            $now = new \DateTime();
-            if ($now >= $endTime) {
-                break;
-            }
-        }
     }
 
     /**
