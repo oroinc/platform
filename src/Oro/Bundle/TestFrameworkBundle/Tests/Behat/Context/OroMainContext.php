@@ -1223,7 +1223,13 @@ class OroMainContext extends MinkContext implements
      *
      * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)"$/
      * @When /^(?:|I )click '(?P<button>(?:[^']|\\')*)'$/
-     *
+     */
+    public function clickButton(null|string|array|TableNode $button)
+    {
+        $this->pressButton($button);
+    }
+
+    /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     #[\Override]

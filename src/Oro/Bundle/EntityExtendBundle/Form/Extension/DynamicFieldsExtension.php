@@ -107,6 +107,10 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
                 continue;
             }
 
+            if ($this->isHiddenFieldTarget($extendConfig)) {
+                continue;
+            }
+
             $fields[$fieldName] = [
                 'priority' => $viewConfigProvider->getConfig($className, $fieldName)->get('priority', false, 0)
             ];
@@ -222,6 +226,17 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
             }
 
             return true;
+        }
+
+        return false;
+    }
+
+    private function isHiddenFieldTarget(ConfigInterface $extendConfig): bool
+    {
+        $relatedClassName = $extendConfig->get('target_entity');
+
+        if ($relatedClassName) {
+            return $this->configManager->isHiddenModel($relatedClassName);
         }
 
         return false;

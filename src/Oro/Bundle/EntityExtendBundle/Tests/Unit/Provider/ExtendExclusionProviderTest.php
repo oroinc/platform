@@ -247,6 +247,42 @@ class ExtendExclusionProviderTest extends TestCase
         );
     }
 
+    public function testIsIgnoredRelationWithTargetEntityHidden(): void
+    {
+        $metadata = new ClassMetadata(self::ENTITY_CLASS);
+
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with(self::ENTITY_CLASS)
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
+            ->method('getFieldConfig')
+            ->with('extend', self::ENTITY_CLASS, self::FIELD_NAME)
+            ->willReturn(
+                $this->getFieldConfig(
+                    self::ENTITY_CLASS,
+                    self::FIELD_NAME,
+                    ['target_entity' => 'Test\TargetEntity']
+                )
+            );
+
+        $this->configManager->expects($this->once())
+            ->method('isHiddenModel')
+            ->with('Test\TargetEntity')
+            ->willReturn(true);
+
+        $this->configManager->expects($this->never())
+            ->method('getEntityConfig')
+            ->with('extend', 'Test\TargetEntity')
+            ->willReturn(
+                $this->getEntityConfig('Test\TargetEntity')
+            );
+
+        $this->assertTrue(
+            $this->exclusionProvider->isIgnoredRelation($metadata, self::FIELD_NAME)
+        );
+    }
+
     public function testIsIgnoredRelationForDefaultFieldOfToManyRelation(): void
     {
         $metadata = new ClassMetadata(self::ENTITY_CLASS);

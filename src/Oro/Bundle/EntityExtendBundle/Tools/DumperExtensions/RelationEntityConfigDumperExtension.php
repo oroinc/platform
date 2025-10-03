@@ -37,7 +37,7 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
     #[\Override]
     public function preUpdate()
     {
-        $entityConfigs = $this->configManager->getConfigs('extend');
+        $entityConfigs = $this->configManager->getConfigs('extend', withHidden: true);
         foreach ($entityConfigs as $entityConfig) {
             if (!$entityConfig->is('is_extend')) {
                 continue;

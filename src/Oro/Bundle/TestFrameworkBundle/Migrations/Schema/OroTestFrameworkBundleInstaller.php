@@ -65,6 +65,8 @@ class OroTestFrameworkBundleInstaller implements
         $this->createTestProductTypeTable($schema);
         $this->createTestUserOwnershipTable($schema);
         $this->createTestExtendedEntityTable($schema);
+        $this->createTestExtendedHiddenEntity($schema);
+        $this->createTestExtendedEntityRelatesToHidden($schema);
 
         /** Foreign keys generation **/
         $this->addTestSearchItemForeignKeys($schema);
@@ -95,6 +97,7 @@ class OroTestFrameworkBundleInstaller implements
         $this->addOroTestFrameworkTestEntityFieldsForeignKeys($schema);
         $this->addOroTestFrameworkManyToManyRelationToTestEntityFieldsForeignKeys($schema);
         $this->addOroTestFrameworkTestEntityExtendFields($schema);
+        $this->addTestExtendedEntityRelatesToHiddenRelations($schema);
     }
 
     /**
@@ -970,6 +973,117 @@ class OroTestFrameworkBundleInstaller implements
             'string_field',
             [
                 'extend' => ['owner' => ExtendScope::OWNER_CUSTOM, 'nullable' => true, 'on_delete' => 'SET NULL']
+            ]
+        );
+    }
+
+    private function createTestExtendedHiddenEntity(Schema $schema): void
+    {
+        $table = $schema->createTable('test_extended_hidden_entity');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('name', 'string', ['length' => 255, 'notnull' => false]);
+        $table->setPrimaryKey(['id']);
+    }
+
+    private function createTestExtendedEntityRelatesToHidden(Schema $schema): void
+    {
+        $table = $schema->createTable('test_extended_entity_relates_to_hidden');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('title', 'string', ['length' => 255, 'notnull' => false]);
+        $table->setPrimaryKey(['id']);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    private function addTestExtendedEntityRelatesToHiddenRelations(Schema $schema): void
+    {
+        $this->extendExtension->addOneToManyRelation(
+            $schema,
+            'test_extended_entity_relates_to_hidden',
+            'tee_to_hidden_otm',
+            'test_extended_hidden_entity',
+            ['id'],
+            ['id'],
+            ['id'],
+            [
+                'extend' => [
+                    'owner' => ExtendScope::OWNER_CUSTOM,
+                    'orphanRemoval' => true,
+                ],
+                'entity' => [
+                    'label' => 'Test extend entity to hidden (OneToMany)',
+                    'description' => 'Related hidden entity',
+                ],
+                'view' => ['is_displayable' => true],
+                'form' => ['is_enabled' => true],
+                'importexport' => ['excluded' => false],
+            ]
+        );
+
+        $this->extendExtension->addOneToManyInverseRelation(
+            $schema,
+            'test_extended_entity_relates_to_hidden',
+            'tee_to_hidden_otm',
+            'test_extended_hidden_entity',
+            'tee_to_hidden_otm_inv',
+            'id',
+            [
+                'extend' => [
+                    'owner' => ExtendScope::OWNER_CUSTOM,
+                ],
+                'entity' => [
+                    'label' => 'Test extend entity to hidden (OneToMany Inverse)',
+                    'description' => 'Test extend entity OneToMany Inverse',
+                ],
+                'view' => ['is_displayable' => true],
+                'form' => ['is_enabled' => true],
+                'importexport' => ['excluded' => false],
+            ]
+        );
+
+        $this->extendExtension->addManyToManyRelation(
+            $schema,
+            'test_extended_entity_relates_to_hidden',
+            'tee_to_hidden_mtm',
+            'test_extended_hidden_entity',
+            ['id'],
+            ['id'],
+            ['id'],
+            [
+                'extend' => [
+                    'owner' => ExtendScope::OWNER_CUSTOM,
+                ],
+                'entity' => [
+                    'label' => 'Test extend entity to hidden (ManyToMany)',
+                    'description' => 'Test extend entity many to many',
+                ],
+                'view' => ['is_displayable' => true],
+                'form' => ['is_enabled' => true],
+                'importexport' => ['excluded' => false],
+            ]
+        );
+
+        $this->extendExtension->addManyToManyInverseRelation(
+            $schema,
+            'test_extended_entity_relates_to_hidden',
+            'tee_to_hidden_mtm',
+            'test_extended_hidden_entity',
+            'tee_to_hidden_mtm_inv',
+            ['id'],
+            ['id'],
+            ['id'],
+            [
+                'extend' => [
+                    'owner' => ExtendScope::OWNER_CUSTOM,
+                ],
+                'entity' => [
+                    'label' => 'Test extend entity to hidden (ManyToMany Inverse)',
+                    'description' => 'Related test extend entity many to many',
+                ],
+                'view' => ['is_displayable' => true],
+                'form' => ['is_enabled' => true],
+                'importexport' => ['excluded' => false],
             ]
         );
     }

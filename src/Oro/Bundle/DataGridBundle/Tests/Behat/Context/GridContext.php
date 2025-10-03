@@ -2510,7 +2510,7 @@ TEXT;
      *
      * @param string $gridName
      */
-    public function iResetGrid($gridName = null)
+    public function iResetGrid(null|string|array|TableNode $gridName = null)
     {
         $grid = $this->getGrid($gridName);
 

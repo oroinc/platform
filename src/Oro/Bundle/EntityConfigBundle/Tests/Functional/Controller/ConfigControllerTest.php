@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileItem;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestExtendedEntityRelatesToHidden;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -38,6 +39,10 @@ class ConfigControllerTest extends WebTestCase
         self::assertResponseStatusCodeEquals($response, $expectedStatusCode);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @return array[]
+     */
     public function updateActionDataProvider(): array
     {
         return [
@@ -96,6 +101,34 @@ class ConfigControllerTest extends WebTestCase
                 'routeParams' => fn (EntityConfigModel $cm) => ['id' => $cm->getFields()->current()->getId()],
                 'className' => File::class,
                 'expectedStatusCode' => Response::HTTP_FORBIDDEN,
+            ],
+            'entity try to get entity field relates to hidden one to many config update page' => [
+                'method' => 'GET',
+                'route' => 'oro_entityconfig_field_update',
+                'routeParams' => fn (EntityConfigModel $cm) => ['id' => $cm->getField('tee_to_hidden_otm')->getId()],
+                'className' => TestExtendedEntityRelatesToHidden::class,
+                'expectedStatusCode' => Response::HTTP_NOT_FOUND,
+            ],
+            'entity try to post entity field relates to hidden one to many config config update page' => [
+                'method' => 'POST',
+                'route' => 'oro_entityconfig_field_update',
+                'routeParams' => fn (EntityConfigModel $cm) => ['id' => $cm->getField('tee_to_hidden_otm')->getId()],
+                'className' => TestExtendedEntityRelatesToHidden::class,
+                'expectedStatusCode' => Response::HTTP_NOT_FOUND,
+            ],
+            'entity try to get entity field relates to hidden many to many config update page' => [
+                'method' => 'GET',
+                'route' => 'oro_entityconfig_field_update',
+                'routeParams' => fn (EntityConfigModel $cm) => ['id' => $cm->getField('tee_to_hidden_mtm')->getId()],
+                'className' => TestExtendedEntityRelatesToHidden::class,
+                'expectedStatusCode' => Response::HTTP_NOT_FOUND,
+            ],
+            'entity try to post entity field relates to hidden many to many config config update page' => [
+                'method' => 'POST',
+                'route' => 'oro_entityconfig_field_update',
+                'routeParams' => fn (EntityConfigModel $cm) => ['id' => $cm->getField('tee_to_hidden_mtm')->getId()],
+                'className' => TestExtendedEntityRelatesToHidden::class,
+                'expectedStatusCode' => Response::HTTP_NOT_FOUND,
             ]
         ];
     }

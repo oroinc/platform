@@ -130,7 +130,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|I )clear "(?P<fieldName>[\w\s]*)" textarea in form "(?P<formName>(?:[^"]|\\")*)"$/
      * @When /^(?:|I )clear "(?P<fieldName>[\w\s]*)" textarea$/
      */
-    public function iClearTextArea($fieldName, $formName = 'OroForm'): void
+    public function iClearTextArea(null|string|array|TableNode $fieldName, $formName = 'OroForm'): void
     {
         $field = $this->getFieldInForm($fieldName, $formName);
         $xpath = $field->getXpath();
