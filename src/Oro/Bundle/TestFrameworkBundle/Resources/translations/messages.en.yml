@@ -18,3 +18,11 @@ oro:
         label: Bi O2M Owner
       serialized_attribute:
         label: Serialized attribute
+    testextendedentityrelatestohidden:
+      entity_label: Test Extended Related To Hidden Entity
+      entity_plural_label: Test Extended Related To Hidden Entities
+      entity_grid_all_view_label: All Test Extended Related To Hidden Entities
+      id:
+        label: ID
+      title:
+        label: Title
