@@ -98,7 +98,7 @@ class JsLogSubscriberTest extends TestCase
     {
         return new AfterStepTested(
             $this->createMock(Environment::class),
-            new FeatureNode('Feature Example', null, [], null, [], null, null, null, 0),
+            new FeatureNode('Feature Example', null, [], null, [], '', '', null, 0),
             new StepNode('', 'Test JsLogger Mock Step', [], 0, null),
             $this->createMock(StepResult::class),
             $this->createMock(Teardown::class)
