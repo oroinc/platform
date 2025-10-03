@@ -347,6 +347,7 @@ services:
         class: Oro\Bundle\EntityExtendBundle\EventListener\UpdateEnumStructureMigrationListener
         arguments:
             - '@oro_migration.service_container'
+            - !tagged_iterator migration.update_enumerable_system_config
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -260 }
             - { name: container.service_subscriber }
@@ -947,3 +948,7 @@ services:
             - '%validator.mapping.cache.file%'
         tags:
             - { name: kernel.cache_warmer }
+
+    oro_entity_extend.migration.enumerable_config_keys_provider:
+        class: Oro\Bundle\EntityExtendBundle\Migration\Enum\UpdateEnumOptionIdsConfigKeysProvider
+        abstract: true
