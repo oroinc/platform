@@ -1,0 +1,31 @@
+api:
+    entity_aliases:
+        Oro\Bundle\TestFrameworkBundle\Entity\TestExtendedEntityRelatesToHidden:
+            alias: teer2hidden
+            plural_alias: teer2hidden
+
+    entities:
+        Oro\Bundle\TestFrameworkBundle\Entity\TestExtendedEntityRelatesToHidden:
+            disable_meta_properties: [ title ]
+            exclude: false
+            fields:
+                title:
+                    exclude: false
+                    data_type: string
+                    description: The title of TestExtendedEntityRelatesToHidden
+            actions:
+                get:
+                    description: Get TestExtendedEntityRelatesToHidden
+                    documentation: Get TestExtendedEntityRelatesToHidden
+                get_list:
+                    description: Get list of TestExtendedEntityRelatesToHidden
+                    documentation: Get list of TestExtendedEntityRelatesToHidden
+                create:
+                    description: Create TestExtendedEntityRelatesToHidden
+                    documentation: Create TestExtendedEntityRelatesToHidden
+                delete:
+                    description: Delete TestExtendedEntityRelatesToHidden
+                    documentation: Delete TestExtendedEntityRelatesToHidden
+                update:
+                    description: Update TestExtendedEntityRelatesToHidden
+                    documentation: Update TestExtendedEntityRelatesToHidden

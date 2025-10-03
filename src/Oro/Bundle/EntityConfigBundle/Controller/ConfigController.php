@@ -8,6 +8,7 @@ use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigFieldHandler;
@@ -193,6 +194,14 @@ class ConfigController extends AbstractController
     #[Template]
     public function fieldUpdateAction(FieldConfigModel $fieldConfigModel)
     {
+        $extendConfig = $fieldConfigModel->toArray('extend');
+        $targetEntity = array_key_exists('target_entity', $extendConfig) ? $extendConfig['target_entity'] : null;
+        $targetConfigModel = $targetEntity ? $this->getConfigManager()->getConfigEntityModel($targetEntity) : null;
+
+        if ($targetConfigModel?->getMode() === ConfigModel::MODE_HIDDEN) {
+            throw $this->createNotFoundException();
+        }
+
         $formAction = $this->generateUrl('oro_entityconfig_field_update', ['id' => $fieldConfigModel->getId()]);
         $successMessage = $this->getTranslator()->trans('oro.entity_config.controller.config_field.message.saved');
 

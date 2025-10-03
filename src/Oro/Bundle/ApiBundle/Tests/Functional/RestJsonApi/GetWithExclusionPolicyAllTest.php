@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestExtendedEntityRelatesToHidden;
 
 class GetWithExclusionPolicyAllTest extends RestJsonApiTestCase
 {
@@ -178,5 +179,68 @@ class GetWithExclusionPolicyAllTest extends RestJsonApiTestCase
         self::assertArrayNotHasKey('relationships', $data['included'][0], 'included.0.relationships');
         self::assertCount(1, $data['included'][1]['attributes'], 'included.1.attributes');
         self::assertArrayNotHasKey('relationships', $data['included'][1], 'included.1.relationships');
+    }
+
+    public function testGetEntityRelatesToHidden(): void
+    {
+
+        $firstItem = current($this->getTestExtendEntitties());
+
+        $response = $this->get(
+            ['entity' => 'teer2hidden', 'id' => $firstItem->getId()],
+        );
+
+        $this->assertResponseContains(
+            [
+                'data'     => [
+                    'type'          => 'teer2hidden',
+                    'id'            => (string)$firstItem->getId(),
+                    'attributes'    => [
+                        'title' => $firstItem->getTitle()
+                    ]
+                ]
+            ],
+            $response
+        );
+
+        $data = self::jsonToArray($response->getContent());
+
+        self::assertArrayNotHasKey('relationships', $data['data'], 'data.relationships');
+    }
+
+    public function testGetListEntityRelatesToHidden(): void
+    {
+        $items = $this->getTestExtendEntitties();
+        $response = $this->cget(['entity' => 'teer2hidden']);
+        $data = [];
+
+        foreach ($items as $item) {
+            $data[] = [
+                'type'          => 'teer2hidden',
+                'id'            => (string)$item->getId(),
+                'attributes'    => [
+                    'title' => $item->getTitle()
+                ]
+            ];
+        }
+
+        $this->assertResponseContains(['data' => $data], $response);
+
+        $data = self::jsonToArray($response->getContent());
+
+        foreach ($data['data'] as $key => $item) {
+            self::assertArrayNotHasKey('relationships', $item, sprintf('data.%s.relationships', $key));
+        }
+    }
+
+    /**
+     * @return array<TestExtendedEntityRelatesToHidden>
+     */
+    private function getTestExtendEntitties(): array
+    {
+        return self::getContainer()
+            ->get('doctrine')
+            ->getRepository(TestExtendedEntityRelatesToHidden::class)
+            ->findAll();
     }
 }
