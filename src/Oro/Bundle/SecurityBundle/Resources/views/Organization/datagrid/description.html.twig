@@ -11,5 +11,5 @@
             {{ value|striptags|slice(0, 50) }}...
     </span>
 {% else %}
-    {{ value|raw }}
+    {{ value }}
 {% endif %}
