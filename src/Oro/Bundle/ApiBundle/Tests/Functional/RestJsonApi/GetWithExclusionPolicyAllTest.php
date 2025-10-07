@@ -183,8 +183,11 @@ class GetWithExclusionPolicyAllTest extends RestJsonApiTestCase
 
     public function testGetEntityRelatesToHidden(): void
     {
-
-        $firstItem = current($this->getTestExtendEntitties());
+        /** @var TestExtendedEntityRelatesToHidden[] $items */
+        $items = $this->getDoctrineHelper()
+            ->getEntityRepositoryForClass(TestExtendedEntityRelatesToHidden::class)
+            ->findAll();
+        $firstItem = current($items);
 
         $response = $this->get(
             ['entity' => 'teer2hidden', 'id' => $firstItem->getId()],
@@ -202,18 +205,20 @@ class GetWithExclusionPolicyAllTest extends RestJsonApiTestCase
             ],
             $response
         );
-
         $data = self::jsonToArray($response->getContent());
-
         self::assertArrayNotHasKey('relationships', $data['data'], 'data.relationships');
     }
 
     public function testGetListEntityRelatesToHidden(): void
     {
-        $items = $this->getTestExtendEntitties();
-        $response = $this->cget(['entity' => 'teer2hidden']);
-        $data = [];
+        /** @var TestExtendedEntityRelatesToHidden[] $items */
+        $items = $this->getDoctrineHelper()
+            ->getEntityRepositoryForClass(TestExtendedEntityRelatesToHidden::class)
+            ->findAll();
 
+        $response = $this->cget(['entity' => 'teer2hidden']);
+
+        $data = [];
         foreach ($items as $item) {
             $data[] = [
                 'type'          => 'teer2hidden',
@@ -223,24 +228,10 @@ class GetWithExclusionPolicyAllTest extends RestJsonApiTestCase
                 ]
             ];
         }
-
         $this->assertResponseContains(['data' => $data], $response);
-
         $data = self::jsonToArray($response->getContent());
-
         foreach ($data['data'] as $key => $item) {
             self::assertArrayNotHasKey('relationships', $item, sprintf('data.%s.relationships', $key));
         }
-    }
-
-    /**
-     * @return array<TestExtendedEntityRelatesToHidden>
-     */
-    private function getTestExtendEntitties(): array
-    {
-        return self::getContainer()
-            ->get('doctrine')
-            ->getRepository(TestExtendedEntityRelatesToHidden::class)
-            ->findAll();
     }
 }
