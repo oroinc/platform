@@ -151,7 +151,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
     public function getActionDocumentationProvider(): array
     {
         return [
-            'known action'                     => [
+            'known action' => [
                 '<p>Description for GET_LIST action</p><p><strong>text in bold</strong></p>',
                 Entity\Account::class,
                 'get_list'
@@ -161,17 +161,17 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
                 Entity\Account::class,
                 'GET_LIST'
             ],
-            'unknown action'                   => [
+            'unknown action' => [
                 null,
                 Entity\Account::class,
                 'unknown'
             ],
-            'unknown actions group'            => [
+            'unknown actions group' => [
                 null,
                 Entity\Group::class,
                 'get'
             ],
-            'unknown class'                    => [
+            'unknown class' => [
                 null,
                 'Test\UnknownClass',
                 'get'
@@ -199,35 +199,35 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
     public function getFieldDocumentationProvider(): array
     {
         return [
-            'only common doc exists'                                               => [
+            'only common doc exists' => [
                 null,
                 Entity\Account::class,
                 'id',
                 'get'
             ],
-            'only common doc exists (requested common doc)'                        => [
+            'only common doc exists (requested common doc)' => [
                 '<p>Description for ID field</p>',
                 Entity\Account::class,
                 'id'
             ],
-            'common doc should not be used'                                        => [
+            'common doc should not be used' => [
                 null,
                 Entity\Account::class,
                 'name',
                 'get'
             ],
-            'common doc should be returned if it requested directly'               => [
+            'common doc should be returned if it requested directly' => [
                 '<p>Description for NAME field</p>',
                 Entity\Account::class,
                 'name'
             ],
-            'action doc should be used'                                            => [
+            'action doc should be used' => [
                 '<p>Description for NAME field for DELETE action</p>',
                 Entity\Account::class,
                 'name',
                 'delete'
             ],
-            'action doc should be used (the first action in #### create, update)'  => [
+            'action doc should be used (the first action in #### create, update)' => [
                 '<p>Description for NAME field for CREATE and UPDATE actions</p>',
                 Entity\Account::class,
                 'name',
@@ -239,25 +239,25 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
                 'name',
                 'update'
             ],
-            'names should be case insensitive'                                     => [
+            'names should be case insensitive' => [
                 '<p>Description for NAME field for CREATE and UPDATE actions</p>',
                 Entity\Account::class,
                 'NAME',
                 'CREATE'
             ],
-            'unknown field'                                                        => [
+            'unknown field' => [
                 null,
                 Entity\Account::class,
                 'unknown',
                 'get'
             ],
-            'unknown fields group'                                                 => [
+            'unknown fields group' => [
                 null,
                 Entity\Group::class,
                 'name',
                 'get'
             ],
-            'unknown class'                                                        => [
+            'unknown class' => [
                 null,
                 'Test\UnknownClass',
                 'name',
@@ -282,27 +282,27 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
     public function getFilterDocumentationProvider(): array
     {
         return [
-            'known filter'                     => [
-                'Description for NAME filter',
+            'known filter' => [
+                '<p>Description for NAME filter</p>',
                 Entity\Account::class,
                 'name'
             ],
             'names should be case insensitive' => [
-                'Description for NAME filter',
+                '<p>Description for NAME filter</p>',
                 Entity\Account::class,
                 'NAME'
             ],
-            'unknown field'                    => [
+            'unknown field' => [
                 null,
                 Entity\Account::class,
                 'unknown'
             ],
-            'unknown filters group'            => [
+            'unknown filters group' => [
                 null,
                 Entity\Group::class,
                 'name'
             ],
-            'unknown class'                    => [
+            'unknown class' => [
                 null,
                 'Test\UnknownClass',
                 'name'
@@ -330,7 +330,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
     public function getSubresourceDocumentationProvider(): array
     {
         return [
-            'known sub-resource'               => [
+            'known sub-resource' => [
                 '<p>Description for <em>contacts GET_SUBRESOURCE</em> sub-resource</p>',
                 Entity\Account::class,
                 'contacts',
@@ -342,19 +342,19 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
                 'CONTACTS',
                 'GET_SUBRESOURCE'
             ],
-            'unknown sub-resource'             => [
+            'unknown sub-resource' => [
                 null,
                 Entity\Account::class,
                 'unknown',
                 'get_subresource'
             ],
-            'unknown subresources group'       => [
+            'unknown subresources group' => [
                 null,
                 Entity\Group::class,
                 'contacts',
                 'get_subresource'
             ],
-            'unknown class'                    => [
+            'unknown class' => [
                 null,
                 'Test\UnknownClass',
                 'contacts',
