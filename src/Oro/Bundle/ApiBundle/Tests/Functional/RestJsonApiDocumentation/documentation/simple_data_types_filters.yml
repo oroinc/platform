@@ -4,7 +4,7 @@ filters:
         type: 'bigint or array or range'
         operators: 'eq,neq,lt,lte,gt,gte,exists,neq_or_null'
     'filter[fieldBoolean]':
-        requirement: '0|1|true|false|yes|no'
+        requirement: '0|1|true|True|false|False|yes|Yes|no|No'
         type: 'boolean'
         operators: 'eq,neq,exists,neq_or_null'
     'filter[fieldCurrency]':

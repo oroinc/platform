@@ -8,7 +8,7 @@ namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
  */
 class NormalizeBoolean extends AbstractProcessor
 {
-    public const REQUIREMENT = '0|1|true|false|yes|no';
+    public const REQUIREMENT = '0|1|true|True|false|False|yes|Yes|no|No';
 
     /**
      * {@inheritdoc}
@@ -36,17 +36,22 @@ class NormalizeBoolean extends AbstractProcessor
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function normalizeValue(mixed $value): mixed
     {
         switch ($value) {
-            case '1':
             case 'true':
+            case 'True':
             case 'yes':
+            case 'Yes':
+            case '1':
                 return true;
-            case '0':
             case 'false':
+            case 'False':
             case 'no':
+            case 'No':
+            case '0':
                 return false;
         }
 
