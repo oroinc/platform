@@ -28,6 +28,7 @@ class OroApiBundle extends Bundle
     {
         parent::build($container);
 
+        $container->addCompilerPass(new Compiler\JsonStatusCodeErrorRendererCompilerPass());
         $container->addCompilerPass(new Compiler\ProcessorBagCompilerPass());
         $container->addCompilerPass(new Compiler\ResourceCheckerRegistryPass());
         $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(

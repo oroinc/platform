@@ -12,6 +12,7 @@ class ApiRequestHelperTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->apiRequestHelper = new ApiRequestHelper('^/api/(?!(rest|doc)($|/.*))');
+        $this->apiRequestHelper->addApiPattern('^/another_api/(?!(rest|doc)($|/.*))');
     }
 
     /**
@@ -29,7 +30,8 @@ class ApiRequestHelperTest extends \PHPUnit\Framework\TestCase
     {
         return [
             ['/product/view/1', false],
-            ['/api/products/1', true]
+            ['/api/products/1', true],
+            ['/another_api/products/1', true]
         ];
     }
 }

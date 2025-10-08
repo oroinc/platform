@@ -47,6 +47,7 @@ fos_rest:
             json: fos_rest.decoder.json
     view:
         failed_validation: HTTP_BAD_REQUEST
+        mime_types: {'json': ['application/json', 'application/x-json']}
         formats:
             json: true
             xml: false

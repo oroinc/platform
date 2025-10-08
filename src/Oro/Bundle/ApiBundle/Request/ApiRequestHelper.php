@@ -7,11 +7,16 @@ namespace Oro\Bundle\ApiBundle\Request;
  */
 class ApiRequestHelper
 {
-    private string $apiPattern;
+    private array $apiPatterns = [];
 
     public function __construct(string $apiPattern)
     {
-        $this->apiPattern = $apiPattern;
+        $this->addApiPattern($apiPattern);
+    }
+
+    public function addApiPattern(string $apiPattern)
+    {
+        $this->apiPatterns[] = $apiPattern;
     }
 
     /**
@@ -24,6 +29,12 @@ class ApiRequestHelper
      */
     public function isApiRequest(string $pathinfo): bool
     {
-        return preg_match('{' . $this->apiPattern . '}', $pathinfo) === 1;
+        foreach ($this->apiPatterns as $apiPattern) {
+            if (preg_match('{' . $apiPattern . '}', $pathinfo) === 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -12,8 +12,6 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetResponseContentType implements ProcessorInterface
 {
-    private const JSON_API_MEDIA_TYPE = 'application/vnd.api+json';
-
     /**
      * {@inheritdoc}
      */
@@ -23,7 +21,7 @@ class SetResponseContentType implements ProcessorInterface
 
         $responseHeaders = $context->getResponseHeaders();
         if (!$responseHeaders->has('Content-Type')) {
-            $context->getResponseHeaders()->set('Content-Type', self::JSON_API_MEDIA_TYPE);
+            $context->getResponseHeaders()->set('Content-Type', 'application/vnd.api+json');
         }
     }
 }
