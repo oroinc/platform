@@ -134,28 +134,8 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $container->setParameter(self::REST_API_PREFIX_PARAMETER_NAME, $config[self::REST_API_PREFIX_CONFIG]);
         $container->setParameter(self::REST_API_PATTERN_PARAMETER_NAME, $config[self::REST_API_PATTERN_CONFIG]);
 
+        $this->modifyFosRestConfig($container);
         $this->configureBatchApiLock($container);
-
-        if ($container instanceof ExtendedContainerBuilder) {
-            $configs = $container->getExtensionConfig('fos_rest');
-            foreach ($configs as $key => $config) {
-                if (isset($config['format_listener']['rules']) && \is_array($config['format_listener']['rules'])) {
-                    // add REST API format listener rule
-                    /** @noinspection PhpArrayAccessCanBeReplacedWithForeachValueInspection */
-                    array_unshift(
-                        $configs[$key]['format_listener']['rules'],
-                        [
-                            'path'             => '%' . self::REST_API_PATTERN_PARAMETER_NAME . '%',
-                            'priorities'       => ['json'],
-                            'fallback_format'  => 'json',
-                            'prefer_extension' => false
-                        ]
-                    );
-                    break;
-                }
-            }
-            $container->setExtensionConfig('fos_rest', $configs);
-        }
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $fileLocator = new FileLocator(__DIR__ . '/../Tests/Functional/Environment');
@@ -164,6 +144,33 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
                 $container->prependExtensionConfig($name, $config);
             }
         }
+    }
+
+    private function modifyFosRestConfig(ContainerBuilder $container): void
+    {
+        if (!$container instanceof ExtendedContainerBuilder) {
+            return;
+        }
+
+        $configs = $container->getExtensionConfig('fos_rest');
+        foreach ($configs as $key => $config) {
+            if (isset($config['format_listener']['rules']) && \is_array($config['format_listener']['rules'])) {
+                // add REST API format listener rule
+                /** @noinspection PhpArrayAccessCanBeReplacedWithForeachValueInspection */
+                array_unshift(
+                    $configs[$key]['format_listener']['rules'],
+                    [
+                        'path' => '%' . self::REST_API_PATTERN_PARAMETER_NAME . '%',
+                        'priorities' => ['json'],
+                        'fallback_format' => 'json',
+                        'prefer_extension' => false
+                    ]
+                );
+                break;
+            }
+        }
+        $configs[] = ['view' => ['mime_types' => ['json' => 'application/vnd.api+json']]];
+        $container->setExtensionConfig('fos_rest', $configs);
     }
 
     private function configureBatchApiLock(ContainerBuilder $container): void
