@@ -100,7 +100,7 @@
                                         {% for key, value in infos %}
                                             <tr>
                                                 <td>{{ key|title }}</td>
-                                                <td>{{ value|json_encode(constant('JSON_UNESCAPED_UNICODE'))|replace({'\\\\': '\\'})|trim('"') }}</td>
+                                                <td>{{ 'description' == key ? value|extra_markdown : value|json_encode(constant('JSON_UNESCAPED_UNICODE'))|replace({'\\\\': '\\'})|trim('"') }}</td>
                                             </tr>
                                         {% endfor %}
                                     </table>

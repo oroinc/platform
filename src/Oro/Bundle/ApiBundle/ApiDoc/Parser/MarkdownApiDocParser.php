@@ -229,11 +229,7 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
             if (!isset($this->loadedData[$className][$section][$element])) {
                 $this->loadedData[$className][$section][$element] = '';
             }
-            if (ConfigUtil::FILTERS === $section) {
-                $this->loadedData[$className][$section][$element] .= $node->nodeValue;
-            } else {
-                $this->loadedData[$className][$section][$element] .= $doc->saveHTML($node);
-            }
+            $this->loadedData[$className][$section][$element] .= $doc->saveHTML($node);
         } else {
             if (!isset($this->loadedData[$className][$section][$element])) {
                 $this->loadedData[$className][$section][$element] = [];
