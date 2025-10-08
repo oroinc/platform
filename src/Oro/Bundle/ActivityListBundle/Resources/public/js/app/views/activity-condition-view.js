@@ -128,7 +128,7 @@ define(function(require) {
             const newEntity = this.TYPE_CHOICE_ENTITY;
 
             if (oldEntity !== newEntity) {
-                this.subview('choice-input').setValue('');
+                this.subview('choice-input').setValue('', false);
                 this.$filterContainer.empty();
                 if (this.filter) {
                     this.filter.reset();

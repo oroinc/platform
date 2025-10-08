@@ -9,6 +9,7 @@ const MultiselectDropdownViewModel = MultiSelectViewModel.extend({
         dropdownMenuLabel: null,
         dropdownPlacement: 'bottom-start',
         dropdownAriaLabel: null,
+        dropdownDisablePopper: false,
         tooltipTitle: null,
         tooltipPlacement: 'top-center',
         enabledTooltip: true,

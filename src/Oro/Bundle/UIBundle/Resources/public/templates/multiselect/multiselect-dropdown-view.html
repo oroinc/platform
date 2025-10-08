@@ -8,6 +8,7 @@
         data-prevent-close-on-menu-click="true"
         aria-expanded="false"
         data-placement="<%- dropdownPlacement %>"
+        <% if (dropdownDisablePopper) { %>data-popper="false"<% } %>
         <% if (tooltipTitle) { %>title="<%- tooltipTitle %>"<% } else if (dropdownMenuLabel) { %>title="<%- dropdownMenuLabel %>"<% } %>
         <% if (dropdownAriaLabel) { %>aria-label="<%- dropdownAriaLabel %>" <% } %>
     >

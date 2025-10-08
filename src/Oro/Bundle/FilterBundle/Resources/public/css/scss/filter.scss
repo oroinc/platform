@@ -81,6 +81,11 @@
             }
         }
 
+        &:has(.multiselect-filter),
+        &:has(.select-filter) {
+            padding: 16px 0 6px;
+        }
+
         .choice-filter,
         .value-field-frame,
         .filter-value,
@@ -446,10 +451,19 @@
         background: $filter-multiselect-background;
         border: $filter-multiselect-border;
         margin-left: $filter-multiselect-offset-left;
+
+        span {
+            max-width: 250px;
+            display: inline-block;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            vertical-align: bottom;
+        }
     }
 
-    &.filter-default-value .multiselect-filter-widget {
-        display: $filter-multiselect-filter-widget-display;
+    .multiselect__dropdown-menu {
+        padding: 0;
     }
 }
 
