@@ -13,10 +13,10 @@ Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account:
       update: '<p>Description for NAME field for CREATE and UPDATE actions</p>'
       delete: '<p>Description for NAME field for DELETE action</p>'
   filters:
-    id: 'Description for ID filter'
-    name: 'Description for NAME filter'
-    createdat: 'Description for CREATEDAT filter'
-    updatedat: 'Description for UPDATEDAT filter'
+    id: '<p>Description for ID filter</p>'
+    name: '<p>Description for NAME filter</p>'
+    createdat: '<p>Description for CREATEDAT filter</p>'
+    updatedat: '<p>Description for UPDATEDAT filter</p>'
   subresources:
     contacts:
         get_subresource: '<p>Description for <em>contacts GET_SUBRESOURCE</em> sub-resource</p>'

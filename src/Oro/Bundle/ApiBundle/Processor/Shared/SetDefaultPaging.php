@@ -74,7 +74,7 @@ class SetDefaultPaging implements ProcessorInterface
                 $filterName,
                 new PageSizeFilter(
                     DataType::INTEGER,
-                    'The number of items per page.',
+                    'The number of records per page.',
                     $pageSize ?? $this->defaultPageSize
                 ),
                 false
