@@ -42,7 +42,31 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildMetaPropertyName(): void
     {
-        self::assertEquals('__name__', ConfigUtil::buildMetaPropertyName('name'));
+        self::assertEquals('_name_', ConfigUtil::buildMetaPropertyName('name'));
+    }
+
+    public function testBuildRequiredMetaPropertyName(): void
+    {
+        self::assertEquals('__name__', ConfigUtil::buildRequiredMetaPropertyName('name'));
+    }
+
+    /**
+     * @dataProvider isRequiredMetaPropertyDataProvider
+     */
+    public function testIsRequiredMetaProperty(string $name, bool $isRequired): void
+    {
+        self::assertSame($isRequired, ConfigUtil::isRequiredMetaProperty($name));
+    }
+
+    public static function isRequiredMetaPropertyDataProvider(): array
+    {
+        return [
+            ['__name__', true],
+            ['__name', false],
+            ['name__', false],
+            ['_name_', false],
+            ['name', false]
+        ];
     }
 
     public function testGetPropertyPathOfMetaPropertyForEmptyConfig(): void
@@ -55,7 +79,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
     public function testGetPropertyPathOfMetaPropertyWhenMetaPropertyDoesNotExist(): void
     {
         $config = new EntityDefinitionConfig();
-        $config->addField('__field1__')->setMetaProperty(true);
+        $config->addField('_field1_')->setMetaProperty(true);
 
         self::assertNull(ConfigUtil::getPropertyPathOfMetaProperty('field2', $config));
     }
@@ -63,7 +87,7 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
     public function testGetPropertyPathOfMetaPropertyWhenFoundItemIsFieldNotMetaProperty(): void
     {
         $config = new EntityDefinitionConfig();
-        $config->addField('__field1__');
+        $config->addField('_field1_');
 
         self::assertNull(ConfigUtil::getPropertyPathOfMetaProperty('field1', $config));
     }
@@ -71,9 +95,9 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
     public function testGetPropertyPathOfMetaPropertyForExistingMetaProperty(): void
     {
         $config = new EntityDefinitionConfig();
-        $config->addField('__field1__')->setMetaProperty(true);
+        $config->addField('_field1_')->setMetaProperty(true);
 
-        self::assertEquals('__field1__', ConfigUtil::getPropertyPathOfMetaProperty('field1', $config));
+        self::assertEquals('_field1_', ConfigUtil::getPropertyPathOfMetaProperty('field1', $config));
     }
 
     public function testGetPropertyPathOfMetaPropertyForExistingMetaPropertyWithPropertyPath(): void
@@ -81,15 +105,15 @@ class ConfigUtilTest extends \PHPUnit\Framework\TestCase
         $config = new EntityDefinitionConfig();
         $field = $config->addField('someField');
         $field->setMetaProperty(true);
-        $field->setPropertyPath('__field1__');
+        $field->setPropertyPath('_field1_');
 
-        self::assertEquals('__field1__', ConfigUtil::getPropertyPathOfMetaProperty('field1', $config));
+        self::assertEquals('_field1_', ConfigUtil::getPropertyPathOfMetaProperty('field1', $config));
     }
 
     public function testGetPropertyPathOfMetaPropertyForExistingExcludedMetaProperty(): void
     {
         $config = new EntityDefinitionConfig();
-        $field = $config->addField('__field1__');
+        $field = $config->addField('_field1_');
         $field->setMetaProperty(true);
         $field->setExcluded();
 

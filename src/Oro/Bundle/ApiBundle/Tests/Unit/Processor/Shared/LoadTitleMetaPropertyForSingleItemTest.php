@@ -70,7 +70,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 
     private function addTitleMetaProperty(EntityDefinitionConfig $config)
     {
-        $titleField = $config->addField('__title__');
+        $titleField = $config->addField('_title_');
         $titleField->setMetaProperty(true);
         $titleField->setMetaPropertyResultName('title');
     }
@@ -147,7 +147,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertEquals(
-            ['id' => 123, '__title__' => 'title 123'],
+            ['id' => 123, '_title_' => 'title 123'],
             $this->context->getResult()
         );
         self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
@@ -212,11 +212,11 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         self::assertEquals(
             [
                 'id' => 123,
-                '__title__' => 'title 123',
+                '_title_' => 'title 123',
                 'association' => [
                     'id' => 1,
                     'name' => 'association 1',
-                    '__title__' => 'association title 1'
+                    '_title_' => 'association title 1'
                 ]
             ],
             $this->context->getResult()
@@ -275,7 +275,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         self::assertEquals(
             [
                 'id' => 123,
-                '__title__' => 'title 123',
+                '_title_' => 'title 123',
                 'association' => [
                     'id' => 1,
                     'name' => 'association 1'
@@ -322,7 +322,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertEquals(
-            ['id' => 123, '__title__' => 'title 123'],
+            ['id' => 123, '_title_' => 'title 123'],
             $this->context->getResult()
         );
         self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
@@ -387,11 +387,11 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         self::assertEquals(
             [
                 'renamedId' => 123,
-                '__title__' => 'title 123',
+                '_title_' => 'title 123',
                 'association' => [
                     'associationRenamedId' => 1,
                     'name' => 'association 1',
-                    '__title__' => 'association title 1'
+                    '_title_' => 'association title 1'
                 ]
             ],
             $this->context->getResult()
@@ -457,11 +457,11 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         self::assertEquals(
             [
                 'id' => 123,
-                '__title__' => 'title 123',
+                '_title_' => 'title 123',
                 'association' => [
                     'associationId' => 1,
                     'name' => 'association 1',
-                    '__title__' => 'association title 1'
+                    '_title_' => 'association title 1'
                 ]
             ],
             $this->context->getResult()
@@ -519,7 +519,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         self::assertEquals(
             [
                 'id' => 123,
-                '__title__' => 'title 123',
+                '_title_' => 'title 123',
                 'association' => [
                     'associationId' => 1,
                     'name' => 'association 1'
@@ -603,12 +603,12 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             [
                 'renamedId1' => 1,
                 'id2' => 2,
-                '__title__' => 'title 123',
+                '_title_' => 'title 123',
                 'association' => [
                     'associationRenamedId1' => 11,
                     'associationId2' => 22,
                     'name' => 'association 1',
-                    '__title__' => 'association title 1'
+                    '_title_' => 'association title 1'
                 ]
             ],
             $this->context->getResult()
@@ -720,16 +720,16 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         self::assertEquals(
             [
                 'id' => 123,
-                '__title__' => 'title 123',
+                '_title_' => 'title 123',
                 'association' => [
                     'id' => 1,
                     '__class__' => 'Test\TargetEntity1',
                     'name' => 'association 1',
-                    '__title__' => 'association title 1',
+                    '_title_' => 'association title 1',
                     'nestedAssociation' => [
                         'id' => 11,
                         'name' => 'nested association 1',
-                        '__title__' => 'nested association title 1'
+                        '_title_' => 'nested association title 1'
                     ]
                 ]
             ],
@@ -842,16 +842,16 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         self::assertEquals(
             [
                 'id' => 123,
-                '__title__' => 'title 123',
+                '_title_' => 'title 123',
                 'association' => [
                     'renamedId' => 1,
                     '__class__' => 'Test\TargetEntity1',
                     'name' => 'association 1',
-                    '__title__' => 'association title 1',
+                    '_title_' => 'association title 1',
                     'nestedAssociation' => [
                         'id' => 11,
                         'name' => 'nested association 1',
-                        '__title__' => 'nested association title 1'
+                        '_title_' => 'nested association title 1'
                     ]
                 ]
             ],

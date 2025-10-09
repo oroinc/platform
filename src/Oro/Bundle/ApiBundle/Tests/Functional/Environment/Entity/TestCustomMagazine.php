@@ -33,6 +33,9 @@ class TestCustomMagazine implements TestFrameworkEntityInterface
     #[ORM\JoinColumn(name: 'best_article_id', referencedColumnName: 'id')]
     private ?TestCustomArticle $bestArticle = null;
 
+    #[ORM\Column(name: 'issue_date', type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $issueDate = null;
+
     public function __construct()
     {
         $this->articles = new ArrayCollection();
@@ -106,5 +109,21 @@ class TestCustomMagazine implements TestFrameworkEntityInterface
     public function setBestArticle($bestArticle)
     {
         $this->bestArticle = $bestArticle;
+    }
+
+    /**
+     * @return \DateTimeInterface|null
+     */
+    public function getIssueDate()
+    {
+        return $this->issueDate;
+    }
+
+    /**
+     * @param \DateTimeInterface|null $issueDate
+     */
+    public function setIssueDate($issueDate)
+    {
+        $this->issueDate = $issueDate;
     }
 }

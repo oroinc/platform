@@ -95,7 +95,8 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
     {
         parent::configureFieldNode($node);
         $node
-            ->booleanNode(ConfigUtil::META_PROPERTY)->end();
+            ->booleanNode(ConfigUtil::META_PROPERTY)->end()
+            ->scalarNode(ConfigUtil::META_PROPERTY_RESULT_NAME)->end();
     }
 
     private function appendArrayOfNotEmptyStrings(NodeBuilder $node, string $name): void

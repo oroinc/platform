@@ -73,7 +73,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -88,11 +88,11 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             [
                 'fields' => [
                     'association1' => [
-                        'target_class'           => 'Test\Association1Target',
-                        'exclusion_policy'       => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'exclusion_policy' => 'all',
                         'identifier_field_names' => ['id'],
-                        'collapse'               => true,
-                        'fields'                 => [
+                        'collapse' => true,
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -142,7 +142,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             'fields' => [
                 'association1' => [
                     'target_class' => 'Test\Association1Target',
-                    'target_type'  => 'to-many'
+                    'target_type' => 'to-many'
                 ]
             ]
         ]);
@@ -157,7 +157,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -172,12 +172,12 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             [
                 'fields' => [
                     'association1' => [
-                        'target_class'           => 'Test\Association1Target',
-                        'target_type'            => 'to-many',
-                        'exclusion_policy'       => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-many',
+                        'exclusion_policy' => 'all',
                         'identifier_field_names' => ['id'],
-                        'collapse'               => true,
-                        'fields'                 => [
+                        'collapse' => true,
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -195,7 +195,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             'fields' => [
                 'association1' => [
                     'target_class' => 'Test\Association1Target',
-                    'data_type'    => 'string'
+                    'data_type' => 'string'
                 ]
             ]
         ]);
@@ -210,7 +210,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -225,12 +225,12 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             [
                 'fields' => [
                     'association1' => [
-                        'target_class'           => 'Test\Association1Target',
-                        'data_type'              => 'string',
-                        'exclusion_policy'       => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'data_type' => 'string',
+                        'exclusion_policy' => 'all',
                         'identifier_field_names' => ['id'],
-                        'collapse'               => true,
-                        'fields'                 => [
+                        'collapse' => true,
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -248,7 +248,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             'fields' => [
                 'association1' => [
                     'target_class' => 'Test\Association1Target',
-                    'data_type'    => 'string'
+                    'data_type' => 'string'
                 ]
             ]
         ]);
@@ -263,7 +263,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id1', 'id2'],
-                        'fields'                 => [
+                        'fields' => [
                             'id1' => [
                                 'data_type' => 'integer'
                             ],
@@ -281,12 +281,12 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             [
                 'fields' => [
                     'association1' => [
-                        'target_class'           => 'Test\Association1Target',
-                        'data_type'              => 'string',
-                        'exclusion_policy'       => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'data_type' => 'string',
+                        'exclusion_policy' => 'all',
                         'identifier_field_names' => ['id1', 'id2'],
-                        'collapse'               => true,
-                        'fields'                 => [
+                        'collapse' => true,
+                        'fields' => [
                             'id1' => [
                                 'data_type' => 'integer'
                             ],
@@ -305,17 +305,32 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'identifier_field_names' => ['id'],
-            'fields'                 => [
-                'id'        => null,
+            'fields' => [
+                'id' => null,
                 '__class__' => [
                     'meta_property' => true,
-                    'data_type'     => 'string'
+                    'data_type' => 'string'
                 ],
-                'field1'    => null,
-                'field2'    => [
+                'requiredMetaProperty1' => [
+                    'meta_property' => true,
+                    'property_path' => '__requited_meta_property_1__'
+                ],
+                '__requited_meta_property_2__' => [
+                    'meta_property' => true,
+                    'property_path' => 'requiredMetaProperty2'
+                ],
+                'metaProperty1' => [
+                    'meta_property' => true
+                ],
+                'metaProperty2' => [
+                    'meta_property' => true,
+                    'property_path' => 'meta_property_2'
+                ],
+                'field1' => null,
+                'field2' => [
                     'exclude' => true
                 ],
-                'field3'    => [
+                'field3' => [
                     'property_path' => 'realField3'
                 ]
             ]
@@ -330,11 +345,19 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'        => null,
+                'fields' => [
+                    'id' => null,
                     '__class__' => [
                         'meta_property' => true,
-                        'data_type'     => 'string'
+                        'data_type' => 'string'
+                    ],
+                    'requiredMetaProperty1' => [
+                        'meta_property' => true,
+                        'property_path' => '__requited_meta_property_1__'
+                    ],
+                    '__requited_meta_property_2__' => [
+                        'meta_property' => true,
+                        'property_path' => 'requiredMetaProperty2'
                     ]
                 ]
             ],
@@ -346,7 +369,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'identifier_field_names' => ['renamedId'],
-            'fields'                 => [
+            'fields' => [
                 'renamedId' => [
                     'property_path' => 'name'
                 ]
@@ -362,7 +385,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['renamedId'],
-                'fields'                 => [
+                'fields' => [
                     'renamedId' => [
                         'property_path' => 'name'
                     ]

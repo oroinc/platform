@@ -244,9 +244,19 @@ class CompleteEntityDefinitionHelper
         // remove all not identifier fields
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            if (!$field->isMetaProperty() && !\in_array($field->getPropertyPath($fieldName), $idFieldNames, true)) {
-                $definition->removeField($fieldName);
+            $propertyPath = $field->getPropertyPath($fieldName);
+            if (\in_array($propertyPath, $idFieldNames, true)
+                || (
+                    $field->isMetaProperty()
+                    && (
+                        ConfigUtil::isRequiredMetaProperty($fieldName)
+                        || ConfigUtil::isRequiredMetaProperty($propertyPath)
+                    )
+                )
+            ) {
+                continue;
             }
+            $definition->removeField($fieldName);
         }
         // make sure all identifier fields are added
         foreach ($idFieldNames as $propertyPath) {
