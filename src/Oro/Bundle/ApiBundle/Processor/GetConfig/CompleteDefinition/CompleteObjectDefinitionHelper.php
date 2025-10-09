@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
@@ -37,11 +38,20 @@ class CompleteObjectDefinitionHelper
         $idFieldNames = $definition->getIdentifierFieldNames();
         $fieldNames = array_keys($definition->getFields());
         foreach ($fieldNames as $fieldName) {
-            if (!\in_array($fieldName, $idFieldNames, true)
-                && !$definition->getField($fieldName)->isMetaProperty()
+            /** @var EntityDefinitionFieldConfig $field */
+            $field = $definition->getField($fieldName);
+            if (\in_array($fieldName, $idFieldNames, true)
+                || (
+                    $field->isMetaProperty()
+                    && (
+                        ConfigUtil::isRequiredMetaProperty($fieldName)
+                        || ConfigUtil::isRequiredMetaProperty($field->getPropertyPath($fieldName))
+                    )
+                )
             ) {
-                $definition->removeField($fieldName);
+                continue;
             }
+            $definition->removeField($fieldName);
         }
     }
 
