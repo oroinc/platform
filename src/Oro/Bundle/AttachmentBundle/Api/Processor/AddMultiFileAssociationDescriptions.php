@@ -113,7 +113,7 @@ class AddMultiFileAssociationDescriptions implements ProcessorInterface
                     $definition->findFieldByPath($associationName, true)?->getDescription()
                 );
                 $hasSortOrder = $associationDefinition->getTargetEntity()
-                    ?->hasField(ConfigUtil::buildMetaPropertyName(self::SORT_ORDER));
+                    ?->hasField(ConfigUtil::buildRequiredMetaPropertyName(self::SORT_ORDER));
                 if ($hasSortOrder) {
                     $associationDocumentation = FieldDescriptionUtil::addFieldNote(
                         $associationDocumentation,

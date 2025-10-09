@@ -144,7 +144,7 @@ class AddMultiFileAssociations implements ProcessorInterface
         EntityDefinitionConfig $definition,
         string $propertyPath
     ): EntityDefinitionFieldConfig {
-        $sortOrderMetaProperty = $definition->addField(ConfigUtil::buildMetaPropertyName(self::SORT_ORDER));
+        $sortOrderMetaProperty = $definition->addField(ConfigUtil::buildRequiredMetaPropertyName(self::SORT_ORDER));
         $sortOrderMetaProperty->setMetaProperty(true);
         $sortOrderMetaProperty->setDataType(DataType::INTEGER);
         $sortOrderMetaProperty->setPropertyPath($propertyPath);
