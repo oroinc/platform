@@ -1,0 +1,11 @@
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomArticle:
+    article1:
+        headline: 'Article 1'
+        body: 'Article 1 Body'
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomMagazine:
+    magazine1:
+        name: 'Magazine 1'
+        articles: ['@article1']
+        bestArticle: '@article1'
+        issueDate: '<(new \DateTime("2025-02-20", new \DateTimeZone("UTC")))>'

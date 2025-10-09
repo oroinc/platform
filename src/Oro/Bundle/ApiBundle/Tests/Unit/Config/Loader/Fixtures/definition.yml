@@ -293,11 +293,17 @@ field_meta_property:
                 meta_property: true
             field2:
                 meta_property: false
+            field3:
+                meta_property: true
+                meta_property_result_name: resultField3
     expected:
         fields:
             field1:
                 meta_property: true
             field2: ~
+            field3:
+                meta_property: true
+                meta_property_result_name: resultField3
 
 field_property_data_type:
     config:

@@ -21,6 +21,9 @@ class TestCustomArticle implements TestFrameworkEntityInterface
     #[ORM\Column(name: 'body', type: Types::TEXT, nullable: true)]
     private ?string $body = null;
 
+    #[ORM\Column(name: 'body_length', type: Types::INTEGER)]
+    private int $bodyLength = 0;
+
     /**
      * @return int
      */
@@ -59,5 +62,22 @@ class TestCustomArticle implements TestFrameworkEntityInterface
     public function setBody($body)
     {
         $this->body = $body;
+        $this->bodyLength = $body ? \strlen($body) : 0;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getBodyLength()
+    {
+        return $this->bodyLength;
+    }
+
+    /**
+     * @param int|null $bodyLength
+     */
+    public function setBodyLength($bodyLength)
+    {
+        $this->bodyLength = $bodyLength;
     }
 }
