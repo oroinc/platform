@@ -14,8 +14,8 @@ use Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -31,13 +31,13 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     const FULL_MODE = 'full';
     const SHORT_MODE = 'short';
 
-    /** @var SerializerInterface|ContextAwareNormalizerInterface|ContextAwareDenormalizerInterface */
+    /** @var SerializerInterface|NormalizerInterface|DenormalizerInterface */
     protected $serializer;
 
     /** @var FieldHelper */
     protected $fieldHelper;
 
-    /** @var ContextAwareDenormalizerInterface */
+    /** @var DenormalizerInterface */
     protected $scalarFieldDenormalizer;
 
     protected EnumOptionsProvider $enumOptionsProvider;
@@ -54,7 +54,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         parent::__construct([self::FULL_MODE, self::SHORT_MODE], self::FULL_MODE);
     }
 
-    public function setScalarFieldDenormalizer(ContextAwareDenormalizerInterface $scalarFieldDenormalizer): void
+    public function setScalarFieldDenormalizer(DenormalizerInterface $scalarFieldDenormalizer): void
     {
         $this->scalarFieldDenormalizer = $scalarFieldDenormalizer;
     }
@@ -75,7 +75,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     }
 
     #[\Override]
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         $event = $this->dispatchDenormalize($data, $this->createObject($type), Events::BEFORE_DENORMALIZE_ENTITY);
         $result = $event->getObject();
@@ -129,8 +129,11 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      *
      */
     #[\Override]
-    public function normalize($object, ?string $format = null, array $context = [])
-    {
+    public function normalize(
+        mixed $object,
+        ?string $format = null,
+        array $context = []
+    ): float|int|bool|\ArrayObject|array|string|null {
         $entityName = ClassUtils::getClass($object);
         $fields = $this->fieldHelper->getEntityFields($entityName, EntityFieldProvider::OPTION_WITH_RELATIONS);
 
@@ -192,15 +195,15 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     }
 
     #[\Override]
-    public function setSerializer(SerializerInterface $serializer)
+    public function setSerializer(SerializerInterface $serializer): void
     {
-        if (!$serializer instanceof ContextAwareNormalizerInterface ||
-            !$serializer instanceof ContextAwareDenormalizerInterface) {
+        if (!$serializer instanceof NormalizerInterface ||
+            !$serializer instanceof DenormalizerInterface) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Serializer must implement "%s" and "%s"',
-                    ContextAwareNormalizerInterface::class,
-                    ContextAwareDenormalizerInterface::class
+                    NormalizerInterface::class,
+                    DenormalizerInterface::class
                 )
             );
         }
@@ -421,5 +424,10 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             $optionClass,
             ExtendHelper::buildEnumOptionId($enumCode, ExtendHelper::buildEnumInternalId($value))
         );
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return ['object' => true];
     }
 }

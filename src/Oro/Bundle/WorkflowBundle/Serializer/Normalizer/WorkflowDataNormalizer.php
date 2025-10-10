@@ -8,8 +8,8 @@ use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
 
@@ -18,8 +18,8 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
  */
 class WorkflowDataNormalizer implements
     SerializerAwareInterface,
-    ContextAwareNormalizerInterface,
-    ContextAwareDenormalizerInterface
+    NormalizerInterface,
+    DenormalizerInterface
 {
     use SerializerAwareTrait;
 
@@ -35,8 +35,11 @@ class WorkflowDataNormalizer implements
     }
 
     #[\Override]
-    public function normalize($object, ?string $format = null, array $context = [])
-    {
+    public function normalize(
+        mixed $object,
+        ?string $format = null,
+        array $context = []
+    ): float|int|bool|\ArrayObject|array|string|null {
         $attributes = [];
         $workflow = $this->getWorkflow();
 
@@ -54,7 +57,7 @@ class WorkflowDataNormalizer implements
 
             if (null !== $attributeValue &&
                 !is_scalar($attributeValue) &&
-                $this->serializer instanceof ContextAwareNormalizerInterface
+                $this->serializer instanceof NormalizerInterface
             ) {
                 $attributeValue = $this->serializer->normalize($attributeValue, $format);
             }
@@ -65,7 +68,7 @@ class WorkflowDataNormalizer implements
     }
 
     #[\Override]
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         $denormalizedData = [];
         $workflow = $this->getWorkflow();
@@ -249,5 +252,10 @@ class WorkflowDataNormalizer implements
         }
 
         return array_keys($configuration[$definitionsNode][$variablesNode]);
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return ['object' => true];
     }
 }

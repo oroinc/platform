@@ -11,13 +11,13 @@ use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * The normalizer for attached files.
  */
-class FileNormalizer implements ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface
+class FileNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     private AttachmentManager $attachmentManager;
 
@@ -48,7 +48,7 @@ class FileNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
     }
 
     #[\Override]
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         return $this->createFileEntity(
             $data['uri'] ?? '',
@@ -62,8 +62,11 @@ class FileNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
      * @param File $object
      */
     #[\Override]
-    public function normalize($object, ?string $format = null, array $context = [])
-    {
+    public function normalize(
+        mixed $object,
+        ?string $format = null,
+        array $context = []
+    ): float|int|bool|\ArrayObject|array|string|null {
         $fileUrl = null;
         // It is impossible to generate URL for a file without ID.
         if ($object->getId()) {

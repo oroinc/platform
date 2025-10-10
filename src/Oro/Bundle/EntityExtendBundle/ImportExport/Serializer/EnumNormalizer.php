@@ -7,13 +7,13 @@ use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Normalizer for enum entities.
  */
-class EnumNormalizer implements ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface
+class EnumNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     protected FieldHelper $fieldHelper;
 
@@ -30,7 +30,7 @@ class EnumNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
      *
      */
     #[\Override]
-    public function normalize($object, ?string $format = null, array $context = []): ?array
+    public function normalize(mixed $object, ?string $format = null, array $context = []): ?array
     {
         if (!$object instanceof EnumOptionInterface) {
             return null;
@@ -51,7 +51,7 @@ class EnumNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
     }
 
     #[\Override]
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         $reflection = new \ReflectionClass($type);
 
@@ -91,5 +91,10 @@ class EnumNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
         return $owner === ExtendScope::OWNER_CUSTOM
             ? ['name' => (string)$object]
             : ['id' => $object->getInternalId()];
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [EnumOptionInterface::class => true];
     }
 }

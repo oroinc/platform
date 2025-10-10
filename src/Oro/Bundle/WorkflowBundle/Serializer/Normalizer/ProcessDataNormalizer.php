@@ -22,8 +22,11 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
     }
 
     #[\Override]
-    public function normalize($object, ?string $format = null, array $context = [])
-    {
+    public function normalize(
+        mixed $object,
+        ?string $format = null,
+        array $context = []
+    ): float|int|bool|\ArrayObject|array|string|null {
         /** @var ProcessData $object */
         $processJob = $this->getProcessJob($context);
         $entity = $object['data'];
@@ -39,34 +42,35 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
     }
 
     #[\Override]
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
-        $denormalizedData = $this->serializer->denormalize($data, '', $format, $context);
-        $denormalizedData = $denormalizedData ?: [];
+        $denormalizedData = is_array($data) ? $data : [];
 
         return new ProcessData($denormalizedData);
     }
 
     #[\Override]
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return is_object($data) && $this->supportsClass($this->getClass($data));
     }
 
     #[\Override]
-    public function supportsDenormalization($data, string $type, ?string $format = null): bool
+    public function supportsDenormalization($data, string $type, ?string $format = null, array $context = []): bool
     {
         return $this->supportsClass($type);
     }
 
     /**
      * Checks if the given class is ProcessData or it's ancestor.
-     *
-     * @param string $class
-     * @return boolean
      */
-    protected function supportsClass($class)
+    protected function supportsClass(string $class): bool
     {
         return is_a($class, ProcessData::class, true);
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [ProcessData::class => true];
     }
 }

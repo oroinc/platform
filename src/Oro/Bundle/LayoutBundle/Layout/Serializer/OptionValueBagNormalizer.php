@@ -19,7 +19,7 @@ class OptionValueBagNormalizer implements NormalizerInterface, DenormalizerInter
     protected $serializer;
 
     #[\Override]
-    public function setSerializer(SerializerInterface $serializer)
+    public function setSerializer(SerializerInterface $serializer): void
     {
         if (!($serializer instanceof NormalizerInterface && $serializer instanceof DenormalizerInterface)) {
             throw new \RuntimeException('OptionValueBagNormalizer is not compatible with provided serializer');
@@ -29,14 +29,17 @@ class OptionValueBagNormalizer implements NormalizerInterface, DenormalizerInter
     }
 
     #[\Override]
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return $data instanceof OptionValueBag;
     }
 
     #[\Override]
-    public function normalize($object, ?string $format = null, array $context = [])
-    {
+    public function normalize(
+        mixed $data,
+        ?string $format = null,
+        array $context = []
+    ): float|int|bool|\ArrayObject|array|string|null {
         $actions = [
             'add' => [],
             'replace' => [],
@@ -44,7 +47,7 @@ class OptionValueBagNormalizer implements NormalizerInterface, DenormalizerInter
         ];
 
         /** @var OptionValueBag $bag */
-        $bag = $object;
+        $bag = $data;
 
         foreach ($bag->all() as $action) {
             switch ($action->getName()) {
@@ -101,13 +104,13 @@ class OptionValueBagNormalizer implements NormalizerInterface, DenormalizerInter
     }
 
     #[\Override]
-    public function supportsDenormalization($data, string $type, ?string $format = null): bool
+    public function supportsDenormalization($data, string $type, ?string $format = null, array $context = []): bool
     {
         return $type === OptionValueBag::class;
     }
 
     #[\Override]
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         $bag = new OptionValueBag();
 
@@ -134,7 +137,7 @@ class OptionValueBagNormalizer implements NormalizerInterface, DenormalizerInter
      *
      * @return mixed
      */
-    protected function denormalizeVarRecursive(array &$element, $format, array $context)
+    protected function denormalizeVarRecursive(array &$element, $format, array $context): mixed
     {
         if (array_key_exists('type', $element) && class_exists($element['type'])) {
             return $this->serializer->denormalize($element, $element['type'], $format, $context);
