@@ -71,6 +71,9 @@ class ExtendExclusionProvider implements ExclusionProviderInterface
         }
         if ($extendFieldConfig->has('target_entity')) {
             $targetEntity = $extendFieldConfig->get('target_entity');
+            if ($this->configManager->isHiddenModel($targetEntity)) {
+                return true;
+            }
             if (!ExtendHelper::isEntityAccessible($this->configManager->getEntityConfig('extend', $targetEntity))) {
                 return true;
             }

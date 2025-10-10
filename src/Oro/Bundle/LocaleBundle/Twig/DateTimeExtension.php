@@ -15,6 +15,7 @@ use Twig\TwigFilter;
  *   - oro_format_date
  *   - oro_format_day
  *   - oro_format_time
+ *   - oro_format_datetime_medium
  */
 class DateTimeExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
@@ -47,6 +48,7 @@ class DateTimeExtension extends AbstractExtension implements ServiceSubscriberIn
             new TwigFilter('oro_format_date', [$this, 'formatDate']),
             new TwigFilter('oro_format_day', [$this, 'formatDay']),
             new TwigFilter('oro_format_time', [$this, 'formatTime']),
+            new TwigFilter('oro_format_datetime_medium', [$this, 'formatDateTimeMedium']),
         ];
     }
 
@@ -109,6 +111,17 @@ class DateTimeExtension extends AbstractExtension implements ServiceSubscriberIn
             $options['dateType'] ?? null,
             $options['locale'] ?? null,
             $options['timeZone'] ?? 'UTC'
+        );
+    }
+
+    public function formatDateTimeMedium($date, ?string $locale = null, ?string $timeZone = null): string
+    {
+        return $this->getDateTimeFormatter()->format(
+            $date,
+            \IntlDateFormatter::MEDIUM,
+            \IntlDateFormatter::NONE,
+            $locale,
+            $timeZone
         );
     }
 

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Component\ChainProcessor\ToArrayInterface;
 use Oro\Component\EntitySerializer\ConfigUtil as BaseConfigUtil;
 
@@ -256,7 +257,31 @@ class ConfigUtil extends BaseConfigUtil
      */
     public static function buildMetaPropertyName(string $resultName): string
     {
-        return sprintf('__%s__', $resultName);
+        return \sprintf('_%s_', $resultName);
+    }
+
+    /**
+     * Returns the name by which the required meta property should be stored in a configuration of an entity.
+     * The feature of required meta properties is that a value for them is always loaded
+     * independs on the "fields" filter.
+     *
+     * @param string $resultName The name by which the meta property should be returned in the response
+     *
+     * @return string
+     */
+    public static function buildRequiredMetaPropertyName(string $resultName): string
+    {
+        return \sprintf('__%s__', $resultName);
+    }
+
+    /**
+     * Checks if a meta property is required one.
+     * The feature of required meta properties is that a value for them is always loaded
+     * independs on the "fields" filter.
+     */
+    public static function isRequiredMetaProperty(string $name): bool
+    {
+        return str_starts_with($name, '__') && str_ends_with($name, '__');
     }
 
     /**
@@ -270,12 +295,14 @@ class ConfigUtil extends BaseConfigUtil
      */
     public static function getPropertyPathOfMetaProperty(string $resultName, EntityDefinitionConfig $config): ?string
     {
-        $fieldName = $config->findFieldNameByPropertyPath(
-            self::buildMetaPropertyName($resultName)
-        );
+        $fieldName = $config->findFieldNameByPropertyPath(self::buildMetaPropertyName($resultName));
+        if (!$fieldName) {
+            $fieldName = $config->findFieldNameByPropertyPath(self::buildRequiredMetaPropertyName($resultName));
+        }
         if (!$fieldName) {
             return null;
         }
+        /** @var EntityDefinitionFieldConfig $field */
         $field = $config->getField($fieldName);
         if ($field->isExcluded() || !$field->isMetaProperty()) {
             return null;

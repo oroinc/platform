@@ -1,0 +1,15 @@
+{% if value|striptags|length > 50 %}
+    {% set tooltip = value %}
+    {% set tooltip_placement = isMobileVersion() ? 'top' : null %}
+    {% set tooltip = '<div class="oro-popover-content">' ~ tooltip ~ '</div>' -%}
+    <span
+            data-toggle="tooltip"
+            data-title="{{ value }}"
+            data-html="true"
+            data-container="body"
+            data-placement="{% if isMobileVersion() %}top{% else %}right{% endif %}">
+            {{ value|striptags|slice(0, 50) }}...
+    </span>
+{% else %}
+    {{ value }}
+{% endif %}

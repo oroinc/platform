@@ -162,6 +162,7 @@ class TestEntitiesMigration implements
 
         $table = $schema->createTable('test_api_nested_objects');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('display_name', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('first_name', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('last_name', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('middle_name', 'string', ['notnull' => false, 'length' => 255]);
@@ -881,12 +882,14 @@ class TestEntitiesMigration implements
         $tableArticle->addColumn('id', 'integer', ['autoincrement' => true]);
         $tableArticle->addColumn('headline', 'string', ['length' => 255]);
         $tableArticle->addColumn('body', 'text', ['notnull' => false]);
+        $tableArticle->addColumn('body_length', 'integer');
         $tableArticle->setPrimaryKey(['id']);
 
         $tableMagazine = $schema->createTable('test_api_custom_magazine');
         $tableMagazine->addColumn('id', 'integer', ['autoincrement' => true]);
         $tableMagazine->addColumn('name', 'string', ['length' => 255]);
         $tableMagazine->addColumn('best_article_id', 'integer', ['notnull' => false]);
+        $tableMagazine->addColumn('issue_date', 'date', ['notnull' => false]);
         $tableMagazine->addIndex(['best_article_id']);
         $tableMagazine->setPrimaryKey(['id']);
         $tableMagazine->addForeignKeyConstraint($tableArticle, ['best_article_id'], ['id']);

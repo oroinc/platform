@@ -74,6 +74,7 @@ services:
         class: Oro\Bundle\DistributionBundle\Handler\ApplicationState
         arguments:
             - '@doctrine.dbal.default_connection'
+            - '@logger'
 
     Oro\Bundle\DistributionBundle\Handler\ApplicationState:
         public: true

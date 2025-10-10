@@ -22,7 +22,7 @@ class AddMetaPropertiesTest extends ConfigProcessorTestCase
         $config = [
             'fields' => [
                 '__prop1__' => [
-                    'data_type'     => 'string',
+                    'data_type' => 'string',
                     'meta_property' => true
                 ]
             ]
@@ -41,17 +41,17 @@ class AddMetaPropertiesTest extends ConfigProcessorTestCase
             [
                 'fields' => [
                     '__prop1__' => [
-                        'data_type'     => 'string',
+                        'data_type' => 'string',
                         'meta_property' => true
                     ],
                     '__prop2__' => [
-                        'data_type'                 => 'string',
-                        'meta_property'             => true,
+                        'data_type' => 'string',
+                        'meta_property' => true,
                         'meta_property_result_name' => 'prop2'
                     ],
                     '__prop3__' => [
-                        'data_type'                 => 'integer',
-                        'meta_property'             => true,
+                        'data_type' => 'integer',
+                        'meta_property' => true,
                         'meta_property_result_name' => 'prop3'
                     ]
                 ]

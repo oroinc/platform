@@ -1639,7 +1639,7 @@ components:
     pageSize:
       name: 'page[size]'
       in: query
-      description: 'The number of items per page.'
+      description: 'The number of records per page.'
       schema:
         type: integer
         default: 10

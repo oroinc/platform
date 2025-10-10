@@ -664,6 +664,9 @@
 
 {% block oro_entity_create_or_select_inline_widget %}
     {% set isButtonsEnabled = not disabled and (attr.readonly is not defined or not attr.readonly) %}
+    {% if isButtonsEnabled != false and attr.isButtonsEnabled is defined %}
+        {% set isButtonsEnabled = attr.isButtonsEnabled %}
+    {% endif %}
     <div id="{{ id }}-el"
             {% if configs.extra_config is not defined or not configs.extra_config %}
                 {% if form.vars.configs.async_dialogs|default(false) is same as(true) %}
@@ -695,6 +698,7 @@
                     options: {
                         inputSelector: '#'~id,
                         entityLabel: label|trans({}, translation_domain),
+                        widgetTitle: form.vars.widget_title ? form.vars.widget_title|trans : '',
                         urlParts: urlParts,
                         existingEntityGridId: form.vars.existing_entity_grid_id|default('id'),
                         createEnabled: form.vars.create_enabled|default(false)

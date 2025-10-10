@@ -39,7 +39,7 @@ class LoadTitleMetaPropertyForCollectionTest extends GetListProcessorTestCase
         $config = new EntityDefinitionConfig();
         $config->setIdentifierFieldNames(['id']);
         $config->addField('id')->setDataType('integer');
-        $titleField = $config->addField('__title__');
+        $titleField = $config->addField('_title_');
         $titleField->setMetaProperty(true);
         $titleField->setMetaPropertyResultName('title');
 
@@ -69,7 +69,7 @@ class LoadTitleMetaPropertyForCollectionTest extends GetListProcessorTestCase
 
         self::assertEquals(
             [
-                ['id' => 123, '__title__' => 'title 123']
+                ['id' => 123, '_title_' => 'title 123']
             ],
             $this->context->getResult()
         );

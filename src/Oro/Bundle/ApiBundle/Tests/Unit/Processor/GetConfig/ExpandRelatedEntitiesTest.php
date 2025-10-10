@@ -93,12 +93,12 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
     {
         $config = [
             'fields' => [
-                'field1'       => null,
+                'field1' => null,
                 'association1' => [
                     'target_class' => 'Test\Association1Target'
                 ],
                 'association2' => [
-                    'target_class'  => 'Test\Association2Target',
+                    'target_class' => 'Test\Association2Target',
                     'property_path' => 'realAssociation2'
                 ],
                 'association3' => [
@@ -153,20 +153,20 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         $this->assertConfig(
             [
                 'fields' => [
-                    'field1'       => null,
+                    'field1' => null,
                     'association1' => [
-                        'target_class'     => 'Test\Association1Target',
+                        'target_class' => 'Test\Association1Target',
                         'exclusion_policy' => 'all',
-                        'test_section'     => ['attr' => 'val']
+                        'test_section' => ['attr' => 'val']
                     ],
                     'association2' => [
-                        'target_class'     => 'Test\Association2Target',
-                        'property_path'    => 'realAssociation2',
+                        'target_class' => 'Test\Association2Target',
+                        'property_path' => 'realAssociation2',
                         'exclusion_policy' => 'all',
-                        'test_section'     => ['attr' => 'val']
+                        'test_section' => ['attr' => 'val']
                     ],
                     'association3' => [
-                        'target_class'     => 'Test\Association3Target',
+                        'target_class' => 'Test\Association3Target',
                         'exclusion_policy' => 'all'
                     ]
                 ]
@@ -278,21 +278,21 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
                 'fields' => [
                     'association1' => [
                         'exclusion_policy' => 'all',
-                        'target_class'     => 'Test\Association1Target',
-                        'target_type'      => 'to-one',
-                        'test_section'     => ['attr' => 'val']
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-one',
+                        'test_section' => ['attr' => 'val']
                     ],
                     'association2' => [
                         'exclusion_policy' => 'all',
-                        'target_class'     => 'Test\Association2Target',
-                        'target_type'      => 'to-one',
-                        'test_section'     => ['attr' => 'val']
+                        'target_class' => 'Test\Association2Target',
+                        'target_type' => 'to-one',
+                        'test_section' => ['attr' => 'val']
                     ],
                     'association3' => [
                         'exclusion_policy' => 'all',
-                        'property_path'    => 'realAssociation3',
-                        'target_type'      => 'to-one',
-                        'target_class'     => 'Test\Association3Target'
+                        'property_path' => 'realAssociation3',
+                        'target_type' => 'to-one',
+                        'target_class' => 'Test\Association3Target'
                     ]
                 ]
             ],
@@ -304,7 +304,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
     {
         $entityDefinition = $this->createConfigObject([
             'fields' => [
-                'account'             => [
+                'account' => [
                     'property_path' => 'customerAssociation.account'
                 ],
                 'customerAssociation' => [
@@ -333,16 +333,16 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         $metadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $metadata->associationMappings = [
             'customerAssociation' => [
-                'fieldName'    => 'customerAssociation',
-                'type'         => ClassMetadata::MANY_TO_ONE,
+                'fieldName' => 'customerAssociation',
+                'type' => ClassMetadata::MANY_TO_ONE,
                 'targetEntity' => 'CustomerAssociation'
             ]
         ];
         $customerAssociationMetadata = new ClassMetadata('CustomerAssociation');
         $customerAssociationMetadata->associationMappings = [
             'account' => [
-                'fieldName'    => 'account',
-                'type'         => ClassMetadata::MANY_TO_ONE,
+                'fieldName' => 'account',
+                'type' => ClassMetadata::MANY_TO_ONE,
                 'targetEntity' => 'Account'
             ]
         ];
@@ -366,10 +366,10 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         $this->assertConfig(
             [
                 'fields' => [
-                    'account'             => [
+                    'account' => [
                         'property_path' => 'customerAssociation.account',
-                        'target_class'  => 'Account',
-                        'target_type'   => 'to-one'
+                        'target_class' => 'Account',
+                        'target_type' => 'to-one'
                     ],
                     'customerAssociation' => [
                         'fields' => [
@@ -388,7 +388,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             'fields' => [
                 'accounts' => [
                     'max_results' => 10,
-                    'order_by'    => ['name' => 'ASC']
+                    'order_by' => ['name' => 'ASC']
                 ]
             ]
         ]);
@@ -439,10 +439,10 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             [
                 'fields' => [
                     'accounts' => [
-                        'max_results'  => 10,
-                        'order_by'     => ['name' => 'ASC'],
+                        'max_results' => 10,
+                        'order_by' => ['name' => 'ASC'],
                         'target_class' => 'Test\Account',
-                        'target_type'  => 'to-many'
+                        'target_type' => 'to-many'
                     ]
                 ]
             ],
@@ -505,8 +505,8 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
                 'fields' => [
                     'association1' => [
                         'exclusion_policy' => 'all',
-                        'target_class'     => 'Test\Association1Target',
-                        'target_type'      => 'to-one'
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-one'
                     ]
                 ]
             ],
@@ -514,14 +514,19 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForManageableEntityWithAssociationMetaProperties()
+    public function testProcessForManageableEntityWithRequiredAssociationMetaProperties()
     {
         $entityDefinition = $this->createConfigObject([
             'fields' => [
                 'accounts' => [
                     'fields' => [
-                        'metaProperty' => [
-                            'meta_property' => true
+                        'metaProperty1' => [
+                            'meta_property' => true,
+                            'property_path' => '__meta_property_1__'
+                        ],
+                        '__meta_property_2__' => [
+                            'meta_property' => true,
+                            'property_path' => 'metaProperty2'
                         ]
                     ]
                 ]
@@ -581,13 +586,99 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
                 'fields' => [
                     'accounts' => [
                         'target_class' => 'Test\Account',
-                        'target_type'  => 'to-many',
+                        'target_type' => 'to-many',
                         'fields' => [
                             'name' => [
                                 'data_type' => 'string'
                             ],
-                            'metaProperty' => [
-                                'meta_property' => true
+                            'metaProperty1' => [
+                                'meta_property' => true,
+                                'property_path' => '__meta_property_1__'
+                            ],
+                            '__meta_property_2__' => [
+                                'meta_property' => true,
+                                'property_path' => 'metaProperty2'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForManageableEntityWithOptionalAssociationMetaProperties()
+    {
+        $entityDefinition = $this->createConfigObject([
+            'fields' => [
+                'accounts' => [
+                    'fields' => [
+                        'metaProperty' => [
+                            'meta_property' => true,
+                            'property_path' => 'meta_property'
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+        $this->context->setResult($entityDefinition);
+        $this->context->setExtras([
+            new ExpandRelatedEntitiesConfigExtra(['accounts']),
+            new TestConfigSection('test_section')
+        ]);
+
+        $this->configProvider->expects(self::any())
+            ->method('getConfig')
+            ->with(
+                'Test\Account',
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new TestConfigSection('test_section')]
+            )
+            ->willReturn($this->createRelationConfigObject([
+                'fields' => [
+                    'name' => [
+                        'data_type' => 'string'
+                    ]
+                ]
+            ]));
+
+        $metadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $metadata->expects(self::once())
+            ->method('hasAssociation')
+            ->with('accounts')
+            ->willReturn(true);
+        $metadata->expects(self::once())
+            ->method('getAssociationTargetClass')
+            ->with('accounts')
+            ->willReturn('Test\Account');
+        $metadata->expects(self::once())
+            ->method('isCollectionValuedAssociation')
+            ->with('accounts')
+            ->willReturn(true);
+        $accountMetadata = new ClassMetadata('Test\Account');
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $metadata],
+                ['Test\Account', true, $accountMetadata]
+            ]);
+
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'accounts' => [
+                        'target_class' => 'Test\Account',
+                        'target_type' => 'to-many',
+                        'fields' => [
+                            'name' => [
+                                'data_type' => 'string'
                             ]
                         ]
                     ]
@@ -603,7 +694,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             'fields' => [
                 'association1' => [
                     'target_class' => 'Test\Association1Target',
-                    'target_type'  => 'to-one'
+                    'target_type' => 'to-one'
                 ]
             ]
         ];
@@ -644,8 +735,8 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
                 'fields' => [
                     'association1' => [
                         'exclusion_policy' => 'all',
-                        'target_class'     => 'Test\Association1Target',
-                        'target_type'      => 'to-one'
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-one'
                     ]
                 ]
             ],
@@ -658,7 +749,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         $config = [
             'fields' => [
                 'association1' => [
-                    'data_type'    => 'some_custom_association',
+                    'data_type' => 'some_custom_association',
                     'target_class' => 'Test\Association1Target'
                 ]
             ]
@@ -712,8 +803,8 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
             [
                 'fields' => [
                     'association1' => [
-                        'data_type'        => 'some_custom_association',
-                        'target_class'     => 'Test\Association1Target',
+                        'data_type' => 'some_custom_association',
+                        'target_class' => 'Test\Association1Target',
                         'exclusion_policy' => 'all'
                     ]
                 ]
@@ -777,8 +868,8 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
                 'fields' => [
                     'association1' => [
                         'exclusion_policy' => 'all',
-                        'target_class'     => 'Test\Association1SubstituteTarget',
-                        'target_type'      => 'to-one'
+                        'target_class' => 'Test\Association1SubstituteTarget',
+                        'target_type' => 'to-one'
                     ]
                 ]
             ],
@@ -809,8 +900,8 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         $metadata = new ClassMetadata(self::TEST_CLASS_NAME);
         $metadata->associationMappings = [
             'account' => [
-                'fieldName'    => 'account',
-                'type'         => ClassMetadata::MANY_TO_ONE,
+                'fieldName' => 'account',
+                'type' => ClassMetadata::MANY_TO_ONE,
                 'targetEntity' => 'Test\AssociationTarget'
             ]
         ];
@@ -841,7 +932,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
     {
         $entityDefinition = $this->createConfigObject([
             'fields' => [
-                'account'  => [
+                'account' => [
                     'property_path' => 'anotherAssociation'
                 ],
                 '_account' => [
@@ -872,8 +963,8 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         $metadata = new ClassMetadata(self::TEST_CLASS_NAME);
         $metadata->associationMappings = [
             'anotherAssociation' => [
-                'fieldName'    => 'anotherAssociation',
-                'type'         => ClassMetadata::MANY_TO_ONE,
+                'fieldName' => 'anotherAssociation',
+                'type' => ClassMetadata::MANY_TO_ONE,
                 'targetEntity' => 'Test\AssociationTarget'
             ]
         ];
@@ -894,10 +985,10 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         $this->assertConfig(
             [
                 'fields' => [
-                    'account'  => [
+                    'account' => [
                         'property_path' => 'anotherAssociation',
-                        'target_class'  => 'Test\AssociationTarget',
-                        'target_type'   => 'to-one'
+                        'target_class' => 'Test\AssociationTarget',
+                        'target_type' => 'to-one'
                     ],
                     '_account' => [
                         'property_path' => 'account'

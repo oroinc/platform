@@ -1072,6 +1072,42 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     //@codingStandardsIgnoreStart
     /**
+     * Set string value in grid filter
+     * Example: And set filter "Name" as is equal to "User" in frontend grid
+     *
+     * @When /^(?:|I )set filter "(?P<filterName>.+)" as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)" in frontend grid$/
+     *
+     * @param string $filterName
+     * @param string $type
+     * @param string $value
+     * @param string $filterGridName
+     */
+    //@codingStandardsIgnoreEnd
+    public function setValueInStringFilterFrontend(
+        $filterName,
+        $type,
+        $value = '',
+        $filterGridName = 'Grid',
+    ) {
+        $value = $this->fixStepArgument($value);
+
+        /** @var GridFilterStringItem $filterItem */
+        $filterItem = $this
+            ->getGridFilters($filterGridName)
+            ->getFilterItem('GridFilterStringItem', $filterName, false, true);
+
+        $filterItem->open();
+        $this->oroMainContext->scrollToXpath($filterItem->getXpath());
+        $filterItem->selectType($type);
+        // does not need set value if use filter 'is empty' or 'is not empty'
+        if (!in_array($type, ['is empty', 'is not empty'])) {
+            $filterItem->setFilterValue($value);
+            $filterItem->submit();
+        }
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
      * Set string value in grid filter and press Enter key
      * Example: When I set filter First Name as contains "Adi" and press Enter key
      * Example: And set filter Name as is equal to "User" and press Enter key
@@ -2473,7 +2509,7 @@ TEXT;
      *
      * @param string $gridName
      */
-    public function iResetGrid($gridName = null)
+    public function iResetGrid(null|string|array|TableNode $gridName = null)
     {
         $grid = $this->getGrid($gridName);
 

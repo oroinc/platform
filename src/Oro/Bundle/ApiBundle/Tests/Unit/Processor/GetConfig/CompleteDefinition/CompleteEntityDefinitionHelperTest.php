@@ -138,12 +138,12 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id'         => ['type' => 'integer'],
-            'field1'     => ['type' => 'string'],
-            'field2'     => ['type' => 'string'],
-            'field3'     => ['type' => 'string'],
-            'field4'     => ['type' => 'string'],
-            'field5'     => ['type' => 'string'],
+            'id' => ['type' => 'integer'],
+            'field1' => ['type' => 'string'],
+            'field2' => ['type' => 'string'],
+            'field3' => ['type' => 'string'],
+            'field4' => ['type' => 'string'],
+            'field5' => ['type' => 'string'],
             'realField6' => ['type' => 'string'],
             'realField7' => ['type' => 'string']
         ];
@@ -164,8 +164,8 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'     => null,
+                'fields' => [
+                    'id' => null,
                     'field1' => null,
                     'field2' => [
                         'exclude' => true
@@ -179,7 +179,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                         'property_path' => 'realField6'
                     ],
                     'field7' => [
-                        'exclude'       => true,
+                        'exclude' => true,
                         'property_path' => 'realField7'
                     ]
                 ]
@@ -222,8 +222,8 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id'         => ['type' => 'integer'],
-            'field1'     => ['type' => 'string', 'enumType' => 'Test\Enum1'],
+            'id' => ['type' => 'integer'],
+            'field1' => ['type' => 'string', 'enumType' => 'Test\Enum1'],
             'realField2' => ['type' => 'string', 'enumType' => 'Test\Enum2']
         ];
         $rootEntityMetadata->associationMappings = [];
@@ -243,8 +243,8 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'     => null,
+                'fields' => [
+                    'id' => null,
                     'field1' => [
                         'data_type' => 'enum:Test\Enum1'
                     ],
@@ -263,7 +263,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $config = $this->createConfigObject([
             'fields' => [
                 'field1' => [
-                    'data_type'     => 'integer',
+                    'data_type' => 'integer',
                     'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
                 ]
             ]
@@ -278,7 +278,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id'     => ['type' => 'integer'],
+            'id' => ['type' => 'integer'],
             'field1' => ['type' => 'string']
         ];
         $rootEntityMetadata->associationMappings = [];
@@ -310,10 +310,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'     => null,
+                'fields' => [
+                    'id' => null,
                     'field1' => [
-                        'data_type'     => 'integer',
+                        'data_type' => 'integer',
                         'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
                     ]
                 ]
@@ -346,7 +346,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'association1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_ONE
+                'type' => ClassMetadata::MANY_TO_ONE
             ]
         ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
@@ -375,7 +375,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -394,12 +394,12 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
-                        'exclusion_policy'       => 'all',
-                        'target_class'           => 'Test\Association1Target',
-                        'target_type'            => 'to-one',
+                        'exclusion_policy' => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-one',
                         'identifier_field_names' => ['id']
                     ]
                 ]
@@ -430,7 +430,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'association1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_ONE
+                'type' => ClassMetadata::MANY_TO_ONE
             ]
         ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
@@ -467,8 +467,8 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => null
                 ]
             ],
@@ -498,7 +498,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'association1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_ONE
+                'type' => ClassMetadata::MANY_TO_ONE
             ]
         ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
@@ -527,7 +527,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -546,15 +546,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
-                        'exclusion_policy'       => 'all',
-                        'target_class'           => 'Test\Association1Target',
-                        'target_type'            => 'to-one',
-                        'collapse'               => true,
+                        'exclusion_policy' => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-one',
+                        'collapse' => true,
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -584,7 +584,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'association1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_ONE
+                'type' => ClassMetadata::MANY_TO_ONE
             ]
         ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
@@ -613,7 +613,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -632,15 +632,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
-                        'exclusion_policy'       => 'all',
-                        'target_class'           => 'Test\Association1Target',
-                        'target_type'            => 'to-one',
-                        'collapse'               => true,
+                        'exclusion_policy' => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-one',
+                        'collapse' => true,
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -676,7 +676,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'realAssociation1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_ONE
+                'type' => ClassMetadata::MANY_TO_ONE
             ]
         ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
@@ -705,7 +705,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -724,16 +724,16 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
-                        'property_path'          => 'realAssociation1',
-                        'exclusion_policy'       => 'all',
-                        'target_class'           => 'Test\Association1Target',
-                        'target_type'            => 'to-one',
-                        'collapse'               => true,
+                        'property_path' => 'realAssociation1',
+                        'exclusion_policy' => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-one',
+                        'collapse' => true,
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -769,7 +769,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'association1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_ONE
+                'type' => ClassMetadata::MANY_TO_ONE
             ]
         ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
@@ -796,7 +796,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -815,16 +815,16 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
-                        'exclude'                => true,
-                        'exclusion_policy'       => 'all',
-                        'target_class'           => 'Test\Association1Target',
-                        'target_type'            => 'to-one',
-                        'collapse'               => true,
+                        'exclude' => true,
+                        'exclusion_policy' => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-one',
+                        'collapse' => true,
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -860,7 +860,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'association1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_ONE
+                'type' => ClassMetadata::MANY_TO_ONE
             ]
         ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
@@ -887,7 +887,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -906,15 +906,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
-                        'exclusion_policy'       => 'all',
-                        'target_class'           => 'Test\Association1Target',
-                        'target_type'            => 'to-one',
-                        'collapse'               => true,
+                        'exclusion_policy' => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-one',
+                        'collapse' => true,
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -948,7 +948,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'association1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_ONE
+                'type' => ClassMetadata::MANY_TO_ONE
             ]
         ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
@@ -977,7 +977,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -996,16 +996,16 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
-                        'exclude'                => true,
-                        'exclusion_policy'       => 'all',
-                        'target_class'           => 'Test\Association1Target',
-                        'target_type'            => 'to-one',
-                        'collapse'               => true,
+                        'exclude' => true,
+                        'exclusion_policy' => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-one',
+                        'collapse' => true,
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -1022,7 +1022,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $config = $this->createConfigObject([
             'fields' => [
                 'association1' => [
-                    'data_type'     => 'object',
+                    'data_type' => 'object',
                     'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
                 ]
             ]
@@ -1042,7 +1042,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'association1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_ONE
+                'type' => ClassMetadata::MANY_TO_ONE
             ]
         ];
 
@@ -1071,10 +1071,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
-                        'data_type'     => 'object',
+                        'data_type' => 'object',
                         'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
                     ]
                 ]
@@ -1107,7 +1107,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'association1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_ONE
+                'type' => ClassMetadata::MANY_TO_ONE
             ]
         ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
@@ -1136,7 +1136,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -1155,16 +1155,16 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
-                        'data_type'              => 'string',
-                        'exclusion_policy'       => 'all',
-                        'target_class'           => 'Test\Association1Target',
-                        'target_type'            => 'to-one',
-                        'collapse'               => true,
+                        'data_type' => 'string',
+                        'exclusion_policy' => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-one',
+                        'collapse' => true,
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -1198,7 +1198,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'association1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_ONE
+                'type' => ClassMetadata::MANY_TO_ONE
             ]
         ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
@@ -1227,7 +1227,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id1', 'id2'],
-                        'fields'                 => [
+                        'fields' => [
                             'id1' => [
                                 'data_type' => 'integer'
                             ],
@@ -1249,15 +1249,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
-                        'exclusion_policy'       => 'all',
-                        'target_class'           => 'Test\Association1Target',
-                        'target_type'            => 'to-one',
-                        'collapse'               => true,
+                        'exclusion_policy' => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-one',
+                        'collapse' => true,
                         'identifier_field_names' => ['id1', 'id2'],
-                        'fields'                 => [
+                        'fields' => [
                             'id1' => [
                                 'data_type' => 'integer'
                             ],
@@ -1278,7 +1278,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             'fields' => [
                 'association1' => [
                     'target_class' => 'Test\Association1Target',
-                    'target_type'  => 'to-one'
+                    'target_type' => 'to-one'
                 ]
             ]
         ]);
@@ -1312,7 +1312,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -1331,15 +1331,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
-                        'exclusion_policy'       => 'all',
-                        'target_class'           => 'Test\Association1Target',
-                        'target_type'            => 'to-one',
-                        'collapse'               => true,
+                        'exclusion_policy' => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-one',
+                        'collapse' => true,
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -1356,9 +1356,9 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $config = $this->createConfigObject([
             'fields' => [
                 'association1' => [
-                    'data_type'    => 'some_custom_association',
+                    'data_type' => 'some_custom_association',
                     'target_class' => 'Test\Association1Target',
-                    'target_type'  => 'to-one'
+                    'target_type' => 'to-one'
                 ]
             ]
         ]);
@@ -1459,7 +1459,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'association1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_ONE
+                'type' => ClassMetadata::MANY_TO_ONE
             ]
         ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
@@ -1495,7 +1495,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -1514,15 +1514,15 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
-                        'exclusion_policy'       => 'all',
-                        'target_class'           => 'Test\Association1SubstituteTarget',
-                        'target_type'            => 'to-one',
-                        'collapse'               => true,
+                        'exclusion_policy' => 'all',
+                        'target_class' => 'Test\Association1SubstituteTarget',
+                        'target_type' => 'to-one',
+                        'collapse' => true,
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -1551,7 +1551,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id'     => ['type' => 'integer'],
+            'id' => ['type' => 'integer'],
             'field1' => ['type' => 'string']
         ];
         $rootEntityMetadata->associationMappings = [];
@@ -1586,10 +1586,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'disable_meta_properties' => true,
-                'hints'                   => ['HINT_TRANSLATABLE'],
-                'identifier_field_names'  => ['id'],
-                'fields'                  => [
-                    'id'     => null,
+                'hints' => ['HINT_TRANSLATABLE'],
+                'identifier_field_names' => ['id'],
+                'fields' => [
+                    'id' => null,
                     'field1' => null
                 ]
             ],
@@ -1600,7 +1600,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     public function testCompleteDefinitionForTranslatableEntityWhenTranslatableHintAlreadySet(): void
     {
         $config = $this->createConfigObject([
-            'hints'  => ['HINT_TRANSLATABLE'],
+            'hints' => ['HINT_TRANSLATABLE'],
             'fields' => [
                 'field1' => null
             ]
@@ -1615,7 +1615,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id'     => ['type' => 'integer'],
+            'id' => ['type' => 'integer'],
             'field1' => ['type' => 'string']
         ];
         $rootEntityMetadata->associationMappings = [];
@@ -1650,10 +1650,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'disable_meta_properties' => true,
-                'hints'                   => ['HINT_TRANSLATABLE'],
-                'identifier_field_names'  => ['id'],
-                'fields'                  => [
-                    'id'     => null,
+                'hints' => ['HINT_TRANSLATABLE'],
+                'identifier_field_names' => ['id'],
+                'fields' => [
+                    'id' => null,
                     'field1' => null
                 ]
             ],
@@ -1665,8 +1665,8 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'disable_meta_properties' => false,
-            'hints'                   => ['name' => 'HINT_TRANSLATABLE', 'value' => false],
-            'fields'                  => [
+            'hints' => ['name' => 'HINT_TRANSLATABLE', 'value' => false],
+            'fields' => [
                 'field1' => null
             ]
         ]);
@@ -1680,7 +1680,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id'     => ['type' => 'integer'],
+            'id' => ['type' => 'integer'],
             'field1' => ['type' => 'string']
         ];
         $rootEntityMetadata->associationMappings = [];
@@ -1712,10 +1712,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->assertConfig(
             [
-                'hints'                  => ['name' => 'HINT_TRANSLATABLE', 'value' => false],
+                'hints' => ['name' => 'HINT_TRANSLATABLE', 'value' => false],
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'     => null,
+                'fields' => [
+                    'id' => null,
                     'field1' => null
                 ]
             ],
@@ -1727,7 +1727,26 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'fields' => [
-                'id'     => null,
+                'id' => null,
+                '__class__' => [
+                    'meta_property' => true,
+                    'data_type' => 'string'
+                ],
+                'requiredMetaProperty1' => [
+                    'meta_property' => true,
+                    'property_path' => '__requited_meta_property_1__'
+                ],
+                '__requited_meta_property_2__' => [
+                    'meta_property' => true,
+                    'property_path' => 'requiredMetaProperty2'
+                ],
+                'metaProperty1' => [
+                    'meta_property' => true
+                ],
+                'metaProperty2' => [
+                    'meta_property' => true,
+                    'property_path' => 'meta_property_2'
+                ],
                 'field1' => null,
                 'field2' => [
                     'exclude' => true
@@ -1763,8 +1782,20 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id' => null
+                'fields' => [
+                    'id' => null,
+                    '__class__' => [
+                        'meta_property' => true,
+                        'data_type' => 'string'
+                    ],
+                    'requiredMetaProperty1' => [
+                        'meta_property' => true,
+                        'property_path' => '__requited_meta_property_1__'
+                    ],
+                    '__requited_meta_property_2__' => [
+                        'meta_property' => true,
+                        'property_path' => 'requiredMetaProperty2'
+                    ]
                 ]
             ],
             $config
@@ -1775,8 +1806,8 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'identifier_field_names' => ['field1'],
-            'fields'                 => [
-                'id'     => null,
+            'fields' => [
+                'id' => null,
                 'field1' => null,
                 'field2' => [
                     'exclude' => true
@@ -1811,7 +1842,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['field1'],
-                'fields'                 => [
+                'fields' => [
                     'field1' => null
                 ]
             ],
@@ -1823,7 +1854,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'fields' => [
-                'id'     => null,
+                'id' => null,
                 'field1' => [
                     'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
                 ],
@@ -1858,7 +1889,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
+                'fields' => [
                     'id' => null
                 ]
             ],
@@ -1870,8 +1901,8 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'fields' => [
-                'id'      => null,
-                'field1'  => [
+                'id' => null,
+                'field1' => [
                     'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH
                 ],
                 '_field1' => [
@@ -1905,7 +1936,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
+                'fields' => [
                     'id' => null
                 ]
             ],
@@ -1944,7 +1975,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
+                'fields' => [
                     'id' => null
                 ]
             ],
@@ -1956,7 +1987,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'identifier_field_names' => ['field1'],
-            'fields'                 => []
+            'fields' => []
         ]);
         $context = new ConfigContext();
         $context->setClassName(self::TEST_CLASS_NAME);
@@ -1983,7 +2014,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['field1'],
-                'fields'                 => [
+                'fields' => [
                     'field1' => null
                 ]
             ],
@@ -2026,7 +2057,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['renamedId'],
-                'fields'                 => [
+                'fields' => [
                     'renamedId' => [
                         'property_path' => 'name'
                     ]
@@ -2040,7 +2071,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'identifier_field_names' => ['field1'],
-            'fields'                 => [
+            'fields' => [
                 'field1' => [
                     'property_path' => 'realField1'
                 ]
@@ -2071,7 +2102,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['field1'],
-                'fields'                 => [
+                'fields' => [
                     'field1' => [
                         'property_path' => 'realField1'
                     ]
@@ -2088,7 +2119,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $config = $this->createConfigObject([
             'fields' => [
-                'id'    => [
+                'id' => [
                     'exclude' => true
                 ],
                 'field' => null
@@ -2154,11 +2185,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'        => null,
+                'fields' => [
+                    'id' => null,
                     '__class__' => [
                         'meta_property' => true,
-                        'data_type'     => 'string'
+                        'data_type' => 'string'
                     ]
                 ]
             ],
@@ -2206,8 +2237,8 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'        => null,
+                'fields' => [
+                    'id' => null,
                     '__class__' => null
                 ]
             ],
@@ -2257,8 +2288,8 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'   => null,
+                'fields' => [
+                    'id' => null,
                     'type' => [
                         'property_path' => '__class__'
                     ]
@@ -2290,7 +2321,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'association1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_MANY
+                'type' => ClassMetadata::MANY_TO_MANY
             ]
         ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
@@ -2309,8 +2340,8 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
-                            'id'        => null,
+                        'fields' => [
+                            'id' => null,
                             '__class__' => null
                         ]
                     ]
@@ -2327,16 +2358,16 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
-                        'exclusion_policy'       => 'all',
-                        'target_class'           => 'Test\Association1Target',
-                        'target_type'            => 'to-many',
-                        'collapse'               => true,
+                        'exclusion_policy' => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-many',
+                        'collapse' => true,
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
-                            'id'        => null,
+                        'fields' => [
+                            'id' => null,
                             '__class__' => null
                         ]
                     ]
@@ -2370,7 +2401,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id'    => ['type' => 'integer'],
+            'id' => ['type' => 'integer'],
             'field' => ['type' => 'string']
         ];
         $rootEntityMetadata->associationMappings = [];
@@ -2396,17 +2427,17 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     public function completeCustomIdentifierDataProvider(): array
     {
         return [
-            'CREATE action, id generator, configured custom id'              => [
-                'targetAction'    => ApiAction::CREATE,
+            'CREATE action, id generator, configured custom id' => [
+                'targetAction' => ApiAction::CREATE,
                 'usesIdGenerator' => true,
-                'config'          => [
+                'config' => [
                     'identifier_field_names' => ['field'],
-                    'fields'                 => []
+                    'fields' => []
                 ],
-                'expectedConfig'  => [
+                'expectedConfig' => [
                     'identifier_field_names' => ['field'],
-                    'fields'                 => [
-                        'id'    => [
+                    'fields' => [
+                        'id' => [
                             'form_options' => [
                                 'mapped' => false
                             ]
@@ -2415,17 +2446,17 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 ]
             ],
-            'UPDATE action, id generator, configured custom id'              => [
-                'targetAction'    => ApiAction::UPDATE,
+            'UPDATE action, id generator, configured custom id' => [
+                'targetAction' => ApiAction::UPDATE,
                 'usesIdGenerator' => true,
-                'config'          => [
+                'config' => [
                     'identifier_field_names' => ['field'],
-                    'fields'                 => []
+                    'fields' => []
                 ],
-                'expectedConfig'  => [
+                'expectedConfig' => [
                     'identifier_field_names' => ['field'],
-                    'fields'                 => [
-                        'id'    => [
+                    'fields' => [
+                        'id' => [
                             'form_options' => [
                                 'mapped' => false
                             ]
@@ -2434,69 +2465,69 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     ]
                 ]
             ],
-            'another action, id generator, configured custom id'             => [
-                'targetAction'    => ApiAction::GET,
+            'another action, id generator, configured custom id' => [
+                'targetAction' => ApiAction::GET,
                 'usesIdGenerator' => true,
-                'config'          => [
+                'config' => [
                     'identifier_field_names' => ['field'],
-                    'fields'                 => []
+                    'fields' => []
                 ],
-                'expectedConfig'  => [
+                'expectedConfig' => [
                     'identifier_field_names' => ['field'],
-                    'fields'                 => [
-                        'id'    => null,
+                    'fields' => [
+                        'id' => null,
                         'field' => null
                     ]
                 ]
             ],
-            'no id generator, configured custom id'                          => [
-                'targetAction'    => ApiAction::CREATE,
+            'no id generator, configured custom id' => [
+                'targetAction' => ApiAction::CREATE,
                 'usesIdGenerator' => false,
-                'config'          => [
+                'config' => [
                     'identifier_field_names' => ['field'],
-                    'fields'                 => []
+                    'fields' => []
                 ],
-                'expectedConfig'  => [
+                'expectedConfig' => [
                     'identifier_field_names' => ['field'],
-                    'fields'                 => [
-                        'id'    => null,
+                    'fields' => [
+                        'id' => null,
                         'field' => null
                     ]
                 ]
             ],
-            'id generator, configured custom id equals to entity id'         => [
-                'targetAction'    => ApiAction::CREATE,
+            'id generator, configured custom id equals to entity id' => [
+                'targetAction' => ApiAction::CREATE,
                 'usesIdGenerator' => true,
-                'config'          => [
+                'config' => [
                     'identifier_field_names' => ['id'],
-                    'fields'                 => []
+                    'fields' => []
                 ],
-                'expectedConfig'  => [
+                'expectedConfig' => [
                     'identifier_field_names' => ['id'],
-                    'fields'                 => [
-                        'id'    => null,
+                    'fields' => [
+                        'id' => null,
                         'field' => null
                     ]
                 ]
             ],
             'id generator, configured custom id equals to renamed entity id' => [
-                'targetAction'    => ApiAction::CREATE,
+                'targetAction' => ApiAction::CREATE,
                 'usesIdGenerator' => true,
-                'config'          => [
+                'config' => [
                     'identifier_field_names' => ['renamedId'],
-                    'fields'                 => [
+                    'fields' => [
                         'renamedId' => [
                             'property_path' => 'id'
                         ]
                     ]
                 ],
-                'expectedConfig'  => [
+                'expectedConfig' => [
                     'identifier_field_names' => ['renamedId'],
-                    'fields'                 => [
+                    'fields' => [
                         'renamedId' => [
                             'property_path' => 'id'
                         ],
-                        'field'     => null
+                        'field' => null
                     ]
                 ]
             ]
@@ -2510,8 +2541,8 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $config = $this->createConfigObject([
             'identifier_field_names' => ['field'],
-            'fields'                 => [
-                'id'    => null,
+            'fields' => [
+                'id' => null,
                 'field' => [
                     'exclude' => true
                 ]
@@ -2531,7 +2562,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id'    => ['type' => 'integer'],
+            'id' => ['type' => 'integer'],
             'field' => ['type' => 'string']
         ];
         $rootEntityMetadata->associationMappings = [];
@@ -2556,7 +2587,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $config = $this->createConfigObject([
             'identifier_field_names' => ['unknownField'],
-            'fields'                 => [
+            'fields' => [
                 'id' => null
             ]
         ]);
@@ -2574,7 +2605,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id'    => ['type' => 'integer'],
+            'id' => ['type' => 'integer'],
             'field' => ['type' => 'string']
         ];
         $rootEntityMetadata->associationMappings = [];
@@ -2646,7 +2677,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             'fields' => [
                 'field' => [
                     'property_path' => ConfigUtil::IGNORE_PROPERTY_PATH,
-                    'depends_on'    => ['field']
+                    'depends_on' => ['field']
                 ]
             ]
         ]);
@@ -2750,7 +2781,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'exclusion_policy' => 'custom_fields',
-            'fields'           => [
+            'fields' => [
                 'field1' => null
             ]
         ]);
@@ -2787,7 +2818,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id'     => ['type' => 'integer'],
+            'id' => ['type' => 'integer'],
             'field1' => ['type' => 'string'],
             'field2' => ['type' => 'string']
         ];
@@ -2807,10 +2838,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->assertConfig(
             [
-                'exclusion_policy'       => 'custom_fields',
+                'exclusion_policy' => 'custom_fields',
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'     => null,
+                'fields' => [
+                    'id' => null,
                     'field1' => null,
                     'field2' => null
                 ]
@@ -2823,7 +2854,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'exclusion_policy' => 'custom_fields',
-            'fields'           => [
+            'fields' => [
                 'field1' => null
             ]
         ]);
@@ -2864,7 +2895,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id'     => ['type' => 'integer'],
+            'id' => ['type' => 'integer'],
             'field1' => ['type' => 'string'],
             'field2' => ['type' => 'string']
         ];
@@ -2884,10 +2915,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->assertConfig(
             [
-                'exclusion_policy'       => 'custom_fields',
+                'exclusion_policy' => 'custom_fields',
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'     => null,
+                'fields' => [
+                    'id' => null,
                     'field1' => null,
                     'field2' => null
                 ]
@@ -2903,7 +2934,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'exclusion_policy' => 'custom_fields',
-            'fields'           => [
+            'fields' => [
                 'field1' => null,
                 'field3' => null
             ]
@@ -2970,7 +3001,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
         $rootEntityMetadata->fieldMappings = [
-            'id'     => ['type' => 'integer'],
+            'id' => ['type' => 'integer'],
             'field1' => ['type' => 'string'],
             'field2' => ['type' => 'string'],
             'field3' => ['type' => 'string'],
@@ -2992,10 +3023,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->assertConfig(
             [
-                'exclusion_policy'       => 'custom_fields',
+                'exclusion_policy' => 'custom_fields',
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'     => null,
+                'fields' => [
+                    'id' => null,
                     'field1' => null,
                     'field2' => null,
                     'field3' => null
@@ -3012,7 +3043,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'exclusion_policy' => 'custom_fields',
-            'fields'           => [
+            'fields' => [
                 'association1' => null
             ]
         ]);
@@ -3040,7 +3071,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'association1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_ONE
+                'type' => ClassMetadata::MANY_TO_ONE
             ]
         ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
@@ -3069,7 +3100,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -3087,17 +3118,17 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->assertConfig(
             [
-                'exclusion_policy'       => 'custom_fields',
+                'exclusion_policy' => 'custom_fields',
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
-                        'exclusion_policy'       => 'all',
-                        'target_class'           => 'Test\Association1Target',
-                        'target_type'            => 'to-one',
-                        'collapse'               => true,
+                        'exclusion_policy' => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-one',
+                        'collapse' => true,
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -3116,7 +3147,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'exclusion_policy' => 'custom_fields',
-            'fields'           => [
+            'fields' => [
                 'association1' => null
             ]
         ]);
@@ -3148,7 +3179,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'association1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_ONE
+                'type' => ClassMetadata::MANY_TO_ONE
             ]
         ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
@@ -3177,7 +3208,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -3195,17 +3226,17 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->assertConfig(
             [
-                'exclusion_policy'       => 'custom_fields',
+                'exclusion_policy' => 'custom_fields',
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
-                        'exclusion_policy'       => 'all',
-                        'target_class'           => 'Test\Association1Target',
-                        'target_type'            => 'to-one',
-                        'collapse'               => true,
+                        'exclusion_policy' => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-one',
+                        'collapse' => true,
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -3224,7 +3255,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'exclusion_policy' => 'custom_fields',
-            'fields'           => [
+            'fields' => [
                 'association1' => null
             ]
         ]);
@@ -3262,7 +3293,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'association1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_ONE
+                'type' => ClassMetadata::MANY_TO_ONE
             ]
         ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
@@ -3291,7 +3322,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -3309,17 +3340,17 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->assertConfig(
             [
-                'exclusion_policy'       => 'custom_fields',
+                'exclusion_policy' => 'custom_fields',
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
-                        'exclusion_policy'       => 'all',
-                        'target_class'           => 'Test\Association1Target',
-                        'target_type'            => 'to-one',
-                        'collapse'               => true,
+                        'exclusion_policy' => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-one',
+                        'collapse' => true,
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -3338,7 +3369,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'exclusion_policy' => 'custom_fields',
-            'fields'           => []
+            'fields' => []
         ]);
         $context = new ConfigContext();
         $context->setClassName(self::TEST_CLASS_NAME);
@@ -3385,7 +3416,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'association1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_ONE
+                'type' => ClassMetadata::MANY_TO_ONE
             ]
         ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
@@ -3414,7 +3445,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -3432,17 +3463,17 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->assertConfig(
             [
-                'exclusion_policy'       => 'custom_fields',
+                'exclusion_policy' => 'custom_fields',
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
-                        'exclusion_policy'       => 'all',
-                        'target_class'           => 'Test\Association1Target',
-                        'target_type'            => 'to-one',
-                        'collapse'               => true,
+                        'exclusion_policy' => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-one',
+                        'collapse' => true,
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'data_type' => 'integer'
                             ]
@@ -3458,7 +3489,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'exclusion_policy' => 'custom_fields',
-            'fields'           => []
+            'fields' => []
         ]);
         $context = new ConfigContext();
         $context->setClassName(self::TEST_CLASS_NAME);
@@ -3505,7 +3536,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'association1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_ONE
+                'type' => ClassMetadata::MANY_TO_ONE
             ]
         ];
 
@@ -3534,9 +3565,9 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->assertConfig(
             [
-                'exclusion_policy'       => 'custom_fields',
+                'exclusion_policy' => 'custom_fields',
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
+                'fields' => [
                     'id' => null
                 ]
             ],
@@ -3551,7 +3582,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     {
         $config = $this->createConfigObject([
             'fields' => [
-                'id'           => [
+                'id' => [
                     'depends_on' => ['association1.id']
                 ],
                 'association1' => null
@@ -3577,7 +3608,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $rootEntityMetadata->associationMappings = [
             'association1' => [
                 'targetEntity' => 'Test\Association1Target',
-                'type'         => ClassMetadata::MANY_TO_ONE
+                'type' => ClassMetadata::MANY_TO_ONE
             ]
         ];
         $associationMetadata = new ClassMetadata('Test\Association1Target');
@@ -3619,7 +3650,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
+                        'fields' => [
                             'id' => [
                                 'property_path' => 'customizedIdentifier'
                             ]
@@ -3629,8 +3660,8 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 $this->createRelationConfigObject(
                     [
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
-                            'id'       => [
+                        'fields' => [
+                            'id' => [
                                 'property_path' => 'customizedIdentifier'
                             ],
                             'renameId' => [
@@ -3651,23 +3682,23 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => [
+                'fields' => [
+                    'id' => [
                         'depends_on' => ['association1.id']
                     ],
                     'association1' => [
-                        'exclusion_policy'       => 'all',
-                        'target_class'           => 'Test\Association1Target',
-                        'target_type'            => 'to-one',
-                        'collapse'               => true,
+                        'exclusion_policy' => 'all',
+                        'target_class' => 'Test\Association1Target',
+                        'target_type' => 'to-one',
+                        'collapse' => true,
                         'identifier_field_names' => ['id'],
-                        'fields'                 => [
-                            'id'       => [
+                        'fields' => [
+                            'id' => [
                                 'property_path' => 'customizedIdentifier'
                             ],
                             'renameId' => [
                                 'property_path' => 'id',
-                                'exclude'       => true
+                                'exclude' => true
                             ]
                         ]
                     ]

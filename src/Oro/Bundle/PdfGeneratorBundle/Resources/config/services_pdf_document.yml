@@ -68,6 +68,7 @@ services:
             $fileFromPdfFileFactory: '@oro_pdf_generator.pdf_file.factory.file_entity_from_pdf_file'
         calls:
             - [ 'setLogger', [ '@logger' ] ]
+            - [ 'setDebug', [ '%kernel.debug%' ] ]
         tags:
             - { name: 'oro_pdf_generator.pdf_document.resolver' }
             - { name: 'monolog.logger', channel: 'oro_pdf_generator' }

@@ -1,9 +1,11 @@
 /* @theme: admin.oro; */
 
+@import './variables';
 @import './styles';
 @import './acl-table';
 @import './security-row';
 @import './field-acl';
 @import './organization-modal-content';
+@import './select2-organization-switcher';
 @import './desktop/main';
 @import './mobile/main';

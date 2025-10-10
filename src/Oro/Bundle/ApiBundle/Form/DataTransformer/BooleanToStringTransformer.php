@@ -39,21 +39,26 @@ class BooleanToStringTransformer implements DataTransformerInterface
     }
 
     /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @throws TransformationFailedException if the given string cannot be converted to a boolean
      */
     private function transformStringToBoolean(string $value): bool
     {
         switch ($value) {
             case 'true':
+            case 'True':
             case 'yes':
+            case 'Yes':
             case '1':
                 return true;
             case 'false':
+            case 'False':
             case 'no':
+            case 'No':
             case '0':
                 return false;
         }
 
-        throw new TransformationFailedException(sprintf('"%s" cannot be converted to a boolean.', $value));
+        throw new TransformationFailedException(\sprintf('"%s" cannot be converted to a boolean.', $value));
     }
 }

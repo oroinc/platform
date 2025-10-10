@@ -54,8 +54,9 @@ class LinkedPropertyTest extends RestJsonApiTestCase
 
         $data = [
             'data' => [
-                'type'       => $entityType,
+                'type' => $entityType,
                 'attributes' => [
+                    'formatted' => ['value' => '-'],
                     'linkedField' => 'item1'
                 ]
             ]
@@ -81,8 +82,8 @@ class LinkedPropertyTest extends RestJsonApiTestCase
 
         $data = [
             'data' => [
-                'type'       => $entityType,
-                'id'         => (string)$entity->getId(),
+                'type' => $entityType,
+                'id' => (string)$entity->getId(),
                 'attributes' => [
                     'linkedField' => 'new item'
                 ]

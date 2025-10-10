@@ -1,0 +1,45 @@
+datagrids:
+    oro-user-organizations:
+        options:
+            toolbarOptions:
+                pageSize:
+                    items: [5, 10]
+                    default_per_page: 5
+        source:
+            type: orm
+            skip_acl_apply: true
+            query:
+                select:
+                    - o.id
+                    - o.name
+                    - o.description
+                    - o.is_global
+                from:
+                    - { table: Oro\Bundle\OrganizationBundle\Entity\Organization, alias: o }
+                where:
+                    and:
+                        - :user_id MEMBER OF o.users
+                        - o.enabled = true
+            bind_parameters:
+                - user_id
+        columns:
+            name:
+                label: oro.organization.name.label
+            description:
+                label: oro.organization.description.label
+                type: twig
+                frontend_type: html
+                template: '@OroSecurity/Organization/datagrid/description.html.twig'
+            is_global:
+                label: oro.organization.is_global.label
+                frontend_type: boolean
+        properties:
+            id: ~
+        filters:
+            columns:
+                name:
+                    type: string
+                    data_name: o.name
+                is_global:
+                    type: boolean
+                    data_name: o.is_global

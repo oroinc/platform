@@ -47,6 +47,23 @@ class FiltersByAssociationTest extends RestJsonApiTestCase
         self::assertEquals(count($expectedRows), $response->headers->get('X-Include-Total-Count'));
     }
 
+    public function testEqualFilterForEnumWithMultipleValues()
+    {
+        // Test single enum field with multiple values
+        $ids = self::processTemplateData(['<toString(@enum1_1->internalId)>', '<toString(@enum1_4->internalId)>']);
+        $filter = ['filter' => ['enumField' => implode(',', $ids)]];
+
+        $expectedRows = [
+            ['id' => '<toString(@entity1_1->id)>'],
+            ['id' => '<toString(@entity1_2->id)>'],
+            ['id' => '<toString(@entity1_4->id)>']
+        ];
+        $this->prepareExpectedRows($expectedRows);
+
+        $response = $this->cget(['entity' => 'testapientity1'], $filter);
+        $this->assertResponseContains(['data' => $expectedRows], $response);
+    }
+
     public function testEqualFilterForMultiEnum()
     {
         $filter = ['filter' => ['multiEnumField' => ['eq' => '<toString(@enum2_1->internalId)>']]];

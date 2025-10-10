@@ -5,7 +5,6 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\Output\Printer;
 use Behat\Testwork\Output\Exception\MissingExtensionException;
 use Behat\Testwork\Output\Printer\Factory\FilesystemOutputFactory;
 use Behat\Testwork\Output\Printer\StreamOutputPrinter;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * A convenient wrapper around the ConsoleOutputPrinter to write valid JUnit
@@ -26,6 +25,13 @@ final class JUnitOutputPrinter extends StreamOutputPrinter
     public function __construct(FilesystemOutputFactory $outputFactory)
     {
         parent::__construct($outputFactory);
+    }
+
+    public function addCurrentTestCaseAttributes(array $testcaseAttributes): void
+    {
+        if ($this->currentTestcase) {
+            $this->addAttributesToNode($this->currentTestcase, $testcaseAttributes);
+        }
     }
 
     private function addCall(string $method, array $arguments)
@@ -164,14 +170,6 @@ final class JUnitOutputPrinter extends StreamOutputPrinter
 
     private function execFlush()
     {
-        if ($this->domDocument instanceof \DOMDocument) {
-            $this->getWritingStream()->write(
-                $this->domDocument->saveXML(null, LIBXML_NOEMPTYTAG),
-                false,
-                OutputInterface::OUTPUT_RAW
-            );
-        }
-
         parent::flush();
     }
 }
