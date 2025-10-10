@@ -285,7 +285,7 @@ const MultiSelectView = BaseMultiSelectView.extend({
                 }
 
                 return {
-                    label: option.innerText,
+                    label: option.innerText.trim(),
                     selected: option.selected,
                     disabled: option.disabled,
                     ...opts,

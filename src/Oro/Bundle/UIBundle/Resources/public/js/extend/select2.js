@@ -780,9 +780,9 @@ define(function(require) {
             makeExtraElementsAccessible(this.results);
         });
 
-        prototype.clear = function() {
+        prototype.clear = function(...args) {
             this.pagePath = '';
-            clear.call(this);
+            clear.apply(this, args);
         };
 
         prototype.createContainer = function() {
