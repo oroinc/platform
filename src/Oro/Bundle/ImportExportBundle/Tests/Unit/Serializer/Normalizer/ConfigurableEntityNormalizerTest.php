@@ -20,8 +20,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class ConfigurableEntityNormalizerTest extends TestCase
@@ -123,8 +123,8 @@ class ConfigurableEntityNormalizerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
             'Serializer must implement "%s" and "%s"',
-            ContextAwareNormalizerInterface::class,
-            ContextAwareDenormalizerInterface::class
+            NormalizerInterface::class,
+            DenormalizerInterface::class
         ));
 
         $serializer = $this->createMock(SerializerInterface::class);

@@ -5,18 +5,21 @@ namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
+/**
+ * Serializer normalizer for handling Doctrine Collections during import/export operations
+ */
 class CollectionNormalizer implements
     SerializerAwareInterface,
-    ContextAwareNormalizerInterface,
-    ContextAwareDenormalizerInterface
+    NormalizerInterface,
+    DenormalizerInterface
 {
     /**
-     * @var SerializerInterface|ContextAwareNormalizerInterface|ContextAwareDenormalizerInterface
+     * @var SerializerInterface|NormalizerInterface|DenormalizerInterface
      */
     protected $serializer;
 
@@ -24,15 +27,15 @@ class CollectionNormalizer implements
      * @throws InvalidArgumentException
      */
     #[\Override]
-    public function setSerializer(SerializerInterface $serializer)
+    public function setSerializer(SerializerInterface $serializer): void
     {
-        if (!$serializer instanceof ContextAwareNormalizerInterface
-            || !$serializer instanceof ContextAwareDenormalizerInterface) {
+        if (!$serializer instanceof NormalizerInterface
+            || !$serializer instanceof DenormalizerInterface) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Serializer must implement "%s" and "%s"',
-                    ContextAwareNormalizerInterface::class,
-                    ContextAwareDenormalizerInterface::class
+                    NormalizerInterface::class,
+                    DenormalizerInterface::class
                 )
             );
         }
@@ -49,8 +52,11 @@ class CollectionNormalizer implements
      * @return array
      */
     #[\Override]
-    public function normalize($object, ?string $format = null, array $context = [])
-    {
+    public function normalize(
+        mixed $object,
+        ?string $format = null,
+        array $context = []
+    ): float|int|bool|\ArrayObject|array|string|null {
         $result = [];
 
         foreach ($object as $item) {
@@ -72,7 +78,7 @@ class CollectionNormalizer implements
      * @return ArrayCollection
      */
     #[\Override]
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (!is_array($data)) {
             return new ArrayCollection();
@@ -118,5 +124,10 @@ class CollectionNormalizer implements
             '/^(Doctrine\\\Common\\\Collections\\\ArrayCollection|ArrayCollection)(<[\w_<>\\\]+>)?$/',
             $type
         );
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return ['object' => true];
     }
 }

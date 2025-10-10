@@ -104,7 +104,7 @@ class ScalarFieldDenormalizer implements ScalarFieldDenormalizerInterface
     }
 
     #[\Override]
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         if ('' === $data) {
             return $data;
@@ -196,5 +196,10 @@ class ScalarFieldDenormalizer implements ScalarFieldDenormalizerInterface
     private function getIgnoredFieldKey(string $className, string $fieldName): string
     {
         return $className . ':' . $fieldName;
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return ['object' => true];
     }
 }

@@ -6,12 +6,11 @@ use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Serializer\Annotation\Ignore as LegacyIgnore;
 use Symfony\Component\Serializer\Attribute\Ignore;
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer as BaseGetSetMethodNormalizer;
 
 /**
  * Modified normalizer to handle(skip) exception thrown during reading of object's attribute values.
  */
-class GetSetMethodNormalizer extends BaseGetSetMethodNormalizer
+class GetSetMethodNormalizer extends SymfonyGetSetMethodNormalizer
 {
     #[\Override]
     protected function getAttributeValue(
@@ -52,7 +51,7 @@ class GetSetMethodNormalizer extends BaseGetSetMethodNormalizer
         string $attribute,
         ?string $format = null,
         array $context = []
-    ) {
+    ): bool {
         $class = \is_object($classOrObject) ? \get_class($classOrObject) : $classOrObject;
 
         if (ExtendHelper::isExtendEntity($class)) {

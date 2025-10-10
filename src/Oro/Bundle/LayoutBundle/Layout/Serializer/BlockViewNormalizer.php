@@ -50,7 +50,7 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
     }
 
     #[\Override]
-    public function setSerializer(SerializerInterface $serializer)
+    public function setSerializer(SerializerInterface $serializer): void
     {
         if (!($serializer instanceof NormalizerInterface && $serializer instanceof DenormalizerInterface)) {
             throw new \RuntimeException('BlockViewNormalizer is not compatible with provided serializer');
@@ -60,14 +60,17 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
     }
 
     #[\Override]
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return $data instanceof BlockView;
     }
 
     #[\Override]
-    public function normalize($object, ?string $format = null, array $context = [])
-    {
+    public function normalize(
+        mixed $object,
+        ?string $format = null,
+        array $context = []
+    ): float|int|bool|\ArrayObject|array|string|null {
         /** @var BlockView $object */
 
         $data = [];
@@ -109,13 +112,13 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
     }
 
     #[\Override]
-    public function supportsDenormalization($data, string $type, ?string $format = null): bool
+    public function supportsDenormalization($data, string $type, ?string $format = null, array $context = []): bool
     {
         return BlockView::class === $type;
     }
 
     #[\Override]
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         $view = new BlockView();
         [$id, $blockType, $blockPrefixes] = $data[self::DATA_KEYS];
@@ -152,7 +155,7 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
         return $view;
     }
 
-    protected function setBlocksRecursive(BlockView $view, BlockViewCollection $blocks)
+    protected function setBlocksRecursive(BlockView $view, BlockViewCollection $blocks): void
     {
         $view->blocks = $blocks;
         $view->vars[self::BLOCK] = $view;
@@ -163,7 +166,7 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
         }
     }
 
-    protected function denormalizeVarRecursive(array &$var, ?string $format, array $context)
+    protected function denormalizeVarRecursive(array &$var, ?string $format, array $context): void
     {
         foreach ($var as &$value) {
             if (!\is_array($value)) {

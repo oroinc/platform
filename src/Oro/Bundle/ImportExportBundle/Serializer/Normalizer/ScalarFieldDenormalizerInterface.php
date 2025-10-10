@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * Converts value of the supported scalar field types from the current scalar representation
  * to the field type representation
  */
-interface ScalarFieldDenormalizerInterface extends ContextAwareDenormalizerInterface
+interface ScalarFieldDenormalizerInterface extends DenormalizerInterface
 {
     public function addFieldToIgnore(string $className, string $fieldName);
 

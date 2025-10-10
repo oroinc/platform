@@ -2,11 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
+/**
+ * Normalizes traversable objects and arrays by processing each contained element through the serializer
+ */
 class ProcessTraversableNormalizer extends AbstractProcessNormalizer
 {
     #[\Override]
-    public function normalize($object, ?string $format = null, array $context = [])
-    {
+    public function normalize(
+        mixed $object,
+        ?string $format = null,
+        array $context = []
+    ): float|int|bool|\ArrayObject|array|string|null {
         $normalizedData = [];
 
         foreach ($object as $key => $value) {
@@ -17,7 +23,7 @@ class ProcessTraversableNormalizer extends AbstractProcessNormalizer
     }
 
     #[\Override]
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         $denormalizedData = [];
 
@@ -29,14 +35,19 @@ class ProcessTraversableNormalizer extends AbstractProcessNormalizer
     }
 
     #[\Override]
-    public function supportsNormalization($data, ?string $format = null): bool
+    public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
         return is_array($data) || $data instanceof \Traversable;
     }
 
     #[\Override]
-    public function supportsDenormalization($data, string $type, ?string $format = null): bool
+    public function supportsDenormalization($data, string $type, ?string $format = null, array $context = []): bool
     {
         return is_array($data);
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return ['object' => true];
     }
 }

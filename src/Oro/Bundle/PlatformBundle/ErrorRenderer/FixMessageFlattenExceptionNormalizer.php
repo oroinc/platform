@@ -26,10 +26,13 @@ class FixMessageFlattenExceptionNormalizer implements NormalizerInterface
     }
 
     #[\Override]
-    public function normalize($object, ?string $format = null, array $context = [])
-    {
+    public function normalize(
+        mixed $data,
+        ?string $format = null,
+        array $context = []
+    ): float|int|bool|\ArrayObject|array|string|null {
         /** @var array $result */
-        $result = $this->innerNormalizer->normalize($object, $format, $context);
+        $result = $this->innerNormalizer->normalize($data, $format, $context);
         if (\is_array($result) && isset($result[self::CODE], $result[self::MESSAGE])) {
             $code = $result[self::CODE];
             $message = $result[self::MESSAGE];
@@ -44,7 +47,7 @@ class FixMessageFlattenExceptionNormalizer implements NormalizerInterface
     }
 
     #[\Override]
-    public function supportsNormalization($data, ?string $format = null): bool
+    public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
         return $this->innerNormalizer->supportsNormalization($data, $format);
     }
