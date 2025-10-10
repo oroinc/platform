@@ -5,12 +5,12 @@ namespace Oro\Bundle\TranslationBundle\ImportExport\Serializer;
 use Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * Denormalizes the translation data into the Translation object.
  */
-class TranslationNormalizer implements ContextAwareDenormalizerInterface
+class TranslationNormalizer implements DenormalizerInterface
 {
     protected TranslationManager $translationManager;
 
@@ -20,7 +20,7 @@ class TranslationNormalizer implements ContextAwareDenormalizerInterface
     }
 
     #[\Override]
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (!is_array($data) || !isset($data['domain'], $data['key'], $data['value'])) {
             throw new UnexpectedValueException('Incorrect record format');
@@ -42,5 +42,10 @@ class TranslationNormalizer implements ContextAwareDenormalizerInterface
     public function supportsDenormalization($data, string $type, ?string $format = null, array $context = []): bool
     {
         return $type === Translation::class && !empty($context['language_code']);
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [Translation::class => true];
     }
 }

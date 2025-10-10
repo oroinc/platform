@@ -4,8 +4,8 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer;
 
 use Oro\Bundle\ImportExportBundle\Serializer\Serializer;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 
 class SerializerTest extends TestCase
@@ -25,17 +25,17 @@ class SerializerTest extends TestCase
 
     public function testGetNormalizer(): void
     {
-        $supportedNormalizer = $this->createMock(ContextAwareNormalizerInterface::class);
+        $supportedNormalizer = $this->createMock(NormalizerInterface::class);
         $supportedNormalizer->expects(self::once())
             ->method('supportsNormalization')
             ->willReturn(true);
 
-        $nonSupportedNormalizer = $this->createMock(ContextAwareNormalizerInterface::class);
+        $nonSupportedNormalizer = $this->createMock(NormalizerInterface::class);
         $nonSupportedNormalizer->expects(self::once())
             ->method('supportsNormalization')
             ->willReturn(false);
 
-        $denormalizer = $this->createMock(ContextAwareDenormalizerInterface::class);
+        $denormalizer = $this->createMock(DenormalizerInterface::class);
         $denormalizer->expects(self::never())
             ->method('supportsDenormalization')
             ->willReturn(true);
@@ -47,17 +47,17 @@ class SerializerTest extends TestCase
 
     public function testGetDenormalizer(): void
     {
-        $normalizer = $this->createMock(ContextAwareNormalizerInterface::class);
+        $normalizer = $this->createMock(NormalizerInterface::class);
         $normalizer->expects(self::never())
             ->method('supportsNormalization')
             ->willReturn(true);
 
-        $supportedDenormalizer = $this->createMock(ContextAwareDenormalizerInterface::class);
+        $supportedDenormalizer = $this->createMock(DenormalizerInterface::class);
         $supportedDenormalizer->expects(self::once())
             ->method('supportsDenormalization')
             ->willReturn(true);
 
-        $nonSupportedDenormalizer = $this->createMock(ContextAwareDenormalizerInterface::class);
+        $nonSupportedDenormalizer = $this->createMock(DenormalizerInterface::class);
         $nonSupportedDenormalizer->expects(self::once())
             ->method('supportsDenormalization')
             ->willReturn(false);
@@ -86,14 +86,14 @@ class SerializerTest extends TestCase
      */
     public function testDenormalize(string $proc, string $procForCompare, int $iterations): void
     {
-        $normalizer = $this->createMock(ContextAwareNormalizerInterface::class);
+        $normalizer = $this->createMock(NormalizerInterface::class);
 
-        $supportedDenormalizer = $this->createMock(ContextAwareDenormalizerInterface::class);
+        $supportedDenormalizer = $this->createMock(DenormalizerInterface::class);
         $supportedDenormalizer->expects(self::exactly($iterations))
             ->method('supportsDenormalization')
             ->willReturn(true);
 
-        $nonSupportedDenormalizer = $this->createMock(ContextAwareDenormalizerInterface::class);
+        $nonSupportedDenormalizer = $this->createMock(DenormalizerInterface::class);
         $nonSupportedDenormalizer->expects(self::exactly($iterations))
             ->method('supportsDenormalization')
             ->willReturn(false);
@@ -123,17 +123,17 @@ class SerializerTest extends TestCase
      */
     public function testNormalize(string $proc, string $procForCompare, int $iterations): void
     {
-        $supportedNormalizer = $this->createMock(ContextAwareNormalizerInterface::class);
+        $supportedNormalizer = $this->createMock(NormalizerInterface::class);
         $supportedNormalizer->expects(self::exactly($iterations))
             ->method('supportsNormalization')
             ->willReturn(true);
 
-        $nonSupportedNormalizer = $this->createMock(ContextAwareNormalizerInterface::class);
+        $nonSupportedNormalizer = $this->createMock(NormalizerInterface::class);
         $nonSupportedNormalizer->expects(self::exactly($iterations))
             ->method('supportsNormalization')
             ->willReturn(false);
 
-        $denormalizer = $this->createMock(ContextAwareDenormalizerInterface::class);
+        $denormalizer = $this->createMock(DenormalizerInterface::class);
 
         $this->serializer = new Serializer([$denormalizer, $nonSupportedNormalizer, $supportedNormalizer]);
 

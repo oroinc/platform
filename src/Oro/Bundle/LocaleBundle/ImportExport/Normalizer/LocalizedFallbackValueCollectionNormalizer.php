@@ -46,8 +46,11 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
     }
 
     #[\Override]
-    public function normalize($object, ?string $format = null, array $context = [])
-    {
+    public function normalize(
+        mixed $object,
+        ?string $format = null,
+        array $context = []
+    ): float|int|bool|\ArrayObject|array|string|null {
         $result = [];
 
         foreach ($object as $item) {
@@ -65,7 +68,7 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     #[\Override]
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (!is_array($data)) {
             return new ArrayCollection();

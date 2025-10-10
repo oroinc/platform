@@ -5,13 +5,13 @@ namespace Oro\Bundle\EntityBundle\ImportExport\Serializer;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Serializer implementation for EntityFieldFallbackValue class
  */
-class EntityFieldFallbackValueNormalizer implements ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface
+class EntityFieldFallbackValueNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     public const VIRTUAL_FIELD_NAME = 'value';
 
@@ -30,8 +30,11 @@ class EntityFieldFallbackValueNormalizer implements ContextAwareNormalizerInterf
      *
      */
     #[\Override]
-    public function normalize($object, ?string $format = null, array $context = [])
-    {
+    public function normalize(
+        mixed $object,
+        ?string $format = null,
+        array $context = []
+    ): float|int|bool|\ArrayObject|array|string|null {
         if (!$object instanceof EntityFieldFallbackValue) {
             return null;
         }
@@ -40,7 +43,7 @@ class EntityFieldFallbackValueNormalizer implements ContextAwareNormalizerInterf
     }
 
     #[\Override]
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         $object = new EntityFieldFallbackValue();
         if (is_array($data) && array_key_exists(self::VIRTUAL_FIELD_NAME, $data)) {

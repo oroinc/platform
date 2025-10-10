@@ -5,13 +5,13 @@ namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 use Oro\Bundle\ImportExportBundle\Formatter\DateTimeTypeConverterInterface;
 use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
 use Symfony\Component\Serializer\Exception\RuntimeException;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Converts a formatted datetime string into a \DateTime object and vice versa.
  */
-class DateTimeNormalizer implements ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface
+class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     protected ?TypeFormatterInterface $formatter = null;
     protected string $defaultDateTimeFormat;
@@ -41,8 +41,11 @@ class DateTimeNormalizer implements ContextAwareNormalizerInterface, ContextAwar
      *
      */
     #[\Override]
-    public function normalize($object, ?string $format = null, array $context = [])
-    {
+    public function normalize(
+        mixed $object,
+        ?string $format = null,
+        array $context = []
+    ): float|int|bool|\ArrayObject|array|string|null {
         if (!empty($context['format'])) {
             return $object->format($context['format']);
         }
@@ -64,7 +67,7 @@ class DateTimeNormalizer implements ContextAwareNormalizerInterface, ContextAwar
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     #[\Override]
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (empty($data)) {
             return null;
@@ -151,5 +154,10 @@ class DateTimeNormalizer implements ContextAwareNormalizerInterface, ContextAwar
     protected function getTimezone(array $context)
     {
         return $context['timezone'] ?? $this->defaultTimezone;
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [\DateTime::class => true];
     }
 }

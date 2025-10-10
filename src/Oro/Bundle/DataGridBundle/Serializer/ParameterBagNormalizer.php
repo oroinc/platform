@@ -15,7 +15,7 @@ class ParameterBagNormalizer extends AbstractObjectNormalizer
      *
      */
     #[\Override]
-    protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
+    protected function getAttributeValue($object, $attribute, $format = null, array $context = []): mixed
     {
         return $object->get($attribute);
     }
@@ -35,13 +35,13 @@ class ParameterBagNormalizer extends AbstractObjectNormalizer
      *
      */
     #[\Override]
-    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
+    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = []): void
     {
         $object->set($attribute, $value);
     }
 
     #[\Override]
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return $data instanceof ParameterBag;
     }

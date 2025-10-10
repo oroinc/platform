@@ -125,12 +125,6 @@ class ProcessDataNormalizerTest extends TestCase
         $class = ProcessData::class;
         $format = 'json';
         $context = ['processJob' => new ProcessJob()];
-        $denormalizedData = ['denormalized', 'data'];
-
-        $this->serializer->expects($this->once())
-            ->method('denormalize')
-            ->with($data, null, $format, $context)
-            ->willReturn($denormalizedData);
 
         /** @var ProcessData $processData */
         $processData = $this->normalizer->denormalize($data, $class, $format, $context);

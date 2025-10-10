@@ -7,6 +7,10 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
+/**
+ * Handles serialization of Doctrine entities in workflow process jobs
+ * Handles entity ID normalization for non-delete events and full entity data serialization for delete events
+ */
 class ProcessEntityNormalizer extends AbstractProcessNormalizer
 {
     protected ManagerRegistry $registry;
@@ -20,8 +24,11 @@ class ProcessEntityNormalizer extends AbstractProcessNormalizer
     }
 
     #[\Override]
-    public function normalize($object, ?string $format = null, array $context = [])
-    {
+    public function normalize(
+        mixed $object,
+        ?string $format = null,
+        array $context = []
+    ): float|int|bool|\ArrayObject|array|string|null {
         $processJob = $this->getProcessJob($context);
         $entityClass = $this->getClass($object);
         $normalizedData = ['className' => $entityClass];
@@ -47,7 +54,7 @@ class ProcessEntityNormalizer extends AbstractProcessNormalizer
     }
 
     #[\Override]
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         $className = $data['className'];
 
@@ -71,13 +78,13 @@ class ProcessEntityNormalizer extends AbstractProcessNormalizer
     }
 
     #[\Override]
-    public function supportsNormalization($data, ?string $format = null): bool
+    public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
         return is_object($data) && $this->doctrineHelper->isManageableEntity($data);
     }
 
     #[\Override]
-    public function supportsDenormalization($data, string $type, ?string $format = null): bool
+    public function supportsDenormalization($data, string $type, ?string $format = null, array $context = []): bool
     {
         return is_array($data) && !empty($data['className']);
     }
@@ -85,5 +92,10 @@ class ProcessEntityNormalizer extends AbstractProcessNormalizer
     protected function getClassMetadata(string $className): ClassMetadata
     {
         return $this->registry->getManagerForClass($className)->getClassMetadata($className);
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return ['object' => true];
     }
 }
