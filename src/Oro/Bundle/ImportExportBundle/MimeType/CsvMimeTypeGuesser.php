@@ -38,9 +38,13 @@ class CsvMimeTypeGuesser extends FileinfoMimeTypeGuesser
         }
 
         // Guess MIME type with FileinfoMimeTypeGuesser. For text/csv return, no need to guess further.
-        $mimeType = parent::guessMimeType($path);
-        if ($mimeType === self::MIME_TYPE) {
-            return $mimeType;
+        try {
+            $mimeType = parent::guessMimeType($path);
+            if ($mimeType === self::MIME_TYPE) {
+                return $mimeType;
+            }
+        } catch (\Throwable $e) {
+            // ignore not parsing exceptions
         }
 
         // If the file has a CSV extension but wasn't detected as text/csv - try to read first 2 lines with fgetcsv.
