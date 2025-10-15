@@ -3161,4 +3161,19 @@ TEXT;
 
         return [$value, $cellValue, $columnTitle];
     }
+
+    /**
+     * @When I click cell in ":column" column of :rowNumber row in :gridName grid
+     * @When I click cell in ":column" column of :rowNumber row
+     */
+    public function clickCellFirstLink(string $column, string $rowNumber, ?string $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        $row  = $grid->getRowByNumber($this->getNumberFromString($rowNumber));
+        $cell = $row->getCellByHeader($column);
+
+        $link = $cell->find('css', 'a, button, [role="button"]');
+        self::assertNotNull($link, "No clickable element in cell '$column' (row $rowNumber).");
+        $link->click();
+    }
 }
