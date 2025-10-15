@@ -1,24 +1,21 @@
-define(function(require) {
-    'use strict';
+import FlowchartJsPlumbOverlayView from '../jsplumb/overlay-view';
+import template from 'tpl-loader!oroworkflow/templates/flowchart/viewer/transition.html';
 
-    const FlowchartJsPlumbOverlayView = require('../jsplumb/overlay-view');
+const FlowchartViewerTransitionOverlayView = FlowchartJsPlumbOverlayView.extend({
+    template,
 
-    const FlowchartViewerTransitionOverlayView = FlowchartJsPlumbOverlayView.extend({
-        template: require('tpl-loader!oroworkflow/templates/flowchart/viewer/transition.html'),
+    /**
+     * @inheritdoc
+     */
+    constructor: function FlowchartViewerTransitionOverlayView(options) {
+        FlowchartViewerTransitionOverlayView.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function FlowchartViewerTransitionOverlayView(options) {
-            FlowchartViewerTransitionOverlayView.__super__.constructor.call(this, options);
-        },
-
-        className: function() {
-            const classNames = [FlowchartViewerTransitionOverlayView.__super__.className.call(this)];
-            classNames.push('workflow-transition-overlay');
-            return classNames.join(' ');
-        }
-    });
-
-    return FlowchartViewerTransitionOverlayView;
+    className: function() {
+        const classNames = [FlowchartViewerTransitionOverlayView.__super__.className.call(this)];
+        classNames.push('workflow-transition-overlay');
+        return classNames.join(' ');
+    }
 });
+
+export default FlowchartViewerTransitionOverlayView;

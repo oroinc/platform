@@ -102,7 +102,7 @@ define(function(require, exports, module) {
         build: function(collection) {
             let gridViews;
             let $gridViews;
-            const GridViewsView = this.GridViewsView;
+            const GridViewsView = this.GridViewsView.default ?? this.GridViewsView;
             const options = gridViewsBuilder.combineGridViewsOptions.call(this);
             const gridViewsOptions = _.extend({collection: collection}, options);
 

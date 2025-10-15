@@ -1,58 +1,54 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery';
+import _ from 'underscore';
+import __ from 'orotranslation/js/translator';
+import DeleteConfirmation from 'oroui/js/delete-confirmation';
+import mediator from 'oroui/js/mediator';
+const options = {
+    successMessage: 'oro.segment.refresh_dialog.success',
+    errorMessage: 'oro.segment.refresh_dialog.error',
+    title: 'oro.segment.refresh_dialog.title',
+    okText: 'oro.segment.refresh_dialog.okText',
+    content: 'oro.segment.refresh_dialog.content',
+    reloadRequired: false
+};
 
-    const $ = require('jquery');
-    const _ = require('underscore');
-    const __ = require('orotranslation/js/translator');
-    const DeleteConfirmation = require('oroui/js/delete-confirmation');
-    const mediator = require('oroui/js/mediator');
-    const options = {
-        successMessage: 'oro.segment.refresh_dialog.success',
-        errorMessage: 'oro.segment.refresh_dialog.error',
-        title: 'oro.segment.refresh_dialog.title',
-        okText: 'oro.segment.refresh_dialog.okText',
-        content: 'oro.segment.refresh_dialog.content',
-        reloadRequired: false
-    };
-
-    function run(url, reloadRequired) {
-        mediator.execute('showLoading');
-        $.post({
-            url: url,
-            errorHandlerMessage: __(options.errorMessage)
-        }).done(function() {
-            if (reloadRequired) {
-                mediator.once('page:update', function() {
-                    mediator.execute('showFlashMessage', 'success', __(options.successMessage));
-                });
-                mediator.execute('refreshPage');
-            } else {
+function run(url, reloadRequired) {
+    mediator.execute('showLoading');
+    $.post({
+        url: url,
+        errorHandlerMessage: __(options.errorMessage)
+    }).done(function() {
+        if (reloadRequired) {
+            mediator.once('page:update', function() {
                 mediator.execute('showFlashMessage', 'success', __(options.successMessage));
-            }
-        }).always(function() {
-            mediator.execute('hideLoading');
-        });
-    }
+            });
+            mediator.execute('refreshPage');
+        } else {
+            mediator.execute('showFlashMessage', 'success', __(options.successMessage));
+        }
+    }).always(function() {
+        mediator.execute('hideLoading');
+    });
+}
 
-    function onClick(reloadRequired, e) {
-        e.preventDefault();
+function onClick(reloadRequired, e) {
+    e.preventDefault();
 
-        const confirm = new DeleteConfirmation({
-            title: __(options.title),
-            okText: __(options.okText),
-            content: __(options.content)
-        });
+    const confirm = new DeleteConfirmation({
+        title: __(options.title),
+        okText: __(options.okText),
+        content: __(options.content)
+    });
 
-        const url = $(e.target).data('url');
+    const url = $(e.target).data('url');
 
-        confirm.on('ok', _.partial(run, url, reloadRequired));
-        confirm.open();
-    }
+    confirm.on('ok', _.partial(run, url, reloadRequired));
+    confirm.open();
+}
 
-    return function(additionalOptions) {
-        _.extend(options, additionalOptions || {});
-        const reloadRequired = Boolean(options.reloadRequired);
-        const button = options._sourceElement;
-        button.on('click', _.partial(onClick, reloadRequired));
-    };
-});
+export default function(additionalOptions) {
+    _.extend(options, additionalOptions || {});
+    const reloadRequired = Boolean(options.reloadRequired);
+    const button = options._sourceElement;
+    button.on('click', _.partial(onClick, reloadRequired));
+};

@@ -1,8 +1,7 @@
-define(function(require) {
-    'use strict';
+import ContentView from 'orosidebar/js/app/views/sidebar-widget/sticky-note/sticky-note-content-view';
+import SetupView from 'orosidebar/js/app/views/sidebar-widget/sticky-note/sticky-note-setup-view';
 
-    return {
-        ContentView: require('orosidebar/js/app/views/sidebar-widget/sticky-note/sticky-note-content-view'),
-        SetupView: require('orosidebar/js/app/views/sidebar-widget/sticky-note/sticky-note-setup-view')
-    };
-});
+export default {
+    ContentView,
+    SetupView
+};

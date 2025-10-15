@@ -1,42 +1,38 @@
-define(function(require) {
-    'use strict';
+import BaseView from 'oroui/js/app/views/base/view';
+import FlowchartJsPlumbAreaView from './area-view';
 
-    const BaseView = require('oroui/js/app/views/base/view');
-    const FlowchartJsPlumbAreaView = require('./area-view');
+const FlowchartJsPlumbOverlayView = BaseView.extend({
+    listen: {
+        'change model': 'render'
+    },
 
-    const FlowchartJsPlumbOverlayView = BaseView.extend({
-        listen: {
-            'change model': 'render'
-        },
+    className: function() {
+        return 'jsplumb-overlay';
+    },
 
-        className: function() {
-            return 'jsplumb-overlay';
-        },
+    /**
+     * @inheritdoc
+     */
+    constructor: function FlowchartJsPlumbOverlayView(options) {
+        FlowchartJsPlumbOverlayView.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function FlowchartJsPlumbOverlayView(options) {
-            FlowchartJsPlumbOverlayView.__super__.constructor.call(this, options);
-        },
-
-        /**
-         * @inheritdoc
-         */
-        initialize: function(options) {
-            if (!(options.areaView instanceof FlowchartJsPlumbAreaView)) {
-                throw new Error('areaView options is required and must be a JsplumbAreaView');
-            }
-            this.areaView = options.areaView;
-            this.overlay = options.overlay;
-            this.listenTo(this.areaView.flowchartState, 'change:transitionLabelsVisible', this.onLabelsToggle);
-            FlowchartJsPlumbOverlayView.__super__.initialize.call(this, options);
-        },
-
-        onLabelsToggle: function(flowchartState) {
-            this.overlay.setVisible(flowchartState.get('transitionLabelsVisible'));
+    /**
+     * @inheritdoc
+     */
+    initialize: function(options) {
+        if (!(options.areaView instanceof FlowchartJsPlumbAreaView)) {
+            throw new Error('areaView options is required and must be a JsplumbAreaView');
         }
-    });
+        this.areaView = options.areaView;
+        this.overlay = options.overlay;
+        this.listenTo(this.areaView.flowchartState, 'change:transitionLabelsVisible', this.onLabelsToggle);
+        FlowchartJsPlumbOverlayView.__super__.initialize.call(this, options);
+    },
 
-    return FlowchartJsPlumbOverlayView;
+    onLabelsToggle: function(flowchartState) {
+        this.overlay.setVisible(flowchartState.get('transitionLabelsVisible'));
+    }
 });
+
+export default FlowchartJsPlumbOverlayView;
