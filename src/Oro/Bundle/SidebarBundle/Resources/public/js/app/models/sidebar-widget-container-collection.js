@@ -1,30 +1,26 @@
-define(function(require) {
-    'use strict';
+import _ from 'underscore';
+import BaseCollection from 'oroui/js/app/models/base/collection';
+import SidebarWidgetContainerModel from 'orosidebar/js/app/models/sidebar-widget-container-model';
 
-    const _ = require('underscore');
-    const BaseCollection = require('oroui/js/app/models/base/collection');
-    const SidebarWidgetContainerModel = require('orosidebar/js/app/models/sidebar-widget-container-model');
+const SidebarWidgetContainerCollection = BaseCollection.extend({
+    model: SidebarWidgetContainerModel,
 
-    const SidebarWidgetContainerCollection = BaseCollection.extend({
-        model: SidebarWidgetContainerModel,
+    comparator: 'position',
 
-        comparator: 'position',
+    /**
+     * @inheritdoc
+     */
+    constructor: function SidebarWidgetContainerCollection(data, options) {
+        SidebarWidgetContainerCollection.__super__.constructor.call(this, data, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function SidebarWidgetContainerCollection(data, options) {
-            SidebarWidgetContainerCollection.__super__.constructor.call(this, data, options);
-        },
-
-        /**
-         * @inheritdoc
-         */
-        initialize: function(data, options) {
-            _.extend(this, _.pick(options, ['url']));
-            SidebarWidgetContainerCollection.__super__.initialize.call(this, data, options);
-        }
-    });
-
-    return SidebarWidgetContainerCollection;
+    /**
+     * @inheritdoc
+     */
+    initialize: function(data, options) {
+        _.extend(this, _.pick(options, ['url']));
+        SidebarWidgetContainerCollection.__super__.initialize.call(this, data, options);
+    }
 });
+
+export default SidebarWidgetContainerCollection;
