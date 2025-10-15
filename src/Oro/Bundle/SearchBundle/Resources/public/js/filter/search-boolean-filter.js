@@ -1,10 +1,6 @@
-define(function(require) {
-    'use strict';
+import MultiSelectFilter from 'oro/filter/multiselect-filter';
 
-    const MultiSelectFilter = require('oro/filter/multiselect-filter');
-
-    const SearchBooleanFilter = MultiSelectFilter.extend({
-    });
-
-    return SearchBooleanFilter;
+const SearchBooleanFilter = MultiSelectFilter.extend({
 });
+
+export default SearchBooleanFilter;

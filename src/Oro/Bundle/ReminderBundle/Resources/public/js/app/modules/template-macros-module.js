@@ -1,4 +1,5 @@
 import {macros} from 'underscore';
+import template from 'tpl-loader!ororeminder/templates/macros/default-reminder-template.html';
 
 macros('reminderTemplates', {
     /**
@@ -9,5 +10,5 @@ macros('reminderTemplates', {
      * @param {string} data.expireAt
      * @param {string?} data.url
      */
-    'default': require('tpl-loader!ororeminder/templates/macros/default-reminder-template.html')
+    'default': template
 });
