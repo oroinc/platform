@@ -1,10 +1,8 @@
-define({
-    between: function(b, a, c) {
-        'use strict';
+export default {
+    between(b, a, c) {
         return (a <= b && b <= c) || (a >= b && b >= c);
     },
-    betweenNonInclusive: function(b, a, c) {
-        'use strict';
+    betweenNonInclusive(b, a, c) {
         return (a < b && b < c) || (a > b && b > c);
     }
-});
+};

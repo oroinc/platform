@@ -1,42 +1,38 @@
-define(function(require) {
-    'use strict';
+import BaseModel from 'oroui/js/app/models/base/model';
 
-    const BaseModel = require('oroui/js/app/models/base/model');
+const TransitionDefinitionModel = BaseModel.extend({
+    defaults: {
+        name: null,
+        preactions: null,
+        preconditions: null,
+        conditions: null,
+        actions: null
+    },
 
-    const TransitionDefinitionModel = BaseModel.extend({
-        defaults: {
-            name: null,
-            preactions: null,
-            preconditions: null,
-            conditions: null,
-            actions: null
-        },
+    /**
+     * @inheritdoc
+     */
+    constructor: function TransitionDefinitionModel(attrs, options) {
+        TransitionDefinitionModel.__super__.constructor.call(this, attrs, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function TransitionDefinitionModel(attrs, options) {
-            TransitionDefinitionModel.__super__.constructor.call(this, attrs, options);
-        },
-
-        /**
-         * @inheritdoc
-         */
-        initialize: function() {
-            if (this.get('preactions') === null) {
-                this.set('preactions', {});
-            }
-            if (this.get('preconditions') === null) {
-                this.set('preconditions', {});
-            }
-            if (this.get('conditions') === null) {
-                this.set('conditions', {});
-            }
-            if (this.get('actions') === null) {
-                this.set('actions', []);
-            }
+    /**
+     * @inheritdoc
+     */
+    initialize: function() {
+        if (this.get('preactions') === null) {
+            this.set('preactions', {});
         }
-    });
-
-    return TransitionDefinitionModel;
+        if (this.get('preconditions') === null) {
+            this.set('preconditions', {});
+        }
+        if (this.get('conditions') === null) {
+            this.set('conditions', {});
+        }
+        if (this.get('actions') === null) {
+            this.set('actions', []);
+        }
+    }
 });
+
+export default TransitionDefinitionModel;
