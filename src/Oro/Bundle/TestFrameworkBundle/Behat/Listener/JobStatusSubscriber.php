@@ -8,6 +8,9 @@ use Behat\Behat\EventDispatcher\Event\BeforeStepTested;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
+use Elastic\Elasticsearch\Client as ElasticsearchClient;
+use Elastic\Elasticsearch\Exception\ClientResponseException;
+use Elastic\Elasticsearch\Exception\ServerResponseException;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
@@ -30,6 +33,8 @@ class JobStatusSubscriber implements EventSubscriberInterface
     /** @var array|Process[] */
     private array $processes = [];
     private int $countConsumers;
+    private ?ElasticsearchClient $elasticsearchClient = null;
+    private ?ElasticsearchClient $websiteElasticsearchClient = null;
 
     public function __construct(
         private KernelInterface $kernel,
@@ -85,16 +90,25 @@ class JobStatusSubscriber implements EventSubscriberInterface
         $connection = $doctrine->getManagerForClass(Job::class)->getConnection();
 
         $endTime = new \DateTime('+900 seconds');
+        $isSearchIndex = false;
         while (true) {
             $this->startConsumerIfNotRunning();
 
-            $activeJobs = $connection->fetchOne(
-                'SELECT j.id FROM oro_message_queue_job j WHERE j.status IN (?) AND j.created_at > ? LIMIT 1',
+            $activeJobs = $connection->fetchAllAssociative(
+                'SELECT j.id, j.name FROM oro_message_queue_job j WHERE j.status IN (?) AND j.created_at > ?',
                 [self::ACTIVE_JOB_STATUSES, $this->startDateTime],
                 [Connection::PARAM_STR_ARRAY, Types::DATETIME_MUTABLE]
             );
 
+            if (!$isSearchIndex) {
+                $isSearchIndex = $this->hasSearchReindexJobs($activeJobs);
+            }
+
             if (!$activeJobs) {
+                if ($isSearchIndex === true) {
+                    $this->refreshElasticsearchClientIndices();
+                }
+
                 return;
             }
 
@@ -113,6 +127,18 @@ class JobStatusSubscriber implements EventSubscriberInterface
                 implode(', ', (array)$activeJobs)
             )
         );
+    }
+
+    private function hasSearchReindexJobs(array $activeJobs): bool
+    {
+        foreach ($activeJobs as $job) {
+            if (str_contains($job['name'], 'search_reindex')
+                || str_contains($job['name'], 'oro.search.reindex')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function setCountConsumersFromOption(int $countConsumers)
@@ -161,5 +187,54 @@ class JobStatusSubscriber implements EventSubscriberInterface
     public function doNotRunConsumer(): void
     {
         $this->shouldNotRunConsumer = true;
+    }
+
+    private function hasElasticsearchClientFactory(): bool
+    {
+        return $this->kernel->getContainer()->has('oro_elasticsearch.client.factory');
+    }
+
+    private function initElasticsearchClients(): void
+    {
+        if ($this->elasticsearchClient && $this->websiteElasticsearchClient) {
+            return;
+        }
+
+        $container = $this->kernel->getContainer();
+        $clientFactory = $container->get('oro_elasticsearch.client.factory');
+
+        if ($container->has('oro_website_elasticsearch.engine.parameters_provider')
+            && $this->websiteElasticsearchClient === null
+        ) {
+            $parameters = $container->get('oro_website_elasticsearch.engine.parameters_provider')
+                ->getEngineParameters();
+            if (!empty($parameters['client'])) {
+                $this->websiteElasticsearchClient = $clientFactory->create($parameters['client']);
+            }
+        }
+
+        if ($container->has('oro_elasticsearch.engine.parameters_provider')
+            && $this->elasticsearchClient === null
+        ) {
+            $parameters = $container->get('oro_elasticsearch.engine.parameters_provider')->getEngineParameters();
+            if (!empty($parameters['client'])) {
+                $this->elasticsearchClient = $clientFactory->create($parameters['client']);
+            }
+        }
+    }
+
+    /**
+     * @throws ServerResponseException
+     * @throws ClientResponseException
+     */
+    private function refreshElasticsearchClientIndices(): void
+    {
+        if (!$this->hasElasticsearchClientFactory()) {
+            return;
+        }
+
+        $this->initElasticsearchClients();
+        $this->websiteElasticsearchClient?->indices()->refresh();
+        $this->elasticsearchClient?->indices()->refresh();
     }
 }
