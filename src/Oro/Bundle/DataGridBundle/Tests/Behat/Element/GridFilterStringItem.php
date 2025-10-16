@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\VariableStorage;
 
 class GridFilterStringItem extends AbstractGridFilterItem
 {
@@ -81,6 +82,7 @@ class GridFilterStringItem extends AbstractGridFilterItem
      */
     public function setFilterValue($value)
     {
+        $value = VariableStorage::normalizeValue($value);
         $this->getInputField()->setValue($value);
     }
 

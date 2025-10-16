@@ -1,9 +1,5 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery';
 
-    const $ = require('jquery');
+import 'bootstrap-alert';
 
-    require('bootstrap-alert');
-
-    return $;
-});
+export default $;
