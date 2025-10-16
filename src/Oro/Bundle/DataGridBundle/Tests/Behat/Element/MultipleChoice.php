@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\VariableStorage;
 
 class MultipleChoice extends AbstractGridFilterItem
 {
@@ -16,6 +17,7 @@ class MultipleChoice extends AbstractGridFilterItem
         $inputs = $widget->findAll('css', 'li > label');
 
         foreach ($values as $value) {
+            $value = VariableStorage::normalizeValue($value);
             $item = $this->findElementByText($inputs, $value);
 
             self::assertNotNull($item, sprintf('Could not find checkbox with "%s" text', $value));
@@ -58,6 +60,7 @@ class MultipleChoice extends AbstractGridFilterItem
         $inputs = $widget->findAll('css', 'li > label');
 
         foreach ($values as $value) {
+            $value = VariableStorage::normalizeValue($value);
             $item = $this->findElementByTextStrict($inputs, $value);
 
             self::assertNotNull($item, sprintf('Could not find checkbox with "%s" text', $value));
@@ -76,6 +79,7 @@ class MultipleChoice extends AbstractGridFilterItem
      */
     public function isItemChecked(string $value): bool
     {
+        $value = VariableStorage::normalizeValue($value);
         $this->open();
         $widget = $this->getWidget();
         $inputs = $widget->findAll('css', 'li > label');
