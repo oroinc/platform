@@ -104,8 +104,10 @@ define(function(require, exports, module) {
          *
          * @property
          */
-        events: {
-            'change select': '_onSelectChange'
+        events() {
+            return {
+                [`change ${this.inputSelector}`]: '_onSelectChange'
+            };
         },
 
         /**
@@ -205,39 +207,41 @@ define(function(require, exports, module) {
             SelectFilter.__super__._onClickCriteriaSelector.call(this, event);
         },
 
+        prerender() {
+            SelectFilter.__super__.prerender.call(this);
+
+            if (this.subview('multiselect')) {
+                this.removeSubview('multiselect');
+            }
+        },
+
         /**
          * Render filter view
          *
          * @return {*}
          */
-        render: function() {
+        render() {
             if (this.isRendered() && this.subview('multiselect')) {
                 const $content = $(this.template(this.getTemplateData()));
-                const selectOptions = $content.find('select').html();
-
-                this.$('select').html(selectOptions);
+                this.$(this.inputSelector).html($content.find(this.inputSelector).html());
 
                 this.subview('multiselect').refresh();
             } else {
+                SelectFilter.__super__.render.call(this);
+
                 const {selectOptionsListAriaLabel} = this.getTemplateDataProps();
-
-                this.resetFlags();
-                const $filter = $(this.template(this.getTemplateData()));
-
                 const View = this.getWidgetConstructor();
 
                 this.subview('multiselect', new View({
                     autoRender: true,
-                    container: $filter.find(this.inputSelector).parent(),
-                    selectElement: $filter.find(this.inputSelector),
+                    container: this.$(this.inputSelector).parent(),
+                    selectElement: this.$(this.inputSelector),
                     listAriaLabel: selectOptionsListAriaLabel,
                     enabledHeader: false,
                     enabledSearch: this.contextSearch,
                     closeAfterChose: this.closeAfterChose,
                     ...this.widgetOptions
                 }));
-
-                this._wrap($filter);
             }
 
             if (!this.loadedMetadata && !this.subview('loading')) {
@@ -308,11 +312,13 @@ define(function(require, exports, module) {
         },
 
         _hideCriteria() {
-            if (this.subview('multiselect') instanceof MultiselectDropdown) {
-                this.subview('multiselect').hide();
-            }
+            if (this.subview('multiselect')) {
+                if (this.subview('multiselect') instanceof MultiselectDropdown) {
+                    this.subview('multiselect').hide();
+                }
 
-            this.subview('multiselect').resetSearch();
+                this.subview('multiselect').resetSearch();
+            }
 
             SelectFilter.__super__._hideCriteria.call(this);
         },

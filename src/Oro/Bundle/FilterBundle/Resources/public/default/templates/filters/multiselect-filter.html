@@ -1,38 +1,40 @@
 <% var selectorId = _.uniqueId('selector-'); %>
 <% var criteriaId = _.uniqueId('criteria-'); %>
 <% let oroui = _.macros('oroui') %>
-<div class="multiselect-filter filter-select">
-    <select multiple data-skip-input-widgets>
-    <% _.each(options, function (option) { %>
-        <option value="<%- option.value %>"
-                title="<%- option.label %>"
-            <% var isSelected = false; %>
-            <% if (_.isArray(selected.value)) { %>
-                <% if (_.indexOf(selected.value, option.value) !== -1) { %>
+<div data-multiselect-filter-template>
+    <div class="multiselect-filter filter-select">
+        <select multiple data-skip-input-widgets>
+        <% _.each(options, function (option) { %>
+            <option value="<%- option.value %>"
+                    title="<%- option.label %>"
+                <% var isSelected = false; %>
+                <% if (_.isArray(selected.value)) { %>
+                    <% if (_.indexOf(selected.value, option.value) !== -1) { %>
+                        <% isSelected = true; %>
+                    <% }%>
+                <% } else if (option.value == selected.value) { %>
                     <% isSelected = true; %>
-                <% }%>
-            <% } else if (option.value == selected.value) { %>
-                <% isSelected = true; %>
-            <% } %>
-            <% if (isSelected === true) { %>
-                selected="selected"
-            <% } else { %>
-                <% if (option.disabled !== undefined && option.disabled) { %>
-                    disabled="disabled"
                 <% } %>
-            <% } %>
-            <% if (option.count !== undefined) { %>data-option-count="<%- option.count %>"<% } %>
-            ><%- option.label %></option>
-    <% }); %>
-    </select>
-</div>
+                <% if (isSelected === true) { %>
+                    selected="selected"
+                <% } else { %>
+                    <% if (option.disabled !== undefined && option.disabled) { %>
+                        disabled="disabled"
+                    <% } %>
+                <% } %>
+                <% if (option.count !== undefined) { %>data-option-count="<%- option.count %>"<% } %>
+                ><%- option.label %></option>
+        <% }); %>
+        </select>
+    </div>
 
-<div class="filter-action-row">
-    <% if (allowClearButtonInFilter) { %>
-        <button type="button"
-            data-role="clear-filter"
-            class="btn btn--flat filter-clear hidden"
-            aria-label="<%- clearFilterButtonAriaLabel %>"
-        ><%- _.__("oro.filter.clearFilterButton.text") %></button>
-    <% } %>
+    <div class="filter-action-row">
+        <% if (allowClearButtonInFilter) { %>
+            <button type="button"
+                data-role="clear-filter"
+                class="btn btn--flat filter-clear hidden"
+                aria-label="<%- clearFilterButtonAriaLabel %>"
+            ><%- _.__("oro.filter.clearFilterButton.text") %></button>
+        <% } %>
+    </div>
 </div>

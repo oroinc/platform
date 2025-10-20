@@ -1,19 +1,21 @@
-<div class="select-filter">
-    <select data-skip-input-widgets>
-        <% _.each(options, function (option) { %>
-        <option value="<%- option.value %>" title="<%- option.label %>"
-            <% if (option.value == selected.value) { %>selected="selected"<% } %>
-            ><%- option.label %><% if (option.count !== undefined) { %> (<%- option.count %>)<% } %></option>
-        <% }); %>
-    </select>
-</div>
+<div data-select-filter-template>
+    <div class="select-filter">
+        <select data-skip-input-widgets>
+            <% _.each(options, function (option) { %>
+            <option value="<%- option.value %>" title="<%- option.label %>"
+                <% if (option.value == selected.value) { %>selected="selected"<% } %>
+                ><%- option.label %><% if (option.count !== undefined) { %> (<%- option.count %>)<% } %></option>
+            <% }); %>
+        </select>
+    </div>
 
-<div class="filter-action-row">
-    <% if (allowClearButtonInFilter) { %>
-        <button type="button"
-            data-role="clear-filter"
-            class="btn btn--flat filter-clear hidden"
-            aria-label="<%- clearFilterButtonAriaLabel %>"
-        ><%- _.__("oro.filter.clearFilterButton.text") %></button>
-    <% } %>
+    <div class="filter-action-row">
+        <% if (allowClearButtonInFilter) { %>
+            <button type="button"
+                data-role="clear-filter"
+                class="btn btn--flat filter-clear hidden"
+                aria-label="<%- clearFilterButtonAriaLabel %>"
+            ><%- _.__("oro.filter.clearFilterButton.text") %></button>
+        <% } %>
+    </div>
 </div>

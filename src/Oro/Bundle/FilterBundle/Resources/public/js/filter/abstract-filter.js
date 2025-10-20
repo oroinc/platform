@@ -174,6 +174,12 @@ define(function(require, exports, module) {
             return this._rendereddInMode === this.renderMode;
         },
 
+        prerender() {
+            this.trigger('prerender');
+
+            return this;
+        },
+
         rendered: function() {
             this._rendereddInMode = this.renderMode;
             this.trigger('rendered');

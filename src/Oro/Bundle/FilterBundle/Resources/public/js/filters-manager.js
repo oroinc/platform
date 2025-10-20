@@ -469,6 +469,10 @@ define(function(require, exports, module) {
                     return;
                 }
 
+                if (typeof filter.prerender === 'function') {
+                    filter.prerender();
+                }
+
                 filter.render();
                 $filterItems.append(filter.$el);
                 filter.rendered();
