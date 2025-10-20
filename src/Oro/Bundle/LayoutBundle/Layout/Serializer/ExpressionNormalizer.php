@@ -46,17 +46,20 @@ class ExpressionNormalizer implements
     }
 
     #[\Override]
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return $data instanceof ParsedExpression;
     }
 
     #[\Override]
-    public function normalize($object, ?string $format = null, array $context = [])
-    {
-        /** @var ParsedExpression $object */
+    public function normalize(
+        mixed $data,
+        ?string $format = null,
+        array $context = []
+    ): float|int|bool|\ArrayObject|array|string|null {
+        /** @var ParsedExpression $data */
 
-        $expression = (string)$object;
+        $expression = (string)$data;
         $closure = $this->expressionLanguageCache->getClosure($expression);
         if (null !== $closure) {
             return [
@@ -73,18 +76,18 @@ class ExpressionNormalizer implements
 
         return [
             self::DATA_EXPRESSION => $expression,
-            self::DATA_NODES => serialize($object->getNodes()),
+            self::DATA_NODES => serialize($data->getNodes()),
         ];
     }
 
     #[\Override]
-    public function supportsDenormalization($data, string $type, ?string $format = null): bool
+    public function supportsDenormalization($data, string $type, ?string $format = null, array $context = []): bool
     {
         return ParsedExpression::class === $type;
     }
 
     #[\Override]
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (\array_key_exists(self::DATA_NODES, $data)) {
             return new SerializedParsedExpression($data[self::DATA_EXPRESSION], $data[self::DATA_NODES]);

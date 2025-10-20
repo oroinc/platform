@@ -15,11 +15,10 @@ class BlockThemeNode extends Node
      * @param Node   $block     A note represents BlockView instance for which additional theme(s) is set
      * @param Node   $resources A theme name or an array of theme names
      * @param int    $lineno    The line number
-     * @param string $tag       The tag name associated with the Node
      */
-    public function __construct(Node $block, Node $resources, $lineno, $tag = null)
+    public function __construct(Node $block, Node $resources, $lineno)
     {
-        parent::__construct(['block' => $block, 'resources' => $resources], [], $lineno, $tag);
+        parent::__construct(['block' => $block, 'resources' => $resources], [], $lineno);
     }
 
     #[\Override]

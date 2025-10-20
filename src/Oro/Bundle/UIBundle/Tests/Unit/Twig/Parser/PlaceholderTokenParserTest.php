@@ -67,7 +67,8 @@ class PlaceholderTokenParserTest extends TestCase
 
         $this->assertInstanceOf(PrintNode::class, $actualNode);
         $this->assertEquals($tokenLine, $actualNode->getTemplateLine());
-        $this->assertEquals('placeholder', $actualNode->getNodeTag());
+        $this->assertInstanceOf(FunctionExpression::class, $actualNode->getNode('expr'));
+        $this->assertEquals('placeholder', $actualNode->getNode('expr')->getAttribute('name'));
     }
 
     public function testParseExpressionNameWithVariables(): void
@@ -96,7 +97,8 @@ class PlaceholderTokenParserTest extends TestCase
 
         $this->assertInstanceOf(PrintNode::class, $actualNode);
         $this->assertEquals($tokenLine, $actualNode->getTemplateLine());
-        $this->assertEquals('placeholder', $actualNode->getNodeTag());
+        $this->assertInstanceOf(FunctionExpression::class, $actualNode->getNode('expr'));
+        $this->assertEquals('placeholder', $actualNode->getNode('expr')->getAttribute('name'));
     }
 
     private function prepareCompiler(PrintNode $node, $expr): void

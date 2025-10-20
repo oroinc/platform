@@ -1,16 +1,12 @@
-define(function(require) {
-    'use strict';
+import InnerPageModel from 'oroviewswitcher/js/app/models/inner-page-model';
+let instance;
 
-    const InnerPageModel = require('oroviewswitcher/js/app/models/inner-page-model');
-    let instance;
-
-    return {
-        getModel: function() {
-            if (instance) {
-                return instance;
-            }
-
-            return instance = new InnerPageModel();
+export default {
+    getModel: function() {
+        if (instance) {
+            return instance;
         }
-    };
-});
+
+        return instance = new InnerPageModel();
+    }
+};

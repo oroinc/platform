@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     const LoadMoreCollection = require('oroui/js/app/models/load-more-collection');
-    const CommentModel = require('orocomment/js/app/models/comment-model');
+    const CommentModel = require('orocomment/js/app/models/comment-model').default;
 
     const CommentCollection = LoadMoreCollection.extend({
         model: CommentModel,

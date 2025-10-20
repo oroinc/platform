@@ -8,13 +8,13 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Normalize/denormalize FieldConfigModel instances.
  */
-class EntityFieldNormalizer implements ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface
+class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     const TYPE_BOOLEAN = 'boolean';
     const TYPE_INTEGER = 'integer';
@@ -50,8 +50,11 @@ class EntityFieldNormalizer implements ContextAwareNormalizerInterface, ContextA
     }
 
     #[\Override]
-    public function normalize($object, ?string $format = null, array $context = [])
-    {
+    public function normalize(
+        mixed $object,
+        ?string $format = null,
+        array $context = []
+    ): float|int|bool|\ArrayObject|array|string|null {
         $result = [
             'id' => $object->getId(),
             'fieldName' => $object->getFieldName(),
@@ -76,7 +79,7 @@ class EntityFieldNormalizer implements ContextAwareNormalizerInterface, ContextA
     }
 
     #[\Override]
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (!isset($data['entity']['id'])) {
             throw new UnexpectedValueException('Data doesn\'t contains entity id');
@@ -238,5 +241,10 @@ class EntityFieldNormalizer implements ContextAwareNormalizerInterface, ContextA
                 self::CONFIG_TYPE => self::TYPE_BOOLEAN,
             ],
         ];
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return ['object' => true];
     }
 }

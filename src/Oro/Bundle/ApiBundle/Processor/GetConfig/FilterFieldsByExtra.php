@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -127,7 +128,13 @@ class FilterFieldsByExtra implements ProcessorInterface
             $fields = $definition->getFields();
             foreach ($fields as $fieldName => $field) {
                 if (!$field->isExcluded()
-                    && !$field->isMetaProperty()
+                    && !(
+                        $field->isMetaProperty()
+                        && (
+                            ConfigUtil::isRequiredMetaProperty($fieldName)
+                            || ConfigUtil::isRequiredMetaProperty($field->getPropertyPath($fieldName))
+                        )
+                    )
                     && !\in_array($fieldName, $allowedFields, true)
                     && !\in_array($fieldName, $idFieldNames, true)
                 ) {

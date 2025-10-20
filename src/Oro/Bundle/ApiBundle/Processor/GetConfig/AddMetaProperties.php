@@ -27,7 +27,7 @@ class AddMetaProperties implements ProcessorInterface
             if (!$dataType) {
                 continue;
             }
-            $metaPropertyName = ConfigUtil::buildMetaPropertyName($name);
+            $metaPropertyName = ConfigUtil::buildRequiredMetaPropertyName($name);
             if ($definition->hasField($metaPropertyName)) {
                 continue;
             }

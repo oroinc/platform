@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\VariableStorage;
+
 /**
  * Table element representation
  */
@@ -75,6 +77,7 @@ class Table extends Element
      */
     public function getRowByContentElement($content, $elementName, $failIfNotFound = true)
     {
+        $content = VariableStorage::normalizeValue($content);
         /** @var TableRow|null $row */
         $row = $this->spin(function () use ($elementName, $content) {
             $element = $this->findElementContains($elementName, $content);

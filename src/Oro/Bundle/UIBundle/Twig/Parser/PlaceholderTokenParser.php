@@ -74,7 +74,7 @@ class PlaceholderTokenParser extends AbstractTokenParser
             $token->getLine()
         );
 
-        return new PrintNode($expr, $token->getLine(), $this->getTag());
+        return new PrintNode($expr, $token->getLine());
     }
 
     #[\Override]

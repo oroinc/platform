@@ -3,15 +3,15 @@
 namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\RuntimeException;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Base context mode aware normalizer.
  */
 abstract class AbstractContextModeAwareNormalizer implements
-    ContextAwareNormalizerInterface,
-    ContextAwareDenormalizerInterface
+    NormalizerInterface,
+    DenormalizerInterface
 {
     protected array $availableModes = [];
 
@@ -30,8 +30,11 @@ abstract class AbstractContextModeAwareNormalizer implements
      *
      */
     #[\Override]
-    public function normalize($object, ?string $format = null, array $context = [])
-    {
+    public function normalize(
+        mixed $object,
+        ?string $format = null,
+        array $context = []
+    ): float|int|bool|\ArrayObject|array|string|null {
         $mode = $this->getMode($context);
         $method = 'normalize' . ucfirst($mode);
         if (method_exists($this, $method)) {
@@ -45,7 +48,7 @@ abstract class AbstractContextModeAwareNormalizer implements
      *
      */
     #[\Override]
-    public function denormalize($data, string $type, ?string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         $mode = $this->getMode($context);
         $method = 'denormalize' . ucfirst($mode);

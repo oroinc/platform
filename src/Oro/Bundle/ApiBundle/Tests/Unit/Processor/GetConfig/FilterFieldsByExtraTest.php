@@ -55,7 +55,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     {
         $config = [
             'exclusion_policy' => 'all',
-            'fields'           => []
+            'fields' => []
         ];
 
         $this->doctrineHelper->expects(self::never())
@@ -82,7 +82,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $config = [
             'exclusion_policy' => 'all',
             'disable_fieldset' => true,
-            'fields'           => [
+            'fields' => [
                 'field1' => null
             ]
         ];
@@ -96,7 +96,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $config = [
             'exclusion_policy' => 'all',
             'disable_fieldset' => true,
-            'fields'           => [
+            'fields' => [
                 'id' => null
             ]
         ];
@@ -113,38 +113,38 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     {
         $config = [
             'identifier_field_names' => ['id'],
-            'exclusion_policy'       => 'all',
-            'fields'                 => [
-                'id'           => null,
-                'field1'       => null,
-                'field2'       => null,
+            'exclusion_policy' => 'all',
+            'fields' => [
+                'id' => null,
+                'field1' => null,
+                'field2' => null,
                 'association1' => [
                     'identifier_field_names' => ['id'],
-                    'target_class'           => 'Test\Association1Target',
-                    'exclusion_policy'       => 'all',
-                    'fields'                 => [
-                        'id'     => null,
+                    'target_class' => 'Test\Association1Target',
+                    'exclusion_policy' => 'all',
+                    'fields' => [
+                        'id' => null,
                         'field1' => null,
                         'field2' => null
                     ]
                 ],
                 'association2' => [
                     'identifier_field_names' => ['id'],
-                    'target_class'           => 'Test\Association2Target',
-                    'exclusion_policy'       => 'all',
-                    'property_path'          => 'realAssociation2',
-                    'fields'                 => [
-                        'id'     => null,
+                    'target_class' => 'Test\Association2Target',
+                    'exclusion_policy' => 'all',
+                    'property_path' => 'realAssociation2',
+                    'fields' => [
+                        'id' => null,
                         'field1' => null,
                         'field2' => null
                     ]
                 ],
                 'association3' => [
                     'identifier_field_names' => ['id'],
-                    'target_class'           => 'Test\Association3Target',
-                    'exclusion_policy'       => 'all',
-                    'fields'                 => [
-                        'id'     => null,
+                    'target_class' => 'Test\Association3Target',
+                    'exclusion_policy' => 'all',
+                    'fields' => [
+                        'id' => null,
                         'field1' => null
                     ]
                 ]
@@ -153,7 +153,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 
         $this->context->setExtras([
             new FilterFieldsConfigExtra([
-                'primary_entity'       => ['field1', 'association1', 'association2', 'association3'],
+                'primary_entity' => ['field1', 'association1', 'association2', 'association3'],
                 'association_1_entity' => ['id', 'field1'],
                 'association_2_entity' => ['field2']
             ])
@@ -197,19 +197,19 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'exclusion_policy'       => 'all',
-                'fields'                 => [
-                    'id'           => null,
-                    'field1'       => null,
-                    'field2'       => [
+                'exclusion_policy' => 'all',
+                'fields' => [
+                    'id' => null,
+                    'field1' => null,
+                    'field2' => [
                         'exclude' => true
                     ],
                     'association1' => [
                         'identifier_field_names' => ['id'],
-                        'target_class'           => 'Test\Association1Target',
-                        'exclusion_policy'       => 'all',
-                        'fields'                 => [
-                            'id'     => null,
+                        'target_class' => 'Test\Association1Target',
+                        'exclusion_policy' => 'all',
+                        'fields' => [
+                            'id' => null,
                             'field1' => null,
                             'field2' => [
                                 'exclude' => true
@@ -218,11 +218,11 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                     ],
                     'association2' => [
                         'identifier_field_names' => ['id'],
-                        'target_class'           => 'Test\Association2Target',
-                        'exclusion_policy'       => 'all',
-                        'property_path'          => 'realAssociation2',
-                        'fields'                 => [
-                            'id'     => null,
+                        'target_class' => 'Test\Association2Target',
+                        'exclusion_policy' => 'all',
+                        'property_path' => 'realAssociation2',
+                        'fields' => [
+                            'id' => null,
                             'field1' => [
                                 'exclude' => true
                             ],
@@ -231,10 +231,10 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                     ],
                     'association3' => [
                         'identifier_field_names' => ['id'],
-                        'target_class'           => 'Test\Association3Target',
-                        'exclusion_policy'       => 'all',
-                        'fields'                 => [
-                            'id'     => null,
+                        'target_class' => 'Test\Association3Target',
+                        'exclusion_policy' => 'all',
+                        'fields' => [
+                            'id' => null,
                             'field1' => null
                         ]
                     ]
@@ -251,34 +251,49 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     {
         $config = [
             'exclusion_policy' => 'all',
-            'fields'           => [
-                'id'           => null,
-                'field1'       => null,
-                'field2'       => null,
+            'fields' => [
+                'id' => null,
+                'field1' => null,
+                'field2' => null,
                 'association1' => [
                     'exclusion_policy' => 'all',
-                    'fields'           => [
-                        'id'        => null,
-                        'field1'    => null,
-                        'field2'    => null,
+                    'fields' => [
+                        'id' => null,
+                        'field1' => null,
+                        'field2' => null,
                         '__class__' => [
                             'meta_property' => true
+                        ],
+                        'requiredMetaProperty1' => [
+                            'meta_property' => true,
+                            'property_path' => '__requited_meta_property_1__'
+                        ],
+                        '__requited_meta_property_2__' => [
+                            'meta_property' => true,
+                            'property_path' => 'requiredMetaProperty2'
+                        ],
+                        'metaProperty1' => [
+                            'meta_property' => true
+                        ],
+                        'metaProperty2' => [
+                            'meta_property' => true,
+                            'property_path' => 'meta_property_2'
                         ]
                     ]
                 ],
                 'association2' => [
                     'exclusion_policy' => 'all',
-                    'property_path'    => 'realAssociation2',
-                    'fields'           => [
-                        'id'     => null,
+                    'property_path' => 'realAssociation2',
+                    'fields' => [
+                        'id' => null,
                         'field1' => null,
                         'field2' => null
                     ]
                 ],
                 'association3' => [
                     'exclusion_policy' => 'all',
-                    'fields'           => [
-                        'id'     => null,
+                    'fields' => [
+                        'id' => null,
                         'field1' => null
                     ]
                 ]
@@ -287,7 +302,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 
         $this->context->setExtras([
             new FilterFieldsConfigExtra([
-                'primary_entity'       => ['field1', 'association1', 'association2', 'association3'],
+                'primary_entity' => ['field1', 'association1', 'association2', 'association3'],
                 'association_1_entity' => ['id', 'field1'],
                 'association_2_entity' => ['field2']
             ])
@@ -370,30 +385,47 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $this->assertConfig(
             [
                 'exclusion_policy' => 'all',
-                'fields'           => [
-                    'id'           => null,
-                    'field1'       => null,
-                    'field2'       => [
+                'fields' => [
+                    'id' => null,
+                    'field1' => null,
+                    'field2' => [
                         'exclude' => true
                     ],
                     'association1' => [
                         'exclusion_policy' => 'all',
-                        'fields'           => [
-                            'id'        => null,
-                            'field1'    => null,
-                            'field2'    => [
+                        'fields' => [
+                            'id' => null,
+                            'field1' => null,
+                            'field2' => [
                                 'exclude' => true
                             ],
                             '__class__' => [
                                 'meta_property' => true
+                            ],
+                            'requiredMetaProperty1' => [
+                                'meta_property' => true,
+                                'property_path' => '__requited_meta_property_1__'
+                            ],
+                            '__requited_meta_property_2__' => [
+                                'meta_property' => true,
+                                'property_path' => 'requiredMetaProperty2'
+                            ],
+                            'metaProperty1' => [
+                                'meta_property' => true,
+                                'exclude' => true
+                            ],
+                            'metaProperty2' => [
+                                'meta_property' => true,
+                                'property_path' => 'meta_property_2',
+                                'exclude' => true
                             ]
                         ]
                     ],
                     'association2' => [
                         'exclusion_policy' => 'all',
-                        'property_path'    => 'realAssociation2',
-                        'fields'           => [
-                            'id'     => null,
+                        'property_path' => 'realAssociation2',
+                        'fields' => [
+                            'id' => null,
                             'field1' => [
                                 'exclude' => true
                             ],
@@ -402,8 +434,8 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                     ],
                     'association3' => [
                         'exclusion_policy' => 'all',
-                        'fields'           => [
-                            'id'     => null,
+                        'fields' => [
+                            'id' => null,
                             'field1' => null
                         ]
                     ]
@@ -420,11 +452,11 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     {
         $config = [
             'exclusion_policy' => 'all',
-            'fields'           => [
+            'fields' => [
                 'association1' => [
                     'exclusion_policy' => 'all',
-                    'fields'           => [
-                        'id'     => null,
+                    'fields' => [
+                        'id' => null,
                         'field1' => null,
                         'field2' => null
                     ]
@@ -434,7 +466,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 
         $this->context->setExtras([
             new FilterFieldsConfigExtra([
-                'primary_entity'         => ['field1', 'association1'],
+                'primary_entity' => ['field1', 'association1'],
                 'association_1_1_entity' => ['id', 'field1']
             ])
         ]);
@@ -492,11 +524,11 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $this->assertConfig(
             [
                 'exclusion_policy' => 'all',
-                'fields'           => [
+                'fields' => [
                     'association1' => [
                         'exclusion_policy' => 'all',
-                        'fields'           => [
-                            'id'     => null,
+                        'fields' => [
+                            'id' => null,
                             'field1' => null,
                             'field2' => [
                                 'exclude' => true
@@ -513,16 +545,16 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     {
         $config = [
             'exclusion_policy' => 'all',
-            'fields'           => [
-                'id'           => ['property_path' => 'realId'],
-                'field1'       => null,
+            'fields' => [
+                'id' => ['property_path' => 'realId'],
+                'field1' => null,
                 'association1' => [
                     'exclusion_policy' => 'all',
-                    'fields'           => ['id' => null]
+                    'fields' => ['id' => null]
                 ],
                 'association2' => [
                     'exclusion_policy' => 'all',
-                    'fields'           => ['id' => null]
+                    'fields' => ['id' => null]
                 ]
             ]
         ];
@@ -569,17 +601,17 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $this->assertConfig(
             [
                 'exclusion_policy' => 'all',
-                'fields'           => [
-                    'id'           => ['property_path' => 'realId'],
-                    'field1'       => ['exclude' => true],
+                'fields' => [
+                    'id' => ['property_path' => 'realId'],
+                    'field1' => ['exclude' => true],
                     'association1' => [
                         'exclusion_policy' => 'all',
-                        'fields'           => ['id' => null]
+                        'fields' => ['id' => null]
                     ],
                     'association2' => [
                         'exclusion_policy' => 'all',
-                        'exclude'          => true,
-                        'fields'           => ['id' => null]
+                        'exclude' => true,
+                        'fields' => ['id' => null]
                     ]
                 ]
             ],
@@ -590,18 +622,18 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     public function testProcessForRenamedIdentifierFieldOfManageableEntityAndConfigHasIdentifierFields(): void
     {
         $config = [
-            'exclusion_policy'       => 'all',
+            'exclusion_policy' => 'all',
             'identifier_field_names' => ['id'],
-            'fields'                 => [
-                'id'           => ['property_path' => 'realId'],
-                'field1'       => null,
+            'fields' => [
+                'id' => ['property_path' => 'realId'],
+                'field1' => null,
                 'association1' => [
                     'exclusion_policy' => 'all',
-                    'fields'           => ['id' => null]
+                    'fields' => ['id' => null]
                 ],
                 'association2' => [
                     'exclusion_policy' => 'all',
-                    'fields'           => ['id' => null]
+                    'fields' => ['id' => null]
                 ]
             ]
         ];
@@ -646,19 +678,19 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy'       => 'all',
+                'exclusion_policy' => 'all',
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => ['property_path' => 'realId'],
-                    'field1'       => ['exclude' => true],
+                'fields' => [
+                    'id' => ['property_path' => 'realId'],
+                    'field1' => ['exclude' => true],
                     'association1' => [
                         'exclusion_policy' => 'all',
-                        'fields'           => ['id' => null]
+                        'fields' => ['id' => null]
                     ],
                     'association2' => [
                         'exclusion_policy' => 'all',
-                        'exclude'          => true,
-                        'fields'           => ['id' => null]
+                        'exclude' => true,
+                        'fields' => ['id' => null]
                     ]
                 ]
             ],
@@ -671,12 +703,12 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $config = [
             'exclusion_policy' => 'all',
             'disable_fieldset' => true,
-            'fields'           => [
-                'id'           => null,
+            'fields' => [
+                'id' => null,
                 'association1' => [
                     'exclusion_policy' => 'all',
-                    'fields'           => [
-                        'id'     => null,
+                    'fields' => [
+                        'id' => null,
                         'field1' => null
                     ]
                 ]
@@ -726,12 +758,12 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
             [
                 'exclusion_policy' => 'all',
                 'disable_fieldset' => true,
-                'fields'           => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
                         'exclusion_policy' => 'all',
-                        'fields'           => [
-                            'id'     => null,
+                        'fields' => [
+                            'id' => null,
                             'field1' => null
                         ]
                     ]
@@ -751,12 +783,12 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $config = [
             'exclusion_policy' => 'all',
             'disable_fieldset' => true,
-            'fields'           => [
-                'id'           => null,
+            'fields' => [
+                'id' => null,
                 'association1' => [
                     'exclusion_policy' => 'all',
-                    'fields'           => [
-                        'id'     => null,
+                    'fields' => [
+                        'id' => null,
                         'field1' => null
                     ]
                 ]
@@ -789,27 +821,27 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     {
         $config = [
             'identifier_field_names' => ['id'],
-            'exclusion_policy'       => 'all',
-            'fields'                 => [
-                'id'           => null,
-                'field1'       => null,
-                'field2'       => null,
+            'exclusion_policy' => 'all',
+            'fields' => [
+                'id' => null,
+                'field1' => null,
+                'field2' => null,
                 'association1' => [
                     'identifier_field_names' => ['id'],
-                    'target_class'           => 'Test\Association1Target',
-                    'exclusion_policy'       => 'all',
-                    'fields'                 => [
-                        'id'     => null,
+                    'target_class' => 'Test\Association1Target',
+                    'exclusion_policy' => 'all',
+                    'fields' => [
+                        'id' => null,
                         'field1' => null,
                         'field2' => null
                     ]
                 ],
                 'association2' => [
                     'identifier_field_names' => ['id'],
-                    'target_class'           => 'Test\Association2Target',
-                    'exclusion_policy'       => 'all',
-                    'fields'                 => [
-                        'id'     => null,
+                    'target_class' => 'Test\Association2Target',
+                    'exclusion_policy' => 'all',
+                    'fields' => [
+                        'id' => null,
                         'field1' => null
                     ]
                 ]
@@ -818,7 +850,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 
         $this->context->setExtras([
             new FilterFieldsConfigExtra([
-                'primary_entity'       => [],
+                'primary_entity' => [],
                 'association_1_entity' => []
             ])
         ]);
@@ -852,22 +884,22 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'exclusion_policy'       => 'all',
-                'fields'                 => [
-                    'id'           => null,
-                    'field1'       => [
+                'exclusion_policy' => 'all',
+                'fields' => [
+                    'id' => null,
+                    'field1' => [
                         'exclude' => true
                     ],
-                    'field2'       => [
+                    'field2' => [
                         'exclude' => true
                     ],
                     'association1' => [
                         'identifier_field_names' => ['id'],
-                        'target_class'           => 'Test\Association1Target',
-                        'exclusion_policy'       => 'all',
-                        'exclude'                => true,
-                        'fields'                 => [
-                            'id'     => null,
+                        'target_class' => 'Test\Association1Target',
+                        'exclusion_policy' => 'all',
+                        'exclude' => true,
+                        'fields' => [
+                            'id' => null,
                             'field1' => [
                                 'exclude' => true
                             ],
@@ -878,11 +910,11 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                     ],
                     'association2' => [
                         'identifier_field_names' => ['id'],
-                        'target_class'           => 'Test\Association2Target',
-                        'exclusion_policy'       => 'all',
-                        'exclude'                => true,
-                        'fields'                 => [
-                            'id'     => null,
+                        'target_class' => 'Test\Association2Target',
+                        'exclusion_policy' => 'all',
+                        'exclude' => true,
+                        'fields' => [
+                            'id' => null,
                             'field1' => null
                         ]
                     ]
@@ -899,25 +931,40 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     {
         $config = [
             'exclusion_policy' => 'all',
-            'fields'           => [
-                'id'           => null,
-                'field1'       => null,
-                'field2'       => null,
+            'fields' => [
+                'id' => null,
+                'field1' => null,
+                'field2' => null,
                 'association1' => [
                     'exclusion_policy' => 'all',
-                    'fields'           => [
-                        'id'        => null,
-                        'field1'    => null,
-                        'field2'    => null,
+                    'fields' => [
+                        'id' => null,
+                        'field1' => null,
+                        'field2' => null,
                         '__class__' => [
                             'meta_property' => true
+                        ],
+                        'requiredMetaProperty1' => [
+                            'meta_property' => true,
+                            'property_path' => '__requited_meta_property_1__'
+                        ],
+                        '__requited_meta_property_2__' => [
+                            'meta_property' => true,
+                            'property_path' => 'requiredMetaProperty2'
+                        ],
+                        'metaProperty1' => [
+                            'meta_property' => true
+                        ],
+                        'metaProperty2' => [
+                            'meta_property' => true,
+                            'property_path' => 'meta_property_2'
                         ]
                     ]
                 ],
                 'association2' => [
                     'exclusion_policy' => 'all',
-                    'fields'           => [
-                        'id'     => null,
+                    'fields' => [
+                        'id' => null,
                         'field1' => null
                     ]
                 ]
@@ -926,7 +973,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 
         $this->context->setExtras([
             new FilterFieldsConfigExtra([
-                'primary_entity'       => [],
+                'primary_entity' => [],
                 'association_1_entity' => []
             ])
         ]);
@@ -991,35 +1038,52 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $this->assertConfig(
             [
                 'exclusion_policy' => 'all',
-                'fields'           => [
-                    'id'           => null,
-                    'field1'       => [
+                'fields' => [
+                    'id' => null,
+                    'field1' => [
                         'exclude' => true
                     ],
-                    'field2'       => [
+                    'field2' => [
                         'exclude' => true
                     ],
                     'association1' => [
                         'exclusion_policy' => 'all',
-                        'exclude'          => true,
-                        'fields'           => [
-                            'id'        => null,
-                            'field1'    => [
+                        'exclude' => true,
+                        'fields' => [
+                            'id' => null,
+                            'field1' => [
                                 'exclude' => true
                             ],
-                            'field2'    => [
+                            'field2' => [
                                 'exclude' => true
                             ],
                             '__class__' => [
                                 'meta_property' => true
+                            ],
+                            'requiredMetaProperty1' => [
+                                'meta_property' => true,
+                                'property_path' => '__requited_meta_property_1__'
+                            ],
+                            '__requited_meta_property_2__' => [
+                                'meta_property' => true,
+                                'property_path' => 'requiredMetaProperty2'
+                            ],
+                            'metaProperty1' => [
+                                'meta_property' => true,
+                                'exclude' => true
+                            ],
+                            'metaProperty2' => [
+                                'meta_property' => true,
+                                'property_path' => 'meta_property_2',
+                                'exclude' => true
                             ]
                         ]
                     ],
                     'association2' => [
                         'exclusion_policy' => 'all',
-                        'exclude'          => true,
-                        'fields'           => [
-                            'id'     => null,
+                        'exclude' => true,
+                        'fields' => [
+                            'id' => null,
                             'field1' => null
                         ]
                     ]
@@ -1036,25 +1100,40 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     {
         $config = [
             'exclusion_policy' => 'all',
-            'fields'           => [
-                'id'           => null,
-                'field1'       => null,
-                'field2'       => null,
+            'fields' => [
+                'id' => null,
+                'field1' => null,
+                'field2' => null,
                 'association1' => [
                     'exclusion_policy' => 'all',
-                    'fields'           => [
-                        'id'        => null,
-                        'field1'    => null,
-                        'field2'    => null,
+                    'fields' => [
+                        'id' => null,
+                        'field1' => null,
+                        'field2' => null,
                         '__class__' => [
                             'meta_property' => true
+                        ],
+                        'requiredMetaProperty1' => [
+                            'meta_property' => true,
+                            'property_path' => '__requited_meta_property_1__'
+                        ],
+                        '__requited_meta_property_2__' => [
+                            'meta_property' => true,
+                            'property_path' => 'requiredMetaProperty2'
+                        ],
+                        'metaProperty1' => [
+                            'meta_property' => true
+                        ],
+                        'metaProperty2' => [
+                            'meta_property' => true,
+                            'property_path' => 'meta_property_2'
                         ]
                     ]
                 ],
                 'association2' => [
                     'exclusion_policy' => 'all',
-                    'fields'           => [
-                        'id'     => null,
+                    'fields' => [
+                        'id' => null,
                         'field1' => null
                     ]
                 ]
@@ -1063,7 +1142,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 
         $this->context->setExtras([
             new FilterFieldsConfigExtra([
-                'primary_entity'       => null,
+                'primary_entity' => null,
                 'association_1_entity' => null
             ])
         ]);
@@ -1126,25 +1205,40 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $this->assertConfig(
             [
                 'exclusion_policy' => 'all',
-                'fields'           => [
-                    'id'           => null,
-                    'field1'       => null,
-                    'field2'       => null,
+                'fields' => [
+                    'id' => null,
+                    'field1' => null,
+                    'field2' => null,
                     'association1' => [
                         'exclusion_policy' => 'all',
-                        'fields'           => [
-                            'id'        => null,
-                            'field1'    => null,
-                            'field2'    => null,
+                        'fields' => [
+                            'id' => null,
+                            'field1' => null,
+                            'field2' => null,
                             '__class__' => [
                                 'meta_property' => true
+                            ],
+                            'requiredMetaProperty1' => [
+                                'meta_property' => true,
+                                'property_path' => '__requited_meta_property_1__'
+                            ],
+                            '__requited_meta_property_2__' => [
+                                'meta_property' => true,
+                                'property_path' => 'requiredMetaProperty2'
+                            ],
+                            'metaProperty1' => [
+                                'meta_property' => true
+                            ],
+                            'metaProperty2' => [
+                                'meta_property' => true,
+                                'property_path' => 'meta_property_2'
                             ]
                         ]
                     ],
                     'association2' => [
                         'exclusion_policy' => 'all',
-                        'fields'           => [
-                            'id'     => null,
+                        'fields' => [
+                            'id' => null,
                             'field1' => null
                         ]
                     ]
@@ -1161,11 +1255,11 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     {
         $config = [
             'exclusion_policy' => 'all',
-            'fields'           => [
+            'fields' => [
                 'association1' => [
                     'exclusion_policy' => 'all',
-                    'fields'           => [
-                        'id'     => null,
+                    'fields' => [
+                        'id' => null,
                         'field1' => null,
                         'field2' => null
                     ]
@@ -1175,7 +1269,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 
         $this->context->setExtras([
             new FilterFieldsConfigExtra([
-                'primary_entity'         => ['field1', 'association1'],
+                'primary_entity' => ['field1', 'association1'],
                 'association_1_1_entity' => []
             ])
         ]);
@@ -1233,11 +1327,11 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $this->assertConfig(
             [
                 'exclusion_policy' => 'all',
-                'fields'           => [
+                'fields' => [
                     'association1' => [
                         'exclusion_policy' => 'all',
-                        'fields'           => [
-                            'id'     => null,
+                        'fields' => [
+                            'id' => null,
                             'field1' => [
                                 'exclude' => true
                             ],
@@ -1259,11 +1353,11 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     {
         $config = [
             'exclusion_policy' => 'all',
-            'fields'           => [
+            'fields' => [
                 'association1' => [
                     'exclusion_policy' => 'all',
-                    'fields'           => [
-                        'id'     => null,
+                    'fields' => [
+                        'id' => null,
                         'field1' => null,
                         'field2' => null
                     ]
@@ -1273,7 +1367,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 
         $this->context->setExtras([
             new FilterFieldsConfigExtra([
-                'primary_entity'         => ['field1', 'association1'],
+                'primary_entity' => ['field1', 'association1'],
                 'association_1_1_entity' => null
             ])
         ]);
@@ -1330,11 +1424,11 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $this->assertConfig(
             [
                 'exclusion_policy' => 'all',
-                'fields'           => [
+                'fields' => [
                     'association1' => [
                         'exclusion_policy' => 'all',
-                        'fields'           => [
-                            'id'     => null,
+                        'fields' => [
+                            'id' => null,
                             'field1' => null,
                             'field2' => null
                         ]
@@ -1417,6 +1511,9 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcessForManageableEntityWhenThereIsFieldsFilterWithNullValue(): void
     {
         $config = [
@@ -1432,6 +1529,21 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                         'field2' => null,
                         '__class__' => [
                             'meta_property' => true
+                        ],
+                        'requiredMetaProperty1' => [
+                            'meta_property' => true,
+                            'property_path' => '__requited_meta_property_1__'
+                        ],
+                        '__requited_meta_property_2__' => [
+                            'meta_property' => true,
+                            'property_path' => 'requiredMetaProperty2'
+                        ],
+                        'metaProperty1' => [
+                            'meta_property' => true
+                        ],
+                        'metaProperty2' => [
+                            'meta_property' => true,
+                            'property_path' => 'meta_property_2'
                         ]
                     ]
                 ]
@@ -1508,6 +1620,23 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                             ],
                             '__class__' => [
                                 'meta_property' => true
+                            ],
+                            'requiredMetaProperty1' => [
+                                'meta_property' => true,
+                                'property_path' => '__requited_meta_property_1__'
+                            ],
+                            '__requited_meta_property_2__' => [
+                                'meta_property' => true,
+                                'property_path' => 'requiredMetaProperty2'
+                            ],
+                            'metaProperty1' => [
+                                'meta_property' => true,
+                                'exclude' => true
+                            ],
+                            'metaProperty2' => [
+                                'meta_property' => true,
+                                'property_path' => 'meta_property_2',
+                                'exclude' => true
                             ]
                         ]
                     ]

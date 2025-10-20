@@ -1,27 +1,24 @@
-define(function(require) {
-    'use strict';
+import BaseView from 'oroui/js/app/views/base/view';
+import _ from 'underscore';
+import template from 'tpl-loader!oroworkflow/templates/flowchart/controls.html';
 
-    const BaseView = require('oroui/js/app/views/base/view');
-    const _ = require('underscore');
+const FlowchartControlView = BaseView.extend({
+    autoRender: true,
 
-    const FlowchartControlView = BaseView.extend({
-        autoRender: true,
+    template,
 
-        template: require('tpl-loader!oroworkflow/templates/flowchart/controls.html'),
-
-        events: {
-            'change [name="toggle-transition-labels"]': function(e) {
-                this.model.set('transitionLabelsVisible', Boolean(_.result(e.currentTarget, 'checked')));
-            }
-        },
-
-        /**
-         * @inheritdoc
-         */
-        constructor: function FlowchartControlView(options) {
-            FlowchartControlView.__super__.constructor.call(this, options);
+    events: {
+        'change [name="toggle-transition-labels"]': function(e) {
+            this.model.set('transitionLabelsVisible', Boolean(_.result(e.currentTarget, 'checked')));
         }
-    });
+    },
 
-    return FlowchartControlView;
+    /**
+     * @inheritdoc
+     */
+    constructor: function FlowchartControlView(options) {
+        FlowchartControlView.__super__.constructor.call(this, options);
+    }
 });
+
+export default FlowchartControlView;

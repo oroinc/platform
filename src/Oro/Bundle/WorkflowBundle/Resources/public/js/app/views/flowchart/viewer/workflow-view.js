@@ -1,114 +1,110 @@
-define(function(require) {
-    'use strict';
+import _ from 'underscore';
+import FlowchartJsPlumbAreaView from '../jsplumb/area-view';
+import FlowchartViewerStepView from './step-view';
+import FlowchartViewerTransitionView from './transition-view';
+import FlowchartViewerTransitionOverlayView from './transition-overlay-view';
+import BaseCollectionView from 'oroui/js/app/views/base/collection-view';
 
-    const _ = require('underscore');
-    const FlowchartJsPlumbAreaView = require('../jsplumb/area-view');
-    const FlowchartViewerStepView = require('./step-view');
-    const FlowchartViewerTransitionView = require('./transition-view');
-    const FlowchartViewerTransitionOverlayView = require('./transition-overlay-view');
-    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+const FlowchartViewerWorkflowView = FlowchartJsPlumbAreaView.extend({
+    /**
+     * @type {Constructor.<FlowchartJsPlumbOverlayView>}
+     */
+    transitionOverlayView: FlowchartViewerTransitionOverlayView,
 
-    const FlowchartViewerWorkflowView = FlowchartJsPlumbAreaView.extend({
-        /**
-         * @type {Constructor.<FlowchartJsPlumbOverlayView>}
-         */
-        transitionOverlayView: FlowchartViewerTransitionOverlayView,
+    /**
+     * @type {Constructor.<FlowchartJsPlumbBoxView>}
+     */
+    stepView: FlowchartViewerStepView,
 
-        /**
-         * @type {Constructor.<FlowchartJsPlumbBoxView>}
-         */
-        stepView: FlowchartViewerStepView,
+    /**
+     * @type {Constructor.<FlowchartViewerTransitionView>}
+     */
+    transitionView: FlowchartViewerTransitionView,
 
-        /**
-         * @type {Constructor.<FlowchartViewerTransitionView>}
-         */
-        transitionView: FlowchartViewerTransitionView,
+    className: 'workflow-flowchart-viewer',
 
-        className: 'workflow-flowchart-viewer',
+    /**
+     * @type {function(): Object|Object}
+     */
+    defaultConnectionOptions: function() {
+        return {
+            detachable: false
+        };
+    },
 
-        /**
-         * @type {function(): Object|Object}
-         */
-        defaultConnectionOptions: function() {
-            return {
-                detachable: false
-            };
-        },
+    /**
+     * @inheritdoc
+     */
+    constructor: function FlowchartViewerWorkflowView(options) {
+        FlowchartViewerWorkflowView.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function FlowchartViewerWorkflowView(options) {
-            FlowchartViewerWorkflowView.__super__.constructor.call(this, options);
-        },
+    /**
+     * @inheritdoc
+     */
+    initialize: function(options) {
+        FlowchartViewerWorkflowView.__super__.initialize.call(this, options);
+        this.defaultConnectionOptions = _.extend(
+            _.result(this, 'defaultConnectionOptions'),
+            options.connectionOptions || {}
+        );
+    },
 
-        /**
-         * @inheritdoc
-         */
-        initialize: function(options) {
-            FlowchartViewerWorkflowView.__super__.initialize.call(this, options);
-            this.defaultConnectionOptions = _.extend(
-                _.result(this, 'defaultConnectionOptions'),
-                options.connectionOptions || {}
-            );
-        },
+    findStepModelByElement: function(el) {
+        const stepCollectionView = this.subview('stepCollectionView');
+        return this.model.get('steps').find(function(model) {
+            return stepCollectionView.getItemView(model).el === el;
+        });
+    },
 
-        findStepModelByElement: function(el) {
-            const stepCollectionView = this.subview('stepCollectionView');
-            return this.model.get('steps').find(function(model) {
-                return stepCollectionView.getItemView(model).el === el;
+    connect: function() {
+        FlowchartViewerWorkflowView.__super__.connect.call(this);
+        this.jsPlumbInstance.batch(() => {
+            this.$el.addClass(this.className);
+            const transitionOverlayView = this.transitionOverlayView;
+            const connectionOptions = _.extend({}, this.defaultConnectionOptions);
+            const StepView = this.stepView;
+            const TransitionView = this.transitionView;
+            const areaView = this;
+            const steps = this.model.get('steps');
+            const stepCollectionView = new BaseCollectionView({
+                el: this.$el,
+                collection: steps,
+                animationDuration: 0,
+                // pass areaView to each model
+                itemView: function(options) {
+                    options = _.extend({
+                        areaView
+                    }, options);
+                    return new StepView(options);
+                },
+                autoRender: true
             });
-        },
-
-        connect: function() {
-            FlowchartViewerWorkflowView.__super__.connect.call(this);
-            this.jsPlumbInstance.batch(() => {
-                this.$el.addClass(this.className);
-                const transitionOverlayView = this.transitionOverlayView;
-                const connectionOptions = _.extend({}, this.defaultConnectionOptions);
-                const StepView = this.stepView;
-                const TransitionView = this.transitionView;
-                const areaView = this;
-                const steps = this.model.get('steps');
-                const stepCollectionView = new BaseCollectionView({
-                    el: this.$el,
-                    collection: steps,
-                    animationDuration: 0,
-                    // pass areaView to each model
-                    itemView: function(options) {
-                        options = _.extend({
-                            areaView
-                        }, options);
-                        return new StepView(options);
-                    },
-                    autoRender: true
-                });
-                const transitionCollectionView = new BaseCollectionView({
-                    el: this.$el,
-                    collection: this.model.get('transitions'),
-                    animationDuration: 0,
-                    // pass areaView to each model
-                    itemView: function(options) {
-                        options = _.extend({
-                            areaView,
-                            stepCollection: steps,
-                            stepCollectionView: stepCollectionView,
-                            transitionOverlayView: transitionOverlayView,
-                            connectionOptions: connectionOptions
-                        }, options);
-                        return new TransitionView(options);
-                    },
-                    autoRender: true
-                });
-
-                this.subview('stepCollectionView', stepCollectionView);
-                this.subview('transitionCollectionView', transitionCollectionView);
+            const transitionCollectionView = new BaseCollectionView({
+                el: this.$el,
+                collection: this.model.get('transitions'),
+                animationDuration: 0,
+                // pass areaView to each model
+                itemView: function(options) {
+                    options = _.extend({
+                        areaView,
+                        stepCollection: steps,
+                        stepCollectionView: stepCollectionView,
+                        transitionOverlayView: transitionOverlayView,
+                        connectionOptions: connectionOptions
+                    }, options);
+                    return new TransitionView(options);
+                },
+                autoRender: true
             });
 
-            // tell zoomable-area to update zoom level
-            this.$el.trigger('autozoom');
-        }
-    });
+            this.subview('stepCollectionView', stepCollectionView);
+            this.subview('transitionCollectionView', transitionCollectionView);
+        });
 
-    return FlowchartViewerWorkflowView;
+        // tell zoomable-area to update zoom level
+        this.$el.trigger('autozoom');
+    }
 });
+
+export default FlowchartViewerWorkflowView;

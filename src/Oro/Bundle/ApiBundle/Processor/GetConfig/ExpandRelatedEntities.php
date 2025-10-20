@@ -261,7 +261,12 @@ class ExpandRelatedEntities implements ProcessorInterface
             }
             $existingFields = $existingTargetEntity->getFields();
             foreach ($existingFields as $existingFieldName => $existingField) {
-                if ($existingField->isMetaProperty()) {
+                if ($existingField->isMetaProperty()
+                    && (
+                        ConfigUtil::isRequiredMetaProperty($existingFieldName)
+                        || ConfigUtil::isRequiredMetaProperty($existingField->getPropertyPath($existingFieldName))
+                    )
+                ) {
                     $targetEntity->addField($existingFieldName, $existingField);
                 }
             }

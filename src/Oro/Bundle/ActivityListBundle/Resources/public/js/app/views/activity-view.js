@@ -9,7 +9,7 @@ define(function(require) {
     const dateTimeFormatter = require('orolocale/js/formatter/datetime');
     const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
     const CommentComponent = require('orocomment/js/app/components/comment-component');
-    const transitionHandler = require('oroworkflow/js/transition-handler');
+    const transitionHandler = require('oroworkflow/js/transition-handler').default;
 
     const ActivityView = BaseView.extend({
         options: {

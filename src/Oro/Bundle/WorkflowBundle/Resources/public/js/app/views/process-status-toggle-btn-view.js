@@ -1,37 +1,33 @@
-define(function(require) {
-    'use strict';
+import BaseView from 'oroui/js/app/views/base/view';
+import mediator from 'oroui/js/mediator';
+import $ from 'jquery';
 
-    const BaseView = require('oroui/js/app/views/base/view');
-    const mediator = require('oroui/js/mediator');
-    const $ = require('jquery');
+const ProcessStatusToggleBtnView = BaseView.extend({
+    events: {
+        'click [data-role="status-toggle"]': 'onStatusToggle'
+    },
 
-    const ProcessStatusToggleBtnView = BaseView.extend({
-        events: {
-            'click [data-role="status-toggle"]': 'onStatusToggle'
-        },
+    /**
+     * @inheritdoc
+     */
+    constructor: function ProcessStatusToggleBtnView(options) {
+        ProcessStatusToggleBtnView.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function ProcessStatusToggleBtnView(options) {
-            ProcessStatusToggleBtnView.__super__.constructor.call(this, options);
-        },
+    onStatusToggle: function(e) {
+        e.preventDefault();
 
-        onStatusToggle: function(e) {
-            e.preventDefault();
-
-            $.ajax({
-                url: e.currentTarget.pathname,
-                method: 'POST',
-                success: function(response) {
-                    if (response.message) {
-                        mediator.execute('showFlashMessage', 'success', response.message, {afterReload: true});
-                    }
-                    mediator.execute('refreshPage');
+        $.ajax({
+            url: e.currentTarget.pathname,
+            method: 'POST',
+            success: function(response) {
+                if (response.message) {
+                    mediator.execute('showFlashMessage', 'success', response.message, {afterReload: true});
                 }
-            });
-        }
-    });
-
-    return ProcessStatusToggleBtnView;
+                mediator.execute('refreshPage');
+            }
+        });
+    }
 });
+
+export default ProcessStatusToggleBtnView;

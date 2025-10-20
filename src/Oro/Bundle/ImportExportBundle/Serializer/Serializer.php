@@ -6,8 +6,8 @@ use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 
 /**
@@ -18,13 +18,13 @@ class Serializer extends SymfonySerializer implements SerializerInterface
     private const PROCESSOR_ALIAS_KEY = 'processorAlias';
     private const ENTITY_NAME_KEY = 'entityName';
 
-    /** @var ContextAwareNormalizerInterface[]|ContextAwareDenormalizerInterface[] */
+    /** @var NormalizerInterface[]|DenormalizerInterface[] */
     protected array $normalizers = [];
 
-    /** @var ContextAwareDenormalizerInterface[] */
+    /** @var DenormalizerInterface[] */
     protected array $denormalizerCache = [];
 
-    /** @var ContextAwareNormalizerInterface[] */
+    /** @var NormalizerInterface[] */
     protected array $normalizerCache = [];
 
     public function __construct(array $normalizers = [], array $encoders = [])
@@ -88,7 +88,7 @@ class Serializer extends SymfonySerializer implements SerializerInterface
         }
 
         foreach ($this->normalizers as $normalizer) {
-            if ($normalizer instanceof ContextAwareDenormalizerInterface
+            if ($normalizer instanceof DenormalizerInterface
                 && $normalizer->supportsDenormalization($data, $type, $format, $context)) {
                 $this->denormalizerCache[$cacheKey] = $normalizer;
 
@@ -166,7 +166,7 @@ class Serializer extends SymfonySerializer implements SerializerInterface
         }
 
         foreach ($this->normalizers as $normalizer) {
-            if ($normalizer instanceof ContextAwareNormalizerInterface
+            if ($normalizer instanceof NormalizerInterface
                 && $normalizer->supportsNormalization($object, $format, $context)) {
                 $this->normalizerCache[$cacheKey] = $normalizer;
 
@@ -179,10 +179,10 @@ class Serializer extends SymfonySerializer implements SerializerInterface
         );
     }
 
-    private function getNormalizer($data, ?string $format = null, array $context = []): ContextAwareNormalizerInterface
+    private function getNormalizer($data, ?string $format = null, array $context = []): NormalizerInterface
     {
         foreach ($this->normalizers as $normalizer) {
-            if (!$normalizer instanceof ContextAwareNormalizerInterface) {
+            if (!$normalizer instanceof NormalizerInterface) {
                 continue;
             }
 
@@ -199,9 +199,9 @@ class Serializer extends SymfonySerializer implements SerializerInterface
         string $type,
         ?string $format = null,
         array $context = []
-    ): ContextAwareDenormalizerInterface {
+    ): DenormalizerInterface {
         foreach ($this->normalizers as $normalizer) {
-            if (!$normalizer instanceof ContextAwareDenormalizerInterface) {
+            if (!$normalizer instanceof DenormalizerInterface) {
                 continue;
             }
 

@@ -549,6 +549,9 @@ api:
             actions: false
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomMagazine:
             fields:
+                issueDate:
+                    data_type: date
+                    meta_property: true
                 articles:
                     exclude: true
                 bestArticle:
@@ -561,7 +564,12 @@ api:
                     target_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomArticle
                     target_type: to-one
                     property_path: _
-        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomArticle: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomArticle:
+            fields:
+                __length__: # "__" at the start and at the end marks the property as required
+                    meta_property: true
+                    meta_property_result_name: length
+                    property_path: bodyLength
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCollection:
             fields:
                 name:
