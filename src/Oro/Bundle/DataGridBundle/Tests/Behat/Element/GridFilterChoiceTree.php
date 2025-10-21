@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\VariableStorage;
+
 class GridFilterChoiceTree extends GridFilterStringItem
 {
     /**
@@ -11,6 +13,7 @@ class GridFilterChoiceTree extends GridFilterStringItem
      */
     public function setFilterValue($value)
     {
+        $value = VariableStorage::normalizeValue($value);
         /** @var ChoiceTreeInput $input */
         $input = $this->getElement('GridFilterChoiceTreeValueInput');
         $input->setValue($value);
@@ -21,6 +24,7 @@ class GridFilterChoiceTree extends GridFilterStringItem
      */
     public function checkValue(string $value, bool $isShouldSee): void
     {
+        $value = VariableStorage::normalizeValue($value);
         /** @var ChoiceTreeInput $input */
         $input = $this->getElement('GridFilterChoiceTreeValueInput');
         $input->checkValue($value, $isShouldSee);

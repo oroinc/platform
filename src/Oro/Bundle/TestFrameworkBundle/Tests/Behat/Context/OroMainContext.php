@@ -1040,6 +1040,7 @@ class OroMainContext extends MinkContext implements
 
         return [$locator, $value, $field];
     }
+
     /**
      * Example: Then I should see that "Header" does not contain "Some Text" placeholder
      * @Then /^I should see that "(?P<elementName>[^"]*)" does not contain "(?P<text>[^"]*)" placeholder$/
@@ -1197,6 +1198,7 @@ class OroMainContext extends MinkContext implements
      */
     public function pressButton($button)
     {
+        $button = VariableStorage::normalizeValue($button);
         if ($button === 'Change History') {
             // consumer doesn't catch up changes of data audit changes immediately, so we need to wait
             sleep(3);
@@ -1218,8 +1220,10 @@ class OroMainContext extends MinkContext implements
                 $clickLink = $this->spin(function () use ($button) {
                     if ($this->getSession()->getPage()->hasLink($button)) {
                         $this->clickLink($button);
+
                         return true;
                     }
+
                     return false;
                 }, 3);
 
@@ -3365,6 +3369,41 @@ JS;
     {
         $element = $this->createElement($elementName);
         VariableStorage::storeData($alias, $element->getValue());
+    }
+
+    /**
+     * Example: And I remember element "Add" text as "my_data"
+     *
+     * @When /^(?:|I )remember element "(?P<fieldName>(?:[^"]|\\")*)" text as "(?P<alias>(?:[^"]|\\")*)"$/
+     */
+    public function rememberElementText(string $elementName, string $alias)
+    {
+        $element = $this->createElement($elementName);
+        VariableStorage::storeData($alias, $element->getText());
+    }
+
+    /**
+     * Example: And I extract text "Order number #(\d+)" from element "Add" and remember it as "my_data"
+     *
+     * @When /^(?:|I )extract text "(?P<regExp>(?:[^"]|\\")*)" from element "(?P<fieldName>(?:[^"]|\\")*)" and remember it as "(?P<alias>(?:[^"]|\\")*)"$/
+     */
+    public function extractAndRememberElementText(string $regExp, string $elementName, string $alias)
+    {
+        $element = $this->createElement($elementName);
+        $text = $element->getText();
+        if (preg_match('/' . $regExp . '/', $text, $matches)) {
+            $value = $matches[1] ?? $matches[0];
+            VariableStorage::storeData($alias, $value);
+        } else {
+            self::fail(
+                sprintf(
+                    'Text matching regex "%s" not found in element "%s". Actual text: "%s"',
+                    $regExp,
+                    $elementName,
+                    $text
+                )
+            );
+        }
     }
 
     /**
