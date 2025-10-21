@@ -9,6 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\SelectorManipulator;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\VariableStorage;
 use WebDriver\Exception\NoSuchElement;
 use WebDriver\Key;
 
@@ -114,6 +115,7 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
      */
     private function setFilterValue($value, $condition)
     {
+        $value = VariableStorage::normalizeValue($value);
         /** @var OroSelenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
         try {

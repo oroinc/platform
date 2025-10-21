@@ -51,14 +51,15 @@ class OroMainContext extends MinkContext implements
     SessionAliasProviderAwareInterface,
     AppKernelAwareInterface
 {
-    const SKIP_WAIT_PATTERN = '/'.
-        '^(?:|I )should see ".+" flash message$|'.
-        '^(?:|I )should see ".+" flash message and I close it$|'.
-        '^(?:|I )should see ".+" error message$|'.
-        '^(?:|I )should see Schema updated flash message$'.
-    '/';
-
     use AssertTrait, PageObjectDictionary, SessionAliasProviderAwareTrait, SpinTrait, AppKernelAwareTrait;
+
+    const SKIP_WAIT_PATTERN = '/' .
+        '^(?:|I )should see ".+" flash message$|' .
+        '^(?:|I )should see ".+" flash message and I close it$|' .
+        '^(?:|I )should see ".+" error message$|' .
+
+        '^(?:|I )should see Schema updated flash message$' .
+        '/';
 
     /** @var Stopwatch */
     private $stopwatch;
@@ -1121,6 +1122,11 @@ class OroMainContext extends MinkContext implements
      */
     public function pressButton($button)
     {
+        $button = VariableStorage::normalizeValue($button);
+        if ($button === 'Change History') {
+            // consumer doesn't catch up changes of data audit changes immediately, so we need to wait
+            sleep(3);
+        }
         for ($i = 0; $i < 2; $i++) {
             try {
                 parent::pressButton($button);
@@ -1129,8 +1135,10 @@ class OroMainContext extends MinkContext implements
                 $clickLink = $this->spin(function () use ($button) {
                     if ($this->getSession()->getPage()->hasLink($button)) {
                         $this->clickLink($button);
+
                         return true;
                     }
+
                     return false;
                 }, 3);
 
@@ -2441,13 +2449,11 @@ JS;
         $childElement = $this->elementFactory->createElement($childElementName, $iframeBody);
         self::assertTrue($childElement->isIsset(), sprintf(
             'Element "%s" not found inside iframe',
-            $childElementName,
-            $iframeName
+            $childElementName
         ));
         self::assertTrue($childElement->isVisible(), sprintf(
             'Element "%s" found inside iframe, but it\'s not visible',
-            $childElementName,
-            $iframeName
+            $childElementName
         ));
 
         $driver->switchToWindow();
@@ -2822,6 +2828,58 @@ JS;
         $this->assertSession()->pageTextMatches($this->fixStepArgument($pattern));
     }
 
+    //@codingStandardsIgnoreStart
+    /**
+     * Example: I should not see "Product 1" and continue checking the condition is met for maximum 10 seconds
+     *
+     * @Then /^(?:|I )should not see "(?P<text>.*)" and continue checking the condition is met for maximum (?P<number>\d+) seconds$/
+     */
+    public function assertPageNotContainsTextWithWait($number, $text)
+    {
+        $result = $this->spin(function (OroMainContext $context) use ($text) {
+            try {
+                $context->assertSession()->pageTextNotContains($this->fixStepArgument($text));
+
+                return true;
+            } catch (\Exception $e) {
+                $this->getSession()->reload();
+
+                return false;
+            }
+        }, $number, 2000000);
+
+        self::assertTrue(
+            $result,
+            sprintf('The text "%s" was found in the text of the current page.', $text)
+        );
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Example: I should see "Product 1" and continue checking the condition is met for maximum 10 seconds
+     *
+     * @Then /^(?:|I )should see "(?P<text>.*)" and continue checking the condition is met for maximum (?P<number>\d+) seconds$/
+     */
+    public function assertPageContainsTextWithWait($number, $text)
+    {
+        $result = $this->spin(function (OroMainContext $context) use ($text) {
+            try {
+                $context->assertSession()->pageTextContains($this->fixStepArgument($text));
+
+                return true;
+            } catch (\Exception $e) {
+                $this->getSession()->reload();
+
+                return false;
+            }
+        }, $number, 2000000);
+
+        self::assertTrue(
+            $result,
+            sprintf('The text "%s" was not found in the text of the current page.', $text)
+        );
+    }
+
     /**
      * Checks, that all resources of a given type are versioned
      * Example: I should be sure that all "json" are versioned
@@ -2906,6 +2964,49 @@ JS;
     }
 
     /**
+     * And I wait for a "oro_product.reindex_products_by_attributes" job
+     *
+     * @Then /^(?:|I )wait for a "(?P<jobName>(?:[^"]|\\")*)" job$/
+     */
+    public function waitForJobSuccess($jobName)
+    {
+        $activeJobStatuses = [Job::STATUS_NEW, Job::STATUS_RUNNING, Job::STATUS_FAILED_REDELIVERED];
+
+        /** @var ManagerRegistry $doctrine */
+        $doctrine = $this->getAppContainer()->get('doctrine');
+        /** @var Connection $connection */
+        $connection = $doctrine->getManagerForClass(Job::class)->getConnection();
+
+        $endTime = new \DateTime('+30 seconds');
+        while (true) {
+            $hasJob = $connection->fetchOne(
+                'SELECT j.id FROM oro_message_queue_job j WHERE j.name like ? LIMIT 1',
+                ['%'.$jobName.'%'],
+                [Types::STRING]
+            );
+
+            if ($hasJob) {
+                $activeJobs = $connection->fetchOne(
+                    'SELECT j.id FROM oro_message_queue_job j WHERE j.status IN (?) AND j.name like ? LIMIT 1',
+                    [$activeJobStatuses, '%'.$jobName.'%'],
+                    [Connection::PARAM_STR_ARRAY, Types::STRING]
+                );
+
+                if (!$activeJobs) {
+                    return;
+                }
+            }
+
+            usleep(100000);
+
+            $now = new \DateTime();
+            if ($now >= $endTime) {
+                break;
+            }
+        }
+    }
+
+    /**
      * Example: And I remember element "Add" value as "my_data"
      *
      * @When /^(?:|I )remember element "(?P<fieldName>(?:[^"]|\\")*)" value as "(?P<alias>(?:[^"]|\\")*)"$/
@@ -2914,6 +3015,41 @@ JS;
     {
         $element = $this->createElement($elementName);
         VariableStorage::storeData($alias, $element->getValue());
+    }
+
+    /**
+     * Example: And I remember element "Add" text as "my_data"
+     *
+     * @When /^(?:|I )remember element "(?P<fieldName>(?:[^"]|\\")*)" text as "(?P<alias>(?:[^"]|\\")*)"$/
+     */
+    public function rememberElementText(string $elementName, string $alias)
+    {
+        $element = $this->createElement($elementName);
+        VariableStorage::storeData($alias, $element->getText());
+    }
+
+    /**
+     * Example: And I extract text "Order number #(\d+)" from element "Add" and remember it as "my_data"
+     *
+     * @When /^(?:|I )extract text "(?P<regExp>(?:[^"]|\\")*)" from element "(?P<fieldName>(?:[^"]|\\")*)" and remember it as "(?P<alias>(?:[^"]|\\")*)"$/
+     */
+    public function extractAndRememberElementText(string $regExp, string $elementName, string $alias)
+    {
+        $element = $this->createElement($elementName);
+        $text = $element->getText();
+        if (preg_match('/' . $regExp . '/', $text, $matches)) {
+            $value = $matches[1] ?? $matches[0];
+            VariableStorage::storeData($alias, $value);
+        } else {
+            self::fail(
+                sprintf(
+                    'Text matching regex "%s" not found in element "%s". Actual text: "%s"',
+                    $regExp,
+                    $elementName,
+                    $text
+                )
+            );
+        }
     }
 
     /**
