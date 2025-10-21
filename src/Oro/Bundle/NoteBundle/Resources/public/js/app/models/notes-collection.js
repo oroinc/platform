@@ -1,35 +1,31 @@
-define([
-    'oroui/js/app/models/base/collection',
-    './note-model'
-], function(BaseCollection, NoteModel) {
-    'use strict';
+import BaseCollection from 'oroui/js/app/models/base/collection';
+import NoteModel from './note-model';
 
-    const NotesCollection = BaseCollection.extend({
-        model: NoteModel,
+const NotesCollection = BaseCollection.extend({
+    model: NoteModel,
 
-        baseUrl: '',
+    baseUrl: '',
 
-        sorting: 'DESC',
+    sorting: 'DESC',
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function NotesCollection(...args) {
-            NotesCollection.__super__.constructor.apply(this, args);
-        },
+    /**
+     * @inheritdoc
+     */
+    constructor: function NotesCollection(...args) {
+        NotesCollection.__super__.constructor.apply(this, args);
+    },
 
-        url: function() {
-            return this.baseUrl + '?sorting=' + this.sorting;
-        },
+    url: function() {
+        return this.baseUrl + '?sorting=' + this.sorting;
+    },
 
-        getSorting: function() {
-            return this.sorting;
-        },
+    getSorting: function() {
+        return this.sorting;
+    },
 
-        setSorting: function(mode) {
-            this.sorting = mode;
-        }
-    });
-
-    return NotesCollection;
+    setSorting: function(mode) {
+        this.sorting = mode;
+    }
 });
+
+export default NotesCollection;

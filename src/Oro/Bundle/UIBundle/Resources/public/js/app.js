@@ -8,8 +8,8 @@ if ('publicPath' in config) {
 module.exports = Promise.all(
     require('./polyfills').default
 ).then(() => Promise.all([
-    require('oronavigation/js/routes-loader'),
-    require('orotranslation/js/translation-loader')
+    import('oronavigation/js/routes-loader'),
+    import('orotranslation/js/translation-loader')
 ])).then(() => {
     const $ = require('jquery');
     const _ = require('underscore');

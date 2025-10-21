@@ -6,7 +6,7 @@ define(function(require) {
     const BaseCollection = require('oroui/js/app/models/base/collection');
     const _ = require('underscore');
     const systemAccessModeOrganizationProvider =
-        require('oroorganization/js/app/tools/system-access-mode-organization-provider');
+        require('oroorganization/js/app/tools/system-access-mode-organization-provider').default;
     /**
      * @export oroemail/js/app/models/email-template-collection
      */

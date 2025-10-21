@@ -6,7 +6,8 @@ define(function(require) {
     const BaseComponent = require('oroui/js/app/components/base/component');
     const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
     const messenger = require('oroui/js/messenger');
-    const systemAccessModeOrganizationProvider = require('oroorganization/js/app/tools/system-access-mode-organization-provider');
+    const systemAccessModeOrganizationProvider =
+        require('oroorganization/js/app/tools/system-access-mode-organization-provider').default;
 
     const IntegrationConnectionCheckerComponent = BaseComponent.extend({
         /**
