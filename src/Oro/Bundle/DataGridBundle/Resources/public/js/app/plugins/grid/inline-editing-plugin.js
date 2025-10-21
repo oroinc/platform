@@ -10,7 +10,7 @@ define(function(require) {
     const ApiAccessor = require('oroui/js/tools/api-accessor');
     const Modal = require('oroui/js/modal');
     const SplitEventList = require('./inline-editing-plugin/split-event-list');
-    const pageStateChecker = require('oronavigation/js/app/services/page-state-checker');
+    const pageStateChecker = require('oronavigation/js/app/services/page-state-checker').default;
     require('orodatagrid/js/app/components/cell-popup-editor-component');
     require('oroform/js/app/views/editor/text-editor-view');
 
