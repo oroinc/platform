@@ -30,8 +30,8 @@ define(function(require) {
          * @property
          */
         widgetOptions: {
-            multiple: true,
-            classes: 'select-filter-widget multiselect-filter-widget'
+            ...SelectFilter.prototype.widgetOptions,
+            multiple: true
         },
 
         /**
@@ -40,6 +40,8 @@ define(function(require) {
          * @private
          */
         minimumDropdownWidth: 120,
+
+        closeAfterChose: false,
 
         /**
          * @inheritdoc
@@ -57,39 +59,8 @@ define(function(require) {
                     value: [FILTER_EMPTY_VALUE]
                 };
             }
+
             MultiSelectFilter.__super__.initialize.call(this, options);
-        },
-
-        /**
-         * @inheritdoc
-         */
-        _onSelectChange: function(e) {
-            MultiSelectFilter.__super__._onSelectChange.call(this, e);
-            this._setDropdownWidth();
-        },
-
-        /**
-         * Set design for select dropdown
-         *
-         * @protected
-         */
-        _setDropdownWidth: function() {
-            if (!this.selectWidget) {
-                return;
-            }
-
-            if (!this.cachedMinimumWidth) {
-                this.cachedMinimumWidth = Math.max(this.minimumDropdownWidth,
-                    this.selectWidget.getMinimumDropdownWidth()) + 24;
-            }
-
-            const widget = this.selectWidget.getWidget();
-            const requiredWidth = this.cachedMinimumWidth;
-            // fix width
-            widget.width(requiredWidth).css({
-                minWidth: requiredWidth,
-                maxWidth: requiredWidth
-            });
         },
 
         /**
@@ -143,7 +114,6 @@ define(function(require) {
         _getCriteriaHint: function(...args) {
             const value = (args.length > 0) ? this._getDisplayValue(args[0]) : this._getDisplayValue();
             const choices = this._getSelectedChoices(value, this.choices);
-
             return choices.length > 0 ? choices.join(', ') : this.placeholder;
         },
 

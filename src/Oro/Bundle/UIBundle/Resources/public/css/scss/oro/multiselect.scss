@@ -1,0 +1,92 @@
+/* @theme: admin.oro; */
+
+.multiselect {
+    &__list {
+        display: grid;
+        list-style: none;
+        min-width: 150px;
+        max-width: 350px;
+
+        &:not(.no-list-scroll) {
+            overflow-y: auto;
+            max-height: 350px;
+        }
+    }
+
+    &__item {
+        padding-inline: $content-padding-medium;
+        white-space: nowrap;
+
+        &:hover {
+            background-color: $neutral-grey-2;
+            cursor: pointer;
+        }
+
+        &:last-child {
+            margin-bottom: 10px;
+        }
+    }
+
+    &--offset {
+        padding-left: $content-padding;
+    }
+
+    &__item-checkbox {
+        align-items: center;
+        display: inline-flex;
+    }
+
+    &__dropdown-menu {
+        padding: $content-padding;
+    }
+
+    &__search {
+        position: relative;
+        padding: 8px;
+
+        .clear-search {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+        }
+
+        input[type=search] {
+            width: 100%;
+            margin-bottom: 0;
+        }
+    }
+
+    &__search-icon {
+        position: absolute;
+        top: 0;
+        left: $content-padding-medium;
+        bottom: 0;
+        margin: auto;
+    }
+
+    &__search-input {
+        padding-inline: 40px;
+    }
+
+    &__no-found {
+        margin-block: $content-padding-small;
+        text-align: center;
+    }
+
+    &__optgroup {
+        &-label {
+            font-weight: font-weight('bold');
+            font-size: $base-font-size;
+            cursor: pointer;
+
+            text-align: center;
+            border-bottom: 1px solid;
+            margin: 1px 0;
+            padding: 3px;
+        }
+
+        &-options {
+            width: auto;
+        }
+    }
+}

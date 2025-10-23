@@ -91,8 +91,8 @@ define(function(require) {
             return this.$el.inputWidget('val');
         },
 
-        setValue: function(value) {
-            this.$el.inputWidget('val', value, true);
+        setValue: function(value, triggerChange = true) {
+            this.$el.inputWidget('val', value, triggerChange);
         },
 
         getData: function() {

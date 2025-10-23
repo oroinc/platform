@@ -25,6 +25,9 @@ The current file describes significant changes in the code that may affect the u
 * Added new `getThemeConfigOption` and `getThemeOption` methods in `Oro\Component\Layout\Extension\Theme\Model\ThemeManager` for retrieving inherited values.
 * Added `Oro\Component\Layout\Extension\Theme\Model\OldThemeProvider` to determine if the current theme is the old theme or inherits from it.
 
+#### UIBundle
+* Added `MultiselectView` and `MultiselectDropdown` as scope of backbone based multiselect views. Afftected functionality `FiltersManager`, `SelectFilter`, `MultiSelectFilter`, `SubcategoryFilter`, `MultiSelectOriginFolder`, `MultiCheckboxEditorView`, `ActivityConditionView`
+
 #### LayoutBundle
 * Added a new `fonts` configuration to the theme definition for building fonts with Webpack and referencing preloaded fonts.
 * Added a new `preload_web_link` layout block type that uses Symfony WebLink component and pushes resources to clients before they even know that they need them.
@@ -50,6 +53,10 @@ found in the PHP attributes implementing `PHPAttributeConfigurationInterface`
 * Updated `\Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType` and `\Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType` with `attachments` field to manage email template attachments in the UI.
 
 ### Removed
+
+#### UIBundle
+* Removed `jquery-ui-multiselect-widget` dependency
+* Removed `MultiselectDecorator` module and extension by `MultiselectDecorator`
 
 * Removed SensioFrameworkExtraBundle dependency because it is not supported by Symfony 7.
   All the annotations provided by this bundle are now built-in in Symfony as PHP attributes.

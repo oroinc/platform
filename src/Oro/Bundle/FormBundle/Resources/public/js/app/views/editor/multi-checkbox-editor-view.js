@@ -4,8 +4,8 @@ define(function(require) {
     const SelectEditorView = require('./select-editor-view');
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
-    require('jquery.multiselect');
-    require('jquery.multiselect.filter');
+    const {Multiselect} = require('oroui/js/app/views/multiselect');
+    const manageFocus = require('oroui/js/tools/manage-focus').default;
 
     /**
      * Multi-select content editor. Please note that it requires column data format
@@ -71,7 +71,6 @@ define(function(require) {
         events: {
             'change select': 'onChange',
             'click [data-action]': 'rethrowAction',
-            'updatePosition': 'onUpdatePosition',
             'click [data-role="apply"]': 'onApplyChanges'
         },
 
@@ -88,34 +87,27 @@ define(function(require) {
 
         onApplyChanges: function() {
             this.prestine = false;
-            this.multiselect.multiselect('close');
         },
 
         onShow: function() {
-            this.multiselect = this.$('select').multiselect({
-                autoOpen: true,
-                classes: _.result(this, 'className'),
-                header: '',
-                height: '',
-                position: {
-                    my: 'left top',
-                    at: 'left top',
-                    of: this.$el
-                },
-                outerTrigger: this.$('[data-role="apply"]'),
-                beforeclose: function() {
-                    if (this.prestine) {
-                        this.trigger('cancelAction');
-                    }
-                }.bind(this)
-            }).multiselectfilter({
-                label: '',
+            const multiselect = new Multiselect({
+                autoRender: true,
+                selectElement: this.$('select'),
+                container: this.$el,
+                enabledHeader: false,
+                hideResetButton: true,
                 placeholder: __('oro.form.inlineEditing.multi_checkbox_editor.filter.placeholder'),
-                autoReset: true
+                cssConfig: {
+                    main: _.result(this, 'className')
+                }
             });
 
-            this.multiselect.multiselect('getMenu').find('label')
-                .bindFirst('keydown' + this.eventNamespace(), function(event) {
+            this.subview('multiselect', multiselect);
+
+            manageFocus.focusTabbable(multiselect.$('[data-role="items"]'));
+
+            multiselect.$('[data-role="items"] label')
+                .bindFirst(`keydown${this.eventNamespace()}`, event => {
                     this.prestine = false;
 
                     switch (event.keyCode) {
@@ -123,7 +115,9 @@ define(function(require) {
                             event.stopImmediatePropagation();
                             event.preventDefault();
 
-                            this.multiselect.multiselect('close');
+                            if (this.prestine) {
+                                this.trigger('cancelAction');
+                            }
 
                             this.onGenericEnterKeydown(event);
                             break;
@@ -131,7 +125,9 @@ define(function(require) {
                             event.stopImmediatePropagation();
                             event.preventDefault();
 
-                            this.multiselect.multiselect('close');
+                            if (this.prestine) {
+                                this.trigger('cancelAction');
+                            }
 
                             this.onGenericTabKeydown(event);
                             break;
@@ -139,30 +135,26 @@ define(function(require) {
                             event.stopImmediatePropagation();
                             event.preventDefault();
 
-                            this.multiselect.multiselect('close');
+                            if (this.prestine) {
+                                this.trigger('cancelAction');
+                            }
 
                             this.onGenericEscapeKeydown(event);
                             break;
                     }
 
                     this.onGenericArrowKeydown(event);
-                }.bind(this));
+                });
 
-            this.multiselect.multiselectfilter('instance').input
-                .on('keydown' + this.eventNamespace(), function(event) {
+            multiselect.$('[data-role="search-input"]')
+                .on(`keydown${this.eventNamespace()}`, event => {
                     this.prestine = false;
 
                     this.onGenericEnterKeydown(event);
                     this.onGenericTabKeydown(event);
                     this.onGenericArrowKeydown(event);
                     this.onGenericEscapeKeydown(event);
-                }.bind(this));
-        },
-
-        onUpdatePosition: function() {
-            if (this.multiselect) {
-                this.multiselect.multiselect('updatePos');
-            }
+                });
         },
 
         parseRawValue: function(value) {
@@ -198,17 +190,6 @@ define(function(require) {
                 old = old === 0 || old ? [old] : [];
             }
             return val.length !== old.length || _.difference(val, old).length > 0;
-        },
-
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-            if (this.multiselect) {
-                this.multiselect.multiselect('destroy');
-                this.multiselect = null;
-            }
-            MultiCheckboxEditorView.__super__.dispose.call(this);
         }
     });
 

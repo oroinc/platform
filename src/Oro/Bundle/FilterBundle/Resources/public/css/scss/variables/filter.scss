@@ -128,8 +128,6 @@ $filter-multiselect-background: none !default;
 $filter-multiselect-border: none !default;
 $filter-multiselect-offset-left: 0 !default;
 
-$filter-multiselect-filter-widget-display: inline-block !default;
-
 $filter-select-oro-wrapper-width: 113px !default;
 $filter-select-oro-wrapper-offset-bottom: 8px !default;
 $filter-select-oro-wrapper-width: 100% !default;
@@ -235,15 +233,10 @@ $reset-filter-button-position: absolute !default;
 $reset-filter-button-top: 0 !default;
 $reset-filter-button-right: 0 !default;
 
-$ui-multiselect-filter-list-color: #032d67 !default;
-$ui-multiselect-filter-list-text-decoration: underline !default;
-
 $select-filter-widget-text-decoration: none !default;
-$ui-multiselect-checkboxes-label-line-height: 20px !default;
 $select-filter-widget-width: auto !default;
 
 $date-visual-element-width: 95px !default;
-$ui-multiselect-checkboxes-overflow-x: visible !default;
 
 $filter-select-height: 29px !default;
 $filter-select-disable-offset-left: 3px !default;

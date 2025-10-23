@@ -25,8 +25,6 @@ aliases:
     jquery.cookie$: jquery.cookie/jquery.cookie
     jquery.form$: oroui/lib/jquery.form
     jquery.mousewheel$: jquery-mousewheel/jquery.mousewheel
-    jquery.multiselect$: jquery-ui-multiselect-widget/src/jquery.multiselect.min
-    jquery.multiselect.filter$: jquery-ui-multiselect-widget/src/jquery.multiselect.filter.min
     jquery.select2$: '@oroinc/select2/select2'
     jquery.timepicker$: timepicker/jquery.timepicker
     jquery.uniform$: '@oroinc/jquery.uniform/src/js/jquery.uniform'
@@ -47,7 +45,6 @@ app-modules:
     - oroui/js/app/modules/input-widgets
     - oroui/js/app/modules/layout-module
     - oroui/js/app/modules/messenger-module
-#    - oroui/js/app/modules/styled-scroll-bar-module -- currently not in use
     - oroui/js/app/modules/swipeable-module
     - oroui/js/app/modules/template-macros-module
     - oroui/js/app/modules/svg-sprite-module
@@ -117,6 +114,8 @@ dynamic-imports:
         - oroui/js/standart-confirmation
         - oroui/js/tools
         - oroui/js/tools/api-accessor
+    multiselect:
+        - oroui/js/app/components/multiselect-component
 map:
     '*':
         alert.js: bootstrap-alert
@@ -128,8 +127,6 @@ map:
         jquery-ui/widgets/datepicker: oroui/js/extend/jquery-ui/widgets/datepicker
         jquery-ui/widgets/dialog: oroui/js/extend/jquery-ui/widgets/dialog
         jquery-ui/widgets/sortable: oroui/js/extend/jquery-ui/widgets/sortable
-        jquery.multiselect: oroui/js/extend/jquery.multiselect
-        jquery.multiselect.filter: oroui/js/extend/jquery.multiselect-filter
         jquery.select2: oroui/js/extend/select2
         jquery.timepicker: oroui/js/extend/jquery.timepicker
         jquery.uniform: oroui/js/extend/jquery.uniform
@@ -165,10 +162,6 @@ map:
         jquery-ui/widgets/dialog: jquery-ui/widgets/dialog
     oroui/js/extend/jquery-ui/widgets/sortable:
         jquery-ui/widgets/sortable: jquery-ui/widgets/sortable
-    oroui/js/extend/jquery.multiselect:
-        jquery.multiselect: jquery.multiselect
-    oroui/js/extend/jquery.multiselect-filter:
-        jquery.multiselect.filter: jquery.multiselect.filter
     oroui/js/extend/jquery.timepicker:
         jquery.timepicker: jquery.timepicker
     oroui/js/extend/jquery.uniform:
@@ -195,12 +188,6 @@ shim:
     jquery:
         expose:
             - $,jQuery
-    jquery.multiselect:
-        imports:
-            - single|jquery|jQuery
-    jquery.multiselect.filter:
-        imports:
-            - single|jquery|jQuery
     jquery.select2:
         exports: single|Select2
         imports:

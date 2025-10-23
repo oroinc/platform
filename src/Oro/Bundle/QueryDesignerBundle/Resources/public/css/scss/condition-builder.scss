@@ -306,6 +306,10 @@
     .active-filter {
         display: inline;
 
+        .multiselect-view {
+            display: contents;
+        }
+
         > div,
         .dropdown,
         .dropup,
