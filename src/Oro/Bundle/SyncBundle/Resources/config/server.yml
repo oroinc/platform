@@ -10,7 +10,7 @@ services:
     oro_sync.gos_web_socket.command.websocket_server.decorator:
         class: Oro\Bundle\SyncBundle\Command\WebsocketServerCommand
         decorates: gos_web_socket.command.websocket_server
-        factory: ['@Oro\Bundle\SyncBundle\WebSocket\WebsocketServerCommandFactory', 'createGosWebsocketCommand']
+        factory: [ '@Oro\Bundle\SyncBundle\WebSocket\WebsocketServerCommandFactory', 'createGosWebsocketCommand' ]
         arguments:
             - '@gos_web_socket.server.launcher'
             - '@oro_sync.gos_websocket_server.parameters_provider'
@@ -25,3 +25,69 @@ services:
             - 'gos:websocket:server'
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 255 }
+
+    oro_sync.websocket_server_state.shared_manager:
+        class: Oro\Bundle\SyncBundle\WebsocketServerState\WebsocketServerSharedStateManager
+        arguments:
+            - '@doctrine'
+
+    oro_sync.websocket_server_state.cache_manager:
+        class: Oro\Bundle\SyncBundle\WebsocketServerState\WebsocketServerCacheStateManager
+        arguments:
+            - '@oro_sync.websocket_server_state.cache_manager.cache'
+
+    oro_sync.websocket_server_state.cache_manager.cache:
+        parent: oro.data.cache
+        tags:
+            - { name: cache.pool, namespace: oro_sync_websocket_server_state_cache_manager }
+
+    oro_sync.websocket.server_stopper:
+        class: Oro\Bundle\SyncBundle\WebSocket\WebsocketServerStopper
+        arguments:
+            - '@gos_web_socket.registry.periodic'
+            - '@gos_web_socket.registry.server_push_handler'
+        calls:
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: oro_websocket }
+
+    oro_sync.periodic.websocket_server_state.system_config:
+        class: Oro\Bundle\SyncBundle\Periodic\WebsocketServerStateCheckPeriodic
+        arguments:
+            - '@oro_sync.websocket_server_state.shared_manager'
+            - '@oro_sync.websocket.server_stopper'
+            - !php/const Oro\Bundle\SyncBundle\WebsocketServerState\WebsocketServerStates::SYSTEM_CONFIG
+        calls:
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: gos_web_socket.periodic }
+            - { name: kernel.event_listener, event: gos_web_socket.server_launched, method: onServerLaunched }
+            - { name: monolog.logger, channel: oro_websocket }
+
+    oro_sync.periodic.websocket_server_state.application_cache:
+        class: Oro\Bundle\SyncBundle\Periodic\WebsocketServerStateCheckPeriodic
+        arguments:
+            - '@oro_sync.websocket_server_state.cache_manager'
+            - '@oro_sync.websocket.server_stopper'
+            - !php/const Oro\Bundle\SyncBundle\WebsocketServerState\WebsocketServerStates::APPLICATION_CACHE
+        calls:
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: gos_web_socket.periodic }
+            - { name: kernel.event_listener, event: gos_web_socket.server_launched, method: onServerLaunched }
+            - { name: monolog.logger, channel: oro_websocket }
+
+    oro_sync.event_listener.system_config.websocket_server_state:
+        class: Oro\Bundle\SyncBundle\EventListener\SystemConfig\WebsocketServerStateSystemConfigUpdateListener
+        arguments:
+            - '@oro_distribution.handler.application_status'
+            - '@oro_sync.websocket_server_state.shared_manager'
+        tags:
+            - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
+
+    oro_sync.event_listener.load_termination_listeners_on_server_launch:
+        class: Oro\Bundle\SyncBundle\EventListener\LoadTerminationListenersOnServerLaunchEventListener
+        arguments:
+            - '@event_dispatcher'
+        tags:
+            - { name: kernel.event_listener, event: gos_web_socket.server_launched, method: onServerLaunched }
