@@ -371,23 +371,6 @@
     }
 }
 
-.ui-multiselect-menu {
-    &.select-filter-widget {
-        // stylelint-disable-next-line declaration-no-important
-        min-width: 100% !important;
-        max-width: 100%;
-
-        .ui-multiselect-checkboxes {
-            &.fixed-li {
-                li > label {
-                    text-overflow: ellipsis;
-                    overflow: hidden;
-                }
-            }
-        }
-    }
-}
-
 @media only screen
     and (max-width: $small-landscape-devices-media-breakpoint)
     and (min-width: #{$small-devices-media-breakpoint + 1}) {

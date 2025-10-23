@@ -227,7 +227,7 @@ define(function(require) {
                 label: __('oro.activitylist.widget.filter.activity.title'),
                 choices: activityTypeChoices || {}
             });
-
+            _.extend(this.activityTypeFilter, dataFilterWrapper);
             this.activityTypeFilter.render();
             this.activityTypeFilter.on('update', this.onFilterStateChange, this);
             $filterContainer.append(this.activityTypeFilter.$el);

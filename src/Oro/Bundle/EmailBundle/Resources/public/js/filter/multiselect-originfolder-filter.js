@@ -2,12 +2,9 @@ define([
     'jquery',
     'underscore',
     'orotranslation/js/translator',
-    'oroui/js/tools',
     'oro/filter/multiselect-filter'
-], function($, _, __, tools, MultiSelect) {
+], function($, _, __, MultiSelect) {
     'use strict';
-
-    const FILTER_EMPTY_VALUE = '';
 
     const MultiSelectOriginFolder = MultiSelect.extend({
         /**
@@ -17,31 +14,10 @@ define([
          */
         templateSelector: '#multiselect-origin-folder-template',
 
-        /**
-         * Selector for widget button
-         *
-         * @property
-         */
-        buttonSelector: '.filter-criteria-selector',
-
-        /**
-         * Minimal width of dropdown
-         *
-         * @private
-         */
-        minimumDropdownWidth: 150,
-
-        /**
-         * Select widget options
-         *
-         * @property
-         */
         widgetOptions: {
-            multiple: true,
-            classes: 'select-filter-widget multiselect-filter-widget multiselect-origin-folder'
+            ...MultiSelect.prototype.widgetOptions,
+            maxItemsForShowSearchBar: 0
         },
-
-        emptyValue: {value: [FILTER_EMPTY_VALUE]},
 
         /**
          * @inheritdoc
@@ -65,31 +41,20 @@ define([
             this.choices = choices;
         },
 
-        /**
-         * Render filter template
-         *
-         * @return {*}
-         */
-        render: function() {
+        getTemplateData() {
             const options = this.choices;
             if (this.populateDefault) {
                 options.unshift({value: '', label: this.placeholder});
             }
 
-            this.setElement((
-                this.template({
-                    label: this.labelPrefix + this.label,
-                    showLabel: this.showLabel,
-                    options: options,
-                    placeholder: this.placeholder,
-                    selected: _.extend({}, this.emptyValue, this.value),
-                    isEmpty: this.isEmpty()
-                })
-            ));
-
-            this._initializeSelectWidget();
-
-            return this;
+            return {
+                label: this.labelPrefix + this.label,
+                showLabel: this.showLabel,
+                options: options,
+                placeholder: this.placeholder,
+                selected: _.extend({}, this.emptyValue, this.value),
+                isEmpty: this.isEmpty()
+            };
         }
     });
 

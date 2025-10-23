@@ -296,11 +296,15 @@ define(function(require, exports, module) {
          */
         render: function() {
             this.resetFlags();
-            const $filter = $(this.template({
-                renderMode: this.renderMode
-            }));
+            const $filter = $(this.template(this.getTemplateData()));
             this._wrap($filter);
             return this;
+        },
+
+        getTemplateData() {
+            return {
+                renderMode: this.renderMode
+            };
         },
 
         /**
