@@ -4,10 +4,13 @@
     &__list {
         display: grid;
         list-style: none;
-        max-height: 350px;
         min-width: 150px;
         max-width: 350px;
-        overflow-y: auto;
+
+        &:not(.no-list-scroll) {
+            overflow-y: auto;
+            max-height: 350px;
+        }
     }
 
     &__item {

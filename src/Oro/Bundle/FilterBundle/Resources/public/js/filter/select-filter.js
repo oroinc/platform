@@ -208,6 +208,13 @@ define(function(require, exports, module) {
         },
 
         prerender() {
+            if (this.renderMode === 'toggle-mode') {
+                this.widgetOptions.cssConfig = {
+                    ...this.widgetOptions.cssConfig,
+                    list: 'multiselect__list no-list-scroll'
+                };
+            }
+
             SelectFilter.__super__.prerender.call(this);
 
             if (this.subview('multiselect')) {
