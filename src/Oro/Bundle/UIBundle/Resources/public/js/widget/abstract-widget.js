@@ -12,7 +12,7 @@ define(function(require) {
     const errorHandler = require('oroui/js/error');
     const messenger = require('oroui/js/messenger');
     const systemAccessModeOrganizationProvider =
-        require('oroorganization/js/app/tools/system-access-mode-organization-provider');
+        require('oroorganization/js/app/tools/system-access-mode-organization-provider').default;
     require('jquery.form');
 
     /**

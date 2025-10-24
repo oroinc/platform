@@ -33,8 +33,6 @@ aliases:
     jquery.jstree$: jstree/dist/jstree
     jquery.minicolors$: oroui/lib/minicolors/jquery.minicolors
     jquery.mousewheel$: jquery-mousewheel/jquery.mousewheel
-    jquery.multiselect$: jquery-ui-multiselect-widget/src/jquery.multiselect.min
-    jquery.multiselect.filter$: jquery-ui-multiselect-widget/src/jquery.multiselect.filter.min
     jquery.select2$: '@oroinc/select2/select2'
     jquery.simplecolorpicker$: oroui/lib/simplecolorpicker/jquery.simplecolorpicker
     jquery.timepicker$: timepicker/jquery.timepicker
@@ -171,8 +169,6 @@ map:
         jquery-ui/widgets/datepicker: oroui/js/extend/jquery-ui/widgets/datepicker
         jquery-ui/widgets/dialog: oroui/js/extend/jquery-ui/widgets/dialog
         jquery-ui/widgets/sortable: oroui/js/extend/jquery-ui/widgets/sortable
-        jquery.multiselect: oroui/js/extend/jquery.multiselect
-        jquery.multiselect.filter: oroui/js/extend/jquery.multiselect-filter
         jquery.select2: oroui/js/extend/select2
         jquery.timepicker: oroui/js/extend/jquery.timepicker
         jquery.uniform: oroui/js/extend/jquery.uniform
@@ -187,6 +183,7 @@ map:
         underscore: oroui/js/extend/underscore
         util.js: bootstrap-util
         oroui/templates/delete-confirmation.html: oroui/templates/modal-dialog.html
+        oroui/templates/multiselect/parts/search/multiselect-search-view.html: oroui/templates/multiselect-backoffice/parts/search/multiselect-search-view.html
     chaplin:
         backbone: backbone
     extend-popper:
@@ -208,10 +205,6 @@ map:
         jquery-ui/widgets/dialog: jquery-ui/widgets/dialog
     oroui/js/extend/jquery-ui/widgets/sortable:
         jquery-ui/widgets/sortable: jquery-ui/widgets/sortable
-    oroui/js/extend/jquery.multiselect:
-        jquery.multiselect: jquery.multiselect
-    oroui/js/extend/jquery.multiselect-filter:
-        jquery.multiselect.filter: jquery.multiselect.filter
     oroui/js/extend/jquery.timepicker:
         jquery.timepicker: jquery.timepicker
     oroui/js/extend/jquery.uniform:
@@ -239,12 +232,6 @@ shim:
         expose:
             - $,jQuery
     jquery.minicolors:
-        imports:
-            - single|jquery|jQuery
-    jquery.multiselect:
-        imports:
-            - single|jquery|jQuery
-    jquery.multiselect.filter:
         imports:
             - single|jquery|jQuery
     jquery.select2:

@@ -1,0 +1,7 @@
+<label class="<%- cssConfig.itemCheckboxLabel %>" title="<%- label %>">
+    <input type="<%- multiple ? 'checkbox' : 'radio' %>" class="<%- cssConfig.itemCheckbox %>" name="<%- name %>" value="<%- value %>"
+        <%- disabled ? ' disabled="disabled"' : '' %>
+        <%- selected ? ' checked="checked"' : '' %>
+    >
+    <span><%- label %> <% if(optionCount !== null) { %>(<%- optionCount %>)<% } %></span>
+</label>

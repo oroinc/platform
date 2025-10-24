@@ -5,7 +5,7 @@ define(function(require) {
     const _ = require('underscore');
     const routing = require('routing');
     const systemAccessModeOrganizationProvider =
-        require('oroorganization/js/app/tools/system-access-mode-organization-provider');
+        require('oroorganization/js/app/tools/system-access-mode-organization-provider').default;
 
     return {
         create: function($form) {

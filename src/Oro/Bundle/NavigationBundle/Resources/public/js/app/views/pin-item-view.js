@@ -1,110 +1,107 @@
-define(function(require) {
-    'use strict';
+import mediator from 'oroui/js/mediator';
+import __ from 'orotranslation/js/translator';
+import BookmarkItemView from 'oronavigation/js/app/views/bookmark-item-view';
+import template from 'tpl-loader!oronavigation/templates/pin-item.html';
 
-    const mediator = require('oroui/js/mediator');
-    const __ = require('orotranslation/js/translator');
-    const BookmarkItemView = require('oronavigation/js/app/views/bookmark-item-view');
+const PinItemView = BookmarkItemView.extend({
+    className: 'pin-holder',
 
-    const PinItemView = BookmarkItemView.extend({
-        className: 'pin-holder',
+    template,
 
-        template: require('tpl-loader!oronavigation/templates/pin-item.html'),
+    listen: {
+        'change:url model': 'render',
+        'change:title_rendered_short model': 'render',
+        'page:afterChange mediator': 'onPageUpdated',
+        'route:change mediator': 'onPageUpdated'
+    },
 
-        listen: {
-            'change:url model': 'render',
-            'change:title_rendered_short model': 'render',
-            'page:afterChange mediator': 'onPageUpdated',
-            'route:change mediator': 'onPageUpdated'
-        },
+    /**
+     * @inheritdoc
+     */
+    constructor: function PinItemView(options) {
+        PinItemView.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function PinItemView(options) {
-            PinItemView.__super__.constructor.call(this, options);
-        },
+    remove: function() {
+        mediator.off('content-manager:content-outdated', this.outdatedContentHandler, this);
+        PinItemView.__super__.remove.call(this);
+    },
 
-        remove: function() {
-            mediator.off('content-manager:content-outdated', this.outdatedContentHandler, this);
-            PinItemView.__super__.remove.call(this);
-        },
+    render: function() {
+        PinItemView.__super__.render.call(this);
 
-        render: function() {
-            PinItemView.__super__.render.call(this);
+        // if cache used highlight tab on content outdated event
+        mediator.on('content-manager:content-outdated', this.outdatedContentHandler, this);
+        this.setActiveItem();
+    },
 
-            // if cache used highlight tab on content outdated event
-            mediator.on('content-manager:content-outdated', this.outdatedContentHandler, this);
-            this.setActiveItem();
-        },
-
-        outdatedContentHandler: function(event) {
-            const url = this.model.get('url');
-            if (mediator.execute('compareUrl', url, event.path)) {
-                if (!this.$el.hasClass('outdated')) {
-                    this.markOutdated();
-                    this.listenTo(mediator, 'page:afterRefresh', this.onPageRefresh);
-                }
+    outdatedContentHandler: function(event) {
+        const url = this.model.get('url');
+        if (mediator.execute('compareUrl', url, event.path)) {
+            if (!this.$el.hasClass('outdated')) {
+                this.markOutdated();
+                this.listenTo(mediator, 'page:afterRefresh', this.onPageRefresh);
             }
-        },
-
-        onPageRefresh: function() {
-            if (this.checkCurrentUrl()) {
-                this.markNormal();
-                this.stopListening(mediator, 'page:afterRefresh');
-            }
-        },
-
-        markOutdated: function() {
-            this.$el
-                .addClass('outdated')
-                .tooltip({
-                    title: __('Content of pinned page is outdated')
-                });
-        },
-
-        markNormal: function() {
-            this.$el
-                .removeClass('outdated')
-                .tooltip('destroy');
-        },
-
-        /**
-         * @inheritdoc
-         */
-        checkCurrentUrl: function() {
-            const url = this.model.get('url');
-            return mediator.execute('compareNormalizedUrl', url, {ignoreGetParameters: ['restore']});
-        },
-
-        /**
-         * @inheritdoc
-         */
-        setActiveItem: function() {
-            const isUrlSame = this.checkCurrentUrl();
-            this.$el.toggleClass('active', isUrlSame);
-            this.$el.find('a').data('options', {forceStartup: !isUrlSame});
-        },
-
-        highlight(hideDelay = 3000) {
-            this.$el.addClass('highlight');
-
-            if (this.highlightTimeoutId) {
-                clearTimeout(this.highlightTimeoutId);
-            }
-
-            this.highlightTimeoutId = setTimeout(() => this.$el.removeClass('highlight'), hideDelay);
-        },
-
-        dispose() {
-            if (this.disposed) {
-                return;
-            }
-
-            clearTimeout(this.highlightTimeoutId);
-
-            PinItemView.__super__.dispose.call(this);
         }
-    });
+    },
 
-    return PinItemView;
+    onPageRefresh: function() {
+        if (this.checkCurrentUrl()) {
+            this.markNormal();
+            this.stopListening(mediator, 'page:afterRefresh');
+        }
+    },
+
+    markOutdated: function() {
+        this.$el
+            .addClass('outdated')
+            .tooltip({
+                title: __('Content of pinned page is outdated')
+            });
+    },
+
+    markNormal: function() {
+        this.$el
+            .removeClass('outdated')
+            .tooltip('destroy');
+    },
+
+    /**
+     * @inheritdoc
+     */
+    checkCurrentUrl: function() {
+        const url = this.model.get('url');
+        return mediator.execute('compareNormalizedUrl', url, {ignoreGetParameters: ['restore']});
+    },
+
+    /**
+     * @inheritdoc
+     */
+    setActiveItem: function() {
+        const isUrlSame = this.checkCurrentUrl();
+        this.$el.toggleClass('active', isUrlSame);
+        this.$el.find('a').data('options', {forceStartup: !isUrlSame});
+    },
+
+    highlight(hideDelay = 3000) {
+        this.$el.addClass('highlight');
+
+        if (this.highlightTimeoutId) {
+            clearTimeout(this.highlightTimeoutId);
+        }
+
+        this.highlightTimeoutId = setTimeout(() => this.$el.removeClass('highlight'), hideDelay);
+    },
+
+    dispose() {
+        if (this.disposed) {
+            return;
+        }
+
+        clearTimeout(this.highlightTimeoutId);
+
+        PinItemView.__super__.dispose.call(this);
+    }
 });
+
+export default PinItemView;
