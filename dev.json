@@ -87,7 +87,7 @@
         "doctrine/data-fixtures": "^1.4.3",
         "doctrine/doctrine-fixtures-bundle": "^3.3.1",
         "doctrine/collections": "~1.8.0",
-        "doctrine/persistence": "~3.4.0",
+        "doctrine/persistence": "3.4.1",
         "symfony/monolog-bundle": "~3.7.0",
         "knplabs/knp-menu": "~3.8.0",
         "knplabs/knp-menu-bundle": "~3.6.0",
