@@ -30,3 +30,5 @@ oro:
             scale:
                 range:
                     not_in_range: This value should be between "{{ min }}" and {{ max }}.
+            enum_option:
+                not_found: The value "{{ value }}" is not a valid enum option.

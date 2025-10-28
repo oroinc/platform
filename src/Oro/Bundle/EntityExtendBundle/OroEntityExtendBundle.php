@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle;
 
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler;
+use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ExtendEntitySerializedEnumValidatorPass;
 use Oro\Bundle\EntityExtendBundle\EntityExtend\ExtendedEntityFieldsProcessor;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
@@ -75,6 +76,7 @@ class OroEntityExtendBundle extends Bundle
         $container->addCompilerPass(new Compiler\ExtendDuplicatorPass());
         $container->addCompilerPass(new Compiler\ChangePropertyAccessorReflectionExtractorPass());
         $container->addCompilerPass(new Compiler\WarmerPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new ExtendEntitySerializedEnumValidatorPass());
     }
 
     private function ensureInitialized()
