@@ -17,11 +17,6 @@
 
     padding: $inline-editor-actions-inner-offset;
 
-    &--over-multiselect {
-        // to show over .ui-multiselect-menu
-        z-index: 10004;
-    }
-
     .btn {
         background: none;
         border: none;

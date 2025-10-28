@@ -159,6 +159,18 @@ oro:
             show_less: 'Show less items'
         dropdown_option_aria_label: "More Actions"
         dropdown_main_btn_prefix: "Action"
+        multiselect:
+            select_all: 'Select All'
+            deselect_all: 'Deselect All'
+            dropdown_mode:
+                toggle_label: 'Open Select'
+            footer:
+                reset_button_label: 'Reset'
+            search:
+                placeholder: 'Search Filters'
+                aria_label: 'Search Filters'
+                reset_btn:
+                    aria_label: 'Reset Search'
         status_button:
             aria_label: 'View status'
     htmlpurifier:

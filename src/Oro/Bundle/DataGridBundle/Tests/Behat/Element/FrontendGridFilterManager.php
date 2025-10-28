@@ -125,7 +125,7 @@ class FrontendGridFilterManager extends Element
     {
         return $this->find(
             'css',
-            'li.datagrid-manager__list-item label[title="' . $title . '"] input[type="checkbox"]'
+            '.datagrid-manager__list-item label[title="' . $title . '"] input[type="checkbox"]'
         );
     }
 }

@@ -1668,7 +1668,6 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
         foreach ($table->getRows() as $row) {
             [$hint] = $row;
-
             $this->assertTrue(
                 in_array($hint, $hints, true),
                 sprintf('Hint "%s" not found on page', $hint)

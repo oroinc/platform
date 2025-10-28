@@ -64,7 +64,7 @@ define(function(require) {
 
         _allowInteraction: function(e) {
             return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop, .tox-dialog, ' +
-                '.dropdown-menu, .ui-multiselect-menu').length;
+                '.dropdown-menu').length;
         },
 
         _create: function() {

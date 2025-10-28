@@ -18,8 +18,6 @@ css:
         - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker-fontawesome.css'
         - 'bundles/oroui/lib/minicolors/jquery.minicolors.css'
         - '~overlayscrollbars/css/OverlayScrollbars.css'
-        - '~jquery-ui-multiselect-widget/jquery.multiselect.css'
-        - '~jquery-ui-multiselect-widget/jquery.multiselect.filter.css'
 
         # customized libraries' styles
         - 'bundles/oroui/css/jquery-ui.grid.css'
