@@ -351,7 +351,7 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -260 }
             - { name: container.service_subscriber }
-    
+
     oro_entity_extend.extension.doctrine_type_mapping:
         class: 'Oro\Component\Action\Model\DoctrineTypeMappingExtension'
         public: false
@@ -405,7 +405,7 @@ services:
             - '@oro_entity_extend.validator.custom_entity_config_validator'
         tags:
             - { name: oro_migration.extension, extension_name: extend }
-            
+
     oro_entity_extend.migration.extension.outdated_extend:
         class: Oro\Bundle\EntityExtendBundle\Migration\Extension\OutdatedExtendExtension
         arguments:
@@ -952,3 +952,10 @@ services:
     oro_entity_extend.migration.enumerable_config_keys_provider:
         class: Oro\Bundle\EntityExtendBundle\Migration\Enum\UpdateEnumOptionIdsConfigKeysProvider
         abstract: true
+
+    oro_entity_extend.validator.extend_entity_enum_values:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\ExtendEntityEnumValuesValidator
+        arguments:
+            - '@oro_entity_extend.enum_options_provider'
+        tags:
+            - { name: validator.constraint_validator }
