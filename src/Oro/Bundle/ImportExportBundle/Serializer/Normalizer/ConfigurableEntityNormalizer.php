@@ -417,9 +417,9 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             // $value is not valid enum option id
         }
 
-        return $this->doctrineHelper->getEntityManager($optionClass)?->getReference(
-            $optionClass,
-            ExtendHelper::buildEnumOptionId($enumCode, ExtendHelper::buildEnumInternalId($value))
-        );
+
+        // Cannot use getReference() here because it creates a Doctrine Proxy that throws
+        // EntityNotFoundException when accessing any method on non-existent entities.
+        return new EnumOption($enumCode, $value, ExtendHelper::buildEnumInternalId($value), 0, false);
     }
 }
