@@ -18,6 +18,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\VariableStorage;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -441,12 +442,15 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @When /^(?:|I )type "(?P<value>(?:[^"]|\\")*)" in "(?P<field>(?:[^"]|\\")*)"$/
      * @When /^(?:|I )type "(?P<value>(?:[^"]|\\")*)" in "(?P<field>(?:[^"]|\\")*)" from "(?P<formName>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )type '(?P<value>(?:[^']|\\')*)' in "(?P<field>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )type '(?P<value>(?:[^']|\\')*)' in "(?P<field>(?:[^"]|\\")*)" from "(?P<formName>(?:[^"]|\\")*)"$/
      * @throws ElementNotFoundException
      */
     public function iTypeInFieldWith($locator, $value, $formName = 'OroForm')
     {
         $locator = $this->fixStepArgument($locator);
         $value = $this->fixStepArgument($value);
+        $value = VariableStorage::normalizeValue($value);
         $formName = $this->fixStepArgument($formName);
 
         /** @var OroForm $form */

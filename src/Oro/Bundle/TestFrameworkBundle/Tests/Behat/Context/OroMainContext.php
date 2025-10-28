@@ -3308,6 +3308,22 @@ JS;
     }
 
     /**
+     * Example: And I remember ID from current URL as "TESTPL.id"
+     *
+     * @When /^(?:|I )remember ID from current URL as "(?P<alias>(?:[^"]|\\")*)"$/
+     */
+    public function rememberIdFromURL(string $alias)
+    {
+        $session = $this->getMink()->getSession();
+        if (preg_match('/(\d+)(?:\?|$)/', $session->getCurrentUrl(), $matches)) {
+            $value = $matches[1] ?? $matches[0];
+            VariableStorage::storeData($alias, $value);
+        } else {
+            self::fail('Can not get numeric ID from current URL ' . $session->getCurrentUrl());
+        }
+    }
+
+    /**
      * And I follow remembered URL
      *
      * @Then /^(?:|I )follow remembered URL$/
