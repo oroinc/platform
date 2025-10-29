@@ -1,18 +1,14 @@
-define(function(require) {
-    'use strict';
+import lengthValidator from 'oroform/js/validator/length';
 
-    const lengthValidator = require('oroform/js/validator/length');
-
-    /**
-     * @export oroentityextend/js/validator/field-name-length
-     */
-    return [
-        'Oro\\Bundle\\EntityExtendBundle\\Validator\\Constraints\\FieldNameLength',
-        function(value, element, param) {
-            return lengthValidator[1].call(this, value, element, param);
-        },
-        function(param, element) {
-            return lengthValidator[2].call(this, param, element);
-        }
-    ];
-});
+/**
+ * @export oroentityextend/js/validator/field-name-length
+ */
+export default [
+    'Oro\\Bundle\\EntityExtendBundle\\Validator\\Constraints\\FieldNameLength',
+    function(value, element, param) {
+        return lengthValidator[1].call(this, value, element, param);
+    },
+    function(param, element) {
+        return lengthValidator[2].call(this, param, element);
+    }
+];
