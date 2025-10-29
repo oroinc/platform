@@ -7,7 +7,7 @@ define(function(require) {
     const widgetManager = require('oroui/js/widget-manager');
     const messenger = require('oroui/js/messenger');
     const mediator = require('oroui/js/mediator');
-    const MultiGridComponent = require('orodatagrid/js/app/components/multi-grid-component');
+    const MultiGridComponent = require('orodatagrid/js/app/components/multi-grid-component').default;
 
     /**
      * @exports ActivityContextComponent

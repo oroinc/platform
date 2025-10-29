@@ -3,7 +3,7 @@ define(function(require) {
 
     const BaseComponent = require('oroui/js/app/components/base/component');
     const routing = require('routing');
-    const CallbackListener = require('orodatagrid/js/datagrid/listener/callback-listener');
+    const CallbackListener = require('orodatagrid/js/datagrid/listener/callback-listener').default;
     const WidgetManager = require('oroui/js/widget-manager');
     const MultipleEntityModel = require('oroform/js/multiple-entity/model');
     const _ = require('underscore');

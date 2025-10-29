@@ -1,26 +1,22 @@
-define(function(require) {
-    'use strict';
+import AbstractAction from './abstract-action';
+import ActionComponentDropDownLauncher from 'orodatagrid/js/datagrid/action-component-dropdown-launcher';
 
-    const AbstractAction = require('./abstract-action');
-    const ActionComponentDropDownLauncher = require('orodatagrid/js/datagrid/action-component-dropdown-launcher');
+const ShowComponentAction = AbstractAction.extend({
+    launcher: ActionComponentDropDownLauncher,
 
-    const ShowComponentAction = AbstractAction.extend({
-        launcher: ActionComponentDropDownLauncher,
+    /**
+     * @inheritdoc
+     */
+    constructor: function ShowComponentAction(options) {
+        ShowComponentAction.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function ShowComponentAction(options) {
-            ShowComponentAction.__super__.constructor.call(this, options);
-        },
-
-        /**
-         * @inheritdoc
-         */
-        execute: function() {
-            // do nothing
-        }
-    });
-
-    return ShowComponentAction;
+    /**
+     * @inheritdoc
+     */
+    execute: function() {
+        // do nothing
+    }
 });
+
+export default ShowComponentAction;

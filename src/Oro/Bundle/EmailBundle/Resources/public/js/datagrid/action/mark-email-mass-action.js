@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    const MassAction = require('oro/datagrid/action/mass-action');
+    const MassAction = require('oro/datagrid/action/mass-action').default;
 
     /**
      * Mark email as read/unread

@@ -1,9 +1,5 @@
-define(function() {
-    'use strict';
+const moduleNameTemplate = 'oro/datagrid/action/{{type}}-action';
 
-    const moduleNameTemplate = 'oro/datagrid/action/{{type}}-action';
-
-    return function(type) {
-        return moduleNameTemplate.replace('{{type}}', type);
-    };
-});
+export default function(type) {
+    return moduleNameTemplate.replace('{{type}}', type);
+};

@@ -1,82 +1,78 @@
-define(function(require) {
-    'use strict';
+import _ from 'underscore';
+import BaseComponent from 'oroui/js/app/components/base/component';
+import ActionsPanel from 'orodatagrid/js/datagrid/actions-panel';
 
-    const _ = require('underscore');
-    const BaseComponent = require('oroui/js/app/components/base/component');
-    const ActionsPanel = require('orodatagrid/js/datagrid/actions-panel');
+/**
+ * @class ToolbarMassActionComponent
+ * @extends BaseComponent
+ */
+const ToolbarMassActionComponent = BaseComponent.extend({
+    /**
+     * Instance of grid
+     * @type {Backgrid.Grid}
+     */
+    grid: null,
 
     /**
-     * @class ToolbarMassActionComponent
-     * @extends BaseComponent
+     * @inheritdoc
      */
-    const ToolbarMassActionComponent = BaseComponent.extend({
-        /**
-         * Instance of grid
-         * @type {Backgrid.Grid}
-         */
-        grid: null,
+    constructor: function ToolbarMassActionComponent(options) {
+        ToolbarMassActionComponent.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function ToolbarMassActionComponent(options) {
-            ToolbarMassActionComponent.__super__.constructor.call(this, options);
-        },
+    /**
+     * @inheritdoc
+     */
+    initialize: function(options) {
+        _.extend(this, _.pick(options, ['collection', 'actions', 'grid']));
 
-        /**
-         * @inheritdoc
-         */
-        initialize: function(options) {
-            _.extend(this, _.pick(options, ['collection', 'actions', 'grid']));
+        const actions = [];
+        const grid = this.grid;
 
-            const actions = [];
-            const grid = this.grid;
+        this.actions.each(function(Action) {
+            const ActionModule = Action.get('module');
+            const action = new ActionModule({datagrid: grid});
 
-            this.actions.each(function(Action) {
-                const ActionModule = Action.get('module');
-                const action = new ActionModule({datagrid: grid});
+            this.listenTo(action, 'preExecute', this.onActionRun.bind(this));
+            actions.push(action);
+        }, this);
 
-                this.listenTo(action, 'preExecute', this.onActionRun.bind(this));
-                actions.push(action);
-            }, this);
+        this.actionsPanel = new ActionsPanel({
+            actions: actions, el: options._sourceElement, collection: this.grid.collection
+        });
+        this.actionsPanel.render();
 
-            this.actionsPanel = new ActionsPanel({
-                actions: actions, el: options._sourceElement, collection: this.grid.collection
-            });
-            this.actionsPanel.render();
-
-            this.listenTo(this.grid.collection, 'backgrid:refresh', function() {
-                if (this.actionsPanel.$el.is(':visible')) {
-                    this.actionsPanel.$el.dropdown('toggle');
-                }
-            });
-            ToolbarMassActionComponent.__super__.initialize.call(this, options);
-        },
-
-        onActionRun: function(action) {
-            if (action && action.disposed) {
-                return;
+        this.listenTo(this.grid.collection, 'backgrid:refresh', function() {
+            if (this.actionsPanel.$el.is(':visible')) {
+                this.actionsPanel.$el.dropdown('toggle');
             }
+        });
+        ToolbarMassActionComponent.__super__.initialize.call(this, options);
+    },
 
-            action.launcherInstance.$el.trigger('tohide.bs.dropdown');
-        },
-
-        /**
-         * @inheritdoc
-         */
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-
-            // remove properties to prevent disposing them with the columns manager
-            delete this.collection;
-            delete this.actions;
-            delete this.grid;
-
-            ToolbarMassActionComponent.__super__.dispose.call(this);
+    onActionRun: function(action) {
+        if (action && action.disposed) {
+            return;
         }
-    });
 
-    return ToolbarMassActionComponent;
+        action.launcherInstance.$el.trigger('tohide.bs.dropdown');
+    },
+
+    /**
+     * @inheritdoc
+     */
+    dispose: function() {
+        if (this.disposed) {
+            return;
+        }
+
+        // remove properties to prevent disposing them with the columns manager
+        delete this.collection;
+        delete this.actions;
+        delete this.grid;
+
+        ToolbarMassActionComponent.__super__.dispose.call(this);
+    }
 });
+
+export default ToolbarMassActionComponent;

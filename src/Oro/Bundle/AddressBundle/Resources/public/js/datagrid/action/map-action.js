@@ -5,7 +5,7 @@ define(function(require) {
     const _ = require('underscore');
     const Popover = require('bootstrap-popover');
     const GoogleMaps = require('oroaddress/js/mapservice/googlemaps');
-    const ModelAction = require('oro/datagrid/action/model-action');
+    const ModelAction = require('oro/datagrid/action/model-action').default;
 
     const MapAction = ModelAction.extend({
         /**

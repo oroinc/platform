@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     const BaseView = require('oroui/js/app/views/base/view');
-    const Backgrid = require('backgrid');
+    const Backgrid = require('backgrid').default;
 
     const ActionPermissionsReadonlyCell = BaseView.extend({
         optionNames: ['column'],

@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     const _ = require('underscore');
-    const ModelAction = require('oro/datagrid/action/model-action');
+    const ModelAction = require('oro/datagrid/action/model-action').default;
     const ButtonManager = require('oroaction/js/button-manager');
 
     const ButtonWidgetAction = ModelAction.extend({

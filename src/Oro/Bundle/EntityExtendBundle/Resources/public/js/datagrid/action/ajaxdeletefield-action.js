@@ -39,4 +39,3 @@ const AjaxdeletefieldAction = AjaxdeleteAction.extend({
 });
 
 export default AjaxdeletefieldAction;
-

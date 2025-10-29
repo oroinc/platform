@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     const mediator = require('oroui/js/mediator');
-    const AbstractAction = require('oro/datagrid/action/abstract-action');
+    const AbstractAction = require('oro/datagrid/action/abstract-action').default;
     const FiltersManager = require('orofilter/js/filters-manager');
 
     const ToggleFiltersAction = AbstractAction.extend({

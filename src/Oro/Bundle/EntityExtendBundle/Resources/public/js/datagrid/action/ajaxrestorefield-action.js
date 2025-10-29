@@ -16,4 +16,3 @@ const AjaxrestorefieldAction = AjaxAction.extend({
 });
 
 export default AjaxrestorefieldAction;
-
