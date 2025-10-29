@@ -77,9 +77,7 @@ class CollectFormErrors implements ProcessorInterface
     {
         $form = $context->getForm();
         if (null !== $form && $form->isSubmitted() && !$form->isValid()) {
-            $this->isExistingEntity = $context->isExisting();
-            $this->processForm($form, $context);
-            $this->isExistingEntity = null;
+            $this->processForm($form, $context, $context->isExisting());
         }
     }
 
@@ -108,9 +106,7 @@ class CollectFormErrors implements ProcessorInterface
             $includedData = $includedEntities->getData($includedEntity);
             $includedForm = $includedData->getForm();
             if (null !== $includedForm && $includedForm->isSubmitted() && !$includedForm->isValid()) {
-                $this->isExistingEntity = $includedData->isExisting();
-                $this->processForm($includedForm, $context);
-                $this->isExistingEntity = null;
+                $this->processForm($includedForm, $context, $includedData->isExisting());
                 if ($context->hasErrors()) {
                     foreach ($context->getErrors() as $error) {
                         $errorCompleter->fixIncludedEntityPath(
@@ -131,7 +127,7 @@ class CollectFormErrors implements ProcessorInterface
         }
     }
 
-    protected function processForm(FormInterface $form, FormContext $context): void
+    protected function processForm(FormInterface $form, FormContext $context, bool $isExistingEntity): void
     {
         /** @var Error[] $foundErrors */
         $foundErrors = [];
@@ -144,7 +140,7 @@ class CollectFormErrors implements ProcessorInterface
             $context->addError($errorObject);
             $foundErrors[] = [$form, $errorObject];
         }
-        $this->processChildren($form, $context, $foundErrors);
+        $this->processChildren($form, $context, $foundErrors, $isExistingEntity);
         $this->fixErrorPaths($foundErrors, $context);
     }
 
@@ -152,12 +148,17 @@ class CollectFormErrors implements ProcessorInterface
      * @param FormInterface $form
      * @param FormContext   $context
      * @param array         $foundErrors [[parent form, error], ...]
+     * @param bool          $isExistingEntity
      */
-    protected function processChildren(FormInterface $form, FormContext $context, array &$foundErrors): void
-    {
+    protected function processChildren(
+        FormInterface $form,
+        FormContext $context,
+        array &$foundErrors,
+        bool $isExistingEntity
+    ): void {
         /** @var FormInterface $child */
         foreach ($form as $child) {
-            if ($this->isExistingEntity && !($child->isSubmitted() && !$child->isValid())) {
+            if ($isExistingEntity && !($child->isSubmitted() && !$child->isValid())) {
                 continue;
             }
             $errors = $child->getErrors();
@@ -167,10 +168,10 @@ class CollectFormErrors implements ProcessorInterface
                     $this->getFieldErrorPropertyPath($error, $child)
                 );
                 $context->addError($errorObject);
-                $foundErrors[] = [$form, $errorObject];
+                $foundErrors[] = [$child->getParent(), $errorObject];
             }
             if ($this->isCompoundForm($child)) {
-                $this->processChildren($child, $context, $foundErrors);
+                $this->processChildren($child, $context, $foundErrors, $isExistingEntity);
             }
         }
     }
