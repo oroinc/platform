@@ -222,9 +222,11 @@
         {% if views is defined and views -%}
         var documentationUrl = null, documentation = '';
         {% for name, view in views -%}
-        {% if view.sandbox and view.documentation_path -%}
+        {% if view.sandbox -%}
             if (apiType === '{{ name }}') {
-                documentationUrl = '{{ asset(view.documentation_path) }}';
+                {% if view.documentation_path -%}
+                    documentationUrl = '{{ asset(view.documentation_path) }}';
+                {% endif -%}
                 {% if view.documentation is defined and view.documentation -%}
                     documentation = {{ view.documentation|extra_markdown|json_encode|raw }};
                 {%- endif -%}

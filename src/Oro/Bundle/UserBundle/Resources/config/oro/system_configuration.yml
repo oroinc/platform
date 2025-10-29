@@ -6,9 +6,6 @@ system_configuration:
         password_complexity_rules:
             icon:  fa-usd
             title: oro.user.system_configuration.groups.password_complexity_rules.title
-#            options:
-#                attr:
-#                    'data-depends-on-field': 'user_login_password'
         email_settings:
             title: oro.user.system_configuration.groups.email_settings.title
         login_options:

@@ -23,11 +23,11 @@ class PageNumberFilterTest extends \PHPUnit\Framework\TestCase
     public function testApplyWithFilter()
     {
         $pageSize = 10;
-        $pageNum = 2;
+        $pageNumber = 2;
         $expectedOffset = 10;
 
         $filter = new PageNumberFilter(DataType::UNSIGNED_INTEGER);
-        $filterValue = new FilterValue('path', $pageNum, null);
+        $filterValue = new FilterValue('path', $pageNumber, null);
         $criteria = new Criteria();
 
         $filter->apply($criteria, $filterValue);
@@ -40,7 +40,28 @@ class PageNumberFilterTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedOffset, $criteria->getFirstResult());
     }
 
-    public function testApplyWithFilterAndNullValue()
+    public function testApplyWithFirstRecordNumberFilter()
+    {
+        $pageSize = 10;
+        $firstRecord = 2;
+        $expectedOffset = 1;
+
+        $filter = new PageNumberFilter(DataType::UNSIGNED_INTEGER);
+        $filterValue = new FilterValue('path', $firstRecord, null);
+        $criteria = new Criteria();
+
+        $filter->useFirstRecordNumber();
+        $filter->apply($criteria, $filterValue);
+
+        self::assertNull($criteria->getFirstResult());
+
+        $criteria->setMaxResults($pageSize);
+        $filter->apply($criteria, $filterValue);
+
+        self::assertSame($expectedOffset, $criteria->getFirstResult());
+    }
+
+    public function testApplyWithFilterAndNullValue(): void
     {
         $filter = new PageNumberFilter(DataType::UNSIGNED_INTEGER);
         $filterValue = new FilterValue('path', null, null);

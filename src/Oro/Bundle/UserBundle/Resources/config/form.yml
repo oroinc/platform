@@ -75,6 +75,13 @@ services:
         tags:
             - { name: form.type, alias: oro_user_user }
 
+    oro_user.form.type.roles_select:
+        class: Oro\Bundle\UserBundle\Form\Type\RolesSelectType
+        arguments:
+            - '@oro_user.form.provider.roles_choices_for_user'
+        tags:
+            - { name: form.type, alias: oro_user_roles_select }
+
     oro_user.form.type.user.api:
         class: Oro\Bundle\UserBundle\Form\Type\UserApiType
         arguments:

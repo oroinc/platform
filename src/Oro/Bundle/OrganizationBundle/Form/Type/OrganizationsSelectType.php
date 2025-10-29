@@ -44,6 +44,8 @@ class OrganizationsSelectType extends AbstractType
                 'organization_tree_ids'   => [],
                 'selected_organizations'  => [],
                 'inherit_data'            => true,
+                'bu_autocomplete_alias'   => 'business_units_tree_search_handler',
+                'acl_protected'           => true
             ]
         );
     }
@@ -95,7 +97,7 @@ class OrganizationsSelectType extends AbstractType
             [
                 'required' => false,
                 'label' => 'oro.user.form.business_units.label',
-                'autocomplete_alias' => 'business_units_tree_search_handler',
+                'autocomplete_alias' => $options['bu_autocomplete_alias'],
                 'label_attr' => [
                     'class' => 'business-units-label'
                 ],
