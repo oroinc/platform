@@ -1,64 +1,61 @@
-define(function(require, exports, module) {
-    'use strict';
+import _ from 'underscore';
+import __ from 'orotranslation/js/translator';
+import BasePlugin from 'oroui/js/app/plugins/base/plugin';
+import ShowComponentAction from 'oro/datagrid/action/show-component-action';
+import DatagridManageColumnView from 'orodatagrid/js/app/views/grid/datagrid-manage-column-view';
+import DatagridManageFilterView from 'orodatagrid/js/app/views/grid/datagrid-manage-filter-view';
+import DatagridSettingView from 'orodatagrid/js/app/views/grid/datagrid-settings-view';
+import moduleConfig from 'module-config';
 
-    const _ = require('underscore');
-    const __ = require('orotranslation/js/translator');
-    const BasePlugin = require('oroui/js/app/plugins/base/plugin');
-    const ShowComponentAction = require('oro/datagrid/action/show-component-action');
-    const DatagridManageColumnView = require('orodatagrid/js/app/views/grid/datagrid-manage-column-view');
-    const DatagridManageFilterView = require('orodatagrid/js/app/views/grid/datagrid-manage-filter-view');
-    const DatagridSettingView = require('orodatagrid/js/app/views/grid/datagrid-settings-view');
+const config = {
+    icon: 'cog',
+    wrapperClassName: `datagrid-settings ${_.isRTL() ? 'dropright' : 'dropleft'}`,
+    label: __('oro.datagrid.settings.title'),
+    ariaLabel: __('oro.datagrid.settings.title_aria_label'),
+    ...moduleConfig(module.id)
+};
 
-    let config = require('module-config').default(module.id);
-    config = _.extend({
-        icon: 'cog',
-        wrapperClassName: `datagrid-settings ${_.isRTL() ? 'dropright' : 'dropleft'}`,
-        label: __('oro.datagrid.settings.title'),
-        ariaLabel: __('oro.datagrid.settings.title_aria_label')
-    }, config);
+const DatagridSettingPlugin = BasePlugin.extend({
+    enable: function() {
+        this.listenTo(this.main, 'beforeToolbarInit', this.onBeforeToolbarInit);
+        DatagridSettingPlugin.__super__.enable.call(this);
+    },
 
-    const DatagridSettingPlugin = BasePlugin.extend({
-        enable: function() {
-            this.listenTo(this.main, 'beforeToolbarInit', this.onBeforeToolbarInit);
-            DatagridSettingPlugin.__super__.enable.call(this);
-        },
-
-        onBeforeToolbarInit: function(toolbarOptions) {
-            const options = {
-                datagrid: this.main,
-                launcherOptions: _.extend(config, {
-                    allowDialog: _.isMobile(),
-                    componentConstructor: toolbarOptions.componentConstructor || DatagridSettingView,
-                    viewConstructors: toolbarOptions.viewConstructors || [
-                        {
-                            id: 'grid',
-                            label: __('oro.datagrid.settings.tab.grid'),
-                            view: DatagridManageColumnView,
-                            options: {
-                                collection: this.main.columns
-                            }
-                        },
-                        {
-                            id: 'filters',
-                            label: __('oro.datagrid.settings.tab.filters'),
-                            view: DatagridManageFilterView,
-                            options: {
-                                collection: _.filter(this.main.metadata.filters, function(filter) {
-                                    // Do not render filters with visible=false setting
-                                    return filter.visible;
-                                }),
-                                addSorting: false
-                            }
+    onBeforeToolbarInit: function(toolbarOptions) {
+        const options = {
+            datagrid: this.main,
+            launcherOptions: _.extend(config, {
+                allowDialog: _.isMobile(),
+                componentConstructor: toolbarOptions.componentConstructor || DatagridSettingView,
+                viewConstructors: toolbarOptions.viewConstructors || [
+                    {
+                        id: 'grid',
+                        label: __('oro.datagrid.settings.tab.grid'),
+                        view: DatagridManageColumnView,
+                        options: {
+                            collection: this.main.columns
                         }
-                    ],
-                    columns: this.main.columns
-                }, toolbarOptions.datagridSettings),
-                order: 600
-            };
+                    },
+                    {
+                        id: 'filters',
+                        label: __('oro.datagrid.settings.tab.filters'),
+                        view: DatagridManageFilterView,
+                        options: {
+                            collection: _.filter(this.main.metadata.filters, function(filter) {
+                                // Do not render filters with visible=false setting
+                                return filter.visible;
+                            }),
+                            addSorting: false
+                        }
+                    }
+                ],
+                columns: this.main.columns
+            }, toolbarOptions.datagridSettings),
+            order: 600
+        };
 
-            toolbarOptions.addToolbarAction(new ShowComponentAction(options));
-        }
-    });
-
-    return DatagridSettingPlugin;
+        toolbarOptions.addToolbarAction(new ShowComponentAction(options));
+    }
 });
+
+export default DatagridSettingPlugin;

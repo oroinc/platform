@@ -1,10 +1,9 @@
-define([
-    'underscore',
-    'orotranslation/js/translator',
-    'oro/datagrid/action/mass-action',
-    'oroui/js/messenger'
-], function(_, __, MassAction, messenger) {
+define(function(require) {
     'use strict';
+
+    const __ = require('orotranslation/js/translator');
+    const MassAction = require('oro/datagrid/action/mass-action').default;
+    const messenger = require('oroui/js/messenger');
 
     /**
      * Merge mass action class.

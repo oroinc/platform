@@ -1,128 +1,122 @@
-define([
-    'jquery',
-    'underscore',
-    'oroui/js/app/views/base/view',
-    'tpl-loader!orodatagrid/templates/datagrid/visible-items-counter.html'
-], function($, _, BaseView, template) {
-    'use strict';
+import BaseView from 'oroui/js/app/views/base/view';
+import template from 'tpl-loader!orodatagrid/templates/datagrid/visible-items-counter.html';
+
+/**
+ * Datagrid simple pagination widget
+ *
+ * @class   orodatagrid.datagrid.VisibleItemsCounter
+ * @extends Backbone.View
+ */
+const VisibleItemsCounter = BaseView.extend({
+    /** @property */
+    enabled: true,
+
+    /** @property */
+    hidden: false,
+
+    /** @property */
+    template: template,
+
+    /** @property */
+    className: 'visible-items-counter',
+
+    /** @property */
+    themeOptions: {
+        optionPrefix: 'itemscounter'
+    },
+
+    /** @property */
+    transTemplate: null,
 
     /**
-     * Datagrid simple pagination widget
-     *
-     * @class   orodatagrid.datagrid.VisibleItemsCounter
-     * @extends Backbone.View
+     * @inheritdoc
      */
-    const VisibleItemsCounter = BaseView.extend({
-        /** @property */
-        enabled: true,
+    constructor: function VisibleItemsCounter(options) {
+        VisibleItemsCounter.__super__.constructor.call(this, options);
+    },
 
-        /** @property */
-        hidden: false,
+    /**
+     * Initializer.
+     *
+     * @param {Object} options
+     * @param {Backbone.Collection} options.collection
+     * @param {Object} options.fastForwardHandleConfig
+     * @param {Number} options.windowSize
+     */
+    initialize: function(options) {
+        options = options || {};
+        this.hidden = options.hidden !== false;
 
-        /** @property */
-        template: template,
+        if (options.template) {
+            this.template = options.template;
+        }
 
-        /** @property */
-        className: 'visible-items-counter',
+        if (options.transTemplate) {
+            this.transTemplate = options.transTemplate;
+        }
 
-        /** @property */
-        themeOptions: {
-            optionPrefix: 'itemscounter'
-        },
+        if (!options.collection) {
+            throw new TypeError('"collection" is required');
+        }
+        this.collection = options.collection;
+        this.listenTo(this.collection, 'add', this.render);
+        this.listenTo(this.collection, 'remove', this.render);
+        this.listenTo(this.collection, 'reset', this.render);
 
-        /** @property */
-        transTemplate: null,
+        this.hidden = options.hide === true;
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function VisibleItemsCounter(options) {
-            VisibleItemsCounter.__super__.constructor.call(this, options);
-        },
+        VisibleItemsCounter.__super__.initialize.call(this, options);
+    },
 
-        /**
-         * Initializer.
-         *
-         * @param {Object} options
-         * @param {Backbone.Collection} options.collection
-         * @param {Object} options.fastForwardHandleConfig
-         * @param {Number} options.windowSize
-         */
-        initialize: function(options) {
-            options = options || {};
-            this.hidden = options.hidden !== false;
+    /**
+     * Disables view
+     *
+     * @return {*}
+     */
+    disable: function() {
+        return this;
+    },
 
-            if (options.template) {
-                this.template = options.template;
-            }
+    /**
+     * Enable view
+     *
+     * @return {*}
+     */
+    enable: function() {
+        return this;
+    },
 
-            if (options.transTemplate) {
-                this.transTemplate = options.transTemplate;
-            }
+    getTemplateData() {
+        const {state} = this.collection;
 
-            if (!options.collection) {
-                throw new TypeError('"collection" is required');
-            }
-            this.collection = options.collection;
-            this.listenTo(this.collection, 'add', this.render);
-            this.listenTo(this.collection, 'remove', this.render);
-            this.listenTo(this.collection, 'reset', this.render);
+        return {
+            disabled: !this.enabled || !state.totalRecords,
+            state: {length: this.collection.length, ...state},
+            transTemplate: this.transTemplate
+        };
+    },
 
-            this.hidden = options.hide === true;
+    /**
+     * Render pagination
+     *
+     * @return {*}
+     */
+    render: function() {
+        const state = this.collection.state;
 
-            VisibleItemsCounter.__super__.initialize.call(this, options);
-        },
-
-        /**
-         * Disables view
-         *
-         * @return {*}
-         */
-        disable: function() {
-            return this;
-        },
-
-        /**
-         * Enable view
-         *
-         * @return {*}
-         */
-        enable: function() {
-            return this;
-        },
-
-        getTemplateData() {
-            const {state} = this.collection;
-
-            return {
-                disabled: !this.enabled || !state.totalRecords,
-                state: {length: this.collection.length, ...state},
-                transTemplate: this.transTemplate
-            };
-        },
-
-        /**
-         * Render pagination
-         *
-         * @return {*}
-         */
-        render: function() {
-            const state = this.collection.state;
-
-            // prevent render if data is not loaded yet
-            if (state.totalRecords === null) {
-                return this;
-            }
-
-            VisibleItemsCounter.__super__.render.call(this);
-
-            if (this.hidden) {
-                this.$el.hide();
-            }
-
+        // prevent render if data is not loaded yet
+        if (state.totalRecords === null) {
             return this;
         }
-    });
 
-    return VisibleItemsCounter;
+        VisibleItemsCounter.__super__.render.call(this);
+
+        if (this.hidden) {
+            this.$el.hide();
+        }
+
+        return this;
+    }
 });
+
+export default VisibleItemsCounter;

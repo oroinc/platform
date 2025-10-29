@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    const Backgrid = require('backgrid');
+    const Backgrid = require('backgrid').default;
     const _ = require('underscore');
     const routing = require('routing');
     const TagsView = require('orotag/js/app/views/viewer/tags-view');

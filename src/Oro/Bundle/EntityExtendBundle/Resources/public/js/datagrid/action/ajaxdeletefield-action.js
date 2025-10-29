@@ -1,9 +1,9 @@
-define([
-    'oro/datagrid/action/ajaxdelete-action',
-    'oroui/js/delete-confirmation',
-    'oroui/js/mediator'
-], function(AjaxdeleteAction, DeleteConfirmation, mediator) {
+define(function(require) {
     'use strict';
+
+    const AjaxdeleteAction = require('oro/datagrid/action/ajaxdelete-action').default;
+    const DeleteConfirmation = require('oroui/js/delete-confirmation');
+    const mediator = require('oroui/js/mediator');
 
     /**
      * Ajax delete field action, shows confirmation dialogue, triggers REST AJAX request
@@ -43,4 +43,3 @@ define([
 
     return AjaxdeletefieldAction;
 });
-

@@ -7,7 +7,7 @@ define(function(require) {
     const routing = require('routing');
     const DialogWidget = require('oro/dialog-widget');
     const BaseView = require('oroui/js/app/views/base/view');
-    const PageableCollection = require('orodatagrid/js/pageable-collection');
+    const PageableCollection = require('orodatagrid/js/pageable-collection').default;
 
     const SelectCreateInlineTypeView = BaseView.extend({
         autoRender: true,

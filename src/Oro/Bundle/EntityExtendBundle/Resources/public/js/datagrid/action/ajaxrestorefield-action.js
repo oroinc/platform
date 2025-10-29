@@ -1,8 +1,8 @@
-define([
-    'oro/datagrid/action/ajax-action',
-    'oroui/js/mediator'
-], function(AjaxAction, mediator) {
+define(function(require) {
     'use strict';
+
+    const AjaxAction = require('oro/datagrid/action/ajax-action').default;
+    const mediator = require('oroui/js/mediator');
 
     /**
      * Ajax restore field action.
@@ -20,4 +20,3 @@ define([
 
     return AjaxrestorefieldAction;
 });
-

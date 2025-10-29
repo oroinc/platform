@@ -1,122 +1,117 @@
-define([
-    'underscore',
-    'jquery',
-    'backbone'
-], function(_, $, Backbone) {
-    'use strict';
+import _ from 'underscore';
+import Backbone from 'backbone';
+
+/**
+ * Abstarct listener for datagrid
+ *
+ * @export  orodatagrid/js/datagrid/listener/abstract-listener
+ * @class   orodatagrid.datagrid.listener.AbstractListener
+ * @extends Backbone.Model
+ */
+const AbstractListener = Backbone.Model.extend({
+    /** @param {String|Array} Column name of cells that will be listened for changing their values */
+    columnName: 'id',
+
+    /** @param {String} Model field that contains data */
+    dataField: 'id',
 
     /**
-     * Abstarct listener for datagrid
-     *
-     * @export  orodatagrid/js/datagrid/listener/abstract-listener
-     * @class   orodatagrid.datagrid.listener.AbstractListener
-     * @extends Backbone.Model
+     * @inheritdoc
      */
-    const AbstractListener = Backbone.Model.extend({
-        /** @param {String|Array} Column name of cells that will be listened for changing their values */
-        columnName: 'id',
+    constructor: function AbstractListener(...args) {
+        AbstractListener.__super__.constructor.apply(this, args);
+    },
 
-        /** @param {String} Model field that contains data */
-        dataField: 'id',
-
-        /**
-         * @inheritdoc
-         */
-        constructor: function AbstractListener(...args) {
-            AbstractListener.__super__.constructor.apply(this, args);
-        },
-
-        /**
-         * Initialize listener object
-         *
-         * @param {Object} options
-         */
-        initialize: function(options) {
-            if (!_.has(options, 'columnName')) {
-                throw new Error('Data column name is not specified');
-            }
-            this.columnName = options.columnName;
-
-            if (options.dataField) {
-                this.dataField = options.dataField;
-            }
-
-            AbstractListener.__super__.initialize.call(this, options);
-
-            if (!options.$gridContainer) {
-                throw new Error('gridSelector is not specified');
-            }
-            this.$gridContainer = options.$gridContainer;
-            this.gridName = options.gridName;
-
-            this.setDatagridAndSubscribe();
-        },
-
-        /**
-         * @inheritdoc
-         */
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-            if (!_.isUndefined(this.$gridContainer)) {
-                this.$gridContainer.off(this.gridEvents);
-            }
-            delete this.$gridContainer;
-            delete this.gridEvents;
-            AbstractListener.__super__.dispose.call(this);
-        },
-
-        /**
-         * Set datagrid instance
-         */
-        setDatagridAndSubscribe: function() {
-            this.gridEvents = this.getGridEvents();
-            this.$gridContainer.on(this.gridEvents);
-        },
-
-        /**
-         * Collects event handlers for grid container
-         *
-         * @returns {Object}
-         */
-        getGridEvents: function() {
-            const events = {};
-            events['datagrid:change:' + this.gridName] = this._onModelEdited.bind(this);
-            return events;
-        },
-
-        /**
-         * Process cell editing
-         *
-         * @param {$.Event} e
-         * @param {Backbone.Model} model
-         * @protected
-         */
-        _onModelEdited: function(e, model) {
-            if (!model.hasChanged(this.columnName)) {
-                return;
-            }
-
-            const value = model.get(this.dataField);
-
-            if (!_.isUndefined(value)) {
-                this._processValue(value, model);
-            }
-        },
-
-        /**
-         * Process value
-         *
-         * @param {*} value Value of model property with name of this.dataField
-         * @param {Backbone.Model} model
-         * @protected
-         * @abstract
-         */
-        _processValue: function(value, model) {
-            throw new Error('_processValue method is abstract and must be implemented');
+    /**
+     * Initialize listener object
+     *
+     * @param {Object} options
+     */
+    initialize: function(options) {
+        if (!_.has(options, 'columnName')) {
+            throw new Error('Data column name is not specified');
         }
-    });
+        this.columnName = options.columnName;
 
-    return AbstractListener;
+        if (options.dataField) {
+            this.dataField = options.dataField;
+        }
+
+        AbstractListener.__super__.initialize.call(this, options);
+
+        if (!options.$gridContainer) {
+            throw new Error('gridSelector is not specified');
+        }
+        this.$gridContainer = options.$gridContainer;
+        this.gridName = options.gridName;
+
+        this.setDatagridAndSubscribe();
+    },
+
+    /**
+     * @inheritdoc
+     */
+    dispose: function() {
+        if (this.disposed) {
+            return;
+        }
+        if (!_.isUndefined(this.$gridContainer)) {
+            this.$gridContainer.off(this.gridEvents);
+        }
+        delete this.$gridContainer;
+        delete this.gridEvents;
+        AbstractListener.__super__.dispose.call(this);
+    },
+
+    /**
+     * Set datagrid instance
+     */
+    setDatagridAndSubscribe: function() {
+        this.gridEvents = this.getGridEvents();
+        this.$gridContainer.on(this.gridEvents);
+    },
+
+    /**
+     * Collects event handlers for grid container
+     *
+     * @returns {Object}
+     */
+    getGridEvents: function() {
+        const events = {};
+        events['datagrid:change:' + this.gridName] = this._onModelEdited.bind(this);
+        return events;
+    },
+
+    /**
+     * Process cell editing
+     *
+     * @param {$.Event} e
+     * @param {Backbone.Model} model
+     * @protected
+     */
+    _onModelEdited: function(e, model) {
+        if (!model.hasChanged(this.columnName)) {
+            return;
+        }
+
+        const value = model.get(this.dataField);
+
+        if (!_.isUndefined(value)) {
+            this._processValue(value, model);
+        }
+    },
+
+    /**
+     * Process value
+     *
+     * @param {*} value Value of model property with name of this.dataField
+     * @param {Backbone.Model} model
+     * @protected
+     * @abstract
+     */
+    _processValue: function(value, model) {
+        throw new Error('_processValue method is abstract and must be implemented');
+    }
 });
+
+export default AbstractListener;

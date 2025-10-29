@@ -1,9 +1,9 @@
-define([
-    'orotranslation/js/translator',
-    'oroui/js/messenger',
-    'oro/datagrid/action/ajax-action'
-], function(__, messenger, AjaxAction) {
+define(function(require) {
     'use strict';
+
+    const __ = require('orotranslation/js/translator');
+    const messenger = require('oroui/js/messenger');
+    const AjaxAction = require('oro/datagrid/action/ajax-action').default;
 
     /**
      * Schedule channel sync action, triggers AJAX request

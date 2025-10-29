@@ -1,53 +1,49 @@
-define([
-    'underscore',
-    './abstract-listener'
-], function(_, AbstractListener) {
-    'use strict';
+import _ from 'underscore';
+import AbstractListener from './abstract-listener';
+
+/**
+ * Listener with custom callback to execute
+ *
+ * @export  orodatagrid/js/datagrid/listener/callback-listener
+ * @class   orodatagrid.datagrid.listener.CallbackListener
+ * @extends orodatagrid.datagrid.listener.AbstractListener
+ */
+const CallbackListener = AbstractListener.extend({
+    /** @param {Call} */
+    processCallback: null,
 
     /**
-     * Listener with custom callback to execute
-     *
-     * @export  orodatagrid/js/datagrid/listener/callback-listener
-     * @class   orodatagrid.datagrid.listener.CallbackListener
-     * @extends orodatagrid.datagrid.listener.AbstractListener
+     * @inheritdoc
      */
-    const CallbackListener = AbstractListener.extend({
-        /** @param {Call} */
-        processCallback: null,
+    constructor: function CallbackListener(...args) {
+        CallbackListener.__super__.constructor.apply(this, args);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function CallbackListener(...args) {
-            CallbackListener.__super__.constructor.apply(this, args);
-        },
-
-        /**
-         * Initialize listener object
-         *
-         * @param {Object} options
-         */
-        initialize: function(options) {
-            if (!_.has(options, 'processCallback')) {
-                throw new Error('Process callback is not specified');
-            }
-
-            this.processCallback = options.processCallback;
-
-            CallbackListener.__super__.initialize.call(this, options);
-        },
-
-        /**
-         * Execute callback
-         *
-         * @param {*} value Value of model property with name of this.dataField
-         * @param {Backbone.Model} model
-         * @protected
-         */
-        _processValue: function(value, model) {
-            this.processCallback(value, model, this);
+    /**
+     * Initialize listener object
+     *
+     * @param {Object} options
+     */
+    initialize: function(options) {
+        if (!_.has(options, 'processCallback')) {
+            throw new Error('Process callback is not specified');
         }
-    });
 
-    return CallbackListener;
+        this.processCallback = options.processCallback;
+
+        CallbackListener.__super__.initialize.call(this, options);
+    },
+
+    /**
+     * Execute callback
+     *
+     * @param {*} value Value of model property with name of this.dataField
+     * @param {Backbone.Model} model
+     * @protected
+     */
+    _processValue: function(value, model) {
+        this.processCallback(value, model, this);
+    }
 });
+
+export default CallbackListener;

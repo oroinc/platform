@@ -1,32 +1,28 @@
-define(function(require) {
-    'use strict';
+import BaseModel from 'oroui/js/app/models/base/model';
 
-    const BaseModel = require('oroui/js/app/models/base/model');
+const DatagridSettingsListFilterModel = BaseModel.extend({
+    defaults: {
+        search: '',
+        renderable: false
+    },
 
-    const DatagridSettingsListFilterModel = BaseModel.extend({
-        defaults: {
-            search: '',
-            renderable: false
-        },
+    /**
+     * @inheritdoc
+     */
+    constructor: function DatagridSettingsListFilterModel(...args) {
+        DatagridSettingsListFilterModel.__super__.constructor.apply(this, args);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function DatagridSettingsListFilterModel(...args) {
-            DatagridSettingsListFilterModel.__super__.constructor.apply(this, args);
-        },
-
-        filterer: function(item) {
-            const search = this.get('search').toLowerCase();
-            if (search.length > 0 && item.get('label').toLowerCase().indexOf(search) === -1) {
-                return false;
-            }
-            if (this.get('renderable') && !item.get('renderable')) {
-                return false;
-            }
-            return true;
+    filterer: function(item) {
+        const search = this.get('search').toLowerCase();
+        if (search.length > 0 && item.get('label').toLowerCase().indexOf(search) === -1) {
+            return false;
         }
-    });
-
-    return DatagridSettingsListFilterModel;
+        if (this.get('renderable') && !item.get('renderable')) {
+            return false;
+        }
+        return true;
+    }
 });
+
+export default DatagridSettingsListFilterModel;
