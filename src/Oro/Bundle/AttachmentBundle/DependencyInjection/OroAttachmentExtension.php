@@ -46,6 +46,10 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
         $container->setParameter('oro_attachment.png_quality', $config['png_quality']);
         $container->setParameter('oro_attachment.jpeg_quality', $config['jpeg_quality']);
         $container->setParameter(
+            'oro_attachment.external_file_details_http_methods',
+            $config['external_file_details_http_methods']
+        );
+        $container->setParameter(
             'oro_attachment.webp_strategy',
             \function_exists('imagewebp') ? $config['webp_strategy'] : WebpConfiguration::DISABLED
         );
