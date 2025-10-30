@@ -12,6 +12,7 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Exception\ExternalFileNotAccessibleException;
 use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Component\Testing\Logger\BufferingLogger;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -23,9 +24,10 @@ class ExternalFileFactoryTest extends \PHPUnit\Framework\TestCase
     private const HTTP_OPTIONS = ['sample_key' => 'sample_value'];
 
     private array $httpOptions;
+    private const REGEX_URL = '/^http:\/\/example\.org*/';
 
     private ClientInterface|\PHPUnit\Framework\MockObject\MockObject $httpClient;
-
+    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
     private LoggerInterface $logger;
 
     private ExternalFileFactory $factory;
@@ -33,11 +35,13 @@ class ExternalFileFactoryTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->httpClient = $this->createMock(ClientInterface::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->factory = new ExternalFileFactory($this->httpClient, self::HTTP_OPTIONS);
 
         $this->logger = new BufferingLogger();
         $this->factory->setLogger($this->logger);
+        $this->factory->setConfigManager($this->configManager);
 
         $this->httpOptions = self::HTTP_OPTIONS + [
                 RequestOptions::HTTP_ERRORS => false,
@@ -220,15 +224,62 @@ class ExternalFileFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory->createFromUrl(self::URL);
     }
 
+    public function testCreateFromUrlWithMethodsFromConfig(): void
+    {
+        $externalFileDetailsHttpMethods = [
+            [
+                'regex' => self::REGEX_URL,
+                'methods' => ['HEAD', 'GET'],
+            ],
+            [
+                'regex' => "/^http:\/\/someexample.cm*/",
+                'methods' => ['GET'],
+            ],
+        ];
+
+        $errorResponse = new Response(400, ['Content-Disposition' => 'inline;filename=image.png']);
+        $successResponse = new Response(200, ['Content-Disposition' => 'inline;filename=image.png']);
+
+        $this->configManager->expects(self::once())
+            ->method('get')
+            ->with('oro_attachment.external_file_details_http_methods')
+            ->willReturn($externalFileDetailsHttpMethods);
+
+        $this->httpClient->expects(self::exactly(2))
+            ->method('request')
+            ->withConsecutive(
+                ['HEAD', self::URL, $this->httpOptions],
+                ['GET', self::URL, $this->httpOptions]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $errorResponse,
+                $successResponse
+            );
+
+        self::assertEquals(
+            new ExternalFile(self::URL, 'image.png'),
+            $this->factory->createFromUrl(self::URL)
+        );
+    }
+
     /**
      * @dataProvider createFromUrlDataProvider
      */
-    public function testCreateFromUrl(ResponseInterface $response, ExternalFile $externalFile): void
-    {
+    public function testCreateFromUrl(
+        ResponseInterface $response,
+        ExternalFile $externalFile,
+        ?array $externalFileDetailsHttpMethods = [],
+        string $expectedHttpMethod = 'HEAD'
+    ): void {
+        $this->configManager->expects(self::once())
+            ->method('get')
+            ->with('oro_attachment.external_file_details_http_methods')
+            ->willReturn($externalFileDetailsHttpMethods);
+
         $this->httpClient
             ->expects(self::once())
             ->method('request')
-            ->with('HEAD', self::URL, $this->httpOptions)
+            ->with($expectedHttpMethod, self::URL, $this->httpOptions)
             ->willReturn($response);
 
         self::assertEquals(
@@ -292,6 +343,39 @@ class ExternalFileFactoryTest extends \PHPUnit\Framework\TestCase
                     ]
                 )),
                 'externalFile' => new ExternalFile(self::URL, 'image.png', 0, 'image/png'),
+            ],
+            'with filename and get methods from config' => [
+                'response' => (new Response(200, ['Content-Disposition' => 'inline;filename=image.png'])),
+                'externalFile' => new ExternalFile(self::URL, 'image.png'),
+                'externalFileDetailsHttpMethods' => [
+                    [
+                        'regex' => self::REGEX_URL,
+                        'methods' => ['GET'],
+                    ],
+                ],
+                'expectedHttpMethod' => 'GET',
+            ],
+            'with size and head method from config' => [
+                'response' => (new Response(
+                    200,
+                    [
+                        'Content-Disposition' => 'inline;filename="image.png"',
+                        'Content-Type' => 'image/png',
+                        'Content-Length' => 4242,
+                    ]
+                )),
+                'externalFile' => new ExternalFile(self::URL, 'image.png', 4242, 'image/png'),
+                'externalFileDetailsHttpMethods' => [
+                    [
+                        'regex' => self::REGEX_URL,
+                        'methods' => ['HEAD', 'GET'],
+                    ],
+                    [
+                        'regex' => "/^http:\/\/someexample.cm*/",
+                        'methods' => ['GET'],
+                    ],
+                ],
+                'expectedHttpMethod' => 'HEAD',
             ],
         ];
     }

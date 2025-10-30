@@ -10,6 +10,7 @@ use GuzzleHttp\RequestOptions;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Exception\ExternalFileNotAccessibleException;
 use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -25,6 +26,8 @@ class ExternalFileFactory implements LoggerAwareInterface
 
     private ClientInterface $httpClient;
 
+    private ConfigManager $configManager;
+
     private array $httpOptions;
 
     public function __construct(ClientInterface $httpClient, array $httpOptions = [])
@@ -32,6 +35,11 @@ class ExternalFileFactory implements LoggerAwareInterface
         $this->httpClient = $httpClient;
         $this->httpOptions = $httpOptions;
         $this->logger = new NullLogger();
+    }
+
+    public function setConfigManager(ConfigManager $configManager): void
+    {
+        $this->configManager = $configManager;
     }
 
     /**
@@ -60,40 +68,50 @@ class ExternalFileFactory implements LoggerAwareInterface
      */
     public function createFromUrl(string $url): ExternalFile
     {
-        try {
-            $response = $this->httpClient->request('HEAD', $url, $this->getHttpOptions());
-        } catch (RequestException $exception) {
-            $reason = (string)$exception->getResponse()?->getReasonPhrase();
-            if (!$reason) {
-                $reason = $this->getHandlerContextError($exception->getHandlerContext());
+        $isReceivedInfo = false;
+        $methods = $this->getUrlMethods($url);
+
+        foreach ($methods as $method) {
+            try {
+                $response = $this->httpClient->request($method, $url, $this->getHttpOptions());
+            } catch (RequestException $exception) {
+                $reason = (string)$exception->getResponse()?->getReasonPhrase();
+                if (!$reason) {
+                    $reason = $this->getHandlerContextError($exception->getHandlerContext());
+                }
+
+                throw new ExternalFileNotAccessibleException(
+                    $url,
+                    $reason,
+                    $exception,
+                    $exception->getResponse()
+                );
+            } catch (ConnectException $exception) {
+                throw new ExternalFileNotAccessibleException(
+                    $url,
+                    $this->getHandlerContextError($exception->getHandlerContext()),
+                    $exception
+                );
+            } catch (GuzzleException $exception) {
+                $this->logger->error(
+                    'Failed to make a HEAD request when creating an external file for {url}: {error}',
+                    [
+                        'exception' => $exception,
+                        'url' => $url,
+                        'error' => $exception->getMessage(),
+                    ]
+                );
+
+                throw new ExternalFileNotAccessibleException($url, $exception->getMessage(), $exception);
             }
 
-            throw new ExternalFileNotAccessibleException(
-                $url,
-                $reason,
-                $exception,
-                $exception->getResponse()
-            );
-        } catch (ConnectException $exception) {
-            throw new ExternalFileNotAccessibleException(
-                $url,
-                $this->getHandlerContextError($exception->getHandlerContext()),
-                $exception
-            );
-        } catch (GuzzleException $exception) {
-            $this->logger->error(
-                'Failed to make a HEAD request when creating an external file for {url}: {error}',
-                [
-                    'exception' => $exception,
-                    'url' => $url,
-                    'error' => $exception->getMessage(),
-                ]
-            );
-
-            throw new ExternalFileNotAccessibleException($url, $exception->getMessage(), $exception);
+            if ($response->getStatusCode() === 200) {
+                $isReceivedInfo = true;
+                break;
+            }
         }
 
-        if ($response->getStatusCode() !== 200) {
+        if (!$isReceivedInfo) {
             throw new ExternalFileNotAccessibleException(
                 $url,
                 $response->getReasonPhrase(),
@@ -108,6 +126,19 @@ class ExternalFileFactory implements LoggerAwareInterface
             $this->getFileSize($response),
             $this->getMimeType($response)
         );
+    }
+
+    private function getUrlMethods(string $url): array
+    {
+        $methods = ['HEAD'];
+        $urlOptions = $this->configManager->get('oro_attachment.external_file_details_http_methods') ?? [];
+        foreach ($urlOptions as $urlOption) {
+            if (preg_match($urlOption['regex'], $url) && !empty($urlOption['methods'])) {
+                $methods = $urlOption['methods'];
+            }
+        }
+
+        return $methods;
     }
 
     private function getHttpOptions(): array

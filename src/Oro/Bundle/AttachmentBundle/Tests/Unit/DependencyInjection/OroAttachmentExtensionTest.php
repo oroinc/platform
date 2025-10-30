@@ -29,6 +29,7 @@ class OroAttachmentExtensionTest extends \PHPUnit\Framework\TestCase
                 'oro_attachment.processors_allowed' => true,
                 'oro_attachment.png_quality' => 100,
                 'oro_attachment.jpeg_quality' => 85,
+                'oro_attachment.external_file_details_http_methods' => [],
                 'oro_attachment.webp_strategy' => WebpConfiguration::ENABLED_IF_SUPPORTED,
                 'oro_attachment.collect_attachment_files_batch_size' => 20000,
                 'oro_attachment.load_existing_attachments_batch_size' => 500,

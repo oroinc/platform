@@ -25,6 +25,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 'maxsize' => 10,
                 'upload_file_mime_types' => [],
                 'upload_image_mime_types' => [],
+                'external_file_details_http_methods' => [],
                 'png_quality' => 100,
                 'jpeg_quality' => 85,
                 'processors_allowed' => true,
