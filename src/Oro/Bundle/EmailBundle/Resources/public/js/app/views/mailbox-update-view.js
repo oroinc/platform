@@ -1,64 +1,59 @@
-define([
-    'jquery',
-    'backbone',
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/mediator'
-], function($, Backbone, _, __, mediator) {
-    'use strict';
+import $ from 'jquery';
+import Backbone from 'backbone';
+import _ from 'underscore';
+import mediator from 'oroui/js/mediator';
+
+/**
+ * @extends Backbone.View
+ */
+const MailboxUpdateView = Backbone.View.extend({
+    /**
+     * @const
+     */
+    RELOAD_MARKER: '_reloadForm',
+
+    events: {
+        'change [name*="processType"]': 'changeHandler'
+    },
 
     /**
-     * @extends Backbone.View
+     * @inheritdoc
      */
-    const MailboxUpdateView = Backbone.View.extend({
-        /**
-         * @const
-         */
-        RELOAD_MARKER: '_reloadForm',
+    constructor: function MailboxUpdateView(options) {
+        MailboxUpdateView.__super__.constructor.call(this, options);
+    },
 
-        events: {
-            'change [name*="processType"]': 'changeHandler'
-        },
+    /**
+     * @param options Object
+     */
+    initialize: function(options) {
+        this.options = _.defaults(options || {}, this.options);
+        const passwordHolderField = $('input[name="oro_email_mailbox[passwordHolder]"]');
+        const passwordField = $('input[name="oro_email_mailbox[origin][password]"]');
+        passwordField.val(passwordHolderField.val());
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function MailboxUpdateView(options) {
-            MailboxUpdateView.__super__.constructor.call(this, options);
-        },
+        this.listenTo(mediator, 'change:systemMailBox:email', this.onChangeEmail.bind(this));
+    },
 
-        /**
-         * @param options Object
-         */
-        initialize: function(options) {
-            this.options = _.defaults(options || {}, this.options);
-            const passwordHolderField = $('input[name="oro_email_mailbox[passwordHolder]"]');
-            const passwordField = $('input[name="oro_email_mailbox[origin][password]"]');
-            passwordField.val(passwordHolderField.val());
+    changeHandler: function(event) {
+        mediator.trigger('serializeFolderCollection');
+        const data = this.$el.serializeArray();
+        const url = this.$el.attr('action');
+        const method = this.$el.attr('method');
 
-            this.listenTo(mediator, 'change:systemMailBox:email', this.onChangeEmail.bind(this));
-        },
+        data.push({name: this.RELOAD_MARKER, value: true});
+        mediator.execute('submitPage', {url: url, type: method, data: $.param(data)});
+    },
 
-        changeHandler: function(event) {
-            mediator.trigger('serializeFolderCollection');
-            const data = this.$el.serializeArray();
-            const url = this.$el.attr('action');
-            const method = this.$el.attr('method');
-
-            data.push({name: this.RELOAD_MARKER, value: true});
-            mediator.execute('submitPage', {url: url, type: method, data: $.param(data)});
-        },
-
-        onChangeEmail: function(data) {
-            const $oroEmailMailBoxEmail = this.$el.find('input[name="oro_email_mailbox[email]"]');
-            if (data && data.email) {
-                $oroEmailMailBoxEmail.val(data.email);
-                $oroEmailMailBoxEmail.prop('readonly', 'readonly');
-            } else {
-                $oroEmailMailBoxEmail.prop('readonly', false);
-            }
+    onChangeEmail: function(data) {
+        const $oroEmailMailBoxEmail = this.$el.find('input[name="oro_email_mailbox[email]"]');
+        if (data && data.email) {
+            $oroEmailMailBoxEmail.val(data.email);
+            $oroEmailMailBoxEmail.prop('readonly', 'readonly');
+        } else {
+            $oroEmailMailBoxEmail.prop('readonly', false);
         }
-    });
-
-    return MailboxUpdateView;
+    }
 });
+
+export default MailboxUpdateView;

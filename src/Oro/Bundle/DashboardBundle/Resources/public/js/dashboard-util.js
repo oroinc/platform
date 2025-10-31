@@ -1,14 +1,10 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery';
 
-    const $ = require('jquery');
-
-    return {
-        onDashboardRemove: function(dashboardId) {
-            $('[data-menu="' + dashboardId + '"]').remove();
-            if (!$('[data-menu]').length) {
-                $('.menu-divider').remove();
-            }
+export default {
+    onDashboardRemove: function(dashboardId) {
+        $('[data-menu="' + dashboardId + '"]').remove();
+        if (!$('[data-menu]').length) {
+            $('.menu-divider').remove();
         }
-    };
-});
+    }
+};

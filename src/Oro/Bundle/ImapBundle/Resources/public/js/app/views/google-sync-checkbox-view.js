@@ -1,162 +1,158 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery';
+import BaseView from 'oroui/js/app/views/base/view';
 
-    const $ = require('jquery');
-    const BaseView = require('oroui/js/app/views/base/view');
+const GoogleSyncCheckboxView = BaseView.extend({
+    $errorMessage: null,
 
-    const GoogleSyncCheckboxView = BaseView.extend({
-        $errorMessage: null,
+    $successMessage: null,
 
-        $successMessage: null,
+    $googleErrorMessage: null,
 
-        $googleErrorMessage: null,
+    $googleWarningMessage: null,
 
-        $googleWarningMessage: null,
+    token: null,
 
-        token: null,
+    googleErrorMessage: '',
 
-        googleErrorMessage: '',
+    canShowMessage: false,
 
-        canShowMessage: false,
+    events: {
+        'change input[type=checkbox]': 'onChangeCheckBox'
+    },
 
-        events: {
-            'change input[type=checkbox]': 'onChangeCheckBox'
-        },
+    listen: {
+        'change:canShowMessage': 'render'
+    },
 
-        listen: {
-            'change:canShowMessage': 'render'
-        },
+    /**
+     * @inheritdoc
+     */
+    constructor: function GoogleSyncCheckboxView(options) {
+        GoogleSyncCheckboxView.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function GoogleSyncCheckboxView(options) {
-            GoogleSyncCheckboxView.__super__.constructor.call(this, options);
-        },
+    /**
+     * @inheritdoc
+     */
+    initialize: function(options) {
+        this.$errorMessage = this.$el.find(options.errorMessage);
+        this.$successMessage = this.$el.find(options.successMessage);
+        this.$googleErrorMessage = this.$el.find(options.googleErrorMessage);
+        this.$googleWarningMessage = this.$el.find(options.googleWarningMessage);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        initialize: function(options) {
-            this.$errorMessage = this.$el.find(options.errorMessage);
-            this.$successMessage = this.$el.find(options.successMessage);
-            this.$googleErrorMessage = this.$el.find(options.googleErrorMessage);
-            this.$googleWarningMessage = this.$el.find(options.googleWarningMessage);
-        },
+    render: function() {
+        this.$googleErrorMessage.html(this.googleErrorMessage);
 
-        render: function() {
-            this.$googleErrorMessage.html(this.googleErrorMessage);
-
-            if (this.canShowMessage) {
-                this.showMessage();
-            } else {
-                this.hideMessages();
-            }
-        },
-
-        /**
-         * Set response from google oAuth2.0 authentication
-         * @param token
-         */
-        setToken: function(token) {
-            this.token = token;
-        },
-
-        /**
-         * Set error message from google API
-         * @params {string} message
-         */
-        setGoogleErrorMessage: function(message) {
-            this.googleErrorMessage = message;
-        },
-
-        /**
-         * Reset error message from google API
-         */
-        resetGoogleErrorMessage: function() {
-            this.googleErrorMessage = '';
-        },
-
-        /**
-         * Reset property token
-         */
-        resetToken: function() {
-            this.token = null;
-        },
-
-        /**
-         * Handler event change for checkbox
-         * @param e
-         */
-        onChangeCheckBox: function(e) {
-            this.resetGoogleErrorMessage();
-            this.resetToken();
+        if (this.canShowMessage) {
+            this.showMessage();
+        } else {
             this.hideMessages();
-
-            if ($(e.target).is(':checked')) {
-                this.canShowMessage = true;
-                this.trigger('requestToken');
-            } else {
-                this.canShowMessage = false;
-                this.$googleWarningMessage.show();
-            }
-        },
-
-        /**
-         * Show success or error message
-         */
-        showMessage: function() {
-            this.hideMessages();
-
-            if (this.googleErrorMessage.length > 0) {
-                this.unCheck();
-                this.showGoogleError();
-            } else if (this.token && !this.token.error) {
-                this.showSuccess();
-            } else {
-                this.unCheck();
-                this.showError();
-            }
-        },
-
-        /**
-         * show success message
-         */
-        hideMessages: function() {
-            this.$errorMessage.hide();
-            this.$successMessage.hide();
-            this.$googleErrorMessage.hide();
-            this.$googleWarningMessage.hide();
-        },
-
-        /**
-         * show success message
-         */
-        showSuccess: function() {
-            this.$successMessage.show();
-        },
-
-        /**
-         * show error message
-         */
-        showError: function() {
-            this.$errorMessage.show();
-        },
-
-        /**
-         * show error message from google API
-         */
-        showGoogleError: function() {
-            this.$googleErrorMessage.show();
-        },
-
-        /**
-         * Remove check status for checkbox
-         */
-        unCheck: function() {
-            this.$el.find('input').prop('checked', false);
         }
-    });
+    },
 
-    return GoogleSyncCheckboxView;
+    /**
+     * Set response from google oAuth2.0 authentication
+     * @param token
+     */
+    setToken: function(token) {
+        this.token = token;
+    },
+
+    /**
+     * Set error message from google API
+     * @params {string} message
+     */
+    setGoogleErrorMessage: function(message) {
+        this.googleErrorMessage = message;
+    },
+
+    /**
+     * Reset error message from google API
+     */
+    resetGoogleErrorMessage: function() {
+        this.googleErrorMessage = '';
+    },
+
+    /**
+     * Reset property token
+     */
+    resetToken: function() {
+        this.token = null;
+    },
+
+    /**
+     * Handler event change for checkbox
+     * @param e
+     */
+    onChangeCheckBox: function(e) {
+        this.resetGoogleErrorMessage();
+        this.resetToken();
+        this.hideMessages();
+
+        if ($(e.target).is(':checked')) {
+            this.canShowMessage = true;
+            this.trigger('requestToken');
+        } else {
+            this.canShowMessage = false;
+            this.$googleWarningMessage.show();
+        }
+    },
+
+    /**
+     * Show success or error message
+     */
+    showMessage: function() {
+        this.hideMessages();
+
+        if (this.googleErrorMessage.length > 0) {
+            this.unCheck();
+            this.showGoogleError();
+        } else if (this.token && !this.token.error) {
+            this.showSuccess();
+        } else {
+            this.unCheck();
+            this.showError();
+        }
+    },
+
+    /**
+     * show success message
+     */
+    hideMessages: function() {
+        this.$errorMessage.hide();
+        this.$successMessage.hide();
+        this.$googleErrorMessage.hide();
+        this.$googleWarningMessage.hide();
+    },
+
+    /**
+     * show success message
+     */
+    showSuccess: function() {
+        this.$successMessage.show();
+    },
+
+    /**
+     * show error message
+     */
+    showError: function() {
+        this.$errorMessage.show();
+    },
+
+    /**
+     * show error message from google API
+     */
+    showGoogleError: function() {
+        this.$googleErrorMessage.show();
+    },
+
+    /**
+     * Remove check status for checkbox
+     */
+    unCheck: function() {
+        this.$el.find('input').prop('checked', false);
+    }
 });
+
+export default GoogleSyncCheckboxView;
