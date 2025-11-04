@@ -671,3 +671,15 @@ services:
             - '@doctrine'
         tags:
             - { name: oro_datagrid.extension }
+
+    # Original service that always returns "default" ("back-office") application URLs.
+    # Inject by class name (Oro\Bundle\EntityConfigBundle\Provider\EntityUrlProvider) to always get "default" application URLs regardless of the current application.
+    Oro\Bundle\EntityConfigBundle\Provider\EntityUrlProvider:
+        arguments:
+            - '@router'
+            - '@oro_entity_config.config_manager'
+
+    # Inject oro_entity_config.provider.entity_url.application_aware to get the potentially decorated service
+    # that returns URLs based on the current application context. For example, it can return "commerce" ("storefront") application URLs on the "storefront" and default application URLs otherwise.
+    oro_entity_config.provider.entity_url.application_aware:
+        alias: Oro\Bundle\EntityConfigBundle\Provider\EntityUrlProvider
