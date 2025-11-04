@@ -43,6 +43,16 @@ class Configuration implements ConfigurationInterface
                     ->prototype('scalar')
                     ->end()
                 ->end()
+                ->arrayNode('external_file_details_http_methods')
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('regex')->end()
+                            ->arrayNode('methods')
+                                ->prototype('scalar')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
                 ->booleanNode('processors_allowed')
                     ->defaultTrue()
                 ->end()
@@ -74,6 +84,7 @@ class Configuration implements ConfigurationInterface
                 'maxsize' => ['value' => self::MAX_FILESIZE_MB],
                 'upload_file_mime_types' => ['value' => null],
                 'upload_image_mime_types' => ['value' => null],
+                'external_file_details_http_methods' => ['value' => null, 'type' => 'array'],
                 'processors_allowed' => ['value' => true],
                 'jpeg_quality' => ['value' => self::JPEG_QUALITY],
                 'png_quality' => ['value' => self::PNG_QUALITY],
@@ -95,6 +106,11 @@ class Configuration implements ConfigurationInterface
                         $v['settings']['upload_image_mime_types']['value'] = MimeTypesConverter::convertToString(
                             $v['upload_image_mime_types']
                         );
+                    }
+
+                    if (!$v['settings']['external_file_details_http_methods']['value']) {
+                        $v['settings']['external_file_details_http_methods']['value'] =
+                            $v['external_file_details_http_methods'];
                     }
 
                     return $v;
