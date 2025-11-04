@@ -1654,8 +1654,8 @@
     {% endif %}
 {% endmacro %}
 
-{% macro badge(label, badgeClass = 'info', iconClass = 'fa-circle') %}
-    <span class="badge badge-pill badge-{{ badgeClass }} status-{{ badgeClass }}">
+{% macro badge(label, badgeClass = 'info', iconClass = 'fa-circle', title = null) %}
+    <span class="badge badge-pill badge-{{ badgeClass }} status-{{ badgeClass }}"{% if title is not null %} title="{{ title }}{% endif %}">
         <i class="icon-status-{{ badgeClass }} {{ iconClass }}" aria-hidden="true"></i>{{ label }}
     </span>
 {% endmacro %}
