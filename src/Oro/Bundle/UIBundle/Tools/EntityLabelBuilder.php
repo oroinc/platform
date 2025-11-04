@@ -2,13 +2,18 @@
 
 namespace Oro\Bundle\UIBundle\Tools;
 
+use Oro\Bundle\UIBundle\Attribute\AsSimpleEntityClassName;
 use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
+
+use function Symfony\Component\String\u;
 
 /**
  * Provides a set of static methods to build entity related translation keys.
  */
 class EntityLabelBuilder
 {
+    protected static array $explodedClassNames = [];
+
     /**
      * Returns the translation key for entity label.
      *
@@ -113,6 +118,36 @@ class EntityLabelBuilder
      */
     public static function explodeClassName($className)
     {
+        if (\array_key_exists($className, self::$explodedClassNames)) {
+            return self::$explodedClassNames[$className];
+        }
+
+        if (\class_exists($className)) {
+            $reflection = new \ReflectionClass($className);
+            if ($reflection->getAttributes(AsSimpleEntityClassName::class)) {
+                // Bundle-less classes:
+                //  App\Entity\Product                     -> ['app', 'entity', 'product']
+                //  App\Model\Product                      -> ['app', 'model', 'product']
+                //
+                // Classes from bundles (vendor prefix and bundle name are combined):
+                //  Acme\Bundle\FooBundle\Entity\Product   -> ['acme_foo', 'entity', 'product']
+                //  Acme\Bundle\FooBundle\Document\Product -> ['acme_foo', 'document', 'product']
+                //
+                // More complex examples:
+                //  AcmeCorp\Model\Subfolder\SomeModel     -> ['acme_corp', 'model', 'subfolder', 'some_model']
+                //  AcmeCorp\Bundle\FooBarBundle\SomeModel\OtherProduct
+                //      -> ['acme_corp_foo_bar', 'some_model', 'other_product']
+                //  AcmeCorp\Bundle\FooBarBundle\SomeModel\DeeperDir\OtherProduct
+                //      -> ['acme_corp_foo_bar', 'some_model', 'deeper_dir', 'other_product']
+                $result = \array_map(
+                    static fn (string $item) => u($item)->snake()->toString(),
+                    u($className)->trimPrefix('\\') ->replace('\\Bundle\\', '')->replace('Bundle\\', '\\')->split('\\')
+                );
+                self::$explodedClassNames[$className] = $result;
+                return $result;
+            }
+        }
+
         // remove insignificant info from the class name. Examples:
         //  Acme\Bundle\TestBundle\Entity\Product   -> Acme\Test\Product
         //  Acme\Bundle\TestBundle\Document\Product -> Acme\Test\Product
@@ -135,6 +170,8 @@ class EntityLabelBuilder
                 $result[] = $item;
             }
         }
+
+        self::$explodedClassNames[$className] = $result;
 
         return $result;
     }
