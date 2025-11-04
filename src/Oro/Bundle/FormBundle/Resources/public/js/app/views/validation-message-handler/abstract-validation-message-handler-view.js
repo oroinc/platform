@@ -79,7 +79,7 @@ define(function(require) {
                 this.popper = null;
             }
 
-            const message = this.label.text();
+            const message = _.escape(this.label.text());
 
             if (message.length) {
                 const messageEl = $(this.template({content: message}));

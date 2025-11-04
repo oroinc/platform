@@ -68,24 +68,30 @@ define([
       }
 
       if (self.options.picker === true) {
-        var selectText = self.$select.is('select') ? self.$select.find('> option:selected').text() : this.getSelectedText(self.options.data);
-        self.$icon = $('<span class="simplecolorpicker icon"'
-                     + ' title="' + selectText + '"'
-                     + ' style="background-color: ' + (!selectedVal && self.options.emptyColor ? self.options.emptyColor : selectedVal) + ';"'
-                     + ' data-color="' + selectedVal + '"'
-                     + (isDisabledVal === false ? ' role="button" tabindex="0"' : ' data-disabled')
-                     + '></span>').insertAfter(self.$select);
-        self.$icon.on('click.' + self.type, self.showPicker);
+          var selectText = self.$select.is('select') ? self.$select.find('> option:selected').text() : this.getSelectedText(self.options.data);
+          self.$icon = $('<span class="simplecolorpicker icon"'
+              + (isDisabledVal === false ? ' role="button" tabindex="0"' : ' data-disabled')
+              + '></span>');
+          self.$icon.attr('title', selectText)
+              .attr('data-color', selectedVal)
+              .css('background-color', (!selectedVal && self.options.emptyColor ? self.options.emptyColor : selectedVal));
+          self.$icon.insertAfter(self.$select);
 
-        self.$picker = $('<span class="simplecolorpicker picker ' + self.options.theme + '"></span>').appendTo(document.body);
-        self.$colorList = self.$picker;
+          self.$icon.on('click.' + self.type, self.showPicker);
+
+          self.$picker = $('<span class="simplecolorpicker picker"></span>');
+          self.$picker.addClass(self.options.theme);
+          self.$picker.appendTo(document.body);
+          self.$colorList = self.$picker;
 
         // Hide picker when clicking outside
         $(document).on('mousedown.' + self.type, self.hidePicker);
         self.$picker.on('mousedown.' + self.type, self.mousedown);
       } else {
-        self.$inline = $('<span class="simplecolorpicker inline ' + self.options.theme + '"></span>').insertAfter(self.$select);
-        self.$colorList = self.$inline;
+          self.$inline = $('<span class="simplecolorpicker inline"></span>');
+          self.$inline.addClass(self.options.theme);
+          self.$inline.insertAfter(self.$select);
+          self.$colorList = self.$inline;
       }
 
       // Build the list of colors
@@ -115,7 +121,7 @@ define([
 
         var title = '';
         if (isDisabled === false) {
-          title = ' title="' + (isSelect ? $option.text() : $option.text) + '"';
+            title = isSelect ? $option.text() : $option.text;
         }
 
         var role = '';
@@ -126,14 +132,13 @@ define([
         var cssClass = isSelect ? $option.prop('class') : $option.class;
         cssClass = cssClass ? 'color ' + cssClass : 'color';
 
-        var $colorSpan = $('<span class="' + cssClass + '"'
-                         + title
-                         + ' style="color: ' + self.getContrastColor(bgColor) + '; background-color: ' + bgColor + ';"'
-                         + ' data-color="' + color + '"'
-                         + selected
-                         + disabled
-                         + role + '>'
-                         + '</span>');
+        var $colorSpan = $('<span ' + selected + disabled + role + '></span>');
+          $colorSpan
+              .attr('class', cssClass)
+              .attr('title', title)
+              .attr('data-color', color)
+              .css('color', self.getContrastColor(bgColor))
+              .css('background-color', bgColor);
 
         self.$colorList.append($colorSpan);
         $colorSpan.on('click.' + self.type, self.colorSpanClicked);
