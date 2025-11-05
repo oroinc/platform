@@ -1,32 +1,28 @@
-define(function(require) {
-    'use strict';
+import BaseView from 'oroui/js/app/views/base/view';
 
-    const BaseView = require('oroui/js/app/views/base/view');
+const AddressCollectionView = BaseView.extend({
+    events: {
+        'click [data-name="field__types"] input': 'onClicked'
+    },
 
-    const AddressCollectionView = BaseView.extend({
-        events: {
-            'click [data-name="field__types"] input': 'onClicked'
-        },
+    /**
+     * @inheritdoc
+     */
+    constructor: function AddressCollectionView(options) {
+        AddressCollectionView.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function AddressCollectionView(options) {
-            AddressCollectionView.__super__.constructor.call(this, options);
-        },
+    onClicked: function(e) {
+        const currentTarget = e.currentTarget;
 
-        onClicked: function(e) {
-            const currentTarget = e.currentTarget;
-
-            if (!currentTarget.checked) {
-                return;
-            }
-
-            this.$('[name$="[types][]"][value="' + currentTarget.value + '"]').prop('checked', false);
-
-            currentTarget.checked = true;
+        if (!currentTarget.checked) {
+            return;
         }
-    });
 
-    return AddressCollectionView;
+        this.$('[name$="[types][]"][value="' + currentTarget.value + '"]').prop('checked', false);
+
+        currentTarget.checked = true;
+    }
 });
+
+export default AddressCollectionView;
