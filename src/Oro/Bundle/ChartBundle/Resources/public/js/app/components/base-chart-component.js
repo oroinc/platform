@@ -1,167 +1,163 @@
-define(function(require) {
-    'use strict';
+import _ from 'underscore';
+import $ from 'jquery';
+import chartTemplate from 'text-loader!orochart/js/templates/base-chart-template.html';
+import BaseComponent from 'oroui/js/app/components/base/component';
 
-    const _ = require('underscore');
-    const $ = require('jquery');
-    const chartTemplate = require('text-loader!orochart/js/templates/base-chart-template.html');
-    const BaseComponent = require('oroui/js/app/components/base/component');
+/**
+ * @class orochart.app.components.BaseChartComponent
+ * @extends oroui.app.components.base.Component
+ * @exports orochart/app/components/base-chart-component
+ */
+const BaseChartComponent = BaseComponent.extend({
+    chartContainerClass: '',
+
+    template: _.template(chartTemplate),
+
+    NARROW_SCREEN_WIDTH: 520,
+
+    CHART_HEIGHT: 350,
+
+    narrowScreen: false,
+
+    aspectRatio: 0.4,
+
+    updateDelay: 40,
+
+    listen: {
+        'layout:reposition mediator': 'debouncedUpdate'
+    },
 
     /**
-     * @class orochart.app.components.BaseChartComponent
-     * @extends oroui.app.components.base.Component
-     * @exports orochart/app/components/base-chart-component
+     * @inheritdoc
      */
-    const BaseChartComponent = BaseComponent.extend({
-        chartContainerClass: '',
+    constructor: function BaseChartComponent(options) {
+        this.debouncedUpdate = _.debounce(this.update, this.updateDelay);
 
-        template: _.template(chartTemplate),
+        BaseChartComponent.__super__.constructor.call(this, options);
+    },
 
-        NARROW_SCREEN_WIDTH: 520,
+    /**
+     * @constructor
+     * @param {Object} options
+     */
+    initialize: function(options) {
+        this.data = options.data;
+        this.options = options.options;
+        this.config = options.config;
 
-        CHART_HEIGHT: 350,
+        this.$el = $(options._sourceElement);
+        this.$chart = null;
 
-        narrowScreen: false,
+        this.renderBaseLayout();
 
-        aspectRatio: 0.4,
+        const updateHandler = this.update.bind(this);
 
-        updateDelay: 40,
+        this.$chart.on('update.' + this.cid, updateHandler);
 
-        listen: {
-            'layout:reposition mediator': 'debouncedUpdate'
-        },
+        _.defer(updateHandler);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function BaseChartComponent(options) {
-            this.debouncedUpdate = _.debounce(this.update, this.updateDelay);
+    /**
+     * Dispose all event handlers
+     *
+     * @overrides
+     */
+    dispose: function() {
+        this.$chart.off('.' + this.cid);
+        delete this.$el;
+        delete this.$chart;
+        delete this.$legend;
+        delete this.$container;
 
-            BaseChartComponent.__super__.constructor.call(this, options);
-        },
+        BaseChartComponent.__super__.dispose.call(this);
+    },
 
-        /**
-         * @constructor
-         * @param {Object} options
-         */
-        initialize: function(options) {
-            this.data = options.data;
-            this.options = options.options;
-            this.config = options.config;
+    renderBaseLayout: function() {
+        this.$el.html(this.template({chartContainerClass: this.chartContainerClass}));
+        this.$chart = this.$el.find('.chart-content');
+        this.$legend = this.$el.find('.chart-legend');
+        this.$container = this.$el.find('.chart-container');
+    },
 
-            this.$el = $(options._sourceElement);
-            this.$chart = null;
+    calcChartWidth() {
+        const $chart = this.$chart;
+        const $widgetContent = $chart.parents('.chart-container').parent();
+        return Math.round($widgetContent.width() * 0.9);
+    },
 
-            this.renderBaseLayout();
+    /**
+     * Update chart size and redraw
+     */
+    update: function() {
+        const isChanged = this.setChartSize();
 
-            const updateHandler = this.update.bind(this);
-
-            this.$chart.on('update.' + this.cid, updateHandler);
-
-            _.defer(updateHandler);
-        },
-
-        /**
-         * Dispose all event handlers
-         *
-         * @overrides
-         */
-        dispose: function() {
-            this.$chart.off('.' + this.cid);
-            delete this.$el;
-            delete this.$chart;
-            delete this.$legend;
-            delete this.$container;
-
-            BaseChartComponent.__super__.dispose.call(this);
-        },
-
-        renderBaseLayout: function() {
-            this.$el.html(this.template({chartContainerClass: this.chartContainerClass}));
-            this.$chart = this.$el.find('.chart-content');
-            this.$legend = this.$el.find('.chart-legend');
-            this.$container = this.$el.find('.chart-container');
-        },
-
-        calcChartWidth() {
-            const $chart = this.$chart;
-            const $widgetContent = $chart.parents('.chart-container').parent();
-            return Math.round($widgetContent.width() * 0.9);
-        },
-
-        /**
-         * Update chart size and redraw
-         */
-        update: function() {
-            const isChanged = this.setChartSize();
-
-            if (isChanged) {
-                this.draw();
-                this.fixSize();
-            }
-        },
-
-        /**
-         * @returns {number}
-         */
-        getChartHeight() {
-            return this.CHART_HEIGHT;
-        },
-
-        /**
-         * Set size of chart
-         *
-         * @returns {boolean}
-         */
-        setChartSize: function() {
-            const $chart = this.$chart;
-            const chartWidth = this.calcChartWidth();
-            const chartHeight = Math.min(Math.round(chartWidth * this.aspectRatio), this.getChartHeight());
-
-            if (chartWidth > 0 && chartWidth !== $chart.width() || chartHeight !== parseInt($chart.css('height'))) {
-                $chart.width(chartWidth);
-                $chart.height(chartHeight);
-                return true;
-            }
-            return false;
-        },
-
-        /**
-         * Set size of chart container
-         */
-        setChartContainerSize: function() {
-            this.$chart.closest('.clearfix').width(this.$chart.width());
-        },
-
-        /**
-         * Fix chart size after drawing to solve problems with too long labels
-         */
-        fixSize: function() {
-            const $chart = this.$chart;
-            const $labels = $chart.find('.flotr-grid-label-x');
-            let labelMaxHeight = $labels.height();
-            let labelMinHeight = $labels.height();
-
-            $labels.each(function(index, element) {
-                const height = $(element).height();
-                if (height > labelMaxHeight) {
-                    labelMaxHeight = height;
-                } else if (height < labelMinHeight) {
-                    labelMinHeight = height;
-                }
-            });
-
-            $chart.height($chart.height() + (labelMaxHeight - labelMinHeight));
-
-            this.setChartContainerSize();
-        },
-
-        /**
-         * Draw comonent
-         */
-        draw: function() {
-            this.$el.html('copmonent');
+        if (isChanged) {
+            this.draw();
+            this.fixSize();
         }
-    });
+    },
 
-    return BaseChartComponent;
+    /**
+     * @returns {number}
+     */
+    getChartHeight() {
+        return this.CHART_HEIGHT;
+    },
+
+    /**
+     * Set size of chart
+     *
+     * @returns {boolean}
+     */
+    setChartSize: function() {
+        const $chart = this.$chart;
+        const chartWidth = this.calcChartWidth();
+        const chartHeight = Math.min(Math.round(chartWidth * this.aspectRatio), this.getChartHeight());
+
+        if (chartWidth > 0 && chartWidth !== $chart.width() || chartHeight !== parseInt($chart.css('height'))) {
+            $chart.width(chartWidth);
+            $chart.height(chartHeight);
+            return true;
+        }
+        return false;
+    },
+
+    /**
+     * Set size of chart container
+     */
+    setChartContainerSize: function() {
+        this.$chart.closest('.clearfix').width(this.$chart.width());
+    },
+
+    /**
+     * Fix chart size after drawing to solve problems with too long labels
+     */
+    fixSize: function() {
+        const $chart = this.$chart;
+        const $labels = $chart.find('.flotr-grid-label-x');
+        let labelMaxHeight = $labels.height();
+        let labelMinHeight = $labels.height();
+
+        $labels.each(function(index, element) {
+            const height = $(element).height();
+            if (height > labelMaxHeight) {
+                labelMaxHeight = height;
+            } else if (height < labelMinHeight) {
+                labelMinHeight = height;
+            }
+        });
+
+        $chart.height($chart.height() + (labelMaxHeight - labelMinHeight));
+
+        this.setChartContainerSize();
+    },
+
+    /**
+     * Draw comonent
+     */
+    draw: function() {
+        this.$el.html('copmonent');
+    }
 });
+
+export default BaseChartComponent;

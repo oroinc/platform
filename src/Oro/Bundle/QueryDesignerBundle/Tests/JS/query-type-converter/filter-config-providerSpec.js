@@ -1,28 +1,11 @@
-import $ from 'jquery';
 import data from '../Fixture/query-type-converter/filter-config-data.json';
-import filterConfigProviderInjector
-    from 'inject-loader!oroquerydesigner/js/query-type-converter/filter-config-provider';
+import FilterConfigProvider, {enumFilterInitializerMock}
+    from '../Fixture/query-type-converter/filter-config-provider-mock.js';
 
 describe('oroquerydesigner/js/query-type-converter/filter-config-provider', () => {
     let filterConfigProvider;
-    let enumFilterInitializerMock;
-    let loadModulesMock;
 
     beforeEach(done => {
-        enumFilterInitializerMock = jasmine.createSpy('enumFilterInitializer')
-            .and.callFake((config, object) => {
-                config.foo = object.relatedEntityName;
-            });
-        loadModulesMock = jasmine.createSpy('loadModules').and
-            .callFake(modules => {
-                modules[data.filters[0].init_module] = enumFilterInitializerMock;
-                return $.when(modules);
-            });
-
-        const FilterConfigProvider = filterConfigProviderInjector({
-            'oroui/js/app/services/load-modules': loadModulesMock
-        });
-
         filterConfigProvider = new FilterConfigProvider(data);
         filterConfigProvider.loadInitModules().done(done);
     });

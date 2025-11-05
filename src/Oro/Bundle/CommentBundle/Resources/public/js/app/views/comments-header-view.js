@@ -1,36 +1,32 @@
-define(function(require) {
-    'use strict';
+import BaseView from 'oroui/js/app/views/base/view';
+import template from 'text-loader!orocomment/templates/comment/comments-header-view.html';
 
-    const BaseView = require('oroui/js/app/views/base/view');
-    const template = require('text-loader!orocomment/templates/comment/comments-header-view.html');
+const CommentsHeaderView = BaseView.extend({
+    template: template,
 
-    const CommentsHeaderView = BaseView.extend({
-        template: template,
+    listen: {
+        'add collection': 'render',
+        'remove collection': 'render',
+        'reset collection': 'render',
+        'syncStateChange collection': 'render',
+        'stateChange collection': 'render'
+    },
 
-        listen: {
-            'add collection': 'render',
-            'remove collection': 'render',
-            'reset collection': 'render',
-            'syncStateChange collection': 'render',
-            'stateChange collection': 'render'
-        },
+    events: {
+        'click a.load-more': 'onLoadMoreClick'
+    },
 
-        events: {
-            'click a.load-more': 'onLoadMoreClick'
-        },
+    /**
+     * @inheritdoc
+     */
+    constructor: function CommentsHeaderView(options) {
+        CommentsHeaderView.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function CommentsHeaderView(options) {
-            CommentsHeaderView.__super__.constructor.call(this, options);
-        },
-
-        onLoadMoreClick: function(e) {
-            e.stopImmediatePropagation();
-            this.$el.trigger('comment-load-more');
-        }
-    });
-
-    return CommentsHeaderView;
+    onLoadMoreClick: function(e) {
+        e.stopImmediatePropagation();
+        this.$el.trigger('comment-load-more');
+    }
 });
+
+export default CommentsHeaderView;
