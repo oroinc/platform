@@ -3,7 +3,8 @@ define(function(require) {
 
     const _ = require('underscore');
     const Backbone = require('backbone');
-    const DialogWidget = require('oro/dialog-widget');
+    const DialogWidgetModule = require('oro/dialog-widget');
+    const DialogWidget = DialogWidgetModule.default ?? DialogWidgetModule;
 
     /**
      * @export  oroform/js/multiple-entity/view

@@ -4,7 +4,8 @@ define(function(require) {
     const _ = require('underscore');
     const $ = require('jquery');
     const mediator = require('oroui/js/mediator');
-    const DialogWidget = require('oro/dialog-widget');
+    const DialogWidgetModule = require('oro/dialog-widget');
+    const DialogWidget = DialogWidgetModule.default ?? DialogWidgetModule;
     const actionsTemplate = require('tpl-loader!orofilter/templates/filters-dialog-actions.html');
 
     /**

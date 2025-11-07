@@ -5,7 +5,8 @@ define(function(require) {
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const routing = require('routing');
-    const DialogWidget = require('oro/dialog-widget');
+    const DialogWidgetModule = require('oro/dialog-widget');
+    const DialogWidget = DialogWidgetModule.default ?? DialogWidgetModule;
     const BaseView = require('oroui/js/app/views/base/view');
     const PageableCollection = require('orodatagrid/js/pageable-collection').default;
 

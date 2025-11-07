@@ -5,7 +5,8 @@ define(function(require) {
     const routing = require('routing');
     const Backbone = require('backbone');
     const EntityView = require('./multiple-entity/view');
-    const DialogWidget = require('oro/dialog-widget');
+    const DialogWidgetModule = require('oro/dialog-widget');
+    const DialogWidget = DialogWidgetModule.default ?? DialogWidgetModule;
     const $ = Backbone.$;
 
     /**
