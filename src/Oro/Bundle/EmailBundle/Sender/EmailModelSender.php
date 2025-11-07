@@ -72,7 +72,7 @@ class EmailModelSender
 
         return $this->createEmailUser(
             $emailModel,
-            MessageIdHelper::getMessageId($symfonyEmail),
+            MessageIdHelper::getTransportMessageId($symfonyEmail),
             $symfonyEmail->getDate(),
             $emailOrigin,
             $persist

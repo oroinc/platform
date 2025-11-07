@@ -64,7 +64,7 @@ class EmailModelSenderTest extends TestCase
             ->to('recipient@example.org')
             ->date(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
         $messageId = 'sample/message/id@example.org';
-        $symfonyEmail->getHeaders()->addHeader('Message-ID', $messageId);
+        $symfonyEmail->getHeaders()->addTextHeader('X-Oro-Message-ID', '<' . $messageId . '>');
 
         $this->symfonyEmailFactory->expects(self::once())
             ->method('createFromEmailModel')
@@ -114,7 +114,7 @@ class EmailModelSenderTest extends TestCase
             ->to('recipient@example.org')
             ->date(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
         $messageId = 'sample/message/id@example.org';
-        $symfonyEmail->getHeaders()->addHeader('Message-ID', $messageId);
+        $symfonyEmail->getHeaders()->addTextHeader('X-Oro-Message-ID', '<' . $messageId . '>');
 
         $this->symfonyEmailFactory->expects(self::once())
             ->method('createFromEmailModel')
@@ -170,7 +170,7 @@ class EmailModelSenderTest extends TestCase
             ->to('recipient@example.org')
             ->date(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
         $messageId = 'sample/message/id@example.org';
-        $symfonyEmail->getHeaders()->addHeader('Message-ID', $messageId);
+        $symfonyEmail->getHeaders()->addTextHeader('X-Oro-Message-ID', '<' . $messageId . '>');
 
         $this->symfonyEmailFactory->expects(self::once())
             ->method('createFromEmailModel')
@@ -220,7 +220,7 @@ class EmailModelSenderTest extends TestCase
             ->to('recipient@example.org')
             ->date(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
         $messageId = 'sample/message/id@example.org';
-        $symfonyEmail->getHeaders()->addHeader('Message-ID', $messageId);
+        $symfonyEmail->getHeaders()->addTextHeader('X-Oro-Message-ID', '<' . $messageId . '>');
 
         $this->embeddedImagesHandler->expects(self::once())
             ->method('handleEmbeddedImages')
@@ -275,7 +275,7 @@ class EmailModelSenderTest extends TestCase
             ->to('recipient@example.org')
             ->date(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
         $messageId = 'sample/message/id@example.org';
-        $symfonyEmail->getHeaders()->addHeader('Message-ID', $messageId);
+        $symfonyEmail->getHeaders()->addTextHeader('X-Oro-Message-ID', '<' . $messageId . '>');
 
         $this->symfonyEmailFactory->expects(self::once())
             ->method('createFromEmailModel')
@@ -337,7 +337,7 @@ class EmailModelSenderTest extends TestCase
             ->to('recipient@example.org')
             ->date(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
         $messageId = 'sample/message/id@example.org';
-        $symfonyEmail->getHeaders()->addHeader('Message-ID', $messageId);
+        $symfonyEmail->getHeaders()->addTextHeader('X-Oro-Message-ID', '<' . $messageId . '>');
 
         $this->embeddedImagesHandler->expects(self::once())
             ->method('handleEmbeddedImages')

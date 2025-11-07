@@ -147,9 +147,10 @@ class MassNotificationsMailerTest extends \PHPUnit\Framework\TestCase
 
         $this->mailer->send($message, $envelope);
 
+        self::assertTrue($message->getHeaders()->has('X-Oro-Message-ID'));
         self::assertEquals(
-            '<' . $messageId . '>',
-            $message->getHeaders()->get('Message-ID')->getBodyAsString()
+            $messageId,
+            $message->getHeaders()->get('X-Oro-Message-ID')->getBody()
         );
     }
 }
