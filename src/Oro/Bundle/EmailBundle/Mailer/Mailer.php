@@ -27,7 +27,9 @@ class Mailer implements MailerInterface
         // copy the Message ID header to be able to detect emails sent from ORO side and to avoid duplicates.
         if ($message instanceof Message) {
             $headers = $message->getHeaders();
-            $headers->addIdHeader('Message-ID', $sentMessage->getMessageId());
+            // Store the transport-provided Message-ID in a custom header.
+            // Some transports may return identifiers that don't comply with RFC 2822.
+            $headers->addTextHeader('X-Oro-Message-ID', $sentMessage->getMessageId());
             $message->setHeaders($headers);
         }
     }

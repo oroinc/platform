@@ -18,6 +18,39 @@ class MessageIdHelperTest extends TestCase
         self::assertEquals('<sample/message/id@example.org>', MessageIdHelper::getMessageId($message));
     }
 
+    public function testGetTransportMessageIdFromCustomHeader(): void
+    {
+        $message = new Message();
+        $message->getHeaders()
+            ->addHeader('From', ['from@example.org'])
+            ->addHeader('Message-ID', 'original/message/id@example.org')
+            ->addTextHeader('X-Oro-Message-ID', 'transport-message-id');
+
+        self::assertEquals('<transport-message-id>', MessageIdHelper::getTransportMessageId($message));
+    }
+
+    public function testGetTransportMessageIdFromCustomHeaderAlreadyWrapped(): void
+    {
+        $message = new Message();
+        $message->getHeaders()
+            ->addHeader('From', ['from@example.org'])
+            ->addHeader('Message-ID', 'original/message/id@example.org')
+            ->addTextHeader('X-Oro-Message-ID', '<transport-message-id>');
+
+        self::assertEquals('<transport-message-id>', MessageIdHelper::getTransportMessageId($message));
+    }
+
+    public function testGetTransportMessageIdFallbackToStandardHeader(): void
+    {
+        $message = new Message();
+        $message->getHeaders()
+            ->addHeader('From', ['from@example.org'])
+            ->addHeader('Message-ID', 'sample/message/id@example.org');
+
+        // Should fallback to standard Message-ID header if X-Oro-Message-ID is not present
+        self::assertEquals('<sample/message/id@example.org>', MessageIdHelper::getTransportMessageId($message));
+    }
+
     /**
      * @dataProvider unwrapMessageIdDataProvider
      */

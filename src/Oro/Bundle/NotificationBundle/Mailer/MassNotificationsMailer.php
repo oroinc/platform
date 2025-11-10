@@ -45,7 +45,9 @@ class MassNotificationsMailer implements MailerInterface, LoggerAwareInterface
             // and avoid duplicates.
             if ($message instanceof Message) {
                 $headers = $message->getHeaders();
-                $headers->addIdHeader('Message-ID', $sentMessage->getMessageId());
+                // Store the transport-provided Message-ID in a custom header.
+                // Some transports may return identifiers that don't comply with RFC 2822.
+                $headers->addTextHeader('X-Oro-Message-ID', $sentMessage->getMessageId());
                 $message->setHeaders($headers);
             }
         } catch (ExceptionInterface $transportException) {
