@@ -1,10 +1,6 @@
-define(function(require) {
-    'use strict';
+import SelectFilter from 'oro/filter/select-filter';
 
-    const SelectFilter = require('oro/filter/select-filter');
-
-    const BooleanFilter = SelectFilter.extend({
-    });
-
-    return BooleanFilter;
+const BooleanFilter = SelectFilter.extend({
 });
+
+export default BooleanFilter;

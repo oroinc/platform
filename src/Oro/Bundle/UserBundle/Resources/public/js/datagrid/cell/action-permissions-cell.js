@@ -1,21 +1,17 @@
-define(function(require) {
-    'use strict';
+import BaseView from 'oroui/js/app/views/base/view';
+import Backgrid from 'backgrid';
 
-    const BaseView = require('oroui/js/app/views/base/view');
-    const Backgrid = require('backgrid').default;
+const ActionPermissionsReadonlyCell = BaseView.extend({
+    optionNames: ['column'],
 
-    const ActionPermissionsReadonlyCell = BaseView.extend({
-        optionNames: ['column'],
+    _attributes: Backgrid.Cell.prototype._attributes,
 
-        _attributes: Backgrid.Cell.prototype._attributes,
-
-        /**
-         * @inheritdoc
-         */
-        constructor: function ActionPermissionsReadonlyCell(options) {
-            ActionPermissionsReadonlyCell.__super__.constructor.call(this, options);
-        }
-    });
-
-    return ActionPermissionsReadonlyCell;
+    /**
+     * @inheritdoc
+     */
+    constructor: function ActionPermissionsReadonlyCell(options) {
+        ActionPermissionsReadonlyCell.__super__.constructor.call(this, options);
+    }
 });
+
+export default ActionPermissionsReadonlyCell;

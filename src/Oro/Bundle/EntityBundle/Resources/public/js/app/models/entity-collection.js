@@ -6,7 +6,7 @@ define(function(require) {
     const routing = require('routing');
     /** @type {Registry} */
     const registry = require('oroui/js/app/services/registry');
-    const entitySync = require('oroentity/js/app/models/entity-sync');
+    const entitySync = require('oroentity/js/app/models/entity-sync').default;
     const EntityModel = require('oroentity/js/app/models/entity-model');
     const BaseCollection = require('oroui/js/app/models/base/collection');
 

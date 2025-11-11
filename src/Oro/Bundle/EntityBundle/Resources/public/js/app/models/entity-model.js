@@ -7,8 +7,8 @@ define(function(require) {
     /** @type {Registry} */
     const registry = require('oroui/js/app/services/registry');
     const mediator = require('oroui/js/mediator');
-    const entitySync = require('oroentity/js/app/models/entity-sync');
-    const entitySerializer = require('oroentity/js/app/models/entity-serializer');
+    const entitySync = require('oroentity/js/app/models/entity-sync').default;
+    const entitySerializer = require('oroentity/js/app/models/entity-serializer').default;
     const BaseModel = require('oroui/js/app/models/base/model');
 
     /**

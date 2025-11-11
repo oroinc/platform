@@ -1,632 +1,628 @@
-define(function(require) {
-    'use strict';
+import template from 'tpl-loader!orofilter/templates/filter/dictionary-filter.html';
+import fieldTemplate from 'tpl-loader!orofilter/templates/filter/select-field.html';
+import $ from 'jquery';
+import routing from 'routing';
+import _ from 'underscore';
+import __ from 'orotranslation/js/translator';
+import ChoiceFilter from 'oro/filter/choice-filter';
+import tools from 'oroui/js/tools';
+import 'jquery.select2';
 
-    const template = require('tpl-loader!orofilter/templates/filter/dictionary-filter.html');
-    const fieldTemplate = require('tpl-loader!orofilter/templates/filter/select-field.html');
-    const $ = require('jquery');
-    const routing = require('routing');
-    const _ = require('underscore');
-    const __ = require('orotranslation/js/translator');
-    const ChoiceFilter = require('oro/filter/choice-filter');
-    const tools = require('oroui/js/tools');
-    require('jquery.select2');
+/**
+ * Multiple select filter: filter values as multiple select options
+ *
+ * @export  oro/filter/dictionary-filter
+ * @class   oro.filter.DictionaryFilter
+ * @extends oro.filter.ChoiceFilter
+ */
+const DictionaryFilter = ChoiceFilter.extend({
+    /* eslint-disable quote-props */
+    /**
+     * select2 will apply to element with this selector
+     */
+    elementSelector: '.select-values-autocomplete',
 
     /**
-     * Multiple select filter: filter values as multiple select options
+     * Filter selector template
      *
-     * @export  oro/filter/dictionary-filter
-     * @class   oro.filter.DictionaryFilter
-     * @extends oro.filter.ChoiceFilter
+     * @property
      */
-    const DictionaryFilter = ChoiceFilter.extend({
-        /* eslint-disable quote-props */
-        /**
-         * select2 will apply to element with this selector
-         */
-        elementSelector: '.select-values-autocomplete',
+    template: template,
+    templateSelector: '#dictionary-filter-template',
 
-        /**
-         * Filter selector template
-         *
-         * @property
-         */
-        template: template,
-        templateSelector: '#dictionary-filter-template',
+    /**
+     * Template selector for dictionary field parts
+     *
+     * @property
+     */
+    fieldTemplate: fieldTemplate,
+    fieldTemplateSelector: '#select-field-template',
 
-        /**
-         * Template selector for dictionary field parts
-         *
-         * @property
-         */
-        fieldTemplate: fieldTemplate,
-        fieldTemplateSelector: '#select-field-template',
+    /**
+     * Maximum value of count items for drop down menu.
+     * If count values will be bigger than this value then
+     * this filter will use select2 with autocomplete
+     */
+    maxCountForDropDownMode: 10,
 
-        /**
-         * Maximum value of count items for drop down menu.
-         * If count values will be bigger than this value then
-         * this filter will use select2 with autocomplete
-         */
-        maxCountForDropDownMode: 10,
+    /**
+     * Selectors for filter data
+     *
+     * @property
+     */
+    criteriaValueSelectors: {
+        type: 'input[type="hidden"]:last',
+        value: 'input.select-values-autocomplete'
+    },
 
-        /**
-         * Selectors for filter data
-         *
-         * @property
-         */
-        criteriaValueSelectors: {
-            type: 'input[type="hidden"]:last',
-            value: 'input.select-values-autocomplete'
-        },
+    filterParams: null,
 
-        filterParams: null,
+    'class': null,
 
-        'class': null,
+    select2ConfigData: null,
 
-        select2ConfigData: null,
+    isInitSelect2: false,
 
-        isInitSelect2: false,
+    previousData: [],
 
-        previousData: [],
+    /**
+     * Data of selected values
+     */
+    selectedData: {},
 
-        /**
-         * Data of selected values
-         */
-        selectedData: {},
+    /**
+     * Route name for dictionary values filter
+     */
+    dictionaryValueRoute: 'oro_dictionary_value',
 
-        /**
-         * Route name for dictionary values filter
-         */
-        dictionaryValueRoute: 'oro_dictionary_value',
+    /**
+     * Route name for dictionary search
+     */
+    dictionarySearchRoute: 'oro_dictionary_search',
 
-        /**
-         * Route name for dictionary search
-         */
-        dictionarySearchRoute: 'oro_dictionary_search',
+    /**
+     * @inheritdoc
+     */
+    constructor: function DictionaryFilter(options) {
+        DictionaryFilter.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function DictionaryFilter(options) {
-            DictionaryFilter.__super__.constructor.call(this, options);
-        },
+    /**
+     * @inheritdoc
+     */
+    initialize: function(options) {
+        // Each filter should have own copy,
+        // otherwise 2 filters on same page will show same values
+        this.selectedData = {};
 
-        /**
-         * @inheritdoc
-         */
-        initialize: function(options) {
-            // Each filter should have own copy,
-            // otherwise 2 filters on same page will show same values
-            this.selectedData = {};
+        if (this.filterParams) {
+            this.dictionaryClass = this.filterParams.class.replace(/\\/g, '_');
+        } else {
+            this.dictionaryClass = this.class.replace(/\\/g, '_');
+        }
 
-            if (this.filterParams) {
-                this.dictionaryClass = this.filterParams.class.replace(/\\/g, '_');
-            } else {
-                this.dictionaryClass = this.class.replace(/\\/g, '_');
-            }
+        this.listenTo(this, 'renderCriteriaLoadValues', this.renderCriteriaLoadValues);
+        this.listenTo(this, 'updateCriteriaLabels', this.updateCriteriaLabels);
 
-            this.listenTo(this, 'renderCriteriaLoadValues', this.renderCriteriaLoadValues);
-            this.listenTo(this, 'updateCriteriaLabels', this.updateCriteriaLabels);
+        DictionaryFilter.__super__.initialize.call(this, options);
+    },
 
-            DictionaryFilter.__super__.initialize.call(this, options);
-        },
+    _toggleSelect2Element: function() {
+        const type = this.getType();
+        const select2element = this.$el.find(this.elementSelector);
 
-        _toggleSelect2Element: function() {
-            const type = this.getType();
-            const select2element = this.$el.find(this.elementSelector);
+        if (this.isEmptyType(type)) {
+            // see original _handleEmptyFilter
+            select2element.hide();
+            select2element.inputWidget('val', '');
+        } else {
+            select2element.show();
+        }
+    },
 
-            if (this.isEmptyType(type)) {
-                // see original _handleEmptyFilter
-                select2element.hide();
-                select2element.inputWidget('val', '');
-            } else {
-                select2element.show();
-            }
-        },
+    /**
+     * @inheritdoc
+     */
+    _updateValueFieldVisibility: function() {
+        this._toggleSelect2Element();
+        return DictionaryFilter.__super__._updateValueFieldVisibility.call(this);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        _updateValueFieldVisibility: function() {
-            this._toggleSelect2Element();
-            return DictionaryFilter.__super__._updateValueFieldVisibility.call(this);
-        },
+    /**
+     * Handle empty filter selection
+     *
+     * @protected
+     */
+    _handleEmptyFilter: function() {
+        this._toggleSelect2Element();
+        return DictionaryFilter.__super__._handleEmptyFilter.call(this);
+    },
 
-        /**
-         * Handle empty filter selection
-         *
-         * @protected
-         */
-        _handleEmptyFilter: function() {
-            this._toggleSelect2Element();
-            return DictionaryFilter.__super__._handleEmptyFilter.call(this);
-        },
+    /**
+     * @inheritdoc
+     */
+    reset: function() {
+        DictionaryFilter.__super__.reset.call(this);
+        const select2element = this.$el.find(this.elementSelector);
+        const data = select2element.inputWidget('data');
+        if (data) {
+            this.previousData = data;
+        }
+        select2element.inputWidget('data', null);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        reset: function() {
-            DictionaryFilter.__super__.reset.call(this);
-            const select2element = this.$el.find(this.elementSelector);
-            const data = select2element.inputWidget('data');
-            if (data) {
-                this.previousData = data;
-            }
-            select2element.inputWidget('data', null);
-        },
+    resetFags() {
+        this.popupCriteriaShowed = false;
+        this.selectDropdownOpened = false;
+        this._criteriaRenderd = false;
+        this._isRenderingInProgress = false;
+    },
 
-        resetFags() {
-            this.popupCriteriaShowed = false;
-            this.selectDropdownOpened = false;
-            this._criteriaRenderd = false;
-            this._isRenderingInProgress = false;
-        },
+    /**
+     * Init render
+     */
+    render: function() {
+        this.resetFags();
+        this.renderDeferred = $.Deferred();
+        this._wrap('');
+        if (this.$el.html() === '') {
+            this._renderCriteria();
+        }
+    },
 
-        /**
-         * Init render
-         */
-        render: function() {
-            this.resetFags();
-            this.renderDeferred = $.Deferred();
-            this._wrap('');
-            if (this.$el.html() === '') {
-                this._renderCriteria();
-            }
-        },
+    /**
+     * Execute ajax request to get data of entities by ids.
+     *
+     * @param successEventName
+     */
+    loadValuesById: function(successEventName) {
+        const self = this;
 
-        /**
-         * Execute ajax request to get data of entities by ids.
-         *
-         * @param successEventName
-         */
-        loadValuesById: function(successEventName) {
-            const self = this;
+        if (this.select2ConfigData === null) {
+            const $container = self.$(self.elementSelector).parent();
 
-            if (this.select2ConfigData === null) {
-                const $container = self.$(self.elementSelector).parent();
+            $container.addClass('loading');
 
-                $container.addClass('loading');
-
-                $.ajax({
-                    url: routing.generate(
-                        self.dictionaryValueRoute,
-                        {
-                            dictionary: this.dictionaryClass
-                        }
-                    ),
-                    data: {
-                        keys: this.isEmptyType(this.value.type) ? [] : this.value.value
-                    },
-                    success: function(response) {
-                        $container.removeClass('loading');
-
-                        self.trigger(successEventName, response);
+            $.ajax({
+                url: routing.generate(
+                    self.dictionaryValueRoute,
+                    {
+                        dictionary: this.dictionaryClass
                     }
-                });
-            } else {
-                const select2ConfigData = this.select2ConfigData;
-                const value = this.value.value;
-                const result = {
-                    results: _.filter(select2ConfigData, function(item) {
-                        const id = item.id.toString();
-                        return _.indexOf(value, id) !== -1;
-                    })
-                };
-                self.trigger(successEventName, result);
-            }
-        },
+                ),
+                data: {
+                    keys: this.isEmptyType(this.value.type) ? [] : this.value.value
+                },
+                success: function(response) {
+                    $container.removeClass('loading');
 
-        /**
-         * Handler for event 'renderCriteriaLoadValues'
-         *
-         * @param response
-         */
-        renderCriteriaLoadValues: function(response) {
-            this.updateLocalValues(response.results);
+                    self.trigger(successEventName, response);
+                }
+            });
+        } else {
+            const select2ConfigData = this.select2ConfigData;
+            const value = this.value.value;
+            const result = {
+                results: _.filter(select2ConfigData, function(item) {
+                    const id = item.id.toString();
+                    return _.indexOf(value, id) !== -1;
+                })
+            };
+            self.trigger(successEventName, result);
+        }
+    },
 
-            this._writeDOMValue(this.value);
-            this.applySelect2();
-            this._updateCriteriaHint();
-            this._updateDOMValue();
-            this._handleEmptyFilter();
-            this.renderDeferred.resolve();
-            this.trigger('update');
-        },
+    /**
+     * Handler for event 'renderCriteriaLoadValues'
+     *
+     * @param response
+     */
+    renderCriteriaLoadValues: function(response) {
+        this.updateLocalValues(response.results);
 
-        /**
-         * Handler for event 'updateCriteriaLabels'
-         *
-         * @param response
-         */
-        updateCriteriaLabels: function(response) {
-            this.updateLocalValues(response.results);
-            this.$(this.elementSelector).inputWidget('data', this.getDataForSelect2());
-            this._updateCriteriaHint();
-            this.trigger('update_criteria_label');
-        },
+        this._writeDOMValue(this.value);
+        this.applySelect2();
+        this._updateCriteriaHint();
+        this._updateDOMValue();
+        this._handleEmptyFilter();
+        this.renderDeferred.resolve();
+        this.trigger('update');
+    },
 
-        /**
-         * Update privet variables selectedData and value
-         *
-         * @param values
-         *
-         * @returns {oro.filter.DictionaryFilter}
-         */
-        updateLocalValues: function(values) {
-            const ids = [];
-            _.each(values, function(item) {
-                ids.push(item.id);
-                this.selectedData[item.id] = item;
-            }, this);
+    /**
+     * Handler for event 'updateCriteriaLabels'
+     *
+     * @param response
+     */
+    updateCriteriaLabels: function(response) {
+        this.updateLocalValues(response.results);
+        this.$(this.elementSelector).inputWidget('data', this.getDataForSelect2());
+        this._updateCriteriaHint();
+        this.trigger('update_criteria_label');
+    },
 
-            this.value.value = ids;
+    /**
+     * Update privet variables selectedData and value
+     *
+     * @param values
+     *
+     * @returns {oro.filter.DictionaryFilter}
+     */
+    updateLocalValues: function(values) {
+        const ids = [];
+        _.each(values, function(item) {
+            ids.push(item.id);
+            this.selectedData[item.id] = item;
+        }, this);
 
-            return this;
-        },
+        this.value.value = ids;
 
-        /**
-         * @inheritdoc
-         */
-        _renderCriteria: function() {
-            this.renderTemplate();
-            this.loadValuesById('renderCriteriaLoadValues');
-        },
+        return this;
+    },
 
-        /**
-         * Render template for filter
-         */
-        renderTemplate: function() {
-            const value = _.extend({}, this.emptyValue, this.value);
-            let selectedChoiceLabel = '';
-            if (!_.isEmpty(this.choices)) {
-                const foundChoice = _.find(this.choices, function(choice) {
-                    return value.type === choice.value;
-                });
-                selectedChoiceLabel = foundChoice.label;
-            }
-            const parts = this._getParts();
+    /**
+     * @inheritdoc
+     */
+    _renderCriteria: function() {
+        this.renderTemplate();
+        this.loadValuesById('renderCriteriaLoadValues');
+    },
 
-            const $filter = $(this.template({
-                parts: parts,
-                isEmpty: false,
-                showLabel: this.showLabel,
-                label: this.label,
-                selectedChoiceLabel: selectedChoiceLabel,
-                selectedChoice: value.type,
-                choices: this.choices,
-                name: this.name,
-                renderMode: this.renderMode,
-                ...this.getTemplateDataProps()
-            }));
+    /**
+     * Render template for filter
+     */
+    renderTemplate: function() {
+        const value = _.extend({}, this.emptyValue, this.value);
+        let selectedChoiceLabel = '';
+        if (!_.isEmpty(this.choices)) {
+            const foundChoice = _.find(this.choices, function(choice) {
+                return value.type === choice.value;
+            });
+            selectedChoiceLabel = foundChoice.label;
+        }
+        const parts = this._getParts();
 
-            this._appendFilter($filter);
-        },
+        const $filter = $(this.template({
+            parts: parts,
+            isEmpty: false,
+            showLabel: this.showLabel,
+            label: this.label,
+            selectedChoiceLabel: selectedChoiceLabel,
+            selectedChoice: value.type,
+            choices: this.choices,
+            name: this.name,
+            renderMode: this.renderMode,
+            ...this.getTemplateDataProps()
+        }));
 
-        /**
-         * init select2 for input
-         */
-        applySelect2: function() {
-            const self = this;
-            const select2Config = this.getSelect2Config();
-            const select2element = this.$el.find(this.elementSelector);
-            const values = this.getDataForSelect2();
+        this._appendFilter($filter);
+    },
 
-            select2element.removeClass('hide');
-            select2element.attr('multiple', 'multiple');
-            select2element.inputWidget('create', 'select2', {initializeOptions: select2Config});
-            self.isInitSelect2 = true;
-            if (this.templateTheme) {
-                select2element.on('change', function() {
-                    self.applyValue();
-                });
-            }
-            select2element.inputWidget('data', values);
-            this._criteriaRenderd = true;
+    /**
+     * init select2 for input
+     */
+    applySelect2: function() {
+        const self = this;
+        const select2Config = this.getSelect2Config();
+        const select2element = this.$el.find(this.elementSelector);
+        const values = this.getDataForSelect2();
 
-            this._alignCriteria();
+        select2element.removeClass('hide');
+        select2element.attr('multiple', 'multiple');
+        select2element.inputWidget('create', 'select2', {initializeOptions: select2Config});
+        self.isInitSelect2 = true;
+        if (this.templateTheme) {
+            select2element.on('change', function() {
+                self.applyValue();
+            });
+        }
+        select2element.inputWidget('data', values);
+        this._criteriaRenderd = true;
 
-            if (this.autoClose !== false) {
-                this._focusCriteriaValue();
-            }
-        },
+        this._alignCriteria();
 
-        /**
-         * Return config for select2
-         */
-        getSelect2Config: function() {
-            const config = {
-                multiple: true,
-                containerCssClass: 'dictionary-filter',
-                dropdownAutoWidth: true,
-                minimumInputLength: 0,
-                placeholder: __('Choose values')
+        if (this.autoClose !== false) {
+            this._focusCriteriaValue();
+        }
+    },
+
+    /**
+     * Return config for select2
+     */
+    getSelect2Config: function() {
+        const config = {
+            multiple: true,
+            containerCssClass: 'dictionary-filter',
+            dropdownAutoWidth: true,
+            minimumInputLength: 0,
+            placeholder: __('Choose values')
+        };
+
+        if (this.select2ConfigData === null) {
+            config.ajax = {
+                url: routing.generate(
+                    this.dictionarySearchRoute,
+                    {
+                        dictionary: this.dictionaryClass
+                    }
+                ),
+                dataType: 'json',
+                delay: 250,
+                type: 'POST',
+                data: function(params) {
+                    return {
+                        q: params // search term
+                    };
+                },
+                results: function(data) {
+                    return {
+                        results: data.results
+                    };
+                }
+            };
+        } else {
+            config.data = {
+                results: this.select2ConfigData
             };
 
-            if (this.select2ConfigData === null) {
-                config.ajax = {
-                    url: routing.generate(
-                        this.dictionarySearchRoute,
-                        {
-                            dictionary: this.dictionaryClass
-                        }
-                    ),
-                    dataType: 'json',
-                    delay: 250,
-                    type: 'POST',
-                    data: function(params) {
-                        return {
-                            q: params // search term
-                        };
-                    },
-                    results: function(data) {
-                        return {
-                            results: data.results
-                        };
-                    }
-                };
-            } else {
-                config.data = {
-                    results: this.select2ConfigData
-                };
-
-                if (config.data.results.length > 100) {
-                    config.minimumInputLength = 2;
-                }
+            if (config.data.results.length > 100) {
+                config.minimumInputLength = 2;
             }
+        }
 
-            if (this.templateTheme === '') {
-                config.width = 'off';
+        if (this.templateTheme === '') {
+            config.width = 'off';
+        }
+
+        return config;
+    },
+
+    /**
+     * Convert data to format for select2
+     *
+     * @returns {Array}
+     */
+    getDataForSelect2: function() {
+        const values = [];
+        _.each(this.value.value, function(value) {
+            const item = this.selectedData[value];
+
+            if (item) {
+                values.push({
+                    id: item.id,
+                    text: item.text
+                });
             }
+        }, this);
 
-            return config;
-        },
+        return values;
+    },
 
-        /**
-         * Convert data to format for select2
-         *
-         * @returns {Array}
-         */
-        getDataForSelect2: function() {
-            const values = [];
-            _.each(this.value.value, function(value) {
-                const item = this.selectedData[value];
+    /**
+     * @inheritdoc
+     */
+    isEmptyValue: function() {
+        if (this.isEmptyType(this.value.type)) {
+            return false;
+        }
+        const value = this.getValue();
 
-                if (item) {
-                    values.push({
-                        id: item.id,
-                        text: item.text
-                    });
-                }
-            }, this);
+        return !value.value || value.value.length === 0;
+    },
 
-            return values;
-        },
+    /**
+     * @inheritdoc
+     */
+    _getParts: function() {
+        const value = _.extend({}, this.emptyValue, this.getValue());
+        const dictionaryPartTemplate = this._getTemplate('fieldTemplate');
+        const parts = [];
+        const selectedPartLabel = this._getSelectedChoiceLabel('choices', this.value);
+        // add date parts only if embed template used
+        if (this.templateTheme !== '') {
+            parts.push(
+                dictionaryPartTemplate({
+                    name: this.name + '_part',
+                    choices: this.choices,
+                    selectedChoice: value.type,
+                    selectedChoiceLabel: selectedPartLabel
+                })
+            );
+        }
 
-        /**
-         * @inheritdoc
-         */
-        isEmptyValue: function() {
-            if (this.isEmptyType(this.value.type)) {
-                return false;
-            }
-            const value = this.getValue();
+        return parts;
+    },
 
-            return !value.value || value.value.length === 0;
-        },
+    /**
+     * Set raw value to filter
+     *
+     * @param value
+     *
+     * @return {*}
+     */
+    setValue: function(value) {
+        this.preloadSelectedData(value);
 
-        /**
-         * @inheritdoc
-         */
-        _getParts: function() {
-            const value = _.extend({}, this.emptyValue, this.getValue());
-            const dictionaryPartTemplate = this._getTemplate('fieldTemplate');
-            const parts = [];
-            const selectedPartLabel = this._getSelectedChoiceLabel('choices', this.value);
-            // add date parts only if embed template used
-            if (this.templateTheme !== '') {
-                parts.push(
-                    dictionaryPartTemplate({
-                        name: this.name + '_part',
-                        choices: this.choices,
-                        selectedChoice: value.type,
-                        selectedChoiceLabel: selectedPartLabel
-                    })
-                );
-            }
+        const oldValue = this.value;
+        this.value = tools.deepClone(value);
+        this.$(this.elementSelector).inputWidget('data', this.getDataForSelect2());
+        this._updateDOMValue();
 
-            return parts;
-        },
+        if (this.valueIsLoaded(value.value) || this.isEmptyType(value.type)) {
+            this._onValueUpdated(this.value, oldValue);
+        } else {
+            this.loadValuesById('updateCriteriaLabels');
+        }
 
-        /**
-         * Set raw value to filter
-         *
-         * @param value
-         *
-         * @return {*}
-         */
-        setValue: function(value) {
-            this.preloadSelectedData(value);
+        return this;
+    },
 
-            const oldValue = this.value;
-            this.value = tools.deepClone(value);
-            this.$(this.elementSelector).inputWidget('data', this.getDataForSelect2());
-            this._updateDOMValue();
+    /**
+     * Preloads selectedData with available data from select2 so that we don't have to
+     * make additional requests
+     */
+    preloadSelectedData: function(value) {
+        if (!this.isInitSelect2 || !value.value) {
+            return;
+        }
 
-            if (this.valueIsLoaded(value.value) || this.isEmptyType(value.type)) {
-                this._onValueUpdated(this.value, oldValue);
-            } else {
-                this.loadValuesById('updateCriteriaLabels');
-            }
-
-            return this;
-        },
-
-        /**
-         * Preloads selectedData with available data from select2 so that we don't have to
-         * make additional requests
-         */
-        preloadSelectedData: function(value) {
-            if (!this.isInitSelect2 || !value.value) {
+        const data = this.$(this.elementSelector).inputWidget('data');
+        _.each(data, function(elem) {
+            if (!('id' in elem)) {
                 return;
             }
 
-            const data = this.$(this.elementSelector).inputWidget('data');
-            _.each(data, function(elem) {
-                if (!('id' in elem)) {
-                    return;
-                }
-
-                if (this.selectedData[elem.id]) {
-                    return;
-                }
-
-                this.selectedData[elem.id] = elem;
-            }, this);
-        },
-
-        /**
-         * @inheritdoc
-         */
-        _writeDOMValue: function(value) {
-            this._setInputValue(this.criteriaValueSelectors.type, value.type);
-        },
-
-        /**
-         * @inheritdoc
-         */
-        _readDOMValue: function() {
-            let value;
-            if (this.isInitSelect2) {
-                value = this.$el.find('.select-values-autocomplete').inputWidget('val');
-            } else {
-                value = null;
-            }
-            return {
-                type: this._getInputValue(this.criteriaValueSelectors.type),
-                value: value
-            };
-        },
-
-        /**
-         * @inheritdoc
-         */
-        _getSelectedChoiceLabel: function(property, value) {
-            let selectedChoiceLabel = '';
-            if (!_.isEmpty(this[property])) {
-                const foundChoice = _.find(this[property], function(choice) {
-                    return (choice.value === value.type);
-                });
-
-                if (foundChoice) {
-                    selectedChoiceLabel = foundChoice.label;
-                }
+            if (this.selectedData[elem.id]) {
+                return;
             }
 
-            return selectedChoiceLabel;
-        },
+            this.selectedData[elem.id] = elem;
+        }, this);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        _getCriteriaHint: function() {
-            const value = this._getDisplayValue();
-            let option = null;
+    /**
+     * @inheritdoc
+     */
+    _writeDOMValue: function(value) {
+        this._setInputValue(this.criteriaValueSelectors.type, value.type);
+    },
 
-            if (!_.isUndefined(value.type)) {
-                const type = value.type;
-                option = this._getChoiceOption(type);
-
-                if (this.isEmptyType(type)) {
-                    return option ? option.label : this.placeholder;
-                }
-            }
-
-            if (!value.value || value.value.length === 0) {
-                return this.placeholder;
-            }
-
-            if (this.valueIsLoaded(value.value)) {
-                const self = this;
-
-                const hintRawValue = _.isObject(_.first(value.value))
-                    ? _.map(value.value, _.property('text'))
-                    : _.chain(value.value)
-                        .map(function(id) {
-                            const item = _.find(self.selectedData, function(item) {
-                                return item.id.toString() === id.toString();
-                            });
-
-                            return item ? item.text : item;
-                        })
-                        .filter(_.negate(_.isUndefined))
-                        .value()
-                        .join(', ');
-
-                const hintValue = this.wrapHintValue ? (`"${hintRawValue}"`) : hintRawValue;
-
-                return (option ? option.label + ' ' : '') + hintValue;
-            } else {
-                return this.placeholder;
-            }
-        },
-
-        /**
-         * @inheritdoc
-         */
-        _hideCriteria: function() {
-            this.$el.find(this.elementSelector).inputWidget('close');
-            DictionaryFilter.__super__._hideCriteria.call(this);
-        },
-
-        /**
-         * Checking  the existence of entities with selected ids in loaded data.
-         *
-         * @param values
-         *
-         * @returns {boolean}
-         */
-        valueIsLoaded: function(values) {
-            if (values) {
-                let foundItems = 0;
-                const self = this;
-                _.each(values, function(item) {
-                    if (self.selectedData && self.selectedData[item]) {
-                        foundItems++;
-                    }
-                });
-
-                return foundItems === values.length;
-            }
-
-            return true;
-        },
-
-        /**
-         * Checking initialize select2 widget
-         * hide criteria witout applying and validation value if select2 have not been initialize yet
-         * @returns {*|void}
-         * @private
-         */
-        _applyValueAndHideCriteria: function() {
-            if (!this.isInitSelect2) {
-                return this._hideCriteria();
-            }
-
-            DictionaryFilter.__super__._applyValueAndHideCriteria.call(this);
-        },
-
-        /**
-         * @return {jQuery}
-         */
-        getCriteriaValueFieldToFocus() {
-            const $el = DictionaryFilter.__super__.getCriteriaValueFieldToFocus.call(this);
-
-            if ($el.data('select2')) {
-                return $el.data('select2').search;
-            }
-
-            return $el;
+    /**
+     * @inheritdoc
+     */
+    _readDOMValue: function() {
+        let value;
+        if (this.isInitSelect2) {
+            value = this.$el.find('.select-values-autocomplete').inputWidget('val');
+        } else {
+            value = null;
         }
-    });
+        return {
+            type: this._getInputValue(this.criteriaValueSelectors.type),
+            value: value
+        };
+    },
 
-    return DictionaryFilter;
+    /**
+     * @inheritdoc
+     */
+    _getSelectedChoiceLabel: function(property, value) {
+        let selectedChoiceLabel = '';
+        if (!_.isEmpty(this[property])) {
+            const foundChoice = _.find(this[property], function(choice) {
+                return (choice.value === value.type);
+            });
+
+            if (foundChoice) {
+                selectedChoiceLabel = foundChoice.label;
+            }
+        }
+
+        return selectedChoiceLabel;
+    },
+
+    /**
+     * @inheritdoc
+     */
+    _getCriteriaHint: function() {
+        const value = this._getDisplayValue();
+        let option = null;
+
+        if (!_.isUndefined(value.type)) {
+            const type = value.type;
+            option = this._getChoiceOption(type);
+
+            if (this.isEmptyType(type)) {
+                return option ? option.label : this.placeholder;
+            }
+        }
+
+        if (!value.value || value.value.length === 0) {
+            return this.placeholder;
+        }
+
+        if (this.valueIsLoaded(value.value)) {
+            const self = this;
+
+            const hintRawValue = _.isObject(_.first(value.value))
+                ? _.map(value.value, _.property('text'))
+                : _.chain(value.value)
+                    .map(function(id) {
+                        const item = _.find(self.selectedData, function(item) {
+                            return item.id.toString() === id.toString();
+                        });
+
+                        return item ? item.text : item;
+                    })
+                    .filter(_.negate(_.isUndefined))
+                    .value()
+                    .join(', ');
+
+            const hintValue = this.wrapHintValue ? (`"${hintRawValue}"`) : hintRawValue;
+
+            return (option ? option.label + ' ' : '') + hintValue;
+        } else {
+            return this.placeholder;
+        }
+    },
+
+    /**
+     * @inheritdoc
+     */
+    _hideCriteria: function() {
+        this.$el.find(this.elementSelector).inputWidget('close');
+        DictionaryFilter.__super__._hideCriteria.call(this);
+    },
+
+    /**
+     * Checking  the existence of entities with selected ids in loaded data.
+     *
+     * @param values
+     *
+     * @returns {boolean}
+     */
+    valueIsLoaded: function(values) {
+        if (values) {
+            let foundItems = 0;
+            const self = this;
+            _.each(values, function(item) {
+                if (self.selectedData && self.selectedData[item]) {
+                    foundItems++;
+                }
+            });
+
+            return foundItems === values.length;
+        }
+
+        return true;
+    },
+
+    /**
+     * Checking initialize select2 widget
+     * hide criteria witout applying and validation value if select2 have not been initialize yet
+     * @returns {*|void}
+     * @private
+     */
+    _applyValueAndHideCriteria: function() {
+        if (!this.isInitSelect2) {
+            return this._hideCriteria();
+        }
+
+        DictionaryFilter.__super__._applyValueAndHideCriteria.call(this);
+    },
+
+    /**
+     * @return {jQuery}
+     */
+    getCriteriaValueFieldToFocus() {
+        const $el = DictionaryFilter.__super__.getCriteriaValueFieldToFocus.call(this);
+
+        if ($el.data('select2')) {
+            return $el.data('select2').search;
+        }
+
+        return $el;
+    }
 });
+
+export default DictionaryFilter;

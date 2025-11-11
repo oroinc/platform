@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     const TextEditorView = require('./text-editor-view');
-    const NumberFormatter = require('orofilter/js/formatter/number-formatter');
+    const NumberFormatter = require('orofilter/js/formatter/number-formatter').default;
 
     /**
      * Number cell content editor.
