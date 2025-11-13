@@ -15,6 +15,9 @@ Feature: Special character in multiple select placeholder
     And I filter Key as is equal to "oro.attachment.mimetypes.placeholder"
     And I edit first record from grid:
       | Translated Value | Select <> Académie française ty'pe... |
+    And I filter Key as is equal to "oro.dashboard.form.choose_business_unit"
+    And I edit first record from grid:
+      | Translated Value | Select <> Académie française ty'pe... |
     And I go to System/Entities/Entity Management
     And filter Name as is equal to "User"
     And click View User in grid
@@ -25,3 +28,7 @@ Feature: Special character in multiple select placeholder
       | Type         | Multiple Files |
     And click "Continue"
     Then I should see that multiple select2 "Allowed MIME types" contains "Select &lt;&gt; Académie française ty'pe..." placeholder
+    When I go to System/User Management/Users
+    And click View admin@example.com in grid
+    And I click "Entity Edit Button"
+    Then I should see that multiple select2 "Organization Business Units" contains "Select &lt;&gt; Académie française ty'pe..." placeholder
