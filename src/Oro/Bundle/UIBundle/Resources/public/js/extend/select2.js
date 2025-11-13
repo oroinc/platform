@@ -1104,9 +1104,13 @@ define(function(require) {
         /* eslint-disable */
         prototype.clearSearch = function () {
             var placeholder = this.getPlaceholder(),
-                maxWidth = this.getMaxSearchWidth();
+                maxWidth = this.getMaxSearchWidth(),
+                isSelect2Tree = this.search.closest('.select2-container').hasClass('select2-tree-autocomplete');
 
-            if (placeholder !== undefined  && this.getVal().length === 0 && this.search.hasClass("select2-focused") === false) {
+            if (placeholder !== undefined &&
+                (this.getVal().length === 0 || isSelect2Tree) &&
+                this.search.hasClass("select2-focused") === false
+            ) {
                 // Decode HTML entities in placeholder text for proper display
                 // Uses _.unescape() for standard entities + manual replacements for edge cases
                 const decodedPlaceholder = _.unescape(placeholder).replace(/&quot;/g, '\"').replace(/&#039;/g, '\'');
