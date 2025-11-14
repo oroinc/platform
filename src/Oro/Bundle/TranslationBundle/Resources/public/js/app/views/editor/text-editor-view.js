@@ -3,7 +3,7 @@ define(function(require) {
 
     const _ = require('underscore');
     const mediator = require('oroui/js/mediator');
-    const BaseView = require('oroform/js/app/views/editor/text-editor-view');
+    const BaseView = require('oroform/js/app/views/editor/text-editor-view').default;
 
     // TODO: will be removed after https://magecore.atlassian.net/browse/BAP-11905
     const TextEditorView = BaseView.extend({

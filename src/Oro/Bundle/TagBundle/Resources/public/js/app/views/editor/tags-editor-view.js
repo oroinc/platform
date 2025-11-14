@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    const AbstractRelationEditorView = require('oroform/js/app/views/editor/abstract-relation-editor-view');
+    const AbstractRelationEditorView = require('oroform/js/app/views/editor/abstract-relation-editor-view').default;
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const $ = require('jquery');
