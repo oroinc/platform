@@ -8,12 +8,15 @@ use Oro\Bundle\SanitizeBundle\Tests\Functional\Environment\Entity\TestSanitizabl
 use Oro\Bundle\SanitizeBundle\Tests\Functional\Environment\Provider\EntityAllMetadataProviderDecorator;
 use Oro\Bundle\SanitizeBundle\Tests\Functional\Environment\Provider\Rule\FileBasedProviderDecorator;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\Testing\TempDirExtension;
 
 /**
  * @dbIsolationPerTest
  */
 class SanitizedSqlDumpApplyTest extends WebTestCase
 {
+    use TempDirExtension;
+
     private const CUSTOM_EMAIL_DOMAIN = 'example.com';
 
     private ?Connection $connection = null;
@@ -28,9 +31,11 @@ class SanitizedSqlDumpApplyTest extends WebTestCase
             ->get('doctrine')
             ->getManager()
             ->getConnection();
-        $this->outputFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sanitize_dump.sql';
-        $metatdataProvider = $this->getContainer()->get(EntityAllMetadataProviderDecorator::class);
-        $metatdataProvider->setEntitiesToFilter([TestSanitizable::class]);
+
+        $this->outputFile = $this->getTempFile('sanitized_sql_dump_apply', 'sanitize_dump'. '.sql');
+
+        $metadataProvider = $this->getContainer()->get(EntityAllMetadataProviderDecorator::class);
+        $metadataProvider->setEntitiesToFilter([TestSanitizable::class]);
     }
 
     public function testSanitizeAppliedProperlyWithoutCustomEmailDomain(): void
@@ -74,10 +79,10 @@ class SanitizedSqlDumpApplyTest extends WebTestCase
 
         [$data, $serializedData] = $this->applyRulesAndReadAffectedData();
 
-        $pregQuotedEailDomain = preg_quote(self::CUSTOM_EMAIL_DOMAIN);
-        self::assertMatchesRegularExpression('/john\\.redison\\d+@' . $pregQuotedEailDomain . '/', $data['email']);
+        $pregQuotedEmailDomain = preg_quote(self::CUSTOM_EMAIL_DOMAIN);
+        self::assertMatchesRegularExpression('/john\\.redison\\d+@' . $pregQuotedEmailDomain . '/', $data['email']);
         self::assertMatchesRegularExpression(
-            '/john\\.redison\\.third\\d+@' . $pregQuotedEailDomain . '/',
+            '/john\\.redison\\.third\\d+@' . $pregQuotedEmailDomain . '/',
             $serializedData['email_third']
         );
     }
@@ -99,7 +104,7 @@ class SanitizedSqlDumpApplyTest extends WebTestCase
         }
         $sql = 'SELECT * FROM test_sanitizable_entity LIMIT 1';
         $data = $this->connection->fetchAssoc($sql);
-        $serializedData = json_decode($data['serialized_data'], true);
+        $serializedData = json_decode($data['serialized_data'], true, 512, JSON_THROW_ON_ERROR);
 
         return [$data, $serializedData];
     }

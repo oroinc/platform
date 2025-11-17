@@ -7,22 +7,23 @@ namespace Oro\Bundle\PdfGeneratorBundle\Tests\Unit\PdfFile;
 use GuzzleHttp\Psr7\LazyOpenStream;
 use GuzzleHttp\Psr7\Utils;
 use Oro\Bundle\PdfGeneratorBundle\PdfFile\PdfFile;
+use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 
 final class PdfFileTest extends TestCase
 {
+    use TempDirExtension;
+
     private StreamInterface&MockObject $stream;
-
     private string $filePath;
-
     private string $mimeType;
 
     protected function setUp(): void
     {
         $this->stream = $this->createMock(StreamInterface::class);
-        $this->filePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('test.pdf', true);
+        $this->filePath = $this->getTempFile('pdf_file', 'test', '.pdf');
         $this->mimeType = 'application/pdf';
     }
 

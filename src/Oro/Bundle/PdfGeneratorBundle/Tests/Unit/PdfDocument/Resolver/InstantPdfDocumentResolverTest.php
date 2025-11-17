@@ -17,19 +17,18 @@ use Oro\Bundle\PdfGeneratorBundle\PdfFile\PdfFile;
 use Oro\Bundle\PdfGeneratorBundle\PdfOptionsPreset\PdfOptionsPreset;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Component\Testing\ReflectionUtil;
+use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class InstantPdfDocumentResolverTest extends TestCase
 {
+    use TempDirExtension;
     use LoggerAwareTraitTestTrait;
 
     private InstantPdfDocumentResolver $resolver;
-
     private MockObject&ManagerRegistry $doctrine;
-
     private MockObject&PdfDocumentGeneratorInterface $pdfDocumentGeneratorComposite;
-
     private MockObject&FileEntityFromPdfFileFactory $fileFromPdfFileFactory;
 
     protected function setUp(): void
@@ -91,49 +90,40 @@ final class InstantPdfDocumentResolverTest extends TestCase
             ->setPdfOptionsPreset(PdfOptionsPreset::DEFAULT)
             ->setPdfDocumentState(PdfDocumentState::PENDING);
 
-        $tempFilePath = sys_get_temp_dir() . '/sample.pdf';
+        $tempFilePath = $this->getTempDir('instant_pdf_document_resolver') . '/sample.pdf';
 
-        try {
-            // Create a temporary file with sample PDF content
-            file_put_contents($tempFilePath, '%PDF-1.4 Sample PDF Content');
+        // Create a temporary file with sample PDF content
+        file_put_contents($tempFilePath, '%PDF-1.4 Sample PDF Content');
 
-            $pdfFile = new PdfFile($tempFilePath, 'application/pdf');
-            $fileEntity = new File();
+        $pdfFile = new PdfFile($tempFilePath, 'application/pdf');
+        $fileEntity = new File();
 
-            $this->pdfDocumentGeneratorComposite
-                ->expects(self::once())
-                ->method('generatePdfFile')
-                ->with($pdfDocument)
-                ->willReturn($pdfFile);
+        $this->pdfDocumentGeneratorComposite->expects(self::once())
+            ->method('generatePdfFile')
+            ->with($pdfDocument)
+            ->willReturn($pdfFile);
 
-            $this->fileFromPdfFileFactory
-                ->expects(self::once())
-                ->method('createFile')
-                ->with($pdfFile, 'sample-document.pdf')
-                ->willReturn($fileEntity);
+        $this->fileFromPdfFileFactory->expects(self::once())
+            ->method('createFile')
+            ->with($pdfFile, 'sample-document.pdf')
+            ->willReturn($fileEntity);
 
-            $entityManager = $this->createMock(EntityManagerInterface::class);
-            $this->doctrine
-                ->expects(self::once())
-                ->method('getManagerForClass')
-                ->with(File::class)
-                ->willReturn($entityManager);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with(File::class)
+            ->willReturn($entityManager);
 
-            $entityManager
-                ->expects(self::once())
-                ->method('persist')
-                ->with($fileEntity);
+        $entityManager->expects(self::once())
+            ->method('persist')
+            ->with($fileEntity);
 
-            $this->assertLoggerNotCalled();
+        $this->assertLoggerNotCalled();
 
-            $this->resolver->resolvePdfDocument($pdfDocument);
+        $this->resolver->resolvePdfDocument($pdfDocument);
 
-            self::assertSame(PdfDocumentState::RESOLVED, $pdfDocument->getPdfDocumentState());
-            self::assertSame($fileEntity, $pdfDocument->getPdfDocumentFile());
-        } finally {
-            // Clean up the temporary file.
-            unlink($tempFilePath);
-        }
+        self::assertSame(PdfDocumentState::RESOLVED, $pdfDocument->getPdfDocumentState());
+        self::assertSame($fileEntity, $pdfDocument->getPdfDocumentFile());
     }
 
     public function testResolvePdfDocumentSkipsWhenNotApplicable(): void
@@ -145,16 +135,13 @@ final class InstantPdfDocumentResolverTest extends TestCase
             ->setPdfOptionsPreset(PdfOptionsPreset::DEFAULT)
             ->setPdfDocumentState(PdfDocumentState::RESOLVED); // Not an applicable state
 
-        $this->pdfDocumentGeneratorComposite
-            ->expects(self::never())
+        $this->pdfDocumentGeneratorComposite->expects(self::never())
             ->method('generatePdfFile');
 
-        $this->fileFromPdfFileFactory
-            ->expects(self::never())
+        $this->fileFromPdfFileFactory->expects(self::never())
             ->method('createFile');
 
-        $this->doctrine
-            ->expects(self::never())
+        $this->doctrine->expects(self::never())
             ->method('getManagerForClass');
 
         $this->assertLoggerNotCalled();
@@ -176,27 +163,22 @@ final class InstantPdfDocumentResolverTest extends TestCase
             ->setPdfDocumentState(PdfDocumentState::PENDING);
 
         $exception = new PdfGeneratorException('PDF generation error');
-        $this->pdfDocumentGeneratorComposite
-            ->expects(self::once())
+        $this->pdfDocumentGeneratorComposite->expects(self::once())
             ->method('generatePdfFile')
             ->with($pdfDocument)
             ->willThrowException($exception);
 
-        $this->fileFromPdfFileFactory
-            ->expects(self::never())
+        $this->fileFromPdfFileFactory->expects(self::never())
             ->method('createFile');
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->doctrine
-            ->expects(self::never())
+        $this->doctrine->expects(self::never())
             ->method('getManagerForClass');
 
-        $entityManager
-            ->expects(self::never())
+        $entityManager->expects(self::never())
             ->method('persist');
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('error')
             ->with(
                 'PDF generation failed for PDF document {pdfDocumentId}: {message}',
@@ -226,22 +208,18 @@ final class InstantPdfDocumentResolverTest extends TestCase
             ->setPdfDocumentState(PdfDocumentState::PENDING);
 
         $exception = new PdfGeneratorException('PDF generation error');
-        $this->pdfDocumentGeneratorComposite
-            ->expects(self::once())
+        $this->pdfDocumentGeneratorComposite->expects(self::once())
             ->method('generatePdfFile')
             ->with($pdfDocument)
             ->willThrowException($exception);
 
-        $this->fileFromPdfFileFactory
-            ->expects(self::never())
+        $this->fileFromPdfFileFactory->expects(self::never())
             ->method('createFile');
 
-        $this->doctrine
-            ->expects(self::never())
+        $this->doctrine->expects(self::never())
             ->method('getManagerForClass');
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('error')
             ->with(
                 'PDF generation failed for PDF document {pdfDocumentId}: {message}',

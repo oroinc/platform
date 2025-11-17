@@ -8,12 +8,15 @@ use Oro\Bundle\LocaleBundle\Provider\LocalizationProviderInterface;
 use Oro\Component\Layout\Extension\Theme\DataProvider\ThemeProvider;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 class ThemeProviderTest extends TestCase
 {
+    use TempDirExtension;
+
     private ThemeManager&MockObject $themeManager;
     private LocalizationProviderInterface&MockObject $localizationProvider;
     private ThemeProvider $provider;
@@ -33,24 +36,10 @@ class ThemeProviderTest extends TestCase
             $this->localizationProvider,
             $this->publicDirectoryProvider,
         );
-
         $this->provider->setLogger($this->logger);
 
-        $this->publicDirectory = sys_get_temp_dir() . '/mocked_public_directory_' . uniqid('', true);
-
-        if (is_dir($this->publicDirectory)) {
-            $this->removeDirectory($this->publicDirectory);
-        }
-
+        $this->publicDirectory = $this->getTempDir('theme_provider', false);
         mkdir($this->publicDirectory, 0777, true);
-    }
-
-    #[\Override]
-    protected function tearDown(): void
-    {
-        if (is_dir($this->publicDirectory)) {
-            $this->removeDirectory($this->publicDirectory);
-        }
     }
 
     public function testGetIcon(): void
@@ -106,13 +95,13 @@ class ThemeProviderTest extends TestCase
         self::assertSame('build/test/path/to/output/css', $this->provider->getStylesOutput($themeName));
         self::assertSame(
             'build/test/path/to/output/css',
-            $this->provider->getStylesOutput($themeName, 'styles')
+            $this->provider->getStylesOutput($themeName)
         );
         self::assertSame(
             'build/test/path/to/output/css/new',
             $this->provider->getStylesOutput($themeName, 'styles_new')
         );
-        self::assertSame(null, $this->provider->getStylesOutput($themeName, 'undefined section'));
+        self::assertNull($this->provider->getStylesOutput($themeName, 'undefined section'));
     }
 
     public function testGetStylesOutputNull(): void
@@ -181,7 +170,7 @@ class ThemeProviderTest extends TestCase
             ->method('getCurrentLocalization')
             ->willReturn($localization);
 
-        self::assertSame($expected, $this->provider->getStylesOutput($themeName, 'styles'));
+        self::assertSame($expected, $this->provider->getStylesOutput($themeName));
         self::assertNull($this->provider->getStylesOutput($themeName, 'undefined_section'));
     }
 
@@ -383,19 +372,5 @@ class ThemeProviderTest extends TestCase
             mkdir($dir, 0777, true);
         }
         file_put_contents($filePath, $content);
-    }
-
-    private function removeDirectory(string $directory): void
-    {
-        if (!is_dir($directory)) {
-            return;
-        }
-
-        $files = array_diff(scandir($directory), ['.', '..']);
-        foreach ($files as $file) {
-            $filePath = $directory . '/' . $file;
-            is_dir($filePath) ? $this->removeDirectory($filePath) : unlink($filePath);
-        }
-        rmdir($directory);
     }
 }
