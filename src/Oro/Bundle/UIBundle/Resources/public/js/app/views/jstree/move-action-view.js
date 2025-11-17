@@ -5,7 +5,8 @@ define(function(require) {
     const _ = require('underscore');
     const $ = require('jquery');
     const __ = require('orotranslation/js/translator');
-    const DialogWidget = require('oro/dialog-widget');
+    const DialogWidgetModule = require('oro/dialog-widget');
+    const DialogWidget = DialogWidgetModule.default ?? DialogWidgetModule;
     const routing = require('routing');
     const messenger = require('oroui/js/messenger');
 

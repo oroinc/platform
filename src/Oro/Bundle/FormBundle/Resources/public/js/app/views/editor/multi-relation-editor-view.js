@@ -1,183 +1,179 @@
-define(function(require) {
-    'use strict';
+import RelatedIdRelationEditorView from './related-id-relation-editor-view';
+import _ from 'underscore';
+import select2autosizer from 'oroui/js/tools/select2-autosizer';
 
-    const RelatedIdRelationEditorView = require('./related-id-relation-editor-view');
-    const _ = require('underscore');
-    const select2autosizer = require('oroui/js/tools/select2-autosizer');
+/**
+ * Multi-relation content editor. Please note that it requires column data format
+ * corresponding to multi-relation-cell.
+ *
+ * ### Column configuration samples:
+ * ``` yml
+ * datagrids:
+ *   {grid-uid}:
+ *     inline_editing:
+ *       enable: true
+ *     # <grid configuration> goes here
+ *     columns:
+ *       # Sample 1. Full configuration
+ *       {column-name-1}:
+ *         inline_editing:
+ *           editor:
+ *             view: oroform/js/app/views/editor/multi-relation-editor-view
+ *             view_options:
+ *               placeholder: '<placeholder>'
+ *               css_class_name: '<class-name>'
+ *               maximumSelectionLength: 3
+ *           validation_rules:
+ *             NotBlank: true
+ *         autocomplete_api_accessor:
+ *           # class: oroentity/js/tools/entity-select-search-api-accessor
+ *           # entity_select is default search api
+ *           # following options are specific only for entity-select-search-api-accessor
+ *           # please place here an options corresponding to specified class
+ *           entity_name: {corresponding-entity}
+ *           field_name: {corresponding-entity-field-name}
+ * ```
+ *
+ * ### Options in yml:
+ *
+ * Column option name                                  | Description
+ * :---------------------------------------------------|:-----------
+ * inline_editing.editor.view_options.placeholder      | Optional. Placeholder translation key for an empty element
+ * inline_editing.editor.view_options.placeholder_raw  | Optional. Raw placeholder value
+ * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
+ * inline_editing.editor.view_options.maximumSelectionLength | Optional. Maximum selection length
+ * inline_editing.validation_rules | Optional. Validation rules. See [documentation](../reference/js_validation.md#conformity-server-side-validations-to-client-once)
+ * inline_editing.autocomplete_api_accessor     | Required. Specifies available choices
+ * inline_editing.autocomplete_api_accessor.class | One of the [list of search APIs](../reference/search-apis.md)
+ *
+ * ### Constructor parameters
+ *
+ * @class
+ * @param {Object} options - Options container
+ * @param {Object} options.model - Current row model
+ * @param {Backgrid.Cell} options.cell - Current datagrid cell
+ * @param {Backgrid.Column} options.column - Current datagrid column
+ * @param {string} options.placeholder - Placeholder translation key for an empty element
+ * @param {string} options.placeholder_raw - Raw placeholder value. It overrides placeholder translation key
+ * @param {string} options.maximumSelectionLength - Maximum selection length
+ * @param {Object} options.validationRules - Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once)
+ * @param {Object} options.autocomplete_api_accessor - Autocomplete API specification.
+ *                                      Please see [list of search API's](../reference/search-apis.md)
+ *
+ * @augments [RelatedIdRelationEditorView](./related-id-relation-editor-view.md)
+ * @exports MultiRelationEditorView
+ */
+const MultiRelationEditorView = RelatedIdRelationEditorView.extend(/** @lends MultiRelationEditorView.prototype */{
+    className: 'multi-relation-editor',
 
     /**
-     * Multi-relation content editor. Please note that it requires column data format
-     * corresponding to multi-relation-cell.
-     *
-     * ### Column configuration samples:
-     * ``` yml
-     * datagrids:
-     *   {grid-uid}:
-     *     inline_editing:
-     *       enable: true
-     *     # <grid configuration> goes here
-     *     columns:
-     *       # Sample 1. Full configuration
-     *       {column-name-1}:
-     *         inline_editing:
-     *           editor:
-     *             view: oroform/js/app/views/editor/multi-relation-editor-view
-     *             view_options:
-     *               placeholder: '<placeholder>'
-     *               css_class_name: '<class-name>'
-     *               maximumSelectionLength: 3
-     *           validation_rules:
-     *             NotBlank: true
-     *         autocomplete_api_accessor:
-     *           # class: oroentity/js/tools/entity-select-search-api-accessor
-     *           # entity_select is default search api
-     *           # following options are specific only for entity-select-search-api-accessor
-     *           # please place here an options corresponding to specified class
-     *           entity_name: {corresponding-entity}
-     *           field_name: {corresponding-entity-field-name}
-     * ```
-     *
-     * ### Options in yml:
-     *
-     * Column option name                                  | Description
-     * :---------------------------------------------------|:-----------
-     * inline_editing.editor.view_options.placeholder      | Optional. Placeholder translation key for an empty element
-     * inline_editing.editor.view_options.placeholder_raw  | Optional. Raw placeholder value
-     * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
-     * inline_editing.editor.view_options.maximumSelectionLength | Optional. Maximum selection length
-     * inline_editing.validation_rules | Optional. Validation rules. See [documentation](../reference/js_validation.md#conformity-server-side-validations-to-client-once)
-     * inline_editing.autocomplete_api_accessor     | Required. Specifies available choices
-     * inline_editing.autocomplete_api_accessor.class | One of the [list of search APIs](../reference/search-apis.md)
-     *
-     * ### Constructor parameters
-     *
-     * @class
-     * @param {Object} options - Options container
-     * @param {Object} options.model - Current row model
-     * @param {Backgrid.Cell} options.cell - Current datagrid cell
-     * @param {Backgrid.Column} options.column - Current datagrid column
-     * @param {string} options.placeholder - Placeholder translation key for an empty element
-     * @param {string} options.placeholder_raw - Raw placeholder value. It overrides placeholder translation key
-     * @param {string} options.maximumSelectionLength - Maximum selection length
-     * @param {Object} options.validationRules - Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once)
-     * @param {Object} options.autocomplete_api_accessor - Autocomplete API specification.
-     *                                      Please see [list of search API's](../reference/search-apis.md)
-     *
-     * @augments [RelatedIdRelationEditorView](./related-id-relation-editor-view.md)
-     * @exports MultiRelationEditorView
+     * @inheritdoc
      */
-    const MultiRelationEditorView = RelatedIdRelationEditorView.extend(/** @lends MultiRelationEditorView.prototype */{
-        className: 'multi-relation-editor',
+    constructor: function MultiRelationEditorView(options) {
+        MultiRelationEditorView.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function MultiRelationEditorView(options) {
-            MultiRelationEditorView.__super__.constructor.call(this, options);
-        },
+    initialize: function(options) {
+        options.ignore_value_field_name = true;
+        this.maximumSelectionLength = options.maximumSelectionLength;
+        MultiRelationEditorView.__super__.initialize.call(this, options);
+    },
 
-        initialize: function(options) {
-            options.ignore_value_field_name = true;
-            this.maximumSelectionLength = options.maximumSelectionLength;
-            MultiRelationEditorView.__super__.initialize.call(this, options);
-        },
+    events: {
+        'change input[name=value]': 'autoSize'
+    },
 
-        events: {
-            'change input[name=value]': 'autoSize'
-        },
+    listen: {
+        'change:visibility': 'autoSize'
+    },
 
-        listen: {
-            'change:visibility': 'autoSize'
-        },
+    autoSize: function() {
+        select2autosizer.applyTo(this.$el, this);
+    },
 
-        autoSize: function() {
-            select2autosizer.applyTo(this.$el, this);
-        },
-
-        getInitialResultItem: function() {
-            const modelValue = this.getModelValue();
-            if (modelValue !== null && modelValue && modelValue.data) {
-                return modelValue.data;
-            } else {
-                return [];
-            }
-        },
-
-        formatRawValue: function(value) {
-            value = this.parseRawValue(value);
-            if (value !== null && value && value.data) {
-                value = value.data;
-            } else {
-                value = [];
-            }
-            return value.map(function(item) {
-                return item.id;
-            }).join(',');
-        },
-
-        filterInitialResultItem: function(choices) {
-            choices = _.clone(choices);
-            return choices;
-        },
-
-        addInitialResultItem: function(choices) {
-            return this.filterInitialResultItem(choices);
-        },
-
-        getSelect2Options: function() {
-            const options = MultiRelationEditorView.__super__.getSelect2Options.call(this);
-            options.multiple = true;
-            options.maximumSelectionLength = this.maximumSelectionLength;
-            return options;
-        },
-
-        parseRawValue: function(value) {
-            if (_.isString(value)) {
-                value = JSON.parse(value);
-            }
-            if (value === null || value === void 0) {
-                // assume empty
-                value = {
-                    count: 0,
-                    data: []
-                };
-            }
-            return value;
-        },
-
-        getValue: function() {
-            const select2Value = this.$('input[name=value]').val();
-            let ids;
-            if (select2Value !== '') {
-                ids = select2Value.split(',').map(function(id) {
-                    return parseInt(id);
-                });
-            } else {
-                ids = [];
-            }
-            return {
-                data: ids.map(function(id) {
-                    return {
-                        id: id
-                    };
-                }),
-                count: ids.length
-            };
-        },
-
-        getServerUpdateData: function() {
-            const data = {};
-            data[this.fieldName] = this.getValue();
-            return data;
-        },
-
-        getModelUpdateData: function() {
-            return this.getServerUpdateData();
+    getInitialResultItem: function() {
+        const modelValue = this.getModelValue();
+        if (modelValue !== null && modelValue && modelValue.data) {
+            return modelValue.data;
+        } else {
+            return [];
         }
-    }, {
-        DEFAULT_ACCESSOR_CLASS: 'oroentity/js/tools/entity-select-search-api-accessor',
-        processColumnMetadata: RelatedIdRelationEditorView.processMetadata
-    });
+    },
 
-    return MultiRelationEditorView;
+    formatRawValue: function(value) {
+        value = this.parseRawValue(value);
+        if (value !== null && value && value.data) {
+            value = value.data;
+        } else {
+            value = [];
+        }
+        return value.map(function(item) {
+            return item.id;
+        }).join(',');
+    },
+
+    filterInitialResultItem: function(choices) {
+        choices = _.clone(choices);
+        return choices;
+    },
+
+    addInitialResultItem: function(choices) {
+        return this.filterInitialResultItem(choices);
+    },
+
+    getSelect2Options: function() {
+        const options = MultiRelationEditorView.__super__.getSelect2Options.call(this);
+        options.multiple = true;
+        options.maximumSelectionLength = this.maximumSelectionLength;
+        return options;
+    },
+
+    parseRawValue: function(value) {
+        if (_.isString(value)) {
+            value = JSON.parse(value);
+        }
+        if (value === null || value === void 0) {
+            // assume empty
+            value = {
+                count: 0,
+                data: []
+            };
+        }
+        return value;
+    },
+
+    getValue: function() {
+        const select2Value = this.$('input[name=value]').val();
+        let ids;
+        if (select2Value !== '') {
+            ids = select2Value.split(',').map(function(id) {
+                return parseInt(id);
+            });
+        } else {
+            ids = [];
+        }
+        return {
+            data: ids.map(function(id) {
+                return {
+                    id: id
+                };
+            }),
+            count: ids.length
+        };
+    },
+
+    getServerUpdateData: function() {
+        const data = {};
+        data[this.fieldName] = this.getValue();
+        return data;
+    },
+
+    getModelUpdateData: function() {
+        return this.getServerUpdateData();
+    }
+}, {
+    DEFAULT_ACCESSOR_CLASS: 'oroentity/js/tools/entity-select-search-api-accessor',
+    processColumnMetadata: RelatedIdRelationEditorView.processMetadata
 });
+
+export default MultiRelationEditorView;

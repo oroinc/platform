@@ -2,3 +2,21 @@ services:
   Twig\Environment:
     public: true
     alias: 'twig'
+
+  oro_test.behat.cache:
+    public: false
+    parent: oro.data.cache
+    tags:
+      - { name: 'cache.pool', namespace: 'oro_behat_tags' }
+
+  oro_test.behat.feature:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\BehatFeature
+    public: true
+    arguments:
+      - '@oro_test.behat.cache'
+
+  oro_test.behat.feature_tag_aware_factory:
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Factory\FeatureTagAwareFactory
+      public: false
+      arguments:
+          - '@oro_test.behat.feature'

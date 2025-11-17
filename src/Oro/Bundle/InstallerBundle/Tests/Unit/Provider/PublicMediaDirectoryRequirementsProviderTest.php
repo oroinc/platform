@@ -3,32 +3,28 @@
 namespace Oro\Bundle\InstallerBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\InstallerBundle\Provider\PublicMediaDirectoryRequirementsProvider;
+use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Requirements\RequirementCollection;
 
 class PublicMediaDirectoryRequirementsProviderTest extends TestCase
 {
+    use TempDirExtension;
+
     private string $mediaDirectory;
+    private string $tempDir;
     private PublicMediaDirectoryRequirementsProvider $provider;
 
     #[\Override]
     protected function setUp(): void
     {
-        $projectDirectory = sys_get_temp_dir();
+        $projectDirectory = $this->getTempDir('public_media_dir_requirements_provider');
         $this->mediaDirectory = '/public/media';
 
         $this->provider = new PublicMediaDirectoryRequirementsProvider($projectDirectory);
 
-        $this->tempDir = sys_get_temp_dir() . $this->mediaDirectory;
+        $this->tempDir = $projectDirectory . $this->mediaDirectory;
         mkdir($this->tempDir, 0777, true);
-    }
-
-    #[\Override]
-    protected function tearDown(): void
-    {
-        chmod($this->tempDir, 0777);
-        rmdir($this->tempDir);
-        rmdir(sys_get_temp_dir() . '/public');
     }
 
     public function testGetOroRequirements(): void

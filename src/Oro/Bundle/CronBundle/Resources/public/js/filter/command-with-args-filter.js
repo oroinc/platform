@@ -1,16 +1,12 @@
-define([
-    'oro/filter/choice-filter'
-], function(ChoiceFilter) {
-    'use strict';
+import ChoiceFilter from 'oro/filter/choice-filter';
 
-    const CommandWithArgsFilter = ChoiceFilter.extend({
-        /**
-         * @inheritdoc
-         */
-        constructor: function CommandWithArgsFilter(options) {
-            CommandWithArgsFilter.__super__.constructor.call(this, options);
-        }
-    });
-
-    return CommandWithArgsFilter;
+const CommandWithArgsFilter = ChoiceFilter.extend({
+    /**
+     * @inheritdoc
+     */
+    constructor: function CommandWithArgsFilter(options) {
+        CommandWithArgsFilter.__super__.constructor.call(this, options);
+    }
 });
+
+export default CommandWithArgsFilter;

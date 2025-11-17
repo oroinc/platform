@@ -1,61 +1,57 @@
-define(function(require) {
-    'use strict';
+import _ from 'underscore';
+import ModelAction from 'oro/datagrid/action/model-action';
+import ButtonManager from 'oroaction/js/button-manager';
 
-    const _ = require('underscore');
-    const ModelAction = require('oro/datagrid/action/model-action');
-    const ButtonManager = require('oroaction/js/button-manager');
+const ButtonWidgetAction = ModelAction.extend({
 
-    const ButtonWidgetAction = ModelAction.extend({
+    /**
+     * @property {Object}
+     */
+    options: {
+        operationName: null
+    },
 
-        /**
-         * @property {Object}
-         */
-        options: {
-            operationName: null
-        },
+    /**
+     * @property {ButtonManager}
+     */
+    buttonManager: null,
 
-        /**
-         * @property {ButtonManager}
-         */
-        buttonManager: null,
+    /**
+     * @inheritdoc
+     */
+    constructor: function ButtonWidgetAction(options) {
+        ButtonWidgetAction.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function ButtonWidgetAction(options) {
-            ButtonWidgetAction.__super__.constructor.call(this, options);
-        },
+    /**
+     * @inheritdoc
+     */
+    initialize: function(options) {
+        ButtonWidgetAction.__super__.initialize.call(this, options);
+        const buttonOptions = _.extend({action: _.pick(this, 'name', 'label')}, this.configuration);
+        this.buttonManager = new ButtonManager(buttonOptions);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        initialize: function(options) {
-            ButtonWidgetAction.__super__.initialize.call(this, options);
-            const buttonOptions = _.extend({action: _.pick(this, 'name', 'label')}, this.configuration);
-            this.buttonManager = new ButtonManager(buttonOptions);
-        },
+    /**
+     * @inheritdoc
+     */
+    run: function() {
+        this.buttonManager.execute();
+    },
 
-        /**
-         * @inheritdoc
-         */
-        run: function() {
-            this.buttonManager.execute();
-        },
-
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-
-            if (_.isFunction(this.buttonManager.dispose)) {
-                this.buttonManager.dispose();
-            }
-
-            delete this.buttonManager;
-
-            ButtonWidgetAction.__super__.dispose.call(this);
+    dispose: function() {
+        if (this.disposed) {
+            return;
         }
-    });
 
-    return ButtonWidgetAction;
+        if (_.isFunction(this.buttonManager.dispose)) {
+            this.buttonManager.dispose();
+        }
+
+        delete this.buttonManager;
+
+        ButtonWidgetAction.__super__.dispose.call(this);
+    }
 });
+
+export default ButtonWidgetAction;

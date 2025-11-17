@@ -6,26 +6,27 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\DistributionBundle\Provider\PublicDirectoryProvider;
 use Oro\Bundle\UIBundle\Twig\AssetSourceExtension;
+use Oro\Component\Testing\TempDirExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
 
 final class AssetSourceExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
+    use TempDirExtension;
 
     private string $testDir;
-
     private AssetSourceExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
-        $this->testDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('asset_source_test_', true);
+        $this->testDir = $this->getTempDir('asset_source_extension');
         mkdir($this->testDir . '/public', 0777, true);
 
         $publicDirectoryProvider = $this->createMock(PublicDirectoryProvider::class);
 
-        $publicDirectoryProvider
+        $publicDirectoryProvider->expects(self::any())
             ->method('getPublicDirectory')
             ->willReturn($this->testDir . '/public');
 
@@ -34,11 +35,6 @@ final class AssetSourceExtensionTest extends TestCase
                 ->add('oro_distribution.provider.public_directory_provider', $publicDirectoryProvider)
                 ->getContainer($this)
         );
-    }
-
-    protected function tearDown(): void
-    {
-        $this->removeDirectory($this->testDir);
     }
 
     public function testGetFunctions(): void
@@ -61,11 +57,7 @@ final class AssetSourceExtensionTest extends TestCase
 
         self::assertSame(
             $content,
-            self::callTwigFunction(
-                $this->extension,
-                'asset_source',
-                [$relativePath]
-            )
+            self::callTwigFunction($this->extension, 'asset_source', [$relativePath])
         );
     }
 
@@ -73,11 +65,7 @@ final class AssetSourceExtensionTest extends TestCase
     {
         self::assertSame(
             '',
-            self::callTwigFunction(
-                $this->extension,
-                'asset_source',
-                ['nonexistent/file.css']
-            )
+            self::callTwigFunction($this->extension, 'asset_source', ['nonexistent/file.css'])
         );
     }
 
@@ -92,11 +80,7 @@ final class AssetSourceExtensionTest extends TestCase
 
         self::assertSame(
             '',
-            self::callTwigFunction(
-                $this->extension,
-                'asset_source',
-                [$relativePath]
-            )
+            self::callTwigFunction($this->extension, 'asset_source', [$relativePath])
         );
 
         chmod($fullPath, 0644);
@@ -110,19 +94,9 @@ final class AssetSourceExtensionTest extends TestCase
 
         self::assertSame(
             '',
-            self::callTwigFunction(
-                $this->extension,
-                'asset_source',
-                [$outsidePath]
-            )
+            self::callTwigFunction($this->extension, 'asset_source', [$outsidePath])
         );
 
         unlink($outsideFullPath);
-    }
-
-    private function removeDirectory(string $dir): void
-    {
-        $filesystem = new Filesystem();
-        $filesystem->remove($dir);
     }
 }

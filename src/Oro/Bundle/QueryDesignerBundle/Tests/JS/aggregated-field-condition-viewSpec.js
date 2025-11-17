@@ -1,121 +1,117 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery';
+import Backbone from 'backbone';
+import jsmoduleExposure from 'jsmodule-exposure';
+import data from './Fixture/aggregated-field-condition/entities.json';
+import filters from './Fixture/aggregated-field-condition/filters.json';
+import columnsData from './Fixture/aggregated-field-condition/columnsData.json';
+import FieldConditionView from 'oroquerydesigner/js/app/views/field-condition-view';
+import FieldChoiceMock from './Fixture/field-condition/field-choice-mock';
+import AggregatedFieldConditionView from 'oroquerydesigner/js/app/views/aggregated-field-condition-view';
+import 'jasmine-jquery';
 
-    const $ = require('jquery');
-    const Backbone = require('backbone');
-    const jsmoduleExposure = require('jsmodule-exposure');
-    const data = require('./Fixture/aggregated-field-condition/entities.json');
-    const filters = require('./Fixture/aggregated-field-condition/filters.json');
-    const columnsData = require('./Fixture/aggregated-field-condition/columnsData.json');
-    const FieldConditionView = require('oroquerydesigner/js/app/views/field-condition-view');
-    const FieldChoiceMock = require('./Fixture/field-condition/field-choice-mock');
-    const AggregatedFieldConditionView = require('oroquerydesigner/js/app/views/aggregated-field-condition-view');
-    require('jasmine-jquery');
+const exposure = jsmoduleExposure.disclose('oroquerydesigner/js/app/views/field-condition-view');
 
-    const exposure = jsmoduleExposure.disclose('oroquerydesigner/js/app/views/field-condition-view');
+xdescribe('oroquerydesigner/js/app/views/aggregated-field-condition-view', function() {
+    let aggregatedFieldConditionView;
 
-    xdescribe('oroquerydesigner/js/app/views/aggregated-field-condition-view', function() {
-        let aggregatedFieldConditionView;
-
-        describe('without initial value', function() {
-            let columnsCollection;
-            beforeEach(function(done) {
-                FieldChoiceMock.setData(data);
-                exposure.substitute('FieldChoiceView').by(FieldChoiceMock);
-                columnsCollection = new Backbone.Collection(columnsData);
-                aggregatedFieldConditionView = new AggregatedFieldConditionView({
-                    autoRender: true,
-                    filters: filters,
-                    columnsCollection: columnsCollection,
-                    fieldChoice: {
-                        entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account'
-                    }
-                });
-                window.setFixtures(aggregatedFieldConditionView.$el);
-                $.when(aggregatedFieldConditionView.deferredRender).then(function() {
-                    done();
-                });
+    describe('without initial value', function() {
+        let columnsCollection;
+        beforeEach(function(done) {
+            FieldChoiceMock.setData(data);
+            exposure.substitute('FieldChoiceView').by(FieldChoiceMock);
+            columnsCollection = new Backbone.Collection(columnsData);
+            aggregatedFieldConditionView = new AggregatedFieldConditionView({
+                autoRender: true,
+                filters: filters,
+                columnsCollection: columnsCollection,
+                fieldChoice: {
+                    entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account'
+                }
             });
-
-            afterEach(function() {
-                aggregatedFieldConditionView.dispose();
-                exposure.recover('FieldChoiceView');
-                delete FieldChoiceMock.lastCreatedInstance;
-            });
-
-            it('is instance of FieldConditionView', function() {
-                expect(aggregatedFieldConditionView).toEqual(jasmine.any(FieldConditionView));
+            window.setFixtures(aggregatedFieldConditionView.$el);
+            $.when(aggregatedFieldConditionView.deferredRender).then(function() {
+                done();
             });
         });
 
-        describe('with initial value', function() {
-            let columnsCollection;
-            const initialValue = {
-                columnName: 'id',
-                criterion: {
-                    filter: 'number',
-                    data: {
-                        value: 1,
-                        type: '3',
-                        params: {
-                            filter_by_having: true
-                        }
+        afterEach(function() {
+            aggregatedFieldConditionView.dispose();
+            exposure.recover('FieldChoiceView');
+            delete FieldChoiceMock.lastCreatedInstance;
+        });
+
+        it('is instance of FieldConditionView', function() {
+            expect(aggregatedFieldConditionView).toEqual(jasmine.any(FieldConditionView));
+        });
+    });
+
+    describe('with initial value', function() {
+        let columnsCollection;
+        const initialValue = {
+            columnName: 'id',
+            criterion: {
+                filter: 'number',
+                data: {
+                    value: 1,
+                    type: '3',
+                    params: {
+                        filter_by_having: true
                     }
+                }
+            },
+            func: {
+                name: 'Count',
+                group_type: 'aggregates',
+                group_name: 'number'
+            },
+            criteria: 'aggregated-condition-item'
+        };
+
+        beforeEach(function(done) {
+            FieldChoiceMock.setData(data);
+            exposure.substitute('FieldChoiceView').by(FieldChoiceMock);
+            columnsCollection = new Backbone.Collection(columnsData);
+            aggregatedFieldConditionView = new AggregatedFieldConditionView({
+                autoRender: true,
+                filters: filters,
+                columnsCollection: columnsCollection,
+                fieldChoice: {
+                    entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account'
                 },
-                func: {
-                    name: 'Count',
-                    group_type: 'aggregates',
-                    group_name: 'number'
-                },
-                criteria: 'aggregated-condition-item'
-            };
-
-            beforeEach(function(done) {
-                FieldChoiceMock.setData(data);
-                exposure.substitute('FieldChoiceView').by(FieldChoiceMock);
-                columnsCollection = new Backbone.Collection(columnsData);
-                aggregatedFieldConditionView = new AggregatedFieldConditionView({
-                    autoRender: true,
-                    filters: filters,
-                    columnsCollection: columnsCollection,
-                    fieldChoice: {
-                        entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account'
-                    },
-                    value: initialValue
-                });
-                window.setFixtures(aggregatedFieldConditionView.$el);
-                $.when(aggregatedFieldConditionView.deferredRender).then(function() {
-                    done();
-                });
+                value: initialValue
             });
-
-            afterEach(function() {
-                aggregatedFieldConditionView.dispose();
-                exposure.recover('FieldChoiceView');
-                delete FieldChoiceMock.lastCreatedInstance;
+            window.setFixtures(aggregatedFieldConditionView.$el);
+            $.when(aggregatedFieldConditionView.deferredRender).then(function() {
+                done();
             });
+        });
 
-            it('shows a filter with value', function() {
-                const filterValue = aggregatedFieldConditionView.filter.getValue();
-                expect(filterValue.value).toBe(initialValue.criterion.data.value);
-            });
+        afterEach(function() {
+            aggregatedFieldConditionView.dispose();
+            exposure.recover('FieldChoiceView');
+            delete FieldChoiceMock.lastCreatedInstance;
+        });
 
-            it('triggers a \'close\' event when related column was deleted', function(done) {
-                aggregatedFieldConditionView.on('close', function() {
-                    expect(aggregatedFieldConditionView.filter).not.toBeDefined();
-                    done();
-                });
-                const columnWithFunction = columnsCollection.at(1);
-                columnsCollection.remove(columnWithFunction);
-            });
+        it('shows a filter with value', function() {
+            const filterValue = aggregatedFieldConditionView.filter.getValue();
+            expect(filterValue.value).toBe(initialValue.criterion.data.value);
+        });
 
-            it('triggers a \'close\' event when label of related column was changed', function(done) {
-                aggregatedFieldConditionView.on('close', function() {
-                    expect(aggregatedFieldConditionView.filter).not.toBeDefined();
-                    done();
-                });
-                columnsCollection.at(1).set('label', 'test');
+        it('triggers a \'close\' event when related column was deleted', function(done) {
+            aggregatedFieldConditionView.on('close', function() {
+                expect(aggregatedFieldConditionView.filter).not.toBeDefined();
+                done();
             });
+            const columnWithFunction = columnsCollection.at(1);
+            columnsCollection.remove(columnWithFunction);
+        });
+
+        it('triggers a \'close\' event when label of related column was changed', function(done) {
+            aggregatedFieldConditionView.on('close', function() {
+                expect(aggregatedFieldConditionView.filter).not.toBeDefined();
+                done();
+            });
+            columnsCollection.at(1).set('label', 'test');
         });
     });
 });

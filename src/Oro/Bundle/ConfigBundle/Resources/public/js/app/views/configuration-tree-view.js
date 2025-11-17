@@ -1,58 +1,54 @@
-define(function(require) {
-    'use strict';
+import _ from 'underscore';
+import $ from 'jquery';
+import tools from 'oroui/js/tools';
+import routing from 'routing';
+import BaseTreeView from 'oroui/js/app/views/jstree/base-tree-view';
 
-    const _ = require('underscore');
-    const $ = require('jquery');
-    const tools = require('oroui/js/tools');
-    const routing = require('routing');
-    const BaseTreeView = require('oroui/js/app/views/jstree/base-tree-view');
+const ConfigurationTreeView = BaseTreeView.extend({
+    autoSelectFoundNode: true,
 
-    const ConfigurationTreeView = BaseTreeView.extend({
-        autoSelectFoundNode: true,
+    /**
+     * @inheritdoc
+     */
+    constructor: function ConfigurationTreeView(options) {
+        ConfigurationTreeView.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function ConfigurationTreeView(options) {
-            ConfigurationTreeView.__super__.constructor.call(this, options);
-        },
+    isNodeHasHandler: function(node) {
+        return node.children.length === 0;
+    },
 
-        isNodeHasHandler: function(node) {
-            return node.children.length === 0;
-        },
+    redirect: function(node) {
+        const parent = _.last(_.without(node.parents, '#'));
+        const routeParams = _.extend({}, this.onSelectRouteParameters, {
+            activeGroup: parent + '/' + node.id
+        });
 
-        redirect: function(node) {
-            const parent = _.last(_.without(node.parents, '#'));
-            const routeParams = _.extend({}, this.onSelectRouteParameters, {
-                activeGroup: parent + '/' + node.id
-            });
-
-            const state = tools.unpackFromQueryString(location.search)[this.viewGroup] || {};
-            if (_.isUndefined(routeParams[this.viewGroup])) {
-                routeParams[this.viewGroup] = state;
-            }
-            const url = routing.generate(this.onSelectRoute, routeParams);
-            // simulate click on real link to check page state
-            const $link = $('<a>').attr('href', url);
-            this.$tree.before($link);
-            $link.trigger('click').remove();
-        },
-
-        onSelect: function(e, selected) {
-            if (this.initialization) {
-                return;
-            } else if (!this.isNodeHasHandler(selected.node)) {
-                return this._toggleParentNode(selected);
-            }
-
-            return this.redirect(selected.node);
-        },
-
-        _toggleParentNode: function(selected) {
-            this.jsTreeInstance.toggle_node(selected.node);
-            this.jsTreeInstance.deselect_node(selected.selected);
+        const state = tools.unpackFromQueryString(location.search)[this.viewGroup] || {};
+        if (_.isUndefined(routeParams[this.viewGroup])) {
+            routeParams[this.viewGroup] = state;
         }
-    });
+        const url = routing.generate(this.onSelectRoute, routeParams);
+        // simulate click on real link to check page state
+        const $link = $('<a>').attr('href', url);
+        this.$tree.before($link);
+        $link.trigger('click').remove();
+    },
 
-    return ConfigurationTreeView;
+    onSelect: function(e, selected) {
+        if (this.initialization) {
+            return;
+        } else if (!this.isNodeHasHandler(selected.node)) {
+            return this._toggleParentNode(selected);
+        }
+
+        return this.redirect(selected.node);
+    },
+
+    _toggleParentNode: function(selected) {
+        this.jsTreeInstance.toggle_node(selected.node);
+        this.jsTreeInstance.deselect_node(selected.selected);
+    }
 });
+
+export default ConfigurationTreeView;

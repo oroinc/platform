@@ -4,13 +4,11 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Manager\File;
 
 use Oro\Bundle\AttachmentBundle\Manager\File\TemporaryFile;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\Testing\TempDirExtension;
 
 class TemporaryFileTest extends WebTestCase
 {
-    /**
-     * @var string
-     */
-    private $tmpFilePath;
+    use TempDirExtension;
 
     #[\Override]
     protected function setUp(): void
@@ -18,26 +16,16 @@ class TemporaryFileTest extends WebTestCase
         $this->initClient([], self::generateBasicAuthHeader());
     }
 
-    #[\Override]
-    protected function tearDown(): void
-    {
-        if (file_exists($this->tmpFilePath)) {
-            unlink($this->tmpFilePath);
-        }
-
-        parent::tearDown();
-    }
-
     public function testFileIsRemoved(): void
     {
-        $cachePath = self::getContainer()->getParameter('kernel.cache_dir');
-        $this->tmpFilePath = tempnam($cachePath, 'tmp');
+        $filePath = $this->getTempFile('attachment_temporary_file');
+        touch($filePath);
 
-        self::assertTrue(file_exists($this->tmpFilePath));
+        self::assertFileExists($filePath);
 
-        $file = new TemporaryFile($this->tmpFilePath);
+        $file = new TemporaryFile($filePath);
         $file = null;
 
-        self::assertFalse(file_exists($this->tmpFilePath));
+        self::assertFileDoesNotExist($filePath);
     }
 }

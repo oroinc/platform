@@ -7,11 +7,22 @@ use Oro\Bundle\ApiBundle\Exception\InvalidFilterValueException;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
- * A filter that can be used to specify the page number.
+ * A filter that can be used to specify the page number or the number of the first record in the response.
  * @see \Oro\Bundle\ApiBundle\Filter\FilterNames::getPageNumberFilterName
  */
 class PageNumberFilter extends StandaloneFilterWithDefaultValue
 {
+    private bool $isFirstRecordNumber = false;
+
+    /**
+     * Changes the behaviour of the filter to use the number of the first record
+     * in the response instead of the page number.
+     */
+    public function useFirstRecordNumber(bool $isFirstRecordNumber = true): void
+    {
+        $this->isFirstRecordNumber = $isFirstRecordNumber;
+    }
+
     #[\Override]
     public function apply(Criteria $criteria, ?FilterValue $value = null): void
     {
@@ -24,7 +35,11 @@ class PageNumberFilter extends StandaloneFilterWithDefaultValue
             }
             $pageSize = $criteria->getMaxResults();
             if (null !== $pageSize) {
-                $criteria->setFirstResult(QueryBuilderUtil::getPageOffset($val, $pageSize));
+                $criteria->setFirstResult(
+                    $this->isFirstRecordNumber
+                        ? $val - 1
+                        : QueryBuilderUtil::getPageOffset($val, $pageSize)
+                );
             }
         }
     }

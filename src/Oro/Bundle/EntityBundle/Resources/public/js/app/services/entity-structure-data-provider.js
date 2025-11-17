@@ -2,13 +2,13 @@ define(function(require) {
     'use strict';
 
     const _ = require('underscore');
-    const EntityError = require('oroentity/js/entity-error');
-    const errorHandler = require('oroentity/js/app/services/entity-structure-error-handler');
-    const EntityTreeNode = require('oroentity/js/app/services/entity-tree-node');
+    const EntityError = require('oroentity/js/entity-error').default;
+    const errorHandler = require('oroentity/js/app/services/entity-structure-error-handler').default;
+    const EntityTreeNode = require('oroentity/js/app/services/entity-tree-node').default;
     /** @type {Registry} */
     const registry = require('oroui/js/app/services/registry');
     const EntityStructuresCollection = require('oroentity/js/app/models/entitystructures-collection');
-    const fieldFilterers = require('oroentity/js/app/services/entity-field-filterers');
+    const fieldFilterers = require('oroentity/js/app/services/entity-field-filterers').default;
     const BaseClass = require('oroui/js/base-class');
 
     /**

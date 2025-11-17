@@ -1,118 +1,114 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery';
+import _ from 'underscore';
 
-    const $ = require('jquery');
-    const _ = require('underscore');
+const DataGridThemeOptionsManager = {
+    defaults: {
+        optionPrefix: '',
+        tagName: '',
+        className: '',
+        hide: false,
+        template: null,
+        templateSelector: null,
+        el: null,
+        elFilter: null
+    },
 
-    const DataGridThemeOptionsManager = {
-        defaults: {
-            optionPrefix: '',
-            tagName: '',
-            className: '',
-            hide: false,
-            template: null,
-            templateSelector: null,
-            el: null,
-            elFilter: null
-        },
+    createConfigurator: function(gridThemeOptions) {
+        const configurator = _.extend({
+            gridThemeOptions: gridThemeOptions
+        }, this);
+        return configurator.configure.bind(configurator);
+    },
 
-        createConfigurator: function(gridThemeOptions) {
-            const configurator = _.extend({
-                gridThemeOptions: gridThemeOptions
-            }, this);
-            return configurator.configure.bind(configurator);
-        },
+    configure: function(view, options, parentView) {
+        const themeOptions = options.themeOptions = $.extend(
+            true,
+            {},
+            this.defaults,
+            view.prototype.themeOptions || {},
+            options.themeOptions || {},
+            this.gridThemeOptions
+        );
 
-        configure: function(view, options, parentView) {
-            const themeOptions = options.themeOptions = $.extend(
-                true,
-                {},
-                this.defaults,
-                view.prototype.themeOptions || {},
-                options.themeOptions || {},
-                this.gridThemeOptions
-            );
-
-            const optionPrefix = themeOptions.optionPrefix;
-            if (optionPrefix) {
-                _.each(themeOptions, function(value, option) {
-                    if (optionPrefix && option.indexOf(optionPrefix) === 0) {
-                        delete themeOptions[option];
-                        option = option.replace(optionPrefix, '');
-                        option = option.charAt(0).toLowerCase() + option.slice(1);// transform: SomeOption > someOption
-                        themeOptions[option] = value;
-                    }
-                });
-            }
-
-            _.each(themeOptions, (value, option) => {
-                const configurator = option + 'Option';
-                if (_.isFunction(this[configurator])) {
-                    this[configurator](view, options, value, parentView);
+        const optionPrefix = themeOptions.optionPrefix;
+        if (optionPrefix) {
+            _.each(themeOptions, function(value, option) {
+                if (optionPrefix && option.indexOf(optionPrefix) === 0) {
+                    delete themeOptions[option];
+                    option = option.replace(optionPrefix, '');
+                    option = option.charAt(0).toLowerCase() + option.slice(1);// transform: SomeOption > someOption
+                    themeOptions[option] = value;
                 }
             });
-        },
-
-        mergeOption: function(view, options, key, value, mergeCallback) {
-            if (!value) {
-                return;
-            }
-
-            if (options[key] === undefined) {
-                options[key] = view.prototype[key];
-            }
-
-            if (_.isFunction(options[key])) {
-                const oldValueFunction = options[key];
-                options[key] = function() {
-                    const oldValue = oldValueFunction.call(this);
-                    return mergeCallback(oldValue, value);
-                };
-            } else {
-                options[key] = mergeCallback(options[key], value);
-            }
-        },
-
-        tagNameOption: function(view, options, tagName) {
-            if (tagName) {
-                options.tagName = tagName;
-            }
-        },
-
-        attributesOption: function(view, options, attributes) {
-            this.mergeOption(view, options, 'attributes', attributes, function(option, themeOption) {
-                return $.extend(true, {}, option || {}, themeOption);
-            });
-        },
-
-        classNameOption: function(view, options, className) {
-            this.mergeOption(view, options, 'className', className, function(option, themeOption) {
-                return (option ? option + ' ' : '') + themeOption;
-            });
-        },
-
-        templateOption: function(view, options, template) {
-            if (template) {
-                options.template = _.template(template);
-            }
-        },
-
-        templateSelectorOption: function(view, options, template) {
-            if (template) {
-                options.template = _.template($(template).html());
-            }
-        },
-
-        elOption: function(view, options, el, parentView) {
-            if (el) {
-                el = parentView.$el.find(el);
-                if (options.elFilter) {
-                    el = el.filter(options.elFilter);
-                }
-                options.el = el.get(0) || null;
-            }
         }
-    };
 
-    return DataGridThemeOptionsManager;
-});
+        _.each(themeOptions, (value, option) => {
+            const configurator = option + 'Option';
+            if (_.isFunction(this[configurator])) {
+                this[configurator](view, options, value, parentView);
+            }
+        });
+    },
+
+    mergeOption: function(view, options, key, value, mergeCallback) {
+        if (!value) {
+            return;
+        }
+
+        if (options[key] === undefined) {
+            options[key] = view.prototype[key];
+        }
+
+        if (_.isFunction(options[key])) {
+            const oldValueFunction = options[key];
+            options[key] = function() {
+                const oldValue = oldValueFunction.call(this);
+                return mergeCallback(oldValue, value);
+            };
+        } else {
+            options[key] = mergeCallback(options[key], value);
+        }
+    },
+
+    tagNameOption: function(view, options, tagName) {
+        if (tagName) {
+            options.tagName = tagName;
+        }
+    },
+
+    attributesOption: function(view, options, attributes) {
+        this.mergeOption(view, options, 'attributes', attributes, function(option, themeOption) {
+            return $.extend(true, {}, option || {}, themeOption);
+        });
+    },
+
+    classNameOption: function(view, options, className) {
+        this.mergeOption(view, options, 'className', className, function(option, themeOption) {
+            return (option ? option + ' ' : '') + themeOption;
+        });
+    },
+
+    templateOption: function(view, options, template) {
+        if (template) {
+            options.template = _.template(template);
+        }
+    },
+
+    templateSelectorOption: function(view, options, template) {
+        if (template) {
+            options.template = _.template($(template).html());
+        }
+    },
+
+    elOption: function(view, options, el, parentView) {
+        if (el) {
+            el = parentView.$el.find(el);
+            if (options.elFilter) {
+                el = el.filter(options.elFilter);
+            }
+            options.el = el.get(0) || null;
+        }
+    }
+};
+
+export default DataGridThemeOptionsManager;

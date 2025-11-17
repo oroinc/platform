@@ -1,59 +1,55 @@
-define(function(require) {
-    'use strict';
+import BaseView from 'oroui/js/app/views/base/view';
+import _ from 'underscore';
+import ImportExportManager from 'oroimportexport/js/importexport-manager';
 
-    const BaseView = require('oroui/js/app/views/base/view');
-    const _ = require('underscore');
-    const ImportExportManager = require('oroimportexport/js/importexport-manager');
+const ExportButtonView = BaseView.extend({
+    /**
+     * @property {Object}
+     */
+    options: {
+        entity: null,
+        routeOptions: {},
+        exportTitle: 'Export',
+        exportProcessor: null,
+        exportJob: null,
+        isExportPopupRequired: false,
+        filePrefix: null
+    },
 
-    const ExportButtonView = BaseView.extend({
-        /**
-         * @property {Object}
-         */
-        options: {
-            entity: null,
-            routeOptions: {},
-            exportTitle: 'Export',
-            exportProcessor: null,
-            exportJob: null,
-            isExportPopupRequired: false,
-            filePrefix: null
-        },
+    /**
+     * @property {ImportExportManager}
+     */
+    importExportManager: null,
 
-        /**
-         * @property {ImportExportManager}
-         */
-        importExportManager: null,
+    /**
+     * @inheritdoc
+     */
+    constructor: function ExportButtonView(options) {
+        ExportButtonView.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function ExportButtonView(options) {
-            ExportButtonView.__super__.constructor.call(this, options);
-        },
+    /**
+     * @inheritdoc
+     */
+    initialize: function(options) {
+        this.options = _.defaults(options || {}, this.options);
 
-        /**
-         * @inheritdoc
-         */
-        initialize: function(options) {
-            this.options = _.defaults(options || {}, this.options);
-
-            if (!this.options.exportProcessor) {
-                return;
-            }
-
-            this.$el.on('click' + this.eventNamespace(), this.onExportClick.bind(this));
-            this.importExportManager = new ImportExportManager(this.options);
-        },
-
-        /**
-         * @param {jQuery.Event} e
-         */
-        onExportClick: function(e) {
-            e.preventDefault();
-
-            this.importExportManager.handleExport();
+        if (!this.options.exportProcessor) {
+            return;
         }
-    });
 
-    return ExportButtonView;
+        this.$el.on('click' + this.eventNamespace(), this.onExportClick.bind(this));
+        this.importExportManager = new ImportExportManager(this.options);
+    },
+
+    /**
+     * @param {jQuery.Event} e
+     */
+    onExportClick: function(e) {
+        e.preventDefault();
+
+        this.importExportManager.handleExport();
+    }
 });
+
+export default ExportButtonView;

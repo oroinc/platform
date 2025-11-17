@@ -1,34 +1,30 @@
-define(function(require) {
-    'use strict';
+import BaseComponent from 'oroui/js/app/components/base/component';
+import $ from 'jquery';
 
-    const BaseComponent = require('oroui/js/app/components/base/component');
-    const $ = require('jquery');
+const PasswordGenerateComponent = BaseComponent.extend({
+    /**
+     * @inheritdoc
+     */
+    constructor: function PasswordGenerateComponent(options) {
+        PasswordGenerateComponent.__super__.constructor.call(this, options);
+    },
 
-    const PasswordGenerateComponent = BaseComponent.extend({
-        /**
-         * @inheritdoc
-         */
-        constructor: function PasswordGenerateComponent(options) {
-            PasswordGenerateComponent.__super__.constructor.call(this, options);
-        },
+    initialize: function(options) {
+        this.$el = $(options.checkbox);
+        this.passwordInput = $(options.passwordInput);
 
-        initialize: function(options) {
-            this.$el = $(options.checkbox);
-            this.passwordInput = $(options.passwordInput);
+        this.togglePassword();
 
-            this.togglePassword();
+        this.$el.on('click', this.togglePassword.bind(this));
+    },
 
-            this.$el.on('click', this.togglePassword.bind(this));
-        },
-
-        togglePassword: function() {
-            if (this.$el.is(':checked')) {
-                this.passwordInput.attr('disabled', true);
-            } else {
-                this.passwordInput.attr('disabled', false);
-            }
+    togglePassword: function() {
+        if (this.$el.is(':checked')) {
+            this.passwordInput.attr('disabled', true);
+        } else {
+            this.passwordInput.attr('disabled', false);
         }
-    });
-
-    return PasswordGenerateComponent;
+    }
 });
+
+export default PasswordGenerateComponent;

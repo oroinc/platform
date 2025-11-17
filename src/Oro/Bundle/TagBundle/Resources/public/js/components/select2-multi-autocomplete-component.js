@@ -3,7 +3,7 @@ define(function(require) {
 
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
-    const Select2AutocompleteComponent = require('oro/select2-autocomplete-component');
+    const Select2AutocompleteComponent = require('oro/select2-autocomplete-component').default;
 
     const Select2MultiAutocompleteComponent = Select2AutocompleteComponent.extend({
         oroTagCreateGranted: false,

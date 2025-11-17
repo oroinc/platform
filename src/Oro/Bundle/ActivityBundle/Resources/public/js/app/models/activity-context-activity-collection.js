@@ -1,38 +1,34 @@
-define(function(require) {
-    'use strict';
+import ActivityContextActivityModel from './activity-context-activity-model';
+import BaseCollection from 'oroui/js/app/models/base/collection';
 
-    const ActivityContextActivityModel = require('./activity-context-activity-model');
-    const BaseCollection = require('oroui/js/app/models/base/collection');
+/**
+ * @export  oroactivity/js/app/models/activity-context-collection
+ */
+const ActivityContextActivityCollection = BaseCollection.extend({
+    route: null,
+
+    routeId: null,
+
+    includeNonEntity: false,
+
+    includeSystemTemplates: true,
+
+    url: null,
+
+    model: function(attributes, options) {
+        if (typeof options.deleteRoute !== 'undefined') {
+            options.route = options.deleteRoute;
+            delete options.deleteRoute;
+        }
+        return new ActivityContextActivityModel(attributes, options);
+    },
 
     /**
-     * @export  oroactivity/js/app/models/activity-context-collection
+     * @inheritdoc
      */
-    const ActivityContextActivityCollection = BaseCollection.extend({
-        route: null,
-
-        routeId: null,
-
-        includeNonEntity: false,
-
-        includeSystemTemplates: true,
-
-        url: null,
-
-        model: function(attributes, options) {
-            if (typeof options.deleteRoute !== 'undefined') {
-                options.route = options.deleteRoute;
-                delete options.deleteRoute;
-            }
-            return new ActivityContextActivityModel(attributes, options);
-        },
-
-        /**
-         * @inheritdoc
-         */
-        constructor: function ActivityContextActivityCollection(...args) {
-            ActivityContextActivityCollection.__super__.constructor.apply(this, args);
-        }
-    });
-
-    return ActivityContextActivityCollection;
+    constructor: function ActivityContextActivityCollection(...args) {
+        ActivityContextActivityCollection.__super__.constructor.apply(this, args);
+    }
 });
+
+export default ActivityContextActivityCollection;

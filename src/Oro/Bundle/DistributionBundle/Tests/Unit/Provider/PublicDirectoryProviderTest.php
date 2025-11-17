@@ -3,25 +3,20 @@
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\DistributionBundle\Provider\PublicDirectoryProvider;
+use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\TestCase;
 
 class PublicDirectoryProviderTest extends TestCase
 {
+    use TempDirExtension;
+
     private string $projectDir;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->projectDir = sys_get_temp_dir() . '/test_project';
-        if (!is_dir($this->projectDir)) {
-            mkdir($this->projectDir, 0777, true);
-        }
-    }
-
-    #[\Override]
-    protected function tearDown(): void
-    {
-        $this->removeDirectory($this->projectDir);
+        $this->projectDir = $this->getTempDir('public_dir_provider') . '/test_project';
+        mkdir($this->projectDir, 0777, true);
     }
 
     public function testGetPublicDirectoryDefault(): void
@@ -35,7 +30,10 @@ class PublicDirectoryProviderTest extends TestCase
     {
         $composerJsonPath = $this->projectDir . '/composer.json';
 
-        file_put_contents($composerJsonPath, json_encode(['extra' => ['public-dir' => 'custom_public']]));
+        file_put_contents(
+            $composerJsonPath,
+            json_encode(['extra' => ['public-dir' => 'custom_public']], JSON_THROW_ON_ERROR)
+        );
 
         $provider = new PublicDirectoryProvider($this->projectDir);
 
@@ -58,19 +56,5 @@ class PublicDirectoryProviderTest extends TestCase
         $provider = new PublicDirectoryProvider($this->projectDir);
 
         self::assertSame($this->projectDir . '/public', $provider->getPublicDirectory());
-    }
-
-    private function removeDirectory(string $directory): void
-    {
-        if (!is_dir($directory)) {
-            return;
-        }
-
-        $files = array_diff(scandir($directory), ['.', '..']);
-        foreach ($files as $file) {
-            $filePath = $directory . '/' . $file;
-            is_dir($filePath) ? $this->removeDirectory($filePath) : unlink($filePath);
-        }
-        rmdir($directory);
     }
 }

@@ -1,130 +1,126 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery';
+import _ from 'underscore';
 
-    const $ = require('jquery');
-    const _ = require('underscore');
+// define a constructor
+const entityFieldUtil = function($el) {
+    this.$el = $el;
+};
 
-    // define a constructor
-    const entityFieldUtil = function($el) {
-        this.$el = $el;
-    };
+/**
+ * @export  oroentity/js/entity-field-choice-util
+ * @class   oroentity.EntityFieldChoiceUtil
+ */
+entityFieldUtil.prototype = {
+    /** @property */
+    optGroupTemplate: _.template(
+        '<optgroup label="<%- label %>">' +
+            '<%= options %>' +
+        '</optgroup>'
+    ),
 
-    /**
-     * @export  oroentity/js/entity-field-choice-util
-     * @class   oroentity.EntityFieldChoiceUtil
-     */
-    entityFieldUtil.prototype = {
-        /** @property */
-        optGroupTemplate: _.template(
-            '<optgroup label="<%- label %>">' +
-                '<%= options %>' +
-            '</optgroup>'
-        ),
+    /** @property */
+    optionTemplate: _.template(
+        '<option value="<%- name %>"<% _.each(_.omit(obj, ["name", "related_entity_fields"]), ' +
+            'function (val, key) { %> data-<%- key %>="<%- val %>"<% }) %>>' +
+            '<%- label %>' +
+        '</option>'
+    ),
 
-        /** @property */
-        optionTemplate: _.template(
-            '<option value="<%- name %>"<% _.each(_.omit(obj, ["name", "related_entity_fields"]), ' +
-                'function (val, key) { %> data-<%- key %>="<%- val %>"<% }) %>>' +
-                '<%- label %>' +
-            '</option>'
-        ),
+    findEntity: function(entity) {
+        return {name: entity, label: entity, plural_label: entity, icon: null};
+    },
 
-        findEntity: function(entity) {
-            return {name: entity, label: entity, plural_label: entity, icon: null};
-        },
-
-        splitFieldId: function(fieldId) {
-            const result = [];
-            if (fieldId !== '') {
-                result.push({
-                    entity: this.findEntity(this.getEntityName()),
-                    label: this._getFieldLabel(fieldId)
-                });
-            }
-            return result;
-        },
-
-        getEntityName: function() {
-            return _.isUndefined(this.$el.data('entity')) ? null : this.$el.data('entity');
-        },
-
-        changeEntity: function(entityName, fields) {
-            this.$el.data('entity', entityName);
-            const emptyItem = this.$el.find('option[value=""]');
-            this.$el.empty();
-            if (emptyItem.length > 0) {
-                this.$el.append(this.optionTemplate({name: '', label: emptyItem.text()}));
-            }
-            const content = this._buildSelectContent(fields);
-            if (content !== '') {
-                this.$el.append(content);
-            }
-            this.$el.val(this.$el.is('[multiple]') ? [] : '');
-            this.$el.trigger('change');
-        },
-
-        getFieldData: function(fieldId) {
-            return this._getOptionElement(fieldId).data();
-        },
-
-        filterData: function() {
-            this.$el.find('option').each(_.partial(function(that) {
-                if (that.exclude(that._getFieldApplicableConditions($(this).data(), that.getEntityName()))) {
-                    $(this).remove();
-                }
-            }, this));
-        },
-
-        _getFieldLabel: function(fieldId) {
-            return this._getOptionElement(fieldId).data('label');
-        },
-
-        _getFieldGroupLabel: function(fieldId) {
-            return this._getOptionElement(fieldId).parent().attr('label');
-        },
-
-        _getOptionElement: function(value) {
-            return this.$el.find('option[value="' + value.replace(/\\/g, '\\\\').replace(/:/g, '\\:') + '"]');
-        },
-
-        _getFieldApplicableConditions: function(field, entity) {
-            return _.extend({
-                entity: entity,
-                field: field.name
-            }, _.pick(field, ['type', 'identifier']));
-        },
-
-        _buildSelectContent: function(fields) {
-            let sFields = '';
-            let sRelations = '';
-            _.each(fields, field => {
-                if (_.isUndefined(field.relation_type)) {
-                    if (_.isUndefined(this.exclude) ||
-                        !this.exclude(this._getFieldApplicableConditions(field, this.getEntityName()))) {
-                        sFields += this.optionTemplate(field);
-                    }
-                } else {
-                    sRelations += this.optionTemplate(field);
-                }
+    splitFieldId: function(fieldId) {
+        const result = [];
+        if (fieldId !== '') {
+            result.push({
+                entity: this.findEntity(this.getEntityName()),
+                label: this._getFieldLabel(fieldId)
             });
-
-            if (sRelations === '') {
-                return sFields;
-            }
-            let result = '';
-            if (sFields !== '') {
-                result += this.optGroupTemplate({
-                    label: this.fieldsLabel,
-                    options: sFields
-                });
-            }
-            result += this.optGroupTemplate({
-                label: this.relatedLabel,
-                options: sRelations
-            });
-            return result;
         }
-    };
+        return result;
+    },
 
-    return entityFieldUtil;
-});
+    getEntityName: function() {
+        return _.isUndefined(this.$el.data('entity')) ? null : this.$el.data('entity');
+    },
+
+    changeEntity: function(entityName, fields) {
+        this.$el.data('entity', entityName);
+        const emptyItem = this.$el.find('option[value=""]');
+        this.$el.empty();
+        if (emptyItem.length > 0) {
+            this.$el.append(this.optionTemplate({name: '', label: emptyItem.text()}));
+        }
+        const content = this._buildSelectContent(fields);
+        if (content !== '') {
+            this.$el.append(content);
+        }
+        this.$el.val(this.$el.is('[multiple]') ? [] : '');
+        this.$el.trigger('change');
+    },
+
+    getFieldData: function(fieldId) {
+        return this._getOptionElement(fieldId).data();
+    },
+
+    filterData: function() {
+        this.$el.find('option').each(_.partial(function(that) {
+            if (that.exclude(that._getFieldApplicableConditions($(this).data(), that.getEntityName()))) {
+                $(this).remove();
+            }
+        }, this));
+    },
+
+    _getFieldLabel: function(fieldId) {
+        return this._getOptionElement(fieldId).data('label');
+    },
+
+    _getFieldGroupLabel: function(fieldId) {
+        return this._getOptionElement(fieldId).parent().attr('label');
+    },
+
+    _getOptionElement: function(value) {
+        return this.$el.find('option[value="' + value.replace(/\\/g, '\\\\').replace(/:/g, '\\:') + '"]');
+    },
+
+    _getFieldApplicableConditions: function(field, entity) {
+        return _.extend({
+            entity: entity,
+            field: field.name
+        }, _.pick(field, ['type', 'identifier']));
+    },
+
+    _buildSelectContent: function(fields) {
+        let sFields = '';
+        let sRelations = '';
+        _.each(fields, field => {
+            if (_.isUndefined(field.relation_type)) {
+                if (_.isUndefined(this.exclude) ||
+                    !this.exclude(this._getFieldApplicableConditions(field, this.getEntityName()))) {
+                    sFields += this.optionTemplate(field);
+                }
+            } else {
+                sRelations += this.optionTemplate(field);
+            }
+        });
+
+        if (sRelations === '') {
+            return sFields;
+        }
+        let result = '';
+        if (sFields !== '') {
+            result += this.optGroupTemplate({
+                label: this.fieldsLabel,
+                options: sFields
+            });
+        }
+        result += this.optGroupTemplate({
+            label: this.relatedLabel,
+            options: sRelations
+        });
+        return result;
+    }
+};
+
+export default entityFieldUtil;

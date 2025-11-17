@@ -1,49 +1,45 @@
-define(function(require) {
-    'use strict';
+import moment from 'moment';
+import datetimeFormatter from 'orolocale/js/formatter/datetime';
 
-    const moment = require('moment');
-    const datetimeFormatter = require('orolocale/js/formatter/datetime');
+function DateValueHelper(dayFormats) {
+    dayFormats = dayFormats || [datetimeFormatter.getDayFormat()];
+    dayFormats = Array.isArray(dayFormats) ? dayFormats : [dayFormats];
+    dayFormats.push(datetimeFormatter.getBackendDayFormat());
 
-    function DateValueHelper(dayFormats) {
-        dayFormats = dayFormats || [datetimeFormatter.getDayFormat()];
-        dayFormats = Array.isArray(dayFormats) ? dayFormats : [dayFormats];
-        dayFormats.push(datetimeFormatter.getBackendDayFormat());
+    this.backendFormats = {};
+    this.backendFormats[this.DAY] = datetimeFormatter.getBackendDayFormat();
+    this.backendFormats[this.MONTH] = datetimeFormatter.getBackendMonthFormat();
 
-        this.backendFormats = {};
-        this.backendFormats[this.DAY] = datetimeFormatter.getBackendDayFormat();
-        this.backendFormats[this.MONTH] = datetimeFormatter.getBackendMonthFormat();
+    this.formats = {};
+    this.formats[this.DAY] = dayFormats;
+    this.formats[this.MONTH] = ['MMM', 'MMMM', this.backendFormats[this.MONTH]];
+}
 
-        this.formats = {};
-        this.formats[this.DAY] = dayFormats;
-        this.formats[this.MONTH] = ['MMM', 'MMMM', this.backendFormats[this.MONTH]];
+DateValueHelper.prototype = {
+    DAY: 'day',
+    MONTH: 'month',
+
+    isValid: function(value) {
+        const type = this._valueType(value);
+
+        return moment(value, this.formats[type], true).isValid();
+    },
+
+    formatDisplayValue: function(rawValue) {
+        const type = this._valueType(rawValue);
+
+        return moment(rawValue, this.formats[type], true).format(this.formats[type][0]);
+    },
+
+    formatRawValue: function(displayValue) {
+        const type = this._valueType(displayValue);
+
+        return moment(displayValue, this.formats[type], true).format(this.backendFormats[type]);
+    },
+
+    _valueType: function(value) {
+        return moment(value, this.formats[this.DAY], true).isValid() ? this.DAY : this.MONTH;
     }
+};
 
-    DateValueHelper.prototype = {
-        DAY: 'day',
-        MONTH: 'month',
-
-        isValid: function(value) {
-            const type = this._valueType(value);
-
-            return moment(value, this.formats[type], true).isValid();
-        },
-
-        formatDisplayValue: function(rawValue) {
-            const type = this._valueType(rawValue);
-
-            return moment(rawValue, this.formats[type], true).format(this.formats[type][0]);
-        },
-
-        formatRawValue: function(displayValue) {
-            const type = this._valueType(displayValue);
-
-            return moment(displayValue, this.formats[type], true).format(this.backendFormats[type]);
-        },
-
-        _valueType: function(value) {
-            return moment(value, this.formats[this.DAY], true).isValid() ? this.DAY : this.MONTH;
-        }
-    };
-
-    return DateValueHelper;
-});
+export default DateValueHelper;

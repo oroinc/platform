@@ -6,28 +6,31 @@ use Oro\Bundle\SanitizeBundle\Tests\Functional\Environment\Entity\TestSanitizabl
 use Oro\Bundle\SanitizeBundle\Tests\Functional\Environment\Provider\EntityAllMetadataProviderDecorator;
 use Oro\Bundle\SanitizeBundle\Tests\Functional\Environment\Provider\Rule\FileBasedProviderDecorator;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\Testing\TempDirExtension;
 
 /**
  * @dbIsolationPerTest
  */
 class SanitizeSqlDumpTest extends WebTestCase
 {
-    private ?string $outputFile = null;
+    use TempDirExtension;
+
+    private string $outputFile;
 
     #[\Override]
     protected function setup(): void
     {
         $this->initClient();
 
-        $this->outputFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sanitize_dump.sql';
-        $metatdataProvider = $this->getContainer()->get(EntityAllMetadataProviderDecorator::class);
-        $metatdataProvider->setEntitiesToFilter([TestSanitizable::class]);
+        $this->outputFile = $this->getTempFile('sanitize_sql_dump', 'sanitize_dump'. '.sql');
+        $metadataProvider = $this->getContainer()->get(EntityAllMetadataProviderDecorator::class);
+        $metadataProvider->setEntitiesToFilter([TestSanitizable::class]);
     }
 
     /**
      * @dataProvider validCasesDataProvider
      */
-    public function testSuccessfullSanitizeSqlDumpWithoutFileOutput(
+    public function testSuccessfulSanitizeSqlDumpWithoutFileOutput(
         array $ruleConfigFiles,
         string $expectedResponse
     ): void {
@@ -43,7 +46,7 @@ class SanitizeSqlDumpTest extends WebTestCase
     /**
      * @dataProvider validCasesDataProvider
      */
-    public function testSuccessfullSanitizeSqlDumpWithFileOutput(
+    public function testSuccessfulSanitizeSqlDumpWithFileOutput(
         array $ruleConfigFiles,
         string $expectedResponse
     ): void {
@@ -80,7 +83,7 @@ class SanitizeSqlDumpTest extends WebTestCase
         ];
     }
 
-    public function testSuccessfullSanitizeSqlDumpWithSkipGuessing(): void
+    public function testSuccessfulSanitizeSqlDumpWithSkipGuessing(): void
     {
         $fileBasedRulesProvider = $this->getContainer()->get(FileBasedProviderDecorator::class);
         $fileBasedRulesProvider->setRuleFiles(['valid/config_1.yml']);
@@ -91,7 +94,7 @@ class SanitizeSqlDumpTest extends WebTestCase
         );
     }
 
-    public function testSqlValdationFailed(): void
+    public function testSqlValidationFailed(): void
     {
         $fileBasedRulesProvider = $this->getContainer()->get(FileBasedProviderDecorator::class);
         $fileBasedRulesProvider->setRuleFiles(['invalid/invalid_raw_sql_syntax.yml']);

@@ -7,6 +7,7 @@ use Oro\Bundle\AssetBundle\Cache\AssetConfigCache;
 use Oro\Bundle\AssetBundle\Command\OroAssetsBuildCommand;
 use Oro\Bundle\ThemeBundle\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Oro\Component\Testing\TempDirExtension;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -17,10 +18,11 @@ use Symfony\Component\Process\Process;
 
 class OroAssetsBuildCommandTest extends TestCase
 {
+    use TempDirExtension;
+
     private AssetCommandProcessFactory&MockObject $assetCommandProcessFactory;
     private AssetConfigCache&MockObject $assetConfigCache;
     private ThemeManager&MockObject $themeManager;
-    private Application&MockObject $application;
     private Kernel&MockObject $kernel;
     private string $projectDir;
     private Process&MockObject $process;
@@ -32,17 +34,14 @@ class OroAssetsBuildCommandTest extends TestCase
         $this->assetCommandProcessFactory = $this->createMock(AssetCommandProcessFactory::class);
         $this->assetConfigCache = $this->createMock(AssetConfigCache::class);
         $this->themeManager = $this->createMock(ThemeManager::class);
-        $this->application = $this->createMock(Application::class);
         $this->kernel = $this->createMock(Kernel::class);
         $this->process = $this->createMock(Process::class);
 
-        $this->projectDir = sys_get_temp_dir();
+        $this->projectDir = $this->getTempDir('assets_build_command');
+        mkdir($this->projectDir . '/node_modules', 0777, true);
 
-        if (!is_dir($this->projectDir . '/node_modules')) {
-            mkdir($this->projectDir . '/node_modules', 0777, true);
-        }
-
-        $this->application->expects(self::any())
+        $application = $this->createMock(Application::class);
+        $application->expects(self::any())
             ->method('getKernel')
             ->willReturn($this->kernel);
 
@@ -55,8 +54,7 @@ class OroAssetsBuildCommandTest extends TestCase
             true,
             $this->themeManager
         );
-
-        $this->command->setApplication($this->application);
+        $this->command->setApplication($application);
     }
 
     public function testWebPackBuildOnEachThemeSeparately(): void

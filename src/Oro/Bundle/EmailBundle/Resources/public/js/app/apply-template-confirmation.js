@@ -1,42 +1,41 @@
-define(['underscore', 'orotranslation/js/translator', 'oroui/js/modal'
-], function(_, __, Modal) {
-    'use strict';
+import _ from 'underscore';
+import __ from 'orotranslation/js/translator';
+import Modal from 'oroui/js/modal';
+
+/**
+ * Apply template confirmation dialog
+ *
+ * @export  oroui/js/apply-template-confirmation
+ * @class   oroui.ApplyTemplateConfirmation
+ * @extends oroui.Modal
+ */
+const EmailApplyTemplateModalView = Modal.extend({
+    /** @property {String} */
+    className: 'modal oro-modal-danger',
+
+    _attributes: {
+        role: 'alertdialog'
+    },
 
     /**
-     * Apply template confirmation dialog
-     *
-     * @export  oroui/js/apply-template-confirmation
-     * @class   oroui.ApplyTemplateConfirmation
-     * @extends oroui.Modal
+     * @inheritdoc
      */
-    const EmailApplyTemplateModalView = Modal.extend({
-        /** @property {String} */
-        className: 'modal oro-modal-danger',
+    constructor: function EmailApplyTemplateModalView(options) {
+        EmailApplyTemplateModalView.__super__.constructor.call(this, options);
+    },
 
-        _attributes: {
-            role: 'alertdialog'
-        },
+    /**
+     * @param {Object} options
+     */
+    initialize: function(options) {
+        options = _.extend({
+            title: __('oro.email.emailtemplate.apply_template_confirmation_title'),
+            okText: __('Yes, Proceed'),
+            cancelText: __('Cancel')
+        }, options);
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function EmailApplyTemplateModalView(options) {
-            EmailApplyTemplateModalView.__super__.constructor.call(this, options);
-        },
-
-        /**
-         * @param {Object} options
-         */
-        initialize: function(options) {
-            options = _.extend({
-                title: __('oro.email.emailtemplate.apply_template_confirmation_title'),
-                okText: __('Yes, Proceed'),
-                cancelText: __('Cancel')
-            }, options);
-
-            EmailApplyTemplateModalView.__super__.initialize.call(this, options);
-        }
-    });
-
-    return EmailApplyTemplateModalView;
+        EmailApplyTemplateModalView.__super__.initialize.call(this, options);
+    }
 });
+
+export default EmailApplyTemplateModalView;

@@ -1,30 +1,28 @@
-define(['backbone'], function(Backbone) {
-    'use strict';
+import Backbone from 'backbone';
+
+/**
+ * Datagrid metadata model
+ *
+ * @export  orodatagrid/js/datagrid/metadata-model
+ * @class   orodatagrid.datagrid.MetadataModel
+ * @extends Backbone.Model
+ */
+const MetadataModel = Backbone.Model.extend({
+    defaults: {
+        columns: [],
+        options: {},
+        state: {},
+        initialState: {},
+        rowActions: {},
+        massActions: {}
+    },
 
     /**
-     * Datagrid metadata model
-     *
-     * @export  orodatagrid/js/datagrid/metadata-model
-     * @class   orodatagrid.datagrid.MetadataModel
-     * @extends Backbone.Model
+     * @inheritdoc
      */
-    const MetadataModel = Backbone.Model.extend({
-        defaults: {
-            columns: [],
-            options: {},
-            state: {},
-            initialState: {},
-            rowActions: {},
-            massActions: {}
-        },
-
-        /**
-         * @inheritdoc
-         */
-        constructor: function MetadataModel(attrs, options) {
-            MetadataModel.__super__.constructor.call(this, attrs, options);
-        }
-    });
-
-    return MetadataModel;
+    constructor: function MetadataModel(attrs, options) {
+        MetadataModel.__super__.constructor.call(this, attrs, options);
+    }
 });
+
+export default MetadataModel;

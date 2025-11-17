@@ -1,72 +1,68 @@
-define(function(require) {
-    'use strict';
+import routing from 'routing';
+import EmailTemplateModel from './email-template-model';
+import BaseCollection from 'oroui/js/app/models/base/collection';
+import _ from 'underscore';
+import systemAccessModeOrganizationProvider
+    from 'oroorganization/js/app/tools/system-access-mode-organization-provider';
+/**
+ * @export oroemail/js/app/models/email-template-collection
+ */
+const EmailTemplateCollection = BaseCollection.extend({
+    route: null,
 
-    const routing = require('routing');
-    const EmailTemplateModel = require('./email-template-model');
-    const BaseCollection = require('oroui/js/app/models/base/collection');
-    const _ = require('underscore');
-    const systemAccessModeOrganizationProvider =
-        require('oroorganization/js/app/tools/system-access-mode-organization-provider').default;
+    routeId: null,
+
+    includeNonEntity: false,
+
+    includeSystemTemplates: true,
+
+    _sa_org_id: null,
+
+    url: null,
+
+    model: EmailTemplateModel,
+
     /**
-     * @export oroemail/js/app/models/email-template-collection
+     * @inheritdoc
      */
-    const EmailTemplateCollection = BaseCollection.extend({
-        route: null,
+    constructor: function EmailTemplateCollection(...args) {
+        EmailTemplateCollection.__super__.constructor.apply(this, args);
+    },
 
-        routeId: null,
+    /**
+     * @inheritdoc
+     */
+    initialize: function(models, options) {
+        _.extend(this, _.pick(options, [
+            'route',
+            'routeId',
+            'includeNonEntity',
+            'includeSystemTemplates',
+            '_sa_org_id'
+        ]));
 
-        includeNonEntity: false,
+        const routeParams = {};
 
-        includeSystemTemplates: true,
+        routeParams[this.routeId] = null;
 
-        _sa_org_id: null,
+        this.url = routing.generate(this.route, routeParams);
 
-        url: null,
+        EmailTemplateCollection.__super__.initialize.call(this, models, options);
+    },
 
-        model: EmailTemplateModel,
-
-        /**
-         * @inheritdoc
-         */
-        constructor: function EmailTemplateCollection(...args) {
-            EmailTemplateCollection.__super__.constructor.apply(this, args);
-        },
-
-        /**
-         * @inheritdoc
-         */
-        initialize: function(models, options) {
-            _.extend(this, _.pick(options, [
-                'route',
-                'routeId',
-                'includeNonEntity',
-                'includeSystemTemplates',
-                '_sa_org_id'
-            ]));
-
-            const routeParams = {};
-
-            routeParams[this.routeId] = null;
-
-            this.url = routing.generate(this.route, routeParams);
-
-            EmailTemplateCollection.__super__.initialize.call(this, models, options);
-        },
-
-        /**
-         * Regenerate route for selected entity
-         *
-         * @param {String} id
-         */
-        setEntityId: function(id) {
-            const routeParams = {};
-            routeParams[this.routeId] = id;
-            routeParams.includeNonEntity = this.includeNonEntity ? '1' : '0';
-            routeParams.includeSystemTemplates = this.includeSystemTemplates ? '1' : '0';
-            routeParams._sa_org_id = systemAccessModeOrganizationProvider.getOrganizationId();
-            this.url = routing.generate(this.route, routeParams);
-        }
-    });
-
-    return EmailTemplateCollection;
+    /**
+     * Regenerate route for selected entity
+     *
+     * @param {String} id
+     */
+    setEntityId: function(id) {
+        const routeParams = {};
+        routeParams[this.routeId] = id;
+        routeParams.includeNonEntity = this.includeNonEntity ? '1' : '0';
+        routeParams.includeSystemTemplates = this.includeSystemTemplates ? '1' : '0';
+        routeParams._sa_org_id = systemAccessModeOrganizationProvider.getOrganizationId();
+        this.url = routing.generate(this.route, routeParams);
+    }
 });
+
+export default EmailTemplateCollection;

@@ -1,78 +1,74 @@
-define(function(require) {
-    'use strict';
+import _ from 'underscore';
+import Backgrid from 'backgrid';
+import NumberFormatter from 'orodatagrid/js/datagrid/formatter/number-formatter';
 
-    const _ = require('underscore');
-    const Backgrid = require('backgrid');
-    const NumberFormatter = require('orodatagrid/js/datagrid/formatter/number-formatter');
+/**
+ * Number column cell.
+ *
+ * @export  oro/datagrid/cell/number-cell
+ * @class   oro.datagrid.cell.NumberCell
+ * @extends Backgrid.NumberCell
+ */
+const NumberCell = Backgrid.NumberCell.extend({
+    /** @property {orodatagrid.datagrid.formatter.NumberFormatter} */
+    formatterPrototype: NumberFormatter,
+
+    /** @property {String} */
+    style: 'decimal',
 
     /**
-     * Number column cell.
-     *
-     * @export  oro/datagrid/cell/number-cell
-     * @class   oro.datagrid.cell.NumberCell
-     * @extends Backgrid.NumberCell
+     * @inheritdoc
      */
-    const NumberCell = Backgrid.NumberCell.extend({
-        /** @property {orodatagrid.datagrid.formatter.NumberFormatter} */
-        formatterPrototype: NumberFormatter,
+    constructor: function NumberCell(options) {
+        NumberCell.__super__.constructor.call(this, options);
+    },
 
-        /** @property {String} */
-        style: 'decimal',
+    /**
+     * @inheritdoc
+     */
+    initialize(options) {
+        _.extend(this, options);
+        NumberCell.__super__.initialize.call(this, options);
+        this.formatter = this.createFormatter();
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function NumberCell(options) {
-            NumberCell.__super__.constructor.call(this, options);
-        },
+    /**
+     * Creates number cell formatter
+     *
+     * @return {orodatagrid.datagrid.formatter.NumberFormatter}
+     */
+    createFormatter() {
+        return new this.formatterPrototype({style: this.style});
+    },
 
-        /**
-         * @inheritdoc
-         */
-        initialize(options) {
-            _.extend(this, options);
-            NumberCell.__super__.initialize.call(this, options);
-            this.formatter = this.createFormatter();
-        },
+    /**
+     * @inheritdoc
+     */
+    render() {
+        const render = NumberCell.__super__.render.call(this);
 
-        /**
-         * Creates number cell formatter
-         *
-         * @return {orodatagrid.datagrid.formatter.NumberFormatter}
-         */
-        createFormatter() {
-            return new this.formatterPrototype({style: this.style});
-        },
+        this.enterEditMode();
 
-        /**
-         * @inheritdoc
-         */
-        render() {
-            const render = NumberCell.__super__.render.call(this);
+        return render;
+    },
 
-            this.enterEditMode();
-
-            return render;
-        },
-
-        /**
-         * @inheritdoc
-         */
-        enterEditMode() {
-            if (this.isEditableColumn() && !this.currentEditor) {
-                NumberCell.__super__.enterEditMode.call(this);
-            }
-        },
-
-        /**
-         * @inheritdoc
-         */
-        exitEditMode() {
-            if (!this.isEditableColumn()) {
-                NumberCell.__super__.exitEditMode.call(this);
-            }
+    /**
+     * @inheritdoc
+     */
+    enterEditMode() {
+        if (this.isEditableColumn() && !this.currentEditor) {
+            NumberCell.__super__.enterEditMode.call(this);
         }
-    });
+    },
 
-    return NumberCell;
+    /**
+     * @inheritdoc
+     */
+    exitEditMode() {
+        if (!this.isEditableColumn()) {
+            NumberCell.__super__.exitEditMode.call(this);
+        }
+    }
 });
+
+export default NumberCell;

@@ -1,42 +1,38 @@
-define(function(require) {
-    'use strict';
+import BaseView from 'oroui/js/app/views/base/view';
 
-    const BaseView = require('oroui/js/app/views/base/view');
+const DateGroupingView = BaseView.extend({
+    autoRender: true,
 
-    const DateGroupingView = BaseView.extend({
-        autoRender: true,
+    switcherCheckbox: '[data-name="field__use-date-group-filter"]',
 
-        switcherCheckbox: '[data-name="field__use-date-group-filter"]',
+    fieldSelect: '[data-name="field__field-name"]',
 
-        fieldSelect: '[data-name="field__field-name"]',
+    allowEmptyCheckbox: '[data-name="field__use-skip-empty-periods-filter"]',
 
-        allowEmptyCheckbox: '[data-name="field__use-skip-empty-periods-filter"]',
+    events: {
+        'change [data-name="field__use-date-group-filter"]': 'render'
+    },
 
-        events: {
-            'change [data-name="field__use-date-group-filter"]': 'render'
-        },
+    listen: {
+        'page:afterChange mediator [data-name="field__use-date-group-filter"]': 'render'
+    },
 
-        listen: {
-            'page:afterChange mediator [data-name="field__use-date-group-filter"]': 'render'
-        },
+    /**
+     * @inheritdoc
+     */
+    constructor: function DateGroupingView(options) {
+        DateGroupingView.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function DateGroupingView(options) {
-            DateGroupingView.__super__.constructor.call(this, options);
-        },
-
-        render: function() {
-            if (this.$(this.switcherCheckbox).is(':checked')) {
-                this.$(this.allowEmptyCheckbox).prop('disabled', false);
-                this.$(this.fieldSelect).inputWidget('disable', false);
-            } else {
-                this.$(this.allowEmptyCheckbox).attr('disabled', true);
-                this.$(this.fieldSelect).inputWidget('disable', true);
-            }
+    render: function() {
+        if (this.$(this.switcherCheckbox).is(':checked')) {
+            this.$(this.allowEmptyCheckbox).prop('disabled', false);
+            this.$(this.fieldSelect).inputWidget('disable', false);
+        } else {
+            this.$(this.allowEmptyCheckbox).attr('disabled', true);
+            this.$(this.fieldSelect).inputWidget('disable', true);
         }
-    });
-
-    return DateGroupingView;
+    }
 });
+
+export default DateGroupingView;

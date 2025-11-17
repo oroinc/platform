@@ -765,6 +765,7 @@ services:
             - !service { class: GuzzleHttp\Client }
             - []
             - '@logger'
+            - '@oro_config.manager'
 
     oro_attachment.provider.extend_field_form_options.file:
         class: Oro\Bundle\AttachmentBundle\Provider\ExtendFieldFileFormOptionsProvider

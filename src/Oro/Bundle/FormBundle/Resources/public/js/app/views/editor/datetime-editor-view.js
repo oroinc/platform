@@ -1,220 +1,216 @@
-define(function(require) {
-    'use strict';
+/**
+ * Datetime cell content editor
+ *
+ * ### Column configuration samples:
+ * ``` yml
+ * datagrids:
+ *   {grid-uid}:
+ *     inline_editing:
+ *       enable: true
+ *     # <grid configuration> goes here
+ *     columns:
+ *       # Sample 1. Mapped by frontend type
+ *       {column-name-1}:
+ *         frontend_type: datetime
+ *       # Sample 2. Full configuration
+ *       {column-name-2}:
+ *         inline_editing:
+ *           editor:
+ *             view: oroform/js/app/views/editor/datetime-editor-view
+ *             view_options:
+ *               css_class_name: '<class-name>'
+ *               datePickerOptions:
+ *                 # See http://api.jqueryui.com/datepicker/
+ *                 altFormat: 'yy-mm-dd'
+ *                 changeMonth: true
+ *                 changeYear: true
+ *                 yearRange: '-80:+1'
+ *                 showButtonPanel: true
+ *               timePickerOptions:
+ *                 # See https://github.com/jonthornton/jquery-timepicker#options
+ *           validation_rules:
+ *             NotBlank: ~
+ *           save_api_accessor:
+ *               route: '<route>'
+ *               query_parameter_names:
+ *                  - '<parameter1>'
+ *                  - '<parameter2>'
+ * ```
+ *
+ * ### Options in yml:
+ *
+ * Column option name                                  | Description
+ * :---------------------------------------------------|:-----------
+ * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
+ * inline_editing.editor.view_options.dateInputAttrs   | Optional. Attributes for the date HTML input element
+ * inline_editing.editor.view_options.datePickerOptions| Optional. See [documentation here](http://api.jqueryui.com/datepicker/)
+ * inline_editing.editor.view_options.timeInputAttrs   | Optional. Attributes for the time HTML input element
+ * inline_editing.editor.view_options.timePickerOptions| Optional. See [documentation here](https://github.com/jonthornton/jquery-timepicker#options)
+ * inline_editing.validation_rules | Optional. Validation rules. See [documentation](../reference/js_validation.md#conformity-server-side-validations-to-client-once)
+ * inline_editing.save_api_accessor                    | Optional. Sets accessor module, route, parameters etc.
+ *
+ * ### Constructor parameters
+ *
+ * @class
+ * @param {Object} options - Options container
+ * @param {Object} options.model - Current row model
+ * @param {string} options.fieldName - Field name to edit in model
+ * @param {Object} options.validationRules - Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once)
+ * @param {Object} options.dateInputAttrs - Attributes for date HTML input element
+ * @param {Object} options.datePickerOptions - See [documentation here](http://api.jqueryui.com/datepicker/)
+ * @param {Object} options.timeInputAttrs - Attributes for time HTML input element
+ * @param {Object} options.timePickerOptions - See [documentation here](https://github.com/jonthornton/jquery-timepicker#options)
+ * @param {string} options.value - initial value of edited field
+ *
+ * @augments [DateEditorView](./date-editor-view.md)
+ * @exports DatetimeEditorView
+ */
+import $ from 'jquery';
+import _ from 'underscore';
+import __ from 'orotranslation/js/translator';
+import datetimeFormatter from 'orolocale/js/formatter/datetime';
+import DateEditorView from './date-editor-view';
+import DatetimepickerView from 'oroui/js/app/views/datepicker/datetimepicker-view';
+
+const DatetimeEditorView = DateEditorView.extend(/** @lends DatetimeEditorView.prototype */{
+    className: 'datetime-editor',
+    inputType: 'hidden',
+    view: DatetimepickerView,
+
+    DEFAULT_OPTIONS: {
+        ...DateEditorView.prototype.DEFAULT_OPTIONS,
+        timeInputAttrs: {
+            'placeholder': __('oro.form.choose_time'),
+            'name': 'time',
+            'autocomplete': 'off',
+            'class': 'input-small timepicker-input',
+            'data-validation': JSON.stringify({Time: {}})
+        },
+        timePickerOptions: {}
+    },
+
+    events: {
+        'keydown .hasDatepicker': 'onDateEditorKeydown',
+        'keydown .timepicker-input': 'onTimeEditorKeydown',
+        'change .hasDatepicker': 'onDateEditorKeydown',
+        'change .timepicker-input': 'onTimeEditorKeydown',
+        'showTimepicker .ui-timepicker-input': 'onTimepickerShow',
+        'hideTimepicker .ui-timepicker-input': 'onTimepickerHide'
+    },
+
+    format: datetimeFormatter.getBackendDateTimeFormat(),
 
     /**
-     * Datetime cell content editor
-     *
-     * ### Column configuration samples:
-     * ``` yml
-     * datagrids:
-     *   {grid-uid}:
-     *     inline_editing:
-     *       enable: true
-     *     # <grid configuration> goes here
-     *     columns:
-     *       # Sample 1. Mapped by frontend type
-     *       {column-name-1}:
-     *         frontend_type: datetime
-     *       # Sample 2. Full configuration
-     *       {column-name-2}:
-     *         inline_editing:
-     *           editor:
-     *             view: oroform/js/app/views/editor/datetime-editor-view
-     *             view_options:
-     *               css_class_name: '<class-name>'
-     *               datePickerOptions:
-     *                 # See http://api.jqueryui.com/datepicker/
-     *                 altFormat: 'yy-mm-dd'
-     *                 changeMonth: true
-     *                 changeYear: true
-     *                 yearRange: '-80:+1'
-     *                 showButtonPanel: true
-     *               timePickerOptions:
-     *                 # See https://github.com/jonthornton/jquery-timepicker#options
-     *           validation_rules:
-     *             NotBlank: ~
-     *           save_api_accessor:
-     *               route: '<route>'
-     *               query_parameter_names:
-     *                  - '<parameter1>'
-     *                  - '<parameter2>'
-     * ```
-     *
-     * ### Options in yml:
-     *
-     * Column option name                                  | Description
-     * :---------------------------------------------------|:-----------
-     * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
-     * inline_editing.editor.view_options.dateInputAttrs   | Optional. Attributes for the date HTML input element
-     * inline_editing.editor.view_options.datePickerOptions| Optional. See [documentation here](http://api.jqueryui.com/datepicker/)
-     * inline_editing.editor.view_options.timeInputAttrs   | Optional. Attributes for the time HTML input element
-     * inline_editing.editor.view_options.timePickerOptions| Optional. See [documentation here](https://github.com/jonthornton/jquery-timepicker#options)
-     * inline_editing.validation_rules | Optional. Validation rules. See [documentation](../reference/js_validation.md#conformity-server-side-validations-to-client-once)
-     * inline_editing.save_api_accessor                    | Optional. Sets accessor module, route, parameters etc.
-     *
-     * ### Constructor parameters
-     *
-     * @class
-     * @param {Object} options - Options container
-     * @param {Object} options.model - Current row model
-     * @param {string} options.fieldName - Field name to edit in model
-     * @param {Object} options.validationRules - Validation rules. See [documentation here](../reference/js_validation.md#conformity-server-side-validations-to-client-once)
-     * @param {Object} options.dateInputAttrs - Attributes for date HTML input element
-     * @param {Object} options.datePickerOptions - See [documentation here](http://api.jqueryui.com/datepicker/)
-     * @param {Object} options.timeInputAttrs - Attributes for time HTML input element
-     * @param {Object} options.timePickerOptions - See [documentation here](https://github.com/jonthornton/jquery-timepicker#options)
-     * @param {string} options.value - initial value of edited field
-     *
-     * @augments [DateEditorView](./date-editor-view.md)
-     * @exports DatetimeEditorView
+     * @inheritdoc
      */
-    const $ = require('jquery');
-    const _ = require('underscore');
-    const __ = require('orotranslation/js/translator');
-    const datetimeFormatter = require('orolocale/js/formatter/datetime');
-    const DateEditorView = require('./date-editor-view');
-    const DatetimepickerView = require('oroui/js/app/views/datepicker/datetimepicker-view');
+    constructor: function DatetimeEditorView(options) {
+        DatetimeEditorView.__super__.constructor.call(this, options);
+    },
 
-    const DatetimeEditorView = DateEditorView.extend(/** @lends DatetimeEditorView.prototype */{
-        className: 'datetime-editor',
-        inputType: 'hidden',
-        view: DatetimepickerView,
+    render: function() {
+        DatetimeEditorView.__super__.render.call(this);
+        // fix ESCAPE time-picker behaviour
+        // must stopPropagation on ESCAPE, if time-picker was visible
+        this.$('.timepicker-input').bindFirst('keydown' + this.eventNamespace(), e => {
+            if (e.keyCode === this.ESCAPE_KEY_CODE && $('.ui-timepicker-wrapper').css('display') === 'block') {
+                e.stopPropagation();
+            }
+        });
+        // fix arrows behaviour
+        this.$('.timepicker-input').on('keydown' + this.eventNamespace(), this.onGenericArrowKeydown.bind(this));
 
-        DEFAULT_OPTIONS: {
-            ...DateEditorView.prototype.DEFAULT_OPTIONS,
-            timeInputAttrs: {
-                'placeholder': __('oro.form.choose_time'),
-                'name': 'time',
-                'autocomplete': 'off',
-                'class': 'input-small timepicker-input',
-                'data-validation': JSON.stringify({Time: {}})
-            },
-            timePickerOptions: {}
-        },
+        return this;
+    },
 
-        events: {
-            'keydown .hasDatepicker': 'onDateEditorKeydown',
-            'keydown .timepicker-input': 'onTimeEditorKeydown',
-            'change .hasDatepicker': 'onDateEditorKeydown',
-            'change .timepicker-input': 'onTimeEditorKeydown',
-            'showTimepicker .ui-timepicker-input': 'onTimepickerShow',
-            'hideTimepicker .ui-timepicker-input': 'onTimepickerHide'
-        },
+    dispose: function() {
+        if (this.disposed) {
+            return;
+        }
+        this.$('.timepicker-input').off(this.eventNamespace());
+        DatetimeEditorView.__super__.dispose.call(this);
+    },
 
-        format: datetimeFormatter.getBackendDateTimeFormat(),
-
-        /**
-         * @inheritdoc
-         */
-        constructor: function DatetimeEditorView(options) {
-            DatetimeEditorView.__super__.constructor.call(this, options);
-        },
-
-        render: function() {
-            DatetimeEditorView.__super__.render.call(this);
-            // fix ESCAPE time-picker behaviour
-            // must stopPropagation on ESCAPE, if time-picker was visible
-            this.$('.timepicker-input').bindFirst('keydown' + this.eventNamespace(), e => {
-                if (e.keyCode === this.ESCAPE_KEY_CODE && $('.ui-timepicker-wrapper').css('display') === 'block') {
-                    e.stopPropagation();
-                }
+    getViewOptions: function() {
+        return $.extend(true, {}, this.DEFAULT_OPTIONS,
+            _.pick(this.options, ['dateInputAttrs', 'datePickerOptions', 'timeInputAttrs', 'timePickerOptions']), {
+                el: this.$('input[name=value]')
             });
-            // fix arrows behaviour
-            this.$('.timepicker-input').on('keydown' + this.eventNamespace(), this.onGenericArrowKeydown.bind(this));
+    },
 
-            return this;
-        },
+    focus: function(atEnd) {
+        if (!atEnd) {
+            this.$('input.hasDatepicker').setCursorToEnd().trigger('focus');
+        } else {
+            this.$('input.timepicker-input').setCursorToEnd().trigger('focus');
+        }
+    },
 
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-            this.$('.timepicker-input').off(this.eventNamespace());
-            DatetimeEditorView.__super__.dispose.call(this);
-        },
+    onFocusout: function(e) {
+        // if blur event was as sequence of time selection in dropdown, returns focus back
+        if (this._isTimeSelection) {
+            delete this._isTimeSelection;
+            this.focus(1);
+        } else {
+            DatetimeEditorView.__super__.onFocusout.call(this, e);
+        }
+    },
 
-        getViewOptions: function() {
-            return $.extend(true, {}, this.DEFAULT_OPTIONS,
-                _.pick(this.options, ['dateInputAttrs', 'datePickerOptions', 'timeInputAttrs', 'timePickerOptions']), {
-                    el: this.$('input[name=value]')
-                });
-        },
+    parseRawValue: function(value) {
+        let parsed;
+        try {
+            parsed = datetimeFormatter.getMomentForBackendDateTime(value);
+        } catch (e) {
+            return null;
+        }
+        // ignore seconds to avoid excessive server requests
+        parsed.seconds(0);
+        return parsed;
+    },
 
-        focus: function(atEnd) {
-            if (!atEnd) {
-                this.$('input.hasDatepicker').setCursorToEnd().trigger('focus');
-            } else {
-                this.$('input.timepicker-input').setCursorToEnd().trigger('focus');
-            }
-        },
+    onDateEditorKeydown: function(e) {
+        // stop propagation to prevent default behaviour
+        if (!e.shiftKey) {
+            e.stopPropagation();
+            this.onGenericTabKeydown(e);
+        }
+    },
 
-        onFocusout: function(e) {
-            // if blur event was as sequence of time selection in dropdown, returns focus back
-            if (this._isTimeSelection) {
-                delete this._isTimeSelection;
+    onTimeEditorKeydown: function(e) {
+        // stop propagation to prevent default behaviour
+        if (e.shiftKey) {
+            e.stopPropagation();
+            this.onGenericTabKeydown(e);
+        }
+    },
+
+    onTimepickerHide: function() {
+        this.toggleDropdownBelowClass(false);
+    },
+
+    onTimepickerShow: function(e) {
+        const $list = this.view.getTimePickerWidget();
+        const isBelow = !$list.hasClass('ui-timepicker-positioned-top');
+        this.toggleDropdownBelowClass(isBelow);
+        $list.off(this.eventNamespace())
+            .on('mousedown' + this.eventNamespace(), e => {
+                // adds flag that blur event was as sequence of time selection in dropdown
+                this._isTimeSelection = true;
+            });
+    },
+
+    onGenericTabKeydown: function(e) {
+        if (e.keyCode === this.TAB_KEY_CODE) {
+            if (this.$('input.hasDatepicker').is(e.currentTarget) && !e.shiftKey) {
+                e.preventDefault();
+                this._isTimeSelection = true;
                 this.focus(1);
-            } else {
-                DatetimeEditorView.__super__.onFocusout.call(this, e);
-            }
-        },
-
-        parseRawValue: function(value) {
-            let parsed;
-            try {
-                parsed = datetimeFormatter.getMomentForBackendDateTime(value);
-            } catch (e) {
-                return null;
-            }
-            // ignore seconds to avoid excessive server requests
-            parsed.seconds(0);
-            return parsed;
-        },
-
-        onDateEditorKeydown: function(e) {
-            // stop propagation to prevent default behaviour
-            if (!e.shiftKey) {
-                e.stopPropagation();
-                this.onGenericTabKeydown(e);
-            }
-        },
-
-        onTimeEditorKeydown: function(e) {
-            // stop propagation to prevent default behaviour
-            if (e.shiftKey) {
-                e.stopPropagation();
-                this.onGenericTabKeydown(e);
-            }
-        },
-
-        onTimepickerHide: function() {
-            this.toggleDropdownBelowClass(false);
-        },
-
-        onTimepickerShow: function(e) {
-            const $list = this.view.getTimePickerWidget();
-            const isBelow = !$list.hasClass('ui-timepicker-positioned-top');
-            this.toggleDropdownBelowClass(isBelow);
-            $list.off(this.eventNamespace())
-                .on('mousedown' + this.eventNamespace(), e => {
-                    // adds flag that blur event was as sequence of time selection in dropdown
-                    this._isTimeSelection = true;
-                });
-        },
-
-        onGenericTabKeydown: function(e) {
-            if (e.keyCode === this.TAB_KEY_CODE) {
-                if (this.$('input.hasDatepicker').is(e.currentTarget) && !e.shiftKey) {
-                    e.preventDefault();
-                    this._isTimeSelection = true;
-                    this.focus(1);
-                } else if (this.$('input.timepicker-input').is(e.currentTarget) && e.shiftKey) {
-                    e.preventDefault();
-                    this._isDateSelection = true;
-                    this.focus();
-                }
+            } else if (this.$('input.timepicker-input').is(e.currentTarget) && e.shiftKey) {
+                e.preventDefault();
+                this._isDateSelection = true;
+                this.focus();
             }
         }
-    });
-
-    return DatetimeEditorView;
+    }
 });
+
+export default DatetimeEditorView;
