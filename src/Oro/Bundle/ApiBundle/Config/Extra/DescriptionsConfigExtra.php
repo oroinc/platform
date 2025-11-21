@@ -13,10 +13,12 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
     public const NAME = 'descriptions';
 
     private ?string $documentationAction;
+    private ?string $resourceDocumentationAction;
 
-    public function __construct(?string $documentationAction = null)
+    public function __construct(?string $documentationAction = null, ?string $resourceDocumentationAction = null)
     {
         $this->documentationAction = $documentationAction;
+        $this->resourceDocumentationAction = $resourceDocumentationAction;
     }
 
     /**
@@ -25,6 +27,14 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
     public function getDocumentationAction(): ?string
     {
         return $this->documentationAction;
+    }
+
+    /**
+     * Gets an action name for which the API resource documentation are requested.
+     */
+    public function getResourceDocumentationAction(): ?string
+    {
+        return $this->resourceDocumentationAction;
     }
 
     #[\Override]
