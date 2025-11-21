@@ -225,7 +225,10 @@ trait DocumentationTestTrait
                 if (!$this->isSkippedField($entityClass, $name) && !$this->isTestField($entityClass, $name)) {
                     if ($this->isEmptyDescription($item, 'description')) {
                         $missingDocs[] = sprintf('Input Field: %s. Empty description.', $name);
-                    } elseif (ApiAction::UPDATE === $action && $idFieldName && $name === $idFieldName) {
+                    } elseif ($idFieldName
+                        && $name === $idFieldName
+                        && $this->isIdFieldRequired($definition, $entityClass, $action, $association)
+                    ) {
                         $description = $item['description'];
                         if (str_contains($description, 'The required field.')) {
                             $description = preg_replace('#\<\/?\w+\>#', '', $description);
@@ -268,6 +271,15 @@ trait DocumentationTestTrait
         }
 
         return $missingDocs;
+    }
+
+    private function isIdFieldRequired(
+        array $definition,
+        string $entityClass,
+        string $action,
+        ?string $association
+    ): bool {
+        return ApiAction::UPDATE === $action;
     }
 
     private function hasDuplicates(string $documentation): bool
