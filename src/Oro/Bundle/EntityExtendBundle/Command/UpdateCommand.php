@@ -121,7 +121,7 @@ HELP
                 $fields = [];
                 $fieldConfigs = $this->configManager->getConfigs('extend', $entityClass);
                 foreach ($fieldConfigs as $fieldConfig) {
-                    if (!$fieldConfig->is('state', ExtendScope::STATE_ACTIVE)) {
+                    if ($this->hasUpdateRequiredState($fieldConfig)) {
                         $fields[$fieldConfig->getId()->getFieldName()] = $fieldConfig->get('state');
                     }
                 }
@@ -136,10 +136,12 @@ HELP
 
     private function isSchemaUpdateRequired(ConfigInterface $config): bool
     {
-        return
-            $config->is('is_extend')
-            && !$config->is('state', ExtendScope::STATE_ACTIVE)
-            && !$config->is('is_deleted');
+        return $config->is('is_extend') && $this->hasUpdateRequiredState($config);
+    }
+
+    private function hasUpdateRequiredState(ConfigInterface $config): bool
+    {
+        return !$config->is('state', ExtendScope::STATE_ACTIVE) && !$config->is('is_deleted');
     }
 
     private function applyChanges(SymfonyStyle $io): int
