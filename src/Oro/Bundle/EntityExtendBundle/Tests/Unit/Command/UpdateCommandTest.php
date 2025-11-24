@@ -96,11 +96,19 @@ class UpdateCommandTest extends TestCase
             new FieldConfigId('extend', 'Test\Entity', 'field2'),
             ['is_extend' => true, 'state' => ExtendScope::STATE_UPDATE]
         );
+        $fieldConfig3 = new Config(
+            new FieldConfigId('extend', 'Test\Entity', 'field3'),
+            ['is_extend' => true, 'state' => ExtendScope::STATE_UPDATE, 'is_deleted' => true]
+        );
+        $fieldConfig4 = new Config(
+            new FieldConfigId('extend', 'Test\Entity', 'field4'),
+            ['is_extend' => true, 'state' => ExtendScope::STATE_DELETE]
+        );
         $this->configManager->expects(self::exactly(2))
             ->method('getConfigs')
             ->willReturnMap([
                 ['extend', null, false, [$entityConfig]],
-                ['extend', 'Test\Entity', false, [$fieldConfig1, $fieldConfig2]]
+                ['extend', 'Test\Entity', false, [$fieldConfig1, $fieldConfig2, $fieldConfig3, $fieldConfig4]]
             ]);
 
         $this->entityExtendUpdateProcessor->expects(self::never())
@@ -112,6 +120,8 @@ class UpdateCommandTest extends TestCase
         $this->assertOutputContains($commandTester, 'The following entities have changes');
         $this->assertOutputContains($commandTester, 'Test\Entity Requires update');
         $this->assertOutputContains($commandTester, 'field2 Requires update');
+        $this->assertOutputContains($commandTester, 'field4 Deleted');
         $this->assertOutputNotContains($commandTester, 'field1');
+        $this->assertOutputNotContains($commandTester, 'field3');
     }
 }
