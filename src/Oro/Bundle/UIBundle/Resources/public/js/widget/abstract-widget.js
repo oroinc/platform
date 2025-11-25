@@ -39,7 +39,8 @@ define(function(require) {
             submitHandler: function() {
                 this.trigger('adoptedFormSubmit', this.form, this);
             },
-            initLayoutOptions: null
+            initLayoutOptions: null,
+            widgetData: null
         },
 
         loadingElement: null,
@@ -753,6 +754,10 @@ define(function(require) {
 
             if (organizationId) {
                 data._sa_org_id = organizationId;
+            }
+
+            if (this.options.widgetData) {
+                return Object.assign(data, this.options.widgetData);
             }
 
             return data;

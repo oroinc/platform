@@ -1795,10 +1795,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @Given /^(?:|I )click "(?P<action>.+)" "(?P<content>.+)" in grid$/
      *
      * @Given /^(?:|I )click (?P<action>(?:|Clone|(?!\bon)\w)*) "(?P<content>.+)" in "(?P<gridName>[^"]+)"$/
-     * @Given /^(?:|I )click "(?P<action>[^"]*)" on row "(?P<content>[^"]*)" in grid$/
+     * @Given /^(?:|I )click "(?P<action>(?:[^"]|"[^"]*")*)" on row "(?P<content>[^"]*)" in grid$/
      * @Given /^(?:|I )click "(?P<action>[^"]*)" on row "(?P<content>[^"]*)" in "(?P<gridName>[^"]+)"$/
      * @Given /^(?:|I )click (?P<action>[\w\s]*) on (?P<content>(?:[^"]|\\")*) in grid "(?P<gridName>[^"]+)"$/
      * @Given /^(?:|I )click "(?P<action>[^"]*)" on row "(?P<content>[^"]*)" in grid "(?P<gridName>[^"]+)"$/
+     * @Given /^(?:|I )click '(?P<action>.*)' on row "(?P<content>[^"]*)" in grid "(?P<gridName>[^"]+)"$/
      *
      * @param string $content
      * @param string $action
@@ -2129,6 +2130,20 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             $message,
             $element->getText(),
             \sprintf('Confirmation dialogue does not contains text %s', $message)
+        );
+    }
+
+    /**
+     * @When /^(?:|I )should not see "(?P<message>(.+))" in confirmation dialogue$/
+     */
+    public function shouldNotSeeInConfirmationDialogue($message)
+    {
+        $this->waitForAjax();
+        $element = $this->elementFactory->createElement('Modal');
+        static::assertStringNotContainsString(
+            $message,
+            $element->getText(),
+            \sprintf('Confirmation dialogue does contains text %s', $message)
         );
     }
 
@@ -3036,6 +3051,38 @@ TEXT;
         foreach ($table->getRows() as $index => $row) {
             for ($i = 0; $i < count($expectedTableRepresentation[0]); ++$i) {
                 $actualTableRepresentation[$index][$i] = $row->getCellByNumber($i)->getText();
+            }
+        }
+
+        self::assertEquals($expectedTableRepresentation, $actualTableRepresentation);
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Example: I should see next rows in "Frontend Customer User Shopping List Invalid Line Items Table" table without headers
+     * | 400-Watt Bulb Work Light SKU123 5 item $2.00 $10.00 |
+     * | You cannot order less than 6 units                  |
+     *
+     * @Then /^(?:|I )should see next rows in "(?P<elementName>[\w\s]+)" table without headers$/
+     * @param TableNode $expectedTableNode
+     * @param string $elementName
+     */
+    //@codingStandardsIgnoreEnd
+    public function iShouldSeeNextRowsInTableWithoutHeaders(TableNode $expectedTableNode, $elementName): void
+    {
+        /** @var Table $table */
+        $table = $this->createElement($elementName);
+
+        static::assertInstanceOf(Table::class, $table, sprintf('Element should be of type %s', Table::class));
+
+        $expectedTableRepresentation = array_values($expectedTableNode->getTable());
+        static::assertTrue(isset($expectedTableRepresentation[0]), 'Expected table should have at least one row');
+
+        $actualTableRepresentation = [];
+
+        foreach ($table->getRows() as $index => $row) {
+            for ($i = 0; $i < count($expectedTableRepresentation[0]); ++$i) {
+                $actualTableRepresentation[$index][$i] = $row->getText();
             }
         }
 

@@ -21,6 +21,7 @@ define(function(require) {
         template: template,
         insertMethod: 'appendTo',
         style: 'default',
+        description: null,
         storageKey: 'oroAfterReloadMessages'
     }, config);
     let queue = [];
@@ -47,7 +48,7 @@ define(function(require) {
         const $el = $(opt.template({
             type,
             message,
-            description: null,
+            description: opt.description,
             style: opt.style,
             dismissible: opt.dismissible,
             showIcon: opt.showIcon,

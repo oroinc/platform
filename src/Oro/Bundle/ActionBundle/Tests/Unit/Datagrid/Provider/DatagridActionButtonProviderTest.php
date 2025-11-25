@@ -23,19 +23,19 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
+final class DatagridActionButtonProviderTest extends TestCase
 {
-    private const PROVIDER_ALIAS = 'test_mass_action_provider';
-    private const TEST_ROUTE = 'test_route';
-    private const TEST_ROUTE_PARAMS = '%7B%22gridName%22%3A%22customer-view-quote-grid%22%7D';
+    private const string PROVIDER_ALIAS = 'test_mass_action_provider';
+    private const string TEST_ROUTE = 'test_route';
+    private const string TEST_ROUTE_PARAMS = '%7B%22gridName%22%3A%22customer-view-quote-grid%22%7D';
 
-    /** @var ButtonProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $buttonProvider;
+    private ButtonProvider&MockObject $buttonProvider;
 
-    /** @var DatagridActionButtonProvider */
-    private $provider;
+    private DatagridActionButtonProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -415,7 +415,24 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
                     'view' => ['key2' => 'value2'],
                     'update' => true
                 ],
-            ]
+            ],
+            'record configuration' => [
+                'config' => DatagridConfiguration::create([
+                    'name' => 'datagrid_name',
+                    'action_configuration' => ['operation1' => false]
+                ]),
+                'record' => new ResultRecord(['id' => 3]),
+                'buttonCollection' => $this->createButtonsCollection(
+                    [
+                        $this->createButton('operation1', true),
+                        $this->createButton('operation3', false)
+                    ]
+                ),
+                'expectedActions' => [
+                    'operation1' => false,
+                    'operation3' => false
+                ],
+            ],
         ];
     }
 

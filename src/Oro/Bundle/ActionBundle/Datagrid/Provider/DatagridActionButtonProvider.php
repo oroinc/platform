@@ -179,19 +179,22 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
      */
     protected function retrieveConfiguration($actionConfiguration, ResultRecordInterface $record, array $config)
     {
-        if (empty($actionConfiguration)) {
+        $recordConfiguration = $record->getValue(ActionExtension::ACTION_CONFIGURATION_KEY) ?? [];
+
+        if (empty($actionConfiguration) && empty($recordConfiguration)) {
             return [];
         }
 
         $rowActions = [];
 
-        if (is_callable($actionConfiguration)) {
+        if (\is_callable($actionConfiguration)) {
             $rowActions = $actionConfiguration($record, $config);
-        } elseif (is_array($actionConfiguration)) {
+            $rowActions = \is_array($rowActions) ? $rowActions : [];
+        } elseif (\is_array($actionConfiguration)) {
             $rowActions = $actionConfiguration;
         }
 
-        return is_array($rowActions) ? $rowActions : [];
+        return \array_merge($rowActions, $recordConfiguration);
     }
 
     /**
