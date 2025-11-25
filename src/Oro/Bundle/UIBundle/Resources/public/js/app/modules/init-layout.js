@@ -306,10 +306,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             rowCountAdd = e.count || $(containerSelector).data('row-count-add') || 1;
         }
 
+        const method = $(this).data('method') || 'append';
         const rowsHtml = generateOroCollectionRows($listContainer, rowCountAdd);
         const {htmlProcessor = html => html} = e;
-        $listContainer.append(htmlProcessor(rowsHtml)).trigger('content:changed');
+        const item = $(htmlProcessor(rowsHtml));
+        $listContainer[method](item).trigger('content:changed');
         $listContainer.trigger('row-collection:updated');
+        $listContainer.trigger('row-collection:added', {item, method});
 
         $listContainer.find('input.position-input').each((i, el) => $(el).val(i));
 
