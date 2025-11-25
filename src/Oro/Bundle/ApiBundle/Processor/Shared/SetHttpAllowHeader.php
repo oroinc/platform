@@ -59,12 +59,12 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
     }
 
     /**
-     * @return array [action => HTTP method, ...]
+     * @return array [HTTP method => action, ...]
      */
     abstract protected function getHttpMethodToActionsMap(): array;
 
     /**
-     * @return array [action => HTTP method, ...]
+     * @return array [HTTP method => action, ...]
      */
     protected function getHttpMethodToActionsMapForResourceWithoutIdentifier(): array
     {
@@ -78,8 +78,6 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
     }
 
     /**
-     * @param Context $context
-     *
      * @return string[]
      */
     protected function getExcludeActions(Context $context): array
@@ -92,10 +90,6 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
     }
 
     /**
-     * @param string      $entityClass
-     * @param string      $version
-     * @param RequestType $requestType
-     *
      * @return string[]
      */
     protected function getExcludeActionsForClass(string $entityClass, string $version, RequestType $requestType): array
@@ -104,7 +98,7 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
     }
 
     /**
-     * @param array    $httpMethodToActionsMap
+     * @param array    $httpMethodToActionsMap [HTTP method => action, ...]
      * @param string[] $excludeActions
      *
      * @return string

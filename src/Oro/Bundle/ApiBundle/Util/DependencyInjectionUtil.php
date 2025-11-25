@@ -68,7 +68,8 @@ class DependencyInjectionUtil
     public static function disableApiProcessor(
         ContainerBuilder $container,
         string $processorServiceId,
-        string $requestType
+        string $requestType,
+        bool $prependExpression = false
     ): void {
         $processorDef = $container->getDefinition($processorServiceId);
         $tags = $processorDef->getTag(self::PROCESSOR_TAG);
@@ -78,7 +79,9 @@ class DependencyInjectionUtil
             if (empty($tag[self::REQUEST_TYPE])) {
                 $tag = self::addRequestTypeToTag($tag, '!' . $requestType);
             } else {
-                $tag[self::REQUEST_TYPE] = sprintf('!%s&%s', $requestType, $tag[self::REQUEST_TYPE]);
+                $tag[self::REQUEST_TYPE] = $prependExpression
+                    ? \sprintf('!%s&%s', $requestType, $tag[self::REQUEST_TYPE])
+                    : \sprintf('%s&!%s', $tag[self::REQUEST_TYPE], $requestType);
             }
             $processorDef->addTag(self::PROCESSOR_TAG, $tag);
         }

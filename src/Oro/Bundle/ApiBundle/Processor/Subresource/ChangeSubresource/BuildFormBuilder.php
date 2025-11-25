@@ -103,7 +103,7 @@ class BuildFormBuilder implements ProcessorInterface
         $formOptions[ValidationExtension::ENABLE_FULL_VALIDATION] = $this->enableFullValidation
             || !$context->isExisting();
 
-        return $formOptions;
+        return array_merge($formOptions, $context->getFormOptions() ?? []);
     }
 
     protected function getEntryFormOptions(ChangeSubresourceContext $context): array

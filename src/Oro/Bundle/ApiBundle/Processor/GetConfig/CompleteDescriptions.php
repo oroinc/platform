@@ -64,12 +64,14 @@ class CompleteDescriptions implements ProcessorInterface
             $isInherit = true;
         }
 
+        /** @var DescriptionsConfigExtra|null $descriptionsConfigExtra */
+        $descriptionsConfigExtra = $context->getExtra(DescriptionsConfigExtra::NAME);
         $this->entityDescriptionHelper->setDescriptionForEntity(
             $definition,
             $requestType,
             $entityClass,
             $isInherit,
-            $targetAction,
+            $descriptionsConfigExtra?->getResourceDocumentationAction() ?? $targetAction,
             $context->isCollection(),
             $context->getAssociationName(),
             $context->getParentClassName()
@@ -79,7 +81,7 @@ class CompleteDescriptions implements ProcessorInterface
             $requestType,
             $entityClass,
             $isInherit,
-            $this->getTargetActionForFields($context)
+            $descriptionsConfigExtra?->getDocumentationAction() ?? $targetAction
         );
         $filters = $context->getFilters();
         if (null !== $filters) {
@@ -91,16 +93,5 @@ class CompleteDescriptions implements ProcessorInterface
                 $isInherit
             );
         }
-    }
-
-    private function getTargetActionForFields(ConfigContext $context): ?string
-    {
-        /** @var DescriptionsConfigExtra|null $descriptionsConfigExtra */
-        $descriptionsConfigExtra = $context->getExtra(DescriptionsConfigExtra::NAME);
-        if (null !== $descriptionsConfigExtra) {
-            return $descriptionsConfigExtra->getDocumentationAction() ?? $context->getTargetAction();
-        }
-
-        return $context->getTargetAction();
     }
 }

@@ -29,6 +29,7 @@ trait FormContextTrait
     private ?FormBuilderInterface $formBuilder = null;
     private ?FormInterface $form = null;
     private bool $skipFormValidation = false;
+    private ?array $formOptions = null;
     /** @var ConfigExtraInterface[]|null $normalizedEntityConfigExtras */
     private ?array $normalizedEntityConfigExtras = null;
     /** @var ConfigExtraInterface[]|null $responseConfigExtras [name => extra, ...] */
@@ -244,6 +245,22 @@ trait FormContextTrait
     public function skipFormValidation(bool $skipFormValidation): void
     {
         $this->skipFormValidation = $skipFormValidation;
+    }
+
+    /**
+     * Gets form options that should override the options from the entity configuration.
+     */
+    public function getFormOptions(): ?array
+    {
+        return $this->formOptions;
+    }
+
+    /**
+     * Sets form options that should override the options from the entity configuration.
+     */
+    public function setFormOptions(?array $formOptions): void
+    {
+        $this->formOptions = $formOptions ?: null;
     }
 
     /**

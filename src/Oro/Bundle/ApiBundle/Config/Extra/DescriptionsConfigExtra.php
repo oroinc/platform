@@ -13,6 +13,7 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
     public const NAME = 'descriptions';
 
     private ?string $documentationAction = null;
+    private ?string $resourceDocumentationAction = null;
 
     /**
      * Gets an action name for which fields' descriptions are requested.
@@ -28,6 +29,22 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
     public function setDocumentationAction(?string $documentationAction): void
     {
         $this->documentationAction = $documentationAction;
+    }
+
+    /**
+     * Gets an action name for which the API resource documentation are requested.
+     */
+    public function getResourceDocumentationAction(): ?string
+    {
+        return $this->resourceDocumentationAction;
+    }
+
+    /**
+     * Sets an action name for which the API resource documentation are requested.
+     */
+    public function setResourceDocumentationAction(?string $resourceDocumentationAction): void
+    {
+        $this->resourceDocumentationAction = $resourceDocumentationAction;
     }
 
     /**

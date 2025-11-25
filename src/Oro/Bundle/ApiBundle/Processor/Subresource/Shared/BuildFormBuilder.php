@@ -87,6 +87,6 @@ class BuildFormBuilder implements ProcessorInterface
         }
         $options[CustomizeFormDataHandler::API_CONTEXT] = $context;
 
-        return $options;
+        return array_merge($options, $context->getFormOptions() ?? []);
     }
 }

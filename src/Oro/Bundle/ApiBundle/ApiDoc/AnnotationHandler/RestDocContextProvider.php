@@ -19,6 +19,8 @@ use Symfony\Component\Routing\Route;
  */
 class RestDocContextProvider
 {
+    public const API_CONTEXT_ATTRIBUTES = '_api_context_attributes';
+
     private const ACTION_TYPE_ATTRIBUTE = '_action_type';
     private const CONTROLLER_ATTRIBUTE = '_controller';
     private const ACTION_SUFFIX = 'Action';
@@ -56,8 +58,16 @@ class RestDocContextProvider
         } else {
             $context->setClassName($entityClass);
         }
-        if (null !== $route && $context instanceof OptionsContext) {
-            self::setActionType($context, $route, $action, $entityClass, $associationName);
+        if (null !== $route) {
+            $attributes = $route->getOption(self::API_CONTEXT_ATTRIBUTES);
+            if ($attributes) {
+                foreach ($attributes as $attributeName => $attributeValue) {
+                    $context->set($attributeName, $attributeValue);
+                }
+            }
+            if ($context instanceof OptionsContext) {
+                self::setActionType($context, $route, $action, $entityClass, $associationName);
+            }
         }
 
         $processor->process($context);
@@ -93,14 +103,14 @@ class RestDocContextProvider
 
     private static function createCannotBeLoadedException(string $type, Context $context): \LogicException
     {
-        $message = sprintf(
+        $message = \sprintf(
             'The %s for "%s" cannot be loaded. Action: %s.',
             $type,
             $context->getClassName(),
             $context->getAction()
         );
         if ($context instanceof SubresourceContext) {
-            $message .= sprintf(' Association: %s.', $context->getAssociationName());
+            $message .= \sprintf(' Association: %s.', $context->getAssociationName());
         }
 
         return new \LogicException($message);
@@ -175,11 +185,11 @@ class RestDocContextProvider
         string $entityClass,
         string $associationName = null
     ): \LogicException {
-        $message .= sprintf(' Entity Class: %s. Action: %s.', $entityClass, $action);
+        $message .= \sprintf(' Entity Class: %s. Action: %s.', $entityClass, $action);
         if ($associationName) {
-            $message .= sprintf(' Association: %s.', $associationName);
+            $message .= \sprintf(' Association: %s.', $associationName);
         }
-        $message .= sprintf(
+        $message .= \sprintf(
             ' Route Path: %s. Controller: %s. Use "%s" route option to explicitly set the action type.',
             $route->getPath(),
             self::getController($route),
