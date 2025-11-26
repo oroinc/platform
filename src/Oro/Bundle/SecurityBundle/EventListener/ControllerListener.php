@@ -10,7 +10,7 @@ use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
- * Checks if an access to a controller action is granted or not.
+ * Checks whether access to a controller action is granted or not.
  */
 class ControllerListener
 {
@@ -27,7 +27,7 @@ class ControllerListener
     }
 
     /**
-     * Checks if an access to a controller action is granted or not.
+     * Checks whether access to a controller action is granted or not.
      *
      * This method is executed just before any controller action.
      *
@@ -44,23 +44,32 @@ class ControllerListener
             if (is_array($controller)) {
                 [$object, $method] = $controller;
                 $className = ClassUtils::getRealClass($object);
+                $this->checkController($className, $method, $event);
+            } elseif (\is_object($controller) && \method_exists($controller, '__invoke')) {
+                // Handle invokable controllers
+                $className = ClassUtils::getRealClass($controller);
+                $method = '__invoke';
+                $this->checkController($className, $method, $event);
+            }
+        }
+    }
 
-                $this->logger->debug(
-                    sprintf(
-                        'Invoked controller "%s::%s". (%s)',
-                        $className,
-                        $method,
-                        $event->getRequestType() === HttpKernelInterface::MAIN_REQUEST
-                            ? 'MAIN_REQUEST'
-                            : 'SUB_REQUEST'
-                    )
-                );
+    protected function checkController(string $className, mixed $method, ControllerEvent $event): void
+    {
+        $this->logger->debug(
+            sprintf(
+                'Invoked controller "%s::%s". (%s)',
+                $className,
+                $method,
+                $event->getRequestType() === HttpKernelInterface::MAIN_REQUEST
+                    ? 'MAIN_REQUEST'
+                    : 'SUB_REQUEST'
+            )
+        );
 
-                if (!$this->classAuthorizationChecker->isClassMethodGranted($className, $method)) {
-                    if ($event->getRequestType() === HttpKernelInterface::MAIN_REQUEST) {
-                        throw new AccessDeniedException(sprintf('Access denied to %s::%s.', $className, $method));
-                    }
-                }
+        if (!$this->classAuthorizationChecker->isClassMethodGranted($className, $method)) {
+            if ($event->getRequestType() === HttpKernelInterface::MAIN_REQUEST) {
+                throw new AccessDeniedException(sprintf('Access denied to %s::%s.', $className, $method));
             }
         }
     }
