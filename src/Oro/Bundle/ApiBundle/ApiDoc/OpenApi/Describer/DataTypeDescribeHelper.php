@@ -379,10 +379,18 @@ class DataTypeDescribeHelper implements SchemaStorageAwareInterface
             $types[] = Util::createType($schema, $dataType);
         }
         $types[] = Util::createSchemaRef($schema, $this->registerDataType($api, Util::TYPE_OBJECT)->schema);
-        $types[] = Util::createSchemaRef($schema, $this->registerDataType($api, Util::TYPE_ARRAY)->schema);
+        $types[] = $this->createMixedArrayType($schema);
         $schema->type = Util::TYPE_OBJECT;
-        $schema->oneOf = $types;
+        $schema->anyOf = $types;
         $schema->nullable = true;
+    }
+
+    private function createMixedArrayType(OA\Schema $parent): OA\Schema
+    {
+        $schema = Util::createType($parent, Util::TYPE_ARRAY);
+        $schema->items = Util::createArrayItems($schema, $parent->schema);
+
+        return $schema;
     }
 
     private function registerArrayType(OA\OpenApi $api, string $dataType, mixed $defaultValue = null): OA\Schema
