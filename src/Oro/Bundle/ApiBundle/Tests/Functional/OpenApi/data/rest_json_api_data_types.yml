@@ -1105,7 +1105,7 @@ components:
         $ref: '#/components/schemas/mixed'
     mixed:
       type: object
-      oneOf:
+      anyOf:
         -
           type: string
         -
@@ -1117,7 +1117,9 @@ components:
         -
           $ref: '#/components/schemas/object'
         -
-          $ref: '#/components/schemas/array'
+          type: array
+          items:
+            $ref: '#/components/schemas/mixed'
         -
           type: 'null'
     object:
