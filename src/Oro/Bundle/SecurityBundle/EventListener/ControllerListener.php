@@ -69,23 +69,32 @@ class ControllerListener
             if (is_array($controller)) {
                 [$object, $method] = $controller;
                 $className = ClassUtils::getRealClass($object);
+                $this->checkController($className, $method, $event);
+            } elseif (\is_object($controller) && \method_exists($controller, '__invoke')) {
+                // Handle invokable controllers
+                $className = ClassUtils::getRealClass($controller);
+                $method = '__invoke';
+                $this->checkController($className, $method, $event);
+            }
+        }
+    }
 
-                $this->logger->debug(
-                    sprintf(
-                        'Invoked controller "%s::%s". (%s)',
-                        $className,
-                        $method,
-                        $event->getRequestType() === HttpKernelInterface::MAIN_REQUEST
-                            ? 'MAIN_REQUEST'
-                            : 'SUB_REQUEST'
-                    )
-                );
+    protected function checkController(string $className, mixed $method, ControllerArgumentsEvent $event): void
+    {
+        $this->logger->debug(
+            sprintf(
+                'Invoked controller "%s::%s". (%s)',
+                $className,
+                $method,
+                $event->getRequestType() === HttpKernelInterface::MAIN_REQUEST
+                    ? 'MAIN_REQUEST'
+                    : 'SUB_REQUEST'
+            )
+        );
 
-                if (!$this->classAuthorizationChecker->isClassMethodGranted($className, $method)) {
-                    if ($event->getRequestType() === HttpKernelInterface::MAIN_REQUEST) {
-                        throw new AccessDeniedException(sprintf('Access denied to %s::%s.', $className, $method));
-                    }
-                }
+        if (!$this->classAuthorizationChecker->isClassMethodGranted($className, $method)) {
+            if ($event->getRequestType() === HttpKernelInterface::MAIN_REQUEST) {
+                throw new AccessDeniedException(sprintf('Access denied to %s::%s.', $className, $method));
             }
         }
     }

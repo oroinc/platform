@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
@@ -15,10 +17,13 @@ use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ControllerListenerTest extends TestCase
 {
-    private const CLASS_NAME = TestDomainObject::class;
-    private const METHOD_NAME = 'getId';
+    private const string CLASS_NAME = TestDomainObject::class;
+    private const string METHOD_NAME = 'getId';
 
     private ClassAuthorizationChecker|MockObject $classAuthorizationChecker;
     private RequestAuthorizationChecker|MockObject $requestAuthorizationChecker;
@@ -110,11 +115,125 @@ class ControllerListenerTest extends TestCase
         $this->listener->onKernelControllerArguments($event);
     }
 
-    public function testUnsupportedControllerType(): void
+    public function testInvokableControllerAccessGranted(): void
+    {
+        $controller = new class() {
+            public function __invoke(): array
+            {
+                return [];
+            }
+        };
+
+        $event = new ControllerArgumentsEvent(
+            kernel: $this->createMock(HttpKernelInterface::class),
+            controller: $controller,
+            arguments: [],
+            request: $this->request,
+            requestType: HttpKernelInterface::MAIN_REQUEST
+        );
+
+        $this->logger->expects(self::once())
+            ->method('debug')
+            ->with(
+                self::matchesRegularExpression('/Invoked controller ".*@anonymous.*::__invoke". \(MAIN_REQUEST\)/')
+            );
+
+        $this->classAuthorizationChecker->expects(self::once())
+            ->method('isClassMethodGranted')
+            ->with(self::anything(), '__invoke')
+            ->willReturn(true);
+
+        $this->listener->onKernelControllerArguments($event);
+    }
+
+    public function testInvokableControllerAccessDenied(): void
+    {
+        $this->expectException(AccessDeniedException::class);
+
+        $controller = new class() {
+            public function __invoke(): array
+            {
+                return [];
+            }
+        };
+
+        $event = new ControllerArgumentsEvent(
+            kernel: $this->createMock(HttpKernelInterface::class),
+            controller: $controller,
+            arguments: [],
+            request: $this->request,
+            requestType: HttpKernelInterface::MAIN_REQUEST
+        );
+
+        $this->logger->expects(self::once())
+            ->method('debug')
+            ->with(self::matchesRegularExpression('/Invoked controller ".*@anonymous.*::__invoke". \(MAIN_REQUEST\)/'));
+
+        $this->classAuthorizationChecker->expects(self::once())
+            ->method('isClassMethodGranted')
+            ->with(self::anything(), '__invoke')
+            ->willReturn(false);
+
+        $this->listener->onKernelControllerArguments($event);
+    }
+
+    public function testInvokableControllerAccessDeniedForSubRequest(): void
+    {
+        $controller = new class() {
+            public function __invoke(): array
+            {
+                return [];
+            }
+        };
+
+        $event = new ControllerArgumentsEvent(
+            kernel: $this->createMock(HttpKernelInterface::class),
+            controller: $controller,
+            arguments: [],
+            request: $this->request,
+            requestType: HttpKernelInterface::SUB_REQUEST
+        );
+
+        $this->logger->expects(self::once())
+            ->method('debug')
+            ->with(self::matchesRegularExpression('/Invoked controller ".*@anonymous.*::__invoke". \(SUB_REQUEST\)/'));
+
+        $this->classAuthorizationChecker->expects(self::once())
+            ->method('isClassMethodGranted')
+            ->with(self::anything(), '__invoke')
+            ->willReturn(false);
+
+        $this->listener->onKernelControllerArguments($event);
+    }
+
+    public function testClosureController(): void
     {
         $event = new ControllerArgumentsEvent(
             kernel: $this->createMock(HttpKernelInterface::class),
             controller: static fn () => null,
+            arguments: [],
+            request: $this->request,
+            requestType: HttpKernelInterface::MAIN_REQUEST
+        );
+
+        $this->logger->expects(self::once())
+            ->method('debug')
+            ->with(self::matchesRegularExpression('/Invoked controller "Closure::__invoke". \(MAIN_REQUEST\)/'));
+
+        $this->classAuthorizationChecker->expects(self::once())
+            ->method('isClassMethodGranted')
+            ->with('Closure', '__invoke')
+            ->willReturn(true);
+
+        $this->listener->onKernelControllerArguments($event);
+    }
+
+    public function testStringFunctionController(): void
+    {
+        // This is just a sanity check, as in Symfony we wouldn't use a string function controller
+        $event = new ControllerArgumentsEvent(
+            kernel: $this->createMock(HttpKernelInterface::class),
+            controller: 'var_dump',
             arguments: [],
             request: $this->request,
             requestType: HttpKernelInterface::MAIN_REQUEST
