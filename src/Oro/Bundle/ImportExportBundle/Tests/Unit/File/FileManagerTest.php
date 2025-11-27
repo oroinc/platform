@@ -5,10 +5,12 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\File;
 use Gaufrette\File;
 use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\TempDirExtension;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class FileManagerTest extends \PHPUnit\Framework\TestCase
 {
@@ -147,6 +149,137 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             [$bomBytes . ' some Test Content ', ' some Test Content '],
             ['Test content ' . $bomBytes, 'Test content ' . $bomBytes],
         ];
+    }
+
+    public function testWriteToStorage(): void
+    {
+        $fileName = 'test.txt';
+        $content = 'test content';
+
+        $this->gaufretteFileManager->expects(self::once())
+            ->method('writeToStorage')
+            ->with($content, $fileName);
+
+        $this->fileManager->writeToStorage($content, $fileName);
+    }
+
+    public function testWriteToTmpLocalStorage(): void
+    {
+        $fileName = 'test.txt';
+        $content = 'test content';
+
+        $this->gaufretteFileManager->expects(self::once())
+            ->method('getFileContent')
+            ->with($fileName)
+            ->willReturn($content);
+
+        $fileManager = new FileManager($this->gaufretteFileManager);
+        $tmpFileName = $fileManager->writeToTmpLocalStorage($fileName);
+        self::assertFileExists($tmpFileName);
+        self::assertEquals($content, file_get_contents($tmpFileName));
+
+        self::assertCount(1, ReflectionUtil::getPropertyValue($fileManager, 'tempFileHandles'));
+
+        // test that temp file is removed in destructor
+        $fileManager = null;
+        self::assertFileDoesNotExist($tmpFileName);
+    }
+
+    public function testWriteToTmpLocalStorageWhenTempFileIsRemovedOutside(): void
+    {
+        $fileName = 'test.txt';
+        $content = 'test content';
+
+        $this->gaufretteFileManager->expects(self::once())
+            ->method('getFileContent')
+            ->with($fileName)
+            ->willReturn($content);
+
+        $fileManager = new FileManager($this->gaufretteFileManager);
+        $tmpFileName = $fileManager->writeToTmpLocalStorage($fileName);
+        self::assertFileExists($tmpFileName);
+        self::assertEquals($content, file_get_contents($tmpFileName));
+
+        $tempFileHandles = ReflectionUtil::getPropertyValue($fileManager, 'tempFileHandles');
+        self::assertCount(1, $tempFileHandles);
+
+        unlink(stream_get_meta_data($tempFileHandles[0])['uri']);
+        self::assertFileDoesNotExist($tmpFileName);
+
+        // test that there is no an exception in destructor
+        $fileManager = null;
+    }
+
+    public function testWriteToTmpLocalStorageWhenTempFileIsClosedOutside(): void
+    {
+        $fileName = 'test.txt';
+        $content = 'test content';
+
+        $this->gaufretteFileManager->expects(self::once())
+            ->method('getFileContent')
+            ->with($fileName)
+            ->willReturn($content);
+
+        $fileManager = new FileManager($this->gaufretteFileManager);
+        $tmpFileName = $fileManager->writeToTmpLocalStorage($fileName);
+        self::assertFileExists($tmpFileName);
+        self::assertEquals($content, file_get_contents($tmpFileName));
+
+        $tempFileHandles = ReflectionUtil::getPropertyValue($fileManager, 'tempFileHandles');
+        self::assertCount(1, $tempFileHandles);
+
+        fclose($tempFileHandles[0]);
+        self::assertFileDoesNotExist($tmpFileName);
+
+        // test that there is no an exception in destructor
+        $fileManager = null;
+    }
+
+    public function testCreateTmpFile(): void
+    {
+        $fileManager = new FileManager($this->gaufretteFileManager);
+        $tmpFileName = $fileManager->createTmpFile();
+        self::assertFileExists($tmpFileName);
+
+        $tempFileHandles = ReflectionUtil::getPropertyValue($fileManager, 'tempFileHandles');
+        self::assertCount(1, $tempFileHandles);
+
+        // test that temp file is removed in destructor
+        $fileManager = null;
+        self::assertFileDoesNotExist($tmpFileName);
+    }
+
+    public function testDeleteTmpFile(): void
+    {
+        $tmpFileName = $this->fileManager->createTmpFile();
+        self::assertFileExists($tmpFileName);
+
+        $tempFileHandles = ReflectionUtil::getPropertyValue($this->fileManager, 'tempFileHandles');
+        self::assertCount(1, $tempFileHandles);
+
+        $this->fileManager->deleteTmpFile($tmpFileName);
+        self::assertFileDoesNotExist($tmpFileName);
+
+        $tempFileHandles = ReflectionUtil::getPropertyValue($this->fileManager, 'tempFileHandles');
+        self::assertCount(0, $tempFileHandles);
+    }
+
+    public function testDeleteTmpFileWhenTempFileIsClosedOutside(): void
+    {
+        $tmpFileName = $this->fileManager->createTmpFile();
+        self::assertFileExists($tmpFileName);
+
+        $tempFileHandles = ReflectionUtil::getPropertyValue($this->fileManager, 'tempFileHandles');
+        self::assertCount(1, $tempFileHandles);
+
+        fclose($tempFileHandles[0]);
+        self::assertFileDoesNotExist($tmpFileName);
+
+        $this->fileManager->deleteTmpFile($tmpFileName);
+        self::assertFileDoesNotExist($tmpFileName);
+
+        $tempFileHandles = ReflectionUtil::getPropertyValue($this->fileManager, 'tempFileHandles');
+        self::assertCount(1, $tempFileHandles);
     }
 
     public function testGetFilesByPeriodWithDirectory(): void
@@ -382,8 +515,6 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileName = 'test.txt';
         $filePath = '/tmp/test.txt';
 
-        file_put_contents($filePath, $content);
-
         $this->gaufretteFileManager->expects(self::once())
             ->method('getFilePath')
             ->with($fileName)
@@ -394,8 +525,13 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->with($filePath)
             ->willReturn(true);
 
-        self::assertFileExists($filePath);
-        self::assertEquals($expectedSize, $this->fileManager->getFileSize($fileName));
+        file_put_contents($filePath, $content);
+        try {
+            self::assertFileExists($filePath);
+            self::assertEquals($expectedSize, $this->fileManager->getFileSize($fileName));
+        } finally {
+            unlink($filePath);
+        }
     }
 
     public function filesDataProvider(): array
