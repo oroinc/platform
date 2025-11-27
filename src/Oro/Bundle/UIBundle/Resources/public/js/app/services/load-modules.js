@@ -1,4 +1,4 @@
-const modules = require('dynamic-imports');
+import dynamicImports from 'dynamic-imports';
 
 function pick(object, keys) {
     return keys.reduce((obj, key) => {
@@ -10,10 +10,10 @@ function pick(object, keys) {
 }
 
 function loadModule(name, ...values) {
-    if (!modules[name]) {
+    if (!loadModules.getModules()[name]) {
         throw new Error(`Module "${name}" is not found in the list of modules used for dynamic-imports`);
     }
-    return modules[name]().then(module =>
+    return loadModules.getModules()[name]().then(module =>
         values.length === 0 ? module.default : pick(module, values));
 }
 
@@ -76,4 +76,8 @@ loadModules.fromObjectProp = function(obj, prop) {
         .then(module => obj[prop] = module);
 };
 
-module.exports = loadModules;
+loadModules.getModules = function() {
+    return dynamicImports;
+};
+
+export default loadModules;

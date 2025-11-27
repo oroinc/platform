@@ -4,12 +4,10 @@ define(function(require) {
     const $ = require('jquery');
     const _ = require('underscore');
     const Backbone = require('backbone');
-    const componentContainerMixin = require('oroui/js/app/components/base/component-container-mixin');
-    const loadModules = require('oroui/js/app/services/load-modules');
-    const tools = require('oroui/js/tools');
-    const pageVisibilityTracker = require('oroui/js/tools/page-visibility-tracker');
-
-    const console = window.console;
+    const componentContainerMixin = require('oroui/js/app/components/base/component-container-mixin').default;
+    const loadModules = require('oroui/js/app/services/load-modules').default;
+    const tools = require('oroui/js/tools').default;
+    const pageVisibilityTracker = require('oroui/js/tools/page-visibility-tracker').default;
 
     const OriginalBackboneView = Backbone.View;
     Backbone.View = function(options) {

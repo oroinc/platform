@@ -1,15 +1,11 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery';
+import 'bootstrap-alert';
+import 'bootstrap-dropdown';
+import 'bootstrap-modal';
+import 'bootstrap-popover';
+import 'bootstrap-scrollspy';
+import 'bootstrap-tab';
+import 'bootstrap-tooltip';
+import 'bootstrap-typeahead';
 
-    const $ = require('jquery');
-    require('bootstrap-alert');
-    require('bootstrap-dropdown');
-    require('bootstrap-modal');
-    require('bootstrap-popover');
-    require('bootstrap-scrollspy');
-    require('bootstrap-tab');
-    require('bootstrap-tooltip');
-    require('bootstrap-typeahead');
-
-    return $;
-});
+export default $;

@@ -13,15 +13,28 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  * Handles file manipulation logic and all related stuff such as creating path, etc.
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class FileManager
 {
     /** @var GaufretteFileManager */
     private $gaufretteFileManager;
 
+    /** @var resource[] */
+    private $tempFileHandles = [];
+
     public function __construct(GaufretteFileManager $gaufretteFileManager)
     {
         $this->gaufretteFileManager = $gaufretteFileManager;
+    }
+
+    public function __destruct()
+    {
+        foreach ($this->tempFileHandles as $tempFileHandle) {
+            if (\is_resource($tempFileHandle)) {
+                @fclose($tempFileHandle);
+            }
+        }
     }
 
     /**
@@ -104,10 +117,39 @@ class FileManager
     public function writeToTmpLocalStorage(string $fileName): string
     {
         $content = $this->gaufretteFileManager->getFileContent($fileName);
-        $pathFile = self::generateTmpFilePath($fileName);
-        @file_put_contents($pathFile, $content);
 
-        return $pathFile;
+        $tempFilePath = $this->createTmpFile();
+        @file_put_contents($tempFilePath, $content);
+
+        return $tempFilePath;
+    }
+
+    public function createTmpFile(): string
+    {
+        $tempFileHandle = tmpfile();
+        if (!$tempFileHandle) {
+            throw new \RuntimeException('Cannot create a temporary file.');
+        }
+        $this->tempFileHandles[] = $tempFileHandle;
+
+        return stream_get_meta_data($tempFileHandle)['uri'];
+    }
+
+    public function deleteTmpFile(string $filePath): void
+    {
+        $foundTmpFileKey = null;
+        foreach ($this->tempFileHandles as $key => $tempFileHandle) {
+            if (\is_resource($tempFileHandle) && stream_get_meta_data($tempFileHandle)['uri'] === $filePath) {
+                $foundTmpFileKey = $key;
+            }
+        }
+        if (null !== $foundTmpFileKey) {
+            $foundTmpFileHandle = $this->tempFileHandles[$foundTmpFileKey];
+            if (\is_resource($foundTmpFileHandle)) {
+                @fclose($foundTmpFileHandle);
+            }
+            unset($this->tempFileHandles[$foundTmpFileKey]);
+        }
     }
 
     /**
@@ -135,11 +177,6 @@ class FileManager
         }
 
         return $fileName;
-    }
-
-    public static function generateTmpFilePath(string $fileName): string
-    {
-        return sys_get_temp_dir() . DIRECTORY_SEPARATOR . $fileName;
     }
 
     /**

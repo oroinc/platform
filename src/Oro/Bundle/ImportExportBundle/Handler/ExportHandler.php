@@ -46,16 +46,16 @@ class ExportHandler extends AbstractHandler
         if (null === $outputFilePrefix) {
             $outputFilePrefix = $processorType;
         }
-        $fileName = FileManager::generateFileName($outputFilePrefix, $outputFormat);
-        $filePath = FileManager::generateTmpFilePath($fileName);
         $entityName = $this->processorRegistry->getProcessorEntityName($processorType, $processorAlias);
+        $fileName = FileManager::generateFileName($outputFilePrefix, $outputFormat);
+        $tmpFilePath = $this->fileManager->createTmpFile();
 
         $configuration = [
             $processorType => array_merge(
                 [
                     'processorAlias' => $processorAlias,
                     'entityName' => $entityName,
-                    'filePath' => $filePath
+                    'filePath' => $tmpFilePath
                 ],
                 $options
             )
@@ -64,11 +64,11 @@ class ExportHandler extends AbstractHandler
         $jobResult = $this->jobExecutor->executeJob($processorType, $jobName, $configuration);
 
         try {
-            $this->fileManager->writeFileToStorage($filePath, $fileName);
+            $this->fileManager->writeFileToStorage($tmpFilePath, $fileName);
         } catch (\Exception $exception) {
             $jobResult->addFailureException($exception);
         } finally {
-            @unlink($filePath);
+            $this->fileManager->deleteTmpFile($tmpFilePath);
         }
 
         $errors = [];
@@ -137,36 +137,34 @@ class ExportHandler extends AbstractHandler
      */
     public function exportResultFileMerge($jobName, $processorType, $outputFormat, array $files)
     {
-        $fileName = FileManager::generateFileName($processorType, $outputFormat);
-        $localFilePath = FileManager::generateTmpFilePath($fileName);
-
         $this->batchFileManager->setWriter($this->getWriter($outputFormat));
         $this->batchFileManager->setReader($this->getReader($outputFormat));
 
-        $localFiles = [];
-
+        $fileName = FileManager::generateFileName($processorType, $outputFormat);
+        $summaryTmpFilePath = $this->fileManager->createTmpFile();
+        $tmpFilePaths = [];
         try {
             $memoryLimit = (int)PhpIniUtil::parseBytes(ini_get('memory_limit'));
             $filesSize = $this->getFilesSize($files);
-            $this->checkDiskSpace($files, $localFilePath);
+            $this->checkDiskSpace($files, $summaryTmpFilePath);
 
             foreach ($files as $file) {
                 $this->checkMemoryLimit($filesSize, $memoryLimit);
 
                 try {
-                    $tmpPath = $this->fileManager->writeToTmpLocalStorage($file);
+                    $tmpFilePath = $this->fileManager->writeToTmpLocalStorage($file);
                 } catch (FileNotFound $e) {
                     continue;
                 }
-                if ($outputFormat === 'csv') {
-                    $tmpPath = $this->fileManager->fixNewLines($tmpPath);
+                if ('csv' === $outputFormat) {
+                    $tmpFilePath = $this->fileManager->fixNewLines($tmpFilePath);
                 }
 
-                $localFiles[] = $tmpPath;
+                $tmpFilePaths[] = $tmpFilePath;
             }
-            $this->batchFileManager->mergeFiles($localFiles, $localFilePath);
+            $this->batchFileManager->mergeFiles($tmpFilePaths, $summaryTmpFilePath);
 
-            $this->fileManager->copyFileToStorage($localFilePath, $fileName);
+            $this->fileManager->copyFileToStorage($summaryTmpFilePath, $fileName);
 
             foreach ($files as $file) {
                 $this->fileManager->deleteFile($file);
@@ -177,10 +175,10 @@ class ExportHandler extends AbstractHandler
         } catch (\Exception $exception) {
             throw new RuntimeException('Cannot merge export files into single summary file', 0, $exception);
         } finally {
-            foreach ($localFiles as $localFile) {
-                @unlink($localFile);
+            $this->fileManager->deleteTmpFile($summaryTmpFilePath);
+            foreach ($tmpFilePaths as $tmpFilePath) {
+                $this->fileManager->deleteTmpFile($tmpFilePath);
             }
-            @unlink($localFilePath);
         }
 
         return $fileName;

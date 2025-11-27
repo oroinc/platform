@@ -1,7 +1,7 @@
-const loadModules = require('oroui/js/app/services/load-modules');
+import loadModules from 'oroui/js/app/services/load-modules';
 const preloadedModules = {};
 
-module.exports = {
+export default {
     preload: function(moduleName) {
         return loadModules(moduleName).then(function(module) {
             if (!preloadedModules.hasOwnProperty(moduleName)) {

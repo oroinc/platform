@@ -1,25 +1,21 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery';
+import __ from 'orotranslation/js/translator';
+import 'jquery.validate';
 
-    const $ = require('jquery');
-    const __ = require('orotranslation/js/translator');
-    require('jquery.validate');
+const defaultParam = {
+    message: 'This value should not be blank.'
+};
 
-    const defaultParam = {
-        message: 'This value should not be blank.'
-    };
-
-    /**
-     * @export oroform/js/validator/notblank
-     */
-    return [
-        'NotBlank',
-        function(...args) {
-            return $.validator.methods.required.apply(this, args);
-        },
-        function(param) {
-            param = Object.assign({}, defaultParam, param);
-            return __(param.message);
-        }
-    ];
-});
+/**
+ * @export oroform/js/validator/notblank
+ */
+export default [
+    'NotBlank',
+    function(...args) {
+        return $.validator.methods.required.apply(this, args);
+    },
+    function(param) {
+        param = Object.assign({}, defaultParam, param);
+        return __(param.message);
+    }
+];

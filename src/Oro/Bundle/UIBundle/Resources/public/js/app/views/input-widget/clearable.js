@@ -1,68 +1,64 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery';
+import template from 'tpl-loader!oroui/templates/clearable.html';
+import AbstractInputWidgetView from 'oroui/js/app/views/input-widget/abstract';
 
-    const $ = require('jquery');
-    const template = require('tpl-loader!oroui/templates/clearable.html');
-    const AbstractInputWidgetView = require('oroui/js/app/views/input-widget/abstract');
+const ClearableInputWidgetView = AbstractInputWidgetView.extend({
+    refreshOnChange: true,
 
-    const ClearableInputWidgetView = AbstractInputWidgetView.extend({
-        refreshOnChange: true,
+    widgetFunctionName: 'clearable',
 
-        widgetFunctionName: 'clearable',
+    template: template,
 
-        template: template,
+    containerClass: 'clearable-input__container',
 
-        containerClass: 'clearable-input__container',
+    $input: null,
 
-        $input: null,
+    events: {
+        'input input': 'refresh',
+        'change input': 'refresh',
+        'click .clearable-input__clear': 'onClear'
+    },
 
-        events: {
-            'input input': 'refresh',
-            'change input': 'refresh',
-            'click .clearable-input__clear': 'onClear'
-        },
+    /**
+     * @inheritdoc
+     */
+    constructor: function ClearableInputWidgetView(options) {
+        ClearableInputWidgetView.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function ClearableInputWidgetView(options) {
-            ClearableInputWidgetView.__super__.constructor.call(this, options);
-        },
+    render: function() {
+        const $container = $(this.template({placeholderIcon: this.$el.data('placeholder-icon')}));
+        this.$input = this.$el;
+        this.$el.after($container);
+        $container.prepend(this.$input);
 
-        render: function() {
-            const $container = $(this.template({placeholderIcon: this.$el.data('placeholder-icon')}));
-            this.$input = this.$el;
-            this.$el.after($container);
-            $container.prepend(this.$input);
+        this.setElement($container);
 
-            this.setElement($container);
+        return this;
+    },
 
-            return this;
-        },
+    /**
+     * @inheritdoc
+     */
+    widgetFunction: function() {
+        this.render();
+        this.refresh();
+    },
 
-        /**
-         * @inheritdoc
-         */
-        widgetFunction: function() {
-            this.render();
-            this.refresh();
-        },
+    refresh: function() {
+        this.getContainer().toggleClass('clearable-input__container--clear', this.$input.val().length === 0);
+    },
 
-        refresh: function() {
-            this.getContainer().toggleClass('clearable-input__container--clear', this.$input.val().length === 0);
-        },
+    onClear: function() {
+        this.$input.val('').trigger('focus').trigger('input');
+    },
 
-        onClear: function() {
-            this.$input.val('').trigger('focus').trigger('input');
-        },
-
-        /**
-         * @inheritdoc
-         */
-        findContainer: function() {
-            return this.$el;
-        }
-    });
-
-    return ClearableInputWidgetView;
+    /**
+     * @inheritdoc
+     */
+    findContainer: function() {
+        return this.$el;
+    }
 });
+
+export default ClearableInputWidgetView;

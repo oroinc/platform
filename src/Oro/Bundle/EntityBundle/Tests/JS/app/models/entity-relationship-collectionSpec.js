@@ -1,6 +1,5 @@
 import Backbone from 'backbone';
-import entityRelationshipCollectionModuleInjector
-    from 'inject-loader!oroentity/js/app/models/entity-relationship-collection';
+import EntityRelationshipCollection from 'oroentity/js/app/models/entity-relationship-collection';
 
 import EntityModel from 'oroentity/js/app/models/entity-model';
 import RegistryMock from '../../Fixture/app/services/registry/registry-mock';
@@ -9,15 +8,12 @@ describe('oroentity/js/app/models/entity-relationship-collection', function() {
     let applicant1;
     let applicant2;
     let registryMock;
-    let EntityRelationshipCollection;
 
     beforeEach(function() {
         applicant1 = Object.create(Backbone.Events);
         applicant2 = Object.create(Backbone.Events);
         registryMock = new RegistryMock();
-        EntityRelationshipCollection = entityRelationshipCollectionModuleInjector({
-            'oroui/js/app/services/registry': registryMock
-        });
+        EntityRelationshipCollection.registry = registryMock;
     });
 
     it('static method EntityRelationshipCollection.globalId', function() {

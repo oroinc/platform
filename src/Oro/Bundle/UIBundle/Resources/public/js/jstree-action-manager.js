@@ -1,60 +1,56 @@
-define(function(require) {
-    'use strict';
+import _ from 'underscore';
+import error from 'oroui/js/error';
 
-    const _ = require('underscore');
-    const error = require('oroui/js/error');
+/**
+ * Actions manager, can stored action views, and share for all jstree
+ *
+ * @type {Object}
+ */
+const ActionManager = {
+    /**
+     * Actions stack
+     *
+     * @property {Object}
+     */
+    actions: {},
 
     /**
-     * Actions manager, can stored action views, and share for all jstree
+     * Register actions
      *
-     * @type {Object}
+     * @param {String} name
+     * @param {Object} action
      */
-    const ActionManager = {
-        /**
-         * Actions stack
-         *
-         * @property {Object}
-         */
-        actions: {},
-
-        /**
-         * Register actions
-         *
-         * @param {String} name
-         * @param {Object} action
-         */
-        addAction: function(name, action) {
-            if (!_.isObject(action) || !action.hasOwnProperty('view')) {
-                return error.showErrorInConsole('"view" and "name" property is required, please define');
-            }
-
-            if (!_.isFunction(action.view)) {
-                return error.showErrorInConsole('"view" should be constructor function');
-            }
-
-            _.defaults(action, {
-                name: name,
-                isAvailable: function() {
-                    return true;
-                }
-            });
-
-            this.actions[action.name] = action;
-        },
-
-        /**
-         *
-         * Get actions for current jstree
-         *
-         * @param {Object} options
-         * @return {Array}
-         */
-        getActions: function(options) {
-            return _.filter(this.actions, function(action) {
-                return action.isAvailable(options);
-            }, this);
+    addAction: function(name, action) {
+        if (!_.isObject(action) || !action.hasOwnProperty('view')) {
+            return error.showErrorInConsole('"view" and "name" property is required, please define');
         }
-    };
 
-    return ActionManager;
-});
+        if (!_.isFunction(action.view)) {
+            return error.showErrorInConsole('"view" should be constructor function');
+        }
+
+        _.defaults(action, {
+            name: name,
+            isAvailable: function() {
+                return true;
+            }
+        });
+
+        this.actions[action.name] = action;
+    },
+
+    /**
+     *
+     * Get actions for current jstree
+     *
+     * @param {Object} options
+     * @return {Array}
+     */
+    getActions: function(options) {
+        return _.filter(this.actions, function(action) {
+            return action.isAvailable(options);
+        }, this);
+    }
+};
+
+export default ActionManager;

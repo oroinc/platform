@@ -19,6 +19,7 @@ use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -103,15 +104,13 @@ abstract class AbstractImportExportTestCase extends WebTestCase
         string $importFilePath
     ): void {
         $this->assertPreImportActionExecuted($configuration, $importFilePath);
-        $preImportMessageData = $this->getOneSentMessageWithTopic(PreImportTopic::getName());
         $this->assertMessageProcessorExecuted();
 
         self::assertMessageSent(ImportTopic::getName());
-        $importMessageData = $this->getOneSentMessageWithTopic(ImportTopic::getName());
+        $this->getOneSentMessageWithTopic(ImportTopic::getName());
         $this->assertMessageProcessorExecuted();
 
-        $this->assertTmpFileRemoved($preImportMessageData['fileName']);
-        $this->assertTmpFileRemoved($importMessageData['fileName']);
+        $this->assertTmpFilesRemoved();
     }
 
     protected function assertImportValidateWorks(
@@ -123,7 +122,6 @@ abstract class AbstractImportExportTestCase extends WebTestCase
 
         $this->assertPreImportValidationActionExecuted($configuration, $importCsvFilePath);
 
-        $preImportValidateMessageData = $this->getOneSentMessageWithTopic(PreImportTopic::getName());
         self::clearMessageCollector();
 
         $this->assertMessageProcessorExecuted();
@@ -148,8 +146,7 @@ abstract class AbstractImportExportTestCase extends WebTestCase
             json_decode($this->getImportExportFileContent($jobId), false, 512, JSON_THROW_ON_ERROR)
         );
 
-        $this->assertTmpFileRemoved($preImportValidateMessageData['fileName']);
-        $this->assertTmpFileRemoved($importValidateMessageData['fileName']);
+        $this->assertTmpFilesRemoved();
         $this->deleteImportExportFile($jobData['errorLogFile']);
     }
 
@@ -161,11 +158,9 @@ abstract class AbstractImportExportTestCase extends WebTestCase
     protected function getOneSentMessageWithTopic(string $topic): array
     {
         $sentMessages = self::getSentMessages();
-
         foreach ($sentMessages as $messageData) {
             if ($messageData['topic'] === $topic) {
                 $message = $messageData['message'];
-
                 if ($message instanceof Message) {
                     return $message->getBody();
                 }
@@ -207,9 +202,7 @@ abstract class AbstractImportExportTestCase extends WebTestCase
         string $importCsvFilePath
     ): void {
         $file = new UploadedFile($importCsvFilePath, basename($importCsvFilePath));
-        $fileName = self::getContainer()
-            ->get('oro_importexport.file.file_manager')
-            ->saveImportingFile($file);
+        $fileName = $this->getFileManager()->saveImportingFile($file);
 
         $this->ajaxRequest(
             'POST',
@@ -244,9 +237,7 @@ abstract class AbstractImportExportTestCase extends WebTestCase
         string $importCsvFilePath
     ): void {
         $file = new UploadedFile($importCsvFilePath, basename($importCsvFilePath));
-        $fileName = self::getContainer()
-            ->get('oro_importexport.file.file_manager')
-            ->saveImportingFile($file);
+        $fileName = $this->getFileManager()->saveImportingFile($file);
 
         $this->client->request(
             'GET',
@@ -392,12 +383,19 @@ abstract class AbstractImportExportTestCase extends WebTestCase
 
     protected function deleteImportExportFile(string $filename)
     {
-        self::getContainer()->get('oro_importexport.file.file_manager')->deleteFile($filename);
+        $this->getFileManager()->deleteFile($filename);
     }
 
-    protected function assertTmpFileRemoved(string $filename): void
+    protected function assertTmpFilesRemoved(): void
     {
-        $filePath = FileManager::generateTmpFilePath($filename);
-        self::assertFileDoesNotExist($filePath);
+        $tempFileHandles = ReflectionUtil::getPropertyValue($this->getFileManager(), 'tempFileHandles');
+        foreach ($tempFileHandles as $tempFileHandle) {
+            self::assertFileDoesNotExist(stream_get_meta_data($tempFileHandle)['uri']);
+        }
+    }
+
+    private function getFileManager(): FileManager
+    {
+        return self::getContainer()->get('oro_importexport.file.file_manager');
     }
 }

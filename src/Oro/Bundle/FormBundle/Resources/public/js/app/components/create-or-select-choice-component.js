@@ -6,7 +6,6 @@ import routing from 'routing';
 import tinyMCE from 'tinymce/tinymce';
 
 const CreateOrSelectChoiceComponent = BaseComponent.extend({
-
     MODE_CREATE: 'create',
     MODE_VIEW: 'view',
     MODE_EDIT: 'edit',

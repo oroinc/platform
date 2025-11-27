@@ -17,8 +17,8 @@ define(function(require) {
 
     const $ = require('jquery');
     const _ = require('underscore');
-    const __ = require('orotranslation/js/translator');
-    const tools = require('oroui/js/tools');
+    const __ = require('orotranslation/js/translator').default;
+    const tools = require('oroui/js/tools').default;
     let config = require('module-config').default(module.id);
     require('jquery-ui/widgets/dialog');
 

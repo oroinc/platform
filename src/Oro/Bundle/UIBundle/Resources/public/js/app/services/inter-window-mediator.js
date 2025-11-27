@@ -1,7 +1,3 @@
-define(function(require) {
-    'use strict';
+import InterWindowMediator from 'oroui/js/app/services/inter-window-mediator/inter-window-mediator';
 
-    const InterWindowMediator = require('oroui/js/app/services/inter-window-mediator/inter-window-mediator');
-
-    return new InterWindowMediator;
-});
+export default new InterWindowMediator;

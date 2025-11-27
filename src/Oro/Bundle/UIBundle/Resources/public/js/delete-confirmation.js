@@ -1,68 +1,64 @@
-define(function(require) {
-    'use strict';
+import _ from 'underscore';
+import __ from 'orotranslation/js/translator';
+import ModalView from 'oroui/js/modal';
+import template from 'tpl-loader!oroui/templates/delete-confirmation.html';
+import moduleConfig from 'module-config';
+const config = {
+    className: 'modal oro-modal-danger',
+    okText: __('Yes, Delete'),
+    title: __('Delete Confirmation'),
+    cancelText: __('Cancel'),
+    okButtonClass: 'btn btn-danger',
+    allowClose: true,
+    ...moduleConfig(module.id)
+};
 
-    const _ = require('underscore');
-    const __ = require('orotranslation/js/translator');
-    const ModalView = require('oroui/js/modal');
-    const template = require('tpl-loader!oroui/templates/delete-confirmation.html');
-    let config = require('module-config').default(module.id);
+/**
+ * Delete confirmation dialog
+ *
+ * @export  oroui/js/delete-confirmation
+ * @class   oroui.DeleteConfirmationView
+ * @extends oroui.ModalView
+ */
+const DeleteConfirmationView = ModalView.extend({
+    /** @property {String} */
+    className: config.className,
 
-    config = Object.assign({}, {
-        className: 'modal oro-modal-danger',
-        okText: __('Yes, Delete'),
-        title: __('Delete Confirmation'),
-        cancelText: __('Cancel'),
-        okButtonClass: 'btn btn-danger',
-        allowClose: true
-    }, config);
+    template,
+
+    /** @property {String} */
+    okText: config.okText,
+
+    /** @property {String} */
+    title: config.title,
+
+    /** @property {String} */
+    cancelText: config.cancelText,
+
+    okButtonClass: config.okButtonClass,
+
+    allowClose: config.allowClose,
+
+    _attributes: {
+        role: 'alertdialog'
+    },
 
     /**
-     * Delete confirmation dialog
-     *
-     * @export  oroui/js/delete-confirmation
-     * @class   oroui.DeleteConfirmationView
-     * @extends oroui.ModalView
+     * @inheritdoc
      */
-    const DeleteConfirmationView = ModalView.extend({
-        /** @property {String} */
-        className: config.className,
+    constructor: function DeleteConfirmationView(options) {
+        DeleteConfirmationView.__super__.constructor.call(this, options);
+    },
 
-        template,
+    /**
+     * @param {Object} options
+     */
+    initialize: function(options) {
+        const fields = ['title', 'okText', 'okButtonClass', 'cancelText', 'allowClose'];
 
-        /** @property {String} */
-        okText: config.okText,
-
-        /** @property {String} */
-        title: config.title,
-
-        /** @property {String} */
-        cancelText: config.cancelText,
-
-        okButtonClass: config.okButtonClass,
-
-        allowClose: config.allowClose,
-
-        _attributes: {
-            role: 'alertdialog'
-        },
-
-        /**
-         * @inheritdoc
-         */
-        constructor: function DeleteConfirmationView(options) {
-            DeleteConfirmationView.__super__.constructor.call(this, options);
-        },
-
-        /**
-         * @param {Object} options
-         */
-        initialize: function(options) {
-            const fields = ['title', 'okText', 'okButtonClass', 'cancelText', 'allowClose'];
-
-            _.defaults(options, _.pick(DeleteConfirmationView.prototype, fields));
-            DeleteConfirmationView.__super__.initialize.call(this, options);
-        }
-    });
-
-    return DeleteConfirmationView;
+        _.defaults(options, _.pick(DeleteConfirmationView.prototype, fields));
+        DeleteConfirmationView.__super__.initialize.call(this, options);
+    }
 });
+
+export default DeleteConfirmationView;

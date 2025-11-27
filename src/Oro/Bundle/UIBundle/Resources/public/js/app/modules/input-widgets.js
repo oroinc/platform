@@ -11,7 +11,7 @@ InputWidgetManager.addWidget('uniform-select', {
 });
 
 InputWidgetManager.addWidget('uniform-file', {
-    selector: 'input:file:not(.no-uniform)',
+    selector: 'input[type="file"]:not(.no-uniform)',
     Widget: UniformFileInputWidget
 });
 

@@ -1,158 +1,154 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery';
+import Backbone from 'backbone';
+import mediator from 'oroui/js/mediator';
+import 'jquery-ui/widget';
 
-    const $ = require('jquery');
-    const Backbone = require('backbone');
-    const mediator = require('oroui/js/mediator');
-    require('jquery-ui/widget');
+$.widget('oroui.sideMenu', {
+    options: {
+        menuPrefix: 'main-menu-group',
+        rootElement: '.main-menu',
+        toggleSelector: '',
+        autoCollapse: true
+    },
 
-    $.widget('oroui.sideMenu', {
-        options: {
-            menuPrefix: 'main-menu-group',
-            rootElement: '.main-menu',
-            toggleSelector: '',
-            autoCollapse: true
-        },
+    /**
+     * Creates side menu
+     *
+     * @private
+     */
+    _create: function() {
+        this.listener = $.extend({}, Backbone.Events);
+        this._on({mainMenuUpdated: this._init});
 
-        /**
-         * Creates side menu
-         *
-         * @private
-         */
-        _create: function() {
-            this.listener = $.extend({}, Backbone.Events);
-            this._on({mainMenuUpdated: this._init});
+        this.$toggle = $(this.options.toggleSelector);
+        this._on(this.$toggle, {click: this.onToggle});
+    },
 
-            this.$toggle = $(this.options.toggleSelector);
-            this._on(this.$toggle, {click: this.onToggle});
-        },
+    /**
+     * Destroys widget's references
+     *
+     * @private
+     */
+    _destroy: function() {
+        this.listener.stopListening(mediator);
+    },
 
-        /**
-         * Destroys widget's references
-         *
-         * @private
-         */
-        _destroy: function() {
-            this.listener.stopListening(mediator);
-        },
+    /**
+     * Do initial changes
+     *
+     * @private
+     */
+    _init: function() {
+        // should be implemented in descendant
+    },
 
-        /**
-         * Do initial changes
-         *
-         * @private
-         */
-        _init: function() {
-            // should be implemented in descendant
-        },
+    /**
+     * Converts menu's markup from dropdown to accordion
+     *
+     * @private
+     */
+    _convertToAccordion: function() {
+        const $root = this.element.find(this.options.rootElement).first();
+        $root.attr('id', this._getGroupId(0)).addClass('accordion');
+        const $groups = $root.find('.dropdown');
 
-        /**
-         * Converts menu's markup from dropdown to accordion
-         *
-         * @private
-         */
-        _convertToAccordion: function() {
-            const $root = this.element.find(this.options.rootElement).first();
-            $root.attr('id', this._getGroupId(0)).addClass('accordion');
-            const $groups = $root.find('.dropdown');
+        $root.find('.dropdown-menu').removeClass('dropdown-menu').addClass('accordion-body collapse');
+        $root.find('.dropdown-menu-wrapper').removeClass('hidden');
+        $root.find('.dropdown-menu-wrapper__scrollable').css({'max-height': 'none'});
+        $root.find('.dropdown-menu-wrapper__child').css({'margin-left': 0, 'margin-top': 0});
+        $groups.removeClass('dropdown').addClass('accordion-group');
 
-            $root.find('.dropdown-menu').removeClass('dropdown-menu').addClass('accordion-body collapse');
-            $root.find('.dropdown-menu-wrapper').removeClass('hidden');
-            $root.find('.dropdown-menu-wrapper__scrollable').css({'max-height': 'none'});
-            $root.find('.dropdown-menu-wrapper__child').css({'margin-left': 0, 'margin-top': 0});
-            $groups.removeClass('dropdown').addClass('accordion-group');
+        const self = this;
+        $groups.each(function(i) {
+            const $group = $(this);
+            const isActive = $group.hasClass('active');
+            const autoCollapse = self.options.autoCollapse;
+            const $header = $group.find('a>span').first();
+            const $target = $group.find('.accordion-body').first();
+            const headerId = self._getGroupId(i + 1) + '-header';
+            const targetId = self._getGroupId(i + 1);
 
-            const self = this;
-            $groups.each(function(i) {
-                const $group = $(this);
-                const isActive = $group.hasClass('active');
-                const autoCollapse = self.options.autoCollapse;
-                const $header = $group.find('a>span').first();
-                const $target = $group.find('.accordion-body').first();
-                const headerId = self._getGroupId(i + 1) + '-header';
-                const targetId = self._getGroupId(i + 1);
-
-                $header.addClass('accordion-toggle')
-                    .toggleClass('collapsed', !isActive)
-                    .attr({
-                        'id': headerId,
-                        'data-toggle': 'collapse',
-                        'data-target': '#' + targetId,
-                        'aria-controls': targetId,
-                        'aria-expanded': isActive
-                    })
-                    .closest('a').addClass('accordion-heading');
-
-                $target.attr({
-                    'id': targetId,
-                    'role': 'menu',
-                    'data-parent': autoCollapse ? '#' + $header.closest('.accordion').attr('id') : null,
-                    'aria-labelledby': headerId
-                }).toggleClass('show', isActive);
-
-                if ($target.has('.accordion-group')) {
-                    $target.addClass('accordion');
-                }
-            });
-        },
-
-        /**
-         * Converts menu's markup from accordion to dropdown
-         *
-         * @private
-         */
-        _convertToDropdown: function() {
-            this.element.find('.accordion').removeClass('accordion collapsed');
-            this.element.find('.accordion-body')
-                .removeClass('accordion-body collapse show')
+            $header.addClass('accordion-toggle')
+                .toggleClass('collapsed', !isActive)
                 .attr({
-                    'id': null,
-                    'style': null,
-                    'role': null,
-                    'aria-labelledby': null
+                    'id': headerId,
+                    'data-toggle': 'collapse',
+                    'data-target': '#' + targetId,
+                    'aria-controls': targetId,
+                    'aria-expanded': isActive
                 })
-                .addClass('dropdown-menu');
-            this.element.find('.accordion-group').removeClass('accordion-group').addClass('dropdown');
-            this.element.find('.accordion-toggle')
-                .removeClass('accordion-toggle collapsed')
-                .attr({
-                    'id': null,
-                    'data-toggle': null,
-                    'data-target': null,
-                    'data-parent': null,
-                    'aria-controls': null,
-                    'aria-expanded': null
-                });
-            this.element.find('.accordion-heading').removeClass('accordion-heading');
-        },
+                .closest('a').addClass('accordion-heading');
 
-        /**
-         * Handles menu toggle state action
-         *
-         * @param {jQuery.Event} e
-         */
-        onToggle: function(e) {
-            e.stopPropagation();
-            this._toggle();
-        },
+            $target.attr({
+                'id': targetId,
+                'role': 'menu',
+                'data-parent': autoCollapse ? '#' + $header.closest('.accordion').attr('id') : null,
+                'aria-labelledby': headerId
+            }).toggleClass('show', isActive);
 
-        /**
-         * Implements toggling process
-         */
-        _toggle: function() {
-            // should be implemented in descendant
-        },
+            if ($target.has('.accordion-group')) {
+                $target.addClass('accordion');
+            }
+        });
+    },
 
-        /**
-         * Generates id value for sub-menu group
-         *
-         * @param {number} i
-         * @returns {string}
-         * @private
-         */
-        _getGroupId: function(i) {
-            return this.options.menuPrefix + '_' + i;
-        }
-    });
+    /**
+     * Converts menu's markup from accordion to dropdown
+     *
+     * @private
+     */
+    _convertToDropdown: function() {
+        this.element.find('.accordion').removeClass('accordion collapsed');
+        this.element.find('.accordion-body')
+            .removeClass('accordion-body collapse show')
+            .attr({
+                'id': null,
+                'style': null,
+                'role': null,
+                'aria-labelledby': null
+            })
+            .addClass('dropdown-menu');
+        this.element.find('.accordion-group').removeClass('accordion-group').addClass('dropdown');
+        this.element.find('.accordion-toggle')
+            .removeClass('accordion-toggle collapsed')
+            .attr({
+                'id': null,
+                'data-toggle': null,
+                'data-target': null,
+                'data-parent': null,
+                'aria-controls': null,
+                'aria-expanded': null
+            });
+        this.element.find('.accordion-heading').removeClass('accordion-heading');
+    },
 
-    return $;
+    /**
+     * Handles menu toggle state action
+     *
+     * @param {jQuery.Event} e
+     */
+    onToggle: function(e) {
+        e.stopPropagation();
+        this._toggle();
+    },
+
+    /**
+     * Implements toggling process
+     */
+    _toggle: function() {
+        // should be implemented in descendant
+    },
+
+    /**
+     * Generates id value for sub-menu group
+     *
+     * @param {number} i
+     * @returns {string}
+     * @private
+     */
+    _getGroupId: function(i) {
+        return this.options.menuPrefix + '_' + i;
+    }
 });
+
+export default $;

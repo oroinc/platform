@@ -16,6 +16,7 @@ use Oro\Bundle\GaufretteBundle\Exception\FlushFailedException;
 use Oro\Bundle\GaufretteBundle\Exception\ProtocolConfigurationException;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Bundle\GaufretteBundle\FilesystemMap;
+use Oro\Component\Testing\ReflectionUtil;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -2266,7 +2267,6 @@ class FileManagerTest extends TestCase
 
         $fileManager = $this->getFileManager(true);
 
-        $resultFile = null;
         try {
             $resultFile = $fileManager->writeToTemporaryFile($content);
             try {
@@ -2291,7 +2291,6 @@ class FileManagerTest extends TestCase
 
         $fileManager = $this->getFileManager(true);
 
-        $resultFile = null;
         try {
             $resultFile = $fileManager->writeStreamToTemporaryFile($srcStream);
             try {
@@ -2455,5 +2454,23 @@ class FileManagerTest extends TestCase
         self::assertEquals(9, file_put_contents($tmpFileName, 'test_data'));
         self::assertEquals('test_data', file_get_contents($tmpFileName));
         self::assertTrue(unlink($tmpFileName));
+    }
+
+    public function testGetTemporaryFileNameShouldRegisterFileInListOfFilesToBeDeletedAutomatically(): void
+    {
+        $fileManager = $this->getFileManager(true);
+
+        $tmpFileName = $fileManager->getTemporaryFileName();
+        self::assertNotEmpty($tmpFileName);
+        self::assertFileDoesNotExist($tmpFileName);
+
+        self::assertEquals([$tmpFileName => true], ReflectionUtil::getPropertyValue($fileManager, 'tmpFiles'));
+
+        file_put_contents($tmpFileName, 'test_data');
+        self::assertFileExists($tmpFileName);
+
+        $fileManager->clearTempFiles();
+        self::assertFileDoesNotExist($tmpFileName);
+        self::assertEquals([], ReflectionUtil::getPropertyValue($fileManager, 'tmpFiles'));
     }
 }

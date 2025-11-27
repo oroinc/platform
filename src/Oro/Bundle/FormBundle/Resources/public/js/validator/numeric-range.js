@@ -1,12 +1,8 @@
-define(function(require) {
-    'use strict';
+import range from 'oroform/js/validator/range';
 
-    const range = require('oroform/js/validator/range');
+// clone of range constraint
+const numericRange = range.slice();
 
-    // clone of range constraint
-    const numericRange = range.slice();
+numericRange[0] = 'Oro\\Bundle\\ValidationBundle\\Validator\\Constraints\\NumericRange';
 
-    numericRange[0] = 'Oro\\Bundle\\ValidationBundle\\Validator\\Constraints\\NumericRange';
-
-    return numericRange;
-});
+export default numericRange;

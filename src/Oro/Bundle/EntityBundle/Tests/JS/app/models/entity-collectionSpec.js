@@ -1,16 +1,18 @@
 import RegistryMock from '../../Fixture/app/services/registry/registry-mock';
 import EntityModel from 'oroentity/js/app/models/entity-model';
-import entityCollectionModuleInjector from 'inject-loader!oroentity/js/app/models/entity-collection';
+import EntityCollection from 'oroentity/js/app/models/entity-collection';
+import Registry from 'oroui/js/app/services/registry';
 
 describe('oroentity/js/app/models/entity-collection', function() {
     let registryMock;
-    let EntityCollection;
 
     beforeEach(function() {
         registryMock = new RegistryMock();
-        EntityCollection = entityCollectionModuleInjector({
-            'oroui/js/app/services/registry': registryMock
-        });
+        EntityCollection.registry = registryMock;
+    });
+
+    afterEach(function() {
+        EntityCollection.registry = Registry;
     });
 
     describe('create collection', function() {

@@ -1,286 +1,286 @@
-define(function(require) {
-    'use strict';
+import 'jasmine-jquery';
+import $ from 'jquery';
+import Backbone from 'backbone';
+import 'jquery-ui/widget';
+import 'oroui/js/input-widget-manager';
+import 'oroui/js/items-manager/editor';
 
-    const $ = require('oroui/js/items-manager/editor');
-    const Backbone = require('backbone');
+describe('oroui/js/items-manager/editor', function() {
+    let $el;
 
-    describe('oroui/js/items-manager/editor', function() {
-        let $el;
+    beforeEach(function() {
+        $el = $('<div>');
+        $el.append(
+            '<input id="name" name="name"/>' +
+            '<select id="choice" name="choice">' +
+                '<option></option>' +
+                '<option>1</option>' +
+                '<option>2</option>' +
+                '<option>3</option>' +
+            '</select>' +
+            '<textarea id="desc" name="desc"></textarea>' +
+            '<input id="a" type="submit"/>' +
+            '<input id="b" type="submit"/>' +
+            '<input id="c" type="submit"/>' +
+            '<button class="add-button"></button>' +
+            '<button class="save-button"></button>' +
+            '<button class="cancel-button"></button>');
+        $('body').append($el);
+    });
 
-        beforeEach(function() {
-            $el = $('<div>');
-            $el.append(
-                '<input id="name" name="name"/>' +
-                '<select id="choice" name="choice">' +
-                    '<option></option>' +
-                    '<option>1</option>' +
-                    '<option>2</option>' +
-                    '<option>3</option>' +
-                '</select>' +
-                '<textarea id="desc" name="desc"></textarea>' +
-                '<input id="a" type="submit"/>' +
-                '<input id="b" type="submit"/>' +
-                '<input id="c" type="submit"/>' +
-                '<button class="add-button"></button>' +
-                '<button class="save-button"></button>' +
-                '<button class="cancel-button"></button>');
-            $('body').append($el);
-        });
+    afterEach(function() {
+        $el.remove();
+        $el = null;
+    });
 
-        afterEach(function() {
-            $el.remove();
-            $el = null;
-        });
-
-        it('is $ widget', function() {
-            expect(function() {
-                $el.itemsManagerEditor({
-                    collection: new Backbone.Collection()
-                });
-            }).not.toThrow();
-        });
-
-        it('resets inputs', function() {
-            $el.find('#name').val(1);
-            $el.find('#choice').val(2);
-            $el.find('#desc').val(3);
-
+    it('is $ widget', function() {
+        expect(function() {
             $el.itemsManagerEditor({
                 collection: new Backbone.Collection()
             });
+        }).not.toThrow();
+    });
 
-            expect($el.find('#name')).toHaveValue('');
-            expect($el.find('#choice')).toHaveValue('');
-            expect($el.find('#desc')).toHaveValue('');
+    it('resets inputs', function() {
+        $el.find('#name').val(1);
+        $el.find('#choice').val(2);
+        $el.find('#desc').val(3);
+
+        $el.itemsManagerEditor({
+            collection: new Backbone.Collection()
         });
 
-        it('does not reset special inputs', function() {
-            $el.find('#a').val(1);
-            $el.find('#b').val(2);
-            $el.find('#c').val(3);
+        expect($el.find('#name')).toHaveValue('');
+        expect($el.find('#choice')).toHaveValue('');
+        expect($el.find('#desc')).toHaveValue('');
+    });
 
-            $el.itemsManagerEditor({
-                collection: new Backbone.Collection()
-            });
+    it('does not reset special inputs', function() {
+        $el.find('#a').val(1);
+        $el.find('#b').val(2);
+        $el.find('#c').val(3);
 
-            expect($el.find('#a')).toHaveValue('1');
-            expect($el.find('#b')).toHaveValue('2');
-            expect($el.find('#c')).toHaveValue('3');
+        $el.itemsManagerEditor({
+            collection: new Backbone.Collection()
         });
 
-        it('sets inputs from edited model', function() {
-            const collection = new Backbone.Collection([{
-                name: 'Name',
-                choice: '2',
-                desc: 'Description'
-            }]);
+        expect($el.find('#a')).toHaveValue('1');
+        expect($el.find('#b')).toHaveValue('2');
+        expect($el.find('#c')).toHaveValue('3');
+    });
 
-            $el.itemsManagerEditor({
-                collection: collection
-            });
+    it('sets inputs from edited model', function() {
+        const collection = new Backbone.Collection([{
+            name: 'Name',
+            choice: '2',
+            desc: 'Description'
+        }]);
 
-            collection.at(0).trigger('action:edit', collection.at(0));
-
-            expect($el.find('#name')).toHaveValue('Name');
-            expect($el.find('#choice')).toHaveValue('2');
-            expect($el.find('#desc')).toHaveValue('Description');
+        $el.itemsManagerEditor({
+            collection: collection
         });
 
-        it('updates edited model on button click', function() {
-            const collection = new Backbone.Collection([{
-                name: 'Name',
-                choice: '2',
-                desc: 'Description'
-            }]);
+        collection.at(0).trigger('action:edit', collection.at(0));
 
-            $el.itemsManagerEditor({
-                collection: collection
-            });
+        expect($el.find('#name')).toHaveValue('Name');
+        expect($el.find('#choice')).toHaveValue('2');
+        expect($el.find('#desc')).toHaveValue('Description');
+    });
 
-            collection.at(0).trigger('action:edit', collection.at(0));
+    it('updates edited model on button click', function() {
+        const collection = new Backbone.Collection([{
+            name: 'Name',
+            choice: '2',
+            desc: 'Description'
+        }]);
 
-            $el.find('#name').val('Name2');
-            $el.find('#choice').val(3);
-            $el.find('#desc').val('Description2');
-
-            $el.find('.save-button').trigger('click');
-
-            expect(collection.at(0).get('name')).toEqual('Name2');
-            expect(collection.at(0).get('choice')).toEqual('3');
-            expect(collection.at(0).get('desc')).toEqual('Description2');
+        $el.itemsManagerEditor({
+            collection: collection
         });
 
-        it('does not update edited model on button click', function() {
-            const collection = new Backbone.Collection([{
-                name: 'Name',
-                choice: '2',
-                desc: 'Description'
-            }]);
+        collection.at(0).trigger('action:edit', collection.at(0));
 
-            $el.itemsManagerEditor({
-                collection: collection
-            });
+        $el.find('#name').val('Name2');
+        $el.find('#choice').val(3);
+        $el.find('#desc').val('Description2');
 
-            collection.at(0).trigger('action:edit', collection.at(0));
+        $el.find('.save-button').trigger('click');
 
-            $el.find('#name').val('Name2');
-            $el.find('#choice').val(3);
-            $el.find('#desc').val('Description2');
+        expect(collection.at(0).get('name')).toEqual('Name2');
+        expect(collection.at(0).get('choice')).toEqual('3');
+        expect(collection.at(0).get('desc')).toEqual('Description2');
+    });
 
-            $el.find('.cancel-button').trigger('click');
+    it('does not update edited model on button click', function() {
+        const collection = new Backbone.Collection([{
+            name: 'Name',
+            choice: '2',
+            desc: 'Description'
+        }]);
 
-            expect(collection.at(0).get('name')).toEqual('Name');
-            expect(collection.at(0).get('choice')).toEqual('2');
-            expect(collection.at(0).get('desc')).toEqual('Description');
+        $el.itemsManagerEditor({
+            collection: collection
         });
 
-        it('creates model on button click', function() {
-            const collection = new Backbone.Collection();
+        collection.at(0).trigger('action:edit', collection.at(0));
 
-            $el.itemsManagerEditor({
-                collection: collection
-            });
+        $el.find('#name').val('Name2');
+        $el.find('#choice').val(3);
+        $el.find('#desc').val('Description2');
 
-            $el.find('#name').val('Name');
-            $el.find('#choice').val(1);
-            $el.find('#desc').val('Description');
+        $el.find('.cancel-button').trigger('click');
 
-            $el.find('.add-button').trigger('click');
+        expect(collection.at(0).get('name')).toEqual('Name');
+        expect(collection.at(0).get('choice')).toEqual('2');
+        expect(collection.at(0).get('desc')).toEqual('Description');
+    });
 
-            expect(collection.at(0).get('name')).toEqual('Name');
-            expect(collection.at(0).get('choice')).toEqual('1');
-            expect(collection.at(0).get('desc')).toEqual('Description');
+    it('creates model on button click', function() {
+        const collection = new Backbone.Collection();
+
+        $el.itemsManagerEditor({
+            collection: collection
         });
 
-        it('does not create model on button click', function() {
-            const collection = new Backbone.Collection();
+        $el.find('#name').val('Name');
+        $el.find('#choice').val(1);
+        $el.find('#desc').val('Description');
 
-            $el.itemsManagerEditor({
-                collection: collection
-            });
+        $el.find('.add-button').trigger('click');
 
-            $el.find('#name').val('Name');
-            $el.find('#choice').val(1);
-            $el.find('#desc').val('Description');
+        expect(collection.at(0).get('name')).toEqual('Name');
+        expect(collection.at(0).get('choice')).toEqual('1');
+        expect(collection.at(0).get('desc')).toEqual('Description');
+    });
 
-            $el.find('.cancel-button').trigger('click');
+    it('does not create model on button click', function() {
+        const collection = new Backbone.Collection();
 
-            expect(collection.length).toEqual(0);
+        $el.itemsManagerEditor({
+            collection: collection
         });
 
-        it('resets inputs if model removed', function() {
-            const collection = new Backbone.Collection([{
-                name: 'Name',
-                choice: '2',
-                desc: 'Description'
-            }]);
+        $el.find('#name').val('Name');
+        $el.find('#choice').val(1);
+        $el.find('#desc').val('Description');
 
-            $el.itemsManagerEditor({
-                collection: collection
-            });
+        $el.find('.cancel-button').trigger('click');
 
-            collection.at(0).trigger('action:edit', collection.at(0));
-            collection.remove(collection.at(0));
+        expect(collection.length).toEqual(0);
+    });
 
-            expect($el.find('#name')).toHaveValue('');
-            expect($el.find('#choice')).toHaveValue('');
-            expect($el.find('#desc')).toHaveValue('');
+    it('resets inputs if model removed', function() {
+        const collection = new Backbone.Collection([{
+            name: 'Name',
+            choice: '2',
+            desc: 'Description'
+        }]);
+
+        $el.itemsManagerEditor({
+            collection: collection
         });
 
-        it('hides edit button if new model', function() {
-            const collection = new Backbone.Collection([{
-                name: 'Name',
-                choice: '2',
-                desc: 'Description'
-            }]);
+        collection.at(0).trigger('action:edit', collection.at(0));
+        collection.remove(collection.at(0));
 
-            $el.itemsManagerEditor({
-                collection: collection
-            });
+        expect($el.find('#name')).toHaveValue('');
+        expect($el.find('#choice')).toHaveValue('');
+        expect($el.find('#desc')).toHaveValue('');
+    });
 
-            expect($el.find('.save-button')).toBeHidden();
+    it('hides edit button if new model', function() {
+        const collection = new Backbone.Collection([{
+            name: 'Name',
+            choice: '2',
+            desc: 'Description'
+        }]);
+
+        $el.itemsManagerEditor({
+            collection: collection
         });
 
-        it('hides add button if editing model', function() {
-            const collection = new Backbone.Collection([{
-                name: 'Name',
-                choice: '2',
-                desc: 'Description'
-            }]);
+        expect($el.find('.save-button')).toBeHidden();
+    });
 
-            $el.itemsManagerEditor({
-                collection: collection
-            });
+    it('hides add button if editing model', function() {
+        const collection = new Backbone.Collection([{
+            name: 'Name',
+            choice: '2',
+            desc: 'Description'
+        }]);
 
-            collection.at(0).trigger('action:edit', collection.at(0));
-
-            expect($el.find('.add-button')).toBeHidden();
+        $el.itemsManagerEditor({
+            collection: collection
         });
 
-        it('calls setter for each input', function() {
-            const collection = new Backbone.Collection([{
-                name: 'Name',
-                choice: '2',
-                desc: 'Description'
-            }]);
+        collection.at(0).trigger('action:edit', collection.at(0));
 
-            $el.itemsManagerEditor({
-                collection: collection,
-                setter: function($el, name, value) {
-                    if (name === 'name') {
-                        return value + '2';
-                    }
-                    if (name === 'choice') {
-                        return 3;
-                    }
-                    if (name === 'desc') {
-                        return value + '2';
-                    }
-                    return value;
+        expect($el.find('.add-button')).toBeHidden();
+    });
+
+    it('calls setter for each input', function() {
+        const collection = new Backbone.Collection([{
+            name: 'Name',
+            choice: '2',
+            desc: 'Description'
+        }]);
+
+        $el.itemsManagerEditor({
+            collection: collection,
+            setter: function($el, name, value) {
+                if (name === 'name') {
+                    return value + '2';
                 }
-            });
-
-            collection.at(0).trigger('action:edit', collection.at(0));
-
-            expect($el.find('#name')).toHaveValue('Name2');
-            expect($el.find('#choice')).toHaveValue('3');
-            expect($el.find('#desc')).toHaveValue('Description2');
-        });
-
-        it('calls getter for each input', function() {
-            const collection = new Backbone.Collection([{
-                name: 'Name',
-                choice: '2',
-                desc: 'Description'
-            }]);
-
-            $el.itemsManagerEditor({
-                collection: collection,
-                getter: function($el, name, value) {
-                    if (name === 'name') {
-                        return value + '2';
-                    }
-                    if (name === 'choice') {
-                        return '1';
-                    }
-                    if (name === 'desc') {
-                        return value + '2';
-                    }
-                    return value;
+                if (name === 'choice') {
+                    return 3;
                 }
-            });
-
-            collection.at(0).trigger('action:edit', collection.at(0));
-
-            $el.find('#name').val('Name2');
-            $el.find('#choice').val(3);
-            $el.find('#desc').val('Description2');
-
-            $el.find('.save-button').trigger('click');
-
-            expect(collection.at(0).get('name')).toEqual('Name22');
-            expect(collection.at(0).get('choice')).toEqual('1');
-            expect(collection.at(0).get('desc')).toEqual('Description22');
+                if (name === 'desc') {
+                    return value + '2';
+                }
+                return value;
+            }
         });
+
+        collection.at(0).trigger('action:edit', collection.at(0));
+
+        expect($el.find('#name')).toHaveValue('Name2');
+        expect($el.find('#choice')).toHaveValue('3');
+        expect($el.find('#desc')).toHaveValue('Description2');
+    });
+
+    it('calls getter for each input', function() {
+        const collection = new Backbone.Collection([{
+            name: 'Name',
+            choice: '2',
+            desc: 'Description'
+        }]);
+
+        $el.itemsManagerEditor({
+            collection: collection,
+            getter: function($el, name, value) {
+                if (name === 'name') {
+                    return value + '2';
+                }
+                if (name === 'choice') {
+                    return '1';
+                }
+                if (name === 'desc') {
+                    return value + '2';
+                }
+                return value;
+            }
+        });
+
+        collection.at(0).trigger('action:edit', collection.at(0));
+
+        $el.find('#name').val('Name2');
+        $el.find('#choice').val(3);
+        $el.find('#desc').val('Description2');
+
+        $el.find('.save-button').trigger('click');
+
+        expect(collection.at(0).get('name')).toEqual('Name22');
+        expect(collection.at(0).get('choice')).toEqual('1');
+        expect(collection.at(0).get('desc')).toEqual('Description22');
     });
 });

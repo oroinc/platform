@@ -1,19 +1,15 @@
-define(function(require) {
-    'use strict';
+import HistoryStateModel from './history-state-model';
+import BaseCollection from './base/collection';
 
-    const HistoryStateModel = require('./history-state-model');
-    const BaseCollection = require('./base/collection');
+const HistoryStateCollection = BaseCollection.extend({
+    model: HistoryStateModel,
 
-    const HistoryStateCollection = BaseCollection.extend({
-        model: HistoryStateModel,
-
-        /**
-         * @inheritdoc
-         */
-        constructor: function HistoryStateCollection(...args) {
-            HistoryStateCollection.__super__.constructor.apply(this, args);
-        }
-    });
-
-    return HistoryStateCollection;
+    /**
+     * @inheritdoc
+     */
+    constructor: function HistoryStateCollection(...args) {
+        HistoryStateCollection.__super__.constructor.apply(this, args);
+    }
 });
+
+export default HistoryStateCollection;

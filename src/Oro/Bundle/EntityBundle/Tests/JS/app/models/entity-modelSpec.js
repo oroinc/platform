@@ -1,20 +1,22 @@
 import Backbone from 'backbone';
 import RegistryMock from '../../Fixture/app/services/registry/registry-mock';
-import entityModelModuleInjector from 'inject-loader!oroentity/js/app/models/entity-model';
+import EntityModel from 'oroentity/js/app/models/entity-model';
+import Registry from 'oroui/js/app/services/registry';
 
 describe('oroentity/js/app/models/entity-model', function() {
     let applicant1;
     let applicant2;
     let registryMock;
-    let EntityModel;
 
     beforeEach(function() {
         applicant1 = Object.create(Backbone.Events);
         applicant2 = Object.create(Backbone.Events);
         registryMock = new RegistryMock();
-        EntityModel = entityModelModuleInjector({
-            'oroui/js/app/services/registry': registryMock
-        });
+        EntityModel.registry = registryMock;
+    });
+
+    afterEach(function() {
+        EntityModel.registry = Registry;
     });
 
     it('static method EntityModel.globalId', function() {
@@ -318,16 +320,12 @@ describe('oroentity/js/app/models/entity-model', function() {
                 .callFake(function(params, applicant) {
                     return new Backbone.Collection(params.data);
                 });
-            EntityModel = entityModelModuleInjector({
-                'oroui/js/app/services/registry': registryMock,
-                'oroui/js/mediator': {
-                    execute: function(name, params, applicant) {
-                        if (name === 'getEntityRelationshipCollection') {
-                            return getEntityRelationshipCollection(params, applicant);
-                        }
-                    }
-                }
-            });
+
+            spyOn(EntityModel, '_getRelationshipCollection')
+                .and.callFake(function(params, applicant) {
+                    return getEntityRelationshipCollection(params, applicant);
+                });
+
             spyOn(EntityModel, 'getEntityModel').and.callThrough();
             entityModel = new EntityModel(rawData);
         });

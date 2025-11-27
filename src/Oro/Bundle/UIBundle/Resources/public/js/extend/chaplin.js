@@ -1,12 +1,11 @@
-define([
-    'jquery',
-    'underscore',
-    'oroui/js/tools',
-    'oroui/js/app/services/load-modules',
-    'chaplin',
-    'oroui/js/extend/backbone' // it is a circular dependency, required just to make sure that backbone is extended
-], function($, _, tools, loadModules, Chaplin) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools').default;
+    const loadModules = require('oroui/js/app/services/load-modules').default;
+    const Chaplin = require('chaplin');
 
     const original = {};
     const utils = Chaplin.utils;

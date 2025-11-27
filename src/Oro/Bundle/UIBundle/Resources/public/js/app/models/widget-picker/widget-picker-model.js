@@ -1,47 +1,43 @@
-define(function(require) {
-    'use strict';
+import BaseModel from 'oroui/js/app/models/base/model';
+import _ from 'underscore';
 
-    const BaseModel = require('oroui/js/app/models/base/model');
-    const _ = require('underscore');
+const WidgetPickerModel = BaseModel.extend({
+    defaults: {
+        dialogIcon: '',
+        title: '',
+        widgetName: '',
+        description: '',
+        isNew: false,
+        added: 0
+    },
 
-    const WidgetPickerModel = BaseModel.extend({
-        defaults: {
-            dialogIcon: '',
-            title: '',
-            widgetName: '',
-            description: '',
-            isNew: false,
-            added: 0
-        },
+    /**
+     * @inheritdoc
+     */
+    constructor: function WidgetPickerModel(attrs, options) {
+        WidgetPickerModel.__super__.constructor.call(this, attrs, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function WidgetPickerModel(attrs, options) {
-            WidgetPickerModel.__super__.constructor.call(this, attrs, options);
-        },
+    /**
+     *
+     * @returns {String}
+     */
+    getName: function() {
+        return this.get('widgetName');
+    },
 
-        /**
-         *
-         * @returns {String}
-         */
-        getName: function() {
-            return this.get('widgetName');
-        },
+    /**
+     * @returns {Array}
+     */
+    getData: function() {
+        const attributes = _.clone(this.getAttributes());
+        delete attributes.added;
+        return attributes;
+    },
 
-        /**
-         * @returns {Array}
-         */
-        getData: function() {
-            const attributes = _.clone(this.getAttributes());
-            delete attributes.added;
-            return attributes;
-        },
-
-        increaseAddedCounter: function() {
-            this.set('added', this.get('added') + 1);
-        }
-    });
-
-    return WidgetPickerModel;
+    increaseAddedCounter: function() {
+        this.set('added', this.get('added') + 1);
+    }
 });
+
+export default WidgetPickerModel;

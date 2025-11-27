@@ -1,86 +1,83 @@
-define(function(require) {
-    'use strict';
+import _ from 'underscore';
+import $ from 'jquery';
+import Backbone from 'backbone';
+import TagCollection from './collection';
+import template from 'tpl-loader!../templates/tag-list.html';
 
-    const _ = require('underscore');
-    const $ = require('jquery');
-    const Backbone = require('backbone');
-    const TagCollection = require('./collection');
+/**
+ * @export  orotag/js/view
+ * @class   orotag.View
+ * @extends Backbone.View
+ */
+const TagView = Backbone.View.extend({
+    options: {
+        filter: null
+    },
+
+    /** @property */
+    template,
 
     /**
-     * @export  orotag/js/view
-     * @class   orotag.View
-     * @extends Backbone.View
+     * @inheritdoc
      */
-    const TagView = Backbone.View.extend({
-        options: {
-            filter: null
-        },
+    constructor: function TagView(options) {
+        TagView.__super__.constructor.call(this, options);
+    },
 
-        /** @property */
-        template: require('tpl-loader!../templates/tag-list.html'),
+    /**
+     * Constructor
+     */
+    initialize: function(options) {
+        this.options = _.defaults(options || {}, this.options);
+        this.collection = new TagCollection();
+        this.listenTo(this.getCollection(), 'reset', this.render);
+        this.listenTo(this, 'filter', this.render);
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function TagView(options) {
-            TagView.__super__.constructor.call(this, options);
-        },
+        this.$tagsHolder = this.$('.tags-holder');
 
-        /**
-         * Constructor
-         */
-        initialize: function(options) {
-            this.options = _.defaults(options || {}, this.options);
-            this.collection = new TagCollection();
-            this.listenTo(this.getCollection(), 'reset', this.render);
-            this.listenTo(this, 'filter', this.render);
+        // process filter action binding
+        this.$('.tag-sort-actions a').on('click', this.filter.bind(this));
+    },
 
-            this.$tagsHolder = this.$('.tags-holder');
+    /**
+     * Filter collection proxy
+     *
+     * @returns {*}
+     */
+    filter: function(e) {
+        const $el = $(e.target);
 
-            // process filter action binding
-            this.$('.tag-sort-actions a').on('click', this.filter.bind(this));
-        },
+        // clear all active links
+        $el.parents('ul').find('a.active').removeClass('active');
+        // make current filter active
+        $el.addClass('active');
 
-        /**
-         * Filter collection proxy
-         *
-         * @returns {*}
-         */
-        filter: function(e) {
-            const $el = $(e.target);
+        this.options.filter = $el.data('type');
+        this.trigger('filter');
 
-            // clear all active links
-            $el.parents('ul').find('a.active').removeClass('active');
-            // make current filter active
-            $el.addClass('active');
+        return this;
+    },
 
-            this.options.filter = $el.data('type');
-            this.trigger('filter');
+    /**
+     * Get collection object
+     *
+     * @returns {*}
+     */
+    getCollection: function() {
+        return this.collection;
+    },
 
-            return this;
-        },
-
-        /**
-         * Get collection object
-         *
-         * @returns {*}
-         */
-        getCollection: function() {
-            return this.collection;
-        },
-
-        /**
-         * Render widget
-         *
-         * @returns {}
-         */
-        render: function() {
-            const templateData = this.getCollection().getFilteredCollection(this.options.filter);
-            templateData.options = this.options;
-            this.$tagsHolder.html(this.template(templateData));
-            return this;
-        }
-    });
-
-    return TagView;
+    /**
+     * Render widget
+     *
+     * @returns {}
+     */
+    render: function() {
+        const templateData = this.getCollection().getFilteredCollection(this.options.filter);
+        templateData.options = this.options;
+        this.$tagsHolder.html(this.template(templateData));
+        return this;
+    }
 });
+
+export default TagView;

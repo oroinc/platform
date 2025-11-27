@@ -1,7 +1,3 @@
-define(function() {
-    'use strict';
-
-    return [
-        ['*pathname', 'page#index']
-    ];
-});
+export default [
+    ['*pathname', 'page#index']
+];
