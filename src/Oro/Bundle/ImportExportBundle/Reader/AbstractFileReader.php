@@ -66,7 +66,7 @@ abstract class AbstractFileReader extends AbstractReader implements ClosableInte
             );
         }
 
-        $this->setFilePath($context->getOption('filePath'));
+        $this->setFilePath($context->getOption(Context::OPTION_FILE_PATH));
 
         if ($context->hasOption(Context::OPTION_FIRST_LINE_IS_HEADER)) {
             $this->firstLineIsHeader = (bool)$context->getOption(Context::OPTION_FIRST_LINE_IS_HEADER);
