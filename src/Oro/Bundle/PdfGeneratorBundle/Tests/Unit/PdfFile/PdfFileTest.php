@@ -8,7 +8,6 @@ use GuzzleHttp\Psr7\LazyOpenStream;
 use GuzzleHttp\Psr7\Utils;
 use Oro\Bundle\PdfGeneratorBundle\PdfFile\PdfFile;
 use Oro\Component\Testing\TempDirExtension;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 
@@ -16,54 +15,49 @@ final class PdfFileTest extends TestCase
 {
     use TempDirExtension;
 
-    private StreamInterface&MockObject $stream;
-    private string $filePath;
-    private string $mimeType;
-
-    protected function setUp(): void
-    {
-        $this->stream = $this->createMock(StreamInterface::class);
-        $this->filePath = $this->getTempFile('pdf_file', 'test', '.pdf');
-        $this->mimeType = 'application/pdf';
-    }
-
     public function testGetStreamWithStreamInstance(): void
     {
-        $pdfFile = new PdfFile($this->stream, $this->mimeType);
+        $stream = $this->createMock(StreamInterface::class);
+        $pdfFile = new PdfFile($stream, 'application/pdf');
 
-        self::assertSame($this->stream, $pdfFile->getStream());
+        self::assertSame($stream, $pdfFile->getStream());
     }
 
     public function testGetStreamWithFilePath(): void
     {
-        $pdfFile = new PdfFile($this->filePath, $this->mimeType);
+        $filePath = $this->getTempFile('pdf_file', 'test', '.pdf');
+        $pdfFile = new PdfFile($filePath, 'application/pdf');
 
         self::assertInstanceOf(LazyOpenStream::class, $pdfFile->getStream());
     }
 
     public function testGetPathWithFilePath(): void
     {
-        $pdfFile = new PdfFile($this->filePath, $this->mimeType);
+        $filePath = $this->getTempFile('pdf_file', 'test', '.pdf');
+        $pdfFile = new PdfFile($filePath, 'application/pdf');
 
-        self::assertSame($this->filePath, $pdfFile->getPath());
+        self::assertSame($filePath, $pdfFile->getPath());
     }
 
     public function testGetPathWithStreamCreatesTempFile(): void
     {
         $stream = Utils::streamFor('Sample PDF content');
-        $pdfFile = new PdfFile($stream, $this->mimeType);
+        $pdfFile = new PdfFile($stream, 'application/pdf');
 
-        $tempFile = $pdfFile->getPath();
-        self::assertFileExists($tempFile);
+        $path = $pdfFile->getPath();
+        self::assertFileExists($path);
 
-        unset($pdfFile);
-        self::assertFileDoesNotExist($tempFile);
+        self::assertEquals($path, $pdfFile->getPath());
+
+        $pdfFile = null;
+        self::assertFileDoesNotExist($path);
     }
 
     public function testGetMimeType(): void
     {
-        $pdfFile = new PdfFile($this->stream, $this->mimeType);
+        $mimeType = 'application/pdf';
+        $pdfFile = new PdfFile($this->createMock(StreamInterface::class), $mimeType);
 
-        self::assertSame($this->mimeType, $pdfFile->getMimeType());
+        self::assertSame($mimeType, $pdfFile->getMimeType());
     }
 }
