@@ -1,38 +1,34 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery';
+import _ from 'underscore';
+import mediator from 'oroui/js/mediator';
+import layout from 'oroui/js/layout';
 
-    const $ = require('jquery');
-    const _ = require('underscore');
-    const mediator = require('oroui/js/mediator');
-    const layout = require('oroui/js/layout');
+const layoutHelper = {
 
-    const layoutHelper = {
+    elementContext: $('#container'),
 
-        elementContext: $('#container'),
+    /**
+     * @param {string} elementSelector
+     * @param {jQuery} elementContext
+     */
+    setAvailableHeight: function(elementSelector, elementContext) {
+        const $element = $(elementSelector, elementContext || this.elementContext);
 
-        /**
-         * @param {string} elementSelector
-         * @param {jQuery} elementContext
-         */
-        setAvailableHeight: function(elementSelector, elementContext) {
-            const $element = $(elementSelector, elementContext || this.elementContext);
+        const calculateHeight = function() {
+            const height = $(window).height() - $element.offset().top;
+            $element.css({
+                'height': height,
+                'min-height': height
+            });
+        };
 
-            const calculateHeight = function() {
-                const height = $(window).height() - $element.offset().top;
-                $element.css({
-                    'height': height,
-                    'min-height': height
-                });
-            };
+        layout.onPageRendered(calculateHeight);
+        $(window).on('resize', _.debounce(calculateHeight, 50));
+        mediator.on('page:afterChange', calculateHeight);
+        mediator.on('layout:adjustHeight', calculateHeight);
 
-            layout.onPageRendered(calculateHeight);
-            $(window).on('resize', _.debounce(calculateHeight, 50));
-            mediator.on('page:afterChange', calculateHeight);
-            mediator.on('layout:adjustHeight', calculateHeight);
+        calculateHeight();
+    }
+};
 
-            calculateHeight();
-        }
-    };
-
-    return layoutHelper;
-});
+export default layoutHelper;

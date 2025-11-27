@@ -3,27 +3,21 @@ import $ from 'jquery';
 import _ from 'underscore';
 import data from '../../Fixture/app/services/entitystructure-data.json';
 import RegistryMock from '../../Fixture/app/services/registry/registry-mock';
-import providerModuleInjector from 'inject-loader!oroentity/js/app/services/entity-structure-data-provider';
-import entityModelModuleInjector from 'inject-loader!oroentity/js/app/models/entity-model';
-import entityCollectionModuleInjector from 'inject-loader!oroentity/js/app/models/entity-collection';
-import entityStructuresCollectionModuleInjector
-    from 'inject-loader!oroentity/js/app/models/entitystructures-collection';
+import EntityStructureDataProvider from 'oroentity/js/app/services/entity-structure-data-provider';
+import EntityModel from 'oroentity/js/app/models/entity-model';
+import EntityCollection from 'oroentity/js/app/models/entity-collection';
+import EntityStructuresCollection from 'oroentity/js/app/models/entitystructures-collection';
+import Registry from 'oroui/js/app/services/registry';
 
 const routing = {
     generate: jasmine.createSpy('entitySync').and.returnValue('test/url')
 };
 
-const EntityModel = entityModelModuleInjector({
-    routing: routing
-});
-
 describe('oroentity/js/app/services/entity-structure-data-provider', function() {
     let applicant1;
     let applicant2;
     let registryMock;
-    let entitySyncMock;
-    let EntityStructuresCollection;
-    let EntityStructureDataProvider;
+
 
     beforeEach(function() {
         applicant1 = Object.create(Backbone.Events);
@@ -31,32 +25,40 @@ describe('oroentity/js/app/services/entity-structure-data-provider', function() 
 
         registryMock = new RegistryMock();
 
-        entitySyncMock = {
-            'default': jasmine.createSpy('entitySync').and.callFake(function(method, model, options) {
-                // mocks fetch collection action
-                const deferred = $.Deferred();
-                const xhrMock = deferred.promise();
-                model.trigger('request', model, xhrMock, options);
-                deferred.done(options.success).resolve(data);
-                return xhrMock;
-            })
-        };
+        spyOn(EntityModel.prototype, 'url')
+            .and.callFake(function(method, params) {
+                return routing.generate(this.ROUTE[method], _.defaults({entity: this.type, id: this.id}, params));
+            });
 
-        const EntityCollection = entityCollectionModuleInjector({
-            'oroui/js/app/services/registry': registryMock,
-            'oroentity/js/app/models/entity-sync': entitySyncMock,
-            'oroentity/js/app/models/entity-model': EntityModel,
-            'routing': routing
-        });
+        EntityCollection.registry = registryMock;
+        spyOn(EntityCollection.prototype, 'sync')
+            .and.callFake(function(method, model, options) {
+                return jasmine.createSpy('entitySync').and.callFake(function(method, model, options) {
+                    // mocks fetch collection action
+                    const deferred = $.Deferred();
+                    const xhrMock = deferred.promise();
+                    model.trigger('request', model, xhrMock, options);
+                    deferred.done(options.success).resolve(data);
+                    return xhrMock;
+                }).call(this, method, model, options);
+            });
+        spyOn(EntityCollection.prototype, 'url')
+            .and.callFake(function(method, params) {
+                const route = this.ROUTE[method];
+                if (!route) {
+                    throw new Error('Method `' + method + '` is not supported by the collection');
+                }
+                return routing.generate(route, _.defaults({
+                    entity: this.type
+                }, params));
+            });
 
-        EntityStructuresCollection = entityStructuresCollectionModuleInjector({
-            'oroentity/js/app/models/entity-collection': EntityCollection
-        });
+        EntityStructureDataProvider.registry = registryMock;
+    });
 
-        EntityStructureDataProvider = providerModuleInjector({
-            'oroui/js/app/services/registry': registryMock,
-            'oroentity/js/app/models/entitystructures-collection': EntityStructuresCollection
-        });
+    afterEach(function() {
+        EntityCollection.registry = Registry;
+        EntityStructureDataProvider.registry = Registry;
     });
 
     describe('entity structures data provider', function() {

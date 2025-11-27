@@ -1,51 +1,48 @@
-define(function(require) {
-    'use strict';
+import BaseView from 'oroui/js/app/views/base/view';
+import $ from 'jquery';
+import template from 'tpl-loader!../../../templates/zoom-controls.html';
 
-    const BaseView = require('oroui/js/app/views/base/view');
-    const $ = require('jquery');
+const ZoomControlsView = BaseView.extend({
+    autoRender: true,
+    template,
 
-    const ZoomControlsView = BaseView.extend({
-        autoRender: true,
-        template: require('tpl-loader!../../../templates/zoom-controls.html'),
+    events: {
+        'click .btn-zoom-in': 'onZoomInClick',
+        'click .btn-zoom-out': 'onZoomOutClick',
+        'click .btn-auto-zoom': 'onAutoZoomClick',
+        'click .btn-set-zoom': 'onSetZoomClick'
+    },
 
-        events: {
-            'click .btn-zoom-in': 'onZoomInClick',
-            'click .btn-zoom-out': 'onZoomOutClick',
-            'click .btn-auto-zoom': 'onAutoZoomClick',
-            'click .btn-set-zoom': 'onSetZoomClick'
-        },
+    listen: {
+        'change model': 'render'
+    },
 
-        listen: {
-            'change model': 'render'
-        },
+    /**
+     * @inheritdoc
+     */
+    constructor: function ZoomControlsView(options) {
+        ZoomControlsView.__super__.constructor.call(this, options);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function ZoomControlsView(options) {
-            ZoomControlsView.__super__.constructor.call(this, options);
-        },
+    onZoomInClick: function(e) {
+        e.preventDefault();
+        this.model.zoomIn();
+    },
 
-        onZoomInClick: function(e) {
-            e.preventDefault();
-            this.model.zoomIn();
-        },
+    onZoomOutClick: function(e) {
+        e.preventDefault();
+        this.model.zoomOut();
+    },
 
-        onZoomOutClick: function(e) {
-            e.preventDefault();
-            this.model.zoomOut();
-        },
+    onAutoZoomClick: function(e) {
+        e.preventDefault();
+        this.model.autoZoom();
+    },
 
-        onAutoZoomClick: function(e) {
-            e.preventDefault();
-            this.model.autoZoom();
-        },
-
-        onSetZoomClick: function(e) {
-            e.preventDefault();
-            this.model.setZoom(parseFloat($(e.currentTarget).attr('data-size')) / 100);
-        }
-    });
-
-    return ZoomControlsView;
+    onSetZoomClick: function(e) {
+        e.preventDefault();
+        this.model.setZoom(parseFloat($(e.currentTarget).attr('data-size')) / 100);
+    }
 });
+
+export default ZoomControlsView;

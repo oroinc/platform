@@ -1437,7 +1437,7 @@ utils = {
   redirectTo: function(pathDesc, params, options) {
     return require('../mediator').execute('router:route', pathDesc, params, options);
   },
-  loadModule: loadModules,
+  loadModule: loadModules.default,
   matchesSelector: (function() {
     var el, matches;
     el = document.documentElement;

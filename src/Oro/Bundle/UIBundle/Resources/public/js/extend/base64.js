@@ -1,14 +1,10 @@
-define(function(require) {
-    'use strict';
+import 'Base64/base64';
 
-    require('Base64/base64');
-
-    return {
-        encode: function(stringToEncode) {
-            return window.btoa(stringToEncode);
-        },
-        decode: function(encodedData) {
-            return window.atob(encodedData);
-        }
-    };
-});
+export default {
+    encode: function(stringToEncode) {
+        return window.btoa(stringToEncode);
+    },
+    decode: function(encodedData) {
+        return window.atob(encodedData);
+    }
+};

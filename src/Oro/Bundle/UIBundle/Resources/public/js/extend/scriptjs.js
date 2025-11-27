@@ -1,5 +1,6 @@
-const config = require('module-config').default(module.id);
-const scriptjs = require('scriptjs');
+import moduleConfig from 'module-config';
+import scriptjs from 'scriptjs';
+const config = moduleConfig(module.id);
 let scriptjsExtend = scriptjs;
 
 /**
@@ -36,4 +37,4 @@ if ('bundlesPath' in config) {
     };
 }
 
-module.exports = scriptjsExtend;
+export default scriptjsExtend;

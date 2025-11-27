@@ -1,10 +1,5 @@
-define(function(require) {
-    'use strict';
-
-    // stub for vertx library to trick webpack
-    return {
-        runOnLoop: function(t) {
-            setTimeout(t, 0);
-        }
-    };
-});
+export default {
+    runOnLoop: function(t) {
+        setTimeout(t, 0);
+    }
+};

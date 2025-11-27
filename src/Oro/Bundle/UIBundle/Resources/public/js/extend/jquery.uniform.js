@@ -1,65 +1,61 @@
-define(function(require) {
-    'use strict';
-
-    /**
-     * Add or remove extra class in Uniform container if selected value is empty
-     * @param {jQuery.Element} $el
-     * @param {jQuery.Element} $elParent
-     */
-    function markIfEmpty($el, $elParent) {
-        if (!$el.length || !$elParent.length) {
-            return;
-        }
-
-        $elParent.toggleClass('uniform-empty-value', $el[0].value.trim() === '');
+/**
+ * Add or remove extra class in Uniform container if selected value is empty
+ * @param {jQuery.Element} $el
+ * @param {jQuery.Element} $elParent
+ */
+function markIfEmpty($el, $elParent) {
+    if (!$el.length || !$elParent.length) {
+        return;
     }
 
-    /**
-     * Add or remove extra class in Uniform container if an element is in "readonly" state
-     * @param {jQuery.Element} $el
-     * @param {jQuery.Element} $elParent
-     */
-    function markAsReadonly($el, $elParent) {
-        if (!$el.length || !$elParent.length) {
-            return;
-        }
+    $elParent.toggleClass('uniform-empty-value', $el[0].value.trim() === '');
+}
 
-        $elParent.toggleClass('readonly', $el.is('[readonly]'));
+/**
+ * Add or remove extra class in Uniform container if an element is in "readonly" state
+ * @param {jQuery.Element} $el
+ * @param {jQuery.Element} $elParent
+ */
+function markAsReadonly($el, $elParent) {
+    if (!$el.length || !$elParent.length) {
+        return;
     }
 
-    const $ = require('jquery');
-    const _ = require('underscore');
+    $elParent.toggleClass('readonly', $el.is('[readonly]'));
+}
 
-    require('jquery.uniform');
+import $ from 'jquery';
+import _ from 'underscore';
 
-    const classList = ['selectClass', 'selectMultiClass'];
-    const originalUniform = $.fn.uniform;
+import 'jquery.uniform';
 
-    $.fn.uniform = _.wrap($.fn.uniform, function(original, options) {
-        if ($(this).is('select')) {
-            const config = _.extend({}, $.uniform.defaults, options);
-            const uniformParentSelectors = _.map(
-                _.values(_.pick(config, classList)),
-                function(selector) {
-                    return '.' + selector;
-                }).join(', ');
+const classList = ['selectClass', 'selectMultiClass'];
+const originalUniform = $.fn.uniform;
 
-            original.call(this, config);
+$.fn.uniform = _.wrap($.fn.uniform, function(original, options) {
+    if ($(this).is('select')) {
+        const config = _.extend({}, $.uniform.defaults, options);
+        const uniformParentSelectors = _.map(
+            _.values(_.pick(config, classList)),
+            function(selector) {
+                return '.' + selector;
+            }).join(', ');
 
-            return this.each(function() {
-                const $el = $(this);
-                const uniformContainer = $el.parent(uniformParentSelectors);
+        original.call(this, config);
 
-                markIfEmpty($el, uniformContainer);
-                markAsReadonly($el, uniformContainer);
+        return this.each(function() {
+            const $el = $(this);
+            const uniformContainer = $el.parent(uniformParentSelectors);
 
-                $el.on('change' + config.eventNamespace, _.partial(markIfEmpty, $el, uniformContainer));
-            });
-        }
+            markIfEmpty($el, uniformContainer);
+            markAsReadonly($el, uniformContainer);
 
-        return original.call(this, options);
-    });
+            $el.on('change' + config.eventNamespace, _.partial(markIfEmpty, $el, uniformContainer));
+        });
+    }
 
-    $.fn.uniform.restore = originalUniform.restore;
-    $.fn.uniform.update = originalUniform.update;
+    return original.call(this, options);
 });
+
+$.fn.uniform.restore = originalUniform.restore;
+$.fn.uniform.update = originalUniform.update;

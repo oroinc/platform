@@ -1,6 +1,3 @@
-define(function(require) {
-    'use strict';
+import Registry from 'oroui/js/app/services/registry/registry';
 
-    const Registry = require('oroui/js/app/services/registry/registry');
-    return new Registry();
-});
+export default new Registry();

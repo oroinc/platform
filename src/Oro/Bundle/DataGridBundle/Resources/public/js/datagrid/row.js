@@ -392,7 +392,7 @@ const Row = Chaplin.CollectionView.extend({
             if (this.$el.data('layout-model')) {
                 options[this.$el.data('layout-model')] = this.model;
             }
-            this.initLayout(options).finally(() => {
+            this.initLayout(options).always(() => {
                 this._resolveDeferredRender();
             });
         } else {

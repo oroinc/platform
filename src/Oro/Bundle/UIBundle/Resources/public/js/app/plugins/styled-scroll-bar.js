@@ -1,199 +1,196 @@
-define(function(require, exports, module) {
-    'use strict';
+const NAME = 'styledScrollBar';
+const DATA_KEY = 'oro.' + NAME;
 
-    const NAME = 'styledScrollBar';
-    const DATA_KEY = 'oro.' + NAME;
+import $ from 'jquery';
+import _ from 'underscore';
+import BaseClass from 'oroui/js/base-class';
+import error from 'oroui/js/error';
+import OverlayScrollBars from 'overlayScrollbars';
+import moduleConfig from 'module-config';
+const config = moduleConfig(module.id);
 
-    const $ = require('jquery');
-    const _ = require('underscore');
-    const BaseClass = require('oroui/js/base-class');
-    const error = require('oroui/js/error');
-    const OverlayScrollBars = require('overlayScrollbars');
-    const config = require('module-config').default(module.id);
+const allowedConfig = _.omit(config, 'callbacks');
 
-    const allowedConfig = _.omit(config, 'callbacks');
+const ScrollBar = BaseClass.extend({
+    scrollBar: null,
 
-    const ScrollBar = BaseClass.extend({
-        scrollBar: null,
+    /**
+     * @inheritdoc
+     */
+    cidPrefix: 'scrollBar',
 
-        /**
-         * @inheritdoc
-         */
-        cidPrefix: 'scrollBar',
+    /**
+     * @inheritdoc
+     */
+    listen: function() {
+        const listenTo = {};
 
-        /**
-         * @inheritdoc
-         */
-        listen: function() {
-            const listenTo = {};
+        listenTo['layout:reposition mediator'] = _.debounce(this.update.bind(this),
+            this.options('autoUpdateInterval'));
+        return listenTo;
+    },
 
-            listenTo['layout:reposition mediator'] = _.debounce(this.update.bind(this),
-                this.options('autoUpdateInterval'));
-            return listenTo;
-        },
+    /**
+     * @inheritdoc
+     */
+    constructor: function ScrollBar(options, element) {
+        this.element = element;
+        ScrollBar.__super__.constructor.call(this, options, element);
+    },
 
-        /**
-         * @inheritdoc
-         */
-        constructor: function ScrollBar(options, element) {
-            this.element = element;
-            ScrollBar.__super__.constructor.call(this, options, element);
-        },
+    /**
+     * @inheritdoc
+     */
+    initialize: function(options) {
+        this.defaults = $.extend(true, {}, $.fn[NAME].defaults, allowedConfig, options || {});
 
-        /**
-         * @inheritdoc
-         */
-        initialize: function(options) {
-            this.defaults = $.extend(true, {}, $.fn[NAME].defaults, allowedConfig, options || {});
+        this.init();
+        $(window).on(`beforeprint${this.eventNamespace()}`, () => this.destroy());
+        $(window).on(`afterprint${this.eventNamespace()}`, () => this.init());
+    },
 
-            this.init();
-            $(window).on(`beforeprint${this.eventNamespace()}`, () => this.destroy());
-            $(window).on(`afterprint${this.eventNamespace()}`, () => this.init());
-        },
+    eventNamespace: function() {
+        return '.delegateEvents' + this.cid;
+    },
 
-        eventNamespace: function() {
-            return '.delegateEvents' + this.cid;
-        },
-
-        /**
-         * Initialize scroll bar
-         */
-        init() {
-            if (this.scrollBar) {
-                this.destroy();
-            }
-            this.scrollBar = new OverlayScrollBars(this.element, this.defaults);
-        },
-
-        /**
-         * destroy scroll bar
-         */
-        destroy() {
-            if (this.scrollBar) {
-                this.scrollBar.destroy();
-                delete this.scrollBar;
-            }
-        },
-
-        /**
-         * Destroy plugin
-         */
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-
+    /**
+     * Initialize scroll bar
+     */
+    init() {
+        if (this.scrollBar) {
             this.destroy();
-            $.removeData(this.element, DATA_KEY);
-            $(window).off(this.eventNamespace());
+        }
+        this.scrollBar = new OverlayScrollBars(this.element, this.defaults);
+    },
 
-            delete this.defaults;
-            ScrollBar.__super__.dispose.call(this);
-        },
+    /**
+     * destroy scroll bar
+     */
+    destroy() {
+        if (this.scrollBar) {
+            this.scrollBar.destroy();
+            delete this.scrollBar;
+        }
+    },
 
-        /**
-         * Proxy for OverlayScrollBars.options method
-         * @returns {Object|undefined}
-         */
-        options: function(...args) {
-            return this.scrollBar.options(...args);
-        },
+    /**
+     * Destroy plugin
+     */
+    dispose: function() {
+        if (this.disposed) {
+            return;
+        }
 
-        /**
-         * Proxy for OverlayScrollBars.update method
-         */
-        update: function(...args) {
-            if (!this.scrollBar || this.disposed) {
-                return;
+        this.destroy();
+        $.removeData(this.element, DATA_KEY);
+        $(window).off(this.eventNamespace());
+
+        delete this.defaults;
+        ScrollBar.__super__.dispose.call(this);
+    },
+
+    /**
+     * Proxy for OverlayScrollBars.options method
+     * @returns {Object|undefined}
+     */
+    options: function(...args) {
+        return this.scrollBar.options(...args);
+    },
+
+    /**
+     * Proxy for OverlayScrollBars.update method
+     */
+    update: function(...args) {
+        if (!this.scrollBar || this.disposed) {
+            return;
+        }
+        this.scrollBar.update(...args);
+    },
+
+    /**
+     * Proxy for OverlayScrollBars.sleep method
+     */
+    sleep: function() {
+        this.scrollBar.sleep();
+    },
+
+    /**
+     * Proxy for OverlayScrollBars.scroll method
+     * @returns {Object|undefined}
+     */
+    scroll: function(...args) {
+        return this.scrollBar.scroll(...args);
+    },
+
+    /**
+     * Proxy for OverlayScrollBars.scrollStop method
+     * @returns {Object}
+     */
+    scrollStop: function() {
+        return this.scrollBar.scrollStop();
+    },
+
+    /**
+     * Proxy for OverlayScrollBars.getElements method
+     * @returns {Object}
+     */
+    getElements: function() {
+        return this.scrollBar.getElements();
+    },
+
+    /**
+     * Proxy for OverlayScrollBars.getState method
+     * @returns {Object}
+     */
+    getState: function() {
+        return this.scrollBar.getState();
+    },
+
+    /**
+     * @returns {Object}
+     */
+    getDefaults: function() {
+        return $.extend(true, {}, $.fn[NAME].defaults);
+    }
+});
+
+$.fn[NAME] = function(options, ...args) {
+    const isMethodCall = typeof options === 'string';
+    let response = this;
+
+    this.each(function(index) {
+        const $element = $(this);
+        const instance = $element.data(DATA_KEY);
+
+        if (!instance) {
+            $element.data(DATA_KEY, new ScrollBar(options, this));
+            return;
+        }
+
+        if (isMethodCall) {
+            if (options === 'instance') {
+                response = instance;
+                return response;
             }
-            this.scrollBar.update(...args);
-        },
 
-        /**
-         * Proxy for OverlayScrollBars.sleep method
-         */
-        sleep: function() {
-            this.scrollBar.sleep();
-        },
+            if (!_.isFunction(instance[options]) || options.charAt(0) === '_') {
+                error.showErrorInConsole(new Error('Instance ' + NAME + ' doesn\'t support method ' + options ));
+                return false;
+            }
 
-        /**
-         * Proxy for OverlayScrollBars.scroll method
-         * @returns {Object|undefined}
-         */
-        scroll: function(...args) {
-            return this.scrollBar.scroll(...args);
-        },
+            const result = instance[options](...args);
 
-        /**
-         * Proxy for OverlayScrollBars.scrollStop method
-         * @returns {Object}
-         */
-        scrollStop: function() {
-            return this.scrollBar.scrollStop();
-        },
-
-        /**
-         * Proxy for OverlayScrollBars.getElements method
-         * @returns {Object}
-         */
-        getElements: function() {
-            return this.scrollBar.getElements();
-        },
-
-        /**
-         * Proxy for OverlayScrollBars.getState method
-         * @returns {Object}
-         */
-        getState: function() {
-            return this.scrollBar.getState();
-        },
-
-        /**
-         * @returns {Object}
-         */
-        getDefaults: function() {
-            return $.extend(true, {}, $.fn[NAME].defaults);
+            if (result !== void 0 && index === 0) {
+                response = result;
+            }
         }
     });
 
-    $.fn[NAME] = function(options, ...args) {
-        const isMethodCall = typeof options === 'string';
-        let response = this;
+    return response;
+};
 
-        this.each(function(index) {
-            const $element = $(this);
-            const instance = $element.data(DATA_KEY);
-
-            if (!instance) {
-                $element.data(DATA_KEY, new ScrollBar(options, this));
-                return;
-            }
-
-            if (isMethodCall) {
-                if (options === 'instance') {
-                    response = instance;
-                    return response;
-                }
-
-                if (!_.isFunction(instance[options]) || options.charAt(0) === '_') {
-                    error.showErrorInConsole(new Error('Instance ' + NAME + ' doesn\'t support method ' + options ));
-                    return false;
-                }
-
-                const result = instance[options](...args);
-
-                if (result !== void 0 && index === 0) {
-                    response = result;
-                }
-            }
-        });
-
-        return response;
-    };
-
-    $.fn[NAME].constructor = ScrollBar;
-    $.fn[NAME].defaults = {
-        className: 'os-theme-dark',
-        autoUpdateInterval: 50
-    };
-});
+$.fn[NAME].constructor = ScrollBar;
+$.fn[NAME].defaults = {
+    className: 'os-theme-dark',
+    autoUpdateInterval: 50
+};

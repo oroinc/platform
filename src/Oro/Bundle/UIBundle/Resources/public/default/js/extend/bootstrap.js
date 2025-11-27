@@ -1,13 +1,9 @@
-define(function(require) {
-    'use strict';
-
-    require('oroui/js/extend/bootstrap/bootstrap-dropdown');
-    require('oroui/js/extend/bootstrap/bootstrap-modal');
-    require('oroui/js/extend/bootstrap/bootstrap-popover');
-    require('oroui/js/extend/bootstrap/bootstrap-scrollspy');
-    require('oroui/js/extend/bootstrap/bootstrap-tooltip');
-    require('oroui/js/extend/bootstrap/bootstrap-typeahead');
-    require('oroui/js/extend/bootstrap/bootstrap-tabs');
-    require('./boostrap-collapse').default;
-    require('bootstrap');
-});
+import 'oroui/js/extend/bootstrap/bootstrap-dropdown';
+import 'oroui/js/extend/bootstrap/bootstrap-modal';
+import 'oroui/js/extend/bootstrap/bootstrap-popover';
+import 'oroui/js/extend/bootstrap/bootstrap-scrollspy';
+import 'oroui/js/extend/bootstrap/bootstrap-tooltip';
+import 'oroui/js/extend/bootstrap/bootstrap-typeahead';
+import 'oroui/js/extend/bootstrap/bootstrap-tabs';
+import './boostrap-collapse';
+import 'bootstrap';

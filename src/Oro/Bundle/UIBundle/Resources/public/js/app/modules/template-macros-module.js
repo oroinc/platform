@@ -1,4 +1,10 @@
 import {macros} from 'underscore';
+import renderPhone from 'tpl-loader!oroui/templates/macros/phone.html';
+import renderLink from 'tpl-loader!oroui/templates/macros/link.html';
+import renderDirection from 'tpl-loader!oroui/templates/macros/direction.html';
+import renderIcon from 'tpl-loader!oroui/templates/macros/svg-icon.html';
+import renderStatus from 'tpl-loader!oroui/templates/macros/status.html';
+import renderTooltipStatus from 'tpl-loader!oroui/templates/macros/tooltip-status.html';
 
 macros('oroui', {
     /**
@@ -8,7 +14,7 @@ macros('oroui', {
      * @param {Object|string} data.phone
      * @param {string?} data.title optional
      */
-    renderPhone: require('tpl-loader!oroui/templates/macros/phone.html'),
+    renderPhone,
 
     /**
      * Renders link
@@ -21,7 +27,7 @@ macros('oroui', {
      * @param {string?} data.class optional
      * @param {string?} data.title optional
      */
-    renderLink: require('tpl-loader!oroui/templates/macros/link.html'),
+    renderLink,
 
     /**
      * Renders content depended on direction
@@ -38,7 +44,7 @@ macros('oroui', {
      * @param {Object|string} data.class optional
      * @param {Object|string} data.dir optional
      */
-    renderDirection: require('tpl-loader!oroui/templates/macros/direction.html'),
+    renderDirection,
 
     /**
      * Renders svg icon
@@ -51,7 +57,7 @@ macros('oroui', {
      * @param {Object|string} data.fill optional
      * @param {string?} data.ariaHidden optional
      */
-    renderIcon: require('tpl-loader!oroui/templates/macros/svg-icon.html'),
+    renderIcon,
 
     /**
      * Renders a status label
@@ -59,7 +65,7 @@ macros('oroui', {
      * @param {string} data.current
      * @param {Object} data.map
      */
-    renderStatus: require('tpl-loader!oroui/templates/macros/status.html'),
+    renderStatus,
 
     /**
      * Renders a status label as a tooltip
@@ -68,5 +74,5 @@ macros('oroui', {
      * @param {Object} data.map
      * @param {string} data.offset
      */
-    renderTooltipStatus: require('tpl-loader!oroui/templates/macros/tooltip-status.html')
+    renderTooltipStatus
 });

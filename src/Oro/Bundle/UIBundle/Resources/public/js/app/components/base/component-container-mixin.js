@@ -1,101 +1,97 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery';
+import ComponentManager from 'oroui/js/app/components/component-manager';
 
-    const ComponentManager = require('oroui/js/app/components/component-manager');
-    const $ = require('jquery');
+const componentContainerMixin = {
+    /**
+     * @returns {jQuery}
+     */
+    getLayoutElement: function() {
+        throw Error('"getLayoutElement" method have to be defined in the component container');
+    },
 
-    const componentContainerMixin = {
-        /**
-         * @returns {jQuery}
-         */
-        getLayoutElement: function() {
-            throw Error('"getLayoutElement" method have to be defined in the component container');
-        },
-
-        /**
-         * Getter for component manager
-         *
-         * @returns {ComponentManager}
-         */
-        _getComponentManager: function() {
-            if (!this.componentManager) {
-                this.componentManager = new ComponentManager(this.getLayoutElement());
-            }
-            return this.componentManager;
-        },
-
-        /**
-         * Getter/setter for components
-         *
-         * @param {string} name
-         * @param {BaseComponent=} component to set
-         * @param {HTMLElement=} el
-         */
-        pageComponent: function(name, component, el) {
-            if (this.disposed) {
-                component.dispose();
-                return;
-            }
-
-            if (name && component) {
-                if (!el) {
-                    throw Error('The element related to the component is required');
-                }
-                return this._getComponentManager().add(name, component, el);
-            } else {
-                return this._getComponentManager().get(name);
-            }
-        },
-
-        /**
-         * @param {string} name component name to remove
-         */
-        removePageComponent: function(name) {
-            this._getComponentManager().remove(name);
-        },
-
-        /**
-         * Applies callback function to all component
-         *
-         * @param {Function} callback
-         * @param {Object?} context
-         */
-        forEachComponent: function(callback, context) {
-            this._getComponentManager().forEachComponent(callback, context || this);
-        },
-
-        /**
-         * @returns {boolean}
-         */
-        hasOwnLayout: function() {
-            return this.getLayoutElement().is('[data-layout="separate"]');
-        },
-
-        /**
-         * Initializes all linked page components
-         * @param {Object|null} options
-         */
-        initPageComponents: function(options) {
-            if (!this.hasOwnLayout()) {
-                const error = new Error('PageComponents can not be initialized for the element without own layout');
-                return $.Deferred().reject(error);
-            }
-            return this._getComponentManager().init(options);
-        },
-
-        /**
-         * Destroys all linked page components
-         */
-        disposePageComponents: function() {
-            if (this.disposed) {
-                return;
-            }
-            if (this.componentManager) {
-                this._getComponentManager().dispose();
-                delete this.componentManager;
-            }
+    /**
+     * Getter for component manager
+     *
+     * @returns {ComponentManager}
+     */
+    _getComponentManager: function() {
+        if (!this.componentManager) {
+            this.componentManager = new ComponentManager(this.getLayoutElement());
         }
-    };
+        return this.componentManager;
+    },
 
-    return componentContainerMixin;
-});
+    /**
+     * Getter/setter for components
+     *
+     * @param {string} name
+     * @param {BaseComponent=} component to set
+     * @param {HTMLElement=} el
+     */
+    pageComponent: function(name, component, el) {
+        if (this.disposed) {
+            component.dispose();
+            return;
+        }
+
+        if (name && component) {
+            if (!el) {
+                throw Error('The element related to the component is required');
+            }
+            return this._getComponentManager().add(name, component, el);
+        } else {
+            return this._getComponentManager().get(name);
+        }
+    },
+
+    /**
+     * @param {string} name component name to remove
+     */
+    removePageComponent: function(name) {
+        this._getComponentManager().remove(name);
+    },
+
+    /**
+     * Applies callback function to all component
+     *
+     * @param {Function} callback
+     * @param {Object?} context
+     */
+    forEachComponent: function(callback, context) {
+        this._getComponentManager().forEachComponent(callback, context || this);
+    },
+
+    /**
+     * @returns {boolean}
+     */
+    hasOwnLayout: function() {
+        return this.getLayoutElement().is('[data-layout="separate"]');
+    },
+
+    /**
+     * Initializes all linked page components
+     * @param {Object|null} options
+     */
+    initPageComponents: function(options) {
+        if (!this.hasOwnLayout()) {
+            const error = new Error('PageComponents can not be initialized for the element without own layout');
+            return $.Deferred().reject(error);
+        }
+        return this._getComponentManager().init(options);
+    },
+
+    /**
+     * Destroys all linked page components
+     */
+    disposePageComponents: function() {
+        if (this.disposed) {
+            return;
+        }
+        if (this.componentManager) {
+            this._getComponentManager().dispose();
+            delete this.componentManager;
+        }
+    }
+};
+
+export default componentContainerMixin;

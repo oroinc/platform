@@ -1,69 +1,65 @@
-define(function(require) {
-    'use strict';
+import _ from 'underscore';
+import Backbone from 'backbone';
+import Chaplin from 'chaplin';
 
-    const _ = require('underscore');
-    const Backbone = require('backbone');
-    const Chaplin = require('chaplin');
+/**
+ * Base class that implement extending in backbone way.
+ * Implements [Backbone events API](http://backbonejs.org/#Events), Chaplin's
+ * [declarative event bindings](https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.view.md#listen) and
+ * [Chaplin.EventBroker API](https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.event_broker.md)
+ *
+ *
+ * @class
+ * @param {Object} options - Options container
+ * @param {Object} options.listen - Optional. Events to bind
+ */
+function BaseClass(options) {
+    this.cid = _.uniqueId(this.cidPrefix);
+    if (!options) {
+        options = {};
+    }
+    this.initialize(options);
+    if (options.listen) {
+        this.on(options.listen);
+    }
+    this.delegateListeners();
+}
+
+BaseClass.prototype = {
+    cidPrefix: 'class',
+
+    constructor: BaseClass,
 
     /**
-     * Base class that implement extending in backbone way.
-     * Implements [Backbone events API](http://backbonejs.org/#Events), Chaplin's
-     * [declarative event bindings](https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.view.md#listen) and
-     * [Chaplin.EventBroker API](https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.event_broker.md)
-     *
-     *
-     * @class
-     * @param {Object} options - Options container
-     * @param {Object} options.listen - Optional. Events to bind
+     * Flag shows if the class is disposed or not
+     * @type {boolean}
      */
-    function BaseClass(options) {
-        this.cid = _.uniqueId(this.cidPrefix);
-        if (!options) {
-            options = {};
+    disposed: false,
+
+    initialize: function(options) {
+        // should be defined in descendants
+    },
+
+    dispose: function() {
+        if (this.disposed) {
+            return;
         }
-        this.initialize(options);
-        if (options.listen) {
-            this.on(options.listen);
-        }
-        this.delegateListeners();
+        this.trigger('dispose', this);
+        this.unsubscribeAllEvents();
+        this.stopListening();
+        this.off();
+
+        this.disposed = true;
+        return typeof Object.freeze === 'function' ? Object.freeze(this) : void 0;
     }
+};
 
-    BaseClass.prototype = {
-        cidPrefix: 'class',
+_.extend(BaseClass.prototype,
+    Backbone.Events,
+    Chaplin.EventBroker,
+    _.pick(Chaplin.View.prototype, ['delegateListeners', 'delegateListener'])
+);
 
-        constructor: BaseClass,
+BaseClass.extend = Backbone.Model.extend;
 
-        /**
-         * Flag shows if the class is disposed or not
-         * @type {boolean}
-         */
-        disposed: false,
-
-        initialize: function(options) {
-            // should be defined in descendants
-        },
-
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-            this.trigger('dispose', this);
-            this.unsubscribeAllEvents();
-            this.stopListening();
-            this.off();
-
-            this.disposed = true;
-            return typeof Object.freeze === 'function' ? Object.freeze(this) : void 0;
-        }
-    };
-
-    _.extend(BaseClass.prototype,
-        Backbone.Events,
-        Chaplin.EventBroker,
-        _.pick(Chaplin.View.prototype, ['delegateListeners', 'delegateListener'])
-    );
-
-    BaseClass.extend = Backbone.Model.extend;
-
-    return BaseClass;
-});
+export default BaseClass;

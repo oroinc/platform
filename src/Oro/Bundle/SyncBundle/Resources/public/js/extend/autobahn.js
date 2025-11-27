@@ -1,10 +1,6 @@
-define(function(require) {
-    'use strict';
+import autobahn from 'autobahn';
+import 'cryptojs/enc-base64';
+import 'cryptojs/pbkdf2';
+import 'cryptojs/hmac-sha256';
 
-    const autobahn = require('autobahn');
-    require('cryptojs/enc-base64');
-    require('cryptojs/pbkdf2');
-    require('cryptojs/hmac-sha256');
-
-    return autobahn;
-});
+export default autobahn;

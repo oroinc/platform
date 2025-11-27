@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     const moment = require('moment');
-    const localeSettings = require('./locale-settings');
+    const localeSettings = require('./locale-settings').default;
     const locale = localeSettings.getLocale();
     require('moment-timezone');
 
