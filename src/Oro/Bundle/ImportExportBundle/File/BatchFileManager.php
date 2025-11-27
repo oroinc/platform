@@ -148,24 +148,20 @@ class BatchFileManager
     private function writeBatch(array $items, ?array $header, string $extension): string
     {
         $batchFileName = FileManager::generateUniqueFileName($extension);
-        $batchFilePath = FileManager::generateTmpFilePath($batchFileName);
-        $writerContext = new Context(array_merge(
-            [
-                Context::OPTION_FILE_PATH => $batchFilePath,
-                Context::OPTION_HEADER => $header
-            ],
-            $this->configurationOptions
-        ));
-        $this->writer->setImportExportContext($writerContext);
+        $tmpFilePath = $this->fileManager->createTmpFile();
+        $this->writer->setImportExportContext(new Context(array_merge([
+            Context::OPTION_FILE_PATH => $tmpFilePath,
+            Context::OPTION_HEADER => $header
+        ], $this->configurationOptions)));
         try {
             try {
                 $this->writer->write($items);
             } finally {
                 $this->writer->close();
             }
-            $this->fileManager->writeFileToStorage($batchFilePath, $batchFileName);
+            $this->fileManager->writeFileToStorage($tmpFilePath, $batchFileName);
         } finally {
-            @unlink($batchFilePath);
+            $this->fileManager->deleteTmpFile($tmpFilePath);
         }
 
         return $batchFileName;

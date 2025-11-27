@@ -7,22 +7,27 @@ namespace Oro\Bundle\PdfGeneratorBundle\PdfFile;
 use GuzzleHttp\Psr7\LazyOpenStream;
 use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Message\StreamInterface;
-use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Represents a generated PDF file.
  */
 class PdfFile implements PdfFileInterface
 {
-    private static ?Filesystem $filesystem = null;
-
-    private ?string $tempFile = null;
+    /** @var resource|false|null */
+    private $tempFileHandle = null;
+    private ?string $tempFilePath = null;
 
     public function __construct(
         private StreamInterface|string $streamOrPath,
         private string $mimeType
     ) {
+    }
+
+    public function __destruct()
+    {
+        if ($this->tempFileHandle && \is_resource($this->tempFileHandle)) {
+            @fclose($this->tempFileHandle);
+        }
     }
 
     #[\Override]
@@ -38,49 +43,28 @@ class PdfFile implements PdfFileInterface
     #[\Override]
     public function getPath(): string
     {
-        if (is_string($this->streamOrPath)) {
+        if (\is_string($this->streamOrPath)) {
             return $this->streamOrPath;
         }
 
-        $this->tempFile ??= $this->createTempFile();
+        if (null === $this->tempFileHandle) {
+            $this->tempFileHandle = tmpfile();
+            if (!$this->tempFileHandle) {
+                throw new \RuntimeException('Cannot create a temporary file to store PDF document.');
+            }
+            $this->tempFilePath = stream_get_meta_data($this->tempFileHandle)['uri'];
+            Utils::copyToStream($this->getStream(), new LazyOpenStream($this->tempFilePath, 'w'));
+        }
+        if (null === $this->tempFilePath) {
+            throw new \RuntimeException('A temporary file to store PDF document does not exist.');
+        }
 
-        return $this->tempFile;
+        return $this->tempFilePath;
     }
 
     #[\Override]
     public function getMimeType(): string
     {
         return $this->mimeType;
-    }
-
-    private function createTempFile(): string
-    {
-        $tempFile = $this->getFilesystem()->tempnam(sys_get_temp_dir(), 'pdf_file_', '.pdf');
-
-        Utils::copyToStream(
-            $this->getStream(),
-            new LazyOpenStream($tempFile, 'w')
-        );
-
-        return $tempFile;
-    }
-
-    private function getFilesystem(): Filesystem
-    {
-        self::$filesystem ??= new Filesystem();
-
-        return self::$filesystem;
-    }
-
-    public function __destruct()
-    {
-        if ($this->tempFile !== null) {
-            try {
-                $this->getFilesystem()->remove($this->tempFile);
-            } catch (IOException $exception) {
-                // If an exception occurs in __destruct(), it can lead to unhandled fatal errors in PHP,
-                // as throwing exceptions inside a destructor is generally discouraged.
-            }
-        }
     }
 }

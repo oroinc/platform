@@ -73,9 +73,21 @@ class BatchFileManagerTest extends TestCase
                 [[[3, 4]]]
             );
 
+        $tmpFile1Path = '/tmp/test1';
+        $tmpFile2Path = '/tmp/test2';
         $fileManager = $this->createMock(FileManager::class);
         $fileManager->expects(self::exactly(2))
-            ->method('writeFileToStorage');
+            ->method('createTmpFile')
+            ->willReturnOnConsecutiveCalls($tmpFile1Path, $tmpFile2Path);
+        $fileManager->expects(self::exactly(2))
+            ->method('writeFileToStorage')
+            ->withConsecutive(
+                [$tmpFile1Path, self::matches('%s.csv')],
+                [$tmpFile2Path, self::matches('%s.csv')]
+            );
+        $fileManager->expects(self::exactly(2))
+            ->method('deleteTmpFile')
+            ->withConsecutive([$tmpFile1Path], [$tmpFile2Path]);
 
         $batchFileManager = new BatchFileManager($fileManager, 1);
         $batchFileManager->setReader($reader);
@@ -126,9 +138,21 @@ class BatchFileManagerTest extends TestCase
                 [[[7, 8], [9, 10]]]
             );
 
+        $tmpFile1Path = '/tmp/test1';
+        $tmpFile2Path = '/tmp/test2';
         $fileManager = $this->createMock(FileManager::class);
         $fileManager->expects(self::exactly(2))
-            ->method('writeFileToStorage');
+            ->method('createTmpFile')
+            ->willReturnOnConsecutiveCalls($tmpFile1Path, $tmpFile2Path);
+        $fileManager->expects(self::exactly(2))
+            ->method('writeFileToStorage')
+            ->withConsecutive(
+                [$tmpFile1Path, self::matches('%s.csv')],
+                [$tmpFile2Path, self::matches('%s.csv')]
+            );
+        $fileManager->expects(self::exactly(2))
+            ->method('deleteTmpFile')
+            ->withConsecutive([$tmpFile1Path], [$tmpFile2Path]);
 
         $batchFileManager = new BatchFileManager($fileManager, 1);
         $batchFileManager->setReader($reader);

@@ -12,6 +12,9 @@ use Oro\Bundle\ImportExportBundle\Reader\CsvFileReader;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
 use Oro\Component\Testing\ReflectionUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
@@ -47,15 +50,10 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
         $this->reader->setStepExecution($stepExecution);
         $this->reader->initializeByContext($context);
 
-        $data = [];
         //ensure that header is cleared before read
         self::assertNull($this->reader->getHeader());
 
-        while (($dataRow = $this->reader->read($stepExecution)) !== null) {
-            $data[] = $dataRow;
-        }
-
-        self::assertEquals($expected, $data);
+        self::assertEquals($expected, $this->readData($this->reader, $stepExecution));
     }
 
     public function testSetStepExecutionNoFileException()
@@ -182,11 +180,8 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
             ->method('incrementReadOffset');
         $context->expects($this->atLeastOnce())
             ->method('incrementReadCount');
-        $data = [];
-        while (($dataRow = $this->reader->read($stepExecution)) !== null) {
-            $data[] = $dataRow;
-        }
-        self::assertEquals($expected, $data);
+
+        self::assertEquals($expected, $this->readData($this->reader, $stepExecution));
     }
 
     public function optionsDataProvider(): array
@@ -291,11 +286,11 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
             ->with($stepExecution)
             ->willReturn($context);
         $this->reader->setStepExecution($stepExecution);
-        $data = [];
-        while (($dataRow = $this->reader->read($stepExecution)) !== null) {
-            $data[] = $dataRow;
-        }
-        self::assertEquals([['\\', 'other field', '\\\\', '\\notquote', 'back \\slash inside', '\"quoted\"']], $data);
+
+        self::assertEquals(
+            [['\\', 'other field', '\\\\', '\\notquote', 'back \\slash inside', '\"quoted\"']],
+            $this->readData($this->reader, $stepExecution)
+        );
     }
 
     /**
@@ -347,6 +342,27 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
         $this->reader->read($context);
     }
 
+    public function testReadFromTempFile(): void
+    {
+        $tmpFileHandle = tmpfile();
+        $tmpFilePath = stream_get_meta_data($tmpFileHandle)['uri'];
+        file_put_contents($tmpFilePath, file_get_contents(__DIR__ . '/fixtures/import_correct.csv'));
+
+        $context = $this->getContextWithOptions(['filePath' => stream_get_meta_data($tmpFileHandle)['uri']]);
+        $stepExecution = $this->createMock(StepExecution::class);
+        $this->contextRegistry->expects($this->any())
+            ->method('getByStepExecution')
+            ->with($stepExecution)
+            ->willReturn($context);
+        $this->reader->setStepExecution($stepExecution);
+        $this->reader->initializeByContext($context);
+
+        self::assertCount(5, $this->readData($this->reader, $stepExecution));
+
+        $tmpFileHandle = null;
+        self::assertFileDoesNotExist($tmpFilePath);
+    }
+
     /**
      * @return StepExecutionProxyContext|\PHPUnit\Framework\MockObject\MockObject
      */
@@ -365,5 +381,15 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
             });
 
         return $context;
+    }
+
+    private function readData(CsvFileReader $reader, StepExecution $stepExecution): array
+    {
+        $data = [];
+        while (($dataRow = $reader->read($stepExecution)) !== null) {
+            $data[] = $dataRow;
+        }
+
+        return $data;
     }
 }
