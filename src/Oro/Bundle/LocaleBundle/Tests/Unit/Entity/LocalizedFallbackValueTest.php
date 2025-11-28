@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -55,5 +57,25 @@ class LocalizedFallbackValueTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertIsArray(LocalizedFallbackValue::getFallbacks());
         $this->assertNotEmpty(LocalizedFallbackValue::getFallbacks());
+    }
+
+    public function testCreateStringWithoutLocalization(): void
+    {
+        $value = 'test string';
+        $result = LocalizedFallbackValue::createString($value);
+
+        $this->assertEquals($value, $result->getString());
+        $this->assertNull($result->getLocalization());
+    }
+
+    public function testCreateStringWithLocalization(): void
+    {
+        $value = 'test string';
+        $localization = new Localization();
+
+        $result = LocalizedFallbackValue::createString($value, $localization);
+
+        $this->assertEquals($value, $result->getString());
+        $this->assertSame($localization, $result->getLocalization());
     }
 }

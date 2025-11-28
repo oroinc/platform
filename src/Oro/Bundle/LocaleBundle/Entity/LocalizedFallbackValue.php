@@ -4,7 +4,6 @@ namespace Oro\Bundle\LocaleBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Extend\Entity\Autocomplete\OroLocaleBundle_Entity_LocalizedFallbackValue;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
@@ -12,9 +11,9 @@ use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizedFallbackValueRepository;
 
 /**
- * Standard entity to store string data related to the some localization.
+ * An entity to store string or text value for some localization.
  *
- * @mixin OroLocaleBundle_Entity_LocalizedFallbackValue
+ * @mixin \Extend\Entity\Autocomplete\OroLocaleBundle_Entity_LocalizedFallbackValue
  */
 #[ORM\Entity(repositoryClass: LocalizedFallbackValueRepository::class)]
 #[ORM\Table(name: 'oro_fallback_localization_val')]
@@ -32,4 +31,13 @@ class LocalizedFallbackValue extends AbstractLocalizedFallbackValue implements E
     #[ORM\Column(name: 'text', type: Types::TEXT, nullable: true)]
     #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true], 'importexport' => ['excluded' => false]])]
     protected ?string $text = null;
+
+    public static function createString(string $value, ?Localization $localization = null): self
+    {
+        $result = (new static())->setString($value);
+        if (null !== $localization) {
+            $result->setLocalization($localization);
+        }
+        return $result;
+    }
 }
