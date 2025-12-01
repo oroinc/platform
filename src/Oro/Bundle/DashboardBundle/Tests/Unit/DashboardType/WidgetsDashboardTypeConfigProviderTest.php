@@ -62,4 +62,9 @@ class WidgetsDashboardTypeConfigProviderTest extends TestCase
 
         self::assertEquals($expectedConfig, $this->provider->getConfig($dashboard));
     }
+
+    public function testIsCloneable(): void
+    {
+        self::assertTrue($this->provider->isCloneable());
+    }
 }

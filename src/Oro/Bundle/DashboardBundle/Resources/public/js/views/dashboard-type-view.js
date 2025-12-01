@@ -6,6 +6,10 @@ const DashboardTypeWatcherView = BaseView.extend({
         change: 'updateClientView'
     },
 
+    options: {
+        cloneableDashboardTypes: []
+    },
+
     /**
      * @inheritdoc
      */
@@ -14,16 +18,18 @@ const DashboardTypeWatcherView = BaseView.extend({
     },
 
     initialize(options) {
-        this.startDashboardrField = $(options.startDashboardrField);
+        this.options = $.extend({}, this.options, options);
+        this.startDashboardField = $(options.startDashboardField);
         this.updateClientView();
     },
 
     updateClientView() {
         const selectedType = this.$el.find(':selected').val();
-        if ('widgets' === selectedType) {
-            this.startDashboardrField.removeClass('hide');
+        // Check if selected dashboard type is in the list of cloneable types
+        if (this.options.cloneableDashboardTypes.includes(selectedType)) {
+            this.startDashboardField.removeClass('hide');
         } else {
-            this.startDashboardrField.addClass('hide');
+            this.startDashboardField.addClass('hide');
         }
     }
 });

@@ -9,7 +9,9 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 /**
  * Defines widgets dashboard type.
  */
-class WidgetsDashboardTypeConfigProvider implements DashboardTypeConfigProviderInterface
+class WidgetsDashboardTypeConfigProvider implements
+    DashboardTypeConfigProviderInterface,
+    CloneableDashboardTypeInterface
 {
     public const TYPE_NAME = 'widgets';
 
@@ -37,5 +39,11 @@ class WidgetsDashboardTypeConfigProvider implements DashboardTypeConfigProviderI
         }
 
         return $dashboardConfig;
+    }
+
+    #[\Override]
+    public function isCloneable(): bool
+    {
+        return true;
     }
 }

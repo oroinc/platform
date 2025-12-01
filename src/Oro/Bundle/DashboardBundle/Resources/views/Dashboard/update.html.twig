@@ -63,7 +63,8 @@
         {% set startDashboardGroupId = 'start-dashboard-'|uniqid %}
         {% if form.dashboardType is defined %}
             {% set dashboardTypeViewOptions = {
-                startDashboardrField: '#' ~ startDashboardGroupId,
+                startDashboardField: '#' ~ startDashboardGroupId,
+                cloneableDashboardTypes: form.dashboardType.vars.cloneable_dashboard_types is defined ? form.dashboardType.vars.cloneable_dashboard_types : []
             } %}
             {{ form_row(form.dashboardType, {
                 'attr': {
