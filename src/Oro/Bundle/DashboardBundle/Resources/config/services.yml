@@ -90,6 +90,14 @@ services:
         tags:
             - { name: form.type, alias: "oro_dashboard" }
 
+    oro_dashboard.form.extension.dashboard_type:
+        class: Oro\Bundle\DashboardBundle\Form\Extension\DashboardTypeExtension
+        arguments:
+            - !tagged_iterator oro_dashboard.dashboard_type.config.provider
+            - '@doctrine'
+        tags:
+            - { name: form.type_extension }
+
     oro_dashboard.form.type.select:
         class: Oro\Bundle\DashboardBundle\Form\Type\DashboardSelectType
         arguments:

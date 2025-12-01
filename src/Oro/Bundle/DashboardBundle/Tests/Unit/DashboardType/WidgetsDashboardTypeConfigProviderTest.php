@@ -5,11 +5,12 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\DashboardType;
 use Oro\Bundle\DashboardBundle\DashboardType\WidgetsDashboardTypeConfigProvider;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WidgetsDashboardTypeConfigProviderTest extends \PHPUnit\Framework\TestCase
+class WidgetsDashboardTypeConfigProviderTest extends TestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
+    private ConfigProvider&MockObject $configProvider;
 
     private $provider;
 
@@ -60,5 +61,10 @@ class WidgetsDashboardTypeConfigProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($expectedConfig);
 
         self::assertEquals($expectedConfig, $this->provider->getConfig($dashboard));
+    }
+
+    public function testIsCloneable(): void
+    {
+        self::assertTrue($this->provider->isCloneable());
     }
 }
