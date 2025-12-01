@@ -12,7 +12,6 @@ use Oro\Bundle\DataAuditBundle\Entity\Repository\AuditRepository;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Async\AuditChangedEntitiesExtensionTrait;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumOptionRepository;
@@ -30,7 +29,11 @@ use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 
 /**
  * @dbIsolationPerTest
- * @SuppressWarnings(PHPMD)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class DataAuditTest extends WebTestCase
 {
@@ -41,7 +44,7 @@ class DataAuditTest extends WebTestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
         $token = new UsernamePasswordOrganizationToken(
             $this->findAdmin(),
             'main',
@@ -84,20 +87,15 @@ class DataAuditTest extends WebTestCase
             $typesToTest[$doctrineType] = true;
         }
 
-        /** @var DoctrineHelper $doctrineHelper */
-        $doctrineHelper = self::getContainer()->get('oro_entity.doctrine_helper');
-
         /** @var FieldConfigModel[] $fields */
-        $fields = $doctrineHelper
-            ->getEntityManager(FieldConfigModel::class)
+        $fields = $this->getEntityManager(FieldConfigModel::class)
             ->getRepository(FieldConfigModel::class)
             ->findAll();
 
         foreach ($fields as $field) {
-            if (is_a($field->getEntity()->getClassName(), TestFrameworkEntityInterface::class, true)) {
-                continue;
+            if (!is_a($field->getEntity()->getClassName(), TestFrameworkEntityInterface::class, true)) {
+                $typesToTest[$field->getType()] = true;
             }
-            $typesToTest[$field->getType()] = true;
         }
 
         // ascii_string is supported only for the SQL Server, so we should not test it. See:
@@ -108,15 +106,13 @@ class DataAuditTest extends WebTestCase
         $typesToTest = array_keys($typesToTest);
         sort($typesToTest);
         foreach ($typesToTest as $type) {
-            $methodName = 'test'.ucfirst((new InflectorFactory())->build()->camelize(\ucwords($type, '_-')));
-            if (method_exists($this, $methodName)) {
-                continue;
+            $methodName = 'test' . ucfirst((new InflectorFactory())->build()->camelize(\ucwords($type, '_-')));
+            if (!method_exists($this, $methodName)) {
+                $missingMethods[] = $methodName;
             }
-
-            $missingMethods[] = $methodName;
         }
 
-        self::assertEmpty($missingMethods, sprintf('Tests are missing: %s', implode(', ', $missingMethods)));
+        self::assertEmpty($missingMethods, \sprintf('Tests are missing: %s', implode(', ', $missingMethods)));
     }
 
     public function testArray()
@@ -134,18 +130,16 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    /* @see /package/platform/src/Oro/Bundle/DataAuditBundle/Resources/views/macros.html.twig */
-                    $owner->getId() => \sprintf(
-                        "<s><pre>%s</pre></s>&nbsp;<pre>%s</pre>",
-                        $this->escapeString(\json_encode($oldValue, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT)),
-                        $this->escapeString(\json_encode($newValue, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT))
-                    ),
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                /* @see /package/platform/src/Oro/Bundle/DataAuditBundle/Resources/views/macros.html.twig */
+                $owner->getId() => \sprintf(
+                    "<s><pre>%s</pre></s>&nbsp;<pre>%s</pre>",
+                    $this->escapeString(self::toJson($oldValue)),
+                    $this->escapeString(self::toJson($newValue))
+                )
             ]
-        );
+        ]);
     }
 
     public function testBigint()
@@ -160,13 +154,11 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>1</s>&nbsp;2',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>1</s>&nbsp;2'
             ]
-        );
+        ]);
     }
 
     public function testBinary()
@@ -220,13 +212,11 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>No</s>&nbsp;Yes',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>No</s>&nbsp;Yes'
             ]
-        );
+        ]);
     }
 
     public function testConfigObject()
@@ -283,13 +273,11 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>USD</s>&nbsp;EUR',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>USD</s>&nbsp;EUR'
             ]
-        );
+        ]);
     }
 
     public function testDate()
@@ -303,13 +291,11 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>Jan 1, 2019</s>&nbsp;Jan 2, 2019',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>Jan 1, 2019</s>&nbsp;Jan 2, 2019'
             ]
-        );
+        ]);
     }
 
     public function testDatetime()
@@ -323,13 +309,11 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>Jan 1, 2019, 12:00 AM</s>&nbsp;Jan 2, 2019, 12:00 AM',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>Jan 1, 2019, 12:00 AM</s>&nbsp;Jan 2, 2019, 12:00 AM'
             ]
-        );
+        ]);
     }
 
     public function testDatetimetz()
@@ -343,13 +327,11 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>Jan 1, 2019, 12:00 AM</s>&nbsp;Jan 2, 2019, 12:00 AM',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>Jan 1, 2019, 12:00 AM</s>&nbsp;Jan 2, 2019, 12:00 AM'
             ]
-        );
+        ]);
     }
 
     public function testDecimal()
@@ -363,13 +345,11 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>0.001</s>&nbsp;0.002',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>0.001</s>&nbsp;0.002'
             ]
-        );
+        ]);
     }
 
     public function testDuration()
@@ -383,13 +363,11 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>2</s>&nbsp;3',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>2</s>&nbsp;3'
             ]
-        );
+        ]);
     }
 
     public function testFile()
@@ -413,13 +391,11 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>0.001</s>&nbsp;0.002',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>0.001</s>&nbsp;0.002'
             ]
-        );
+        ]);
     }
 
     public function testGuid()
@@ -434,14 +410,22 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() =>
-                        '<s>ca205501-a584-4e16-bb19-0226cbb9e1c8</s>&nbsp;731d9a5c-1a42-4bb0-92f3-13f8c7824536',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() =>
+                    '<s>ca205501-a584-4e16-bb19-0226cbb9e1c8</s>&nbsp;731d9a5c-1a42-4bb0-92f3-13f8c7824536'
             ]
-        );
+        ]);
+    }
+
+    public function testUuid()
+    {
+        $this->markTestSkipped('BAP-18750');
+    }
+
+    public function testUlid()
+    {
+        $this->markTestSkipped('BAP-18750');
     }
 
     public function testImage()
@@ -460,13 +444,11 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>2</s>&nbsp;3',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>2</s>&nbsp;3'
             ]
-        );
+        ]);
     }
 
     public function testJsonArray()
@@ -484,18 +466,16 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    /* @see /package/platform/src/Oro/Bundle/DataAuditBundle/Resources/views/macros.html.twig */
-                    $owner->getId() => \sprintf(
-                        "<s><pre>%s</pre></s>&nbsp;<pre>%s</pre>",
-                        $this->escapeString(\json_encode($oldValue, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT)),
-                        $this->escapeString(\json_encode($newValue, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT))
-                    ),
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                /* @see /package/platform/src/Oro/Bundle/DataAuditBundle/Resources/views/macros.html.twig */
+                $owner->getId() => \sprintf(
+                    "<s><pre>%s</pre></s>&nbsp;<pre>%s</pre>",
+                    $this->escapeString(self::toJson($oldValue)),
+                    $this->escapeString(self::toJson($newValue))
+                )
             ]
-        );
+        ]);
     }
 
     public function testJson()
@@ -513,18 +493,16 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    /* @see /package/platform/src/Oro/Bundle/DataAuditBundle/Resources/views/macros.html.twig */
-                    $owner->getId() => \sprintf(
-                        "<s><pre>%s</pre></s>&nbsp;<pre>%s</pre>",
-                        $this->escapeString(\json_encode($oldValue, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT)),
-                        $this->escapeString(\json_encode($newValue, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT))
-                    ),
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                /* @see /package/platform/src/Oro/Bundle/DataAuditBundle/Resources/views/macros.html.twig */
+                $owner->getId() => \sprintf(
+                    "<s><pre>%s</pre></s>&nbsp;<pre>%s</pre>",
+                    $this->escapeString(self::toJson($oldValue)),
+                    $this->escapeString(self::toJson($newValue))
+                )
             ]
-        );
+        ]);
     }
 
     public function testManyToMany()
@@ -544,22 +522,20 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(true);
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        sprintf('Item #%s&quot; added', $child->getId()),
-                        '<s></s>childString',
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => [
-                        sprintf('&quot;%s&quot; added', $owner->getId()),
-                        '<s></s>ownerString',
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => [
+                    \sprintf('Item #%s&quot; added', $child->getId()),
+                    '<s></s>childString'
+                ]
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => [
+                    \sprintf('&quot;%s&quot; added', $owner->getId()),
+                    '<s></s>ownerString'
+                ]
             ]
-        );
+        ]);
     }
 
     public function testManyToManyRemove()
@@ -578,22 +554,20 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $owner->removeChildrenManyToMany($child);
         $em->flush();
 
         $this->processMessages(true);
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => sprintf('Item #%s&quot; removed', $child->getId()),
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => sprintf('&quot;%s&quot; removed', $owner->getId()),
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => \sprintf('Item #%s&quot; removed', $child->getId())
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => \sprintf('&quot;%s&quot; removed', $owner->getId())
             ]
-        );
+        ]);
     }
 
     public function testManyToManyRemoveOwner()
@@ -611,22 +585,20 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $child->setOwners(new ArrayCollection([]));
         $em->flush();
 
         $this->processMessages(true);
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => sprintf('Item #%s&quot; removed', $child->getId()),
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => sprintf('&quot;%s&quot; removed', $owner->getId()),
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => \sprintf('Item #%s&quot; removed', $child->getId())
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => \sprintf('&quot;%s&quot; removed', $owner->getId())
             ]
-        );
+        ]);
     }
 
     public function testManyToManyUpdate()
@@ -644,25 +616,23 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $child->setStringProperty('childString2');
         $em->flush();
 
         $this->processMessages(false, true);
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        sprintf('Item #%s&quot; changed', $child->getId()),
-                        '<s>childString</s>&nbsp;childString2',
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => '<s>childString</s>&nbsp;childString2',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => [
+                    \sprintf('Item #%s&quot; changed', $child->getId()),
+                    '<s>childString</s>&nbsp;childString2'
+                ]
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => '<s>childString</s>&nbsp;childString2'
             ]
-        );
+        ]);
     }
 
     public function testManyToManyUpdateNonReverseOwner()
@@ -679,19 +649,17 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $child->setStringProperty('childString2');
         $em->flush();
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataChild::class => [
-                    $child->getId() => '<s>childString</s>&nbsp;childString2',
-                ],
+        $this->assertData([
+            TestAuditDataChild::class => [
+                $child->getId() => '<s>childString</s>&nbsp;childString2'
             ]
-        );
+        ]);
     }
 
     public function testManyToManyUpdateNonReverseChild()
@@ -708,25 +676,23 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $child->setStringProperty('childString2');
         $em->flush();
 
         $this->processMessages(false, true);
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        sprintf('Item #%s&quot; changed', $child->getId()),
-                        '<s>childString</s>&nbsp;childString2',
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => '<s>childString</s>&nbsp;childString2',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => [
+                    \sprintf('Item #%s&quot; changed', $child->getId()),
+                    '<s>childString</s>&nbsp;childString2'
+                ]
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => '<s>childString</s>&nbsp;childString2'
             ]
-        );
+        ]);
     }
 
     public function testManyToManyUpdateOwner()
@@ -744,25 +710,23 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $owner->setStringProperty('ownerString2');
         $em->flush();
 
         $this->processMessages(false, true);
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>ownerString</s>&nbsp;ownerString2',
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => [
-                        sprintf('&quot;%s&quot; changed', $owner->getId()),
-                        '<s>ownerString</s>&nbsp;ownerString2',
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>ownerString</s>&nbsp;ownerString2'
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => [
+                    \sprintf('&quot;%s&quot; changed', $owner->getId()),
+                    '<s>ownerString</s>&nbsp;ownerString2'
+                ]
             ]
-        );
+        ]);
     }
 
     public function testManyToManyUnidirectional()
@@ -781,21 +745,17 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(true);
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        sprintf('Item #%s&quot; added', $child->getId()),
-                        '<s></s>childString',
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => [
-                        '<s></s>&nbsp;childString',
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => [
+                    \sprintf('Item #%s&quot; added', $child->getId()),
+                    '<s></s>childString'
+                ]
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => ['<s></s>&nbsp;childString']
             ]
-        );
+        ]);
     }
 
     public function testManyToManyRemoveUnidirectional()
@@ -812,19 +772,17 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $owner->removeChildrenManyToManyUnidirectional($child);
         $em->flush();
 
         $this->processMessages(true);
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => sprintf('Item #%s&quot; removed', $child->getId()),
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => \sprintf('Item #%s&quot; removed', $child->getId())
             ]
-        );
+        ]);
     }
 
     public function testManyToManyUpdateUnidirectional()
@@ -841,19 +799,17 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $child->setStringProperty('childString2');
         $em->flush();
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataChild::class => [
-                    $child->getId() => '<s>childString</s>&nbsp;childString2',
-                ],
+        $this->assertData([
+            TestAuditDataChild::class => [
+                $child->getId() => '<s>childString</s>&nbsp;childString2'
             ]
-        );
+        ]);
     }
 
     public function testManyToManyUpdateOwnerUnidirectional()
@@ -870,19 +826,17 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $owner->setStringProperty('ownerString2');
         $em->flush();
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>ownerString</s>&nbsp;ownerString2',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>ownerString</s>&nbsp;ownerString2'
             ]
-        );
+        ]);
     }
 
     public function testMultiEnum()
@@ -903,7 +857,7 @@ class DataAuditTest extends WebTestCase
         $em->persist($enum34);
         $em->persist($owner);
         $em->flush();
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
 
         $enum5 = $enumRepo->createEnumOption('audit_muenum', 'enum5', 'enum5', 5);
         $enum6 = $enumRepo->createEnumOption('audit_muenum', 'enum6', 'enum6', 6);
@@ -920,21 +874,17 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        '<s>enum1,enum2,enum3</s>&nbsp;enum3,enum5,enum6',
-                    ],
-                ],
-                EnumOption::class => [
-                    'audit_muenum.enum1' => '<s>audit_muenum.enum1</s>',
-                    'audit_muenum.enum3' => '<s>enum3</s>&nbsp;enum4',
-                    'audit_muenum.enum5' => '<s></s>&nbsp;enum5',
-                    'audit_muenum.enum6' => '<s></s>&nbsp;enum6',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => ['<s>enum1,enum2,enum3</s>&nbsp;enum3,enum5,enum6']
+            ],
+            EnumOption::class => [
+                'audit_muenum.enum1' => '<s>audit_muenum.enum1</s>',
+                'audit_muenum.enum3' => '<s>enum3</s>&nbsp;enum4',
+                'audit_muenum.enum5' => '<s></s>&nbsp;enum5',
+                'audit_muenum.enum6' => '<s></s>&nbsp;enum6'
             ]
-        );
+        ]);
     }
 
     public function testMultiEnumRemove()
@@ -955,7 +905,7 @@ class DataAuditTest extends WebTestCase
         $em->persist($enum3);
         $em->persist($owner);
         $em->flush();
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
 
         $owner->removeMultiEnumProperty($enum1);
         $owner->removeMultiEnumProperty($enum2);
@@ -964,15 +914,11 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                       '<s>enum1,enum2,enum3</s>&nbsp;'
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => ['<s>enum1,enum2,enum3</s>&nbsp;']
             ]
-        );
+        ]);
     }
 
     public function testMultiEnumClear(): void
@@ -994,21 +940,17 @@ class DataAuditTest extends WebTestCase
         $em->persist($owner);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $owner->setMultiEnumProperty([]);
         $owner->addMultiEnumProperty($enumAfterCollectionClear);
 
         $em->flush();
         $this->processMessages();
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        '<s>enum1,enum2</s>&nbsp;enum3'
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => ['<s>enum1,enum2</s>&nbsp;enum3']
             ]
-        );
+        ]);
     }
 
     public function testManyToManyClear(): void
@@ -1028,7 +970,7 @@ class DataAuditTest extends WebTestCase
         $em->persist($owner);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
 
         $owner->getChildrenManyToMany()->clear();
         $owner->addChildrenManyToMany($child3);
@@ -1036,22 +978,20 @@ class DataAuditTest extends WebTestCase
         $em->flush();
         $this->processMessages(true);
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        sprintf('Item #%s&quot; added', $child3->getId()),
-                        sprintf('Item #%s&quot; removed', $child1->getId()),
-                        sprintf('Item #%s&quot; removed', $child2->getId()),
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $child1->getId() => [sprintf('&quot;%s&quot; removed', $owner->getId())],
-                    $child2->getId() => [sprintf('&quot;%s&quot; removed', $owner->getId())],
-                    $child3->getId() => [sprintf('&quot;%s&quot; added', $owner->getId())]
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => [
+                    \sprintf('Item #%s&quot; added', $child3->getId()),
+                    \sprintf('Item #%s&quot; removed', $child1->getId()),
+                    \sprintf('Item #%s&quot; removed', $child2->getId())
                 ]
+            ],
+            TestAuditDataChild::class => [
+                $child1->getId() => [\sprintf('&quot;%s&quot; removed', $owner->getId())],
+                $child2->getId() => [\sprintf('&quot;%s&quot; removed', $owner->getId())],
+                $child3->getId() => [\sprintf('&quot;%s&quot; added', $owner->getId())]
             ]
-        );
+        ]);
     }
 
     public function testManyToOne()
@@ -1066,7 +1006,7 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $child->setOwnerManyToOne($owner);
         $owner->addChildrenOneToMany($child);
         $child->setStringProperty('childString2');
@@ -1074,22 +1014,20 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        sprintf('Item #%s&quot; added', $child->getId()),
-                        '<s>childString</s>&nbsp;childString2',
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => [
-                        sprintf('&quot;%s&quot; added', $owner->getId()),
-                        '<s>childString</s>&nbsp;childString2',
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => [
+                    \sprintf('Item #%s&quot; added', $child->getId()),
+                    '<s>childString</s>&nbsp;childString2'
+                ]
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => [
+                    \sprintf('&quot;%s&quot; added', $owner->getId()),
+                    '<s>childString</s>&nbsp;childString2'
+                ]
             ]
-        );
+        ]);
     }
 
     public function testManyToOneUpdate()
@@ -1106,27 +1044,23 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $child->setStringProperty('childString2');
         $em->flush();
 
         $this->processMessages(false, true);
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        sprintf('Item #%s&quot; changed', $child->getId()),
-                        '<s>childString</s>&nbsp;childString2',
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => [
-                        '<s>childString</s>&nbsp;childString2',
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => [
+                    \sprintf('Item #%s&quot; changed', $child->getId()),
+                    '<s>childString</s>&nbsp;childString2'
+                ]
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => ['<s>childString</s>&nbsp;childString2']
             ]
-        );
+        ]);
     }
 
     public function testManyToOneRemove()
@@ -1143,27 +1077,21 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $owner->removeChildrenOneToMany($child);
         $child->setOwnerManyToOne(null);
         $em->flush();
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        sprintf('Item #%s&quot; removed', $child->getId()),
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => [
-                        sprintf('&quot;%s&quot; removed', $owner->getId()),
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => [\sprintf('Item #%s&quot; removed', $child->getId())]
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => [\sprintf('&quot;%s&quot; removed', $owner->getId())]
             ]
-        );
+        ]);
     }
 
     /**
@@ -1196,7 +1124,7 @@ class DataAuditTest extends WebTestCase
         $em->persist($enum1);
         $em->persist($owner);
         $em->flush();
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
 
         $enum2 = $enumRepo->createEnumOption('audit_enum', 'enum2', 'enum2', 2);
         $owner->setEnumProperty($enum2);
@@ -1205,18 +1133,14 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                      '<s>enum1</s>&nbsp;enum2'
-                    ],
-                ],
-                EnumOption::class => [
-                    'audit_enum.enum2' => '<s></s>&nbsp;enum2',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => ['<s>enum1</s>&nbsp;enum2']
+            ],
+            EnumOption::class => [
+                'audit_enum.enum2' => '<s></s>&nbsp;enum2'
             ]
-        );
+        ]);
     }
 
     public function testMoney()
@@ -1231,13 +1155,11 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>1.01</s>&nbsp;1.02',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>1.01</s>&nbsp;1.02'
             ]
-        );
+        ]);
     }
 
     public function testMoneyValue()
@@ -1252,13 +1174,11 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>1.01</s>&nbsp;1.02',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>1.01</s>&nbsp;1.02'
             ]
-        );
+        ]);
     }
 
     public function testObject()
@@ -1292,22 +1212,20 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        sprintf('Item #%s&quot; added', $child->getId()),
-                        '<s></s>childString',
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => [
-                        sprintf('&quot;%s&quot; added', $owner->getId()),
-                        '<s></s>&nbsp;childString',
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => [
+                    \sprintf('Item #%s&quot; added', $child->getId()),
+                    '<s></s>childString'
+                ]
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => [
+                    \sprintf('&quot;%s&quot; added', $owner->getId()),
+                    '<s></s>&nbsp;childString'
+                ]
             ]
-        );
+        ]);
     }
 
     public function testOneToManyRemove()
@@ -1325,22 +1243,20 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $owner->removeChildrenOneToMany($child);
         $em->flush();
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => sprintf('Item #%s&quot; removed', $child->getId()),
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => sprintf('&quot;%s&quot; removed', $owner->getId()),
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => \sprintf('Item #%s&quot; removed', $child->getId())
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => \sprintf('&quot;%s&quot; removed', $owner->getId())
             ]
-        );
+        ]);
     }
 
     public function testOneToManyRemoveOwner()
@@ -1358,22 +1274,20 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $child->setOwnerManyToOne(null);
         $em->flush();
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => sprintf('Item #%s&quot; removed', $child->getId()),
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => sprintf('&quot;%s&quot; removed', $owner->getId()),
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => \sprintf('Item #%s&quot; removed', $child->getId())
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => \sprintf('&quot;%s&quot; removed', $owner->getId())
             ]
-        );
+        ]);
     }
 
     public function testOneToManyUpdate()
@@ -1391,25 +1305,23 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $child->setStringProperty('childString2');
         $em->flush();
 
         $this->processMessages(false, true);
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        sprintf('Item #%s&quot; changed', $child->getId()),
-                        '<s>childString</s>&nbsp;childString2',
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => '<s>childString</s>&nbsp;childString2',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => [
+                    \sprintf('Item #%s&quot; changed', $child->getId()),
+                    '<s>childString</s>&nbsp;childString2'
+                ]
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => '<s>childString</s>&nbsp;childString2'
             ]
-        );
+        ]);
     }
 
     public function testOneToManyUpdateNonReverseOwner()
@@ -1426,26 +1338,20 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $child->setStringProperty('childString2');
         $em->flush();
 
         $this->processMessages(false, true);
 
-        $this->assertData(
-            [
-                TestAuditDataChild::class => [
-                    $child->getId() => [
-                        '<s>childString</s>&nbsp;childString2',
-                    ],
-                ],
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        sprintf('&quot;Item #%s&quot; changed', $child->getId()),
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataChild::class => [
+                $child->getId() => ['<s>childString</s>&nbsp;childString2']
+            ],
+            TestAuditDataOwner::class => [
+                $owner->getId() => [\sprintf('&quot;Item #%s&quot; changed', $child->getId())]
             ]
-        );
+        ]);
     }
 
     public function testOneToManyUpdateNonReverseChild()
@@ -1462,25 +1368,23 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $child->setStringProperty('childString2');
         $em->flush();
 
         $this->processMessages(false, true);
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        sprintf('Item #%s&quot; changed', $child->getId()),
-                        '<s>childString</s>&nbsp;childString2',
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => '<s>childString</s>&nbsp;childString2',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => [
+                    \sprintf('Item #%s&quot; changed', $child->getId()),
+                    '<s>childString</s>&nbsp;childString2'
+                ]
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => '<s>childString</s>&nbsp;childString2'
             ]
-        );
+        ]);
     }
 
     public function testOneToManyUpdateOwner()
@@ -1498,25 +1402,23 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $owner->setStringProperty('ownerString2');
         $em->flush();
 
         $this->processMessages(false, true);
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>ownerString</s>&nbsp;ownerString2',
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => [
-                        sprintf('&quot;%s&quot; changed', $owner->getId()),
-                        '<s>ownerString</s>&nbsp;ownerString2',
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>ownerString</s>&nbsp;ownerString2'
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => [
+                    \sprintf('&quot;%s&quot; changed', $owner->getId()),
+                    '<s>ownerString</s>&nbsp;ownerString2'
+                ]
             ]
-        );
+        ]);
     }
 
     public function testOneToOne()
@@ -1536,22 +1438,20 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(false, true);
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        sprintf('Item #%s&quot; added', $child->getId()),
-                        '<s></s>childString',
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => [
-                        sprintf('&quot;%s&quot; added', $owner->getId()),
-                        '<s></s>ownerString',
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => [
+                    \sprintf('Item #%s&quot; added', $child->getId()),
+                    '<s></s>childString'
+                ]
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => [
+                    \sprintf('&quot;%s&quot; added', $owner->getId()),
+                    '<s></s>ownerString'
+                ]
             ]
-        );
+        ]);
     }
 
     public function testOneToOneUpdate()
@@ -1569,27 +1469,23 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $child->setStringProperty('childString2');
         $em->flush();
 
         $this->processMessages(false, true);
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        sprintf('Item #%s&quot; changed', $child->getId()),
-                        '<s>childString</s>&nbsp;childString2',
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => [
-                        '<s>childString</s>&nbsp;childString2',
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => [
+                    \sprintf('Item #%s&quot; changed', $child->getId()),
+                    '<s>childString</s>&nbsp;childString2'
+                ]
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => ['<s>childString</s>&nbsp;childString2']
             ]
-        );
+        ]);
     }
 
     public function testOneToOneUpdateOwner()
@@ -1607,27 +1503,23 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $owner->setStringProperty('ownerString2');
         $em->flush();
 
         $this->processMessages(false, true);
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        '<s>ownerString</s>&nbsp;ownerString2',
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => [
-                        sprintf('&quot;%s&quot; changed', $owner->getId()),
-                        '<s>ownerString</s>&nbsp;ownerString2',
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => ['<s>ownerString</s>&nbsp;ownerString2']
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => [
+                    \sprintf('&quot;%s&quot; changed', $owner->getId()),
+                    '<s>ownerString</s>&nbsp;ownerString2'
+                ]
             ]
-        );
+        ]);
     }
 
     /**
@@ -1648,12 +1540,12 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $child->setOwner(null);
         $em->persist($child);
         $em->flush();
 
-        self::assertEquals([], $this->getSentMessages());
+        self::assertEquals([], self::getSentMessages());
     }
 
     public function testOneToOneRemoveCascade()
@@ -1674,28 +1566,26 @@ class DataAuditTest extends WebTestCase
         $ownerId = $owner->getId();
         $childId = $child->getId();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $em->remove($child);
         $em->flush();
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $ownerId => [
-                        '<s>ownerString</s>&nbsp;',
-                        sprintf('&quot;TestAuditDataChild::%s&quot; removed', $childId),
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $childId => [
-                        '<s>childString</s>&nbsp;',
-                        sprintf('&quot;TestAuditDataOwner::%s&quot; removed', $ownerId),
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $ownerId => [
+                    '<s>ownerString</s>&nbsp;',
+                    \sprintf('&quot;TestAuditDataChild::%s&quot; removed', $childId)
+                ]
+            ],
+            TestAuditDataChild::class => [
+                $childId => [
+                    '<s>childString</s>&nbsp;',
+                    \sprintf('&quot;TestAuditDataOwner::%s&quot; removed', $ownerId)
+                ]
             ]
-        );
+        ]);
     }
 
     public function testOneToOneRemoveCascadeOwner()
@@ -1716,28 +1606,26 @@ class DataAuditTest extends WebTestCase
         $ownerId = $owner->getId();
         $childId = $child->getId();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $em->remove($owner);
         $em->flush();
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $ownerId => [
-                        '<s>ownerString</s>&nbsp;',
-                        sprintf('&quot;TestAuditDataChild::%s&quot; removed', $childId),
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $childId => [
-                        '<s>childString</s>&nbsp;',
-                        sprintf('&quot;TestAuditDataOwner::%s&quot; removed', $ownerId),
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $ownerId => [
+                    '<s>ownerString</s>&nbsp;',
+                    \sprintf('&quot;TestAuditDataChild::%s&quot; removed', $childId)
+                ]
+            ],
+            TestAuditDataChild::class => [
+                $childId => [
+                    '<s>childString</s>&nbsp;',
+                    \sprintf('&quot;TestAuditDataOwner::%s&quot; removed', $ownerId)
+                ]
             ]
-        );
+        ]);
     }
 
     public function testOneToOneRemoveOrphan()
@@ -1758,28 +1646,26 @@ class DataAuditTest extends WebTestCase
         $ownerId = $owner->getId();
         $childId = $child->getId();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $em->remove($child);
         $em->flush();
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $ownerId => [
-                        '<s>ownerString</s>&nbsp;',
-                        sprintf('&quot;TestAuditDataChild::%s&quot; removed', $childId),
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $childId => [
-                        '<s>childString</s>&nbsp;',
-                        sprintf('&quot;TestAuditDataOwner::%s&quot; removed', $ownerId),
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $ownerId => [
+                    '<s>ownerString</s>&nbsp;',
+                    \sprintf('&quot;TestAuditDataChild::%s&quot; removed', $childId)
+                ]
+            ],
+            TestAuditDataChild::class => [
+                $childId => [
+                    '<s>childString</s>&nbsp;',
+                    \sprintf('&quot;TestAuditDataOwner::%s&quot; removed', $ownerId)
+                ]
             ]
-        );
+        ]);
     }
 
     public function testOneToOneRemoveOrphanOwner()
@@ -1800,28 +1686,26 @@ class DataAuditTest extends WebTestCase
         $ownerId = $owner->getId();
         $childId = $child->getId();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $em->remove($owner);
         $em->flush();
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $ownerId => [
-                        '<s>ownerString</s>',
-                        sprintf('&quot;TestAuditDataChild::%s&quot; removed', $childId),
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $childId => [
-                        '<s>childString</s>',
-                        sprintf('&quot;TestAuditDataOwner::%s&quot; removed', $ownerId),
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $ownerId => [
+                    '<s>ownerString</s>',
+                    \sprintf('&quot;TestAuditDataChild::%s&quot; removed', $childId)
+                ]
+            ],
+            TestAuditDataChild::class => [
+                $childId => [
+                    '<s>childString</s>',
+                    \sprintf('&quot;TestAuditDataOwner::%s&quot; removed', $ownerId)
+                ]
             ]
-        );
+        ]);
     }
 
     public function testOneToOneRemoveOwner()
@@ -1842,26 +1726,20 @@ class DataAuditTest extends WebTestCase
         $ownerId = $owner->getId();
         $childId = $child->getId();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $owner->setChild(null);
         $em->flush();
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $ownerId => [
-                        sprintf('&quot;Item #%s&quot; removed', $childId),
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $childId => [
-                        sprintf('&quot;%s&quot; removed', $ownerId),
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $ownerId => [\sprintf('&quot;Item #%s&quot; removed', $childId)]
+            ],
+            TestAuditDataChild::class => [
+                $childId => [\sprintf('&quot;%s&quot; removed', $ownerId)]
             ]
-        );
+        ]);
     }
 
     public function testOneToOneReverseUpdate()
@@ -1878,27 +1756,23 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $child->setStringProperty('childString2');
         $em->flush();
 
         $this->processMessages(false, true);
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        sprintf('Item #%s&quot; changed', $child->getId()),
-                        '<s>childString</s>&nbsp;childString2',
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => [
-                        '<s>childString</s>&nbsp;childString2',
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => [
+                    \sprintf('Item #%s&quot; changed', $child->getId()),
+                    '<s>childString</s>&nbsp;childString2'
+                ]
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => ['<s>childString</s>&nbsp;childString2']
             ]
-        );
+        ]);
     }
 
     public function testOneToOneReverseUpdateOwner()
@@ -1915,27 +1789,23 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $owner->setStringProperty('ownerString2');
         $em->flush();
 
         $this->processMessages(false, true);
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        '<s>ownerString</s>&nbsp;ownerString2',
-                    ],
-                ],
-                TestAuditDataChild::class => [
-                    $child->getId() => [
-                        sprintf('&quot;%s&quot; changed', $owner->getId()),
-                        '<s>ownerString</s>&nbsp;ownerString2',
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => ['<s>ownerString</s>&nbsp;ownerString2']
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => [
+                    \sprintf('&quot;%s&quot; changed', $owner->getId()),
+                    '<s>ownerString</s>&nbsp;ownerString2'
+                ]
             ]
-        );
+        ]);
     }
 
     public function testOneToOneUnidirectional()
@@ -1954,21 +1824,17 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        sprintf('Item #%s&quot; added', $child->getId()),
-                        '<s></s>&nbsp;ownerString',
-                    ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => [
+                    \sprintf('Item #%s&quot; added', $child->getId()),
+                    '<s></s>&nbsp;ownerString'
                 ],
-                TestAuditDataChild::class => [
-                    $child->getId() => [
-                        '<s></s>&nbsp;childString',
-                    ],
-                ],
+            ],
+            TestAuditDataChild::class => [
+                $child->getId() => ['<s></s>&nbsp;childString']
             ]
-        );
+        ]);
     }
 
     public function testOneToOneUnidirectionalUpdate()
@@ -1984,21 +1850,17 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $owner->setStringProperty('ownerString2');
         $em->flush();
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        '<s>ownerString</s>&nbsp;ownerString2',
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => ['<s>ownerString</s>&nbsp;ownerString2']
             ]
-        );
+        ]);
     }
 
     public function testOneToOneUnidirectionalUpdateChild()
@@ -2014,21 +1876,17 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $child->setStringProperty('childString2');
         $em->flush();
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataChild::class => [
-                    $child->getId() => [
-                        '<s>childString</s>&nbsp;childString2',
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataChild::class => [
+                $child->getId() => ['<s>childString</s>&nbsp;childString2']
             ]
-        );
+        ]);
     }
 
     public function testOneToOneUnidirectionalRemove()
@@ -2045,21 +1903,17 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
         $owner->setChildUnidirectional(null);
         $em->flush();
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => [
-                        sprintf('Item #%s&quot; removed', $child->getId()),
-                    ],
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => [\sprintf('Item #%s&quot; removed', $child->getId())]
             ]
-        );
+        ]);
     }
 
     public function testPercent()
@@ -2073,13 +1927,11 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>0.01</s>&nbsp;0.02',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>0.01</s>&nbsp;0.02'
             ]
-        );
+        ]);
     }
 
     public function testSecureArray()
@@ -2101,18 +1953,16 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    /* @see /package/platform/src/Oro/Bundle/DataAuditBundle/Resources/views/macros.html.twig */
-                    $owner->getId() => \sprintf(
-                        "<s><pre>%s</pre></s>&nbsp;<pre>%s</pre>",
-                        $this->escapeString(\json_encode($oldValue, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT)),
-                        $this->escapeString(\json_encode($newValue, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT))
-                    ),
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                /* @see /package/platform/src/Oro/Bundle/DataAuditBundle/Resources/views/macros.html.twig */
+                $owner->getId() => \sprintf(
+                    "<s><pre>%s</pre></s>&nbsp;<pre>%s</pre>",
+                    $this->escapeString(self::toJson($oldValue)),
+                    $this->escapeString(self::toJson($newValue))
+                )
             ]
-        );
+        ]);
     }
 
     public function testSmallint()
@@ -2127,13 +1977,11 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>2</s>&nbsp;3',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>2</s>&nbsp;3'
             ]
-        );
+        ]);
     }
 
     public function testString()
@@ -2148,13 +1996,11 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>string1</s>&nbsp;string2',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>string1</s>&nbsp;string2'
             ]
-        );
+        ]);
     }
 
     public function testText()
@@ -2169,13 +2015,11 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>string1</s>&nbsp;string2',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>string1</s>&nbsp;string2'
             ]
-        );
+        ]);
     }
 
     public function testTime()
@@ -2189,13 +2033,11 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
-            [
-                TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>12:00 AM</s>&nbsp;12:00 AM',
-                ],
+        $this->assertData([
+            TestAuditDataOwner::class => [
+                $owner->getId() => '<s>12:00 AM</s>&nbsp;12:00 AM'
             ]
-        );
+        ]);
     }
 
     public function testDateImmutable()
@@ -2297,7 +2139,7 @@ class DataAuditTest extends WebTestCase
             self::assertInstanceOf(AbstractAuditProcessor::class, $processor);
 
             foreach ($processor::getSubscribedTopics() as $topic) {
-                $message = $this->getSentMessage($topic);
+                $message = self::getSentMessage($topic);
                 $messageModel = $session->createMessage($message);
                 $messageModel->setMessageId('oro_owner');
                 $messageModel->setProperties([
@@ -2321,7 +2163,7 @@ class DataAuditTest extends WebTestCase
         $em = $this->getEntityManager();
         $em->persist($owner);
         $em->flush();
-        $this->getMessageCollector()->clear();
+        self::getMessageCollector()->clear();
 
         return $em;
     }
@@ -2330,5 +2172,10 @@ class DataAuditTest extends WebTestCase
     private function escapeString(string $value): string
     {
         return \htmlspecialchars($value, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');
+    }
+
+    private static function toJson(mixed $value): string
+    {
+        return \json_encode($value, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT | \JSON_THROW_ON_ERROR);
     }
 }
