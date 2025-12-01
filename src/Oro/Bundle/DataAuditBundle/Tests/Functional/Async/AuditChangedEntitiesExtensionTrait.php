@@ -96,9 +96,14 @@ trait AuditChangedEntitiesExtensionTrait
         ]);
     }
 
-    private function getEntityManager(): EntityManagerInterface
+    private function getEntityManager(?string $entityClass = null): EntityManagerInterface
     {
-        return $this->getClientInstance()->getContainer()->get('doctrine.orm.entity_manager');
+        $doctrine = self::getContainer()->get('doctrine');
+        if ($entityClass) {
+            return $doctrine->getManagerForClass($entityClass);
+        }
+
+        return $doctrine->getManager();
     }
 
     /**

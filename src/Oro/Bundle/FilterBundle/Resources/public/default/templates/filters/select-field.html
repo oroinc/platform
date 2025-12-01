@@ -5,7 +5,7 @@
         <% _.each(choices, function (option) { %>
             <% let uniqueId = _.uniqueId('radio-') %>
             <div class="selectable-group__item">
-                <label class="checkbox-label " data-radio="data-radio" for="<%- uniqueId %>" aria-label="<%- choiceAriaLabel %>">
+                <label class="checkbox-label " data-radio="data-radio" for="<%- uniqueId %>" aria-label="<%- choiceAriaLabel %> <%- option.label %>">
                     <input
                         type="radio"
                         id="<%- uniqueId %>"

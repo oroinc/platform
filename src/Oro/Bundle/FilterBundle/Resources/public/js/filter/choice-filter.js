@@ -186,7 +186,12 @@ const ChoiceFilter = TextFilter.extend({
         this._updateValueField();
     },
 
-    _updateValueField: function() {
+    /**
+     * Update value field visibility and focus state
+     *
+     * @param {boolean} focusCriteriaField
+     */
+    _updateValueField: function({focusCriteriaField = true} = {}) {
         const valueFrame = this.$('.value-field-frame');
         if (!valueFrame.length) {
             return;
@@ -195,7 +200,7 @@ const ChoiceFilter = TextFilter.extend({
         const type = this.getType();
         const isEmptyType = this.isEmptyType(type);
         this.$('.filter-criteria').toggleClass('empty-type', isEmptyType);
-        if (!isEmptyType && this.autoClose !== false) {
+        if (!isEmptyType && this.autoClose !== false && focusCriteriaField) {
             this.$(this.criteriaValueSelectors.value).trigger('focus');
         }
     },
