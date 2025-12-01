@@ -9,7 +9,7 @@ $checkbox-size-var: var(--checkbox-size, #{$checkbox-size}) !default;
 $checkbox-appearance: none !default;
 $checkbox-vertical-align: middle !default;
 $checkbox-margin: 0 !default;
-$checkbox-border: 2px solid get-var-color('neutral', 'grey3') !default;
+$checkbox-border: 1px solid get-var-color('neutral', 'grey3') !default;
 $checkbox-color: get-var-color('neutral', 'white-100') !default;
 $checkbox-display: inline-grid !default;
 $checkbox-border-radius: 3px !default;
