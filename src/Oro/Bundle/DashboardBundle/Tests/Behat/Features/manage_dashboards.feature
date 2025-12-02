@@ -13,8 +13,9 @@ Feature: Manage dashboards
     And number of records should be 1
     And I click "Create Dashboard"
     And I fill form with:
-      | Label      | My own custom dashboard |
-      | Clone From | Blank Dashboard         |
+      | Label          | My own custom dashboard |
+      | Dashboard type | Widgets                 |
+      | Clone From     | Blank Dashboard         |
     When I save and close form
     Then I should see "Dashboard saved" flash message
     And page has "My own custom dashboard" header

@@ -1,8 +1,5 @@
 import _ from 'underscore';
-import componentShortcutsManager from 'oroui/js/component-shortcuts-manager';
-
-const originalReservedKeys = componentShortcutsManager.reservedKeys.slice();
-const originalShortcuts = Object.assign({}, componentShortcutsManager.getAll());
+import componentShortcutsManagerModule from 'oroui/js/component-shortcuts-manager';
 
 const testWidgetConfiguration = {
     moduleName: 'test-path-to-module',
@@ -11,15 +8,12 @@ const testWidgetConfiguration = {
     }
 };
 
+const componentShortcutsManager = _.clone(componentShortcutsManagerModule);
+
 describe('Component Shortcuts Manager', function() {
     beforeEach(function() {
         componentShortcutsManager.reservedKeys = ['options', 'someReservedName'];
         componentShortcutsManager.removeAll();
-    });
-
-    afterEach(function() {
-        componentShortcutsManager.reservedKeys = originalReservedKeys;
-        componentShortcutsManager.shortcuts = originalShortcuts;
     });
 
     it('Initialize manager with custom module config', function() {
