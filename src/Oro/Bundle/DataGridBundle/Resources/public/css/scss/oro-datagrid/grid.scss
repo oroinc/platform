@@ -34,7 +34,8 @@
     }
 
     &-sticky {
-        overflow: hidden;
+        scrollbar-width: none;
+        overflow: auto;
     }
 
     &-table {
