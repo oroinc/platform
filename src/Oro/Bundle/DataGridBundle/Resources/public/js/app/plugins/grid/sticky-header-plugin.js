@@ -235,16 +235,15 @@ const StickyHeaderPlugin = BasePlugin.extend({
     },
 
     attachScroll() {
-        this.domCache.content.addEventListener('scroll', e => {
-            this.domCache.sticky.scrollLeft = e.target.scrollLeft;
-        });
+        const scrollContent = this.domCache.content.querySelector(this.selectors.osViewport) ?? this.domCache.content;
 
-        // If we enabled otherScroll, we must listen for its updateScroll event
-        this.domCache.$content.on('updateScroll', e => {
-            const osViewportEl = e.target.querySelector(this.selectors.osViewport);
+        this.domCache.sticky.addEventListener('scroll', () => {
+            scrollContent.scrollLeft = this.domCache.sticky.scrollLeft;
+        }, {passive: true});
 
-            this.domCache.sticky.scrollLeft = osViewportEl?.scrollLeft || 0;
-        });
+        scrollContent.addEventListener('scroll', () => {
+            this.domCache.sticky.scrollLeft = scrollContent.scrollLeft;
+        }, {passive: true});
     },
 
     observeCells() {
