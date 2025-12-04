@@ -40,6 +40,11 @@ class CsrfProtectionRequestListener
 
         $request = $event->getRequest();
 
+        if (!$request->hasSession(true)
+            || !$request->getSession()->isStarted()) {
+            return;
+        }
+
         $this->csrfTokenManager->getToken(csrfRequestManager::CSRF_TOKEN_ID);
 
         // check CSRF Protection annotation and validate token. Refresh used token after check
@@ -71,6 +76,12 @@ class CsrfProtectionRequestListener
         }
 
         $request = $event->getRequest();
+
+        if (!$request->hasSession(true)
+            || !$request->getSession()->isStarted()) {
+            return;
+        }
+
         if ($request->attributes->has(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE)) {
             $event->getResponse()->headers->setCookie(
                 $request->attributes->get(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE)

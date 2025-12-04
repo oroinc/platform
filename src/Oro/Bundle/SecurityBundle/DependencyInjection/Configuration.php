@@ -39,6 +39,28 @@ class Configuration implements ConfigurationInterface
                         ->end()
                 ->end()
             ->end()
+            ->arrayNode('stateless_csrf_protection')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    // defaults to framework.csrf_protection.stateless_token_ids
+                    ->scalarNode('enabled')->defaultNull()->end()
+                    ->arrayNode('stateless_token_ids')
+                        ->scalarPrototype()->end()
+                        ->info('Enable headers/cookies-based CSRF validation for the listed token ids.')
+                    ->end()
+                    ->scalarNode('check_header')
+                        ->defaultFalse()
+                        ->info(
+                            'Whether to check the CSRF token in a header in addition to a cookie ' .
+                            'when using stateless protection.'
+                        )
+                    ->end()
+                    ->scalarNode('cookie_name')
+                        ->defaultValue('csrf-token')
+                        ->info('The name of the cookie to use when using stateless protection.')
+                    ->end()
+                ->end()
+            ->end()
             ->arrayNode('login_target_path_excludes')
                 ->normalizeKeys(false)
                 ->defaultValue([])

@@ -10,12 +10,16 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
 {
     private CsrfRequestManager|MockObject $csrfRequestManager;
@@ -47,9 +51,32 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelController($event);
     }
 
-    public function testOnKernelControllerNoCsrfProtection(): void
+    public function testOnKernelControllerNoCsrfProtectionNoSession(): void
     {
         $request = Request::create('/');
+        $request->cookies->set(CsrfRequestManager::CSRF_TOKEN_ID, 'test');
+
+        $event = new ControllerEvent(
+            $this->createMock(HttpKernelInterface::class),
+            fn ($x) => $x,
+            $request,
+            HttpKernelInterface::MAIN_REQUEST
+        );
+
+        $this->csrfTokenManager->expects($this->never())
+            ->method('getToken');
+
+        $this->listener->onKernelController($event);
+    }
+
+    public function testOnKernelControllerNoCsrfProtectionWithSession(): void
+    {
+        $request = Request::create('/');
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects($this->once())
+            ->method('isStarted')
+            ->willReturn(true);
+        $request->setSession($session);
         $request->cookies->set(CsrfRequestManager::CSRF_TOKEN_ID, 'test');
 
         $event = new ControllerEvent(
@@ -66,11 +93,39 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelController($event);
     }
 
-    public function testOnKernelControllerDisabledCheck(): void
+    public function testOnKernelControllerDisabledCheckNoSession(): void
     {
         $csrfProtection = new CsrfProtection(['enabled' => false]);
 
         $request = Request::create('/');
+        $request->attributes->set('_' . CsrfProtection::ALIAS_NAME, $csrfProtection);
+        $request->cookies->set(CsrfRequestManager::CSRF_TOKEN_ID, 'test');
+
+        $event = new ControllerEvent(
+            $this->createMock(HttpKernelInterface::class),
+            fn ($x) => $x,
+            $request,
+            HttpKernelInterface::MAIN_REQUEST
+        );
+
+        $this->csrfTokenManager->expects($this->never())
+            ->method('getToken');
+        $this->csrfRequestManager->expects(self::never())
+            ->method('refreshRequestToken');
+
+        $this->listener->onKernelController($event);
+    }
+
+    public function testOnKernelControllerDisabledCheckWithSession(): void
+    {
+        $csrfProtection = new CsrfProtection(['enabled' => false]);
+
+        $request = Request::create('/');
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects($this->once())
+            ->method('isStarted')
+            ->willReturn(true);
+        $request->setSession($session);
         $request->attributes->set('_' . CsrfProtection::ALIAS_NAME, $csrfProtection);
         $request->cookies->set(CsrfRequestManager::CSRF_TOKEN_ID, 'test');
 
@@ -98,6 +153,11 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
         $csrfProtection = new CsrfProtection(['enabled' => true, 'useRequest' => $useRequest]);
 
         $request = Request::create('/');
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects($this->once())
+            ->method('isStarted')
+            ->willReturn(true);
+        $request->setSession($session);
         $request->attributes->set('_' . CsrfProtection::ALIAS_NAME, $csrfProtection);
 
         $event = new ControllerEvent(
@@ -127,6 +187,11 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
         $csrfProtection = new CsrfProtection(['enabled' => true, 'useRequest' => $useRequest]);
 
         $request = Request::create('/');
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects($this->once())
+            ->method('isStarted')
+            ->willReturn(true);
+        $request->setSession($session);
         $request->attributes->set('_' . CsrfProtection::ALIAS_NAME, $csrfProtection);
 
         $event = new ControllerEvent(
@@ -194,6 +259,11 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
         $cookie = Cookie::create('test');
 
         $request = Request::create('/');
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects($this->once())
+            ->method('isStarted')
+            ->willReturn(true);
+        $request->setSession($session);
         $request->attributes->set(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE, $cookie);
         $response = new Response();
 

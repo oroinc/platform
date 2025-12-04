@@ -35,7 +35,7 @@ class EmbedFormControllerTest extends WebTestCase
                     'css' => 'input { color: red; }',
                     'successMessage' => 'Test success message',
                     'formType' => EmbeddedFormStub::class,
-                    '_token' => $this->getCsrfToken('embedded_form')->getValue()
+                    '_token' => $this->getCsrfToken('submit')->getValue()
                 ],
             ]
         );

@@ -1,0 +1,29 @@
+services:
+    oro_security.csrf.same_origin_token_manager_abstract:
+        class: Oro\Bundle\SecurityBundle\Csrf\SameOriginCsrfTokenManager
+        abstract: true
+        arguments:
+            - '@request_stack'
+            - '@?logger'
+            - '@.inner'
+            - !abstract 'oro_security.stateless_csrf.stateless_token_ids'
+            - !abstract 'oro_security.stateless_csrf.check_header'
+            - !abstract 'oro_security.stateless_csrf.cookie_name'
+
+    oro_security.csrf.same_origin_token_manager:
+      parent: oro_security.csrf.same_origin_token_manager_abstract
+      decorates: security.csrf.token_manager
+      tags:
+        - { name: monolog.logger, channel: request }
+        - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse}
+
+    oro_security.csrf.same_origin_ajax_token_manager:
+      parent: oro_security.csrf.same_origin_token_manager_abstract
+      decorates: oro_security.csrf_token_manager
+      arguments:
+        $tokenIds: [ '_csrf_token' ]
+        $checkHeader: 0
+        $cookieName: 'https-_csrf'
+      tags:
+        - { name: monolog.logger, channel: request }
+        - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse, priority: 255  }

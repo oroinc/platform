@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclConfigurationPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclGroupProvidersPass;
+use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\FormTypeCsrfPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnerMetadataProvidersPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipDecisionMakerPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\RemoveAclSchemaListenerPass;
@@ -56,6 +57,7 @@ class OroSecurityBundle extends Bundle
             }
         ));
         $container->addCompilerPass(new SessionPass());
+        $container->addCompilerPass(new FormTypeCsrfPass());
         $container->addCompilerPass(new SetFirewallExceptionListenerPass());
 
         if ($container instanceof ExtendedContainerBuilder) {

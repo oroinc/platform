@@ -35,6 +35,7 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
         }
 
         $this->configureCookieTokenStorage($container, $config);
+        $this->configureStatelessCsrfProtection($container, $config, $loader);
 
         $container->setParameter('oro_security.login_target_path_excludes', $config['login_target_path_excludes']);
     }
@@ -52,5 +53,29 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
         $container->getDefinition('oro_security.csrf.cookie_token_storage')
             ->replaceArgument(0, $config['csrf_cookie']['cookie_secure'])
             ->replaceArgument(2, $config['csrf_cookie']['cookie_samesite']);
+    }
+
+    private function configureStatelessCsrfProtection(
+        ContainerBuilder $container,
+        array $config,
+        Loader\YamlFileLoader $loader
+    ): void {
+        $csrfConfig = $config['stateless_csrf_protection'];
+        if (!$csrfConfig['enabled']) {
+            return;
+        }
+
+        $loader->load('stateless_csrf.yml');
+
+        if (!$csrfConfig['stateless_token_ids']) {
+            $container->removeDefinition('oro_security.csrf.same_origin_token_manager');
+
+            return;
+        }
+
+        $container->getDefinition('oro_security.csrf.same_origin_token_manager')
+            ->replaceArgument(3, $csrfConfig['stateless_token_ids'])
+            ->replaceArgument(4, $csrfConfig['check_header'])
+            ->replaceArgument(5, $csrfConfig['cookie_name']);
     }
 }

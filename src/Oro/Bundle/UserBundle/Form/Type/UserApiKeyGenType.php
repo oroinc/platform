@@ -9,6 +9,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for generating user Api key in back office
+ */
 class UserApiKeyGenType extends AbstractType
 {
     const NAME = 'oro_user_apikey_gen';
@@ -31,7 +34,8 @@ class UserApiKeyGenType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class' => UserApi::class,
-                'csrf_protection' => ['enabled' => true, 'fieild_name' => 'apikey_token'],
+                'csrf_protection' => true,
+                'csrf_field_name' => 'apikey_token',
                 'csrf_token_id' => self::NAME,
                 'apiKeyElementId' => 'user-apikey-gen-elem'
             ]
