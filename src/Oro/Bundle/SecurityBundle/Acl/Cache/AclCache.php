@@ -166,16 +166,18 @@ class AclCache implements AclCacheInterface
         array &$indexes
     ): void {
         if (\array_key_exists('o', $aceData)) {
-            foreach ($aceData['o'] as $mask) {
-                $acl->insertObjectAce($sid, $mask, $indexes['o'], true, 'all');
+            foreach ($aceData['o'] as $aceInfo) {
+                [$mask, $strategy] = $this->extractAceInfo($aceInfo);
+                $acl->insertObjectAce($sid, $mask, $indexes['o'], true, $strategy);
 
                 $indexes['o']++;
             }
         }
 
         if (\array_key_exists('c', $aceData)) {
-            foreach ($aceData['c'] as $mask) {
-                $acl->insertClassAce($sid, $mask, $indexes['c'], true, 'all');
+            foreach ($aceData['c'] as $aceInfo) {
+                [$mask, $strategy] = $this->extractAceInfo($aceInfo);
+                $acl->insertClassAce($sid, $mask, $indexes['c'], true, $strategy);
                 $indexes['c']++;
             }
         }
@@ -183,8 +185,9 @@ class AclCache implements AclCacheInterface
         if (\array_key_exists('fc', $aceData)) {
             foreach ($aceData['fc'] as $fieldName => $fieldAces) {
                 $this->ensureFieldIndexExist($indexes['fc'], $fieldName);
-                foreach ($fieldAces as $mask) {
-                    $acl->insertClassFieldAce($fieldName, $sid, $mask, $indexes['fc'][$fieldName], true, 'all');
+                foreach ($fieldAces as $aceInfo) {
+                    [$mask, $strategy] = $this->extractAceInfo($aceInfo);
+                    $acl->insertClassFieldAce($fieldName, $sid, $mask, $indexes['fc'][$fieldName], true, $strategy);
                     $indexes['fc'][$fieldName]++;
                 }
             }
@@ -193,12 +196,27 @@ class AclCache implements AclCacheInterface
         if (\array_key_exists('fo', $aceData)) {
             foreach ($aceData['fo'] as $fieldName => $fieldAces) {
                 $this->ensureFieldIndexExist($indexes['fo'], $fieldName);
-                foreach ($fieldAces as $mask) {
-                    $acl->insertObjectFieldAce($fieldName, $sid, $mask, $indexes['fo'][$fieldName], true, 'all');
+                foreach ($fieldAces as $aceInfo) {
+                    [$mask, $strategy] = $this->extractAceInfo($aceInfo);
+                    $acl->insertObjectFieldAce($fieldName, $sid, $mask, $indexes['fo'][$fieldName], true, $strategy);
                     $indexes['fo'][$fieldName]++;
                 }
             }
         }
+    }
+
+    /**
+     * Extracts mask and strategy from ACE info.
+     * Supports both old format (int mask) and new format (array with mask and strategy).
+     */
+    private function extractAceInfo(int|array $aceInfo): array
+    {
+        if (\is_array($aceInfo)) {
+            return [$aceInfo['mask'], $aceInfo['strategy'] ?? 'all'];
+        }
+
+        // Backward compatibility: old cache format with only mask
+        return [$aceInfo, 'all'];
     }
 
     private function ensureFieldIndexExist(&$array, string $fieldName): void
@@ -248,7 +266,10 @@ class AclCache implements AclCacheInterface
         $data = [];
         foreach ($aces as $ace) {
             if ($ace->getSecurityIdentity()->equals($sid)) {
-                $data[] = $ace->getMask();
+                $data[] = [
+                    'mask' => $ace->getMask(),
+                    'strategy' => $ace->getStrategy(),
+                ];
             }
         }
 
