@@ -218,12 +218,24 @@ class AclCacheTest extends \PHPUnit\Framework\TestCase
         $this->aclCache->putInCacheBySids($acl, [$sid1, $sid2, $sid3]);
 
         self::assertEquals(
-            ['a0a2c4e7b89e4e9a3244e64be56ec92b', ['c' => [0], 'fc' => ['field1' => [2]]]],
+            [
+                'a0a2c4e7b89e4e9a3244e64be56ec92b',
+                [
+                    'c' => [['mask' => 0, 'strategy' => 'all']],
+                    'fc' => ['field1' => [['mask' => 2, 'strategy' => 'all']]]
+                ]
+            ],
             $item1->get()
         );
 
         self::assertEquals(
-            ['4d48b7d84eef3d4be900edfdb843e290', ['o' => [1], 'fo' => ['field1' => [3]]]],
+            [
+                '4d48b7d84eef3d4be900edfdb843e290',
+                [
+                    'o' => [['mask' => 1, 'strategy' => 'all']],
+                    'fo' => ['field1' => [['mask' => 3, 'strategy' => 'all']]]
+                ]
+            ],
             $item2->get()
         );
 
@@ -265,9 +277,21 @@ class AclCacheTest extends \PHPUnit\Framework\TestCase
             . '_7e0e25e9f99ddb6ed17b43b11490776f';
 
         $item1 = $this->getEntity(CacheItem::class, ['isHit' => true]);
-        $item1->set(['a0a2c4e7b89e4e9a3244e64be56ec92b', ['c' => [0], 'fc' => ['field1' => [2]]]]);
+        $item1->set([
+            'a0a2c4e7b89e4e9a3244e64be56ec92b',
+            [
+                'c' => [['mask' => 0, 'strategy' => 'all']],
+                'fc' => ['field1' => [['mask' => 2, 'strategy' => 'all']]]
+            ]
+        ]);
         $item2 = $this->getEntity(CacheItem::class, ['isHit' => true]);
-        $item2->set(['4d48b7d84eef3d4be900edfdb843e290', ['o' => [1], 'fo' => ['field1' => [3]]]]);
+        $item2->set([
+            '4d48b7d84eef3d4be900edfdb843e290',
+            [
+                'o' => [['mask' => 1, 'strategy' => 'all']],
+                'fo' => ['field1' => [['mask' => 3, 'strategy' => 'all']]]
+            ]
+        ]);
         $item3 = $this->getEntity(CacheItem::class, ['isHit' => true]);
         $item3->set([]);
 
@@ -277,10 +301,10 @@ class AclCacheTest extends \PHPUnit\Framework\TestCase
         $sid3 = new RoleSecurityIdentity('TEST_ROLE_3');
 
         $acl = new Acl(-1, $oid, $this->permissionGrantingStrategy, [$sid1, $sid2, $sid3], false);
-        $acl->insertClassAce($sid1, 0, 0, true);
-        $acl->insertObjectAce($sid2, 1, 0, true);
-        $acl->insertClassFieldAce('field1', $sid1, 2, 0, true);
-        $acl->insertObjectFieldAce('field1', $sid2, 3, 0, true);
+        $acl->insertClassAce($sid1, 0, 0, true, 'all');
+        $acl->insertObjectAce($sid2, 1, 0, true, 'all');
+        $acl->insertClassFieldAce('field1', $sid1, 2, 0, true, 'all');
+        $acl->insertObjectFieldAce('field1', $sid2, 3, 0, true, 'all');
 
         $this->cache->expects(self::once())
             ->method('getItems')
@@ -303,9 +327,21 @@ class AclCacheTest extends \PHPUnit\Framework\TestCase
             . '_7e0e25e9f99ddb6ed17b43b11490776f';
 
         $item1 = $this->getEntity(CacheItem::class, ['isHit' => true]);
-        $item1->set(['a0a2c4e7b89e4e9a3244e64be56ec92b', ['c' => [0], 'fc' => ['field1' => [2]]]]);
+        $item1->set([
+            'a0a2c4e7b89e4e9a3244e64be56ec92b',
+            [
+                'c' => [['mask' => 0, 'strategy' => 'all']],
+                'fc' => ['field1' => [['mask' => 2, 'strategy' => 'all']]]
+            ]
+        ]);
         $item2 = $this->getEntity(CacheItem::class, ['isHit' => true]);
-        $item2->set(['4d48b7d84eef3d4be900edfdb843e290', ['o' => [1], 'fo' => ['field1' => [3]]]]);
+        $item2->set([
+            '4d48b7d84eef3d4be900edfdb843e290',
+            [
+                'o' => [['mask' => 1, 'strategy' => 'all']],
+                'fo' => ['field1' => [['mask' => 3, 'strategy' => 'all']]]
+            ]
+        ]);
         $item3 = $this->getEntity(CacheItem::class, ['isHit' => false]);
 
         $oid = new ObjectIdentity('entity', \stdClass::class);
@@ -319,5 +355,30 @@ class AclCacheTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$item1, $item2, $item3]);
 
         self::assertNull($this->aclCache->getFromCacheByIdentityAndSids($oid, [$sid1, $sid2, $sid3]));
+    }
+
+    public function testGetFromCacheByIdentityAndSidsWithBackwardCompatibility(): void
+    {
+        $item1Key = '09a15e9660c1ebc6f429d818825ce0c62f82758dcc11e2a2f05e2a7f35a1b34319985aa1'
+            . '_f5e638cc78dd325906c1298a0c21fb6be711631380ef1b422ae392db3ca08b8e061aea4e'
+            . '_a0a2c4e7b89e4e9a3244e64be56ec92b';
+
+        // Old cache format with only mask (int)
+        $item1 = $this->getEntity(CacheItem::class, ['isHit' => true]);
+        $item1->set(['a0a2c4e7b89e4e9a3244e64be56ec92b', ['c' => [0], 'o' => [1]]]);
+
+        $oid = new ObjectIdentity('entity', \stdClass::class);
+        $sid1 = new RoleSecurityIdentity('TEST_ROLE_1');
+
+        $acl = new Acl(-1, $oid, $this->permissionGrantingStrategy, [$sid1], false);
+        $acl->insertClassAce($sid1, 0, 0, true, 'all');
+        $acl->insertObjectAce($sid1, 1, 0, true, 'all');
+
+        $this->cache->expects(self::once())
+            ->method('getItems')
+            ->with([$item1Key])
+            ->willReturn([$item1]);
+
+        self::assertEquals($acl, $this->aclCache->getFromCacheByIdentityAndSids($oid, [$sid1]));
     }
 }
