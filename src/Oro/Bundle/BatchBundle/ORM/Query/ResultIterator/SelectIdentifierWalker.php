@@ -67,10 +67,12 @@ class SelectIdentifierWalker extends TreeWalkerAdapter
 
         $AST->selectClause->selectExpressions = [new AST\SelectExpression($pathExpression, null)];
 
-        // add Group By Identifier to make distinction
-        if (isset($AST->groupByClause) && !$usedInGroupBy) {
-            array_unshift($AST->groupByClause->groupByItems, $pathExpression);
-        } else {
+        // GROUP BY handling:
+        // - If GROUP BY exists: REPLACE it with just identifier (required because SELECT now only contains id,
+        //   so GROUP BY cannot reference columns that are no longer in SELECT).
+        // - If no GROUP BY but has JOINs: add GROUP BY to eliminate duplicates.
+        // - If no GROUP BY and no JOINs: skip GROUP BY (selecting by PK already guarantees unique rows).
+        if (isset($AST->groupByClause) || !empty($fromRoot->joins)) {
             $AST->groupByClause = new AST\GroupByClause([$pathExpression]);
         }
     }
