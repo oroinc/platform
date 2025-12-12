@@ -24,7 +24,6 @@ Feature: User delete
       | Primary Email       | email@test.com |
       | Roles               | Administrator  |
       | Enabled             | Enabled        |
-      | OroCRM Organization | true           |
     And I save and close form
     And I should see "User saved" flash message
     And I go to System/User Management/Users
@@ -38,7 +37,6 @@ Feature: User delete
       | Primary Email       | email2@test.com |
       | Roles               | Administrator  |
       | Enabled             | Enabled        |
-      | OroCRM Organization | true           |
     And I save and close form
     Then I should see "User saved" flash message
 

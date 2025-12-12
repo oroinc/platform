@@ -7,3 +7,9 @@ oro_user:
         errors:
             bad_credentials: 'Your login was unsuccessful. Please check your e-mail address and password before trying again. If you have forgotten your password, follow "Forgot your password?" link.'
             empty_owner: 'There was an issue with your authentication, please contact the system administrator.'
+            empty_business_units: >
+                The user must be assigned to at least one organization business unit in order to log in. 
+                Please contact your administrator.
+            empty_organization: >
+                The user does not have an active organization assigned to it.
+                Please contact your administrator.

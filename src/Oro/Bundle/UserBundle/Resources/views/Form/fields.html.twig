@@ -66,3 +66,11 @@
         {% endfor %}
     </div>
 {% endblock %}
+
+{% block oro_user_user_organizations_select_widget %}
+    <div class="alert alert-info" role="alert">
+        <strong>{{ 'oro.user.form.importance'|trans }}</strong>:
+        {{ 'oro.user.form.organization.notice'|trans }}
+    </div>
+    {{ block('oro_organizations_select_widget') }}
+{% endblock %}

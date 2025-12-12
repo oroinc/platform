@@ -45,6 +45,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, D
 
         $user = $userManager->createUser();
         $organization = $this->getReference('organization');
+        $businessUnit = $this->getReference('business_unit');
 
         $user
             ->setOwner($this->getReference('business_unit'))
@@ -56,6 +57,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, D
             ->setEmail('simple@example.com')
             ->setOrganization($organization)
             ->addOrganization($organization)
+            ->addBusinessUnit($businessUnit)
             ->setSalt('');
 
         $userManager->updateUser($user);

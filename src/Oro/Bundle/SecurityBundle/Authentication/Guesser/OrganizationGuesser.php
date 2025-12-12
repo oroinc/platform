@@ -16,16 +16,16 @@ class OrganizationGuesser implements OrganizationGuesserInterface
     public function guess(AbstractUser $user): ?Organization
     {
         $organization = $user->getOrganization();
+
         if (null === $organization) {
             throw new BadUserOrganizationException('The user does not have an active organization assigned to it.');
         }
+
         if ($user->isBelongToOrganization($organization, true)) {
             return $organization;
         }
+
         $firstOrganization = $this->getFirstOrganization($user->getOrganizations(true));
-        if (null === $firstOrganization) {
-            throw new BadUserOrganizationException('The user does not have active organization assigned to it.');
-        }
 
         return $firstOrganization;
     }

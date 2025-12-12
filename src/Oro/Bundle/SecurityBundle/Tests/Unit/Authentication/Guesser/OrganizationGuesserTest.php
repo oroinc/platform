@@ -84,9 +84,6 @@ class OrganizationGuesserTest extends TestCase
             ->with($this->isTrue())
             ->willReturn(new ArrayCollection());
 
-        self::expectException(BadUserOrganizationException::class);
-        self::expectExceptionMessage('The user does not have active organization assigned to it.');
-
         $this->guesser->guess($user);
     }
 }

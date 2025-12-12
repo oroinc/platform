@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -36,6 +37,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, D
         $user = $userManager->createUser();
         $user->setUsername('simple_user')
             ->setOwner($this->getReference('business_unit'))
+            ->setBusinessUnits(new ArrayCollection([$this->getReference('business_unit')]))
             ->setPlainPassword('simple_password')
             ->setEmail('simple_user@example.com')
             ->setOrganization($organization)
@@ -59,6 +61,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, D
         $user2 = $userManager->createUser();
         $user2->setUsername('simple_user2')
             ->setOwner($this->getReference('business_unit'))
+            ->setBusinessUnits(new ArrayCollection([$this->getReference('business_unit')]))
             ->setPlainPassword('simple_password2')
             ->setFirstName('Elley')
             ->setLastName('Towards')
