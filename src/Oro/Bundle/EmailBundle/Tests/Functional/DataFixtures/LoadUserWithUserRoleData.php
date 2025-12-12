@@ -41,6 +41,7 @@ class LoadUserWithUserRoleData extends AbstractFixture implements ContainerAware
             ->addUserRole($role)
             ->setOrganization($organization)
             ->addOrganization($organization)
+            ->addBusinessUnit($organization->getBusinessUnits()->first())
             ->setFirstName('Test')
             ->setLastName('User')
             ->setEnabled(true)

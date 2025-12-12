@@ -22,7 +22,6 @@ class LoadUserData extends AbstractLoadUserData
                 'firstName' => 'Simple',
                 'lastName' => 'User',
                 'plainPassword' => self::USER_PASSWORD,
-
                 'reference' => self::USER_NAME,
                 'enabled' => true,
                 'role' => 'PUBLIC_ACCESS',

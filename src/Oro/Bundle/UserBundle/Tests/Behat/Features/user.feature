@@ -17,15 +17,17 @@ Feature: User
     And I go to System/User Management/Users
     And I click "Create User"
     When fill "Create User Form" with:
-      | Username            | user1Name      |
-      | Password            | user1Name      |
-      | Re-Enter Password   | user1Name      |
-      | First Name          | First Name     |
-      | Last Name           | Last Name      |
-      | Primary Email       | email@test.com |
-      | Roles               | Administrator  |
-      | Enabled             | Enabled        |
-      | OroCRM Organization | true           |
+      | Username                    | user1Name      |
+      | Password                    | user1Name      |
+      | Re-Enter Password           | user1Name      |
+      | First Name                  | First Name     |
+      | Last Name                   | Last Name      |
+      | Primary Email               | email@test.com |
+      | Roles                       | Administrator  |
+      | Enabled                     | Enabled        |
+    And I click "Organization Business Units Element"
+    And I should see "Oro / Main"
+    And I click "Business Unit First Result Element"
     And I save and close form
     Then I should see "User saved" flash message
 
@@ -33,15 +35,17 @@ Feature: User
     Given I go to System/User Management/Users
     And I click "Create User"
     And fill "Create User Form" with:
-      | Username            | userName1       |
-      | First Name          | First Name1     |
-      | Last Name           | Last Name1      |
-      | Primary Email       | email1@test.com |
-      | Roles               | Administrator   |
-      | Birthday            | 1990-07-24      |
-      | Enabled             | Enabled         |
-      | Generate Password   | true            |
-      | OroCRM Organization | true            |
+      | Username                    | userName1       |
+      | First Name                  | First Name1     |
+      | Last Name                   | Last Name1      |
+      | Primary Email               | email1@test.com |
+      | Roles                       | Administrator   |
+      | Birthday                    | 1990-07-24      |
+      | Enabled                     | Enabled         |
+      | Generate Password           | true            |
+    And I click "Organization Business Units Element"
+    And I should see "Oro / Main"
+    And I click "Business Unit First Result Element"
 
   @skipWait
   Scenario: Follow email link
@@ -83,16 +87,18 @@ Feature: User
     And I go to System/User Management/Users
     And I click "Create User"
     When fill "Create User Form" with:
-      | Username            | userName2       |
-      | Password            | Pa$$w0rd        |
-      | Re-Enter Password   | Pa$$w0rd        |
-      | First Name          | First Name      |
-      | Last Name           | Last Name       |
-      | Primary Email       | email2@test.com |
-      | Roles               | Administrator   |
-      | Birthday            | 1990-07-24      |
-      | Enabled             | Enabled         |
-      | OroCRM Organization | true            |
+      | Username                    | userName2       |
+      | Password                    | Pa$$w0rd        |
+      | Re-Enter Password           | Pa$$w0rd        |
+      | First Name                  | First Name      |
+      | Last Name                   | Last Name       |
+      | Primary Email               | email2@test.com |
+      | Roles                       | Administrator   |
+      | Birthday                    | 1990-07-24      |
+      | Enabled                     | Enabled         |
+    And I click "Organization Business Units Element"
+    And I should see "Oro / Main"
+    And I click "Business Unit First Result Element"
 
     And I save and close form
     Then I should see "User saved" flash message
