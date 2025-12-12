@@ -28,6 +28,9 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Container
         $admin = $manager->getRepository(User::class)->findOneBy(['username' => 'admin']);
         /** @var Group $group */
         $group = $manager->getRepository(Group::class)->findOneBy(['name' => 'Administrators']);
+
+        $businessUnit = $admin->getOrganization()?->getBusinessUnits()?->first();
+
         if (!$admin) {
             /** @var Role $role */
             $role = $manager->getRepository(Role::class)->findOneBy(['role' => 'ROLE_ADMINISTRATOR']);
@@ -43,6 +46,10 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Container
             ->setLastName('Doe')
             ->setEmail('admin@example.com')
             ->setSalt('');
+
+        if ($businessUnit) {
+            $admin->addBusinessUnit($businessUnit);
+        }
 
         if (!$admin->hasGroup($group)) {
             $admin->addGroup($group);

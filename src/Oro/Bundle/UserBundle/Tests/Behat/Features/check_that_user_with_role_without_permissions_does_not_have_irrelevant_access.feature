@@ -18,15 +18,17 @@ Feature: Check that user with role without permissions does not have irrelevant 
     Given go to System/ User Management/ Users
     And click "Create User"
     And I fill "User Form" with:
-      | Username            | userName       |
-      | Password            | Pa$$w0rd       |
-      | Re-Enter Password   | Pa$$w0rd       |
-      | First Name          | First Name     |
-      | Last Name           | Last Name      |
-      | Primary Email       | email@test.com |
-      | OroCRM Organization | true           |
-      | Bare Role           | true           |
-      | Enabled             | Enabled        |
+      | Username                    | userName       |
+      | Password                    | Pa$$w0rd       |
+      | Re-Enter Password           | Pa$$w0rd       |
+      | First Name                  | First Name     |
+      | Last Name                   | Last Name      |
+      | Primary Email               | email@test.com |
+      | Bare Role                   | true           |
+      | Enabled                     | Enabled        |
+    And I click "Organization Business Units Element"
+    And I should see "Oro / Main"
+    And I click "Business Unit First Result Element"
     When I save and close form
     Then I should see "User saved" flash message
     And I should see "Bare Role"

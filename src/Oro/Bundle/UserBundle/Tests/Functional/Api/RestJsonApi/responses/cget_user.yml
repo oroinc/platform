@@ -30,7 +30,10 @@ data:
                     type: businessunits
                     id: '<toString(@business_unit->id)>'
             businessUnits:
-                data: []
+                data:
+                    -
+                        type: businessunits
+                        id: '<toString(@business_unit->id)>'
             organizations:
                 data:
                     -
