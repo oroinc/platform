@@ -43,13 +43,3 @@ Feature: User search with business unit permissions
     And I should see following search results:
       | Title    | Type |
       | John Doe | User |
-
-  Scenario: Search admin user with role permissions 'View:Business Unit' for User entity and without business unit
-    Given I login as "test" user
-    And I click "Search"
-    And type "admin" in "search"
-    When I click "Search Submit"
-    Then I should be on Search Result page
-    And I should not see following search entity types:
-      | Type  |
-      | Users |

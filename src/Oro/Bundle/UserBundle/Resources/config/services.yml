@@ -101,6 +101,14 @@ services:
             - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\UserBundle\Entity\Role, event: prePersist}
             - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\UserBundle\Entity\Role, event: preUpdate}
 
+    oro_user.organization.listener:
+        class: Oro\Bundle\UserBundle\EventListener\UserOrganizationListener
+        arguments:
+            - '@oro_security.token_accessor'
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\UserBundle\Entity\User, event: prePersist }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\UserBundle\Entity\User, event: preUpdate }
+
     oro_user.twig.user_extension:
         class: Oro\Bundle\UserBundle\Twig\OroUserExtension
         arguments:

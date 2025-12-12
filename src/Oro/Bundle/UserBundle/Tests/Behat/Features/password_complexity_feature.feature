@@ -19,13 +19,15 @@ Feature: Password complexity feature
     And I go to System/User Management/Users
     And click "Create User"
     And I fill "User Form" with:
-      | Enabled             | Enabled          |
-      | Username            | mattjohnes       |
-      | First Name          | Matt             |
-      | Last Name           | Johnes           |
-      | Primary Email       | orotest@test.com |
-      | Roles               | Administrator    |
-      | OroCRM Organization | true             |
+      | Enabled                     | Enabled          |
+      | Username                    | mattjohnes       |
+      | First Name                  | Matt             |
+      | Last Name                   | Johnes           |
+      | Primary Email               | orotest@test.com |
+      | Roles                       | Administrator    |
+    And I click "Organization Business Units Element"
+    And I should see "Oro / Main"
+    And I click "Business Unit First Result Element"
 
   Scenario Outline:
     Given I fill "User Form" with:
@@ -126,13 +128,15 @@ Feature: Password complexity feature
     And I go to System/User Management/Users
     And click "Create User"
     And I fill "User Form" with:
-      | Enabled             | Enabled            |
-      | Username            | roothmio           |
-      | First Name          | Rooth              |
-      | Last Name           | Mio                |
-      | Primary Email       | orotest+1@test.com |
-      | Roles               | Administrator      |
-      | OroCRM Organization | true               |
+      | Enabled                     | Enabled            |
+      | Username                    | roothmio           |
+      | First Name                  | Rooth              |
+      | Last Name                   | Mio                |
+      | Primary Email               | orotest+1@test.com |
+      | Roles                       | Administrator      |
+    And I click "Organization Business Units Element"
+    And I should see "Oro / Main"
+    And I click "Business Unit First Result Element"
 
   Scenario Outline:
     Given I fill "User Form" with:

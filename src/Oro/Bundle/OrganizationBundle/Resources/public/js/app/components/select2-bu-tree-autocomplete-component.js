@@ -10,12 +10,11 @@ define(function(require) {
     const BUTreeAutocompleteComponent = Select2TreeAutocompleteComponent.extend({
         ViewType: Select2BuTreeAutocompleteView,
 
-        organizations: {},
-
         /**
          * @inheritdoc
          */
         constructor: function BUTreeAutocompleteComponent(options) {
+            this.organizations = {};
             BUTreeAutocompleteComponent.__super__.constructor.call(this, options);
         },
 

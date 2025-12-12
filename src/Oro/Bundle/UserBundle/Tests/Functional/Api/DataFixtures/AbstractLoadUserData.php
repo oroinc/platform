@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AbstractFixture;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
@@ -36,6 +37,8 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Dependent
             $user = $userManager->createUser();
             /** @var Organization $organization */
             $organization = $this->getReference(LoadOrganization::ORGANIZATION);
+            /** @var BusinessUnit $businessUnit */
+            $businessUnit = $organization->getBusinessUnits()->first();
 
             $api = new UserApi();
             $api->setApiKey($userData['apiKey'])
@@ -55,6 +58,9 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Dependent
                 ->setSalt('');
             if ($role) {
                 $user->addUserRole($role);
+            }
+            if ($businessUnit) {
+                $user->addBusinessUnit($businessUnit);
             }
 
             $userManager->updateUser($user, false);

@@ -49,6 +49,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, D
 
         $user = $userManager->createUser();
         $organization = $this->getReference('organization');
+        $businessUnit = $this->getReference('business_unit');
 
         $apiKey = new UserApi();
         $apiKey
@@ -67,6 +68,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, D
             ->addApiKey($apiKey)
             ->setOrganization($organization)
             ->addOrganization($organization)
+            ->addBusinessUnit($businessUnit)
             ->setSalt('');
 
         $userManager->updateUser($user);

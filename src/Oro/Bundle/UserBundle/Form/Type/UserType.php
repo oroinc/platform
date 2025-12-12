@@ -149,6 +149,10 @@ class UserType extends AbstractType
             return;
         }
 
+        if ($data->getOrganizations()->count() === 0) {
+            $this->addUserToOrganization($data);
+        }
+
         if (!$this->featureChecker->isFeatureEnabled('user_login_password')) {
             return;
         }
@@ -266,6 +270,7 @@ class UserType extends AbstractType
                 OrganizationsSelectType::class,
                 [
                     'required' => false,
+                    'block_prefix' => 'oro_user_user_organizations_select',
                 ]
             );
         }
@@ -274,5 +279,15 @@ class UserType extends AbstractType
     private function isMyProfilePage(): bool
     {
         return $this->requestStack->getCurrentRequest()->get('_route') === 'oro_user_profile_update';
+    }
+
+    private function addUserToOrganization(User $user): void
+    {
+        $currentUserOrganization = $this->tokenAccessor->getOrganization();
+        $userOrganization = $user->getOrganization() ?? $currentUserOrganization;
+
+        if ($userOrganization) {
+            $user->addOrganization($userOrganization);
+        }
     }
 }

@@ -1,0 +1,19 @@
+Oro\Bundle\UserBundle\Entity\User:
+    user_without_organization:
+        firstName: Test1
+        lastName: Test1
+        username: test1
+        userRoles: [ '@userRole' ]
+        owner: '@business_unit'
+        email: test1@example.com
+        password: <userPassword(@user_without_organization->username)>
+    user_without_business_unit:
+        firstName: Test
+        lastName: Test
+        username: test
+        organization: '@organization'
+        organizations: ['@organization']
+        userRoles: ['@userRole']
+        owner: '@business_unit'
+        email: test@example.com
+        password: <userPassword(@user_without_business_unit->username)>

@@ -51,6 +51,8 @@ oro:
             signature.label: Email Signature
             choose_role: Choose a role...
             business_units.label: Organization Business Units
+            importance: Important
+            organization.notice: The user must be assigned to at least one organization business unit in order to log in.
         menu:
             system_tab.label: System
             user_list.description: List of system users

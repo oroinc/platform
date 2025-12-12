@@ -8,6 +8,10 @@ oro_behat_extension:
           Username: '_username'
           Password: '_password'
           Remember me on this computer: '_remember_me'
+    Organization Business Units Element:
+      selector: 'div[id^="s2id_oro_user_user_form_organizations_businessUnits"] ul.select2-choices li.select2-search-field:first-child'
+    Business Unit First Result Element:
+      selector: '.select2-results li:first-child .select2-result-label'
 
     User Form:
       selector: 'form[name="oro_user_user_form"]'

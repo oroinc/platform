@@ -5,8 +5,9 @@ namespace Oro\Bundle\UserBundle\Security;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Exception\CredentialsResetException;
+use Oro\Bundle\UserBundle\Exception\EmptyBusinessUnitsException;
+use Oro\Bundle\UserBundle\Exception\EmptyOrganizationException;
 use Oro\Bundle\UserBundle\Exception\EmptyOwnerException;
-use Oro\Bundle\UserBundle\Exception\OrganizationException;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\DisabledException;
@@ -41,7 +42,15 @@ class UserChecker implements UserCheckerInterface
             throw $exception;
         }
         if (null !== $user->getAuthStatus() && $user->getOrganizations(true)->count() === 0) {
-            $exception = new OrganizationException();
+            $exception = new EmptyOrganizationException();
+            $exception->setUser($user);
+
+            throw $exception;
+        }
+        if ($user->getBusinessUnits()?->isEmpty()) {
+            $exception = new EmptyBusinessUnitsException(
+                'The user must be assigned to at least one organization business unit.'
+            );
             $exception->setUser($user);
 
             throw $exception;
