@@ -22,4 +22,4 @@ oro:
                 redirect_uri.label: Redirect URI
                 redirect_uri.tooltip: Copy this value and add it to the trusted redirect URIs of your Google application.
                 sso_only_login.label: Disable Non-SSO Login for Listed Domains
-                sso_only_login.tooltip: When enabled, users with email addresses matching the domains specified in the *Domains* field will be required to sign in using Google SSO only. Username and password login will be restricted for these users.
+                sso_only_login.tooltip: When enabled, users with email addresses matching the domains specified in the Domains field will be required to sign in using Google SSO only. Username and password login will be restricted for these users.
