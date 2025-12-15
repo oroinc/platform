@@ -75,7 +75,7 @@ class ScriptHandler
 
         if ($filesystem->exists('../../pnpm-workspace.yaml')) {
             // In case of monorepo we need to run pnpm install in the monorepo root
-            self::pnpmInstallMonorepo($event->getIO(), $options['process-timeout'], $isVerbose);
+            self::pnpmInstallMonorepo($event->getIO(), $options['process-timeout'], $isVerbose, $packageJson->name);
             return;
         }
 
@@ -273,15 +273,41 @@ class ScriptHandler
     private static function pnpmInstallMonorepo(
         IOInterface $inputOutput,
         int $timeout = 60,
-        bool $verbose = false
+        bool $verbose = false,
+        string $packageName = ''
     ): void {
         $logLevel = $verbose ? 'info' : 'error';
 
-        $pnpmInstallCmd = ['pnpm', 'install', '--prefer-offline', '--loglevel', $logLevel];
+        $pnpmInstallCmd = ['pnpm', 'install', '--prefer-offline', '--ignore-script', '--loglevel', $logLevel];
+
+        if ($packageName != '') {
+            /**
+             * When a package name is provided, pnpm install will target only
+             * the specified application and it's dependencies recursively
+             */
+            $pnpmInstallCmd[] = '--filter';
+            $pnpmInstallCmd[] = $packageName . '...';
+        }
 
         $monorepoRoot = dirname(getcwd(), 2);
         if (self::runProcess($inputOutput, $pnpmInstallCmd, $timeout, $monorepoRoot) !== 0) {
             throw new \RuntimeException('Failed to install pnpm assets in monorepo');
+        }
+
+        if ($packageName != '') {
+            /**
+             * When a package name is provided, this command builds only the dependencies
+             * of the specified application, excluding the application itself
+             */
+            $pnpmBuildDepsCmd = [
+                'pnpm', '-r', '--loglevel', $logLevel,
+                '--filter', $packageName . '^...',
+                '--if-present', 'run', 'build'
+            ];
+
+            if (self::runProcess($inputOutput, $pnpmBuildDepsCmd, $timeout, $monorepoRoot) !== 0) {
+                throw new \RuntimeException('Failed to build sub dependencies for application');
+            }
         }
     }
 
@@ -294,7 +320,7 @@ class ScriptHandler
         bool $verbose = false
     ): void {
         $logLevel = $verbose ? 'info' : 'error';
-        $pnpmInstallCmd = ['pnpm', 'install', '--no-frozen-lockfile', '--loglevel', $logLevel];
+        $pnpmInstallCmd = ['pnpm', 'install', '--no-frozen-lockfile', '--ignore-script', '--loglevel', $logLevel];
 
         if (self::runProcess($inputOutput, $pnpmInstallCmd, $timeout) !== 0) {
             throw new \RuntimeException('Failed to generate pnpm-lock.yaml');
