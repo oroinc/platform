@@ -215,3 +215,14 @@ services:
         class: Oro\Bundle\PlatformBundle\Provider\UsageStats\UsageStatsProvider
         arguments:
             - '@oro_platform.provider.usage_stats.usage_stats_provider_registry'
+
+    oro_platform.post_upgrade.task_registry:
+        class: Oro\Bundle\PlatformBundle\PostUpgrade\PostUpgradeTaskRegistry
+        arguments:
+            - !tagged_iterator oro.post_upgrade_task
+
+    Oro\Bundle\PlatformBundle\Command\PostUpgradeTasksCommand:
+        arguments:
+            - '@oro_platform.post_upgrade.task_registry'
+        tags:
+            - { name: console.command }
