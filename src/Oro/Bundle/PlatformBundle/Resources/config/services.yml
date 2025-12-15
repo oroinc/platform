@@ -241,3 +241,14 @@ services:
             - '@oro_platform.attribute_reader'
         tags:
             - { name: kernel.event_subscriber }
+
+    oro_platform.post_upgrade.task_registry:
+        class: Oro\Bundle\PlatformBundle\PostUpgrade\PostUpgradeTaskRegistry
+        arguments:
+            - !tagged_iterator oro.post_upgrade_task
+
+    Oro\Bundle\PlatformBundle\Command\PostUpgradeTasksCommand:
+        arguments:
+            - '@oro_platform.post_upgrade.task_registry'
+        tags:
+            - { name: console.command }
