@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\UserBundle\Tests\Unit\Datagrid\Extension\MassAction;
 
 use Doctrine\ORM\EntityManager;
@@ -7,20 +9,24 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
-use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordActionHandler;
+use Oro\Bundle\UserBundle\Event\PasswordChangeEvent;
 use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ResetPasswordActionHandlerTest extends TestCase
 {
-    private TranslatorInterface&MockObject $translator;
-    private int $methodCalls;
     private ResetPasswordActionHandler $handler;
+    private TranslatorInterface|MockObject $translator;
+    private EventDispatcherInterface|MockObject $eventDispatcher;
+    private ResetPasswordHandler|MockObject $resetPasswordHandler;
+
+    private int $methodCalls;
 
     #[\Override]
     protected function setUp(): void
@@ -28,27 +34,38 @@ class ResetPasswordActionHandlerTest extends TestCase
         $tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $tokenAccessor->expects($this->atLeastOnce())
             ->method('getUser')
-            ->willReturn(new User());
+            ->willReturn(new User(999)); // Current user with ID 999
 
         $this->translator = $this->createMock(TranslatorInterface::class);
-
-        $resetPasswordHandler = $this->createMock(ResetPasswordHandler::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->resetPasswordHandler = $this->createMock(ResetPasswordHandler::class);
 
         $this->methodCalls = 0;
         $this->handler = new ResetPasswordActionHandler(
-            $resetPasswordHandler,
+            $this->resetPasswordHandler,
             $this->translator,
-            $tokenAccessor
+            $tokenAccessor,
+            $this->eventDispatcher
         );
     }
 
-    public function testHandle(): void
+    public function testHandle()
     {
         $responseMessage = 'TEST123';
 
         $this->translator->expects($this->once())
             ->method('trans')
             ->willReturn($responseMessage);
+
+        // Expect event dispatch for each user (6 users)
+        $this->eventDispatcher->expects($this->exactly(6))
+            ->method('dispatch')
+            ->with($this->isInstanceOf(PasswordChangeEvent::class), PasswordChangeEvent::BEFORE_PASSWORD_RESET)
+            ->willReturnCallback(static fn (PasswordChangeEvent $event) => $event);
+
+        $this->resetPasswordHandler->expects($this->exactly(6))
+            ->method('resetPasswordAndNotify')
+            ->willReturn(true);
 
         $em = $this->createMock(EntityManager::class);
         $em->expects($this->atLeastOnce())
@@ -71,7 +88,7 @@ class ResetPasswordActionHandlerTest extends TestCase
             ->method('current')
             ->willReturnCallback(function () {
                 $this->methodCalls++;
-                return $this->methodCalls < 7 ? new ResultRecord(new User()) : null;
+                return $this->methodCalls < 7 ? new ResultRecord(new User($this->methodCalls)) : null;
             });
 
         $args = $this->createMock(MassActionHandlerArgs::class);
@@ -81,7 +98,70 @@ class ResetPasswordActionHandlerTest extends TestCase
 
         $response = $this->handler->handle($args);
 
-        $this->assertInstanceOf(MassActionResponse::class, $response);
+        $this->assertEquals($responseMessage, $response->getMessage());
+    }
+
+    public function testHandleWhenEventDenies()
+    {
+        $responseMessage = 'TEST123';
+
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->willReturn($responseMessage);
+
+        // Expect event dispatch for each user (6 users)
+        // First 3 users are allowed, last 3 are denied
+        $this->eventDispatcher->expects($this->exactly(6))
+            ->method('dispatch')
+            ->with(
+                $this->isInstanceOf(PasswordChangeEvent::class),
+                PasswordChangeEvent::BEFORE_PASSWORD_RESET
+            )
+            ->willReturnCallback(function (PasswordChangeEvent $event) {
+                static $callCount = 0;
+                $callCount++;
+                if ($callCount > 3) {
+                    $event->disablePasswordChange('Test reason');
+                }
+                return $event;
+            });
+
+        // Only 3 users should have their password reset (the ones allowed by event)
+        $this->resetPasswordHandler->expects($this->exactly(3))
+            ->method('resetPasswordAndNotify')
+            ->willReturn(true);
+
+        $em = $this->createMock(EntityManager::class);
+        $em->expects($this->atLeastOnce())
+            ->method('flush');
+
+        $qb = $this->createMock(QueryBuilder::class);
+        $qb->expects($this->once())
+            ->method('getEntityManager')
+            ->willReturn($em);
+
+        $results = $this->createMock(IterableResult::class);
+        $results->expects($this->once())
+            ->method('getSource')
+            ->willReturn($qb);
+        $results->expects($this->atLeastOnce())
+            ->method('rewind');
+        $results->expects($this->atLeastOnce())
+            ->method('next');
+        $results->expects($this->atLeastOnce())
+            ->method('current')
+            ->willReturnCallback(function () {
+                $this->methodCalls++;
+                return $this->methodCalls < 7 ? new ResultRecord(new User($this->methodCalls)) : null;
+            });
+
+        $args = $this->createMock(MassActionHandlerArgs::class);
+        $args->expects($this->once())
+            ->method('getResults')
+            ->willReturn($results);
+
+        $response = $this->handler->handle($args);
+
         $this->assertEquals($responseMessage, $response->getMessage());
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\UserBundle\Tests\Unit\Handler;
 
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
@@ -7,16 +9,19 @@ use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Event\PasswordChangeEvent;
 use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ResetPasswordHandlerTest extends TestCase
 {
-    private EmailNotificationManager&MockObject $emailNotificationManager;
-    private UserManager&MockObject $userManager;
-    private LoggerInterface&MockObject $logger;
+    private EmailNotificationManager|MockObject $emailNotificationManager;
+    private UserManager|MockObject $userManager;
+    private LoggerInterface|MockObject $logger;
+    private EventDispatcherInterface|MockObject $eventDispatcher;
     private ResetPasswordHandler $handler;
 
     #[\Override]
@@ -25,11 +30,13 @@ class ResetPasswordHandlerTest extends TestCase
         $this->emailNotificationManager = $this->createMock(EmailNotificationManager::class);
         $this->userManager = $this->createMock(UserManager::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->handler = new ResetPasswordHandler(
             $this->emailNotificationManager,
             $this->userManager,
-            $this->logger
+            $this->logger,
+            $this->eventDispatcher
         );
     }
 
@@ -37,6 +44,9 @@ class ResetPasswordHandlerTest extends TestCase
     {
         $user = new User();
         $user->setEnabled(false);
+
+        $this->eventDispatcher->expects(self::never())
+            ->method('dispatch');
         $this->userManager->expects(self::never())
             ->method('setAuthStatus');
         $this->userManager->expects(self::never())
@@ -53,6 +63,15 @@ class ResetPasswordHandlerTest extends TestCase
         $email = 'example@test.com';
         $user = new User();
         $user->setEmail($email);
+
+        $this->eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(
+                self::isInstanceOf(PasswordChangeEvent::class),
+                PasswordChangeEvent::BEFORE_PASSWORD_RESET
+            )
+            ->willReturnArgument(0);
+
         $this->userManager->expects(self::once())
             ->method('setAuthStatus')
             ->with($user, UserManager::STATUS_RESET);
@@ -79,6 +98,15 @@ class ResetPasswordHandlerTest extends TestCase
         $email = 'example@test.com';
         $user = new User();
         $user->setEmail($email);
+
+        $this->eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(
+                self::isInstanceOf(PasswordChangeEvent::class),
+                PasswordChangeEvent::BEFORE_PASSWORD_RESET
+            )
+            ->willReturnArgument(0);
+
         $this->userManager->expects(self::once())
             ->method('setAuthStatus')
             ->with($user, UserManager::STATUS_RESET);
@@ -110,6 +138,15 @@ class ResetPasswordHandlerTest extends TestCase
         $user = new User();
         $user->setConfirmationToken($token);
         $user->setEmail($email);
+
+        $this->eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(
+                self::isInstanceOf(PasswordChangeEvent::class),
+                PasswordChangeEvent::BEFORE_PASSWORD_RESET
+            )
+            ->willReturnArgument(0);
+
         $this->userManager->expects(self::once())
             ->method('setAuthStatus')
             ->with($user, UserManager::STATUS_RESET);
@@ -129,5 +166,36 @@ class ResetPasswordHandlerTest extends TestCase
         $result = $this->handler->resetPasswordAndNotify($user);
         self::assertTrue($result);
         self::assertEquals($token, $user->getConfirmationToken());
+    }
+
+    public function testResetPasswordAndNotifyWhenEventDenies(): void
+    {
+        $user = new User();
+        $user->setEmail('test@example.com');
+
+        $this->eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(
+                self::isInstanceOf(PasswordChangeEvent::class),
+                PasswordChangeEvent::BEFORE_PASSWORD_RESET
+            )
+            ->willReturnCallback(function (PasswordChangeEvent $event) {
+                $event->disablePasswordChange('Test reason');
+                return $event;
+            });
+
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(self::stringContains('Admin password reset is not allowed'));
+
+        $this->userManager->expects(self::never())
+            ->method('setAuthStatus');
+        $this->userManager->expects(self::never())
+            ->method('updateUser');
+        $this->emailNotificationManager->expects(self::never())
+            ->method('processSingle');
+
+        $result = $this->handler->resetPasswordAndNotify($user);
+        self::assertFalse($result);
     }
 }

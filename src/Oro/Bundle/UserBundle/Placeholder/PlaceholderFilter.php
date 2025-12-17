@@ -1,31 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\UserBundle\Placeholder;
 
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Event\PasswordChangeEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * User entity placeholder filter.
+ *
+ * Usage examples:
+ *
+ *      applicable: "@oro_user.placeholder.filter->isPasswordManageEnabled($entity$)"
+ *      applicable: "@oro_user.placeholder.filter->isPasswordResetEnabled($entity$)"
+ *      applicable: "@oro_user.placeholder.filter->isUserApplicable()"
+ *
  */
 class PlaceholderFilter
 {
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    public function __construct(TokenAccessorInterface $tokenAccessor)
-    {
-        $this->tokenAccessor = $tokenAccessor;
+    public function __construct(
+        protected readonly TokenAccessorInterface $tokenAccessor,
+        protected readonly EventDispatcherInterface $eventDispatcher
+    ) {
     }
 
-    /**
-     * Checks if password management is available
-     *
-     * @param object $entity
-     * @return bool
-     */
-    public function isPasswordManageEnabled($entity)
+    public function isPasswordManageEnabled(?object $entity): bool
     {
         if ($entity instanceof User &&
             $entity->getAuthStatus() &&
@@ -34,27 +37,34 @@ class PlaceholderFilter
             return false;
         }
 
-        return $entity instanceof User && $entity->isEnabled();
+        if (!$entity instanceof User || !$entity->isEnabled()) {
+            return false;
+        }
+
+        // Dispatch event to allow extensions to prevent password change
+        $event = new PasswordChangeEvent($entity);
+        $this->eventDispatcher->dispatch($event, PasswordChangeEvent::BEFORE_PASSWORD_CHANGE);
+
+        return $event->isAllowed();
     }
 
-    /**
-     * Checks if password can be reset
-     *
-     * @param object $entity
-     *
-     * @return bool
-     */
-    public function isPasswordResetEnabled($entity)
+    public function isPasswordResetEnabled(?object $entity): bool
     {
-        return $entity instanceof User
-            && $entity->isEnabled()
-            && $this->tokenAccessor->getUserId() !== $entity->getId();
+        if (!$entity instanceof User
+            || !$entity->isEnabled()
+            || $this->tokenAccessor->getUserId() === $entity->getId()
+        ) {
+            return false;
+        }
+
+        // Dispatch event to allow extensions to prevent password reset
+        $event = new PasswordChangeEvent($entity);
+        $this->eventDispatcher->dispatch($event, PasswordChangeEvent::BEFORE_PASSWORD_RESET);
+
+        return $event->isAllowed();
     }
 
-    /**
-     * @return bool
-     */
-    public function isUserApplicable()
+    public function isUserApplicable(): bool
     {
         return $this->tokenAccessor->getUser() instanceof User;
     }
