@@ -56,6 +56,8 @@ services:
             - '@logger'
             - '@oro_user.provider.user_logging_info_provider'
             - '%oro_user.reset.ttl%'
+        calls:
+            - [setEventDispatcher, ['@event_dispatcher']]
 
     oro_user.form.emailsettings:
         class: Symfony\Component\Form\Form

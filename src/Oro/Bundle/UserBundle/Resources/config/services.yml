@@ -326,6 +326,8 @@ services:
             - '@oro_notification.manager.email_notification'
             - '@oro_user.manager'
             - '@logger'
+        calls:
+            - [setEventDispatcher, ['@event_dispatcher']]
 
     oro_user.activity_widget_provider:
         class: Oro\Bundle\UIBundle\Provider\TabMenuWidgetProvider
@@ -365,6 +367,8 @@ services:
         public: true
         arguments:
             - '@oro_security.token_accessor'
+        calls:
+            - [ setEventDispatcher, [ '@event_dispatcher' ] ]
 
     oro_user.password_change.widget_provider.actions:
         parent: oro_ui.widget_provider.action_button.abstract

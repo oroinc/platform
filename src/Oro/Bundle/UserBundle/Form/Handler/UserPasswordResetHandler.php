@@ -4,8 +4,10 @@ namespace Oro\Bundle\UserBundle\Form\Handler;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Event\PasswordChangeEvent;
 use Oro\Bundle\UserBundle\Provider\UserLoggingInfoProviderInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -15,6 +17,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class UserPasswordResetHandler
 {
+    public const string SESSION_PASSWORD_RESET_UNAVAILABLE = 'oro_user_password_reset_unavailable';
+    public const string SESSION_PASSWORD_RESET_UNAVAILABLE_MESSAGE = 'oro_user_password_reset_unavailable_message';
+
+    protected ?EventDispatcherInterface $eventDispatcher = null;
+
     public function __construct(
         private UserManager $userManager,
         private TranslatorInterface $translator,
@@ -24,6 +31,13 @@ class UserPasswordResetHandler
     ) {
     }
 
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): self
+    {
+        $this->eventDispatcher = $eventDispatcher;
+        return $this;
+    }
+
+    /** @SuppressWarnings(PHPMD.CyclomaticComplexity) */
     public function process(FormInterface $form, Request $request)
     {
         if (!$request->isMethod(Request::METHOD_POST)) {
@@ -42,6 +56,26 @@ class UserPasswordResetHandler
         $user = $this->userManager->findUserByUsernameOrEmail($usernameOrEmail);
         // For non-existing or disabled user behave like for existing user to prevent username enumeration
         if (!$user?->isEnabled()) {
+            return $usernameOrEmail;
+        }
+
+        // Dispatch event to allow extensions to prevent password reset
+        $event = new PasswordChangeEvent($user);
+        $this->eventDispatcher?->dispatch($event, PasswordChangeEvent::BEFORE_PASSWORD_RESET);
+        if (!$event->isAllowed()) {
+            // Set a session flag to indicate the password reset was denied
+            $request->getSession()->set(self::SESSION_PASSWORD_RESET_UNAVAILABLE, true);
+            $request->getSession()->set(
+                self::SESSION_PASSWORD_RESET_UNAVAILABLE_MESSAGE,
+                $event->getNotAllowedMessage()
+            );
+            $this->logger->notice(
+                \sprintf(
+                    'Password reset request denied%s.',
+                    $event->getNotAllowedLogMessage() ? ' (' . $event->getNotAllowedLogMessage() . ')' : ''
+                ),
+                $this->userLoggingInfoProvider->getUserLoggingInfo($user)
+            );
             return $usernameOrEmail;
         }
 

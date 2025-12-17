@@ -5,6 +5,8 @@ namespace Oro\Bundle\UserBundle\Placeholder;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Event\PasswordChangeEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * User entity placeholder filter.
@@ -14,9 +16,17 @@ class PlaceholderFilter
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
+    protected ?EventDispatcherInterface $eventDispatcher = null;
+
     public function __construct(TokenAccessorInterface $tokenAccessor)
     {
         $this->tokenAccessor = $tokenAccessor;
+    }
+
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): self
+    {
+        $this->eventDispatcher = $eventDispatcher;
+        return $this;
     }
 
     /**
@@ -34,7 +44,15 @@ class PlaceholderFilter
             return false;
         }
 
-        return $entity instanceof User && $entity->isEnabled();
+        if (!$entity instanceof User || !$entity->isEnabled()) {
+            return false;
+        }
+
+        // Dispatch event to allow extensions to prevent password change
+        $event = new PasswordChangeEvent($entity);
+        $this->eventDispatcher?->dispatch($event, PasswordChangeEvent::BEFORE_PASSWORD_CHANGE);
+
+        return $event->isAllowed();
     }
 
     /**
@@ -46,9 +64,18 @@ class PlaceholderFilter
      */
     public function isPasswordResetEnabled($entity)
     {
-        return $entity instanceof User
-            && $entity->isEnabled()
-            && $this->tokenAccessor->getUserId() !== $entity->getId();
+        if (!$entity instanceof User
+            || !$entity->isEnabled()
+            || $this->tokenAccessor->getUserId() === $entity->getId()
+        ) {
+            return false;
+        }
+
+        // Dispatch event to allow extensions to prevent password reset
+        $event = new PasswordChangeEvent($entity);
+        $this->eventDispatcher?->dispatch($event, PasswordChangeEvent::BEFORE_PASSWORD_RESET);
+
+        return $event->isAllowed();
     }
 
     /**
