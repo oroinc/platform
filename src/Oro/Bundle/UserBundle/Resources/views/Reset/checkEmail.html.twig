@@ -8,11 +8,19 @@
         <div class="form-wrapper__inner">
             <form action="" class="form-signin">
                 <div class="title-box">
-                    <h2 class="title">{{ 'oro.user.password.reset_password.title'|trans }}</h2>
+                    <h2 class="title">{{ resetUnavailable|default(false)
+                        ? 'oro.user.password.reset_password.unavailable.title'|trans
+                        : 'oro.user.password.reset_password.title'|trans
+                        }}</h2>
                 </div>
                 <fieldset>
-                    <div class="alert alert-success" role="alert">
-                        {{ 'oro.user.password.reset_password.message'|trans({ '%email%': email }) }}
+                    {% set isUnavailable = resetUnavailable|default(false) %}
+                    <div class="alert {{ isUnavailable ? 'alert-error' : 'alert-success' }}" role="alert">
+                        {% if isUnavailable %}
+                            {{ resetUnavailableMessage|default('oro.user.password.reset_password.unavailable.message'|trans) }}
+                        {% else %}
+                            {{ 'oro.user.password.reset_password.message'|trans({ '%email%': email }) }}
+                        {% endif %}
                     </div>
                     <a href="{{ path('oro_user_security_login') }}">&laquo; {{ 'Return to Login'|trans }}</a>
                 </fieldset>

@@ -149,6 +149,9 @@ oro:
                 label: Reset password
                 title: Check Email
                 message: If there is a user account associated with %email% you will receive an email with a link to reset your password.
+                unavailable:
+                    title: Password Reset Unavailable
+                    message: Please contact the system administrator to reset your password.
                 flash:
                     success: Reset password email has been sent to user
             change_password.label:          Change password

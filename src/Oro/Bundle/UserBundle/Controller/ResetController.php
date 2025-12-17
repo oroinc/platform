@@ -164,8 +164,12 @@ class ResetController extends AbstractController
     {
         $session = $request->getSession();
         $email = $session->get(static::SESSION_EMAIL);
+        $resetUnavailable = $session->get(UserPasswordResetHandler::SESSION_PASSWORD_RESET_UNAVAILABLE, false);
+        $resetUnavailableMessage = $session->get(UserPasswordResetHandler::SESSION_PASSWORD_RESET_UNAVAILABLE_MESSAGE);
 
         $session->remove(static::SESSION_EMAIL);
+        $session->remove(UserPasswordResetHandler::SESSION_PASSWORD_RESET_UNAVAILABLE);
+        $session->remove(UserPasswordResetHandler::SESSION_PASSWORD_RESET_UNAVAILABLE_MESSAGE);
 
         if (empty($email)) {
             // the user does not come from the sendEmail action
@@ -174,6 +178,8 @@ class ResetController extends AbstractController
 
         return array(
             'email' => $email,
+            'resetUnavailable' => $resetUnavailable,
+            'resetUnavailableMessage' => $resetUnavailableMessage,
         );
     }
 
