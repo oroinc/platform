@@ -9,7 +9,9 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponseInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Event\PasswordChangeEvent;
 use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -32,7 +34,8 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
     public function __construct(
         ResetPasswordHandler $resetPasswordHandler,
         TranslatorInterface $translator,
-        TokenAccessorInterface $tokenAccessor
+        TokenAccessorInterface $tokenAccessor,
+        protected readonly EventDispatcherInterface $eventDispatcher
     ) {
         $this->resetPasswordHandler = $resetPasswordHandler;
         $this->translator = $translator;
@@ -59,6 +62,13 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
 
             // current user should not be able to reset own password
             if ($currentUserId === $user->getId()) {
+                continue;
+            }
+
+            // Check if password reset is allowed for this user
+            $event = new PasswordChangeEvent($user);
+            $this->eventDispatcher->dispatch($event, PasswordChangeEvent::BEFORE_PASSWORD_RESET);
+            if (!$event->isAllowed()) {
                 continue;
             }
 

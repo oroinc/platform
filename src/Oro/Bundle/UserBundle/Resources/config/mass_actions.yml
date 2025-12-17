@@ -12,6 +12,7 @@ services:
             - '@oro_user.handler.reset_password_handler'
             - '@translator'
             - '@oro_security.token_accessor'
+            - '@event_dispatcher'
 
     oro_datagrid.mass_action.disable_users:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\AjaxMassAction

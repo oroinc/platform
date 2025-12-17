@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Handler;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Event\PasswordChangeEvent;
 use Oro\Bundle\UserBundle\Form\Handler\UserPasswordResetHandler;
 use Oro\Bundle\UserBundle\Provider\UserLoggingInfoProviderInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
@@ -17,12 +21,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserPasswordResetHandlerTest extends TestCase
 {
-    private int $ttl = 3600;
-    private UserManager&MockObject $userManager;
-    private TranslatorInterface&MockObject $translator;
-    private LoggerInterface&MockObject $logger;
-    private UserLoggingInfoProviderInterface&MockObject $userLoggingInfoProvider;
+    private UserManager|MockObject $userManager;
+    private TranslatorInterface|MockObject $translator;
+    private LoggerInterface|MockObject $logger;
+    private UserLoggingInfoProviderInterface|MockObject $userLoggingInfoProvider;
+    private EventDispatcherInterface|MockObject $eventDispatcher;
     private UserPasswordResetHandler $handler;
+    private int $ttl = 3600;
 
     #[\Override]
     protected function setUp(): void
@@ -31,13 +36,15 @@ class UserPasswordResetHandlerTest extends TestCase
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->userLoggingInfoProvider = $this->createMock(UserLoggingInfoProviderInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->handler = new UserPasswordResetHandler(
             $this->userManager,
             $this->translator,
             $this->logger,
             $this->userLoggingInfoProvider,
-            $this->ttl
+            $this->ttl,
+            $this->eventDispatcher
         );
     }
 
@@ -181,6 +188,14 @@ class UserPasswordResetHandlerTest extends TestCase
             ->with('test_user')
             ->willReturn($user);
 
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                $this->isInstanceOf(PasswordChangeEvent::class),
+                PasswordChangeEvent::BEFORE_PASSWORD_RESET
+            )
+            ->willReturnArgument(0);
+
         $this->userManager->expects($this->once())
             ->method('sendResetPasswordEmail')
             ->willThrowException(new \Exception());
@@ -210,6 +225,67 @@ class UserPasswordResetHandlerTest extends TestCase
         $result = $this->handler->process($form, $request);
 
         $this->assertNull($result);
+    }
+
+    public function testProcessWhenEventDenies(): void
+    {
+        $user = $this->createMock(User::class);
+        $user->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
+
+        $user->expects($this->never())
+            ->method('getEmail');
+
+        $user->expects($this->never())
+            ->method('isPasswordRequestNonExpired');
+
+        $this->userManager->expects($this->once())
+            ->method('findUserByUsernameOrEmail')
+            ->with('test_user')
+            ->willReturn($user);
+
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                $this->isInstanceOf(PasswordChangeEvent::class),
+                PasswordChangeEvent::BEFORE_PASSWORD_RESET
+            )
+            ->willReturnCallback(function (PasswordChangeEvent $event) {
+                $event->disablePasswordChange('Test reason');
+                return $event;
+            });
+
+        $this->logger->expects($this->once())
+            ->method('notice')
+            ->with(
+                $this->stringContains('Password reset request denied'),
+                $this->anything()
+            );
+
+        $this->userLoggingInfoProvider->expects($this->once())
+            ->method('getUserLoggingInfo')
+            ->with($user)
+            ->willReturn([]);
+
+        $this->userManager->expects($this->never())
+            ->method('sendResetPasswordEmail');
+
+        $session = $this->createMock(Session::class);
+        $session->expects($this->exactly(2))
+            ->method('set')
+            ->withConsecutive(
+                [UserPasswordResetHandler::SESSION_PASSWORD_RESET_UNAVAILABLE, true],
+                [UserPasswordResetHandler::SESSION_PASSWORD_RESET_UNAVAILABLE_MESSAGE, 'Test reason']
+            );
+
+        $request = $this->getRequest();
+        $request->setSession($session);
+
+        $form = $this->configureValidSubmittedForm($request, 'test_user');
+        $result = $this->handler->process($form, $request);
+
+        $this->assertEquals('test_user', $result);
     }
 
     private function getRequest(): Request
