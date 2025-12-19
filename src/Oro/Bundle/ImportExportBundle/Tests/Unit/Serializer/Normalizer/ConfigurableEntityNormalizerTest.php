@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -10,6 +11,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidFieldTypeException;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ScalarFieldDenormalizer;
 use Oro\Bundle\ImportExportBundle\Serializer\Serializer;
@@ -21,6 +23,9 @@ use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
@@ -436,6 +441,44 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
             );
 
         self::assertEquals($expected, $this->normalizer->denormalize($data, $class, null, $context));
+    }
+
+    public function testDenormalizeWithTypeError(): void
+    {
+        $class = DenormalizationStub::class;
+
+        $classMetadata = $this->createMock(ClassMetadata::class);
+
+        $fields = [[
+            'name' => 'id',
+            'type' => 'integer',
+        ]];
+
+        $data = [
+            'id' => 'asd',
+        ];
+
+        $serializer = $this->createMock(Serializer::class);
+        $this->normalizer->setSerializer($serializer);
+
+        $this->fieldHelper->expects(self::once())
+            ->method('getEntityFields')
+            ->with($class, EntityFieldProvider::OPTION_WITH_RELATIONS)
+            ->willReturn($fields);
+
+        $this->eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->withConsecutive(
+                [self::isInstanceOf(DenormalizeEntityEvent::class), Events::BEFORE_DENORMALIZE_ENTITY]
+            )
+            ->willReturnOnConsecutiveCalls(
+                new DenormalizeEntityEvent(new $class(), $data)
+            );
+
+        self::expectException(InvalidFieldTypeException::class);
+        self::expectExceptionMessage('DenormalizationStub.id: This value should contain only ?int, "asd" given.');
+
+        $this->normalizer->denormalize($data, $class, null, []);
     }
 
     public function denormalizeDataProvider(): array

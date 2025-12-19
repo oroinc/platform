@@ -5,9 +5,11 @@ namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
 use Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidFieldTypeException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
@@ -336,6 +338,29 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      */
     protected function setObjectValue($object, $fieldName, $value)
     {
-        $this->fieldHelper->setObjectValue($object, $fieldName, $value);
+        try {
+            $this->fieldHelper->setObjectValue($object, $fieldName, $value);
+        } catch (\TypeError $e) {
+            // In reason of can't be possible to validate all types of entity fields and hiding original
+            // errors, stack traces that shows system code structure we need to catch TypeError that thrown by
+            // ReflectionProperty::setValue with incorrect type and throw another type of exception
+            // for show correct error messages in importexport error log
+            $entityClass = ClassUtils::getClass($object);
+            $fieldHeader = $this->fieldHelper->getConfigValue($entityClass, $fieldName, 'header') ?: $fieldName;
+
+            $reflection = new EntityReflectionClass($entityClass);
+            $shortName = $reflection->getShortName();
+            $fieldType = $reflection->getProperty($fieldName)->getType();
+
+            throw new InvalidFieldTypeException(
+                sprintf(
+                    '%s.%s: This value should contain only %s, "%s" given.',
+                    $shortName,
+                    $fieldHeader,
+                    $fieldType,
+                    $value
+                )
+            );
+        }
     }
 }

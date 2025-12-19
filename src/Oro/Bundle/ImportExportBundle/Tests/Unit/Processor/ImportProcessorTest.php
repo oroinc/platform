@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidFieldTypeException;
 use Oro\Bundle\ImportExportBundle\Processor\ContextAwareProcessor;
 use Oro\Bundle\ImportExportBundle\Processor\ImportProcessor;
 use Oro\Bundle\ImportExportBundle\Serializer\SerializerInterface;
@@ -111,5 +112,41 @@ class ImportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->setEntityName($entityName);
 
         self::assertEquals($entityName, ReflectionUtil::getPropertyValue($this->processor, 'entityName'));
+    }
+
+    public function testProcessWithTypeError(): void
+    {
+        $this->setProcessExpects();
+
+        $error = new InvalidFieldTypeException(
+            'TestClass.id: This value should contain only integers, "ID" given.'
+        );
+
+        $this->context->expects(self::once())
+            ->method('addError')
+            ->with(sprintf('Error in Row #0. %s', $error->getMessage()));
+
+        $this->context->expects(self::once())
+            ->method('incrementErrorEntriesCount');
+
+        $converter = $this->createMock(DataConverterInterface::class);
+        $converter->expects(self::once())
+            ->method('convertToImportFormat')
+            ->with($this->item)
+            ->willReturnArgument(0);
+
+        $this->serializer->expects(self::once())
+            ->method('denormalize')
+            ->willThrowException($error);
+
+        $strategy = $this->createMock(StrategyInterface::class);
+        $strategy->expects(self::never())
+            ->method('process')
+            ->with($this->object)
+            ->willReturnArgument(0);
+
+        $this->processor->setDataConverter($converter);
+        $this->processor->setStrategy($strategy);
+        self::assertEquals(null, $this->processor->process($this->item));
     }
 }
