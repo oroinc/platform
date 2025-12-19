@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Processor;
 
+use Oro\Bundle\ImportExportBundle\Context\BatchContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidFieldTypeException;
 use Oro\Bundle\ImportExportBundle\Serializer\SerializerInterface;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
 
@@ -82,7 +84,19 @@ class ImportProcessor implements ContextAwareProcessor, EntityNameAwareInterface
 
         $this->context->setValue('itemData', $item);
 
-        $object = $this->serializer->denormalize($item, $this->getEntityName(), '', $this->context->getConfiguration());
+        try {
+            $object = $this->serializer->denormalize(
+                $item,
+                $this->getEntityName(),
+                '',
+                $this->context->getConfiguration()
+            );
+        } catch (InvalidFieldTypeException $e) {
+            $this->context->addError(sprintf('Error in Row #%s. %s', $this->getCurrentRowNumber(), $e->getMessage()));
+            $this->context->incrementErrorEntriesCount();
+
+            return null;
+        }
 
         if ($this->strategy) {
             $object = $this->strategy->process($object);
@@ -98,5 +112,15 @@ class ImportProcessor implements ContextAwareProcessor, EntityNameAwareInterface
         }
 
         return $this->context->getOption('entityName');
+    }
+
+    private function getCurrentRowNumber(): int
+    {
+        $rowNumber = intval($this->context->getReadOffset());
+        if ($this->context instanceof BatchContextInterface) {
+            $rowNumber += (intval($this->context->getBatchNumber()) - 1) * intval($this->context->getBatchSize());
+        }
+
+        return $rowNumber;
     }
 }
