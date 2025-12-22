@@ -23,10 +23,9 @@ class ApiRequestHelperTest extends TestCase
      */
     public function testIsApiRequest(string $pathinfo, bool $isApiRequest): void
     {
-        self::assertSame(
-            $isApiRequest,
-            $this->apiRequestHelper->isApiRequest($pathinfo)
-        );
+        self::assertSame($isApiRequest, $this->apiRequestHelper->isApiRequest($pathinfo));
+        // test memory cache
+        self::assertSame($isApiRequest, $this->apiRequestHelper->isApiRequest($pathinfo));
     }
 
     public function isApiRequestDataProvider(): array
