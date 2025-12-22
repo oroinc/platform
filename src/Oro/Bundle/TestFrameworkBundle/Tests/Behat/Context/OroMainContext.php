@@ -1624,6 +1624,74 @@ JS;
     }
 
     /**
+     * Assert that the page contains today's date in various common formats.
+     * This step checks for multiple date formats to handle different locales and display formats.
+     * When an element is specified, it attempts to parse the date from the element's text.
+     * Example: And I should see today's date
+     * Example: And I should see today's date in the "Order Date" element
+     *
+     * @Then /^(?:|I )should see today's date$/
+     * @Then /^(?:|I )should see today's date in the "(?P<element>[^"]*)" element$/
+     */
+    public function iShouldSeeTodaysDate($element = null)
+    {
+        $today = new \DateTime('now', new \DateTimeZone('UTC'));
+        $todayDateFormatted = $today->format('Y-m-d');
+
+        if ($element) {
+            // When the element is specified, parse the date from the element's text
+            $elementObject = $this->createElement($element);
+            self::assertTrue($elementObject->isIsset(), \sprintf('Element "%s" not found', $element));
+            $content = \trim($elementObject->getText());
+
+            try {
+                $parsedDate = new \DateTime($content);
+                $parsedDateFormatted = $parsedDate->format('Y-m-d');
+
+                self::assertEquals($todayDateFormatted, $parsedDateFormatted, \sprintf(
+                    'Date in the "%s" element is "%s" (parsed as %s), expected today\'s date %s',
+                    $element,
+                    $content,
+                    $parsedDateFormatted,
+                    $todayDateFormatted
+                ));
+            } catch (\Exception $e) {
+                self::fail(\sprintf(
+                    'Could not parse date from the "%s" element. Content: "%s". Error: %s',
+                    $element,
+                    $content,
+                    $e->getMessage()
+                ));
+            }
+        } else {
+            // When no element is specified, check for common date formats on the page
+            $formats = [
+                'M j, Y',      // Dec 18, 2025
+                'n/j/Y',       // 12/18/2025
+                'Y-m-d',       // 2025-12-18
+                'F j, Y',      // December 18, 2025
+                'd/m/Y',       // 18/12/2025
+            ];
+
+            $content = $this->getSession()->getPage()->getText();
+            $found = false;
+
+            foreach ($formats as $format) {
+                $formattedDate = $today->format($format);
+                if (\str_contains($content, $formattedDate)) {
+                    $found = true;
+                    break;
+                }
+            }
+
+            self::assertTrue($found, \sprintf(
+                'Today\'s date was not found on the page. Expected one of: %s',
+                \implode(', ', \array_map(fn ($f) => $today->format($f), $formats))
+            ));
+        }
+    }
+
+    /**
      * Assert entity owner
      * Example: And Harry Freeman should be an owner
      * Example: And Todd Greene should be an owner
