@@ -14,8 +14,9 @@
     z-index: $zindex-dropdown - 101;
     background-color: $primary-inverse;
 
-    opacity: 0;
     // opacity should not be zero for valid scroll work on IOS
-    /* stylelint-disable-nex-line declaration-block-no-duplicate-properties */
+    /* stylelint-disable-next-line declaration-block-no-duplicate-properties */
+    opacity: 0;
+    /* stylelint-disable-next-line declaration-block-no-duplicate-properties */
     opacity: .001;
 }

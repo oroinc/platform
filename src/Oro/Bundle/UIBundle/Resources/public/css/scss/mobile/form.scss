@@ -100,7 +100,7 @@ select[multiple] {
         margin-right: 0;
 
         &:not(:last-of-type) {
-            margin: 0 0 $form-container-control-row-space 0;
+            margin: 0 0 $form-container-control-row-space;
         }
     }
 

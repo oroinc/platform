@@ -1,5 +1,8 @@
 /* @theme: default; */
+
+@use 'sass:meta';
 @use 'sass:list';
+@use 'sass:map';
 
 // Use: @include font-face('Poppins', '../fonts/poppins/Poppins-Italic-subset', 400, normal, ('woff'), swap);
 @mixin font-face(
@@ -112,7 +115,7 @@
     // ('main', 'secondary', 'icon')
     $font-names: map_keys($fonts);
 
-    @if (length($fonts) >= 1) {
+    @if (list.length($fonts) >= 1) {
         @each $font in $fonts {
             $font-index: $font-index + 1;
 
@@ -131,7 +134,7 @@
             //        )
             //     )
             //  )
-            $current-section: map_get($fonts, $current-section-name);
+            $current-section: map.get($fonts, $current-section-name);
 
             // Iterate 'variants' section
             // (
@@ -143,13 +146,13 @@
             // )
 
             // Iterate font variants
-            $font-variants: map_get($current-section, 'variants');
+            $font-variants: map.get($current-section, 'variants');
 
-            $font-formats: map_get($current-section, 'formats');
+            $font-formats: map.get($current-section, 'formats');
 
-            @if (type-of($font-variants) == 'map' or type-of($font-variants) == 'list') {
+            @if (meta.type-of($font-variants) == 'map' or meta.type-of($font-variants) == 'list') {
                 // Get Iterate section 'family'
-                $font-family: map_get($current-section, 'family');
+                $font-family: map.get($current-section, 'family');
 
                 // Default value
                 $file-path: null;
@@ -160,27 +163,27 @@
                 // Default value
                 $font-style: null;
 
-                @if (type-of($font-variants) == 'map') {
-                    $file-path: map_get($font-variants, 'path');
+                @if (meta.type-of($font-variants) == 'map') {
+                    $file-path: map.get($font-variants, 'path');
                     $font-display: swap;
                     $font-unicode-range: null;
 
                     // Sections 'variants' and 'style' not required.
                     // Update only if They are defined in iterate  section.
                     @if (map_has_key($font-variants, 'weight')) {
-                        $font-weigh: map_get($font-variants, 'weight');
+                        $font-weigh: map.get($font-variants, 'weight');
                     }
 
                     @if (map_has_key($font-variants, 'style')) {
-                        $font-style: map_get($font-variants, 'style');
+                        $font-style: map.get($font-variants, 'style');
                     }
 
                     @if (map_has_key($font-variants, 'unicode-range')) {
-                        $font-unicode-range: map_get($font-variants, 'unicode-range');
+                        $font-unicode-range: map.get($font-variants, 'unicode-range');
                     }
 
                     @if (map_has_key($font-variants, 'display')) {
-                        $font-display: map_get($font-variants, 'display');
+                        $font-display: map.get($font-variants, 'display');
                     }
 
                     @include include-font-face(
@@ -194,28 +197,28 @@
                     );
                 }
 
-                @if (type-of($font-variants) == 'list') {
+                @if (meta.type-of($font-variants) == 'list') {
                     @each $font-variant in $font-variants {
-                        $file-path: map_get($font-variant, 'path');
+                        $file-path: map.get($font-variant, 'path');
                         $font-display: swap;
                         $font-unicode-range: null;
 
                         // Sections 'variants' and 'style' not required.
                         // Update only if They are defined in iterate  section.
                         @if (map_has_key($font-variant, 'weight')) {
-                            $font-weigh: map_get($font-variant, 'weight');
+                            $font-weigh: map.get($font-variant, 'weight');
                         }
 
                         @if (map_has_key($font-variant, 'style')) {
-                            $font-style: map_get($font-variant, 'style');
+                            $font-style: map.get($font-variant, 'style');
                         }
 
                         @if (map_has_key($font-variant, 'unicode-range')) {
-                            $font-unicode-range: map_get($font-variant, 'unicode-range');
+                            $font-unicode-range: map.get($font-variant, 'unicode-range');
                         }
 
                         @if (map_has_key($font-variant, 'display')) {
-                            $font-display: map_get($font-variant, 'display');
+                            $font-display: map.get($font-variant, 'display');
                         }
 
                         @include include-font-face(

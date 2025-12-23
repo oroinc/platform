@@ -270,13 +270,14 @@
                 font-size: $app-header-font-size;
                 white-space: normal;
 
-                // stylelint-disable-next-line selector-max-compound-selectors
+                // stylelint-disable selector-max-compound-selectors
                 [class^='fa-'],
                 [class*=' fa-'] {
                     font-size: $app-header-icon-font-size;
                     width: $app-header-icon-font-size;
                     text-align: center;
                 }
+                // stylelint-enable selector-max-compound-selectors
 
                 &:hover {
                     color: $app-header-text-hover-color;
