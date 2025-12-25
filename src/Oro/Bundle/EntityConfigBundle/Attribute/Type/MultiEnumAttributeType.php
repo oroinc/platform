@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Attribute\Type;
 
-use Laminas\Stdlib\Guard\ArrayOrTraversableGuardTrait;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -12,8 +11,6 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
  */
 class MultiEnumAttributeType extends EnumAttributeType
 {
-    use ArrayOrTraversableGuardTrait;
-
     /**
      * {@inheritdoc}
      */
@@ -67,11 +64,15 @@ class MultiEnumAttributeType extends EnumAttributeType
     }
 
     /**
-     * @param string $originalValue
      * @throws \InvalidArgumentException
      */
     protected function ensureTraversable($originalValue)
     {
-        $this->guardForArrayOrTraversable($originalValue, 'Value', \InvalidArgumentException::class);
+        if (!\is_array($originalValue) && !$originalValue instanceof \Traversable) {
+            throw new \InvalidArgumentException(\sprintf(
+                'Value must be an array or Traversable, [%s] given',
+                get_debug_type($originalValue)
+            ));
+        }
     }
 }

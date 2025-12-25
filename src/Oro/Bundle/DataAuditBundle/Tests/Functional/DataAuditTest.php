@@ -426,6 +426,16 @@ class DataAuditTest extends WebTestCase
         );
     }
 
+    public function testUuid()
+    {
+        $this->markTestSkipped('BAP-18750');
+    }
+
+    public function testUlid()
+    {
+        $this->markTestSkipped('BAP-18750');
+    }
+
     public function testImage()
     {
         $this->markTestSkipped('Image audit not supported');
