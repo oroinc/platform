@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Attribute\Type;
 
-use Laminas\Stdlib\Guard\ArrayOrTraversableGuardTrait;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -12,8 +11,6 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
  */
 class MultiEnumAttributeType extends EnumAttributeType
 {
-    use ArrayOrTraversableGuardTrait;
-
     #[\Override]
     public function isSortable(FieldConfigModel $attribute)
     {
@@ -39,13 +36,10 @@ class MultiEnumAttributeType extends EnumAttributeType
         $this->ensureTraversable($originalValue);
 
         $value = [];
-
         /** @var EnumOptionInterface[] $originalValue */
         foreach ($originalValue as $enum) {
             $this->ensureSupportedType($enum);
-
-            $key = sprintf('%s_enum.%s', $attribute->getFieldName(), $enum->getInternalId());
-
+            $key = \sprintf('%s_enum.%s', $attribute->getFieldName(), $enum->getInternalId());
             $value[$key] = 1;
         }
 
@@ -59,11 +53,15 @@ class MultiEnumAttributeType extends EnumAttributeType
     }
 
     /**
-     * @param string $originalValue
      * @throws \InvalidArgumentException
      */
     protected function ensureTraversable($originalValue): void
     {
-        $this->guardForArrayOrTraversable($originalValue, 'Value', \InvalidArgumentException::class);
+        if (!\is_array($originalValue) && !$originalValue instanceof \Traversable) {
+            throw new \InvalidArgumentException(\sprintf(
+                'Value must be an array or Traversable, [%s] given',
+                get_debug_type($originalValue)
+            ));
+        }
     }
 }

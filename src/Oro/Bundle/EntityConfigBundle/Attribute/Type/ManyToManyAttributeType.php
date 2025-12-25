@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\Attribute\Type;
 
 use InvalidArgumentException;
-use Laminas\Stdlib\Guard\ArrayOrTraversableGuardTrait;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -17,7 +16,6 @@ use RuntimeException;
 class ManyToManyAttributeType implements AttributeTypeInterface
 {
     use AttributeLocalizableTrait;
-    use ArrayOrTraversableGuardTrait;
     use FallbackTrait;
 
     /** @var EntityNameResolver */
@@ -81,11 +79,15 @@ class ManyToManyAttributeType implements AttributeTypeInterface
     }
 
     /**
-     * @param string $originalValue
      * @throws InvalidArgumentException
      */
     protected function ensureTraversable($originalValue)
     {
-        $this->guardForArrayOrTraversable($originalValue, 'Value', InvalidArgumentException::class);
+        if (!\is_array($originalValue) && !$originalValue instanceof \Traversable) {
+            throw new \InvalidArgumentException(\sprintf(
+                'Value must be an array or Traversable, [%s] given',
+                get_debug_type($originalValue)
+            ));
+        }
     }
 }
