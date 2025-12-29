@@ -27,15 +27,28 @@ class EntityConfigListenerTest extends TestCase
     /**
      * @dataProvider changeSetProvider
      */
-    public function testPreFlush(string $scope, array $changeSet, bool $shouldClearCache): void
-    {
-        $config = new Config(new FieldConfigId($scope, 'Test\Entity', 'testField'));
+    public function testPreFlush(
+        string $scope,
+        array $changeSet,
+        ?int $modelId = null,
+        bool $shouldClearCache
+    ): void {
+        $className = 'Test\Entity';
+        $fieldName = 'testField';
+
+        $exactlyCalled = $scope === 'email' ? 1 : 0;
+        $config = new Config(new FieldConfigId($scope, $className, $fieldName));
 
         $configManager = $this->createMock(ConfigManager::class);
-        $configManager->expects(self::exactly($scope === 'email' ? 1 : 0))
+        $configManager->expects(self::exactly($exactlyCalled))
             ->method('getConfigChangeSet')
             ->with(self::identicalTo($config))
             ->willReturn($changeSet);
+
+        $configManager->expects(self::exactly($exactlyCalled))
+            ->method('getConfigModelId')
+            ->with($className, $fieldName)
+            ->willReturn($modelId);
 
         if ($shouldClearCache) {
             $this->emailRendererConfigProvider->expects(self::once())
@@ -54,18 +67,27 @@ class EntityConfigListenerTest extends TestCase
             'email config changed'     => [
                 'scope'            => 'email',
                 'change'           => ['available_in_template' => [true, false]],
+                'id'               => 1,
                 'shouldClearCache' => true
             ],
             'email config not changed' => [
                 'scope'            => 'email',
                 'change'           => [],
+                'id'               => 1,
                 'shouldClearCache' => false
             ],
             'not email config'         => [
                 'scope'            => 'someConfigScope',
                 'change'           => [],
+                'id'               => 1,
                 'shouldClearCache' => false
-            ]
+            ],
+            'new email config'     => [
+                'scope'            => 'email',
+                'change'           => [],
+                'id'               => null,
+                'shouldClearCache' => true
+            ],
         ];
     }
 }
