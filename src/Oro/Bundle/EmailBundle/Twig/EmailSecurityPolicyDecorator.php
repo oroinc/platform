@@ -26,11 +26,15 @@ class EmailSecurityPolicyDecorator implements SecurityPolicyInterface
 
     public function checkMethodAllowed($obj, $method): void
     {
-        if (str_contains($obj::class, '\Entity\\')
-            && (str_starts_with($method, 'get') || str_starts_with($method, 'is') || str_starts_with($method, 'has'))
-        ) {
+        $isEntityObject = str_contains($obj::class, '\Entity\\');
+        $isAllowedMethods  = str_starts_with($method, 'get') ||
+            str_starts_with($method, 'is') ||
+            str_starts_with($method, 'has');
+
+        if (($isEntityObject && $isAllowedMethods) || strtolower($method) === '__tostring') {
             return;
         }
+
         $this->securityPolicy->checkMethodAllowed($obj, $method);
     }
 
