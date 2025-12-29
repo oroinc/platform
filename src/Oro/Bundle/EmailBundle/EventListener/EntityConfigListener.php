@@ -26,7 +26,12 @@ class EntityConfigListener
         }
 
         $changeSet = $event->getConfigManager()->getConfigChangeSet($config);
-        if (isset($changeSet['available_in_template'])) {
+        $isNewField = !$event->getConfigManager()->getConfigModelId(
+            $config->getId()->getClassName(),
+            $config->getId()->getFieldName()
+        );
+
+        if ($isNewField || isset($changeSet['available_in_template'])) {
             $this->emailRendererConfigProvider->clearCache();
         }
     }
