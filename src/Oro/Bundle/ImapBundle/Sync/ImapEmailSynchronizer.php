@@ -188,7 +188,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
             ->andWhere('o.imapHost IS NOT NULL')
             ->andWhere('o.imapPort > 0')
             ->andWhere('o.user IS NOT NULL')
-            ->andWhere('o.password IS NOT NULL');
+            ->andWhere('o.password IS NOT NULL OR o.accessToken IS NOT NULL');
 
         return $queryBuilder;
     }

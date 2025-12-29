@@ -34,9 +34,12 @@ class EmailSecurityPolicyDecorator implements SecurityPolicyInterface
     #[\Override]
     public function checkMethodAllowed($obj, $method): void
     {
-        if (str_contains($obj::class, '\Entity\\')
-            && (str_starts_with($method, 'get') || str_starts_with($method, 'is') || str_starts_with($method, 'has'))
-        ) {
+        $isEntityObject = str_contains($obj::class, '\Entity\\');
+        $isAllowedMethods  = str_starts_with($method, 'get') ||
+            str_starts_with($method, 'is') ||
+            str_starts_with($method, 'has');
+
+        if (($isEntityObject && $isAllowedMethods) || strtolower($method) === '__tostring') {
             return;
         }
 
@@ -64,19 +67,8 @@ class EmailSecurityPolicyDecorator implements SecurityPolicyInterface
     {
         $configuration = $this->templateRendererConfigProvider->getConfiguration();
 
-        $methods = $this->addToStringMethod($configuration[TemplateRendererConfigProviderInterface::METHODS]);
-
-        $this->securityPolicy->setAllowedMethods($methods);
+        $this->securityPolicy->setAllowedMethods($configuration[TemplateRendererConfigProviderInterface::METHODS]);
         $this->securityPolicy
             ->setAllowedProperties($configuration[TemplateRendererConfigProviderInterface::PROPERTIES]);
-    }
-
-    private function addToStringMethod(array $configMethods): array
-    {
-        foreach ($configMethods as $className => &$methods) {
-            $methods[] = '__toString';
-        }
-
-        return $configMethods;
     }
 }
