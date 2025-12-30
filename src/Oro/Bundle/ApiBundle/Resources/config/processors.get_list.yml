@@ -32,6 +32,11 @@ services:
     # build_query
     #
 
+    oro_api.get_list.apply_initialize_criteria_callback:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\ApplyInitializeCriteriaCallback
+        tags:
+            - { name: oro.api.processor, action: get_list, group: build_query, priority: 90 }
+
     #
     # load_data
     #
