@@ -3,6 +3,7 @@ import _ from 'underscore';
 import __ from 'orotranslation/js/translator';
 import {Multiselect} from 'oroui/js/app/views/multiselect';
 import manageFocus from 'oroui/js/tools/manage-focus';
+import template from 'tpl-loader!oroform/templates/editor/multi-checkbox-editor.html';
 
 /**
  * Multi-select content editor. Please note that it requires column data format
@@ -56,7 +57,7 @@ import manageFocus from 'oroui/js/tools/manage-focus';
  */
 const MultiCheckboxEditorView = SelectEditorView.extend(/** @lends MultiCheckboxEditorView.prototype */{
     className: 'multi-checkbox-editor',
-    template: require('tpl-loader!oroform/templates/editor/multi-checkbox-editor.html'),
+    template,
 
     /**
      * Jquery object that wraps select DOM element with initialized multiselect plugin

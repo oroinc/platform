@@ -1,10 +1,10 @@
-const config = require('module-config').default(module.id);
-
+/* eslint-disable-next-line no-undef */
 define(function(require) {
     'use strict';
 
     const _ = require('underscore');
     const asap = require('asap');
+    const config = require('module-config').default(module.id);
 
     _.mixin({
         nl2br: function(str) {

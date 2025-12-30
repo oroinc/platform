@@ -543,8 +543,8 @@ ComponentManager.prototype = {
         }
         if (!tools.debug) {
             // if there is unhandled error -- show user message
-            require('chaplin').mediator
-                .execute('showMessage', 'error', __('oro.ui.components.initialization_error'));
+            import('chaplin').then(chaplin => chaplin.mediator
+                .execute('showMessage', 'error', __('oro.ui.components.initialization_error')));
         }
     },
 

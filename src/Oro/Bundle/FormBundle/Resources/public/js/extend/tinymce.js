@@ -1,5 +1,8 @@
+/* global require */
+/* eslint-disable import/no-commonjs */
 const _ = require('underscore');
 const tinyMCE = require('tinymce');
+
 require.context(
     '!file-loader?name=[path][name].[ext]&outputPath=../_static/&context=tinymce!tinymce/icons',
     true,
@@ -25,6 +28,7 @@ require.context(
     true,
     /.*/
 );
+
 const moduleConfig = require('module-config').default(module.id);
 
 _.extend(tinyMCE, _.pick(moduleConfig, 'baseURL'));
