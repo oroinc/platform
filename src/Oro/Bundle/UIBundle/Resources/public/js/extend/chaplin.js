@@ -1,3 +1,21 @@
+/**
+ * Chaplin extensions and customizations for Oro Platform.
+ *
+ * This module extends Chaplin (View, CollectionView, Router, Composer, SyncMachine) with custom functionality
+ * including view lifecycle management, collection view rendering optimizations, improved routing,
+ * composition retrieval, and disposal patterns for proper memory management.
+ *
+ * @note This module uses AMD (Asynchronous Module Definition) format and cannot be converted to ESM.
+ * The main reason is that there are legacy libraries in the application that explicitly expect
+ * this to be an AMD module and rely on the AMD module loading mechanism.
+ * Converting to ESM could lead to unexpected runtime errors and break compatibility with
+ * existing code that depends on AMD-specific behavior and module resolution patterns.
+ * Any migration to ESM would require a comprehensive audit of all dependent libraries
+ * and components to ensure compatibility.
+ *
+ * @returns {Chaplin} Extended Chaplin object with custom View, CollectionView, Router, Composer, and SyncMachine methods
+ */
+/* eslint-disable-next-line no-undef */
 define(function(require) {
     'use strict';
 

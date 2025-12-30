@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import _ from 'underscore';
 import filters from './Fixture/filters.json';
-const listOptions = JSON.stringify(require('./Fixture/list-options.json'));
+import listOptions from './Fixture/list-options.json';
 import FieldConditionView from 'oroquerydesigner/js/app/views/field-condition-view';
 import ActivityConditionView from 'oroactivitylist/js/app/views/activity-condition-view';
 import 'jasmine-jquery';

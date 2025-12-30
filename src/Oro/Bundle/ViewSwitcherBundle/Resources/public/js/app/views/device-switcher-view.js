@@ -1,3 +1,4 @@
+/* global require */
 require.resolveWeak(// fixes issue with missing icons/default/icons.js file in public dir
     '!file-loader?name=[path][name].[ext]&outputPath=../_static!@oroinc/jquery.nicescroll/jquery.nicescroll.min.js'
 );

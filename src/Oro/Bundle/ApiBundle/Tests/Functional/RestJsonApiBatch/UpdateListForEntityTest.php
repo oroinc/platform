@@ -13,6 +13,8 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestProductType;
 /**
  * @dbIsolationPerTest
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
 {
@@ -162,26 +164,77 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
 
     public function testUpdateEntities(): void
     {
-        $entityType = $this->getEntityType(TestDepartment::class);
-        $this->processUpdateList(
+        $operationId = $this->processUpdateList(
             TestDepartment::class,
+            $this->getUpdateEntitiesRequestData()
+        );
+        $this->assertUpdateEntitiesResult($operationId);
+    }
+
+    public function testUpdateEntitiesWithoutMessageQueue(): void
+    {
+        $operationId = $this->sendUpdateListRequestWithoutMessageQueue(
+            TestDepartment::class,
+            $this->getUpdateEntitiesRequestData()
+        );
+        $this->assertUpdateEntitiesResult($operationId);
+    }
+
+    public function testUpdateEntitiesWithoutMessageQueueAndWithSyncMode(): void
+    {
+        $response = $this->sendUpdateListRequestWithoutMessageQueueAndWithSynchronousMode(
+            TestDepartment::class,
+            $this->getUpdateEntitiesRequestData()
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $responseContent = $this->updateResponseContent(
             [
                 'data' => [
                     [
-                        'meta' => ['update' => true],
                         'type' => $entityType,
                         'id' => '<toString(@department1->id)>',
                         'attributes' => ['title' => 'Updated Department 1']
                     ],
                     [
-                        'meta' => ['update' => true],
                         'type' => $entityType,
                         'id' => '<toString(@department2->id)>',
                         'attributes' => ['title' => 'Updated Department 2']
                     ]
                 ]
-            ]
+            ],
+            $response
         );
+        $this->assertResponseContains($responseContent, $response);
+
+        $this->assertUpdateEntitiesResult($this->getLastOperationId());
+    }
+
+    private function getUpdateEntitiesRequestData(): array
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+
+        return [
+            'data' => [
+                [
+                    'meta' => ['update' => true],
+                    'type' => $entityType,
+                    'id' => '<toString(@department1->id)>',
+                    'attributes' => ['title' => 'Updated Department 1']
+                ],
+                [
+                    'meta' => ['update' => true],
+                    'type' => $entityType,
+                    'id' => '<toString(@department2->id)>',
+                    'attributes' => ['title' => 'Updated Department 2']
+                ]
+            ]
+        ];
+    }
+
+    private function assertUpdateEntitiesResult(int $operationId): void
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
 
         $response = $this->cget(['entity' => $entityType]);
         $responseContent = $this->updateResponseContent(
@@ -202,28 +255,104 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
             $response
         );
         $this->assertResponseContains($responseContent, $response);
+
+        $operation = $this->getEntityManager()->find(AsyncOperation::class, $operationId);
+        $summary = $operation->getSummary();
+        unset($summary['aggregateTime']);
+        self::assertSame(
+            [
+                'readCount' => 2,
+                'writeCount' => 2,
+                'errorCount' => 0,
+                'createCount' => 0,
+                'updateCount' => 2
+            ],
+            $summary
+        );
+        $department1Id = $this->getDepartmentId('Updated Department 1');
+        $department2Id = $this->getDepartmentId('Updated Department 2');
+        self::assertSame(
+            [
+                'primary' => [
+                    [$department1Id, (string)$department1Id, true],
+                    [$department2Id, (string)$department2Id, true]
+                ]
+            ],
+            $operation->getAffectedEntities()
+        );
     }
 
     public function testCreateAndUpdateEntities(): void
     {
-        $entityType = $this->getEntityType(TestDepartment::class);
-        $this->processUpdateList(
+        $operationId = $this->processUpdateList(
             TestDepartment::class,
+            $this->getCreateAndUpdateEntitiesRequestData()
+        );
+        $this->assertCreateAndUpdateEntitiesResult($operationId);
+    }
+
+    public function testCreateAndUpdateEntitiesWithoutMessageQueue(): void
+    {
+        $operationId = $this->sendUpdateListRequestWithoutMessageQueue(
+            TestDepartment::class,
+            $this->getCreateAndUpdateEntitiesRequestData()
+        );
+        $this->assertCreateAndUpdateEntitiesResult($operationId);
+    }
+
+    public function testCreateAndUpdateEntitiesWithoutMessageQueueAndWithSyncMode(): void
+    {
+        $response = $this->sendUpdateListRequestWithoutMessageQueueAndWithSynchronousMode(
+            TestDepartment::class,
+            $this->getCreateAndUpdateEntitiesRequestData()
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $responseContent = $this->updateResponseContent(
             [
                 'data' => [
                     [
                         'type' => $entityType,
+                        'id' => 'new',
                         'attributes' => ['title' => 'New Department 1']
                     ],
                     [
-                        'meta' => ['update' => true],
                         'type' => $entityType,
                         'id' => '<toString(@department1->id)>',
                         'attributes' => ['title' => 'Updated Department 1']
                     ]
                 ]
-            ]
+            ],
+            $response
         );
+        $this->assertResponseContains($responseContent, $response);
+
+        $this->assertCreateAndUpdateEntitiesResult($this->getLastOperationId());
+    }
+
+    private function getCreateAndUpdateEntitiesRequestData(): array
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+
+        return [
+            'data' => [
+                [
+                    'type' => $entityType,
+                    'attributes' => ['title' => 'New Department 1']
+                ],
+                [
+                    'meta' => ['update' => true],
+                    'type' => $entityType,
+                    'id' => '<toString(@department1->id)>',
+                    'attributes' => ['title' => 'Updated Department 1']
+                ]
+            ]
+        ];
+    }
+
+    private function assertCreateAndUpdateEntitiesResult(int $operationId): void
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
 
         $response = $this->cget(['entity' => $entityType]);
         $responseContent = $this->updateResponseContent(
@@ -249,6 +378,30 @@ class UpdateListForEntityTest extends RestJsonApiUpdateListTestCase
             $response
         );
         $this->assertResponseContains($responseContent, $response);
+
+        $operation = $this->getEntityManager()->find(AsyncOperation::class, $operationId);
+        $summary = $operation->getSummary();
+        unset($summary['aggregateTime']);
+        self::assertSame(
+            [
+                'readCount' => 2,
+                'writeCount' => 2,
+                'errorCount' => 0,
+                'createCount' => 1,
+                'updateCount' => 1
+            ],
+            $summary
+        );
+        $updatedDepartmentId = $this->getDepartmentId('Updated Department 1');
+        self::assertSame(
+            [
+                'primary' => [
+                    [$this->getDepartmentId('New Department 1'), null, false],
+                    [$updatedDepartmentId, (string)$updatedDepartmentId, true]
+                ]
+            ],
+            $operation->getAffectedEntities()
+        );
     }
 
     public function testCreateEntitiesWhenRequestDataHasHeaderAndMetaAndLinksSections(): void

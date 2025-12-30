@@ -5,8 +5,7 @@ import innerPageModelService from 'oroviewswitcher/js/app/services/inner-page-mo
 import DemoPopupView from 'oroviewswitcher/js/app/views/demo/demo-popup-view';
 import DemoHelpCarouselView from 'oroviewswitcher/js/app/views/demo/demo-help-carousel-view';
 import DemoLogoutButtonView from 'oroviewswitcher/js/app/views/demo/demo-logout-button-view';
-
-require('app-modules').default;
+import 'app-modules';
 
 import moduleConfig from 'module-config';
 const config = moduleConfig(module.id);

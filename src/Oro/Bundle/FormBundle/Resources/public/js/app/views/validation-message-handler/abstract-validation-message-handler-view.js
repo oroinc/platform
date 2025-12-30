@@ -3,6 +3,7 @@ import _ from 'underscore';
 import {isIOS, isSoftwareKeyboardEnabled} from 'oroui/js/tools';
 import Popper from 'popper';
 import BaseView from 'oroui/js/app/views/base/view';
+import template from 'tpl-loader!oroform/templates/floating-error-message.html';
 const VALIDATOR_ERROR_CLASS = 'validation-failed';
 
 function getScrollParent(element) {
@@ -40,7 +41,7 @@ const AbstractValidationMessageHandlerView = BaseView.extend({
 
     useMessageLabelWidth: true,
 
-    template: require('tpl-loader!oroform/templates/floating-error-message.html'),
+    template,
 
     /**
      * @inheritdoc

@@ -1,3 +1,4 @@
+/* eslint-disable-next-line no-undef */
 define(function(require) {
     'use strict';
 

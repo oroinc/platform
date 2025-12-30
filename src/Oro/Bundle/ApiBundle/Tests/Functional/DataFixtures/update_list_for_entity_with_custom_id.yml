@@ -1,0 +1,8 @@
+dependencies:
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomIdentifier:
+    entity{1..2}:
+        key: 'existing_entity_<current()>'
+        name: 'Existing Entity <current()>'

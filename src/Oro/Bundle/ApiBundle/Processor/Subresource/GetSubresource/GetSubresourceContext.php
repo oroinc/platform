@@ -13,7 +13,9 @@ class GetSubresourceContext extends SubresourceContext
     private const TOTAL_COUNT_CALLBACK = 'totalCountCallback';
 
     /**
-     * Gets a callback that can be used to calculate the total number of related records
+     * Gets a callback that can be used to calculate the total number of related records.
+     *
+     * @return callable|null function (): int
      */
     public function getTotalCountCallback(): ?callable
     {
@@ -21,7 +23,9 @@ class GetSubresourceContext extends SubresourceContext
     }
 
     /**
-     * Sets a callback that can be used to calculate the total number of related records
+     * Sets a callback that can be used to calculate the total number of related records.
+     *
+     * @param callable|null $totalCount function (): int
      */
     public function setTotalCountCallback(?callable $totalCount): void
     {

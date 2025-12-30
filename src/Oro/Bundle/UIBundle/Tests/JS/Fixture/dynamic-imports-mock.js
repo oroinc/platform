@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     'js/module-a': () => new Promise(resolve => {
         setTimeout(() => resolve({'default': {moduleName: 'a'}, '__esModule': true}));
     }),

@@ -12,7 +12,9 @@ class ListContext extends Context
     private const TOTAL_COUNT_CALLBACK = 'totalCountCallback';
 
     /**
-     * Gets a callback that can be used to calculate the total number of records in a list of entities
+     * Gets a callback that can be used to calculate the total number of records in a list of entities.
+     *
+     * @return callable|null function (): int
      */
     public function getTotalCountCallback(): ?callable
     {
@@ -20,7 +22,9 @@ class ListContext extends Context
     }
 
     /**
-     * Sets a callback that can be used to calculate the total number of records in a list of entities
+     * Sets a callback that can be used to calculate the total number of records in a list of entities.
+     *
+     * @param callable|null $totalCount function (): int
      */
     public function setTotalCountCallback(?callable $totalCount): void
     {
