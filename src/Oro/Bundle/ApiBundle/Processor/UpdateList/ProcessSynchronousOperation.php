@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\UpdateList;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Query;
 use Oro\Bundle\ApiBundle\Async\Topic\DeleteAsyncOperationTopic;
 use Oro\Bundle\ApiBundle\Batch\ErrorManager;
@@ -11,6 +12,7 @@ use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
+use Oro\Bundle\ApiBundle\Metadata\EntityIdMetadataInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
@@ -165,8 +167,10 @@ class ProcessSynchronousOperation implements ProcessorInterface
         foreach ($primaryEntities as [$entityId]) {
             $primaryEntityIds[] = $entityId;
         }
-        $targetContext = $this->normalizeEntities($context, $context->getClassName(), $primaryEntityIds);
-        $this->processNormalizationResult($targetContext, $context);
+        $this->processNormalizationResult(
+            $this->normalizeEntities($context, $context->getClassName(), $primaryEntityIds),
+            $context
+        );
         if ($context->hasErrors()) {
             return [];
         }
@@ -185,7 +189,7 @@ class ProcessSynchronousOperation implements ProcessorInterface
             }
             foreach ($includedEntityMap as $entityClass => $entityIds) {
                 $includedTargetContext = $this->normalizeEntities($context, $entityClass, $entityIds);
-                if ($targetContext->hasErrors()) {
+                if ($includedTargetContext->hasErrors()) {
                     $this->processNormalizationErrors($includedTargetContext, $context);
                 } else {
                     $includedDataPerEntityType[] = $includedTargetContext->getResult();
@@ -233,16 +237,36 @@ class ProcessSynchronousOperation implements ProcessorInterface
         $targetContext->skipGroup(ApiActionGroup::DATA_SECURITY_CHECK);
         $targetContext->setSoftErrorsHandling(true);
 
-        $filterNames = $this->filterNamesRegistry->getFilterNames($context->getRequestType());
-        $filterGroupName = $filterNames->getDataFilterGroupName();
-        $idFilterName = $filterGroupName ? $filterGroupName . '[id]' : 'id';
-        $targetContext->getFilterValues()->set($idFilterName, new FilterValue($idFilterName, $entityIds));
-        $pageSizeFilterName = $filterNames->getPageSizeFilterName();
+        $targetContext->setInitializeCriteriaCallback(function (Criteria $criteria) use ($entityIds, $context) {
+            self::applyEntityIdRestriction($criteria, $entityIds, $context->getMetadata());
+        });
+
+        $pageSizeFilterName = $this->filterNamesRegistry->getFilterNames($context->getRequestType())
+            ->getPageSizeFilterName();
         $targetContext->getFilterValues()->set($pageSizeFilterName, new FilterValue($pageSizeFilterName, -1));
 
         $targetProcessor->process($targetContext);
 
         return $targetContext;
+    }
+
+    private static function applyEntityIdRestriction(
+        Criteria $criteria,
+        array $entityIds,
+        EntityIdMetadataInterface $metadata
+    ): void {
+        $idFieldNames = $metadata->getIdentifierFieldNames();
+        if (\count($idFieldNames) === 1) {
+            // single identifier
+            $criteria->andWhere(Criteria::expr()->in($metadata->getPropertyPath(reset($idFieldNames)), $entityIds));
+        } else {
+            // composite identifier
+            // will be fixed in BAP-15595
+            throw new RuntimeException(\sprintf(
+                'A composite identifiers is not implemented yet. Entity: %s.',
+                $metadata->getClassName()
+            ));
+        }
     }
 
     private function processNormalizationResult(GetListContext $targetContext, UpdateListContext $context): void
