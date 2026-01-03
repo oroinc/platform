@@ -96,7 +96,7 @@ class BatchStatusTest extends TestCase
         $failed = new BatchStatus(BatchStatus::FAILED);
         self::assertFalse($failed->isRunning());
 
-        $completed = new  BatchStatus(BatchStatus::COMPLETED);
+        $completed = new BatchStatus(BatchStatus::COMPLETED);
         self::assertFalse($completed->isRunning());
 
         $started = new BatchStatus(BatchStatus::STARTED);

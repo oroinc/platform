@@ -17,7 +17,7 @@ class Schema extends BaseSchema
      * Important: your class must extend Oro\Bundle\MigrationBundle\Migration\Schema\Table class
      *            or extend Doctrine\DBAL\Schema\Table class and must have __construct(array $args) method
      */
-    const TABLE_CLASS = 'Doctrine\DBAL\Schema\Table';
+    public const TABLE_CLASS = 'Doctrine\DBAL\Schema\Table';
 
     /**
      * Creates an instance of TABLE_CLASS class
@@ -52,7 +52,7 @@ class Schema extends BaseSchema
         return $table;
     }
 
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     #[\Override]
     protected function _addTable(BaseTable $table)
     {
@@ -61,5 +61,5 @@ class Schema extends BaseSchema
         }
         parent::_addTable($table);
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 }

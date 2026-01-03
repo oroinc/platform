@@ -56,7 +56,7 @@ class LoadPermissionConfigurationCommand extends Command
                 'Permissions to load'
             )
             ->setHelp(
-                // @codingStandardsIgnoreStart
+                // phpcs:disable
                 <<<'HELP'
 The <info>%command.name%</info> command loads permission configuration from the configuration files to the database.
 
@@ -67,7 +67,7 @@ The <info>--permissions</info> option can be used to load only the specified per
   <info>php %command.full_name% --permissions=<permission1> --permissions=<permission2> --permissions=<permissionN></info>
 
 HELP
-                // @codingStandardsIgnoreEnd
+                // phpcs:enable
             )
             ->addUsage('--permissions=<permission1> --permissions=<permission2> --permissions=<permissionN>')
         ;

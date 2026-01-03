@@ -17,7 +17,7 @@ class UpdateTest extends TestCase
         $form = $this->createMock(FormInterface::class);
         $formHandler = $this->createMock(FormHandlerInterface::class);
         $formTemplateDataProvider = $this->createMock(FormTemplateDataProviderInterface::class);
-        $update = new  Update();
+        $update = new Update();
 
         $update->setFormData($data);
         $update->setFrom($form);

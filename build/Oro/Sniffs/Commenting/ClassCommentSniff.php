@@ -6,8 +6,8 @@ use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Standards\PEAR\Sniffs\Commenting\ClassCommentSniff as BaseClassCommentSniff;
 
 /**
- * This sniff checks if class/interface/trait documentation exists ind it have text doc that describes
- * what this class for.
+ * This sniff checks if the class/interface/trait documentation exists,
+ * and it has a PHPDoc that describes what this class for.
  *
  * @category PHP
  */
@@ -17,9 +17,9 @@ class ClassCommentSniff extends BaseClassCommentSniff
      * Tags in correct order and related info.
      * This array cannot be configured from the outside.
      *
-     * @var array
+     * @var array<string, array<string, bool>>
      */
-    protected $tags = [
+    protected const EXPECTED_TAGS = [
         '@category'   => [
             'required'       => false,
             'allow_multiple' => false,
@@ -71,7 +71,8 @@ class ClassCommentSniff extends BaseClassCommentSniff
         return [
             T_CLASS,
             T_INTERFACE,
-            T_TRAIT
+            T_TRAIT,
+            T_ENUM,
         ];
     }
 
@@ -97,8 +98,8 @@ class ClassCommentSniff extends BaseClassCommentSniff
             $tokens[$objectDoctypeOpenPosition]['comment_closer']
         );
 
-        // check if class have no documentation
-        // 5 is the position where description should start.
+        // check if the class has no documentation
+        // 5 is the position where the description should start.
         if (!$objectDoctypeContentPosition || $tokens[$objectDoctypeContentPosition]['column'] > 5) {
             $error = '%s should contain text documentation what is it for';
             $phpcsFile->addError($error, $stackPtr, 'Class doc', [ucfirst($objectType)]);

@@ -125,12 +125,12 @@ class Config implements ConfigInterface
      *
      * @return Config A new instance of a Config object
      */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     public static function __set_state($data)
     {
         return new Config($data['id'], $data['values']);
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 
     /**
      * Creates a new object that is a copy of the current instance.

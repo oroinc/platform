@@ -78,10 +78,10 @@ class EntityConfigId implements ConfigIdInterface
      * @param array $data Initialization array
      * @return EntityConfigId A new instance of a EntityConfigId object
      */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     public static function __set_state($data)
     {
         return new EntityConfigId($data['scope'], $data['className']);
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 }

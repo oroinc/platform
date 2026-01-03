@@ -107,7 +107,7 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
         $tabToBeActivated->click();
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Download data template from entity grid page with custom processor
      *
@@ -115,19 +115,19 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
      * @param string $entity
      * @param string $processorName
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iDownloadDataTemplateFileWithProcessor($entity, $processorName)
     {
         $this->downloadTemplateFile($entity, $processorName);
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Download data template from entity grid page with custom processor and job name
      *
      * @When /^(?:|I )download Data Template file with processor "(?P<processorName>([\w\s\.]+))" and job "(?P<jobName>([\w\s\.]+))"$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iDownloadDataTemplateFileWithProcessorAndJob(
         string $processorName,
         string $jobName
@@ -273,7 +273,7 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
         $this->exportedFileContainsFollowingData($filePath, $expectedEntities);
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * This method strictly compares data from the downloaded file
      *
@@ -283,7 +283,7 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
      * @param string|null $processorName
      * @param TableNode $expectedEntities
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function exportedFileForEntityWithProcessorContainsFollowingData(
         $entity,
         TableNode $expectedEntities,
@@ -309,7 +309,7 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
         $this->exportedFileForEntityWithProcessorContainsAtLeastFollowingColumns($entity, $expectedEntities, null);
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * This method makes non-strict comparison of data from the downloaded file.
      *
@@ -321,7 +321,7 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
      * @param TableNode   $expectedEntities
      * @param string|null $processorName
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function exportedFileForEntityWithProcessorContainsAtLeastFollowingColumns(
         $entity,
         TableNode $expectedEntities,

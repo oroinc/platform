@@ -14,7 +14,7 @@ class OroNavigationBundle implements Migration
     #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
-        // @codingStandardsIgnoreStart
+        // phpcs:disable
 
         /** Generate table oro_navigation_history **/
         $table = $schema->createTable('oro_navigation_history');
@@ -97,6 +97,6 @@ class OroNavigationBundle implements Migration
         $table->addForeignKeyConstraint($schema->getTable('oro_user'), ['user_id'], ['id'], ['onDelete' => 'CASCADE', 'onUpdate' => null]);
         /** End of generate foreign keys for table oro_navigation_pagestate **/
 
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
     }
 }

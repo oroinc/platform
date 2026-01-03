@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace  Oro\Bundle\NotificationBundle\Command;
+namespace Oro\Bundle\NotificationBundle\Command;
 
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\NotificationBundle\Exception\NotificationSendException;
@@ -44,7 +44,6 @@ class MassNotificationCommand extends Command
             ->addOption('sender_name', null, InputOption::VALUE_OPTIONAL, 'Notification sender name')
             ->addOption('sender_email', null, InputOption::VALUE_OPTIONAL, 'Notification sender email')
             ->setHelp(
-                // @codingStandardsIgnoreStart
                 <<<'HELP'
 The <info>%command.name%</info> command sends an email notification to the recipients listed in 
 <comment>System Configuration > General Setup > Email Configuration > Maintenance Notifications > Recipients</comment>.
@@ -71,7 +70,6 @@ the default name and email address of the sender:
 
 HELP
             )
-            // @codingStandardsIgnoreEnd
             ->addUsage('--message=<message-text>')
             ->addUsage('--file=<path-to-text-file>')
             ->addUsage('--message=<message> --subject=<subject>')

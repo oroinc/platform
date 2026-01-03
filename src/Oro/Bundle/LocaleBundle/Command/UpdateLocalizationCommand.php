@@ -59,7 +59,7 @@ class UpdateLocalizationCommand extends Command
                 Translator::DEFAULT_LOCALE
             )
             ->setHelp(
-                // @codingStandardsIgnoreStart
+                // phpcs:disable
                 <<<'HELP'
 The <info>%command.name%</info> command replaces "<comment>en</comment>" in "<comment>Language</comment>" and "<comment>Formatting code</comment>"
 options of the default localization with the new values passed as <info>--language</info>
@@ -71,7 +71,7 @@ language entity for the <info>--language</info> option value if such language do
 <error>This is an internal command. Please do not run it manually.</error>
 
 HELP
-                // @codingStandardsIgnoreEnd
+                // phpcs:enable
             )
             ->addUsage('--formatting-code=<formatting-code> --language=<language>')
         ;

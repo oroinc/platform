@@ -74,7 +74,7 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
      *
      * @return OwnerTree A new instance of a OwnerTree object
      */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     public static function __set_state($data)
     {
         $result = new OwnerTree();
@@ -84,7 +84,7 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
 
         return $result;
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 
     #[\Override]
     public function getUserOrganizationId($userId)

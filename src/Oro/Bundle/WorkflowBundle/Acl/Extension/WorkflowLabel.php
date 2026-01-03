@@ -22,11 +22,11 @@ class WorkflowLabel extends Label
      *
      * @return WorkflowLabel
      */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     #[\Override]
     public static function __set_state($data)
     {
         return new WorkflowLabel($data['label']);
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 }

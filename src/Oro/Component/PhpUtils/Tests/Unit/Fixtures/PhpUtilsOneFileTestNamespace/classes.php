@@ -1,6 +1,6 @@
 <?php
 
-// @codingStandardsIgnoreStart
+// phpcs:disable
 
 namespace PhpUtilsOneFileTestNamespace;
 
@@ -11,4 +11,4 @@ class Foo
 class Baz
 {
 }
-// @codingStandardsIgnoreEnd
+// phpcs:enable

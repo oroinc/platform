@@ -64,7 +64,7 @@ class EmailTemplateAttachmentVariablesProvider
     }
 
     /**
-     * @codingStandardsIgnoreStart
+     * phpcs:disable
      *
      * @param array<string> $parents
      *  Example:
@@ -89,7 +89,7 @@ class EmailTemplateAttachmentVariablesProvider
      *
      * @return array<string, array{label: string, type: string, related_entity_name: ?string}>
      *
-     * @codingStandardsIgnoreEnd
+     * phpcs:enable
      */
     private function doGetEntityVariables(
         array $parents,

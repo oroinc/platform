@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @OroScript("Valid install script")
  */

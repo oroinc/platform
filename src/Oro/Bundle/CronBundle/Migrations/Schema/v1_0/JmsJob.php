@@ -14,7 +14,7 @@ class JmsJob implements Migration
     #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
-        // @codingStandardsIgnoreStart
+        // phpcs:disable
 
         /** Generate table jms_job_dependencies **/
         $table = $schema->createTable('jms_job_dependencies');
@@ -86,6 +86,6 @@ class JmsJob implements Migration
         $table->addForeignKeyConstraint($schema->getTable('jms_jobs'), ['originalJob_id'], ['id'], ['onDelete' => null, 'onUpdate' => null]);
         /** End of generate foreign keys for table jms_jobs **/
 
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
     }
 }

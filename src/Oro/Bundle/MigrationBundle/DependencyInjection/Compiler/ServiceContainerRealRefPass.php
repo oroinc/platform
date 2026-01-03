@@ -1,13 +1,13 @@
 <?php
 
 /*
- * @codingStandardsIgnoreStart
+ * phpcs:disable
  *
  * This file is a copy of {@see Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerRealRefPass}
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * @codingStandardsIgnoreEnd
+ * phpcs:enable
  */
 
 namespace Oro\Bundle\MigrationBundle\DependencyInjection\Compiler;

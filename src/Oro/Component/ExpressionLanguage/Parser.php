@@ -9,7 +9,7 @@ use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\ExpressionLanguage\Token;
 use Symfony\Component\ExpressionLanguage\TokenStream;
 
-// @codingStandardsIgnoreStart
+// phpcs:disable
 
 /**
  * Copy of {@see \Symfony\Component\ExpressionLanguage\Parser} with following changes:
@@ -433,4 +433,4 @@ class Parser
         return new Node\Node($args);
     }
 }
-// @codingStandardsIgnoreEnd
+// phpcs:enable

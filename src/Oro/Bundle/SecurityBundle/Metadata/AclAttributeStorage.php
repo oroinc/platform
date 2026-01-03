@@ -276,7 +276,7 @@ class AclAttributeStorage
      * @param array $data Initialization array
      * @return AclAttributeStorage A new instance of a AclAttributeStorage object
      */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     public static function __set_state($data)
     {
         $result = new AclAttributeStorage();
@@ -285,5 +285,5 @@ class AclAttributeStorage
 
         return $result;
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 }

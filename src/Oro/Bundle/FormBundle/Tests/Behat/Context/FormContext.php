@@ -74,12 +74,12 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         }, 5);
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * @When /^(?:|I )open select entity popup for field "(?P<fieldName>[\w\s]*)" in form "(?P<formName>(?:[^"]|\\")*)"$/
      * @When /^(?:|I )open select entity popup for field "(?P<fieldName>[\w\s]*)"$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iOpenSelectEntityPopup($fieldName, $formName = "OroForm")
     {
         /** @var Select2Entity $field */
@@ -87,12 +87,12 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $field->openSelectEntityPopup();
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * @When /^(?:|I )open create entity popup for field "(?P<fieldName>[\w\s]*)" in form "(?P<formName>(?:[^"]|\\")*)"$/
      * @When /^(?:|I )open create entity popup for field "(?P<fieldName>[\w\s]*)"$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iOpenCreateEntityPopup($fieldName, $formName = "OroForm")
     {
         /** @var Select2Entity $field */
@@ -498,7 +498,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $form->setInnerHtmlForElement($locator, '');
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Type value in field chapter by chapter. Imitate real user input from keyboard
      * Example: And continue typing "Common" in "search"
@@ -508,7 +508,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|I )continue typing "(?P<value>(?:[^"]|\\")*)" in "(?P<field>(?:[^"]|\\")*)" from "(?P<formName>(?:[^"]|\\")*)"$/
      * @throws ElementNotFoundException
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iContinueTypingInFieldWith($locator, $value, $formName = 'OroForm')
     {
         $locator = $this->fixStepArgument($locator);
@@ -687,7 +687,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         self::assertTrue($field->hasCheckedField($elementName));
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select:$/
      * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select pre-filled with "(?P<value>(?:[^"]|\\")*)":$/
@@ -700,7 +700,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      * @param string $value
      * @throws ElementNotFoundException
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function shouldSeeTheFollowingOptionsForSelect(
         $field,
         TableNode $options,
@@ -744,7 +744,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         }
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * @Then /^(?:|I )should not see the following options for "(?P<field>[^"]*)" select:$/
      * @Then /^(?:|I )should not see the following options for "(?P<label>[^"]*)" select pre-filled with "(?P<value>(?:[^"]|\\")*)":$/
@@ -757,7 +757,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      * @param string $value
      * @throws ElementNotFoundException
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function shouldNotSeeTheFollowingOptionsForSelect(
         $field,
         TableNode $options,
@@ -800,7 +800,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         }
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * @Then /^(?:|I )should see the "(?P<elementName>[^"]*)" element in "(?P<fieldName>[^"]*)" select$/
      * @Then /^(?:|I )should see the "(?P<elementName>[^"]*)" element in "(?P<fieldName>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)"$/
@@ -811,7 +811,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @throws ElementNotFoundException
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function shouldSeeTheFollowingElementInSelect(
         string $elementName,
         string $fieldName,
@@ -907,14 +907,14 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         );
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should not be readonly$/
      * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should not be readonly in form "(?P<formElement>(?:[^"]|\\")*)"$/
      *
      * @throws ElementNotFoundException
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function fieldShouldNotBeReadonly(string $fieldName, ?string $formElement = null): void
     {
         $field = $this->getFieldByFormName($fieldName, $formElement);
@@ -1144,12 +1144,12 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $uploadFile->setValue($fileName);
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * @When /^(?:|I )fill "(?P<fieldName>(?:[^"]|\\")*)" with absolute URL "(?P<url>(?:[^"]|\\")*)"$/
      * @When /^(?:|I )fill "(?P<fieldName>(?:[^"]|\\")*)" with absolute URL "(?P<url>(?:[^"]|\\")*)" in form "(?P<formName>(?:[^"]|\\")*)"$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iFillAbsoluteUrl(string $fieldName, string $url, string $formName = 'OroForm'): void
     {
         $element = $this->getFieldInForm($fieldName, $formName);

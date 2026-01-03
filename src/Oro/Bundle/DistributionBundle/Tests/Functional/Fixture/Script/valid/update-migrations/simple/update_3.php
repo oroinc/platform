@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @OroScript("Simple migration 3 script")
  */

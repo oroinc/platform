@@ -40,7 +40,7 @@ class SqlQuery extends AbstractQuery
         return $this->qb->getSQL();
     }
 
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     #[\Override]
     protected function _doExecute()
     {
@@ -74,7 +74,7 @@ class SqlQuery extends AbstractQuery
 
         return $this->_em->getConnection()->executeQuery($sql, $parameters, $types, $this->_queryCacheProfile);
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 
     /**
      * Deep clone of all expression objects in the SQL parts.

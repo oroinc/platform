@@ -345,7 +345,7 @@ HTML;
      */
     private function getTwigFormLayoutResult()
     {
-        // @codingStandardsIgnoreStart
+        // phpcs:disable
         $expected = <<<HTML
 <div id="form_for_layout_renderer_test" data-ftid="form_for_layout_renderer_test" data-name="form__form-for-layout-renderer-test">
     <div>
@@ -401,7 +401,7 @@ HTML;
     </div>
 </div>
 HTML;
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
 
         return $expected;
     }
@@ -411,12 +411,12 @@ HTML;
      */
     private function getFormStartTestLayoutResult()
     {
-        // @codingStandardsIgnoreStart
+        // phpcs:disable
         $expected = <<<HTML
 <form name="form_for_layout_renderer_test" method="post" action="test.php" data-ftid="form_for_layout_renderer_test" data-name="form__form-for-layout-renderer-test" id="form_for_layout_renderer_test">
 <input type="hidden" name="_method" value="PATCH"/>
 HTML;
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
 
         return $expected;
     }

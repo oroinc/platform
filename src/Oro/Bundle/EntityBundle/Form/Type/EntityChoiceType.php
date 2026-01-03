@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class EntityChoiceType extends AbstractType
 {
-    const NAME = 'oro_entity_choice';
+    public const NAME = 'oro_entity_choice';
 
     /** @var EntityProvider */
     protected $provider;
@@ -49,7 +49,7 @@ class EntityChoiceType extends AbstractType
                 'translatable_options' => false,
                 'apply_exclusions'     => true,
                 'group_by' => function () {
-                    // @codingStandardsIgnoreStart
+                    // phpcs:disable
                     /**
                      * This option was added since duplicated values are removed otherwise
                      * (which happens if there are at least 2 entities having the same translations in
@@ -60,7 +60,7 @@ class EntityChoiceType extends AbstractType
                      * then choiceView is created from each group:
                      * https://github.com/symfony/symfony/blob/c25e054d9e6b376d1f242e9d92454e7037bc4c01/src/Symfony/Component/Form/ChoiceList/Factory/DefaultChoiceListFactory.php#L174
                      */
-                    // @codingStandardsIgnoreEnd
+                    // phpcs:enable
                     return null;
                 }
             ]

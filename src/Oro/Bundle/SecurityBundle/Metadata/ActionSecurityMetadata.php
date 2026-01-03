@@ -101,7 +101,7 @@ class ActionSecurityMetadata implements ClassSecurityMetadata
      *
      * @return ActionSecurityMetadata
      */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     public static function __set_state($data)
     {
         return new ActionSecurityMetadata(
@@ -112,5 +112,5 @@ class ActionSecurityMetadata implements ClassSecurityMetadata
             $data['category']
         );
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 }

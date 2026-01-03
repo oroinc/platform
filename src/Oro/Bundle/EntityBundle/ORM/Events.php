@@ -20,16 +20,16 @@ final class Events
      *
      * @var string
      */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     public const preClose = 'preClose';
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
     /**
      * The preClear event occurs when the EntityManager#clear() operation is invoked,
      * before onClear event, i.e. before the actual clearing.
      *
      * @var string
      */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     public const preClear = 'preClear';
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 }

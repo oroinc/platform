@@ -11,7 +11,7 @@ class OroTagBundle implements Migration
     #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
-        // @codingStandardsIgnoreStart
+        // phpcs:disable
 
         /** Generate table oro_tag_tag **/
         $table = $schema->createTable('oro_tag_tag');
@@ -51,6 +51,6 @@ class OroTagBundle implements Migration
         $table->addForeignKeyConstraint($schema->getTable('oro_tag_tag'), ['tag_id'], ['id'], ['onDelete' => 'CASCADE', 'onUpdate' => null]);
         /** End of generate foreign keys for table oro_tag_tagging **/
 
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
     }
 }

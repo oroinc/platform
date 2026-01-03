@@ -119,7 +119,7 @@ class OroAssetsBuildCommand extends Command
         ;
         $this
             ->setHelp(
-                // @codingStandardsIgnoreStart
+                // phpcs:disable
                 <<<'HELP'
 The <info>%command.name%</info> command runs bin/webpack to build the web assets in all themes.
 
@@ -187,7 +187,7 @@ The <info>--iterate-themes</info> option can be used to run webpack for each ena
 
   <info>php %command.full_name% --iterate-themes</info>
 HELP
-                // @codingStandardsIgnoreEnd
+                // phpcs:enable
             );
         $this
             ->addUsage('<theme-name>')

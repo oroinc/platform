@@ -2,7 +2,7 @@
 
 $finder = PhpCsFixer\Finder::create()
     ->in([__DIR__.'/../..'])
-    ->notPath(['doctrine-extensions', 'upgrade'])
+    ->notPath(['doctrine-extensions', 'upgrade-toolkit'])
     ->files()
     ->name('*.php')
     ->notName('*.php.twig')
@@ -18,7 +18,7 @@ $config->setRules([
         'psr_autoloading' => true,
 
         '@PSR12' => true,
-        'visibility_required' => ['elements' => ['method', 'property']],
+        'modifier_keywords' => ['elements' => ['method', 'property']],
         // imports
         'ordered_imports' => true,
         'no_unused_imports' => true,

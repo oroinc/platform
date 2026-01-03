@@ -117,7 +117,7 @@ class WorkflowAclMetadata implements ClassSecurityMetadata
      *
      * @return WorkflowAclMetadata
      */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     public static function __set_state($data)
     {
         return new WorkflowAclMetadata(
@@ -129,5 +129,5 @@ class WorkflowAclMetadata implements ClassSecurityMetadata
             $data['category']
         );
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 }

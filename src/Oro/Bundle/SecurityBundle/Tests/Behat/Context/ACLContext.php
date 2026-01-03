@@ -75,7 +75,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware
         $clickElement->click();
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Set access level for action for specified entity for role
      * Two roles is supported - User and Administrator
@@ -87,7 +87,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware
      * @Given /^(?P<user>(administrator|user)) permissions on (?P<action>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) is set to (?P<accessLevel>(?:[^"]|\\")*)$/
      * @When /^(?:|I )set (?P<user>(administrator|user)) permissions on (?P<action>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) to (?P<accessLevel>(?:[^"]|\\")*)$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iHavePermissionsForEntity($entity, $action, $accessLevel, $user)
     {
         $role = $this->getRole($user);
@@ -169,7 +169,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware
         $this->getMink()->setDefaultSessionName('first_session');
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Set access level for several actions for specified entity for role
      * Two roles is supported - User and Administrator
@@ -179,7 +179,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @Given /^(?P<user>(administrator|user)) permissions on (?P<action1>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) as (?P<accessLevel1>(?:[^"]|\\")*) and on (?P<action2>(?:|View|Create|Edit|Delete|Assign|Share)) as (?P<accessLevel2>(?:[^"]|\\")*)$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iHaveSeveralPermissionsForEntity($user, $entity, $action1, $accessLevel1, $action2, $accessLevel2)
     {
         $role = $this->getRole($user);
@@ -405,12 +405,12 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware
         }
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * @Then /^the permission "(?P<permission>(?:[^"]|\\")*)" for field "(?P<fieldName>(?:[^"]|\\")*)" is set to "(?P<accessLevel>(?:[^"]|\\")*)"$/
      * @Then /^the permission "(?P<permission>(?:[^"]|\\")*)" for transition "(?P<fieldName>(?:[^"]|\\")*)" is set to "(?P<accessLevel>(?:[^"]|\\")*)"$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function permissionIsSetTo(string $fieldName, string $permission, string $accessLevel): void
     {
         $element = $this->getPermissionDropdownForField($fieldName, $permission);
@@ -432,12 +432,12 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware
         );
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * @When /^(?:|I )open "(?P<permission>(?:[^"]|\\")*)" permission dropdown for "(?P<fieldName>(?:[^"]|\\")*)" transition$/
      * @When /^(?:|I )open "(?P<permission>(?:[^"]|\\")*)" permission dropdown for "(?P<fieldName>(?:[^"]|\\")*)" field$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iOpenPermissionDropdown(string $permission, string $fieldName): void
     {
         $element = $this->getPermissionDropdownForField($fieldName, $permission);

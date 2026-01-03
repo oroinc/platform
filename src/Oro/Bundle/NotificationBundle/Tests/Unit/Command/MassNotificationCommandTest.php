@@ -1,6 +1,6 @@
 <?php
 
-namespace  Oro\Bundle\NotificationBundle\Tests\Unit\Command;
+namespace Oro\Bundle\NotificationBundle\Tests\Unit\Command;
 
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;

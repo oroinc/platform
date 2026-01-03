@@ -87,7 +87,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ->addOption('skip-translations', null, InputOption::VALUE_NONE, 'Skip applying translations')
             ->addOption('drop-database', null, InputOption::VALUE_NONE, 'Delete all existing data')
             ->addOption('default-currency', null, InputOption::VALUE_OPTIONAL, 'Oro default currency')
-            // @codingStandardsIgnoreStart
+            // phpcs:disable
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command is the application installer. It installs the application
@@ -173,7 +173,7 @@ HELP
             ->addUsage('--drop-database')
             ->addUsage("-vvv --env=prod --timeout=600 --language=en --formatting-code=en_US --organization-name=<company> --user-name=<username> --user-email=<email> --user-firstname=<firstname> --user-lastname=<lastname> --user-password=<password> --application-url=<url> --sample-data=y")
             ->addUsage("-vvv --env=prod --timeout=600 --language=en --formatting-code=en_US --organization-name='Acme Inc.' --user-name=admin --user-email=admin@example.com --user-firstname=John --user-lastname=Doe --user-password='PleaseReplaceWithSomeStrongPassword' --application-url='http://example.com/' --sample-data=y")
-            // @codingStandardsIgnoreEnd
+            // phpcs:enable
         ;
 
         parent::configure();

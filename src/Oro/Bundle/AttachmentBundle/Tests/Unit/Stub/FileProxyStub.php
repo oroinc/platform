@@ -14,7 +14,7 @@ class FileProxyStub extends File implements Proxy
         $this->initialized = $initialized;
     }
 
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     #[\Override]
     public function __load()
     {
@@ -26,5 +26,5 @@ class FileProxyStub extends File implements Proxy
     {
         return $this->initialized;
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 }

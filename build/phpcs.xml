@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="OroProject" xsi:noNamespaceSchemaLocation="https://schema.phpcodesniffer.com/phpcs.xsd">
+    <description>Project-specific ruleset using the Oro standard.</description>
+
+    <!-- Include the Oro external standard (which includes PSR12 and custom sniffs) -->
+    <rule ref="Oro"/>
+
+    <!-- Project-specific exclusions -->
+    <exclude-pattern>*/Acme/*</exclude-pattern>
+    <exclude-pattern>*/Rector/*</exclude-pattern>
+    <exclude-pattern>*/sets/*</exclude-pattern>
+    <exclude-pattern>*/doctrine-em-loader.php</exclude-pattern>
+</ruleset>

@@ -123,12 +123,12 @@ JS;
         $this->filesCount[$extension] = $this->countFilesInAttachmentFilesystem($extension);
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * @Then /^number of files in attachment directory is (?P<count>[\d]+) (?P<operator>(?:less|more)) than remembered$/
      * @Then /^number of files with extension "(?P<extension>[^"]+)" in attachment directory is (?P<count>[\d]+) (?P<operator>(?:less|more)) than remembered$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function numberOfAttachmentFilesIsChangedBy(string $operator, int $count, string $extension = ''): void
     {
         $currentCount = $this->countFilesInAttachmentFilesystem($extension);

@@ -12,7 +12,7 @@ use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\ExpressionLanguage\Token;
 use Symfony\Component\ExpressionLanguage\TokenStream;
 
-// @codingStandardsIgnoreStart
+// phpcs:disable
 
 /**
  * Copy of {@see \Symfony\Component\ExpressionLanguage\Lexer} with the following changes:
@@ -117,4 +117,4 @@ class Lexer
         return new TokenStream($tokens, $expression);
     }
 }
-// @codingStandardsIgnoreEnd
+// phpcs:enable

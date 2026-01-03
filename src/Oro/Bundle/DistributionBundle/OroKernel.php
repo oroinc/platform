@@ -353,7 +353,7 @@ abstract class OroKernel extends Kernel
         $cachePath = $cache->getPath();
 
         $errorLevel = $this->getErrorReportingLevel();
-        // @codingStandardsIgnoreStart
+        // phpcs:disable
         try {
             if (file_exists($cachePath) && \is_object($this->container = include $cachePath)
                 && (!$this->debug || (self::$freshCache[$k = $cachePath.'.'.$this->environment] ?? self::$freshCache[$k] = $cache->isFresh()))
@@ -496,7 +496,7 @@ abstract class OroKernel extends Kernel
 
             touch($oldContainerDir.'.legacy');
         }
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
         if ($this->container->has('cache_warmer')) {
             $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
         }

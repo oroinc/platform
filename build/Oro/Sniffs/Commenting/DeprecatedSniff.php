@@ -7,7 +7,7 @@ use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Util\Tokens;
 
 /**
- * Checks if code have deprecation annotation.
+ * Checks if the code has deprecation annotation.
  *
  * @category PHP
  */
@@ -23,7 +23,7 @@ class DeprecatedSniff implements Sniff
 
     public function register()
     {
-        return array_diff(Tokens::$commentTokens, Tokens::$phpcsCommentTokens);
+        return array_diff(Tokens::COMMENT_TOKENS, Tokens::PHPCS_ANNOTATION_TOKENS);
     }
 
     public function process(File $phpcsFile, $stackPtr)

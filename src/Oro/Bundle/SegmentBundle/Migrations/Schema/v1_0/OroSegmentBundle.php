@@ -11,7 +11,7 @@ class OroSegmentBundle implements Migration
     #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
-        // @codingStandardsIgnoreStart
+        // phpcs:disable
 
         /** Generate table oro_segment **/
         $table = $schema->createTable('oro_segment');
@@ -61,6 +61,6 @@ class OroSegmentBundle implements Migration
         $table->addForeignKeyConstraint($schema->getTable('oro_segment'), ['segment_id'], ['id'], ['onDelete' => 'CASCADE', 'onUpdate' => null]);
         /** End of generate foreign keys for table oro_segment_snapshot **/
 
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
     }
 }

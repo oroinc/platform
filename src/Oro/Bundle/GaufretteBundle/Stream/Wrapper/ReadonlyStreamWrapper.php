@@ -23,7 +23,7 @@ class ReadonlyStreamWrapper extends StreamWrapper
         }
     }
 
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     #[\Override]
     public function url_stat($path, $flags)
     {
@@ -36,23 +36,23 @@ class ReadonlyStreamWrapper extends StreamWrapper
 
         return $stream->stat();
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     #[\Override]
     public function stream_write($data)
     {
         throw new \LogicException('The Read-only stream does not allow write.');
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     #[\Override]
     public function stream_flush()
     {
         throw new \LogicException('The Read-only stream does not allow flush.');
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 
     #[\Override]
     public function unlink($path)

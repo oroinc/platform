@@ -81,11 +81,11 @@ class DatabasePlatformMock extends AbstractPlatform
     }
 
     /** @override */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     #[\Override]
     protected function _getCommonIntegerTypeDeclarationSQL(array $columnDef)
     {
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
     }
 
     /** @override */

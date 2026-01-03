@@ -25,10 +25,10 @@ class DriverMock implements \Doctrine\DBAL\Driver
      * @return string  The DSN.
      * @override
      */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     protected function _constructPdoDsn(array $params)
     {
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
         return "";
     }
 

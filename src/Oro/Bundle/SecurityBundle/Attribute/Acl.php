@@ -242,7 +242,7 @@ class Acl
      * @param array $data Initialization array
      * @return Acl A new instance of a Acl object
      */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     public static function __set_state($data)
     {
         $result = new Acl(validate: false);
@@ -258,5 +258,5 @@ class Acl
 
         return $result;
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 }

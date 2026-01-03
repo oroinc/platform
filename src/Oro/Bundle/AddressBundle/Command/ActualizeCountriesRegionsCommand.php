@@ -74,7 +74,6 @@ class ActualizeCountriesRegionsCommand extends Command
                 'Remove countries and regions from our storage'
             )
             ->setHelp(
-                // @codingStandardsIgnoreStart
                 <<<'HELP'
 The <info>%command.name%</info> command for updating countries and regions data 
 from external provider.
@@ -99,7 +98,6 @@ HELP
             ->addUsage('--update-full-data')
             ->addUsage('--add-new-data')
             ->addUsage('--remove-old-data')
-            // @codingStandardsIgnoreEnd
         ;
     }
 

@@ -11,7 +11,7 @@ class OroImapBundle implements Migration
     #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
-        // @codingStandardsIgnoreStart
+        // phpcs:disable
 
         /** Generate table oro_email_folder_imap **/
         $table = $schema->createTable('oro_email_folder_imap');
@@ -49,6 +49,6 @@ class OroImapBundle implements Migration
         $table->addColumn('imap_user', 'string', ['notnull' => false, 'length' => 100]);
         $table->addColumn('imap_password', 'string', ['notnull' => false, 'length' => 100]);
 
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
     }
 }
