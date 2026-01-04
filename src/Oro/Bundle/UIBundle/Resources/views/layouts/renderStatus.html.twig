@@ -10,11 +10,26 @@ Parameters - array:
 {% macro status(parameters) %}
     {% apply spaceless %}
         {% set label = parameters.label|default('') %}
+        {% set tooltip = parameters.tooltip|default(null) %}
+        {% set tooltipTemplate = parameters.tooltipTemplate|default(null) %}
+        {% set placement = parameters.tooltipPlacement|default('bottom') %}
+        {% set offset = parameters.tooltipOffset|default('-8, 0') %}
         {% set code = parameters.code|default('') %}
         {% set map = parameters.map|default([]) %}
         {% set codeKey = code is iterable ? '' : code %}
         {% set classes = map[codeKey] is defined ? ' status-label--' ~ map[codeKey] : '' %}
-        <span class="status-label{{ classes }}">{{ label }}</span>
+        <span class="status-label{{ classes }}"
+            {% if tooltip %}
+                title="{{ tooltip }}"
+                data-toggle="tooltip"
+                data-placement="{{ placement }}"
+                data-offset="{{ offset }}"
+                data-trigger="hover"
+                {% if tooltipTemplate %}
+                    data-template="{{ tooltipTemplate }}"
+                {% endif %}
+            {% endif %}
+        >{{ label }}</span>
     {% endapply %}
 {% endmacro %}
 
