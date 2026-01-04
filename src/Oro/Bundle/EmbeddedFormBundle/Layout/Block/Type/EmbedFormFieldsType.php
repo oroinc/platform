@@ -24,9 +24,9 @@ use Symfony\Component\OptionsResolver\Options;
  */
 class EmbedFormFieldsType extends AbstractFormType
 {
-    const NAME = 'embed_form_fields';
+    public const NAME = 'embed_form_fields';
 
-    const SHORT_NAME = 'fields';
+    public const SHORT_NAME = 'fields';
 
     /** @var FormLayoutBuilderInterface */
     protected $formLayoutBuilder;

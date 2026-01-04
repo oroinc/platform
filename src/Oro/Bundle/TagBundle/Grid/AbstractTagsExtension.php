@@ -16,10 +16,10 @@ abstract class AbstractTagsExtension extends AbstractExtension
 {
     use UnsupportedGridPrefixesTrait;
 
-    const GRID_FILTERS_PATH = '[filters][columns]';
-    const GRID_SORTERS_PATH = '[sorters][columns]';
-    const FILTER_COLUMN_NAME = 'tagname';
-    const PROPERTY_ID_PATH   = '[properties][id]';
+    public const GRID_FILTERS_PATH = '[filters][columns]';
+    public const GRID_SORTERS_PATH = '[sorters][columns]';
+    public const FILTER_COLUMN_NAME = 'tagname';
+    public const PROPERTY_ID_PATH   = '[properties][id]';
 
     /** @var TagManager */
     protected $tagManager;

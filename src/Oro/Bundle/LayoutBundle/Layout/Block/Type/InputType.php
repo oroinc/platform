@@ -14,7 +14,7 @@ use Oro\Component\Layout\Util\BlockUtils;
  */
 class InputType extends AbstractType
 {
-    const NAME = 'input';
+    public const NAME = 'input';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

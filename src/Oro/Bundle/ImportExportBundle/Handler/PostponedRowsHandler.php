@@ -19,9 +19,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class PostponedRowsHandler
 {
-    const MAX_ATTEMPTS = 30;
+    public const MAX_ATTEMPTS = 30;
 
-    const DELAY_SECONDS = 5;
+    public const DELAY_SECONDS = 5;
 
     /**
      * @var FileManager

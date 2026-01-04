@@ -7,13 +7,13 @@ namespace Oro\Component\MessageQueue\Job;
  */
 class Job
 {
-    const STATUS_NEW = 'oro.message_queue_job.status.new';
-    const STATUS_RUNNING = 'oro.message_queue_job.status.running';
-    const STATUS_SUCCESS = 'oro.message_queue_job.status.success';
-    const STATUS_FAILED = 'oro.message_queue_job.status.failed';
-    const STATUS_FAILED_REDELIVERED = 'oro.message_queue_job.status.failed_redelivered';
-    const STATUS_CANCELLED = 'oro.message_queue_job.status.cancelled';
-    const STATUS_STALE = 'oro.message_queue_job.status.stale';
+    public const STATUS_NEW = 'oro.message_queue_job.status.new';
+    public const STATUS_RUNNING = 'oro.message_queue_job.status.running';
+    public const STATUS_SUCCESS = 'oro.message_queue_job.status.success';
+    public const STATUS_FAILED = 'oro.message_queue_job.status.failed';
+    public const STATUS_FAILED_REDELIVERED = 'oro.message_queue_job.status.failed_redelivered';
+    public const STATUS_CANCELLED = 'oro.message_queue_job.status.cancelled';
+    public const STATUS_STALE = 'oro.message_queue_job.status.stale';
 
     protected ?int $id = null;
 

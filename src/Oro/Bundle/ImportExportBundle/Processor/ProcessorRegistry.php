@@ -7,10 +7,10 @@ use Oro\Bundle\ImportExportBundle\Exception\UnexpectedValueException;
 
 class ProcessorRegistry
 {
-    const TYPE_EXPORT = 'export';
-    const TYPE_EXPORT_TEMPLATE = 'export_template';
-    const TYPE_IMPORT = 'import';
-    const TYPE_IMPORT_VALIDATION = 'import_validation';
+    public const TYPE_EXPORT = 'export';
+    public const TYPE_EXPORT_TEMPLATE = 'export_template';
+    public const TYPE_IMPORT = 'import';
+    public const TYPE_IMPORT_VALIDATION = 'import_validation';
 
     /**
      * Processor storage format:

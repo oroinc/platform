@@ -4,7 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Converter;
 
 class PhpDateTimeFormatConverter extends AbstractDateTimeFormatConverter
 {
-    const NAME = 'php';
+    public const NAME = 'php';
 
     /**
      * ICU format => PHP date format

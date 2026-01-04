@@ -10,15 +10,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class PasswordTooltipProvider
 {
-    const BASE = 'oro.user.password_complexity.';
-    const SPECIAL_CHARS_LIST = '!"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~';
-    const UNRESTRICTED = self::BASE . 'unrestricted';
-    const MIN_LENGTH = 'min_length';
-    const LOWER_CASE = 'lower_case';
-    const UPPER_CASE = 'upper_case';
-    const NUMBERS = 'numbers';
-    const SPECIAL_CHARS = 'special_chars';
-    const SEPARATOR = '_';
+    public const BASE = 'oro.user.password_complexity.';
+    public const SPECIAL_CHARS_LIST = '!"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~';
+    public const UNRESTRICTED = self::BASE . 'unrestricted';
+    public const MIN_LENGTH = 'min_length';
+    public const LOWER_CASE = 'lower_case';
+    public const UPPER_CASE = 'upper_case';
+    public const NUMBERS = 'numbers';
+    public const SPECIAL_CHARS = 'special_chars';
+    public const SEPARATOR = '_';
 
     /**
      * @var array Map of the config keys and their corresponding tooltip translation keys

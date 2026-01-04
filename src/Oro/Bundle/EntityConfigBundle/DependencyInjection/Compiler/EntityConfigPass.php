@@ -21,14 +21,14 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class EntityConfigPass implements CompilerPassInterface
 {
-    const CONFIG_MANAGER_SERVICE         = 'oro_entity_config.config_manager';
-    const CONFIG_BAG_SERVICE             = 'oro_entity_config.provider_config_bag';
-    const CONFIG_PROVIDER_BAG_SERVICE    = 'oro_entity_config.provider_bag';
-    const CONFIG_PROVIDER_SERVICE_PREFIX = 'oro_entity_config.provider.';
-    const CONFIG_CACHE_SERVICE           = 'oro_entity_config.cache';
-    const CONFIG_HANDLER_SERVICE         = 'oro_entity_config.configuration_handler';
+    public const CONFIG_MANAGER_SERVICE         = 'oro_entity_config.config_manager';
+    public const CONFIG_BAG_SERVICE             = 'oro_entity_config.provider_config_bag';
+    public const CONFIG_PROVIDER_BAG_SERVICE    = 'oro_entity_config.provider_bag';
+    public const CONFIG_PROVIDER_SERVICE_PREFIX = 'oro_entity_config.provider.';
+    public const CONFIG_CACHE_SERVICE           = 'oro_entity_config.cache';
+    public const CONFIG_HANDLER_SERVICE         = 'oro_entity_config.configuration_handler';
 
-    const ENTITY_CONFIG_ROOT_NODE = 'entity_config';
+    public const ENTITY_CONFIG_ROOT_NODE = 'entity_config';
 
     private const CONFIG_FILE = 'Resources/config/oro/entity_config.yml';
 

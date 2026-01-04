@@ -10,9 +10,9 @@ use Oro\Component\Layout\Util\BlockUtils;
 
 class EmbedFormStartType extends AbstractFormType
 {
-    const NAME = 'embed_form_start';
+    public const NAME = 'embed_form_start';
 
-    const SHORT_NAME = 'start';
+    public const SHORT_NAME = 'start';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

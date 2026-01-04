@@ -8,9 +8,9 @@ use Oro\Bundle\AddressBundle\Entity\Country;
 
 class LoadCountryData extends AbstractFixture
 {
-    const COUNTRY_USA = 'country.usa';
-    const COUNTRY_MEXICO = 'country.mexico';
-    const COUNTRY_GERMANY = 'country.germany';
+    public const COUNTRY_USA = 'country.usa';
+    public const COUNTRY_MEXICO = 'country.mexico';
+    public const COUNTRY_GERMANY = 'country.germany';
 
     /** @var array */
     protected $countries = [

@@ -15,9 +15,9 @@ use Symfony\Component\Routing\Route;
  */
 class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterface
 {
-    const ROUTE_GROUP = 'dictionary_entity';
-    const ENTITY_ATTRIBUTE = 'dictionary';
-    const ENTITY_PLACEHOLDER = '{dictionary}';
+    public const ROUTE_GROUP = 'dictionary_entity';
+    public const ENTITY_ATTRIBUTE = 'dictionary';
+    public const ENTITY_PLACEHOLDER = '{dictionary}';
 
     /** @var ChainDictionaryValueListProvider */
     private $dictionaryProvider;

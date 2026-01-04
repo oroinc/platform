@@ -7,10 +7,10 @@ namespace Oro\Bundle\ReminderBundle\Model;
  */
 class ReminderInterval
 {
-    const UNIT_MINUTE = 'M';
-    const UNIT_HOUR   = 'H';
-    const UNIT_DAY    = 'D';
-    const UNIT_WEEK   = 'W';
+    public const UNIT_MINUTE = 'M';
+    public const UNIT_HOUR   = 'H';
+    public const UNIT_DAY    = 'D';
+    public const UNIT_WEEK   = 'W';
 
     /**
      * @var int

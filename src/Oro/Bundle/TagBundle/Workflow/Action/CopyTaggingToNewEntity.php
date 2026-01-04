@@ -23,9 +23,9 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class CopyTaggingToNewEntity extends AbstractAction
 {
-    const PATH_SOURCE       = 'source';
-    const PATH_DESTINATION  = 'destination';
-    const PATH_ORGANIZATION = 'organization';
+    public const PATH_SOURCE       = 'source';
+    public const PATH_DESTINATION  = 'destination';
+    public const PATH_ORGANIZATION = 'organization';
 
     /** @var TagManager */
     protected $tagManager;

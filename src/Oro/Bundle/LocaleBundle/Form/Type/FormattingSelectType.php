@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormattingSelectType extends AbstractType
 {
-    const NAME = 'oro_formatting_select';
+    public const NAME = 'oro_formatting_select';
 
     /**
      * @var LocalizationChoicesProvider

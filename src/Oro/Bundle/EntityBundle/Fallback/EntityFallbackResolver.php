@@ -27,13 +27,13 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
  */
 class EntityFallbackResolver
 {
-    const TYPE_BOOLEAN = 'boolean';
-    const TYPE_STRING = 'string';
-    const TYPE_INTEGER = 'integer';
-    const TYPE_DECIMAL = 'decimal';
-    const TYPE_ARRAY = 'array';
+    public const TYPE_BOOLEAN = 'boolean';
+    public const TYPE_STRING = 'string';
+    public const TYPE_INTEGER = 'integer';
+    public const TYPE_DECIMAL = 'decimal';
+    public const TYPE_ARRAY = 'array';
 
-    const FALLBACK_FIELD_NAME = 'fieldName';
+    public const FALLBACK_FIELD_NAME = 'fieldName';
 
     /** @var array */
     public static $allowedTypes = [

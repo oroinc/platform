@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class RegionType extends AbstractType
 {
-    const COUNTRY_OPTION_KEY = 'country_field';
+    public const COUNTRY_OPTION_KEY = 'country_field';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

@@ -11,7 +11,7 @@ use Doctrine\ORM\Query\TreeWalkerAdapter;
  */
 class CurrentUserWalker extends TreeWalkerAdapter
 {
-    const HINT_SECURITY_CONTEXT = 'oro_security.current_user_walker.security_context';
+    public const HINT_SECURITY_CONTEXT = 'oro_security.current_user_walker.security_context';
 
     #[\Override]
     public function walkSelectStatement(AST\SelectStatement $AST)

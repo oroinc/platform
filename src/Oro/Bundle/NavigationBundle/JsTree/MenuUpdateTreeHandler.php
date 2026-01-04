@@ -11,8 +11,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class MenuUpdateTreeHandler
 {
-    const MENU_ITEM_DIVIDER_LABEL = '---------------';
-    const ROOT_PARENT_VALUE = '#';
+    public const MENU_ITEM_DIVIDER_LABEL = '---------------';
+    public const ROOT_PARENT_VALUE = '#';
 
     /**
      * Used to hide inaccessible menu items for back-office menu tree

@@ -15,7 +15,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Status;
  */
 class ChannelRepository extends EntityRepository
 {
-    const BUFFER_SIZE = 100;
+    public const BUFFER_SIZE = 100;
 
     /**
      * Returns latest status for integration's connector and code if it exists.

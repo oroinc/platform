@@ -20,7 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class OroEntityCreateOrSelectChoiceType extends AbstractType
 {
-    const NAME = 'oro_entity_create_or_select_choice';
+    public const NAME = 'oro_entity_create_or_select_choice';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;

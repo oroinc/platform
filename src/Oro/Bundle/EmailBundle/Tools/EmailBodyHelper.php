@@ -7,7 +7,7 @@ namespace Oro\Bundle\EmailBundle\Tools;
  */
 class EmailBodyHelper
 {
-    const MAX_STRING_LENGTH = 500;
+    public const MAX_STRING_LENGTH = 500;
 
     /**
      * Returns the plain text representation of email body

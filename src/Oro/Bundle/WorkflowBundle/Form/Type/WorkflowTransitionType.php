@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WorkflowTransitionType extends AbstractType
 {
-    const NAME = 'oro_workflow_transition';
+    public const NAME = 'oro_workflow_transition';
 
     public function getName()
     {

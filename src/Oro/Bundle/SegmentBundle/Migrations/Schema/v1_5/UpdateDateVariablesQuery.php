@@ -13,7 +13,7 @@ class UpdateDateVariablesQuery implements MigrationQuery, ConnectionAwareInterfa
 {
     use ConnectionAwareTrait;
 
-    const LIMIT = 100;
+    public const LIMIT = 100;
 
     /** @var string */
     protected $segmentTable;

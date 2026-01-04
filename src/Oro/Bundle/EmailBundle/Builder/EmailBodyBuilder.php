@@ -13,8 +13,8 @@ use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
  */
 class EmailBodyBuilder
 {
-    const ORO_EMAIL_ATTACHMENT_SYNC_ENABLE = 'oro_email.attachment_sync_enable';
-    const ORO_EMAIL_ATTACHMENT_SYNC_MAX_SIZE = 'oro_email.attachment_sync_max_size';
+    public const ORO_EMAIL_ATTACHMENT_SYNC_ENABLE = 'oro_email.attachment_sync_enable';
+    public const ORO_EMAIL_ATTACHMENT_SYNC_MAX_SIZE = 'oro_email.attachment_sync_max_size';
 
     /**
      * @var EmailBody

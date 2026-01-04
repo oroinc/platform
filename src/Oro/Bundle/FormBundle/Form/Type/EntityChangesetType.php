@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EntityChangesetType extends AbstractType
 {
-    const NAME = 'oro_entity_changeset';
+    public const NAME = 'oro_entity_changeset';
 
     /**
      * @var DoctrineHelper

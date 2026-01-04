@@ -378,7 +378,7 @@ abstract class OroKernel extends Kernel
                 //if (!flock($lock, $wouldBlock ? LOCK_SH : LOCK_EX)) {
                 //    fclose($lock);
                 //} else {
-                $cache = new class($cachePath, $this->debug) extends ConfigCache {
+                $cache = new class ($cachePath, $this->debug) extends ConfigCache {
                     public $lock;
 
                     public function write($content, ?array $metadata = null)

@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ChoiceTreeFilterLoadDataEvent extends Event
 {
-    const EVENT_NAME = 'oro_filter.choice_tree_filter_load_data';
+    public const EVENT_NAME = 'oro_filter.choice_tree_filter_load_data';
 
     /** @var String */
     protected $className;

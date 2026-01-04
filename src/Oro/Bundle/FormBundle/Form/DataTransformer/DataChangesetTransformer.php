@@ -8,7 +8,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class DataChangesetTransformer implements DataTransformerInterface
 {
-    const DATA_KEY = 'data';
+    public const DATA_KEY = 'data';
 
     #[\Override]
     public function transform($value)

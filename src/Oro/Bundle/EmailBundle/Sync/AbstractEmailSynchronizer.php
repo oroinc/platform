@@ -29,10 +29,10 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
 {
     use LoggerAwareTrait;
 
-    const SYNC_CODE_IN_PROCESS = 1;
-    const SYNC_CODE_FAILURE    = 2;
-    const SYNC_CODE_SUCCESS    = 3;
-    const SYNC_CODE_IN_PROCESS_FORCE = 4;
+    public const SYNC_CODE_IN_PROCESS = 1;
+    public const SYNC_CODE_FAILURE    = 2;
+    public const SYNC_CODE_SUCCESS    = 3;
+    public const SYNC_CODE_IN_PROCESS_FORCE = 4;
 
     protected static string $messageQueueTopic = '';
     protected string $clearInterval = 'P1D';

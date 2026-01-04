@@ -4,9 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Exception;
 
 class InvalidTransitionException extends WorkflowException
 {
-    const UNKNOWN_TRANSITION = 1;
-    const NOT_START_TRANSITION = 2;
-    const STEP_HAS_NO_ALLOWED_TRANSITION = 3;
+    public const UNKNOWN_TRANSITION = 1;
+    public const NOT_START_TRANSITION = 2;
+    public const STEP_HAS_NO_ALLOWED_TRANSITION = 3;
 
     public static function unknownTransition($transitionName)
     {

@@ -6,8 +6,8 @@ use Behat\Mink\Element\NodeElement;
 
 class Tabs extends Element
 {
-    const SELECTOR_TAB_HEADER = '.tab-collection ul li a';
-    const SELECTOR_TAB_CONTENT = '.tab-content';
+    public const SELECTOR_TAB_HEADER = '.tab-collection ul li a';
+    public const SELECTOR_TAB_CONTENT = '.tab-content';
 
     /**
      * @param string $tabName

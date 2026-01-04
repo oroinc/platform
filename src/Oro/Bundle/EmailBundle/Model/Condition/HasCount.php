@@ -11,9 +11,9 @@ class HasCount extends AbstractCondition implements ContextAccessorAwareInterfac
 {
     use ContextAccessorAwareTrait;
 
-    const OP_EQUAL   = 'equal_to';
-    const OP_GREATER = 'greater_than';
-    const OP_LESS    = 'less_than';
+    public const OP_EQUAL   = 'equal_to';
+    public const OP_GREATER = 'greater_than';
+    public const OP_LESS    = 'less_than';
 
     protected $countable;
     protected $operation;

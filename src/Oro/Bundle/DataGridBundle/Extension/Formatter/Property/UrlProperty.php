@@ -11,11 +11,11 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class UrlProperty extends AbstractProperty
 {
-    const ROUTE_KEY       = 'route';
-    const IS_ABSOLUTE_KEY = 'isAbsolute';
-    const ANCHOR_KEY      = 'anchor';
-    const PARAMS_KEY      = 'params';
-    const DIRECT_PARAMS_KEY = 'direct_params';
+    public const ROUTE_KEY       = 'route';
+    public const IS_ABSOLUTE_KEY = 'isAbsolute';
+    public const ANCHOR_KEY      = 'anchor';
+    public const PARAMS_KEY      = 'params';
+    public const DIRECT_PARAMS_KEY = 'direct_params';
 
     /** @var array */
     protected $excludeParams = [self::ROUTE_KEY, self::IS_ABSOLUTE_KEY, self::ANCHOR_KEY, self::PARAMS_KEY];

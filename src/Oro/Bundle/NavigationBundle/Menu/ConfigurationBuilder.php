@@ -17,7 +17,7 @@ class ConfigurationBuilder implements BuilderInterface
     public const MAX_NESTING_LEVEL = 'max_nesting_level';
     public const WARNING = 'warning';
 
-    const DEFAULT_SCOPE_TYPE = 'menu_default_visibility';
+    public const DEFAULT_SCOPE_TYPE = 'menu_default_visibility';
 
     /** @var ResolverInterface */
     protected $resolver;

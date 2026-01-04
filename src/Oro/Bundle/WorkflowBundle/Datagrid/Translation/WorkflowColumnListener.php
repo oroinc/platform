@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 
 class WorkflowColumnListener
 {
-    const COLUMN_NAME = 'workflow';
+    public const COLUMN_NAME = 'workflow';
 
     public function onBuildBefore(BuildBefore $event)
     {

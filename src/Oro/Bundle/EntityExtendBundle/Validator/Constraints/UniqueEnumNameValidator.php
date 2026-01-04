@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class UniqueEnumNameValidator extends ConstraintValidator
 {
-    const ALIAS = 'oro_entity_extend.validator.unique_enum_name';
+    public const ALIAS = 'oro_entity_extend.validator.unique_enum_name';
 
     /**
      * @var ConfigManager

@@ -14,7 +14,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class CountQueryOptimizationEvent extends Event
 {
-    const EVENT_NAME = 'oro.entity.count_query.optimize';
+    public const EVENT_NAME = 'oro.entity.count_query.optimize';
 
     /** @var QueryOptimizationContext */
     protected $context;

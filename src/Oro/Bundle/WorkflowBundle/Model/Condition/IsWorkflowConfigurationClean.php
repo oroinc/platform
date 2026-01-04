@@ -13,7 +13,7 @@ class IsWorkflowConfigurationClean extends AbstractCondition implements ContextA
 {
     use ContextAccessorAwareTrait;
 
-    const NAME = 'is_workflow_configuration_clean';
+    public const NAME = 'is_workflow_configuration_clean';
 
     /** @var ConfigurationChecker */
     protected $checker;

@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class OroPercentType extends AbstractType
 {
-    const NAME = 'oro_percent';
+    public const NAME = 'oro_percent';
 
     public function getName()
     {

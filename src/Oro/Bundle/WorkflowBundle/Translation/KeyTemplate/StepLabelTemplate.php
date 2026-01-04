@@ -7,7 +7,7 @@ namespace Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
  */
 class StepLabelTemplate extends StepTemplate
 {
-    const NAME = 'step_label';
+    public const NAME = 'step_label';
 
     #[\Override]
     public function getTemplate(): string

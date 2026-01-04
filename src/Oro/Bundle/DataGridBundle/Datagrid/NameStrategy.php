@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class NameStrategy implements NameStrategyInterface
 {
-    const DELIMITER = ':';
+    public const DELIMITER = ':';
 
     /** @var RequestStack */
     private $requestStack;

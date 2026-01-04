@@ -16,7 +16,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class ConfigObject implements \ArrayAccess, \IteratorAggregate
 {
-    const NAME_KEY = 'name';
+    public const NAME_KEY = 'name';
 
     /** @var PropertyAccessorInterface */
     protected $accessor;

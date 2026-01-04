@@ -15,7 +15,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class PreBuild extends Event implements GridConfigurationEventInterface
 {
-    const NAME = 'oro_datagrid.datagrid.build.pre';
+    public const NAME = 'oro_datagrid.datagrid.build.pre';
 
     /** @var DatagridConfiguration */
     protected $config;

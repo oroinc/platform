@@ -6,7 +6,7 @@ use Symfony\Component\Form\AbstractType;
 
 class OroResizeableRichTextType extends AbstractType
 {
-    const NAME = 'oro_resizeable_rich_text';
+    public const NAME = 'oro_resizeable_rich_text';
 
     public function getName()
     {

@@ -11,7 +11,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class FakeRestClientFactory implements RestClientFactoryInterface
 {
-    const DEFAULT_RESPONSE = '__DEFAULT__';
+    public const DEFAULT_RESPONSE = '__DEFAULT__';
 
     /** @var string Fixture file path */
     protected $fixtureFile;

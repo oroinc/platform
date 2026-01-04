@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class GenderType extends AbstractType
 {
-    const NAME = 'oro_gender';
+    public const NAME = 'oro_gender';
 
     /**
      * @var GenderProvider

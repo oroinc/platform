@@ -10,7 +10,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class ExpressionGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionInterface
 {
-    const NODE_CONDITIONS = 'conditions';
+    public const NODE_CONDITIONS = 'conditions';
 
     /** @var ExpressionLanguage */
     protected $expressionLanguage;

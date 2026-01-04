@@ -16,8 +16,8 @@ use Psr\Log\NullLogger;
  */
 class ExtendConfigProcessor
 {
-    const APPEND_CONFIGS = '_append_configs';
-    const RENAME_CONFIGS = '_rename_configs';
+    public const APPEND_CONFIGS = '_append_configs';
+    public const RENAME_CONFIGS = '_rename_configs';
 
     /**
      * @var ConfigManager

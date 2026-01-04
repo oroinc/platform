@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class NotSqlKeywordValidator extends ConstraintValidator
 {
-    const ALIAS = 'oro_entity_extend.validator.not_sql_keyword';
+    public const ALIAS = 'oro_entity_extend.validator.not_sql_keyword';
 
     /**
      * @var ManagerRegistry

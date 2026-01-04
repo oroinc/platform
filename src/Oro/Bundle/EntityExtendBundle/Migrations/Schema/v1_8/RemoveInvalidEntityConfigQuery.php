@@ -14,7 +14,7 @@ class RemoveInvalidEntityConfigQuery implements MigrationQuery, ConnectionAwareI
 {
     use ConnectionAwareTrait;
 
-    const LIMIT = 100;
+    public const LIMIT = 100;
 
     /** @var array */
     protected $invalidExtendConfigs = [

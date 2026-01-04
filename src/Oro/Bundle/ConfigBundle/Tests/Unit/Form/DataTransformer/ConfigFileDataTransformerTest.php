@@ -210,7 +210,7 @@ class ConfigFileDataTransformerTest extends TestCase
 
     private function getHttpFile(): HttpFile
     {
-        return new class('', false) extends HttpFile {
+        return new class ('', false) extends HttpFile {
             public function isFile(): bool
             {
                 return true;

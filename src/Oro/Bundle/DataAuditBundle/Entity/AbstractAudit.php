@@ -45,11 +45,11 @@ use Oro\Bundle\UserBundle\Entity\Impersonation;
 )]
 abstract class AbstractAudit
 {
-    const ACTION_CREATE = 'create';
-    const ACTION_UPDATE = 'update';
-    const ACTION_REMOVE = 'remove';
+    public const ACTION_CREATE = 'create';
+    public const ACTION_UPDATE = 'update';
+    public const ACTION_REMOVE = 'remove';
 
-    const OBJECT_NAME_MAX_LENGTH = 255;
+    public const OBJECT_NAME_MAX_LENGTH = 255;
 
     #[ORM\Column(type: Types::INTEGER)]
     #[ORM\Id]

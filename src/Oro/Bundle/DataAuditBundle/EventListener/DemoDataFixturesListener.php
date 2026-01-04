@@ -13,7 +13,7 @@ class DemoDataFixturesListener
     /**
      * This listener is disabled to disable data audit of the loading data
      */
-    const DATA_COLLECTOR_LISTENER = 'oro_dataaudit.listener.send_changed_entities_to_message_queue';
+    public const DATA_COLLECTOR_LISTENER = 'oro_dataaudit.listener.send_changed_entities_to_message_queue';
 
     /** @var OptionalListenerManager */
     private $listenerManager;

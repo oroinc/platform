@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormView;
 
 class WidgetTitleType extends AbstractType
 {
-    const NAME = 'oro_type_widget_title';
+    public const NAME = 'oro_type_widget_title';
 
     public function getName()
     {

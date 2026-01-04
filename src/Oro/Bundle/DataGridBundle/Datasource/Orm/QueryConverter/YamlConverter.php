@@ -13,7 +13,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class YamlConverter implements QueryConverterInterface
 {
-    const MAX_ITERATIONS = 100;
+    public const MAX_ITERATIONS = 100;
 
     #[\Override]
     public function parse($value, ManagerRegistry $doctrine)

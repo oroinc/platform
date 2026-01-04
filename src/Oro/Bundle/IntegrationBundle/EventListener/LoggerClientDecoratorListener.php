@@ -11,7 +11,7 @@ class LoggerClientDecoratorListener extends AbstractClientDecoratorListener impl
 {
     use LoggerAwareTrait;
 
-    const CONFIG_KEY = 'logger';
+    public const CONFIG_KEY = 'logger';
 
     protected $defaultConfigurationParameters = [
         'enabled' => true,

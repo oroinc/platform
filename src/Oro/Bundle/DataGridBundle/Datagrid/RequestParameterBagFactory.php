@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class RequestParameterBagFactory
 {
-    const DEFAULT_ROOT_PARAM = 'grid';
+    public const DEFAULT_ROOT_PARAM = 'grid';
 
     /**
      * @var RequestStack

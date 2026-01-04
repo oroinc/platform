@@ -7,7 +7,7 @@ namespace Oro\Bundle\ActionBundle\Model;
  */
 class Attribute implements EntityParameterInterface
 {
-    const INTERNAL_TYPE_ATTRIBUTE = 'attribute';
+    public const INTERNAL_TYPE_ATTRIBUTE = 'attribute';
 
     /**
      * @var string

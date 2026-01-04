@@ -13,9 +13,9 @@ use Oro\Component\Layout\Util\BlockUtils;
  */
 class EmbedFormEndType extends AbstractFormType
 {
-    const NAME = 'embed_form_end';
+    public const NAME = 'embed_form_end';
 
-    const SHORT_NAME = 'end';
+    public const SHORT_NAME = 'end';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

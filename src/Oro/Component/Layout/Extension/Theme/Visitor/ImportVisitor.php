@@ -20,7 +20,7 @@ use Oro\Component\Layout\Model\LayoutUpdateImport;
  */
 class ImportVisitor implements VisitorInterface
 {
-    const IMPORT_FOLDER = 'imports';
+    public const IMPORT_FOLDER = 'imports';
 
     /** @var LayoutUpdateLoaderInterface */
     private $loader;

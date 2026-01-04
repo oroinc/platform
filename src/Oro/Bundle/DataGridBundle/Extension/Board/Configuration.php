@@ -10,40 +10,40 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    const GROUP_KEY = 'group_by';
-    const GROUP_PROPERTY_KEY = 'property';
-    const GROUP_PROPERTY_VALUE_KEY = 'value_field_name';
-    const GROUP_PROPERTY_ORDER_BY = 'order_by';
+    public const GROUP_KEY = 'group_by';
+    public const GROUP_PROPERTY_KEY = 'property';
+    public const GROUP_PROPERTY_VALUE_KEY = 'value_field_name';
+    public const GROUP_PROPERTY_ORDER_BY = 'order_by';
 
-    const LABEL_KEY = 'label';
-    const ICON_KEY = 'icon';
+    public const LABEL_KEY = 'label';
+    public const ICON_KEY = 'icon';
 
-    const ACL_RESOURCE_KEY = 'acl_resource';
-    const DEFAULT_COLUMN_KEY = 'default_column';
+    public const ACL_RESOURCE_KEY = 'acl_resource';
+    public const DEFAULT_COLUMN_KEY = 'default_column';
 
-    const PLUGIN_KEY = 'plugin';
-    const BOARD_VIEW_KEY = 'board_view';
-    const CARD_VIEW_KEY = 'card_view';
-    const HEADER_VIEW_KEY = 'column_header_view';
-    const COLUMN_VIEW_KEY = 'column_view';
-    const DEFAULT_PLUGIN = 'orodatagrid/js/app/plugins/grid-component/board-appearance-plugin';
-    const DEFAULT_BOARD_VIEW = 'orodatagrid/js/app/views/board/board-view';
-    const DEFAULT_CARD_VIEW = 'orodatagrid/js/app/views/board/card-view';
-    const DEFAULT_HEADER_VIEW = 'orodatagrid/js/app/views/board/column-header-view';
-    const DEFAULT_COLUMN_VIEW = 'orodatagrid/js/app/views/board/column-view';
+    public const PLUGIN_KEY = 'plugin';
+    public const BOARD_VIEW_KEY = 'board_view';
+    public const CARD_VIEW_KEY = 'card_view';
+    public const HEADER_VIEW_KEY = 'column_header_view';
+    public const COLUMN_VIEW_KEY = 'column_view';
+    public const DEFAULT_PLUGIN = 'orodatagrid/js/app/plugins/grid-component/board-appearance-plugin';
+    public const DEFAULT_BOARD_VIEW = 'orodatagrid/js/app/views/board/board-view';
+    public const DEFAULT_CARD_VIEW = 'orodatagrid/js/app/views/board/card-view';
+    public const DEFAULT_HEADER_VIEW = 'orodatagrid/js/app/views/board/column-header-view';
+    public const DEFAULT_COLUMN_VIEW = 'orodatagrid/js/app/views/board/column-view';
 
-    const DEFAULT_TRANSITION_CLASS = 'orodatagrid/js/app/transitions/update-main-property-transition';
-    const DEFAULT_ROUTE = 'oro_api_patch_entity_data';
-    const TRANSITION_KEY = 'default_transition';
-    const TRANSITION_CLASS_KEY = 'class';
-    const TRANSITION_API_ACCESSOR_KEY = 'save_api_accessor';
-    const DEFAULT_TRANSITION_API_ACCESSOR_CLASS = 'oroui/js/tools/api-accessor';
-    const TRANSITION_PARAMS_KEY = 'params';
+    public const DEFAULT_TRANSITION_CLASS = 'orodatagrid/js/app/transitions/update-main-property-transition';
+    public const DEFAULT_ROUTE = 'oro_api_patch_entity_data';
+    public const TRANSITION_KEY = 'default_transition';
+    public const TRANSITION_CLASS_KEY = 'class';
+    public const TRANSITION_API_ACCESSOR_KEY = 'save_api_accessor';
+    public const DEFAULT_TRANSITION_API_ACCESSOR_CLASS = 'oroui/js/tools/api-accessor';
+    public const TRANSITION_PARAMS_KEY = 'params';
 
-    const TOOLBAR_KEY = 'toolbar';
-    const ADDITIONAL_KEY = 'additional';
+    public const TOOLBAR_KEY = 'toolbar';
+    public const ADDITIONAL_KEY = 'additional';
 
-    const PROCESSOR_KEY = 'processor';
+    public const PROCESSOR_KEY = 'processor';
 
     #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder

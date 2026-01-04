@@ -7,9 +7,9 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
  */
 class OroOptions
 {
-    const KEY = 'oro_options';
+    public const KEY = 'oro_options';
 
-    const APPEND_SECTION = '_append';
+    public const APPEND_SECTION = '_append';
 
     /** @var array */
     private $options;

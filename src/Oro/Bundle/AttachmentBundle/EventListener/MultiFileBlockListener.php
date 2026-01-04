@@ -22,7 +22,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class MultiFileBlockListener
 {
     // default priority for view pages
-    const ADDITIONAL_SECTION_PRIORITY = 1200;
+    public const ADDITIONAL_SECTION_PRIORITY = 1200;
 
     /** @var AttributeManager */
     private $attributeManager;

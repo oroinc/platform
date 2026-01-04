@@ -7,8 +7,8 @@ use Oro\Bundle\ChartBundle\Model\Data\DataInterface;
 
 class PieChartDataTransformer implements TransformerInterface
 {
-    const FRACTION_INPUT_DATA_FIELD = 'fraction_input_data_field';
-    const FRACTION_OUTPUT_DATA_FIELD = 'fraction_output_data_field';
+    public const FRACTION_INPUT_DATA_FIELD = 'fraction_input_data_field';
+    public const FRACTION_OUTPUT_DATA_FIELD = 'fraction_output_data_field';
 
     /**
      * Transform data to pie chart specific format

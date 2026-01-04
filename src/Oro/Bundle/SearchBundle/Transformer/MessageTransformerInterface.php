@@ -4,8 +4,8 @@ namespace Oro\Bundle\SearchBundle\Transformer;
 
 interface MessageTransformerInterface
 {
-    const MESSAGE_FIELD_ENTITY_CLASS = 'class';
-    const MESSAGE_FIELD_ENTITY_IDS = 'entityIds';
+    public const MESSAGE_FIELD_ENTITY_CLASS = 'class';
+    public const MESSAGE_FIELD_ENTITY_IDS = 'entityIds';
 
     /**
      * Transform data to queue messages

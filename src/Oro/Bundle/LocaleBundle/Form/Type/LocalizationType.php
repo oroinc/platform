@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class LocalizationType extends AbstractType
 {
-    const NAME = 'oro_localization';
+    public const NAME = 'oro_localization';
 
     /** @var string */
     protected $dataClass;

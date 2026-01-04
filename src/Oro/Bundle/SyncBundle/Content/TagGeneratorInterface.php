@@ -4,7 +4,7 @@ namespace Oro\Bundle\SyncBundle\Content;
 
 interface TagGeneratorInterface
 {
-    const COLLECTION_SUFFIX = '_type_collection';
+    public const COLLECTION_SUFFIX = '_type_collection';
 
     /**
      * Is data format supported

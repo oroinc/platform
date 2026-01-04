@@ -11,11 +11,11 @@ use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
  */
 class RelationGuesser implements GuesserInterface
 {
-    const DEFAULT_EDITOR_VIEW = 'oroform/js/app/views/editor/related-id-relation-editor-view';
-    const DEFAULT_API_ACCESSOR_CLASS = 'oroui/js/tools/search-api-accessor';
+    public const DEFAULT_EDITOR_VIEW = 'oroform/js/app/views/editor/related-id-relation-editor-view';
+    public const DEFAULT_API_ACCESSOR_CLASS = 'oroui/js/tools/search-api-accessor';
 
     /** Frontend type */
-    const RELATION = 'relation';
+    public const RELATION = 'relation';
 
     #[\Override]
     public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)

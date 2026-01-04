@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class EnumNameType extends AbstractType
 {
-    const INVALID_NAME_MESSAGE =
+    public const INVALID_NAME_MESSAGE =
         'This value should contain only alphabetic symbols, underscore, hyphen, spaces and numbers.';
 
     /** @var EnumTypeHelper */

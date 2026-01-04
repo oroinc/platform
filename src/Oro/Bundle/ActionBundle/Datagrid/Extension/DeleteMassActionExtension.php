@@ -13,7 +13,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class DeleteMassActionExtension extends BaseDeleteMassActionExtension
 {
-    const OPERATION_NAME = 'DELETE';
+    public const OPERATION_NAME = 'DELETE';
 
     /** @var OperationRegistry */
     protected $operationRegistry;

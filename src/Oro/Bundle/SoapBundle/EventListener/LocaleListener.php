@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class LocaleListener implements EventSubscriberInterface
 {
-    const API_PREFIX = '/api/rest/';
+    public const API_PREFIX = '/api/rest/';
 
     private TranslatableListener $translatableListener;
 

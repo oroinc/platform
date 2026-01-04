@@ -48,7 +48,7 @@ class GetListContextTest extends TestCase
         );
 
         $this->assertInitializeCriteriaCallback(
-            new class() {
+            new class () {
                 public function __invoke(Criteria $criteria): void
                 {
                     $criteria->andWhere(Criteria::expr()->eq('id', 1));

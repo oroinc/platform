@@ -12,7 +12,7 @@ use Twig\Environment;
  */
 class LinkProperty extends UrlProperty
 {
-    const TEMPLATE = '@OroDataGrid/Extension/Formatter/Property/linkProperty.html.twig';
+    public const TEMPLATE = '@OroDataGrid/Extension/Formatter/Property/linkProperty.html.twig';
 
     /**
      * @var Environment

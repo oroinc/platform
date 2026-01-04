@@ -10,7 +10,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 
 class CreateEntity extends CreateObject
 {
-    const OPTION_KEY_FLUSH = 'flush';
+    public const OPTION_KEY_FLUSH = 'flush';
 
     /**
      * @var ManagerRegistry

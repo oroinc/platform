@@ -15,7 +15,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
  */
 class FieldConfigGridListener extends AbstractConfigGridListener
 {
-    const ENTITY_PARAM = 'entityId';
+    public const ENTITY_PARAM = 'entityId';
 
     /**
      * @var ParameterBag

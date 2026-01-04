@@ -11,7 +11,7 @@ use Psr\Log\LoggerInterface;
  */
 class CleanupEntityConfigQuery extends AbstractEntityConfigQuery
 {
-    const LIMIT = 100;
+    public const LIMIT = 100;
 
     private const ENTITY_INDEX_TYPE = 0;
     private const FIELD_INDEX_TYPE = 1;

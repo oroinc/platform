@@ -12,9 +12,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\HasLifecycleCallbacks]
 class InternalEmailOrigin extends EmailOrigin
 {
-    const BAP = 'BAP';
+    public const BAP = 'BAP';
 
-    const MAILBOX_NAME = 'Local';
+    public const MAILBOX_NAME = 'Local';
 
     #[ORM\Column(name: 'internal_name', type: Types::STRING, length: 30)]
     protected ?string $internalName = null;

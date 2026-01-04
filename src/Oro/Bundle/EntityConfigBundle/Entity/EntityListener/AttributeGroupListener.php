@@ -11,7 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator;
  */
 class AttributeGroupListener
 {
-    const DEFAULT_SLUG = 'default_group';
+    public const DEFAULT_SLUG = 'default_group';
 
     /** @var SlugGenerator */
     private $slugGenerator;

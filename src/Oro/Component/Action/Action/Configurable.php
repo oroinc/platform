@@ -6,7 +6,7 @@ use Oro\Component\ConfigExpression\ExpressionInterface;
 
 class Configurable implements ActionInterface
 {
-    const ALIAS = 'configurable';
+    public const ALIAS = 'configurable';
 
     /**
      * @var ActionAssembler

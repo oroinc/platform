@@ -11,9 +11,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ScheduleIntervalType extends AbstractType
 {
-    const NAME = 'oro_cron_schedule_interval';
-    const ACTIVE_AT_FIELD = 'activeAt';
-    const DEACTIVATE_AT_FIELD = 'deactivateAt';
+    public const NAME = 'oro_cron_schedule_interval';
+    public const ACTIVE_AT_FIELD = 'activeAt';
+    public const DEACTIVATE_AT_FIELD = 'deactivateAt';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

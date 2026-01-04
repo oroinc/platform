@@ -7,7 +7,7 @@ use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 
 class SkipEmptyPeriodsFilter extends ChoiceFilter
 {
-    const NAME = 'skip_empty_periods';
+    public const NAME = 'skip_empty_periods';
 
     #[\Override]
     public function init($name, array $params)

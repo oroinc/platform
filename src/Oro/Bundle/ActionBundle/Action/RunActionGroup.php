@@ -16,11 +16,11 @@ class RunActionGroup extends AbstractAction
 {
     use OptionsResolverTrait;
 
-    const OPTION_ACTION_GROUP   = 'action_group';
-    const OPTION_PARAMETERS_MAP = 'parameters_mapping';
-    const OPTION_RESULTS        = 'results';
-    const OPTION_RESULT         = 'result';
-    const ERRORS_DEFAULT_KEY    = 'errors';
+    public const OPTION_ACTION_GROUP   = 'action_group';
+    public const OPTION_PARAMETERS_MAP = 'parameters_mapping';
+    public const OPTION_RESULTS        = 'results';
+    public const OPTION_RESULT         = 'result';
+    public const ERRORS_DEFAULT_KEY    = 'errors';
 
     /** @var ActionGroupRegistry */
     protected $actionGroupRegistry;

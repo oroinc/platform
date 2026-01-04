@@ -14,19 +14,19 @@ class LoadTranslations extends AbstractFixture implements DependentFixtureInterf
 {
     use ContainerAwareTrait;
 
-    const TRANSLATION1 = 'translation.trans1';
-    const TRANSLATION2 = 'translation.trans2';
-    const TRANSLATION3 = 'translation.trans3';
-    const TRANSLATION4 = 'translation.trans4';
-    const TRANSLATION5 = 'translation.trans5';
+    public const TRANSLATION1 = 'translation.trans1';
+    public const TRANSLATION2 = 'translation.trans2';
+    public const TRANSLATION3 = 'translation.trans3';
+    public const TRANSLATION4 = 'translation.trans4';
+    public const TRANSLATION5 = 'translation.trans5';
 
-    const TRANSLATION_KEY_1 = 'translation.trans1';
-    const TRANSLATION_KEY_2 = 'translation.trans2';
-    const TRANSLATION_KEY_3 = 'translation.trans3';
-    const TRANSLATION_KEY_4 = 'translation.trans4';
-    const TRANSLATION_KEY_5 = 'translation.trans5';
+    public const TRANSLATION_KEY_1 = 'translation.trans1';
+    public const TRANSLATION_KEY_2 = 'translation.trans2';
+    public const TRANSLATION_KEY_3 = 'translation.trans3';
+    public const TRANSLATION_KEY_4 = 'translation.trans4';
+    public const TRANSLATION_KEY_5 = 'translation.trans5';
 
-    const TRANSLATION_KEY_DOMAIN = 'test_domain';
+    public const TRANSLATION_KEY_DOMAIN = 'test_domain';
 
     #[\Override]
     public function getDependencies()

@@ -10,10 +10,10 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 interface DataFixturesExecutorInterface
 {
     /** Data fixtures contain the main data for an application */
-    const MAIN_FIXTURES = 'main';
+    public const MAIN_FIXTURES = 'main';
 
     /** Data fixtures contain the demo data for an application */
-    const DEMO_FIXTURES = 'demo';
+    public const DEMO_FIXTURES = 'demo';
 
     /**
      * Executes the given data fixtures.

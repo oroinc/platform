@@ -8,8 +8,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class OwnershipDecisionMakerPass implements CompilerPassInterface
 {
-    const TAG_NAME = 'oro_security.owner.ownership_decision_maker';
-    const CHAIN_SERVICE_ID = 'oro_security.owner.ownership_decision_maker.chain';
+    public const TAG_NAME = 'oro_security.owner.ownership_decision_maker';
+    public const CHAIN_SERVICE_ID = 'oro_security.owner.ownership_decision_maker.chain';
 
     #[\Override]
     public function process(ContainerBuilder $container)

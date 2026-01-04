@@ -9,8 +9,8 @@ use Symfony\Component\Form\FormInterface;
 
 class FormScopeCriteriaResolver
 {
-    const SCOPE = 'scope';
-    const CONTEXT = 'context';
+    public const SCOPE = 'scope';
+    public const CONTEXT = 'context';
     /**
      * @var ScopeManager
      */

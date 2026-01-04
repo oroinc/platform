@@ -7,8 +7,8 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\AbstractProperty;
 
 class LocalizedValueProperty extends AbstractProperty
 {
-    const NAME = 'localized_value';
-    const ALLOW_EMPTY = 'allow_empty';
+    public const NAME = 'localized_value';
+    public const ALLOW_EMPTY = 'allow_empty';
 
     #[\Override]
     protected function getRawValue(ResultRecordInterface $record)

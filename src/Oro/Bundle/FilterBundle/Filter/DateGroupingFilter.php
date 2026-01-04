@@ -24,20 +24,20 @@ class DateGroupingFilter extends ChoiceFilter
 {
     use ArrayTrait;
 
-    const NAME = 'date_grouping';
+    public const NAME = 'date_grouping';
 
-    const COLUMN_NAME = 'column_name';
+    public const COLUMN_NAME = 'column_name';
 
-    const CALENDAR_ENTITY = 'calendar_entity';
-    const TARGET_ENTITY = 'target_entity';
-    const NOT_NULLABLE_FIELD = 'not_nullable_field';
-    const JOINED_COLUMN = 'joined_column';
-    const JOINED_TABLE = 'joined_table';
+    public const CALENDAR_ENTITY = 'calendar_entity';
+    public const TARGET_ENTITY = 'target_entity';
+    public const NOT_NULLABLE_FIELD = 'not_nullable_field';
+    public const JOINED_COLUMN = 'joined_column';
+    public const JOINED_TABLE = 'joined_table';
 
-    const TYPE_DAY = 'day';
-    const TYPE_MONTH = 'month';
-    const TYPE_QUARTER = 'quarter';
-    const TYPE_YEAR = 'year';
+    public const TYPE_DAY = 'day';
+    public const TYPE_MONTH = 'month';
+    public const TYPE_QUARTER = 'quarter';
+    public const TYPE_YEAR = 'year';
 
     /** @var ManagerRegistry */
     protected $doctrine;

@@ -19,7 +19,7 @@ use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
  */
 class ThemeExtension extends AbstractExtension
 {
-    const THEME_KEY = 'theme';
+    public const THEME_KEY = 'theme';
 
     /** @var LayoutUpdateLoaderInterface */
     protected $loader;

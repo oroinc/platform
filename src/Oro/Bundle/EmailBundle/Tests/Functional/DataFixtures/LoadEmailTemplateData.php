@@ -12,16 +12,16 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LoadEmailTemplateData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
-    const NO_ENTITY_NAME_TEMPLATE_REFERENCE = 'emailTemplate1';
-    const NOT_SYSTEM_TEMPLATE_REFERENCE = 'emailTemplate2';
-    const NOT_SYSTEM_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE = 'emailTemplate3';
-    const SYSTEM_WITH_ENTITY_TEMPLATE_REFERENCE = 'emailTemplate4';
-    const NOT_SYSTEM_NO_ENTITY_TEMPLATE_REFERENCE = 'emailTemplate5';
-    const SYSTEM_NOT_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE = 'emailTemplate6';
-    const NOT_SYSTEM_NOT_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE = 'emailTemplate7';
-    const SYSTEM_FAIL_TO_COMPILE = 'emailTemplate8';
-    const OWNER_USER_REFERENCE = 'simple_user';
-    const ENTITY_NAME = 'Entity\Name';
+    public const NO_ENTITY_NAME_TEMPLATE_REFERENCE = 'emailTemplate1';
+    public const NOT_SYSTEM_TEMPLATE_REFERENCE = 'emailTemplate2';
+    public const NOT_SYSTEM_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE = 'emailTemplate3';
+    public const SYSTEM_WITH_ENTITY_TEMPLATE_REFERENCE = 'emailTemplate4';
+    public const NOT_SYSTEM_NO_ENTITY_TEMPLATE_REFERENCE = 'emailTemplate5';
+    public const SYSTEM_NOT_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE = 'emailTemplate6';
+    public const NOT_SYSTEM_NOT_VISIBLE_WITH_ENTITY_TEMPLATE_REFERENCE = 'emailTemplate7';
+    public const SYSTEM_FAIL_TO_COMPILE = 'emailTemplate8';
+    public const OWNER_USER_REFERENCE = 'simple_user';
+    public const ENTITY_NAME = 'Entity\Name';
 
     /** @var ContainerInterface */
     private $container;

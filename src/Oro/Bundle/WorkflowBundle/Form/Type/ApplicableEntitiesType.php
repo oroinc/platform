@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ApplicableEntitiesType extends AbstractType
 {
-    const NAME = 'oro_workflow_applicable_entities';
+    public const NAME = 'oro_workflow_applicable_entities';
 
     /** @var WorkflowEntityConnector */
     protected $entityConnector;

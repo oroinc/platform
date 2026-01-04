@@ -11,13 +11,13 @@ class Token
     public $type;
     public $cursor;
 
-    const EOF_TYPE         = 'end of expression';
-    const NAME_TYPE        = 'name';
-    const NUMBER_TYPE      = 'number';
-    const STRING_TYPE      = 'string';
-    const OPERATOR_TYPE    = 'operator';
-    const PUNCTUATION_TYPE = 'punctuation';
-    const KEYWORD_TYPE     = 'keyword';
+    public const EOF_TYPE         = 'end of expression';
+    public const NAME_TYPE        = 'name';
+    public const NUMBER_TYPE      = 'number';
+    public const STRING_TYPE      = 'string';
+    public const OPERATOR_TYPE    = 'operator';
+    public const PUNCTUATION_TYPE = 'punctuation';
+    public const KEYWORD_TYPE     = 'keyword';
 
     /**
      * Constructor.

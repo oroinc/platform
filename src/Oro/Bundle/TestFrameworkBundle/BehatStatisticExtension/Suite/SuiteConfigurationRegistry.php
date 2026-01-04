@@ -18,7 +18,7 @@ use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\SuiteCo
  */
 class SuiteConfigurationRegistry
 {
-    const PREFIX_SUITE_SET = 'AutoSuiteSet';
+    public const PREFIX_SUITE_SET = 'AutoSuiteSet';
 
     /**
      * @var Suite[]

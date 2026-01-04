@@ -9,9 +9,9 @@ use Psr\Log\LoggerInterface;
 
 class UpdateWorkflowConfigurationQuery extends ParametrizedMigrationQuery
 {
-    const TRANSITIONS_KEY = 'transitions';
+    public const TRANSITIONS_KEY = 'transitions';
 
-    const TRANSITION_DEFINITION_KEY = 'transition_definitions';
+    public const TRANSITION_DEFINITION_KEY = 'transition_definitions';
 
     #[\Override]
     public function getDescription()

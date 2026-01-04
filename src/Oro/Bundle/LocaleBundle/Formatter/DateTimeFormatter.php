@@ -10,8 +10,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class DateTimeFormatter implements DateTimeFormatterInterface
 {
-    const DEFAULT_DATE_TYPE = \IntlDateFormatter::MEDIUM;
-    const DEFAULT_TIME_TYPE = \IntlDateFormatter::SHORT;
+    public const DEFAULT_DATE_TYPE = \IntlDateFormatter::MEDIUM;
+    public const DEFAULT_TIME_TYPE = \IntlDateFormatter::SHORT;
 
     /** @var LocaleSettings */
     protected $localeSettings;

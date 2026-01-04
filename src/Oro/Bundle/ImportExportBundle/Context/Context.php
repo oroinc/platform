@@ -9,13 +9,13 @@ namespace Oro\Bundle\ImportExportBundle\Context;
  */
 class Context implements ContextInterface, BatchContextInterface
 {
-    const OPTION_FILE_PATH = 'filePath';
-    const OPTION_DELIMITER = 'delimiter';
-    const OPTION_ENCLOSURE = 'enclosure';
-    const OPTION_ESCAPE = 'escape';
-    const OPTION_FIRST_LINE_IS_HEADER = 'firstLineIsHeader';
-    const OPTION_HEADER = 'header';
-    const OPTION_BATCH_SIZE = 'batch_size';
+    public const OPTION_FILE_PATH = 'filePath';
+    public const OPTION_DELIMITER = 'delimiter';
+    public const OPTION_ENCLOSURE = 'enclosure';
+    public const OPTION_ESCAPE = 'escape';
+    public const OPTION_FIRST_LINE_IS_HEADER = 'firstLineIsHeader';
+    public const OPTION_HEADER = 'header';
+    public const OPTION_BATCH_SIZE = 'batch_size';
 
     /**
      * @var array

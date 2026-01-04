@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Processor\Context;
 
 class LayoutDialogResultType implements LayoutResultTypeInterface
 {
-    const NAME = 'layout_dialog';
+    public const NAME = 'layout_dialog';
 
     /** @var string */
     private $formRouteName;

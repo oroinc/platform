@@ -6,8 +6,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 interface RestApiReadInterface
 {
-    const ACTION_LIST = 'list';
-    const ACTION_READ = 'read';
+    public const ACTION_LIST = 'list';
+    public const ACTION_READ = 'read';
 
     /**
      * Handles GET request for the list of items

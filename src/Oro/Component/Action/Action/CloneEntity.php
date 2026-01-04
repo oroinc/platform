@@ -17,7 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class CloneEntity extends CloneObject
 {
-    const OPTION_KEY_FLUSH = 'flush';
+    public const OPTION_KEY_FLUSH = 'flush';
 
     /** @var ManagerRegistry */
     protected $registry;

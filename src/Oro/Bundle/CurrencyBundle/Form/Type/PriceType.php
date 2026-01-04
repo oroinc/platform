@@ -17,8 +17,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class PriceType extends AbstractType
 {
-    const NAME = 'oro_currency_price';
-    const OPTIONAL_VALIDATION_GROUP = 'Optional';
+    public const NAME = 'oro_currency_price';
+    public const OPTIONAL_VALIDATION_GROUP = 'Optional';
 
     /**
      * @var string

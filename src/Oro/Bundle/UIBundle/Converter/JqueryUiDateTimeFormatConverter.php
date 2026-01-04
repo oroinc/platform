@@ -9,7 +9,7 @@ use Oro\Bundle\LocaleBundle\Converter\AbstractDateTimeFormatConverter;
  */
 class JqueryUiDateTimeFormatConverter extends AbstractDateTimeFormatConverter
 {
-    const NAME = 'jquery_ui';
+    public const NAME = 'jquery_ui';
 
     /**
      * ICU format => JQueryUI format

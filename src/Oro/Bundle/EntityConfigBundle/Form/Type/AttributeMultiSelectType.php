@@ -17,7 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class AttributeMultiSelectType extends AbstractType
 {
-    const NAME = 'oro_entity_config_attribute_multi_select';
+    public const NAME = 'oro_entity_config_attribute_multi_select';
 
     /** @var array */
     private $choices = [];

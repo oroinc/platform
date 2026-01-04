@@ -10,11 +10,11 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 
 class LoadTagsData extends AbstractFixture
 {
-    const FIRST_ACTIVITY = 'firstActivity';
-    const SECOND_ACTIVITY = 'secondActivity';
-    const THIRD_ACTIVITY = 'thirdActivity';
+    public const FIRST_ACTIVITY = 'firstActivity';
+    public const SECOND_ACTIVITY = 'secondActivity';
+    public const THIRD_ACTIVITY = 'thirdActivity';
 
-    const FIRST_TAG = 'firstTag';
+    public const FIRST_TAG = 'firstTag';
 
     private static $activitiesTags = [
         self::FIRST_ACTIVITY => [

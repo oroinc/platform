@@ -16,11 +16,11 @@ class NavigationHistoryItemData extends AbstractFixture implements DependentFixt
 {
     use ContainerAwareTrait;
 
-    const NAVIGATION_HISTORY_ITEM_1 = 'First navigation history item';
-    const NAVIGATION_HISTORY_ITEM_2 = 'Second navigation history item';
-    const NAVIGATION_HISTORY_ITEM_3 = 'Third navigation history item';
-    const NAVIGATION_HISTORY_ITEM_4 = 'Fourth navigation history item';
-    const NAVIGATION_HISTORY_ITEM_5 = 'Fifth navigation history item';
+    public const NAVIGATION_HISTORY_ITEM_1 = 'First navigation history item';
+    public const NAVIGATION_HISTORY_ITEM_2 = 'Second navigation history item';
+    public const NAVIGATION_HISTORY_ITEM_3 = 'Third navigation history item';
+    public const NAVIGATION_HISTORY_ITEM_4 = 'Fourth navigation history item';
+    public const NAVIGATION_HISTORY_ITEM_5 = 'Fifth navigation history item';
 
     #[\Override]
     public function getDependencies()

@@ -18,12 +18,12 @@ class LoadAttributeData extends AbstractFixture implements ContainerAwareInterfa
 {
     use ContainerAwareTrait;
 
-    const ENTITY_CONFIG_MODEL = TestActivityTarget::class;
-    const SYSTEM_ATTRIBUTE_1  = AddAttributesToTestActivityTargetMigration::SYSTEM_ATTRIBUTE_1;
-    const SYSTEM_ATTRIBUTE_2  = AddAttributesToTestActivityTargetMigration::SYSTEM_ATTRIBUTE_2;
-    const REGULAR_ATTRIBUTE_1 = AddAttributesToTestActivityTargetMigration::REGULAR_ATTRIBUTE_1;
-    const REGULAR_ATTRIBUTE_2 = AddAttributesToTestActivityTargetMigration::REGULAR_ATTRIBUTE_2;
-    const BOOL_ATTRIBUTE_1 = AddAttributesToTestActivityTargetMigration::BOOL_ATTRIBUTE_1;
+    public const ENTITY_CONFIG_MODEL = TestActivityTarget::class;
+    public const SYSTEM_ATTRIBUTE_1  = AddAttributesToTestActivityTargetMigration::SYSTEM_ATTRIBUTE_1;
+    public const SYSTEM_ATTRIBUTE_2  = AddAttributesToTestActivityTargetMigration::SYSTEM_ATTRIBUTE_2;
+    public const REGULAR_ATTRIBUTE_1 = AddAttributesToTestActivityTargetMigration::REGULAR_ATTRIBUTE_1;
+    public const REGULAR_ATTRIBUTE_2 = AddAttributesToTestActivityTargetMigration::REGULAR_ATTRIBUTE_2;
+    public const BOOL_ATTRIBUTE_1 = AddAttributesToTestActivityTargetMigration::BOOL_ATTRIBUTE_1;
 
     /** @var array */
     private static $attributesData = [];

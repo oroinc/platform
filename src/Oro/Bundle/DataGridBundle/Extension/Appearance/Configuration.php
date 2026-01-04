@@ -7,10 +7,10 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const GRID_APPEARANCE_TYPE = 'grid';
-    const LABEL_KEY = 'label';
-    const ICON_KEY = 'icon';
-    const DEFAULT_PROCESSING_KEY = 'default_processing';
+    public const GRID_APPEARANCE_TYPE = 'grid';
+    public const LABEL_KEY = 'label';
+    public const ICON_KEY = 'icon';
+    public const DEFAULT_PROCESSING_KEY = 'default_processing';
 
     #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder

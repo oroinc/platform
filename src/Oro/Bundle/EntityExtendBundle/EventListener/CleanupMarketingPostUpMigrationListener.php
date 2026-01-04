@@ -11,9 +11,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class CleanupMarketingPostUpMigrationListener
 {
-    const TRACKING_BUNDLE_NAME = 'OroTrackingBundle';
-    const MARKETING_LIST_BUNDLE_NAME = 'OroMarketingListBundle';
-    const CAMPAIGN_BUNDLE_NAME = 'OroCampaignBundle';
+    public const TRACKING_BUNDLE_NAME = 'OroTrackingBundle';
+    public const MARKETING_LIST_BUNDLE_NAME = 'OroMarketingListBundle';
+    public const CAMPAIGN_BUNDLE_NAME = 'OroCampaignBundle';
 
     /**
      * @var KernelInterface

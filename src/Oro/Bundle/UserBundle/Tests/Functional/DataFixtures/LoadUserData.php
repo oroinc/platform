@@ -18,25 +18,25 @@ class LoadUserData extends AbstractFixture implements
 {
     use ContainerAwareTrait;
 
-    const SIMPLE_USER = 'simple_user';
-    const SIMPLE_USER_FIRST_NAME = 'Elley';
-    const SIMPLE_USER_LAST_NAME = 'Towards';
-    const SIMPLE_USER_EMAIL = 'simple_user@example.com';
-    const SIMPLE_USER_PASSWORD = 'simple_password';
+    public const SIMPLE_USER = 'simple_user';
+    public const SIMPLE_USER_FIRST_NAME = 'Elley';
+    public const SIMPLE_USER_LAST_NAME = 'Towards';
+    public const SIMPLE_USER_EMAIL = 'simple_user@example.com';
+    public const SIMPLE_USER_PASSWORD = 'simple_password';
 
-    const SIMPLE_USER_2 = 'simple_user2';
-    const SIMPLE_USER_2_FIRST_NAME = 'Merry';
-    const SIMPLE_USER_2_LAST_NAME = 'Backwards';
-    const SIMPLE_USER_2_EMAIL = 'simple_user2@example.com';
-    const SIMPLE_USER_2_PASSWORD = 'simple_password2';
+    public const SIMPLE_USER_2 = 'simple_user2';
+    public const SIMPLE_USER_2_FIRST_NAME = 'Merry';
+    public const SIMPLE_USER_2_LAST_NAME = 'Backwards';
+    public const SIMPLE_USER_2_EMAIL = 'simple_user2@example.com';
+    public const SIMPLE_USER_2_PASSWORD = 'simple_password2';
 
-    const USER_WITH_CONFIRMATION_TOKEN = 'user_with_confirmation_token';
-    const USER_WITH_CONFIRMATION_TOKEN_FIRST_NAME = 'Forgot';
-    const USER_WITH_CONFIRMATION_TOKEN_LAST_NAME = 'Password';
-    const USER_WITH_CONFIRMATION_TOKEN_EMAIL = 'user_with_confirmation_token@example.com';
-    const USER_WITH_CONFIRMATION_TOKEN_PASSWORD = 'simple_password3';
+    public const USER_WITH_CONFIRMATION_TOKEN = 'user_with_confirmation_token';
+    public const USER_WITH_CONFIRMATION_TOKEN_FIRST_NAME = 'Forgot';
+    public const USER_WITH_CONFIRMATION_TOKEN_LAST_NAME = 'Password';
+    public const USER_WITH_CONFIRMATION_TOKEN_EMAIL = 'user_with_confirmation_token@example.com';
+    public const USER_WITH_CONFIRMATION_TOKEN_PASSWORD = 'simple_password3';
 
-    const CONFIRMATION_TOKEN = 'confirmation_token';
+    public const CONFIRMATION_TOKEN = 'confirmation_token';
 
     #[\Override]
     public function getDependencies()

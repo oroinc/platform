@@ -11,9 +11,9 @@ use Oro\Bundle\DataGridBundle\Event\BuildBefore;
  */
 class AuditHistoryGridListener
 {
-    const GRID_PARAM_CLASS      = 'object_class';
-    const GRID_PARAM_OBJECT_ID  = 'object_id';
-    const GRID_PARAM_FIELD_NAME = 'field_name';
+    public const GRID_PARAM_CLASS      = 'object_class';
+    public const GRID_PARAM_OBJECT_ID  = 'object_id';
+    public const GRID_PARAM_FIELD_NAME = 'field_name';
 
     /** @var array */
     protected $paramsToBind = [];

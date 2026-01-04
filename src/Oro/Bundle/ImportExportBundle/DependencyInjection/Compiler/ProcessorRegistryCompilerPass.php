@@ -9,8 +9,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ProcessorRegistryCompilerPass implements CompilerPassInterface
 {
-    const PROCESSOR_REGISTRY_SERVICE = 'oro_importexport.processor.registry';
-    const PROCESSOR_TAG              = 'oro_importexport.processor';
+    public const PROCESSOR_REGISTRY_SERVICE = 'oro_importexport.processor.registry';
+    public const PROCESSOR_TAG              = 'oro_importexport.processor';
 
     #[\Override]
     public function process(ContainerBuilder $container)

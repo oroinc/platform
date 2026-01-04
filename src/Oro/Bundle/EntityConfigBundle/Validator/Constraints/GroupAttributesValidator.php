@@ -11,7 +11,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class GroupAttributesValidator extends ConstraintValidator
 {
-    const ALIAS = 'oro_entity_config.validator.group_attributes';
+    public const ALIAS = 'oro_entity_config.validator.group_attributes';
 
     /**
      * @var AttributeManager

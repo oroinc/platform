@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ClientCompilerPass implements CompilerPassInterface
 {
-    const CLIENT_SERVICE = 'test.client';
+    public const CLIENT_SERVICE = 'test.client';
 
     #[\Override]
     public function process(ContainerBuilder $container)

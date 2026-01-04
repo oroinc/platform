@@ -15,8 +15,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
  */
 class SearchListener
 {
-    const EMPTY_ORGANIZATION_ID = 0;
-    const EMPTY_OWNER_ID        = 0;
+    public const EMPTY_ORGANIZATION_ID = 0;
+    public const EMPTY_OWNER_ID        = 0;
 
     /** @var OwnershipMetadataProviderInterface */
     protected $metadataProvider;

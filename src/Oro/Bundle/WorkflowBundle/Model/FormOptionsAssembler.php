@@ -15,8 +15,8 @@ use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
  */
 class FormOptionsAssembler extends BaseAbstractAssembler
 {
-    const STEP_OWNER = 'step';
-    const TRANSITION_OWNER = 'transition';
+    public const STEP_OWNER = 'step';
+    public const TRANSITION_OWNER = 'transition';
 
     /**
      * @var Attribute[]

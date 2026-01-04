@@ -6,8 +6,8 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider as AttributeProvider;
 
 class AttributeConfigHelper
 {
-    const CODE_IS_ATTRIBUTE = 'is_attribute';
-    const CODE_HAS_ATTRIBUTES = 'has_attributes';
+    public const CODE_IS_ATTRIBUTE = 'is_attribute';
+    public const CODE_HAS_ATTRIBUTES = 'has_attributes';
 
     /**
      * @var AttributeProvider

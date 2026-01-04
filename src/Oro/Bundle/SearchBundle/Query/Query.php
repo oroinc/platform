@@ -11,53 +11,53 @@ use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
  */
 class Query
 {
-    const ORDER_ASC = 'asc';
-    const ORDER_DESC = 'desc';
+    public const ORDER_ASC = 'asc';
+    public const ORDER_DESC = 'desc';
 
-    const KEYWORD_SELECT = 'select';
-    const KEYWORD_FROM = 'from';
-    const KEYWORD_WHERE = 'where';
-    const KEYWORD_AND = 'and';
-    const KEYWORD_OR = 'or';
-    const KEYWORD_OFFSET = 'offset';
-    const KEYWORD_MAX_RESULTS = 'max_results';
-    const KEYWORD_AGGREGATE = 'aggregate';
-    const KEYWORD_ORDER_BY = 'order_by';
-    const KEYWORD_AS = 'as';
+    public const KEYWORD_SELECT = 'select';
+    public const KEYWORD_FROM = 'from';
+    public const KEYWORD_WHERE = 'where';
+    public const KEYWORD_AND = 'and';
+    public const KEYWORD_OR = 'or';
+    public const KEYWORD_OFFSET = 'offset';
+    public const KEYWORD_MAX_RESULTS = 'max_results';
+    public const KEYWORD_AGGREGATE = 'aggregate';
+    public const KEYWORD_ORDER_BY = 'order_by';
+    public const KEYWORD_AS = 'as';
 
-    const OPERATOR_EQUALS = '=';
-    const OPERATOR_NOT_EQUALS = '!=';
-    const OPERATOR_GREATER_THAN = '>';
-    const OPERATOR_GREATER_THAN_EQUALS = '>=';
-    const OPERATOR_LESS_THAN = '<';
-    const OPERATOR_LESS_THAN_EQUALS = '<=';
-    const OPERATOR_CONTAINS = '~';
-    const OPERATOR_NOT_CONTAINS = '!~';
-    const OPERATOR_IN = 'in';
-    const OPERATOR_NOT_IN = '!in';
-    const OPERATOR_STARTS_WITH = 'starts_with';
-    const OPERATOR_EXISTS = 'exists';
-    const OPERATOR_NOT_EXISTS = 'notexists';
-    const OPERATOR_LIKE = 'like';
-    const OPERATOR_NOT_LIKE = 'notlike';
+    public const OPERATOR_EQUALS = '=';
+    public const OPERATOR_NOT_EQUALS = '!=';
+    public const OPERATOR_GREATER_THAN = '>';
+    public const OPERATOR_GREATER_THAN_EQUALS = '>=';
+    public const OPERATOR_LESS_THAN = '<';
+    public const OPERATOR_LESS_THAN_EQUALS = '<=';
+    public const OPERATOR_CONTAINS = '~';
+    public const OPERATOR_NOT_CONTAINS = '!~';
+    public const OPERATOR_IN = 'in';
+    public const OPERATOR_NOT_IN = '!in';
+    public const OPERATOR_STARTS_WITH = 'starts_with';
+    public const OPERATOR_EXISTS = 'exists';
+    public const OPERATOR_NOT_EXISTS = 'notexists';
+    public const OPERATOR_LIKE = 'like';
+    public const OPERATOR_NOT_LIKE = 'notlike';
 
-    const TYPE_TEXT = 'text';
-    const TYPE_INTEGER = 'integer';
-    const TYPE_DATETIME = 'datetime';
-    const TYPE_DECIMAL = 'decimal';
+    public const TYPE_TEXT = 'text';
+    public const TYPE_INTEGER = 'integer';
+    public const TYPE_DATETIME = 'datetime';
+    public const TYPE_DECIMAL = 'decimal';
 
-    const INFINITY = 10000000;
-    const FINITY = 0.000001;
+    public const INFINITY = 10000000;
+    public const FINITY = 0.000001;
 
-    const AGGREGATE_FUNCTION_COUNT = 'count';
-    const AGGREGATE_FUNCTION_SUM = 'sum';
-    const AGGREGATE_FUNCTION_MAX = 'max';
-    const AGGREGATE_FUNCTION_MIN = 'min';
-    const AGGREGATE_FUNCTION_AVG = 'avg';
+    public const AGGREGATE_FUNCTION_COUNT = 'count';
+    public const AGGREGATE_FUNCTION_SUM = 'sum';
+    public const AGGREGATE_FUNCTION_MAX = 'max';
+    public const AGGREGATE_FUNCTION_MIN = 'min';
+    public const AGGREGATE_FUNCTION_AVG = 'avg';
 
-    const AGGREGATE_PARAMETER_MAX = 'max';
+    public const AGGREGATE_PARAMETER_MAX = 'max';
 
-    const DELIMITER = ' ';
+    public const DELIMITER = ' ';
 
     /**
      * Indicates type of search query

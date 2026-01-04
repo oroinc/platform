@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class WorkflowDefinitionType extends AbstractType
 {
-    const NAME = 'oro_workflow_definition';
+    public const NAME = 'oro_workflow_definition';
 
     /** @var WorkflowDefinitionChoicesGroupProvider */
     private $provider;

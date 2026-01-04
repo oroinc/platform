@@ -9,7 +9,7 @@ use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class EntityConfigHelper
 {
-    const EXTEND_CONFIG_SCOPE = 'extend';
+    public const EXTEND_CONFIG_SCOPE = 'extend';
 
     /**
      * @var ConfigManager

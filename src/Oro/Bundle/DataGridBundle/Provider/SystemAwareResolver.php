@@ -12,8 +12,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class SystemAwareResolver implements ContainerAwareInterface
 {
-    const KEY_EXTENDS       = 'extends';
-    const KEY_EXTENDED_FROM = 'extended_from';
+    public const KEY_EXTENDS       = 'extends';
+    public const KEY_EXTENDED_FROM = 'extended_from';
 
     /**
      * @var ContainerInterface

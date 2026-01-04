@@ -8,8 +8,8 @@ namespace Oro\Component\MessageQueue\Log\Processor;
  */
 class RestoreOriginalChannelProcessor
 {
-    const LOG_CHANNEL_KEY = 'log_channel';
-    const CONTEXT_KEY     = 'context';
+    public const LOG_CHANNEL_KEY = 'log_channel';
+    public const CONTEXT_KEY     = 'context';
 
     /**
      * Replaces the record channel with the channel stored in the context.

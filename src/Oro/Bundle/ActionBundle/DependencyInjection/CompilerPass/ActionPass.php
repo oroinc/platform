@@ -13,10 +13,10 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ActionPass extends AbstractPass
 {
-    const ACTION_TAG = 'oro_action.action';
-    const ACTION_FACTORY_SERVICE_ID = 'oro_action.action_factory';
+    public const ACTION_TAG = 'oro_action.action';
+    public const ACTION_FACTORY_SERVICE_ID = 'oro_action.action_factory';
 
-    const EVENT_DISPATCHER_SERVICE = 'event_dispatcher';
+    public const EVENT_DISPATCHER_SERVICE = 'event_dispatcher';
 
     /** @var ParameterBagInterface */
     private $parameterBag;

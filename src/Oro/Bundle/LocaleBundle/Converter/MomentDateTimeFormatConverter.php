@@ -7,7 +7,7 @@ namespace Oro\Bundle\LocaleBundle\Converter;
  */
 class MomentDateTimeFormatConverter extends AbstractDateTimeFormatConverter
 {
-    const NAME = 'moment';
+    public const NAME = 'moment';
 
     /**
      * ICU format => moment.js data

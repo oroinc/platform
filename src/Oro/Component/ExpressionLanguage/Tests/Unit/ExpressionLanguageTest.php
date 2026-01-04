@@ -71,7 +71,7 @@ class ExpressionLanguageTest extends TestCase
         $this->expressionLanguage = new ExpressionLanguage(
             null,
             [
-                new class() implements ExpressionFunctionProviderInterface {
+                new class () implements ExpressionFunctionProviderInterface {
                     public function getFunctions(): array
                     {
                         return [

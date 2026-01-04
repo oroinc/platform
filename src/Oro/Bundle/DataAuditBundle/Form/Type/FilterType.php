@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class FilterType extends AbstractType
 {
-    const NAME = 'oro_type_audit_filter';
+    public const NAME = 'oro_type_audit_filter';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

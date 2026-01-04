@@ -27,7 +27,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 {
-    const STRATEGY_CONTEXT = 'configurable_add_or_replace_strategy';
+    public const STRATEGY_CONTEXT = 'configurable_add_or_replace_strategy';
 
     /** @var EntityClassNameProviderInterface */
     protected $entityClassNameProvider;

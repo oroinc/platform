@@ -11,5 +11,5 @@ class StartTransitionEvents
      *
      * @var string
      */
-    const HANDLE_BEFORE_RENDER = 'oro_workflow.start_transition.handle_before_render';
+    public const HANDLE_BEFORE_RENDER = 'oro_workflow.start_transition.handle_before_render';
 }

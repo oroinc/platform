@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TreeSelectType extends AbstractType
 {
-    const NAME = 'oro_ui_tree_select';
+    public const NAME = 'oro_ui_tree_select';
 
     #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)

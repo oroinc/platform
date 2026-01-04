@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class DynamicAssetVersionPass implements CompilerPassInterface
 {
-    const ASSET_VERSION_SERVICE_TEMPLATE = 'assets._package_%s';
+    public const ASSET_VERSION_SERVICE_TEMPLATE = 'assets._package_%s';
 
     /** @var string */
     protected $packageName;

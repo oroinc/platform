@@ -10,7 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class SearchResultAfter extends Event implements GridEventInterface
 {
-    const NAME = 'oro_datagrid.search_datasource.result.after';
+    public const NAME = 'oro_datagrid.search_datasource.result.after';
 
     /**
      * @var DatagridInterface

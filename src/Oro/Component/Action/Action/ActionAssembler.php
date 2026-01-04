@@ -12,10 +12,10 @@ use Oro\Component\ConfigExpression\ExpressionInterface;
  */
 class ActionAssembler extends AbstractAssembler
 {
-    const PARAMETERS_KEY = 'parameters';
-    const BREAK_ON_FAILURE_KEY = 'break_on_failure';
-    const ACTIONS_KEY = 'actions';
-    const CONDITIONS_KEY = 'conditions';
+    public const PARAMETERS_KEY = 'parameters';
+    public const BREAK_ON_FAILURE_KEY = 'break_on_failure';
+    public const ACTIONS_KEY = 'actions';
+    public const CONDITIONS_KEY = 'conditions';
 
     /**
      * @var ActionFactoryInterface

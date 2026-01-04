@@ -10,8 +10,8 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  */
 class ConfigurationMerger
 {
-    const EXTENDS_NODE_NAME = 'extends';
-    const REPLACES_NODE_NAME = 'replace';
+    public const EXTENDS_NODE_NAME = 'extends';
+    public const REPLACES_NODE_NAME = 'replace';
 
     /** @var array [bundle class name => bundle index, ...] */
     protected $bundles;

@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class BusinessUnitType extends AbstractType
 {
-    const FORM_NAME = 'oro_business_unit';
+    public const FORM_NAME = 'oro_business_unit';
 
     /** @var BusinessUnitManager */
     protected $businessUnitManager;

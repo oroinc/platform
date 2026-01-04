@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class WidgetItemType extends AbstractType
 {
-    const NAME = 'oro_type_widget_item';
+    public const NAME = 'oro_type_widget_item';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

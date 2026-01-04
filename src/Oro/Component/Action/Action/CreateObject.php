@@ -7,10 +7,10 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class CreateObject extends AbstractAction
 {
-    const OPTION_KEY_ATTRIBUTE = 'attribute';
-    const OPTION_KEY_ARGUMENTS = 'arguments';
-    const OPTION_KEY_CLASS     = 'class';
-    const OPTION_KEY_DATA      = 'data';
+    public const OPTION_KEY_ATTRIBUTE = 'attribute';
+    public const OPTION_KEY_ARGUMENTS = 'arguments';
+    public const OPTION_KEY_CLASS     = 'class';
+    public const OPTION_KEY_DATA      = 'data';
 
     /**
      * @var array

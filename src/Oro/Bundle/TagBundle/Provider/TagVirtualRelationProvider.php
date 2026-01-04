@@ -9,8 +9,8 @@ use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
 class TagVirtualRelationProvider implements VirtualRelationProviderInterface
 {
-    const RELATION_NAME = 'tags_virtual';
-    const TARGET_ALIAS  = 'virtualTag';
+    public const RELATION_NAME = 'tags_virtual';
+    public const TARGET_ALIAS  = 'virtualTag';
 
     /** @var TaggableHelper */
     protected $taggableHelper;

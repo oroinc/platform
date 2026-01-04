@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class MultiCurrencyType extends PriceType
 {
-    const NAME = 'oro_multicurrency';
+    public const NAME = 'oro_multicurrency';
 
     /**
      * @return string

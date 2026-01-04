@@ -13,8 +13,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'oro_segment_type')]
 class SegmentType
 {
-    const TYPE_DYNAMIC = 'dynamic';
-    const TYPE_STATIC  = 'static';
+    public const TYPE_DYNAMIC = 'dynamic';
+    public const TYPE_STATIC  = 'static';
 
     #[ORM\Column(name: 'name', type: Types::STRING, length: 32)]
     #[ORM\Id]

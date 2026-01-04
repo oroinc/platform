@@ -14,11 +14,11 @@ use Oro\Component\DoctrineUtils\ORM\QueryUtil;
  */
 class MassDeleteLimiter
 {
-    const NO_LIMIT                 = 1;
-    const LIMIT_ACCESS             = 2;
-    const LIMIT_MAX_RECORDS        = 3;
-    const LIMIT_ACCESS_MAX_RECORDS = 4;
-    const MAX_DELETE_RECORDS       = 100;
+    public const NO_LIMIT                 = 1;
+    public const LIMIT_ACCESS             = 2;
+    public const LIMIT_MAX_RECORDS        = 3;
+    public const LIMIT_ACCESS_MAX_RECORDS = 4;
+    public const MAX_DELETE_RECORDS       = 100;
 
     /** @var AclHelper */
     protected $aclHelper;

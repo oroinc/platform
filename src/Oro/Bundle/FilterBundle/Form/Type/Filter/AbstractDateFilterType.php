@@ -20,20 +20,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 abstract class AbstractDateFilterType extends AbstractType
 {
-    const TYPE_NONE        = 0;
-    const TYPE_BETWEEN     = 1;
-    const TYPE_NOT_BETWEEN = 2;
-    const TYPE_MORE_THAN   = 3;
-    const TYPE_LESS_THAN   = 4;
-    const TYPE_EQUAL       = 5;
-    const TYPE_NOT_EQUAL   = 6;
+    public const TYPE_NONE        = 0;
+    public const TYPE_BETWEEN     = 1;
+    public const TYPE_NOT_BETWEEN = 2;
+    public const TYPE_MORE_THAN   = 3;
+    public const TYPE_LESS_THAN   = 4;
+    public const TYPE_EQUAL       = 5;
+    public const TYPE_NOT_EQUAL   = 6;
 
-    const TYPE_TODAY        = 7;
-    const TYPE_THIS_WEEK    = 8;
-    const TYPE_THIS_MONTH   = 9;
-    const TYPE_THIS_QUARTER = 10;
-    const TYPE_THIS_YEAR    = 11;
-    const TYPE_ALL_TIME     = 12;
+    public const TYPE_TODAY        = 7;
+    public const TYPE_THIS_WEEK    = 8;
+    public const TYPE_THIS_MONTH   = 9;
+    public const TYPE_THIS_QUARTER = 10;
+    public const TYPE_THIS_YEAR    = 11;
+    public const TYPE_ALL_TIME     = 12;
 
     /**
      * @var array

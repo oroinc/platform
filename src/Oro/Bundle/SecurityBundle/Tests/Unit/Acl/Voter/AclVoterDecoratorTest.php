@@ -22,7 +22,7 @@ class AclVoterDecoratorTest extends TestCase
     {
         $this->wrapped = $this->createMock(AclVoterInterface::class);
 
-        $this->decorator = new class($this->wrapped) extends AclVoterDecorator {
+        $this->decorator = new class ($this->wrapped) extends AclVoterDecorator {
         };
     }
 

@@ -12,49 +12,49 @@ namespace Oro\Component\Layout;
 class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
 {
     /** The group name for add new items related actions */
-    const GROUP_ADD = 1;
+    public const GROUP_ADD = 1;
 
     /** The group name for remove items related actions */
-    const GROUP_REMOVE = 2;
+    public const GROUP_REMOVE = 2;
 
     /** The action name for add layout item */
-    const ADD = 1;
+    public const ADD = 1;
 
     /** The action name for remove layout item */
-    const REMOVE = 2;
+    public const REMOVE = 2;
 
     /** The action name for move layout item */
-    const MOVE = 3;
+    public const MOVE = 3;
 
     /** The action name for add the alias for the layout item */
-    const ADD_ALIAS = 4;
+    public const ADD_ALIAS = 4;
 
     /** The action name for remove the alias for the layout item */
-    const REMOVE_ALIAS = 5;
+    public const REMOVE_ALIAS = 5;
 
     /** The action name for add/update an option for the layout item */
-    const SET_OPTION = 6;
+    public const SET_OPTION = 6;
 
     /** The action name for add additional value for an option for the layout item */
-    const APPEND_OPTION = 7;
+    public const APPEND_OPTION = 7;
 
     /** The action name for remove a value from an option for the layout item */
-    const SUBTRACT_OPTION = 8;
+    public const SUBTRACT_OPTION = 8;
 
     /** The action name for replace one value with another value for an option for the layout item */
-    const REPLACE_OPTION = 9;
+    public const REPLACE_OPTION = 9;
 
     /** The action name for remove an option for the layout item */
-    const REMOVE_OPTION = 10;
+    public const REMOVE_OPTION = 10;
 
     /** The action name for change the block type for the layout item */
-    const CHANGE_BLOCK_TYPE = 11;
+    public const CHANGE_BLOCK_TYPE = 11;
 
     /** The action name for add the theme(s) to be used for rendering the layout item and its children */
-    const SET_BLOCK_THEME = 12;
+    public const SET_BLOCK_THEME = 12;
 
     /** The action name for add the form theme(s) to be used for rendering forms */
-    const SET_FORM_THEME = 13;
+    public const SET_FORM_THEME = 13;
 
     /** @var LayoutRegistryInterface */
     protected $registry;

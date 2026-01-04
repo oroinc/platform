@@ -6,7 +6,7 @@ use Symfony\Component\Validator\Constraint;
 
 class NonExtendedEntityBidirectional extends Constraint
 {
-    const VALIDATOR_ALIAS = 'oro_entity_extend.validator.non_extended_entity_bidirectional';
+    public const VALIDATOR_ALIAS = 'oro_entity_extend.validator.non_extended_entity_bidirectional';
 
     /**
      * @var string

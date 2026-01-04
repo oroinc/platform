@@ -8,9 +8,9 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 class LoadItems extends AbstractFixture
 {
-    const ITEM1 = 'test-item1';
-    const ITEM2 = 'test-item2';
-    const ITEM3 = 'test-item3';
+    public const ITEM1 = 'test-item1';
+    public const ITEM2 = 'test-item2';
+    public const ITEM3 = 'test-item3';
 
     /**
      * @var array

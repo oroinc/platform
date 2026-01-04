@@ -12,8 +12,8 @@ interface EntityNameProviderInterface
     /**
      * Some default formats
      */
-    const FULL = 'full';
-    const SHORT = 'short';
+    public const FULL = 'full';
+    public const SHORT = 'short';
 
     /**
      * Returns a text representation of the given entity.

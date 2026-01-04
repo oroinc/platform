@@ -23,9 +23,9 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  */
 class FieldHelper
 {
-    const HAS_CONFIG = 'has_config';
+    public const HAS_CONFIG = 'has_config';
 
-    const IDENTITY_ONLY_WHEN_NOT_EMPTY = -1;
+    public const IDENTITY_ONLY_WHEN_NOT_EMPTY = -1;
 
     /** @var array */
     protected $fieldsCache = [];

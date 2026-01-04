@@ -10,18 +10,18 @@ use Oro\Component\PhpUtils\ArrayUtil;
  */
 class ExtendOptionsManager
 {
-    const ENTITY_CLASS_OPTION = '_entity_class';
-    const FIELD_NAME_OPTION   = '_field';
-    const TYPE_OPTION         = '_type';
-    const MODE_OPTION         = '_mode';
-    const TARGET_OPTION       = '_target';
-    const NEW_NAME_OPTION     = '_new_name';
-    const APPEND_SECTION      = '_append';
+    public const ENTITY_CLASS_OPTION = '_entity_class';
+    public const FIELD_NAME_OPTION   = '_field';
+    public const TYPE_OPTION         = '_type';
+    public const MODE_OPTION         = '_mode';
+    public const TARGET_OPTION       = '_target';
+    public const NEW_NAME_OPTION     = '_new_name';
+    public const APPEND_SECTION      = '_append';
 
     /**
      * Example of usage: sprintf('%s!%s', $tableName, $columnName)
      */
-    const COLUMN_OPTION_FORMAT = '%s!%s';
+    public const COLUMN_OPTION_FORMAT = '%s!%s';
 
     /**
      * @var array

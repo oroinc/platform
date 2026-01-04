@@ -13,15 +13,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class AppearanceExtension extends AbstractExtension
 {
-    const APPEARANCE_CONFIG_PATH = 'appearances';
-    const APPEARANCE_OPTION_PATH = '[options][appearances]';
+    public const APPEARANCE_CONFIG_PATH = 'appearances';
+    public const APPEARANCE_OPTION_PATH = '[options][appearances]';
 
-    const APPEARANCE_ROOT_PARAM = '_appearance';
-    const APPEARANCE_TYPE_PARAM = '_type';
-    const APPEARANCE_DATA_PARAM = '_data';
+    public const APPEARANCE_ROOT_PARAM = '_appearance';
+    public const APPEARANCE_TYPE_PARAM = '_type';
+    public const APPEARANCE_DATA_PARAM = '_data';
 
-    const MINIFIED_APPEARANCE_TYPE_PARAM = 'a';
-    const MINIFIED_APPEARANCE_DATA_PARAM = 'ad';
+    public const MINIFIED_APPEARANCE_TYPE_PARAM = 'a';
+    public const MINIFIED_APPEARANCE_DATA_PARAM = 'ad';
 
     /** @var Configuration */
     protected $configuration;

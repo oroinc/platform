@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SortingChoiceType extends AbstractType
 {
-    const NAME = 'oro_sorting_choice';
+    public const NAME = 'oro_sorting_choice';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

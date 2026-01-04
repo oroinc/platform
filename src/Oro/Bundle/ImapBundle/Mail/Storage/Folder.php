@@ -10,12 +10,12 @@ use Oro\Bundle\EmailBundle\Model\FolderType;
  */
 class Folder extends BaseFolder
 {
-    const FLAG_SENT   = 'Sent';
-    const FLAG_SPAM   = 'Spam';
-    const FLAG_TRASH  = 'Trash';
-    const FLAG_DRAFTS = 'Drafts';
-    const FLAG_INBOX  = 'Inbox';
-    const FLAG_ALL    = 'All';
+    public const FLAG_SENT   = 'Sent';
+    public const FLAG_SPAM   = 'Spam';
+    public const FLAG_TRASH  = 'Trash';
+    public const FLAG_DRAFTS = 'Drafts';
+    public const FLAG_INBOX  = 'Inbox';
+    public const FLAG_ALL    = 'All';
 
     /** @var array */
     protected $flagTypeMap = [

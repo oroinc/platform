@@ -10,7 +10,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class DefaultLocalizationValidator extends ConstraintValidator
 {
-    const ENABLED_LOCALIZATIONS_NAME = 'oro_locale___enabled_localizations';
+    public const ENABLED_LOCALIZATIONS_NAME = 'oro_locale___enabled_localizations';
 
     /**
      * @var LocalizationManager

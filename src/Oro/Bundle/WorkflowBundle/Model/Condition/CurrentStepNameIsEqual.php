@@ -17,7 +17,7 @@ class CurrentStepNameIsEqual extends AbstractCondition implements ContextAccesso
 {
     use ContextAccessorAwareTrait;
 
-    const NAME = 'current_step_name_is_equal';
+    public const NAME = 'current_step_name_is_equal';
 
     /**
      * @var string

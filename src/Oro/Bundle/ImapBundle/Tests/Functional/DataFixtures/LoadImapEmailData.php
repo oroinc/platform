@@ -11,11 +11,11 @@ use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 
 class LoadImapEmailData extends AbstractFixture implements DependentFixtureInterface
 {
-    const IMAP_EMAIL_1 = 'imap_email.1';
-    const IMAP_EMAIL_2 = 'imap_email.2';
-    const IMAP_EMAIL_3 = 'imap_email.3';
-    const IMAP_EMAIL_4 = 'imap_email.4';
-    const IMAP_EMAIL_5 = 'imap_email.5';
+    public const IMAP_EMAIL_1 = 'imap_email.1';
+    public const IMAP_EMAIL_2 = 'imap_email.2';
+    public const IMAP_EMAIL_3 = 'imap_email.3';
+    public const IMAP_EMAIL_4 = 'imap_email.4';
+    public const IMAP_EMAIL_5 = 'imap_email.5';
 
     #[\Override]
     public function load(ObjectManager $manager)

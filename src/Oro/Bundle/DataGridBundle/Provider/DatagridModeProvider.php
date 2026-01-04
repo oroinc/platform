@@ -7,7 +7,7 @@ namespace Oro\Bundle\DataGridBundle\Provider;
  */
 class DatagridModeProvider
 {
-    const DATAGRID_FRONTEND_MODE     = 'frontend';
-    const DATAGRID_BACKEND_MODE      = 'backend';
-    const DATAGRID_IMPORTEXPORT_MODE = 'importexport';
+    public const DATAGRID_FRONTEND_MODE     = 'frontend';
+    public const DATAGRID_BACKEND_MODE      = 'backend';
+    public const DATAGRID_IMPORTEXPORT_MODE = 'importexport';
 }

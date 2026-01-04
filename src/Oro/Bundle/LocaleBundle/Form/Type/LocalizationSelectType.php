@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LocalizationSelectType extends AbstractType
 {
-    const NAME = 'oro_locale_localization_select';
+    public const NAME = 'oro_locale_localization_select';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

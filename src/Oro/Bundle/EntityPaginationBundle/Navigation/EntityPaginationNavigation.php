@@ -10,10 +10,10 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class EntityPaginationNavigation
 {
-    const FIRST    = 'first';
-    const PREVIOUS = 'previous';
-    const NEXT     = 'next';
-    const LAST     = 'last';
+    public const FIRST    = 'first';
+    public const PREVIOUS = 'previous';
+    public const NEXT     = 'next';
+    public const LAST     = 'last';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;

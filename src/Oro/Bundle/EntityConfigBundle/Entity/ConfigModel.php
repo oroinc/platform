@@ -13,9 +13,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\MappedSuperclass]
 abstract class ConfigModel
 {
-    const MODE_DEFAULT = 'default';
-    const MODE_HIDDEN = 'hidden';
-    const MODE_READONLY = 'readonly';
+    public const MODE_DEFAULT = 'default';
+    public const MODE_HIDDEN = 'hidden';
+    public const MODE_READONLY = 'readonly';
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     protected ?\DateTimeInterface $created = null;

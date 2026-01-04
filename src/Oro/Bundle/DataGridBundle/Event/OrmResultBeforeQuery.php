@@ -8,7 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class OrmResultBeforeQuery extends Event implements GridEventInterface
 {
-    const NAME = 'oro_datagrid.orm_datasource.result.before_query';
+    public const NAME = 'oro_datagrid.orm_datasource.result.before_query';
 
     /** @var DatagridInterface */
     protected $datagrid;

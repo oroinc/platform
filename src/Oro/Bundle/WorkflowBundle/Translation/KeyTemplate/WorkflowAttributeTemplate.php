@@ -7,7 +7,7 @@ namespace Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
  */
 class WorkflowAttributeTemplate extends WorkflowTemplate
 {
-    const NAME = 'workflow_attribute';
+    public const NAME = 'workflow_attribute';
 
     #[\Override]
     public function getTemplate(): string

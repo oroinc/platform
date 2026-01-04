@@ -8,8 +8,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class MetadataProvidersPass implements CompilerPassInterface
 {
-    const TAG_NAME = 'oro_soap.metadata_provider';
-    const CHAIN_SERVICE_ID = 'oro_soap.provider.metadata.chain';
+    public const TAG_NAME = 'oro_soap.metadata_provider';
+    public const CHAIN_SERVICE_ID = 'oro_soap.provider.metadata.chain';
 
     #[\Override]
     public function process(ContainerBuilder $container)

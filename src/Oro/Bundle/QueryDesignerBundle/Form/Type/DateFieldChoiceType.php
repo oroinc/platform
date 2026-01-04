@@ -6,7 +6,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateFieldChoiceType extends FieldChoiceType
 {
-    const NAME = 'oro_date_field_choice';
+    public const NAME = 'oro_date_field_choice';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

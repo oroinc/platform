@@ -8,7 +8,7 @@ use Oro\Component\Layout\ContextInterface;
 
 class IsLoggedInContextConfigurator implements ContextConfiguratorInterface
 {
-    const OPTION_NAME = 'is_logged_in';
+    public const OPTION_NAME = 'is_logged_in';
 
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;

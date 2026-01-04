@@ -14,7 +14,7 @@ use Oro\Component\Layout\Util\BlockUtils;
 
 abstract class AbstractFormType extends AbstractType
 {
-    const SHORT_NAME = '';
+    public const SHORT_NAME = '';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

@@ -7,7 +7,7 @@ namespace Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
  */
 class TransitionWarningMessageTemplate extends TransitionTemplate
 {
-    const NAME = 'transition_warning_message';
+    public const NAME = 'transition_warning_message';
 
     #[\Override]
     public function getTemplate(): string

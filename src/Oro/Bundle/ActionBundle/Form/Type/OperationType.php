@@ -20,7 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class OperationType extends AbstractType
 {
-    const NAME = 'oro_action_operation';
+    public const NAME = 'oro_action_operation';
 
     /** @var RequiredAttributesListener */
     protected $requiredAttributesListener;

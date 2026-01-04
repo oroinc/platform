@@ -11,8 +11,8 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class ActivityListEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {
-    const ASSOCIATION_KIND = 'activityList';
-    const ENTITY_CLASS     = 'Oro\Bundle\ActivityListBundle\Entity\ActivityList';
+    public const ASSOCIATION_KIND = 'activityList';
+    public const ENTITY_CLASS     = 'Oro\Bundle\ActivityListBundle\Entity\ActivityList';
 
     protected $targetEntityConfigs;
 

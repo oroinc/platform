@@ -28,7 +28,7 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class Redirect extends AssignUrl
 {
-    const NEW_TAB_OPTION = 'new_tab';
+    public const NEW_TAB_OPTION = 'new_tab';
 
     /**
      * @param ContextAccessor $contextAccessor

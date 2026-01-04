@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DateTimeRangeFilterType extends AbstractDateFilterType
 {
-    const NAME = 'oro_type_datetime_range_filter';
+    public const NAME = 'oro_type_datetime_range_filter';
 
     public function getName()
     {

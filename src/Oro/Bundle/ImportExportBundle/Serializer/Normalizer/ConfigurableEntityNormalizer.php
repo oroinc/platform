@@ -30,8 +30,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer implements SerializerAwareInterface
 {
-    const FULL_MODE = 'full';
-    const SHORT_MODE = 'short';
+    public const FULL_MODE = 'full';
+    public const SHORT_MODE = 'short';
 
     /** @var SerializerInterface|NormalizerInterface|DenormalizerInterface */
     protected $serializer;

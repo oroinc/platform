@@ -15,7 +15,7 @@ use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
  */
 class AttributeAssembler extends AbstractAssembler
 {
-    const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
+    public const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
 
     /**
      * @var AttributeGuesser

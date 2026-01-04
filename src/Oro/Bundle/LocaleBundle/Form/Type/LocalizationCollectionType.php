@@ -17,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class LocalizationCollectionType extends AbstractType
 {
-    const NAME = 'oro_locale_localization_collection';
+    public const NAME = 'oro_locale_localization_collection';
 
     /**
      * @var ManagerRegistry

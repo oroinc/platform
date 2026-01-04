@@ -10,8 +10,8 @@ use Symfony\Component\Yaml\Yaml;
  */
 class XssPayloadProvider
 {
-    const DEFAULT_JS_PAYLOAD = 'alert(1)';
-    const DEFAULT_PAYLOAD_TYPE = 'script';
+    public const DEFAULT_JS_PAYLOAD = 'alert(1)';
+    public const DEFAULT_PAYLOAD_TYPE = 'script';
 
     /**
      * @var array

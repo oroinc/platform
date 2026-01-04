@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AttributeGroupCollectionType extends AbstractType
 {
-    const NAME = 'oro_entity_config_attribute_group_collection';
+    public const NAME = 'oro_entity_config_attribute_group_collection';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

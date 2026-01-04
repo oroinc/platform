@@ -9,7 +9,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class EntityChangesetTransformer implements DataTransformerInterface
 {
-    const ENTITY_KEY = 'entity';
+    public const ENTITY_KEY = 'entity';
 
     /**
      * @var DoctrineHelper

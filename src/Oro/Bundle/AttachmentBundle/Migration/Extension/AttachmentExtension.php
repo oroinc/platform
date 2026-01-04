@@ -17,9 +17,9 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
 {
     use ExtendExtensionAwareTrait;
 
-    const FILE_TABLE_NAME       = 'oro_attachment_file';
-    const ATTACHMENT_TABLE_NAME = 'oro_attachment';
-    const ATTACHMENT_FILE_ITEM_TABLE = 'oro_attachment_file_item';
+    public const FILE_TABLE_NAME       = 'oro_attachment_file';
+    public const ATTACHMENT_TABLE_NAME = 'oro_attachment';
+    public const ATTACHMENT_FILE_ITEM_TABLE = 'oro_attachment_file_item';
 
     /**
      * @param Schema $schema

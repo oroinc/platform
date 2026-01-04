@@ -9,7 +9,7 @@ use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 
 class DataGridTagListener
 {
-    const TAGS_PATH = '[contentTags]';
+    public const TAGS_PATH = '[contentTags]';
 
     /** @var TagGeneratorInterface */
     protected $generator;

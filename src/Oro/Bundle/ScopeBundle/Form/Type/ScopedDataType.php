@@ -16,11 +16,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ScopedDataType extends AbstractType
 {
-    const NAME = 'oro_scoped_data_type';
-    const SCOPES_OPTION = 'scopes';
-    const TYPE_OPTION = 'type';
-    const OPTIONS_OPTION = 'options';
-    const PRELOADED_SCOPES_OPTION = 'preloaded_scopes';
+    public const NAME = 'oro_scoped_data_type';
+    public const SCOPES_OPTION = 'scopes';
+    public const TYPE_OPTION = 'type';
+    public const OPTIONS_OPTION = 'options';
+    public const PRELOADED_SCOPES_OPTION = 'preloaded_scopes';
 
     /**
      * @var ManagerRegistry

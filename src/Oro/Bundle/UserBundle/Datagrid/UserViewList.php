@@ -12,7 +12,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
  */
 class UserViewList extends AbstractViewsList
 {
-    const GRID_NAME = 'users-grid';
+    public const GRID_NAME = 'users-grid';
 
     protected $systemViews = [
         'user.active' => [

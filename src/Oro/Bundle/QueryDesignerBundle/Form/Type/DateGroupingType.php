@@ -14,11 +14,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DateGroupingType extends AbstractType
 {
-    const NAME = 'oro_query_designer_date_grouping';
-    const FIELD_NAME_ID = 'fieldName';
-    const USE_SKIP_EMPTY_PERIODS_FILTER_ID = 'useSkipEmptyPeriodsFilter';
-    const USE_DATE_GROUPING_FILTER = 'useDateGroupFilter';
-    const DATE_GROUPING_NAME = 'date_grouping';
+    public const NAME = 'oro_query_designer_date_grouping';
+    public const FIELD_NAME_ID = 'fieldName';
+    public const USE_SKIP_EMPTY_PERIODS_FILTER_ID = 'useSkipEmptyPeriodsFilter';
+    public const USE_DATE_GROUPING_FILTER = 'useDateGroupFilter';
+    public const DATE_GROUPING_NAME = 'date_grouping';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

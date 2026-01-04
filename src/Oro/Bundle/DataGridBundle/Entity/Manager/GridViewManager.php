@@ -26,9 +26,9 @@ use Oro\Component\PhpUtils\ArrayUtil;
  */
 class GridViewManager
 {
-    const DEFAULT_VIEW_KEY = 'default_view';
-    const SYSTEM_VIEWS_KEY = 'system_views';
-    const ALL_VIEWS_KEY    = 'all_views';
+    public const DEFAULT_VIEW_KEY = 'default_view';
+    public const SYSTEM_VIEWS_KEY = 'system_views';
+    public const ALL_VIEWS_KEY    = 'all_views';
 
     /** @var AclHelper */
     protected $aclHelper;

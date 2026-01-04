@@ -21,7 +21,7 @@ class AbstractComparisonTest extends TestCase
     {
         $this->contextAccessor = $this->createMock(ContextAccessorInterface::class);
 
-        $this->condition = new class() extends AbstractComparison {
+        $this->condition = new class () extends AbstractComparison {
             protected function doCompare($left, $right)
             {
             }

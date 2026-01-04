@@ -9,9 +9,9 @@ use Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface;
  */
 class JobConfigurationProvider implements JobConfigurationProviderInterface
 {
-    const JOBS_ARRAY_KEY = 'jobs';
-    const JOB_NAME_DEFAULT_KEY = 'default';
-    const JOB_NAME_DELIMITERS = ['dot' => '.', 'colon' => ':'];
+    public const JOBS_ARRAY_KEY = 'jobs';
+    public const JOB_NAME_DEFAULT_KEY = 'default';
+    public const JOB_NAME_DELIMITERS = ['dot' => '.', 'colon' => ':'];
 
     /**
      * @var array

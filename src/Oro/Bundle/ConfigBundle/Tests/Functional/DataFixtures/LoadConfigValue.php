@@ -10,7 +10,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class LoadConfigValue extends AbstractFixture
 {
-    const FILENAME = 'config_value.yml';
+    public const FILENAME = 'config_value.yml';
 
     #[\Override]
     public function load(ObjectManager $manager)

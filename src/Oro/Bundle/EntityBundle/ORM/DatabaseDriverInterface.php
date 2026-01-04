@@ -7,8 +7,8 @@ namespace Oro\Bundle\EntityBundle\ORM;
  */
 interface DatabaseDriverInterface
 {
-    const DRIVER_POSTGRESQL = 'postgresql';
-    const DRIVER_MYSQL      = 'mysql';
+    public const DRIVER_POSTGRESQL = 'postgresql';
+    public const DRIVER_MYSQL      = 'mysql';
 
     /**
      * @return string

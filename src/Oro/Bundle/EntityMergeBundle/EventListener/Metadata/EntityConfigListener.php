@@ -11,8 +11,8 @@ use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
  */
 class EntityConfigListener
 {
-    const CONFIG_MERGE_SCOPE = 'merge';
-    const INVERSE_OPTION_PREFIX = 'inverse_';
+    public const CONFIG_MERGE_SCOPE = 'merge';
+    public const INVERSE_OPTION_PREFIX = 'inverse_';
 
     /**
      * @var EntityConfigHelper

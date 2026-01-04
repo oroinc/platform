@@ -10,8 +10,8 @@ use Symfony\Contracts\Cache\CacheInterface;
  */
 class UrlGenerator
 {
-    const URL = '//r.orocrm.com/a/';
-    const FORM_JS = 'f.js';
+    public const URL = '//r.orocrm.com/a/';
+    public const FORM_JS = 'f.js';
 
     private PackageProvider $packageProvider;
     private CacheInterface $cacheProvider;

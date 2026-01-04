@@ -22,7 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class IntegrationSelectType extends AbstractType
 {
-    const NAME = 'oro_integration_select';
+    public const NAME = 'oro_integration_select';
 
     /** @var EntityManager */
     protected $em;

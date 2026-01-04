@@ -11,9 +11,9 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    const FILTERS_PATH         = '[filters]';
-    const COLUMNS_PATH         = '[filters][columns]';
-    const DEFAULT_FILTERS_PATH = '[filters][default]';
+    public const FILTERS_PATH         = '[filters]';
+    public const COLUMNS_PATH         = '[filters][columns]';
+    public const DEFAULT_FILTERS_PATH = '[filters][default]';
 
     /** @var array */
     protected $types;

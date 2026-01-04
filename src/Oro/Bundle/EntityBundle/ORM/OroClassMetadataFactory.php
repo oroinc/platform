@@ -20,7 +20,7 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class OroClassMetadataFactory extends ClassMetadataFactory
 {
-    const ALL_METADATA_KEY = 'oro_entity.all_metadata';
+    public const ALL_METADATA_KEY = 'oro_entity.all_metadata';
 
     /** @var EntityManagerInterface|null */
     private $entityManager;

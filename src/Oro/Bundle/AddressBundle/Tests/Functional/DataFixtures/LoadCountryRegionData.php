@@ -10,8 +10,8 @@ use Oro\Bundle\AddressBundle\Entity\Region;
 
 class LoadCountryRegionData extends AbstractFixture implements DependentFixtureInterface
 {
-    const REGION_US_FL = 'region.usfl';
-    const REGION_US_XX = 'region.usxx';
+    public const REGION_US_FL = 'region.usfl';
+    public const REGION_US_XX = 'region.usxx';
 
     /** @var array */
     protected $data = [

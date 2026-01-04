@@ -10,7 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatisti
  */
 class FilesystemStatisticRepository implements StatisticRepositoryInterface, ObjectRepository
 {
-    const FEATURE_DURATION_FILE = 'feature_duration.json';
+    public const FEATURE_DURATION_FILE = 'feature_duration.json';
 
     /**
      * @var array

@@ -17,8 +17,8 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 class WidgetController extends AbstractController
 {
-    const DEFAULT_FORM_TEMPLATE = '@OroAction/Operation/form.html.twig';
-    const DEFAULT_PAGE_TEMPLATE = '@OroAction/Operation/page.html.twig';
+    public const DEFAULT_FORM_TEMPLATE = '@OroAction/Operation/form.html.twig';
+    public const DEFAULT_PAGE_TEMPLATE = '@OroAction/Operation/page.html.twig';
 
     /**
      *

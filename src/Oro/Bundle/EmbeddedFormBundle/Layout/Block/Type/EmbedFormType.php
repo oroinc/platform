@@ -13,8 +13,8 @@ use Oro\Component\Layout\BlockBuilderInterface;
  */
 class EmbedFormType extends AbstractType
 {
-    const NAME = 'embed_form';
-    const FIELD_SEPARATOR = '_';
+    public const NAME = 'embed_form';
+    public const FIELD_SEPARATOR = '_';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

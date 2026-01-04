@@ -19,52 +19,52 @@ class DatagridConfiguration extends ConfigObject
 {
     private const COLUMNS_PATH = '[columns]';
     private const FILTERS_PATH = '[filters][columns]';
-    const COLUMN_PATH = '[columns][%s]';
-    const SORTER_PATH = '[sorters][columns][%s]';
-    const FILTER_PATH = '[filters][columns][%s]';
-    const PROPERTY_PATH = '[properties][%s]';
-    const DATASOURCE_PATH = '[source]';
-    const DATASOURCE_TYPE_PATH = '[source][type]';
-    const BASE_DATAGRID_CLASS_PATH  = '[options][base_datagrid_class]';
-    const FROM_PATH = '[source][query][from]';
-    const SELECT_PATH = '[source][query][select]';
-    const ENTITY_HINT_PATH = '[options][entityHint]';
-    const JS_MODULES_PATH = '[options][jsmodules]';
-    const EMPTY_GRID_MESSAGE_PATH = '[options][noDataMessages][emptyGrid]';
-    const EMPTY_FILTERED_GRID_MESSAGE_PATH = '[options][noDataMessages][emptyFilteredGrid]';
+    public const COLUMN_PATH = '[columns][%s]';
+    public const SORTER_PATH = '[sorters][columns][%s]';
+    public const FILTER_PATH = '[filters][columns][%s]';
+    public const PROPERTY_PATH = '[properties][%s]';
+    public const DATASOURCE_PATH = '[source]';
+    public const DATASOURCE_TYPE_PATH = '[source][type]';
+    public const BASE_DATAGRID_CLASS_PATH  = '[options][base_datagrid_class]';
+    public const FROM_PATH = '[source][query][from]';
+    public const SELECT_PATH = '[source][query][select]';
+    public const ENTITY_HINT_PATH = '[options][entityHint]';
+    public const JS_MODULES_PATH = '[options][jsmodules]';
+    public const EMPTY_GRID_MESSAGE_PATH = '[options][noDataMessages][emptyGrid]';
+    public const EMPTY_FILTERED_GRID_MESSAGE_PATH = '[options][noDataMessages][emptyFilteredGrid]';
 
-    const EXTENDED_ENTITY_NAME = 'extended_entity_name';
+    public const EXTENDED_ENTITY_NAME = 'extended_entity_name';
 
     // Use this option as workaround for http://www.doctrine-project.org/jira/browse/DDC-2794
-    const DATASOURCE_SKIP_COUNT_WALKER_PATH = '[options][skip_count_walker]';
+    public const DATASOURCE_SKIP_COUNT_WALKER_PATH = '[options][skip_count_walker]';
 
     /**
      * This option refers to ACL resource that will be checked before datagrid is loaded.
      */
-    const ACL_RESOURCE_PATH = '[acl_resource]';
+    public const ACL_RESOURCE_PATH = '[acl_resource]';
 
     /**
      * This option makes possible to skip apply of ACL adjustment to source query of datagrid.
      */
-    const DATASOURCE_SKIP_ACL_APPLY_PATH = '[source][skip_acl_apply]';
+    public const DATASOURCE_SKIP_ACL_APPLY_PATH = '[source][skip_acl_apply]';
 
     /**
      * This option allow to pass additional context to
      * {@see \Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder} to make additional checks
      * during getting the ACL condition data.
      */
-    const ACL_CONDITION_DATA_BUILDER_CONTEXT = '[source][acl_condition_data_builder_context]';
+    public const ACL_CONDITION_DATA_BUILDER_CONTEXT = '[source][acl_condition_data_builder_context]';
 
     /**
      * This option sets what ACL permission will be applied to datasource if value is DATASOURCE_SKIP_ACL_APPLY_PATH
      * is set to false. Default value of this setting is VIEW.
      */
-    const DATASOURCE_ACL_APPLY_PERMISSION_PATH = '[source][acl_apply_permission]';
+    public const DATASOURCE_ACL_APPLY_PERMISSION_PATH = '[source][acl_apply_permission]';
 
     /**
      * A datagrid parameters to datasource parameters binding.
      */
-    const DATASOURCE_BIND_PARAMETERS_PATH = '[source][bind_parameters]';
+    public const DATASOURCE_BIND_PARAMETERS_PATH = '[source][bind_parameters]';
 
     /** @var object|null */
     private $query;

@@ -15,14 +15,14 @@ class LoadLanguageDemoData extends AbstractFixture
 {
     use UserUtilityTrait;
 
-    const LANG_DE_DE = 'language.de_DE';
-    const LANG_FR_FR = 'language.fr_FR';
-    const LANG_EN_US = 'language.en_US';
-    const LANG_EN_CA = 'language.en_CA';
-    const LANG_EN_GB = 'language.en_GB';
-    const LANG_EN_AU = 'language.en_AU';
-    const LANG_ES_AR = 'language.es_AR';
-    const LANG_FR_CA = 'language.fr_CA';
+    public const LANG_DE_DE = 'language.de_DE';
+    public const LANG_FR_FR = 'language.fr_FR';
+    public const LANG_EN_US = 'language.en_US';
+    public const LANG_EN_CA = 'language.en_CA';
+    public const LANG_EN_GB = 'language.en_GB';
+    public const LANG_EN_AU = 'language.en_AU';
+    public const LANG_ES_AR = 'language.es_AR';
+    public const LANG_FR_CA = 'language.fr_CA';
 
     /** @var array */
     protected static $languages = [

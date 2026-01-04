@@ -10,8 +10,8 @@ use Psr\Log\LoggerInterface;
 
 class UpdateCustomEntityOwnerQuery extends ParametrizedMigrationQuery
 {
-    const NEW_OWNER_LABEL = 'oro.custom_entity.owner.label';
-    const NEW_OWNER_DESCRIPTION = 'oro.custom_entity.owner.description';
+    public const NEW_OWNER_LABEL = 'oro.custom_entity.owner.label';
+    public const NEW_OWNER_DESCRIPTION = 'oro.custom_entity.owner.description';
 
     #[\Override]
     public function getDescription()

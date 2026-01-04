@@ -33,7 +33,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ConfigurationType extends AbstractType
 {
-    const NAME = 'oro_imap_configuration';
+    public const NAME = 'oro_imap_configuration';
 
     /** @var SymmetricCrypterInterface */
     protected $encryptor;

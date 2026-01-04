@@ -9,11 +9,11 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\VariableStorage;
  */
 class Table extends Element
 {
-    const TABLE_HEADER_ELEMENT = 'TableHeader';
-    const TABLE_ROW_STRICT_ELEMENT = 'TableRowStrict';
-    const TABLE_ROW_ELEMENT = 'TableRow';
-    const ERROR_NO_ROW = "Can't get %s row, because there are only %s rows in table";
-    const ERROR_NO_ROW_CONTENT = 'Table has no record with "%s" content';
+    public const TABLE_HEADER_ELEMENT = 'TableHeader';
+    public const TABLE_ROW_STRICT_ELEMENT = 'TableRowStrict';
+    public const TABLE_ROW_ELEMENT = 'TableRow';
+    public const ERROR_NO_ROW = "Can't get %s row, because there are only %s rows in table";
+    public const ERROR_NO_ROW_CONTENT = 'Table has no record with "%s" content';
 
     /**
      * Get Element tr by row number

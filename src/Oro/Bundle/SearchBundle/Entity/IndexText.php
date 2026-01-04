@@ -13,6 +13,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'oro_search_index_text_item_field_idx', columns: ['item_id', 'field'])]
 class IndexText extends AbstractIndexText
 {
-    const HYPHEN_SUBSTITUTION = ' ';
-    const TABLE_NAME = 'oro_search_index_text';
+    public const HYPHEN_SUBSTITUTION = ' ';
+    public const TABLE_NAME = 'oro_search_index_text';
 }

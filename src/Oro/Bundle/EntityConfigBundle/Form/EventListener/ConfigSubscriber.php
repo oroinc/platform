@@ -19,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ConfigSubscriber implements EventSubscriberInterface
 {
-    const NEW_PENDING_VALUE_KEY = 1;
+    public const NEW_PENDING_VALUE_KEY = 1;
 
     /** @var ConfigTranslationHelper */
     protected $translationHelper;

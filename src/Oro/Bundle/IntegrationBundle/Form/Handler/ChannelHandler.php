@@ -22,9 +22,9 @@ class ChannelHandler
 {
     use RequestHandlerTrait;
 
-    const UPDATE_MARKER = 'formUpdateMarker';
+    public const UPDATE_MARKER = 'formUpdateMarker';
 
-    const TRANSPORT_TYPE_FIELD_NAME = 'transportType';
+    public const TRANSPORT_TYPE_FIELD_NAME = 'transportType';
 
     /** @var RequestStack */
     protected $requestStack;

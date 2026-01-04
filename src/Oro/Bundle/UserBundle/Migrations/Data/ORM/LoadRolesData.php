@@ -12,10 +12,10 @@ use Oro\Bundle\UserBundle\Entity\Role;
  */
 class LoadRolesData extends AbstractFixture implements DependentFixtureInterface
 {
-    const ROLE_ANONYMOUS     = 'PUBLIC_ACCESS';
-    const ROLE_USER          = 'ROLE_USER';
-    const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
-    const ROLE_MANAGER       = 'ROLE_MANAGER';
+    public const ROLE_ANONYMOUS     = 'PUBLIC_ACCESS';
+    public const ROLE_USER          = 'ROLE_USER';
+    public const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
+    public const ROLE_MANAGER       = 'ROLE_MANAGER';
 
     #[\Override]
     public function getDependencies()

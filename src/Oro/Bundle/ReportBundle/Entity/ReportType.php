@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'oro_report_type')]
 class ReportType
 {
-    const TYPE_TABLE = 'TABLE';
+    public const TYPE_TABLE = 'TABLE';
 
     #[ORM\Column(name: 'name', type: Types::STRING, length: 32)]
     #[ORM\Id]

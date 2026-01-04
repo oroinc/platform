@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ColumnType extends AbstractType
 {
-    const NAME = 'oro_query_designer_column';
+    public const NAME = 'oro_query_designer_column';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

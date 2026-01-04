@@ -10,9 +10,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class LoadLanguages extends AbstractFixture implements DependentFixtureInterface
 {
-    const LANGUAGE1 = 'en_CA';
-    const LANGUAGE2 = 'fr_FR';
-    const LANGUAGE3 = 'en_US';
+    public const LANGUAGE1 = 'en_CA';
+    public const LANGUAGE2 = 'fr_FR';
+    public const LANGUAGE3 = 'en_US';
 
     public const LANGUAGES = [
         self::LANGUAGE1 => [

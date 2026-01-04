@@ -10,7 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class MenuUpdateWithScopeChangeEvent extends Event
 {
-    const NAME = 'oro_menu.menu_update_with_scope_change';
+    public const NAME = 'oro_menu.menu_update_with_scope_change';
 
     /**
      * @var string

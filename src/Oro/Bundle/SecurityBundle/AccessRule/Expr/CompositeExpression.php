@@ -9,8 +9,8 @@ use Oro\Bundle\SecurityBundle\AccessRule\Visitor;
  */
 class CompositeExpression implements ExpressionInterface
 {
-    const TYPE_AND = 'AND';
-    const TYPE_OR = 'OR';
+    public const TYPE_AND = 'AND';
+    public const TYPE_OR = 'OR';
 
     /** @var string */
     private $type;

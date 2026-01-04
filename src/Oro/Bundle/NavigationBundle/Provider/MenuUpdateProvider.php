@@ -12,7 +12,7 @@ use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
  */
 class MenuUpdateProvider implements MenuUpdateProviderInterface
 {
-    const SCOPE_CONTEXT_OPTION = 'scopeContext';
+    public const SCOPE_CONTEXT_OPTION = 'scopeContext';
 
     /**
      * @var ScopeManager

@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormInterface;
 class FormLayoutBuilder implements FormLayoutBuilderInterface
 {
     /** A char that separates fields within a path */
-    const PATH_SEPARATOR = '.';
+    public const PATH_SEPARATOR = '.';
 
     /** @var array */
     protected $simpleFormTypes = [];

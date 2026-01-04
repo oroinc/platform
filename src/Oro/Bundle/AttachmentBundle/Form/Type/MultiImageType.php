@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class MultiImageType extends AbstractType
 {
-    const TYPE = 'oro_attachment_multi_image';
+    public const TYPE = 'oro_attachment_multi_image';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

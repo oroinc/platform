@@ -9,7 +9,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class AttributeFamilyGroupsValidator extends ConstraintValidator
 {
-    const ALIAS = 'oro_entity_config.validator.attribute_family_groups';
+    public const ALIAS = 'oro_entity_config.validator.attribute_family_groups';
 
     #[\Override]
     public function validate($value, Constraint $constraint)

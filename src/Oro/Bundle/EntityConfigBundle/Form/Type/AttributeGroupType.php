@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class AttributeGroupType extends AbstractType
 {
-    const NAME = 'oro_entity_config_attribute_group';
+    public const NAME = 'oro_entity_config_attribute_group';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

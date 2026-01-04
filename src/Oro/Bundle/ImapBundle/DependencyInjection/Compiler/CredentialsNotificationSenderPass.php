@@ -11,9 +11,9 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class CredentialsNotificationSenderPass implements CompilerPassInterface
 {
-    const SERVICE_KEY = 'oro_imap.origin_credentials.issue_manager';
-    const NOTIFICATION_CHANNEL_TAG = 'oro_imap.origin_credentials.notification_sender';
-    const NOTIFICATION_USER_CHANNEL_TAG = 'oro_imap.origin_credentials.user_notification_sender';
+    public const SERVICE_KEY = 'oro_imap.origin_credentials.issue_manager';
+    public const NOTIFICATION_CHANNEL_TAG = 'oro_imap.origin_credentials.notification_sender';
+    public const NOTIFICATION_USER_CHANNEL_TAG = 'oro_imap.origin_credentials.user_notification_sender';
 
     #[\Override]
     public function process(ContainerBuilder $container)

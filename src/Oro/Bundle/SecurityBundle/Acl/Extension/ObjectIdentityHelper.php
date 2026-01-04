@@ -7,11 +7,11 @@ namespace Oro\Bundle\SecurityBundle\Acl\Extension;
  */
 class ObjectIdentityHelper
 {
-    const FIELD_DELIMITER = '::';
+    public const FIELD_DELIMITER = '::';
 
-    const IDENTITY_TYPE_DELIMITER = ':';
+    public const IDENTITY_TYPE_DELIMITER = ':';
 
-    const GROUP_DELIMITER = '@';
+    public const GROUP_DELIMITER = '@';
 
     /**
      * Parse identity string to array of values: id, type, and fieldName

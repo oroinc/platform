@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IntegrationSettingsDynamicFormType extends AbstractType
 {
-    const NAME = 'oro_integration_integration_settings_type';
+    public const NAME = 'oro_integration_integration_settings_type';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

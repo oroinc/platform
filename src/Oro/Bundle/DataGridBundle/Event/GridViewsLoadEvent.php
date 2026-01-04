@@ -11,7 +11,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class GridViewsLoadEvent extends Event
 {
-    const EVENT_NAME = 'oro_datagrid.grid_views_load';
+    public const EVENT_NAME = 'oro_datagrid.grid_views_load';
 
     /** @var string */
     protected $gridName;

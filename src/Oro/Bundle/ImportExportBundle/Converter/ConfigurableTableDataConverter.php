@@ -23,12 +23,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class ConfigurableTableDataConverter extends AbstractTableDataConverter implements EntityNameAwareInterface
 {
-    const DEFAULT_SINGLE_RELATION_LEVEL = 5;
-    const DEFAULT_MULTIPLE_RELATION_LEVEL = 3;
-    const DEFAULT_ORDER = 10000;
+    public const DEFAULT_SINGLE_RELATION_LEVEL = 5;
+    public const DEFAULT_MULTIPLE_RELATION_LEVEL = 3;
+    public const DEFAULT_ORDER = 10000;
 
-    const CONVERSION_TYPE_DATA = 'data';
-    const CONVERSION_TYPE_FIXTURES = 'fixtures';
+    public const CONVERSION_TYPE_DATA = 'data';
+    public const CONVERSION_TYPE_FIXTURES = 'fixtures';
 
     /** @var string */
     protected $entityName;

@@ -11,12 +11,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class Lexer
 {
-    const REGEXP_TIME     = '#(\d\d:\d\d(:\d\d)?)#';
-    const REGEXP_DATETIME = '#((\d{4}\-\d{2}\-\d{2})[tT\s]*(\d\d:\d\d(:\d\d)?)?)#';
-    const REGEXP_DAYMONTH = '#^\d{2}\-\d{2}$#';
-    const REGEXP_VARIABLE = '#{{(\d+)}}#';
-    const REGEXP_OPERATOR = '#\+|\-#';
-    const REGEXP_INTEGER  = '#[0-9]+#';
+    public const REGEXP_TIME     = '#(\d\d:\d\d(:\d\d)?)#';
+    public const REGEXP_DATETIME = '#((\d{4}\-\d{2}\-\d{2})[tT\s]*(\d\d:\d\d(:\d\d)?)?)#';
+    public const REGEXP_DAYMONTH = '#^\d{2}\-\d{2}$#';
+    public const REGEXP_VARIABLE = '#{{(\d+)}}#';
+    public const REGEXP_OPERATOR = '#\+|\-#';
+    public const REGEXP_INTEGER  = '#[0-9]+#';
 
     /** @var TranslatorInterface */
     private $translator;

@@ -14,7 +14,7 @@ final class ProcessEvents
      *
      * @var string
      */
-    const HANDLE_BEFORE = 'oro_workflow.process.handle_before';
+    public const HANDLE_BEFORE = 'oro_workflow.process.handle_before';
 
     /**
      * This event occurs after process trigger was handled by ProcessHandler
@@ -23,7 +23,7 @@ final class ProcessEvents
      *
      * @var string
      */
-    const HANDLE_AFTER = 'oro_workflow.process.handle_after';
+    public const HANDLE_AFTER = 'oro_workflow.process.handle_after';
 
     /**
      * This event occurs after process was handled by ProcessHandler and after all changes were flushed to persistence.
@@ -32,5 +32,5 @@ final class ProcessEvents
      *
      * @var string
      */
-    const HANDLE_AFTER_FLUSH = 'oro_workflow.process.handle_after_flush';
+    public const HANDLE_AFTER_FLUSH = 'oro_workflow.process.handle_after_flush';
 }

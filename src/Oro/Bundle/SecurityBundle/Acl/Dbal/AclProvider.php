@@ -34,7 +34,7 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
  */
 class AclProvider implements AclProviderInterface
 {
-    const MAX_BATCH_SIZE = 30;
+    public const MAX_BATCH_SIZE = 30;
 
     protected const EMPTY_ACL_ID = 0;
 

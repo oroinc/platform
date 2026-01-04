@@ -7,7 +7,7 @@ use Oro\Bundle\NavigationBundle\Provider\TitleService;
 
 class NavigationTitleProvider
 {
-    const FRONTEND_MENU_NAME = 'frontend_menu';
+    public const FRONTEND_MENU_NAME = 'frontend_menu';
 
     /** @var TitleService */
     private $titleService;

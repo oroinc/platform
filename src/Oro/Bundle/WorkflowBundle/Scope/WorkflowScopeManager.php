@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface;
  */
 class WorkflowScopeManager
 {
-    const SCOPE_TYPE = 'workflow_definition';
+    public const SCOPE_TYPE = 'workflow_definition';
 
     /** @var ManagerRegistry */
     protected $registry;

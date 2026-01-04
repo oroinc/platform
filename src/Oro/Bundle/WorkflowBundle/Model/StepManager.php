@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\Collection;
 
 class StepManager
 {
-    const DEFAULT_START_STEP_NAME = 'step:starting_point';
+    public const DEFAULT_START_STEP_NAME = 'step:starting_point';
 
     /**
      * @var Collection|Step[]

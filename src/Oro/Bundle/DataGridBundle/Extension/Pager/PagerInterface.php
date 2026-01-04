@@ -10,14 +10,14 @@ interface PagerInterface
     /**
      * Pager parameters
      */
-    const PAGER_ROOT_PARAM = '_pager';
-    const PAGE_PARAM       = '_page';
-    const PER_PAGE_PARAM   = '_per_page';
-    const DISABLED_PARAM   = '_disabled';
-    const ADJUSTED_COUNT   = '_adjusted_count';
+    public const PAGER_ROOT_PARAM = '_pager';
+    public const PAGE_PARAM       = '_page';
+    public const PER_PAGE_PARAM   = '_per_page';
+    public const DISABLED_PARAM   = '_disabled';
+    public const ADJUSTED_COUNT   = '_adjusted_count';
 
-    const MINIFIED_PAGE_PARAM     = 'i';
-    const MINIFIED_PER_PAGE_PARAM = 'p';
+    public const MINIFIED_PAGE_PARAM     = 'i';
+    public const MINIFIED_PER_PAGE_PARAM = 'p';
 
     /**
      * Set max records per page

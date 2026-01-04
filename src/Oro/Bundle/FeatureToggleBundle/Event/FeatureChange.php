@@ -6,7 +6,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class FeatureChange extends Event
 {
-    const NAME = 'oro_featuretoggle.feature.change';
+    public const NAME = 'oro_featuretoggle.feature.change';
 
     /**
      * @var string

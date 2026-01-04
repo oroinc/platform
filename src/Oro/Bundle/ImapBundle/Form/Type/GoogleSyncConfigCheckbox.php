@@ -10,7 +10,7 @@ use Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox;
  */
 class GoogleSyncConfigCheckbox extends ConfigCheckbox
 {
-    const NAME = 'oro_config_google_imap_sync_checkbox';
+    public const NAME = 'oro_config_google_imap_sync_checkbox';
 
     #[\Override]
     public function getName()

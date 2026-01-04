@@ -22,18 +22,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class BoardExtension extends AbstractExtension
 {
-    const CONFIG_PATH = 'board';
+    public const CONFIG_PATH = 'board';
 
-    const APPEARANCE_TYPE = 'board';
+    public const APPEARANCE_TYPE = 'board';
 
-    const ENTITY_PAGINATION_PARAM = 'entity_pagination';
-    const DEFAULT_ITEMS_PER_PAGE = 10;
+    public const ENTITY_PAGINATION_PARAM = 'entity_pagination';
+    public const DEFAULT_ITEMS_PER_PAGE = 10;
 
     /**
      * Parameter used to handle pagination within board column
      * Should contain ids of board column to which a clicked entity belongs
      */
-    const BOARD_COLUMNS_ID_PARAM_ID = 'boardColumnIds';
+    public const BOARD_COLUMNS_ID_PARAM_ID = 'boardColumnIds';
 
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;

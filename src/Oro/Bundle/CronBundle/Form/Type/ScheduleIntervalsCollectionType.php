@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ScheduleIntervalsCollectionType extends AbstractType
 {
-    const NAME = 'oro_cron_schedule_intervals_collection';
+    public const NAME = 'oro_cron_schedule_intervals_collection';
 
     #[\Override]
     public function getParent(): ?string

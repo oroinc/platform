@@ -9,12 +9,12 @@ use Composer\InstalledVersions;
  */
 class PackageProvider
 {
-    const ORO_NAMESPACE = 'oro';
-    const NAMESPACE_DELIMITER = '/';
+    public const ORO_NAMESPACE = 'oro';
+    public const NAMESPACE_DELIMITER = '/';
 
-    const PACKAGE_PLATFORM = 'platform';
-    const PACKAGE_CRM = 'crm';
-    const PACKAGE_COMMERCE = 'commerce';
+    public const PACKAGE_PLATFORM = 'platform';
+    public const PACKAGE_CRM = 'crm';
+    public const PACKAGE_COMMERCE = 'commerce';
 
     protected array $oroPackages = [];
 

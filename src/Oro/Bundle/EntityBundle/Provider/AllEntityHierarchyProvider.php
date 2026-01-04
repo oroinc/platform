@@ -15,7 +15,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class AllEntityHierarchyProvider extends AbstractEntityHierarchyProvider
 {
-    const HIERARCHY_METADATA_CACHE_KEY = 'oro_entity.all_hierarchy_metadata';
+    public const HIERARCHY_METADATA_CACHE_KEY = 'oro_entity.all_hierarchy_metadata';
 
     /** @var ConfigProvider */
     protected $extendConfigProvider;

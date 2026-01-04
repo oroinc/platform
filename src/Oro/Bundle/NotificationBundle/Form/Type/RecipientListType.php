@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class RecipientListType extends AbstractType
 {
-    const NAME = 'oro_notification_recipient_list';
+    public const NAME = 'oro_notification_recipient_list';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

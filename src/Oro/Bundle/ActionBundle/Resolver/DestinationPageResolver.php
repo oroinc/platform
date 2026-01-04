@@ -17,9 +17,9 @@ class DestinationPageResolver
     /** @var RouterInterface */
     protected $router;
 
-    const DEFAULT_DESTINATION = '';
-    const AVAILABLE_DESTINATIONS = ['view', 'name', self::DEFAULT_DESTINATION];
-    const PARAM_ORIGINAL_URL = 'originalUrl';
+    public const DEFAULT_DESTINATION = '';
+    public const AVAILABLE_DESTINATIONS = ['view', 'name', self::DEFAULT_DESTINATION];
+    public const PARAM_ORIGINAL_URL = 'originalUrl';
 
     public function __construct(
         EntityConfigHelper $entityConfigHelper,

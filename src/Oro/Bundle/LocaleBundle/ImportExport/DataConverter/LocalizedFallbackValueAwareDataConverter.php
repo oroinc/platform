@@ -14,9 +14,9 @@ use Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocalizationCodeFormatter;
  */
 class LocalizedFallbackValueAwareDataConverter extends PropertyPathTitleDataConverter
 {
-    const FIELD_VALUE = 'value';
-    const FIELD_FALLBACK = 'fallback';
-    const DEFAULT_LOCALIZATION = 'default';
+    public const FIELD_VALUE = 'value';
+    public const FIELD_FALLBACK = 'fallback';
+    public const DEFAULT_LOCALIZATION = 'default';
 
     /** @var string */
     protected $localizationClassName;

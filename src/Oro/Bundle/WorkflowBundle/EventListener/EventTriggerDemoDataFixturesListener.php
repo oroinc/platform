@@ -13,7 +13,7 @@ class EventTriggerDemoDataFixturesListener
     /**
      * This listener is disabled to prevent additional reindexing of search index
      */
-    const EVENT_TRIGGER_COLLECTOR_LISTENER = 'oro_workflow.listener.event_trigger_collector';
+    public const EVENT_TRIGGER_COLLECTOR_LISTENER = 'oro_workflow.listener.event_trigger_collector';
 
     /** @var OptionalListenerManager */
     private $listenerManager;

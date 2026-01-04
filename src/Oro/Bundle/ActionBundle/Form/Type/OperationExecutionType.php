@@ -12,9 +12,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class OperationExecutionType extends AbstractType
 {
-    const CSRF_TOKEN_FIELD = 'operation_execution_csrf_token';
+    public const CSRF_TOKEN_FIELD = 'operation_execution_csrf_token';
 
-    const NAME = 'oro_action_operation_execution';
+    public const NAME = 'oro_action_operation_execution';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

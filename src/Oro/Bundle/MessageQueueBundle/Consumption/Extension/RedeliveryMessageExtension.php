@@ -15,7 +15,7 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
  */
 class RedeliveryMessageExtension extends AbstractExtension
 {
-    const PROPERTY_REDELIVER_COUNT = 'oro-redeliver-count';
+    public const PROPERTY_REDELIVER_COUNT = 'oro-redeliver-count';
 
     /**
      * @var DriverInterface

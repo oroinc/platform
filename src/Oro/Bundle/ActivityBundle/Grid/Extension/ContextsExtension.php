@@ -43,13 +43,13 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class ContextsExtension extends AbstractExtension
 {
-    const CONTEXTS_ENABLED_PATH = '[options][contexts][enabled]';
-    const CONTEXTS_COLUMN_PATH = '[options][contexts][column_name]';
-    const CONTEXTS_ENTITY_PATH = '[options][contexts][entity_name]';
-    const GRID_COLUMNS_PATH = '[columns]';
-    const DEFAULT_COLUMN_NAME = 'contexts';
-    const DEFAULT_COLUMN_LABEL = 'oro.activity.contexts.column.label';
-    const DEFAULT_TEMPLATE = '@OroActivity/Grid/Column/contexts.html.twig';
+    public const CONTEXTS_ENABLED_PATH = '[options][contexts][enabled]';
+    public const CONTEXTS_COLUMN_PATH = '[options][contexts][column_name]';
+    public const CONTEXTS_ENTITY_PATH = '[options][contexts][entity_name]';
+    public const GRID_COLUMNS_PATH = '[columns]';
+    public const DEFAULT_COLUMN_NAME = 'contexts';
+    public const DEFAULT_COLUMN_LABEL = 'oro.activity.contexts.column.label';
+    public const DEFAULT_TEMPLATE = '@OroActivity/Grid/Column/contexts.html.twig';
 
     /** @var EntityClassResolver */
     protected $entityClassResolver;

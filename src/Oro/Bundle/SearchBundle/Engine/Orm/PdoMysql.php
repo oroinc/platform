@@ -17,8 +17,8 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class PdoMysql extends BaseDriver
 {
-    const ENGINE_MYISAM = 'MyISAM';
-    const ENGINE_INNODB = 'InnoDB';
+    public const ENGINE_MYISAM = 'MyISAM';
+    public const ENGINE_INNODB = 'InnoDB';
 
     /**
      * The value of ft_min_word_len

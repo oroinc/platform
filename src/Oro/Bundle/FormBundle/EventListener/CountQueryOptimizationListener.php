@@ -12,7 +12,7 @@ use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryOptimizationContext;
  */
 class CountQueryOptimizationListener
 {
-    const PRIMARY_CONDITION_PATTERN = '/%s.primary\s*=\s*(?P<value>true|1|:\w+|\?\d+)/';
+    public const PRIMARY_CONDITION_PATTERN = '/%s.primary\s*=\s*(?P<value>true|1|:\w+|\?\d+)/';
 
     public function onOptimize(CountQueryOptimizationEvent $event)
     {

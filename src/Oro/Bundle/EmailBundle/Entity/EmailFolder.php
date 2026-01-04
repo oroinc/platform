@@ -18,15 +18,15 @@ use Oro\Bundle\EmailBundle\Model\FolderType;
 #[Index(columns: ['outdated_at'], name: 'email_folder_outdated_at_idx')]
 class EmailFolder
 {
-    const SYNC_ENABLED_TRUE = true;
-    const SYNC_ENABLED_FALSE = false;
-    const SYNC_ENABLED_IGNORE = null;
+    public const SYNC_ENABLED_TRUE = true;
+    public const SYNC_ENABLED_FALSE = false;
+    public const SYNC_ENABLED_IGNORE = null;
 
-    const DIRECTION_INCOMING = 'incoming';
-    const DIRECTION_OUTGOING = 'outgoing';
-    const DIRECTION_BOTH = 'both';
+    public const DIRECTION_INCOMING = 'incoming';
+    public const DIRECTION_OUTGOING = 'outgoing';
+    public const DIRECTION_BOTH = 'both';
 
-    const MAX_FAILED_COUNT = 10;
+    public const MAX_FAILED_COUNT = 10;
 
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]

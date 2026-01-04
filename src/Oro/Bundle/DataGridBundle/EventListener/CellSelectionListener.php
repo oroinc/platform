@@ -39,9 +39,9 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
  */
 class CellSelectionListener
 {
-    const CELL_SELECTION_OPTION_PATH = '[options][cellSelection]';
-    const REQUIRED_MODULES_KEY       = '[options][jsmodules]';
-    const CELL_SELECTION_JS_MODULE   = 'orodatagrid/js/datagrid/listener/change-editable-cell-listener';
+    public const CELL_SELECTION_OPTION_PATH = '[options][cellSelection]';
+    public const REQUIRED_MODULES_KEY       = '[options][jsmodules]';
+    public const CELL_SELECTION_JS_MODULE   = 'orodatagrid/js/datagrid/listener/change-editable-cell-listener';
 
     /**
      * Required options for selectCell js module

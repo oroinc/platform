@@ -8,21 +8,21 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const SORTERS_KEY                       = 'sorters';
-    const COLUMNS_KEY                       = 'columns';
-    const MULTISORT_KEY                     = 'multiple_sorting';
-    const DEFAULT_SORTERS_KEY               = 'default';
-    const TOOLBAR_SORTING_KEY               = 'toolbar_sorting';
-    const DISABLE_DEFAULT_SORTING_KEY       = 'disable_default_sorting';
-    const DISABLE_NOT_SELECTED_OPTION_KEY   = 'disable_not_selected_option';
+    public const SORTERS_KEY                       = 'sorters';
+    public const COLUMNS_KEY                       = 'columns';
+    public const MULTISORT_KEY                     = 'multiple_sorting';
+    public const DEFAULT_SORTERS_KEY               = 'default';
+    public const TOOLBAR_SORTING_KEY               = 'toolbar_sorting';
+    public const DISABLE_DEFAULT_SORTING_KEY       = 'disable_default_sorting';
+    public const DISABLE_NOT_SELECTED_OPTION_KEY   = 'disable_not_selected_option';
 
-    const SORTERS_PATH                      = '[sorters]';
-    const COLUMNS_PATH                      = '[sorters][columns]';
-    const MULTISORT_PATH                    = '[sorters][multiple_sorting]';
-    const DEFAULT_SORTERS_PATH              = '[sorters][default]';
-    const TOOLBAR_SORTING_PATH              = '[sorters][toolbar_sorting]';
-    const DISABLE_DEFAULT_SORTING_PATH      = '[sorters][disable_default_sorting]';
-    const DISABLE_NOT_SELECTED_OPTION_PATH  = '[sorters][disable_not_selected_option]';
+    public const SORTERS_PATH                      = '[sorters]';
+    public const COLUMNS_PATH                      = '[sorters][columns]';
+    public const MULTISORT_PATH                    = '[sorters][multiple_sorting]';
+    public const DEFAULT_SORTERS_PATH              = '[sorters][default]';
+    public const TOOLBAR_SORTING_PATH              = '[sorters][toolbar_sorting]';
+    public const DISABLE_DEFAULT_SORTING_PATH      = '[sorters][disable_default_sorting]';
+    public const DISABLE_NOT_SELECTED_OPTION_PATH  = '[sorters][disable_not_selected_option]';
 
     #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder

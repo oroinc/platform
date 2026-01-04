@@ -8,8 +8,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class TemplateEntityRepositoryCompilerPass implements CompilerPassInterface
 {
-    const TEMPLATE_MANAGER_KEY = 'oro_importexport.template_fixture.manager';
-    const TEMPLATE_FIXTURE_TAG = 'oro_importexport.template_fixture';
+    public const TEMPLATE_MANAGER_KEY = 'oro_importexport.template_fixture.manager';
+    public const TEMPLATE_FIXTURE_TAG = 'oro_importexport.template_fixture';
 
     #[\Override]
     public function process(ContainerBuilder $container)

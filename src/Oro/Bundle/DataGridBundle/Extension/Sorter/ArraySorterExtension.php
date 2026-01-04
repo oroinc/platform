@@ -10,8 +10,8 @@ use Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException;
 
 class ArraySorterExtension extends AbstractSorterExtension
 {
-    const ASC_SORTING = 'ASC';
-    const DESC_SORTING = 'DESC';
+    public const ASC_SORTING = 'ASC';
+    public const DESC_SORTING = 'DESC';
 
     #[\Override]
     public function isApplicable(DatagridConfiguration $config)

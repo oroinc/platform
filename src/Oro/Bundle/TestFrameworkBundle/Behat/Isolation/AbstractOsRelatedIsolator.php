@@ -4,9 +4,9 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
 abstract class AbstractOsRelatedIsolator
 {
-    const WINDOWS_OS = 'WINDOWS';
-    const LINUX_OS   = 'LINUX';
-    const MAC_OS     = 'DARWIN';
+    public const WINDOWS_OS = 'WINDOWS';
+    public const LINUX_OS   = 'LINUX';
+    public const MAC_OS     = 'DARWIN';
 
     /**
      * @return array of applicable OS

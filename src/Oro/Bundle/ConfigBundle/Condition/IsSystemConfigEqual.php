@@ -17,7 +17,7 @@ class IsSystemConfigEqual extends AbstractCondition implements ContextAccessorAw
 {
     use ContextAccessorAwareTrait;
 
-    const NAME = 'is_system_config_equal';
+    public const NAME = 'is_system_config_equal';
 
     /** @var ConfigManager */
     protected $configManager;

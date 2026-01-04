@@ -13,13 +13,13 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class LoadTransitionTriggers extends AbstractFixture implements DependentFixtureInterface
 {
-    const UPDATE_TRIGGER_FIELD = 'field_name';
+    public const UPDATE_TRIGGER_FIELD = 'field_name';
 
-    const TRIGGER_CREATE = 'trigger_create';
-    const TRIGGER_UPDATE = 'trigger_update';
-    const TRIGGER_DELETE = 'trigger_delete';
-    const TRIGGER_CRON = 'trigger_cron';
-    const TRIGGER_DISABLED = 'trigger_disabled';
+    public const TRIGGER_CREATE = 'trigger_create';
+    public const TRIGGER_UPDATE = 'trigger_update';
+    public const TRIGGER_DELETE = 'trigger_delete';
+    public const TRIGGER_CRON = 'trigger_cron';
+    public const TRIGGER_DISABLED = 'trigger_disabled';
 
     /** @var array */
     protected static $triggers = [

@@ -14,9 +14,9 @@ use Oro\Bundle\EmailBundle\Entity\Repository\EmailRecipientRepository;
 #[ORM\Index(columns: ['email_id', 'type'], name: 'email_id_type_idx')]
 class EmailRecipient
 {
-    const TO = 'to';
-    const CC = 'cc';
-    const BCC = 'bcc';
+    public const TO = 'to';
+    public const CC = 'cc';
+    public const BCC = 'bcc';
 
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]

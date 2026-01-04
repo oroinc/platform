@@ -43,7 +43,7 @@ class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterfac
 {
     use ExtendEntityTrait;
 
-    const GRID_PREFIX = 'oro_segment_grid_';
+    public const GRID_PREFIX = 'oro_segment_grid_';
 
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: Types::INTEGER)]

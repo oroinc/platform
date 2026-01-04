@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SearchEnumFilterType extends AbstractType
 {
-    const NAME = 'oro_search_type_enum_filter';
+    public const NAME = 'oro_search_type_enum_filter';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

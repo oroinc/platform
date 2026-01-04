@@ -8,8 +8,8 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 
 abstract class AbstractFieldsChangesAction extends AbstractAction
 {
-    const OPTION_KEY_ENTITY = 'entity';
-    const OPTION_KEY_CHANGESET = 'changeSet';
+    public const OPTION_KEY_ENTITY = 'entity';
+    public const OPTION_KEY_CHANGESET = 'changeSet';
 
     /**
      * @var array

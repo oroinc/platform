@@ -7,9 +7,9 @@ use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
 class DateTimeTypeFormatter extends DateTimeFormatter implements TypeFormatterInterface
 {
-    const TYPE_DATETIME = 'datetime';
-    const TYPE_DATE     = 'date';
-    const TYPE_TIME     = 'time';
+    public const TYPE_DATETIME = 'datetime';
+    public const TYPE_DATE     = 'date';
+    public const TYPE_TIME     = 'time';
 
     #[\Override]
     public function formatType($value, $type)

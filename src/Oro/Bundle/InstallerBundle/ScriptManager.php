@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class ScriptManager
 {
-    const ORO_INSTALLER_SCRIPT_FILE_NAME = 'install.php';
+    public const ORO_INSTALLER_SCRIPT_FILE_NAME = 'install.php';
 
     protected KernelInterface $kernel;
 

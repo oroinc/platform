@@ -19,9 +19,9 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
  */
 class Email implements OrganizationAwareInterface
 {
-    const MAIL_TYPE_DIRECT  = 'direct';
-    const MAIL_TYPE_REPLY   = 'reply';
-    const MAIL_TYPE_FORWARD = 'forward';
+    public const MAIL_TYPE_DIRECT  = 'direct';
+    public const MAIL_TYPE_REPLY   = 'reply';
+    public const MAIL_TYPE_FORWARD = 'forward';
 
     /** @var string */
     protected $gridName;

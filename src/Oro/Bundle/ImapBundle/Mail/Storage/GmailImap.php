@@ -7,17 +7,17 @@ namespace Oro\Bundle\ImapBundle\Mail\Storage;
  */
 class GmailImap extends Imap
 {
-    const DEFAULT_GMAIL_HOST = 'imap.gmail.com';
-    const DEFAULT_GMAIL_PORT = '993';
-    const DEFAULT_GMAIL_SSL = 'ssl';
+    public const DEFAULT_GMAIL_HOST = 'imap.gmail.com';
+    public const DEFAULT_GMAIL_PORT = '993';
+    public const DEFAULT_GMAIL_SSL = 'ssl';
 
-    const DEFAULT_GMAIL_SMTP_HOST = 'smtp.gmail.com';
-    const DEFAULT_GMAIL_SMTP_PORT = '465';
-    const DEFAULT_GMAIL_SMTP_SSL = 'ssl';
+    public const DEFAULT_GMAIL_SMTP_HOST = 'smtp.gmail.com';
+    public const DEFAULT_GMAIL_SMTP_PORT = '465';
+    public const DEFAULT_GMAIL_SMTP_SSL = 'ssl';
 
-    const X_GM_MSGID = 'X-GM-MSGID';
-    const X_GM_THRID = 'X-GM-THRID';
-    const X_GM_LABELS = 'X-GM-LABELS';
+    public const X_GM_MSGID = 'X-GM-MSGID';
+    public const X_GM_THRID = 'X-GM-THRID';
+    public const X_GM_LABELS = 'X-GM-LABELS';
 
     public function __construct($params)
     {

@@ -19,8 +19,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class TagSearchResultsExtension extends AbstractExtension
 {
-    const TYPE_PATH  = '[columns][entity][type]';
-    const TYPE_VALUE = 'tag-search-result';
+    public const TYPE_PATH  = '[columns][entity][type]';
+    public const TYPE_VALUE = 'tag-search-result';
 
     protected ResultFormatter $resultFormatter;
 

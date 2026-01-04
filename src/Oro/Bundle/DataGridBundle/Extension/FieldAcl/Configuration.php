@@ -11,8 +11,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    const FIELDS_ACL = '[fields_acl]';
-    const COLUMNS_PATH  = '[fields_acl][columns]';
+    public const FIELDS_ACL = '[fields_acl]';
+    public const COLUMNS_PATH  = '[fields_acl][columns]';
 
     #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder

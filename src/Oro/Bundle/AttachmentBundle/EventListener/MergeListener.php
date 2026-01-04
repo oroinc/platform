@@ -14,7 +14,7 @@ use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
  */
 class MergeListener
 {
-    const TEMPLATE_NAME = '@OroAttachment/Form/mergeValue.html.twig';
+    public const TEMPLATE_NAME = '@OroAttachment/Form/mergeValue.html.twig';
 
     /** @var AttachmentManager $attachmentManager */
     protected $attachmentManager;

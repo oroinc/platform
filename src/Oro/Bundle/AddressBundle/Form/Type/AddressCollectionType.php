@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class AddressCollectionType extends AbstractType
 {
-    const NAME = 'oro_address_collection';
+    public const NAME = 'oro_address_collection';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

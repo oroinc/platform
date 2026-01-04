@@ -19,8 +19,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ResetPasswordActionHandler implements MassActionHandlerInterface
 {
-    const SUCCESS_MESSAGE = 'oro.user.password.force_reset.mass_action.success';
-    const ERROR_MESSAGE = 'oro.user.password.force_reset.mass_action.failure';
+    public const SUCCESS_MESSAGE = 'oro.user.password.force_reset.mass_action.success';
+    public const ERROR_MESSAGE = 'oro.user.password.force_reset.mass_action.failure';
 
     /** @var ResetPasswordHandler */
     protected $resetPasswordHandler;

@@ -7,9 +7,9 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const SESSION_ID_FIELD_NAME       = 'session_id_field_name';
-    const CSRF_TOKEN_LIFETIME         = 'csrf_token_lifetime';
-    const CSRF_TOKEN_CACHE_SERVICE_ID = 'csrf_token_cache_service_id';
+    public const SESSION_ID_FIELD_NAME       = 'session_id_field_name';
+    public const CSRF_TOKEN_LIFETIME         = 'csrf_token_lifetime';
+    public const CSRF_TOKEN_CACHE_SERVICE_ID = 'csrf_token_cache_service_id';
 
     #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder

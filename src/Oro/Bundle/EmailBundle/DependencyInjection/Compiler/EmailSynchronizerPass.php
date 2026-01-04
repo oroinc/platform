@@ -8,10 +8,10 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class EmailSynchronizerPass implements CompilerPassInterface
 {
-    const SERVICE_KEY = 'oro_email.email_synchronization_manager';
-    const TAG         = 'oro_email.email_synchronizer';
+    public const SERVICE_KEY = 'oro_email.email_synchronization_manager';
+    public const TAG         = 'oro_email.email_synchronizer';
 
-    const SERVICE_TOKEN_STORAGE = 'security.token_storage';
+    public const SERVICE_TOKEN_STORAGE = 'security.token_storage';
 
     #[\Override]
     public function process(ContainerBuilder $container)

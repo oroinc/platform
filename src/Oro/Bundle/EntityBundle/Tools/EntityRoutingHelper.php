@@ -15,9 +15,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class EntityRoutingHelper
 {
-    const PARAM_ACTION = '_action';
-    const PARAM_ENTITY_CLASS = 'entityClass';
-    const PARAM_ENTITY_ID = 'entityId';
+    public const PARAM_ACTION = '_action';
+    public const PARAM_ENTITY_CLASS = 'entityClass';
+    public const PARAM_ENTITY_ID = 'entityId';
 
     /** @var EntityClassNameHelper */
     protected $entityClassNameHelper;

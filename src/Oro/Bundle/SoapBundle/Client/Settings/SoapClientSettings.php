@@ -4,7 +4,7 @@ namespace Oro\Bundle\SoapBundle\Client\Settings;
 
 class SoapClientSettings implements SoapClientSettingsInterface
 {
-    const OPTION_TIMEOUT = 'connection_timeout';
+    public const OPTION_TIMEOUT = 'connection_timeout';
 
     /**
      * @var string|null

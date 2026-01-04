@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SearchDatasource implements DatasourceInterface
 {
-    const TYPE = 'search';
+    public const TYPE = 'search';
 
     /** @var QueryFactoryInterface */
     protected $queryFactory;

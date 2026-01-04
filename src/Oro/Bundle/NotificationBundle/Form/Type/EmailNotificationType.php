@@ -21,7 +21,7 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class EmailNotificationType extends AbstractType
 {
-    const NAME = 'emailnotification';
+    public const NAME = 'emailnotification';
 
     /** @var BuildTemplateFormSubscriber */
     protected $buildTemplateSubscriber;

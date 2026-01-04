@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class GroupingType extends AbstractType
 {
-    const NAME = 'oro_query_designer_grouping';
+    public const NAME = 'oro_query_designer_grouping';
 
     /** @var Manager */
     protected $manager;

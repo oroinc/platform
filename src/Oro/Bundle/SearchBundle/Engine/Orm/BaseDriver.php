@@ -30,9 +30,9 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 abstract class BaseDriver implements DBALPersisterInterface
 {
-    const EXPRESSION_TYPE_OR  = 'OR';
-    const EXPRESSION_TYPE_AND = 'AND';
-    const SPECIAL_SEPARATOR = '__SEPARATOR__';
+    public const EXPRESSION_TYPE_OR  = 'OR';
+    public const EXPRESSION_TYPE_AND = 'AND';
+    public const SPECIAL_SEPARATOR = '__SEPARATOR__';
 
     /**
      * @var string

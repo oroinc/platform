@@ -8,7 +8,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const DEFAULT_LIMIT = 1000;
+    public const DEFAULT_LIMIT = 1000;
 
     #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder

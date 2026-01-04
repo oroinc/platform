@@ -13,7 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class TranslationContextResolver implements TranslationContextResolverInterface
 {
-    const TRANSLATION_TEMPLATE = 'oro.workflow.translation.context.{{ template }}';
+    public const TRANSLATION_TEMPLATE = 'oro.workflow.translation.context.{{ template }}';
 
     /** @var TranslatorInterface */
     protected $translator;

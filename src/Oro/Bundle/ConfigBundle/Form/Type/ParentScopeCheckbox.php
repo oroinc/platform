@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ParentScopeCheckbox extends AbstractType
 {
-    const NAME = 'oro_config_parent_scope_checkbox_type';
+    public const NAME = 'oro_config_parent_scope_checkbox_type';
 
     #[\Override]
     public function getBlockPrefix(): string

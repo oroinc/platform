@@ -6,7 +6,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class FindAfter extends Event
 {
-    const NAME = 'oro_api.request.find.after';
+    public const NAME = 'oro_api.request.find.after';
 
     /**
      * @var object

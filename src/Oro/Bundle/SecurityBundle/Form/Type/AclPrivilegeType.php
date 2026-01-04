@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class AclPrivilegeType extends AbstractType
 {
-    const NAME = 'oro_acl_privilege';
+    public const NAME = 'oro_acl_privilege';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

@@ -25,7 +25,7 @@ class ImapClearManager implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    const REINDEX_CHUNK_SIZE = 100;
+    public const REINDEX_CHUNK_SIZE = 100;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;

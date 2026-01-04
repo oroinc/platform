@@ -17,7 +17,7 @@ use Oro\Component\Action\Exception\InvalidParameterException;
  */
 class AssignConstantValue extends AbstractAction
 {
-    const NAME = 'assign_constant_value';
+    public const NAME = 'assign_constant_value';
 
     /**
      * @var mixed

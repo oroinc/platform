@@ -7,9 +7,9 @@ use Doctrine\DBAL\Types\StringType;
 
 class CurrencyType extends StringType
 {
-    const TYPE = 'currency';
+    public const TYPE = 'currency';
 
-    const ISO_CODE_LENGTH = 3;
+    public const ISO_CODE_LENGTH = 3;
 
     #[\Override]
     public function getName()

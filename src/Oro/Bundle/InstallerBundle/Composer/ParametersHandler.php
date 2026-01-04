@@ -10,7 +10,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class ParametersHandler
 {
-    const DOCUMENTATION = <<<DOC
+    public const DOCUMENTATION = <<<DOC
 
 <info>Usage examples:</info>
 <info>===============</info>

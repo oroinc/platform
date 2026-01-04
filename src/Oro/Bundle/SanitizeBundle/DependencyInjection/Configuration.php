@@ -10,7 +10,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    const ROOT_NODE = 'oro_sanitize';
+    public const ROOT_NODE = 'oro_sanitize';
 
     #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder

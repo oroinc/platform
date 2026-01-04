@@ -10,13 +10,13 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 class DatagridGuesser
 {
     /** column formatting options key */
-    const FORMATTER = 'formatter';
+    public const FORMATTER = 'formatter';
 
     /** column sorting options key */
-    const SORTER = 'sorter';
+    public const SORTER = 'sorter';
 
     /** column filtering options key */
-    const FILTER = 'filter';
+    public const FILTER = 'filter';
 
     /** @var iterable|ColumnOptionsGuesserInterface[] */
     private $columnOptionsGuessers;

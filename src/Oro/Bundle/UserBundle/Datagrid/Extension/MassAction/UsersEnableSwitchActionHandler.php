@@ -20,7 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class UsersEnableSwitchActionHandler implements MassActionHandlerInterface
 {
-    const FLUSH_BATCH_SIZE = 100;
+    public const FLUSH_BATCH_SIZE = 100;
 
     /** @var AclHelper */
     protected $aclHelper;

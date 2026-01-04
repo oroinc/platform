@@ -18,12 +18,12 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class MassActionExtension extends AbstractExtension
 {
-    const METADATA_ACTION_KEY = 'massActions';
-    const ACTION_KEY          = 'mass_actions';
-    const OPTIONS_KEY         = 'options';
-    const OPTIONS_PATH        = '[options][mass_actions]';
-    const ALLOWED_REQUEST_TYPES   = 'allowedRequestTypes';
-    const ALLOWED_REQUEST_METHODS = ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'];
+    public const METADATA_ACTION_KEY = 'massActions';
+    public const ACTION_KEY          = 'mass_actions';
+    public const OPTIONS_KEY         = 'options';
+    public const OPTIONS_PATH        = '[options][mass_actions]';
+    public const ALLOWED_REQUEST_TYPES   = 'allowedRequestTypes';
+    public const ALLOWED_REQUEST_METHODS = ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'];
 
     /** @var MassActionFactory */
     protected $actionFactory;

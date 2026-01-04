@@ -8,8 +8,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class EmailRecipientsProviderPass implements CompilerPassInterface
 {
-    const SERVICE_KEY = 'oro_email.email_recipients.provider';
-    const TAG = 'oro_email.recipients_provider';
+    public const SERVICE_KEY = 'oro_email.email_recipients.provider';
+    public const TAG = 'oro_email.recipients_provider';
 
     #[\Override]
     public function process(ContainerBuilder $container)

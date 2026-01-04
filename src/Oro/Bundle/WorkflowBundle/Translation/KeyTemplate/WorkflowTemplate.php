@@ -9,8 +9,8 @@ use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
  */
 class WorkflowTemplate implements TranslationKeyTemplateInterface
 {
-    const NAME = 'workflow';
-    const KEY_PREFIX = 'oro.workflow';
+    public const NAME = 'workflow';
+    public const KEY_PREFIX = 'oro.workflow';
 
     /**
      * @return string

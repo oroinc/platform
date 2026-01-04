@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class EmailBodyLoaded extends Event
 {
-    const NAME = 'oro_email.email_body_loaded';
+    public const NAME = 'oro_email.email_body_loaded';
 
     /** @var Email */
     protected $email;

@@ -6,7 +6,7 @@ use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 
 class ExportTemplateType extends ExportType
 {
-    const NAME = 'oro_importexport_export_template';
+    public const NAME = 'oro_importexport_export_template';
 
     #[\Override]
     protected function getProcessorType()

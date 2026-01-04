@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LocalizationParentSelectType extends AbstractType
 {
-    const NAME = 'oro_localization_parent_select';
+    public const NAME = 'oro_localization_parent_select';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

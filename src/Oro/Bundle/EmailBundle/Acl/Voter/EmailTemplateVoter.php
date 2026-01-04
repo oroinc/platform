@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class EmailTemplateVoter extends AbstractEntityVoter
 {
-    const EMAIL_TEMPLATE_DELETE_ALIAS = 'oro_email_emailtemplate_delete';
+    public const EMAIL_TEMPLATE_DELETE_ALIAS = 'oro_email_emailtemplate_delete';
 
     protected $supportedAttributes = [
         BasicPermission::DELETE,

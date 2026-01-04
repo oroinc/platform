@@ -6,7 +6,7 @@ use Psr\Log\LoggerInterface;
 
 class TreeExecutor extends AbstractAction
 {
-    const ALIAS = 'tree';
+    public const ALIAS = 'tree';
 
     /**
      * @var array

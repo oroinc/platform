@@ -6,7 +6,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class PrepareEntityMapEvent extends Event
 {
-    const EVENT_NAME = 'oro_search.prepare_entity_map';
+    public const EVENT_NAME = 'oro_search.prepare_entity_map';
 
     /** @var string */
     protected $className;

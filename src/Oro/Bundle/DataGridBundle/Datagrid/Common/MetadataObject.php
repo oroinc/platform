@@ -12,10 +12,10 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class MetadataObject extends ConfigObject
 {
-    const GRID_NAME_KEY        = 'gridName';
-    const OPTIONS_KEY          = 'options';
-    const REQUIRED_MODULES_KEY = 'jsmodules';
-    const LAZY_KEY             = 'lazy';
+    public const GRID_NAME_KEY        = 'gridName';
+    public const OPTIONS_KEY          = 'options';
+    public const REQUIRED_MODULES_KEY = 'jsmodules';
+    public const LAZY_KEY             = 'lazy';
 
     /**
      * Default metadata array

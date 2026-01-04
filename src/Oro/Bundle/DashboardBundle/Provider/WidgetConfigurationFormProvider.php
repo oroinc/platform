@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormInterface;
 
 class WidgetConfigurationFormProvider
 {
-    const FORM_FIELDS_KEY = 'configuration';
+    public const FORM_FIELDS_KEY = 'configuration';
 
     /** @var array */
     protected $config;

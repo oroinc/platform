@@ -10,8 +10,8 @@ use Psr\Log\LoggerInterface;
 
 class RemoveExtendedFieldsQuery extends ParametrizedMigrationQuery
 {
-    const PROPERTY_WORKFLOW_ITEM = 'workflowItem';
-    const PROPERTY_WORKFLOW_STEP = 'workflowStep';
+    public const PROPERTY_WORKFLOW_ITEM = 'workflowItem';
+    public const PROPERTY_WORKFLOW_STEP = 'workflowStep';
 
     #[\Override]
     public function getDescription()

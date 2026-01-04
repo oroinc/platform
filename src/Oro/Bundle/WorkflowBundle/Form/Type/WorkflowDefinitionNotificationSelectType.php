@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WorkflowDefinitionNotificationSelectType extends AbstractType
 {
-    const NAME = 'oro_workflow_definition_notification_select';
+    public const NAME = 'oro_workflow_definition_notification_select';
 
     /** @var WorkflowRegistry $workflowRegistry */
     protected $workflowRegistry;

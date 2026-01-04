@@ -13,7 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class NumberRangeFilterType extends AbstractType implements NumberRangeFilterTypeInterface
 {
-    const NAME = 'oro_type_number_range_filter';
+    public const NAME = 'oro_type_number_range_filter';
 
     /**
      * @var TranslatorInterface

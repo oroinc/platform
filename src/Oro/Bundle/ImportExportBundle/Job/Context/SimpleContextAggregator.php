@@ -12,7 +12,7 @@ use Oro\Bundle\ImportExportBundle\Job\ContextHelper;
  */
 class SimpleContextAggregator implements ContextAggregatorInterface
 {
-    const TYPE = 'simple';
+    public const TYPE = 'simple';
 
     /** @var ContextRegistry */
     protected $contextRegistry;

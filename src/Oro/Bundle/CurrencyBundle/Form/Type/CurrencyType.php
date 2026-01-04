@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CurrencyType extends AbstractType
 {
-    const CONFIG_FORM_NAME = 'oro_currency___default_currency';
+    public const CONFIG_FORM_NAME = 'oro_currency___default_currency';
 
     #[\Override]
     public function getParent(): ?string

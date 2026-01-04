@@ -25,24 +25,24 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
  */
 class Imap extends \Laminas\Mail\Storage\Imap
 {
-    const BODY_HEADER = 'BODY[HEADER]';
-    const BODY_PEEK_HEADER = 'BODY.PEEK[HEADER]';
-    const BODY_PEEK_TEXT = 'BODY.PEEK[TEXT]';
-    const RFC822_HEADER = 'RFC822.HEADER';
-    const FLAGS = 'FLAGS';
-    const UID = 'UID';
-    const INTERNALDATE = 'INTERNALDATE';
+    public const BODY_HEADER = 'BODY[HEADER]';
+    public const BODY_PEEK_HEADER = 'BODY.PEEK[HEADER]';
+    public const BODY_PEEK_TEXT = 'BODY.PEEK[TEXT]';
+    public const RFC822_HEADER = 'RFC822.HEADER';
+    public const FLAGS = 'FLAGS';
+    public const UID = 'UID';
+    public const INTERNALDATE = 'INTERNALDATE';
 
     /**
      * Indicates protocol capabilities
      */
-    const CAPABILITY_IMAP4_REV_1 = 'IMAP4rev1';
-    const CAPABILITY_IMAP4 = 'IMAP4';
+    public const CAPABILITY_IMAP4_REV_1 = 'IMAP4rev1';
+    public const CAPABILITY_IMAP4 = 'IMAP4';
 
     /**
      * Indicates whether IMAP server can store the same message in different folders
      */
-    const CAPABILITY_MSG_MULTI_FOLDERS = 'X_MSG_MULTI_FOLDERS';
+    public const CAPABILITY_MSG_MULTI_FOLDERS = 'X_MSG_MULTI_FOLDERS';
 
     /**
      * UIDVALIDITY of currently selected folder

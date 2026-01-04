@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroAutocompleteType extends AbstractType
 {
-    const NAME = 'oro_autocomplete';
+    public const NAME = 'oro_autocomplete';
 
     /**
      * @var SearchRegistry

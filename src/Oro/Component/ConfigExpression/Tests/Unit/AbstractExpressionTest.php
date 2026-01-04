@@ -15,7 +15,7 @@ class AbstractExpressionTest extends TestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->condition = new class() extends AbstractExpression {
+        $this->condition = new class () extends AbstractExpression {
             protected function doEvaluate($context)
             {
                 $this->addError($context, 'test reason');

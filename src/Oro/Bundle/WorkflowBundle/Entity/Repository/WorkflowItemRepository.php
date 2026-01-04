@@ -17,7 +17,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class WorkflowItemRepository extends ServiceEntityRepository
 {
-    const DELETE_BATCH_SIZE = 1000;
+    public const DELETE_BATCH_SIZE = 1000;
 
     /**
      * Returns all available workflow items for given entity id & entity class

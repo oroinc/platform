@@ -9,7 +9,7 @@ use Symfony\Component\Process\ExecutableFinder;
  */
 class ProcessorExecutableFinder
 {
-    const EXTRA_DIRS = ['/usr/bin', '/usr/local/bin', '/opt/bin', '/bin'];
+    public const EXTRA_DIRS = ['/usr/bin', '/usr/local/bin', '/opt/bin', '/bin'];
 
     /**
      * @var ExecutableFinder

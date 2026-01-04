@@ -9,10 +9,10 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
  */
 class FieldConfigHelper
 {
-    const FILE_TYPE = 'file';
-    const IMAGE_TYPE = 'image';
-    const MULTI_FILE_TYPE = 'multiFile';
-    const MULTI_IMAGE_TYPE = 'multiImage';
+    public const FILE_TYPE = 'file';
+    public const IMAGE_TYPE = 'image';
+    public const MULTI_FILE_TYPE = 'multiFile';
+    public const MULTI_IMAGE_TYPE = 'multiImage';
 
     public static function isImageField(ConfigIdInterface $fieldConfigId): bool
     {

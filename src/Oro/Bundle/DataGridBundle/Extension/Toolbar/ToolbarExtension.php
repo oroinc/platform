@@ -18,16 +18,16 @@ class ToolbarExtension extends AbstractExtension
     /**
      * Configuration tree paths
      */
-    const METADATA_KEY = 'options';
+    public const METADATA_KEY = 'options';
 
-    const OPTIONS_PATH                         = '[options]';
-    const TOOLBAR_OPTION_PATH                  = '[options][toolbarOptions]';
-    const TOOLBAR_HIDE_OPTION_PATH             = '[options][toolbarOptions][hide]';
-    const PAGER_ITEMS_OPTION_PATH              = '[options][toolbarOptions][pageSize][items]';
-    const PAGER_DEFAULT_PER_PAGE_OPTION_PATH   = '[options][toolbarOptions][pageSize][default_per_page]';
-    const PAGER_ONE_PAGE_OPTION_PATH           = '[options][toolbarOptions][pagination][onePage]';
-    const TURN_OFF_TOOLBAR_RECORDS_NUMBER_PATH = '[options][toolbarOptions][turnOffToolbarRecordsNumber]';
-    const TOOLBAR_PAGINATION_HIDE_OPTION_PATH  = '[options][toolbarOptions][pagination][hide]';
+    public const OPTIONS_PATH                         = '[options]';
+    public const TOOLBAR_OPTION_PATH                  = '[options][toolbarOptions]';
+    public const TOOLBAR_HIDE_OPTION_PATH             = '[options][toolbarOptions][hide]';
+    public const PAGER_ITEMS_OPTION_PATH              = '[options][toolbarOptions][pageSize][items]';
+    public const PAGER_DEFAULT_PER_PAGE_OPTION_PATH   = '[options][toolbarOptions][pageSize][default_per_page]';
+    public const PAGER_ONE_PAGE_OPTION_PATH           = '[options][toolbarOptions][pagination][onePage]';
+    public const TURN_OFF_TOOLBAR_RECORDS_NUMBER_PATH = '[options][toolbarOptions][turnOffToolbarRecordsNumber]';
+    public const TOOLBAR_PAGINATION_HIDE_OPTION_PATH  = '[options][toolbarOptions][pagination][hide]';
 
     /** @var ConfigManager */
     private $cm;

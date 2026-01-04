@@ -28,9 +28,9 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class TestIsolationSubscriber implements EventSubscriberInterface
 {
-    const ISOLATOR_THRESHOLD = 2000;
+    public const ISOLATOR_THRESHOLD = 2000;
 
-    const YES_PATTERN = '/^Y/i';
+    public const YES_PATTERN = '/^Y/i';
 
     /** @var IsolatorInterface[] */
     private array $isolators = [];

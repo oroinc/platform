@@ -6,7 +6,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class WriterErrorEvent extends Event
 {
-    const NAME = 'oro_integration.writer_error';
+    public const NAME = 'oro_integration.writer_error';
 
     /** @var array */
     protected $batchItems;

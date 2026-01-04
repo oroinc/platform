@@ -6,7 +6,7 @@ use Symfony\Component\Form\AbstractType;
 
 class ImageTypeStub extends AbstractType
 {
-    const NAME = 'oro_image';
+    public const NAME = 'oro_image';
 
     #[\Override]
     public function getBlockPrefix(): string

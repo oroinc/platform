@@ -27,10 +27,10 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class BehatStatisticExtension implements TestworkExtension
 {
-    const SUITE_SET_ENV_VAR = 'BEHAT_SUITE_SETS';
-    const SUITE_ENV_VAR     = 'BEHAT_SUITES';
-    const AVG_STRATEGY_TAG  = 'avg_strategy';
-    const AVG_STRATEGY_AWARE_TAG = 'avg_strategy_aware';
+    public const SUITE_SET_ENV_VAR = 'BEHAT_SUITE_SETS';
+    public const SUITE_ENV_VAR     = 'BEHAT_SUITES';
+    public const AVG_STRATEGY_TAG  = 'avg_strategy';
+    public const AVG_STRATEGY_AWARE_TAG = 'avg_strategy_aware';
 
     #[\Override]
     public function initialize(ExtensionManager $extensionManager)

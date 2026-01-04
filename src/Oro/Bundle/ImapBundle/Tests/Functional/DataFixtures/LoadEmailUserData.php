@@ -13,11 +13,11 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class LoadEmailUserData extends AbstractFixture implements DependentFixtureInterface
 {
-    const EMAIL_USER_1 = 'imap_email_user.1';
-    const EMAIL_USER_2 = 'imap_email_user.2';
-    const EMAIL_USER_3 = 'imap_email_user.3';
-    const EMAIL_USER_4 = 'imap_email_user.4';
-    const EMAIL_USER_5 = 'imap_email_user.5';
+    public const EMAIL_USER_1 = 'imap_email_user.1';
+    public const EMAIL_USER_2 = 'imap_email_user.2';
+    public const EMAIL_USER_3 = 'imap_email_user.3';
+    public const EMAIL_USER_4 = 'imap_email_user.4';
+    public const EMAIL_USER_5 = 'imap_email_user.5';
 
     #[\Override]
     public function load(ObjectManager $manager)

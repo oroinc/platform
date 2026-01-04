@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AttachmentType extends AbstractType
 {
-    const NAME = 'oro_attachment';
+    public const NAME = 'oro_attachment';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

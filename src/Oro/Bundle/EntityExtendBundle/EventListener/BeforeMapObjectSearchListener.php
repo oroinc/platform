@@ -18,8 +18,8 @@ use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
  */
 class BeforeMapObjectSearchListener
 {
-    const FIELDS_PATH = 'fields';
-    const ENUM_TARGET_FIELD = 'name';
+    public const FIELDS_PATH = 'fields';
+    public const ENUM_TARGET_FIELD = 'name';
 
     /** @var array */
     protected $customTypesMap = [

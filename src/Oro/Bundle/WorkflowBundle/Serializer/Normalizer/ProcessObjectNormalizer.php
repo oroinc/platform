@@ -8,7 +8,7 @@ namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
  */
 class ProcessObjectNormalizer extends AbstractProcessNormalizer
 {
-    const SERIALIZED = '__SERIALIZED__';
+    public const SERIALIZED = '__SERIALIZED__';
 
     #[\Override]
     public function normalize(

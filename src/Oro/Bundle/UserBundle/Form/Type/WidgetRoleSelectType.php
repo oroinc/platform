@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class WidgetRoleSelectType extends AbstractType
 {
-    const NAME = 'oro_type_widget_role_select';
+    public const NAME = 'oro_type_widget_role_select';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

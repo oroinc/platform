@@ -27,7 +27,7 @@ class BufferedIdentityQueryResultIterator extends AbstractBufferedQueryResultIte
     /**
      * Count of records that will be loaded on each page during iterations
      */
-    const DEFAULT_BUFFER_SIZE = 200;
+    public const DEFAULT_BUFFER_SIZE = 200;
 
     /** @var IdentityIterationStrategyInterface */
     protected $iterationStrategy;

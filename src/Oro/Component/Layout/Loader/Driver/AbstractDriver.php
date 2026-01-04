@@ -14,9 +14,9 @@ use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
  */
 abstract class AbstractDriver implements DriverInterface
 {
-    const CLASS_PREFIX = '__Oro_Layout_Update_';
+    public const CLASS_PREFIX = '__Oro_Layout_Update_';
 
-    const ELEMENT_PREFIX = '_';
+    public const ELEMENT_PREFIX = '_';
 
     /** @var LayoutUpdateGeneratorInterface */
     private $generator;

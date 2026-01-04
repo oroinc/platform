@@ -9,7 +9,7 @@ use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
  */
 class FeatureCSChecker implements HealthCheckerInterface
 {
-    const NAME_PATTERN = '/^[^.]*$/';
+    public const NAME_PATTERN = '/^[^.]*$/';
 
     /**
      * @var array

@@ -17,12 +17,12 @@ class HtmlTagHelper implements TranslatorAwareInterface
 {
     use TranslatorAwareTrait;
 
-    const SUB_DIR = 'ezyang';
-    const MODE = 0775;
+    public const SUB_DIR = 'ezyang';
+    public const MODE = 0775;
 
-    const MAX_STRING_LENGTH = 256;
+    public const MAX_STRING_LENGTH = 256;
 
-    const HTMLPURIFIER_CONFIG_REVISION = 2019072301;
+    public const HTMLPURIFIER_CONFIG_REVISION = 2019072301;
 
     /**
      * @var HTMLPurifier[]

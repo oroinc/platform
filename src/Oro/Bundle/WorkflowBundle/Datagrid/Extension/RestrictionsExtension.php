@@ -13,9 +13,9 @@ use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 
 class RestrictionsExtension extends AbstractExtension
 {
-    const ENTITY_RESTRICTIONS = 'entity_restrictions';
-    const PROPERTY_ID_PATH    = '[properties][id]';
-    const PROPERTIES_PATH     = '[properties]';
+    public const ENTITY_RESTRICTIONS = 'entity_restrictions';
+    public const PROPERTY_ID_PATH    = '[properties][id]';
+    public const PROPERTIES_PATH     = '[properties]';
 
     /** @var EntityClassResolver */
     protected $entityClassResolver;

@@ -45,7 +45,7 @@ class GetSubresourceContextTest extends TestCase
         );
 
         $this->assertTotalCountCallback(
-            new class() {
+            new class () {
                 public function __invoke(): int
                 {
                     return 123;

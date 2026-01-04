@@ -6,7 +6,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class WidgetOptionsLoadEvent extends Event
 {
-    const EVENT_NAME = 'oro_segment.widget_options_load';
+    public const EVENT_NAME = 'oro_segment.widget_options_load';
 
     /** @var array */
     protected $widgetOptions;

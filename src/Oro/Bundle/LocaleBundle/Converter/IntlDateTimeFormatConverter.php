@@ -4,7 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Converter;
 
 class IntlDateTimeFormatConverter extends AbstractDateTimeFormatConverter
 {
-    const NAME = 'intl';
+    public const NAME = 'intl';
 
     /**
      * Returns INTL format without convert

@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class UserAgentProvider implements UserAgentProviderInterface
 {
-    const UNKNOWN_USER_AGENT = 'unknown_user_agent';
+    public const UNKNOWN_USER_AGENT = 'unknown_user_agent';
 
     /** @var RequestStack */
     protected $requestStack;

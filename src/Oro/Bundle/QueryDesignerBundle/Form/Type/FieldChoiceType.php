@@ -14,7 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FieldChoiceType extends AbstractType
 {
-    const NAME = 'oro_field_choice';
+    public const NAME = 'oro_field_choice';
 
     /** @var TranslatorInterface */
     protected $translator;

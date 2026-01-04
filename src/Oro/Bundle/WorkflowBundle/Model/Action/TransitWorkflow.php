@@ -13,11 +13,11 @@ use Oro\Component\ConfigExpression\ContextAccessor;
  */
 class TransitWorkflow extends ComponentAbstractAction
 {
-    const OPTION_INDEX_ENTITY = 0;
-    const OPTION_INDEX_TRANSITION = 1;
-    const OPTION_INDEX_WORKFLOW = 2;
-    const OPTION_INDEX_DATA = 3;
-    const OPTION_INDEX_IF_ALLOWED = 4;
+    public const OPTION_INDEX_ENTITY = 0;
+    public const OPTION_INDEX_TRANSITION = 1;
+    public const OPTION_INDEX_WORKFLOW = 2;
+    public const OPTION_INDEX_DATA = 3;
+    public const OPTION_INDEX_IF_ALLOWED = 4;
 
     /**
      * @var WorkflowManager

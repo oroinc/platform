@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class OnButtonsMatched extends Event
 {
-    const NAME = 'oro_action.button_provider.on_buttons_matched';
+    public const NAME = 'oro_action.button_provider.on_buttons_matched';
 
     /** @var ButtonsCollection */
     protected $buttons;

@@ -13,7 +13,7 @@ use Oro\Component\PhpUtils\ArrayUtil;
  */
 class DashboardModel implements EntityModelInterface
 {
-    const DEFAULT_TEMPLATE = '@OroDashboard/Index/default.html.twig';
+    public const DEFAULT_TEMPLATE = '@OroDashboard/Index/default.html.twig';
 
     /**
      * @var Dashboard

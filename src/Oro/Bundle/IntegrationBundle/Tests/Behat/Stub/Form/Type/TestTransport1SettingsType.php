@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 class TestTransport1SettingsType extends AbstractType
 {
-    const BLOCK_PREFIX = 'oro_test_transport_1_settings';
+    public const BLOCK_PREFIX = 'oro_test_transport_1_settings';
 
     /**
      * @throws ConstraintDefinitionException

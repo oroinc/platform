@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class MailboxSaved extends Event
 {
-    const NAME = 'oro_email.mailbox_saved';
+    public const NAME = 'oro_email.mailbox_saved';
 
     /** @var Mailbox */
     protected $mailbox;

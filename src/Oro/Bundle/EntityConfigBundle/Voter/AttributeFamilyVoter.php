@@ -13,7 +13,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class AttributeFamilyVoter extends AbstractEntityVoter implements ServiceSubscriberInterface
 {
-    const ATTRIBUTE_DELETE = 'delete';
+    public const ATTRIBUTE_DELETE = 'delete';
 
     protected $supportedAttributes = [self::ATTRIBUTE_DELETE];
 

@@ -8,8 +8,8 @@ use Psr\Log\LoggerInterface;
 
 class ChangeEnumIdentityQuery extends ParametrizedMigrationQuery
 {
-    const FIELD_FROM = 'name';
-    const FIELD_TO   = 'id';
+    public const FIELD_FROM = 'name';
+    public const FIELD_TO   = 'id';
 
     #[\Override]
     public function getDescription()

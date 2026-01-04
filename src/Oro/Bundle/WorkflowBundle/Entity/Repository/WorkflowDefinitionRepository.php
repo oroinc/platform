@@ -14,10 +14,10 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
  */
 class WorkflowDefinitionRepository extends EntityRepository
 {
-    const ACTIVE_WORKFLOW_DEFINITIONS_CACHE_ID = 'oro_active_workflow_definitions_cache';
-    const ACTIVE_FOR_ENTITY_WORKFLOW_DEFINITIONS_CACHE_ID = 'oro_active_for_entity_workflow_definitions_cache';
-    const ENTITY_WORKFLOW_DEFINITIONS_CACHE_ID = 'oro_entity_workflow_definitions_cache';
-    const RELATED_ENTITY_CLASSES_CACHE_ID = 'oro_related_entity_classes_workflow_definitions_cache';
+    public const ACTIVE_WORKFLOW_DEFINITIONS_CACHE_ID = 'oro_active_workflow_definitions_cache';
+    public const ACTIVE_FOR_ENTITY_WORKFLOW_DEFINITIONS_CACHE_ID = 'oro_active_for_entity_workflow_definitions_cache';
+    public const ENTITY_WORKFLOW_DEFINITIONS_CACHE_ID = 'oro_entity_workflow_definitions_cache';
+    public const RELATED_ENTITY_CLASSES_CACHE_ID = 'oro_related_entity_classes_workflow_definitions_cache';
 
     public function getWorkflowDefinitionsConfigs(): \Iterator
     {

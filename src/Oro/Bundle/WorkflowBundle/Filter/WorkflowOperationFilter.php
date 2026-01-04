@@ -10,7 +10,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class WorkflowOperationFilter implements OperationRegistryFilterInterface
 {
-    const WILDCARD = 'break'; //reserved word never will be used as class name
+    public const WILDCARD = 'break'; //reserved word never will be used as class name
 
     /**
      * @var ManagerRegistry

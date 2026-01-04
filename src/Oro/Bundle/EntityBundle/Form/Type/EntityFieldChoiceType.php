@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EntityFieldChoiceType extends AbstractType
 {
-    const NAME = 'oro_entity_field_choice';
+    public const NAME = 'oro_entity_field_choice';
 
     /** @var EntityProvider */
     protected $entityProvider;

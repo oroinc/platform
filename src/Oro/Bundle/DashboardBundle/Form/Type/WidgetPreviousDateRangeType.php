@@ -7,7 +7,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 class WidgetPreviousDateRangeType extends AbstractType
 {
-    const NAME = 'oro_type_widget_previous_date_range';
+    public const NAME = 'oro_type_widget_previous_date_range';
 
     public function getName()
     {

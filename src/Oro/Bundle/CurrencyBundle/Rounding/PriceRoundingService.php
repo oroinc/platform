@@ -6,9 +6,9 @@ use Oro\DBAL\Types\MoneyType;
 
 class PriceRoundingService extends AbstractRoundingService
 {
-    const FALLBACK_PRECISION = MoneyType::TYPE_SCALE;
-    const DEFAULT_ROUND_TYPE = RoundingServiceInterface::ROUND_HALF_UP;
-    const DEFAULT_PRECISION  = 2;
+    public const FALLBACK_PRECISION = MoneyType::TYPE_SCALE;
+    public const DEFAULT_ROUND_TYPE = RoundingServiceInterface::ROUND_HALF_UP;
+    public const DEFAULT_PRECISION  = 2;
 
     #[\Override]
     public function getRoundType()

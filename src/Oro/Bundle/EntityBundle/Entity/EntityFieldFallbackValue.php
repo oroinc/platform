@@ -16,11 +16,11 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 #[Config]
 class EntityFieldFallbackValue
 {
-    const FALLBACK_TYPE = 'fallbackType';
-    const FALLBACK_LIST = 'fallbackList';
-    const FALLBACK_SCALAR_FIELD = 'scalarValue';
-    const FALLBACK_ARRAY_FIELD = 'arrayValue';
-    const FALLBACK_PARENT_FIELD = 'fallback';
+    public const FALLBACK_TYPE = 'fallbackType';
+    public const FALLBACK_LIST = 'fallbackList';
+    public const FALLBACK_SCALAR_FIELD = 'scalarValue';
+    public const FALLBACK_ARRAY_FIELD = 'arrayValue';
+    public const FALLBACK_PARENT_FIELD = 'fallback';
 
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]

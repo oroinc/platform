@@ -40,16 +40,16 @@ use Psr\Log\LoggerInterface;
 class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProcessor
 {
     /** Determines how many emails can be loaded from IMAP server at once */
-    const READ_BATCH_SIZE = 100;
+    public const READ_BATCH_SIZE = 100;
 
     /** Determines how often "Processed X of N emails" hint should be added to a log */
-    const READ_HINT_COUNT = 500;
+    public const READ_HINT_COUNT = 500;
 
     /** Determines how often the clearing of outdated folders routine should be executed */
-    const CLEANUP_EVERY_N_RUN = 100;
+    public const CLEANUP_EVERY_N_RUN = 100;
 
     /** Time limit to sync origin in seconds */
-    const MAX_ORIGIN_SYNC_TIME = 60;
+    public const MAX_ORIGIN_SYNC_TIME = 60;
 
     protected ImapEmailManager $manager;
     protected ImapEmailRemoveManager $removeManager;

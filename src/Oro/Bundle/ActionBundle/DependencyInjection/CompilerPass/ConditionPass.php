@@ -6,8 +6,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ConditionPass extends AbstractPass
 {
-    const EXPRESSION_TAG = 'oro_action.condition';
-    const EXTENSION_SERVICE_ID = 'oro_action.expression.extension';
+    public const EXPRESSION_TAG = 'oro_action.condition';
+    public const EXTENSION_SERVICE_ID = 'oro_action.expression.extension';
 
     #[\Override]
     public function process(ContainerBuilder $container)

@@ -341,7 +341,7 @@ class ImportExportControllerTest extends WebTestCase
     {
         $registry = self::getContainer()->get('oro_importexport.configuration.registry');
         $registry->addConfiguration(
-            new class() implements ImportExportConfigurationProviderInterface {
+            new class () implements ImportExportConfigurationProviderInterface {
                 public function get(): ImportExportConfigurationInterface
                 {
                     return new ImportExportConfiguration([
@@ -368,7 +368,7 @@ class ImportExportControllerTest extends WebTestCase
         );
 
         $registry->addConfiguration(
-            new class() implements ImportExportConfigurationProviderInterface {
+            new class () implements ImportExportConfigurationProviderInterface {
                 public function get(): ImportExportConfigurationInterface
                 {
                     return new ImportExportConfiguration([

@@ -7,7 +7,7 @@ use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class DefaultLabelListener
 {
-    const CONFIG_ENTITY_SCOPE = 'entity';
+    public const CONFIG_ENTITY_SCOPE = 'entity';
 
     /**
      * @var EntityConfigHelper

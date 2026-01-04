@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class OroDateType extends AbstractType
 {
-    const NAME = 'oro_date';
+    public const NAME = 'oro_date';
 
     #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)

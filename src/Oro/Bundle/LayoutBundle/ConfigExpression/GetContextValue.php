@@ -8,7 +8,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class GetContextValue extends AbstractFunction
 {
-    const PROPERTY_PATH_PREFIX = 'context.';
+    public const PROPERTY_PATH_PREFIX = 'context.';
 
     /** @var mixed */
     protected $value;

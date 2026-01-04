@@ -27,7 +27,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * The ACE will be considered applicable when all the turned-on bits in the
      * required mask are also turned-on in the ACE mask.
      */
-    const ALL = 'all';
+    public const ALL = 'all';
 
     /**
      * Granting strategy ANY.
@@ -35,14 +35,14 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * The ACE will be considered applicable when any of the turned-on bits in
      * the required mask is also turned-on the in the ACE mask.
      */
-    const ANY = 'any';
+    public const ANY = 'any';
 
     /**
      * Granting strategy EQUAL.
      *
      * The ACE will be considered applicable when the bitmasks are equal.
      */
-    const EQUAL = 'equal';
+    public const EQUAL = 'equal';
 
     /**
      * Granting strategy PERMISSION.
@@ -63,7 +63,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * but ACE mask can contains only VIEW and EDIT permissions and never contains CREATE permission.
      * The typical use case of this strategy is to share a record with another SID.
      */
-    const PERMISSION = 'perm';
+    public const PERMISSION = 'perm';
 
     /** @var AuditLoggerInterface */
     protected $auditLogger;

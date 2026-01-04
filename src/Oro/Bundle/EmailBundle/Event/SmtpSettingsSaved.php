@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class SmtpSettingsSaved extends Event
 {
-    const NAME = 'oro_email.smtp_settings_saved';
+    public const NAME = 'oro_email.smtp_settings_saved';
 
     /** @var SmtpSettings */
     protected $smtpSettings;

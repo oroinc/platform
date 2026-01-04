@@ -10,7 +10,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
  */
 class ProcessJobRepository extends EntityRepository
 {
-    const DELETE_HASH_BATCH = 100;
+    public const DELETE_HASH_BATCH = 100;
 
     public function deleteByHashes(array $hashes)
     {

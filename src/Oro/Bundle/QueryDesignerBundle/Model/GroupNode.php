@@ -6,9 +6,9 @@ use Oro\Component\PhpUtils\ArrayUtil;
 
 class GroupNode
 {
-    const TYPE_COMPUTED   = 'computed';
-    const TYPE_UNCOMPUTED = 'uncomputed';
-    const TYPE_MIXED      = 'mixed';
+    public const TYPE_COMPUTED   = 'computed';
+    public const TYPE_UNCOMPUTED = 'uncomputed';
+    public const TYPE_MIXED      = 'mixed';
 
     /** @var string */
     protected $condition;

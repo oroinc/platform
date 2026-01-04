@@ -26,7 +26,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
  */
 class FlushEntity extends AbstractAction
 {
-    const OPTION_KEY_ENTITY = 'entity';
+    public const OPTION_KEY_ENTITY = 'entity';
 
     /**
      * @var mixed

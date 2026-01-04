@@ -9,7 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 abstract class ChannelActionEvent extends Event
 {
-    const NAME = '';
+    public const NAME = '';
 
     /**
      * @var Collection|string[]

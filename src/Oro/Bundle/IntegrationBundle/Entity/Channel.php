@@ -38,13 +38,13 @@ use Oro\Component\Config\Common\ConfigObject;
 class Channel implements OrganizationAwareInterface
 {
     /** This mode allow to do any changes(including removing) with channel */
-    const EDIT_MODE_ALLOW = 3;
+    public const EDIT_MODE_ALLOW = 3;
 
     /** This mode allow only to activate/deactivate channel(switch enable field) */
-    const EDIT_MODE_RESTRICTED = 2;
+    public const EDIT_MODE_RESTRICTED = 2;
 
     /** This mode do not allow to edit, remove and activate/deactivate channel */
-    const EDIT_MODE_DISALLOW = 1;
+    public const EDIT_MODE_DISALLOW = 1;
 
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: Types::INTEGER)]

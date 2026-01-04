@@ -15,11 +15,11 @@ use Symfony\Component\Config\Definition\Processor;
  */
 class ProcessorDecorator
 {
-    const ROOT          = 'system_configuration';
-    const GROUPS_NODE   = 'groups';
-    const FIELDS_ROOT   = 'fields';
-    const TREE_ROOT     = 'tree';
-    const API_TREE_ROOT = 'api_tree';
+    public const ROOT          = 'system_configuration';
+    public const GROUPS_NODE   = 'groups';
+    public const FIELDS_ROOT   = 'fields';
+    public const TREE_ROOT     = 'tree';
+    public const API_TREE_ROOT = 'api_tree';
 
     /** @var Processor */
     protected $processor;

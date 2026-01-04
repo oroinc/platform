@@ -12,7 +12,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class LoadFieldsMetadata extends Event
 {
-    const NAME = 'oro_security.event.load_fields_metadata.after';
+    public const NAME = 'oro_security.event.load_fields_metadata.after';
 
     /** @var array */
     protected $fields;

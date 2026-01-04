@@ -7,7 +7,7 @@ use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
 
 class TagsTypeFormatter implements TypeFormatterInterface
 {
-    const TYPE_TAGS = 'tags';
+    public const TYPE_TAGS = 'tags';
 
     #[\Override]
     public function formatType($value, $type)
