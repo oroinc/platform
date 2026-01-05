@@ -93,7 +93,7 @@ class DumpConfigCommand extends AbstractDebugCommand
                 'Show a list of documentation resources'
             )
             ->setHelp(
-                // @codingStandardsIgnoreStart
+                // phpcs:disable
                 <<<'HELP'
 The <info>%command.name%</info> command dumps the given entity configuration used in API.
 
@@ -121,7 +121,7 @@ The <info>--documentation-resources</info> option shows a list of documentation 
   <info>php %command.full_name% --documentation-resources <entity></info>
 
 HELP
-                // @codingStandardsIgnoreEnd
+                // phpcs:enable
             )
             ->addUsage('--extra=definition --extra=<extra> <entity>')
             ->addUsage('--extra=definition --extra=<extra1> --extra=<extra2> --extra=<extraN> <entity>')

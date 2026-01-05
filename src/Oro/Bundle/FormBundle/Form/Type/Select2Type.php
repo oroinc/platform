@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class Select2Type extends AbstractType
 {
-    const HIDDEN_TYPE = 'Symfony\Component\Form\Extension\Core\Type\HiddenType';
+    public const HIDDEN_TYPE = 'Symfony\Component\Form\Extension\Core\Type\HiddenType';
 
     /**
      * @var string

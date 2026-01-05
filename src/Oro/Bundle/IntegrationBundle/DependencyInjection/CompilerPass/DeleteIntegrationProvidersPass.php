@@ -8,8 +8,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class DeleteIntegrationProvidersPass implements CompilerPassInterface
 {
-    const DELETE_PROVIDER_TAG = 'oro_integration.delete_provider';
-    const DELETE_MANAGER      = 'oro_integration.delete_manager';
+    public const DELETE_PROVIDER_TAG = 'oro_integration.delete_provider';
+    public const DELETE_MANAGER      = 'oro_integration.delete_manager';
 
     #[\Override]
     public function process(ContainerBuilder $container)

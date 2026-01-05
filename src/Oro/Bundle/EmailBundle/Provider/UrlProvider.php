@@ -13,7 +13,7 @@ class UrlProvider
 {
     use UrlProviderTrait;
 
-    const APPLICATION_URL = 'oro_ui.application_url';
+    public const APPLICATION_URL = 'oro_ui.application_url';
 
     /** @var ConfigManager */
     protected $configManager;

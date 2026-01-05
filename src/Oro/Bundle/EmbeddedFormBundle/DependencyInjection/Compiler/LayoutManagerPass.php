@@ -12,10 +12,10 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class LayoutManagerPass implements CompilerPassInterface
 {
-    const LAYOUT_FACTORY_BUILDER_SERVICE_ID = 'oro_layout.layout_factory_builder';
-    const LAYOUT_MANGER_SERVICE_ID = 'oro_layout.layout_manager';
-    const EF_LAYOUT_FACTORY_BUILDER_SERVICE_ID = 'oro_embedded_form.layout_factory_builder';
-    const EF_LAYOUT_MANGER_SERVICE_ID = 'oro_embedded_form.layout_manager';
+    public const LAYOUT_FACTORY_BUILDER_SERVICE_ID = 'oro_layout.layout_factory_builder';
+    public const LAYOUT_MANGER_SERVICE_ID = 'oro_layout.layout_manager';
+    public const EF_LAYOUT_FACTORY_BUILDER_SERVICE_ID = 'oro_embedded_form.layout_factory_builder';
+    public const EF_LAYOUT_MANGER_SERVICE_ID = 'oro_embedded_form.layout_manager';
 
     #[\Override]
     public function process(ContainerBuilder $container)

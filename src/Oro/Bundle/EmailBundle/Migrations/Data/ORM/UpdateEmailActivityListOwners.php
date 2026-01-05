@@ -21,7 +21,7 @@ class UpdateEmailActivityListOwners extends AbstractFixture implements Container
 {
     use ContainerAwareTrait;
 
-    const BATCH_SIZE = 200;
+    public const BATCH_SIZE = 200;
 
     /**
      * @var ContainerInterface

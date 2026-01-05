@@ -12,7 +12,7 @@ use Oro\Component\Config\Common\ConfigObject;
  */
 class ConfigObjectType extends JsonType
 {
-    const TYPE = 'config_object';
+    public const TYPE = 'config_object';
 
     #[\Override]
     public function getName()

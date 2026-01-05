@@ -61,7 +61,7 @@ class AclAncestor
      * @param array $data Initialization array
      * @return AclAncestor A new instance of a AclAncestor object
      */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     public static function __set_state($data)
     {
         $result     = AclAncestor::fromArray();
@@ -69,5 +69,5 @@ class AclAncestor
 
         return $result;
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 }

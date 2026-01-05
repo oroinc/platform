@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\SegmentWidget;
 
 class ContextChecker
 {
-    const DISABLED_PARAM = 'disable_audit';
+    public const DISABLED_PARAM = 'disable_audit';
 
     /**
      * @param array $context

@@ -10,7 +10,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class CollectionElementValueExists extends AbstractComparison
 {
-    const NAME = 'collection_element_value_exists';
+    public const NAME = 'collection_element_value_exists';
 
     #[\Override]
     public function initialize(array $options)

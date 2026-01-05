@@ -21,13 +21,13 @@ class LoadWorkflowTranslations extends AbstractFixture implements DependentFixtu
 {
     use ContainerAwareTrait;
 
-    const WORKFLOW1 = 'workflow1';
-    const WORKFLOW2 = 'workflow2';
-    const WORKFLOW3 = 'workflow3';
-    const WORKFLOW4 = 'workflow4';
+    public const WORKFLOW1 = 'workflow1';
+    public const WORKFLOW2 = 'workflow2';
+    public const WORKFLOW3 = 'workflow3';
+    public const WORKFLOW4 = 'workflow4';
 
-    const TRANSLATION1 = 'translation1.key';
-    const TRANSLATION2 = 'translation2.key';
+    public const TRANSLATION1 = 'translation1.key';
+    public const TRANSLATION2 = 'translation2.key';
 
     /** @var array */
     protected $workflowTranslations = [

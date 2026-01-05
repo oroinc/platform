@@ -14,7 +14,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class DefaultOwnerSetEvent extends Event
 {
-    const NAME = 'oro_integration.default_owner.set';
+    public const NAME = 'oro_integration.default_owner.set';
 
     /** @var Integration */
     protected $integration;

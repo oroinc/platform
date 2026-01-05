@@ -11,7 +11,7 @@ class ExecuteActionEvents
      *
      * @var string
      */
-    const HANDLE_BEFORE = 'oro_action.action.handle_before';
+    public const HANDLE_BEFORE = 'oro_action.action.handle_before';
 
     /**
      * This event occurs after execute action
@@ -20,5 +20,5 @@ class ExecuteActionEvents
      *
      * @var string
      */
-    const HANDLE_AFTER = 'oro_action.action.handle_after';
+    public const HANDLE_AFTER = 'oro_action.action.handle_after';
 }

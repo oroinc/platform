@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class EntitySelectType extends AbstractType
 {
-    const NAME = 'oro_entity_select';
+    public const NAME = 'oro_entity_select';
 
     /** @var ConfigManager */
     protected $cm;

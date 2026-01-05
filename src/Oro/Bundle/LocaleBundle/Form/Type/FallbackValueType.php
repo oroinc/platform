@@ -20,7 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class FallbackValueType extends AbstractType
 {
-    const NAME = 'oro_locale_fallback_value';
+    public const NAME = 'oro_locale_fallback_value';
 
     public function getName()
     {

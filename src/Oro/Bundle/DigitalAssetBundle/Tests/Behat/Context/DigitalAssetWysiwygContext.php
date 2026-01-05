@@ -13,9 +13,9 @@ class DigitalAssetWysiwygContext extends WysiwygContext
 {
     /**
      * Example: When I fill in WYSIWYG "CMS Page Content" with "tiger.svg" image in "Content"
-     * @codingStandardsIgnoreStart
+     * phpcs:disable
      * @When /^(?:|I )fill in WYSIWYG "(?P<wysiwygElementName>[^"]+)" with "(?P<fileName>(?:[^"]|\\")*)" image in "(?P<text>(?:[^"]|\\")*)"$/
-     * @codingStandardsIgnoreEnd
+     * phpcs:enable
      *
      * @param string $wysiwygElementName
      * @param string $fileName

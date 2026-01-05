@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractQueryDesignerType extends AbstractType
 {
-    const DATE_GROUPING_FORM_NAME = 'dateGrouping';
+    public const DATE_GROUPING_FORM_NAME = 'dateGrouping';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

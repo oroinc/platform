@@ -1,6 +1,6 @@
 <?php
 
-namespace  Oro\Bundle\LayoutBundle\Tests\Functional\Command;
+namespace Oro\Bundle\LayoutBundle\Tests\Functional\Command;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 

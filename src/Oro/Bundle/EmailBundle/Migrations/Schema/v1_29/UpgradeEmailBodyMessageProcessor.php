@@ -20,7 +20,7 @@ use Psr\Log\LoggerInterface;
  */
 class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    const BATCH_SIZE = 500;
+    public const BATCH_SIZE = 500;
 
     /** @var MessageProducerInterface */
     protected $messageProducer;

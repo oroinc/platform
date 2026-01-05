@@ -37,10 +37,10 @@ class Reminder implements ExtendEntityInterface
 {
     use ExtendEntityTrait;
 
-    const STATE_SENT = 'sent';
-    const STATE_NOT_SENT = 'not_sent';
-    const STATE_FAIL = 'fail';
-    const STATE_REQUESTED = 'requested';
+    public const STATE_SENT = 'sent';
+    public const STATE_NOT_SENT = 'not_sent';
+    public const STATE_FAIL = 'fail';
+    public const STATE_REQUESTED = 'requested';
 
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]

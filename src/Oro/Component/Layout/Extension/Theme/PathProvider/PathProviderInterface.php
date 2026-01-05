@@ -4,7 +4,7 @@ namespace Oro\Component\Layout\Extension\Theme\PathProvider;
 
 interface PathProviderInterface
 {
-    const DELIMITER = DIRECTORY_SEPARATOR;
+    public const DELIMITER = DIRECTORY_SEPARATOR;
 
     /**
      * Provides paths where applicable resources are located.

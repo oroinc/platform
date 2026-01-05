@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class OrmDatasource implements DatasourceInterface, BindParametersInterface
 {
-    const TYPE = 'orm';
+    public const TYPE = 'orm';
 
     /** @var QueryBuilder */
     protected $qb;

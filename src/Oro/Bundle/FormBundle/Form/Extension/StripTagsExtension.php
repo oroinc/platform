@@ -19,7 +19,7 @@ class StripTagsExtension extends AbstractTypeExtension implements ServiceSubscri
 {
     use FormExtendedTypeTrait;
 
-    const OPTION_NAME = 'strip_tags';
+    public const OPTION_NAME = 'strip_tags';
 
     /** @var ContainerInterface */
     private $container;

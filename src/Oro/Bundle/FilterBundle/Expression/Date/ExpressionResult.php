@@ -16,11 +16,11 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
  */
 class ExpressionResult
 {
-    const TYPE_INT = 1;
-    const TYPE_DATE = 2;
-    const TYPE_TIME = 3;
-    const TYPE_DAYMONTH = 4;
-    const TYPE_DATETIME = 5;
+    public const TYPE_INT = 1;
+    public const TYPE_DATE = 2;
+    public const TYPE_TIME = 3;
+    public const TYPE_DAYMONTH = 4;
+    public const TYPE_DATETIME = 5;
 
     /** @var int */
     private $variableType = null;

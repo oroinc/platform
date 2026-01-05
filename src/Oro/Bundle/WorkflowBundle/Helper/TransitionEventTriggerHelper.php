@@ -14,11 +14,11 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
  */
 class TransitionEventTriggerHelper
 {
-    const TRIGGER_ENTITY = 'entity';
-    const TRIGGER_WORKFLOW_ENTITY = 'mainEntity';
-    const TRIGGER_PREVIOUS_ENTITY = 'prevEntity';
-    const TRIGGER_WORKFLOW_DEFINITION = 'wd';
-    const TRIGGER_WORKFLOW_ITEM = 'wi';
+    public const TRIGGER_ENTITY = 'entity';
+    public const TRIGGER_WORKFLOW_ENTITY = 'mainEntity';
+    public const TRIGGER_PREVIOUS_ENTITY = 'prevEntity';
+    public const TRIGGER_WORKFLOW_DEFINITION = 'wd';
+    public const TRIGGER_WORKFLOW_ITEM = 'wi';
 
     /** @var WorkflowManager */
     private $workflowManager;

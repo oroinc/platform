@@ -17,8 +17,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 )]
 class MassNotification
 {
-    const STATUS_FAILED  = 0;
-    const STATUS_SUCCESS = 1;
+    public const STATUS_FAILED  = 0;
+    public const STATUS_SUCCESS = 1;
 
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]

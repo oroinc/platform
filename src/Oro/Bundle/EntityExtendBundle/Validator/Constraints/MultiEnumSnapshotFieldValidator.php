@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class MultiEnumSnapshotFieldValidator extends AbstractFieldValidator
 {
-    const ALIAS = 'oro_entity_extend.validator.multi_enum_snapshot';
+    public const ALIAS = 'oro_entity_extend.validator.multi_enum_snapshot';
 
     #[\Override]
     public function validate($value, Constraint $constraint)

@@ -12,7 +12,7 @@ use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
 class MergeListener
 {
-    const FIELD_NAME = 'tags';
+    public const FIELD_NAME = 'tags';
 
     /** @var TagManager */
     protected $tagManager;

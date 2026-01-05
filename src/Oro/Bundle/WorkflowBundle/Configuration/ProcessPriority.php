@@ -10,9 +10,9 @@ use Oro\Component\MessageQueue\Client\MessagePriority;
  */
 class ProcessPriority
 {
-    const PRIORITY_LOW = -5;
-    const PRIORITY_DEFAULT = 0;
-    const PRIORITY_HIGH = 5;
+    public const PRIORITY_LOW = -5;
+    public const PRIORITY_DEFAULT = 0;
+    public const PRIORITY_HIGH = 5;
 
     /**
      * @param int $processPriority

@@ -4,9 +4,9 @@ namespace Oro\Bundle\LocaleBundle\Model;
 
 class FallbackType
 {
-    const SYSTEM = 'system';
-    const PARENT_LOCALIZATION = 'parent_localization';
-    const NONE = null;
+    public const SYSTEM = 'system';
+    public const PARENT_LOCALIZATION = 'parent_localization';
+    public const NONE = null;
 
     /**
      * @var string

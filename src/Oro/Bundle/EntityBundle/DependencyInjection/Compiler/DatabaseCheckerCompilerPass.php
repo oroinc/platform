@@ -8,8 +8,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class DatabaseCheckerCompilerPass implements CompilerPassInterface
 {
-    const STATE_MANAGER_SERVICE     = 'oro_entity.database_checker.state_manager';
-    const DATABASE_CHECKER_TAG_NAME = 'oro_entity.database_checker';
+    public const STATE_MANAGER_SERVICE     = 'oro_entity.database_checker.state_manager';
+    public const DATABASE_CHECKER_TAG_NAME = 'oro_entity.database_checker';
 
     #[\Override]
     public function process(ContainerBuilder $container)

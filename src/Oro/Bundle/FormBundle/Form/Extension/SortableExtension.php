@@ -12,7 +12,7 @@ class SortableExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
 
-    const POSITION_FIELD_NAME = '_position';
+    public const POSITION_FIELD_NAME = '_position';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

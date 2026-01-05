@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class EmbeddedFormSubmitBeforeEvent extends Event
 {
-    const EVENT_NAME = 'oro_embedded_form.form_submit.before';
+    public const EVENT_NAME = 'oro_embedded_form.form_submit.before';
 
     /** @var  Object */
     protected $data;

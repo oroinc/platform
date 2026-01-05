@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ConfigureDbalTransportExtensionsPass implements CompilerPassInterface
 {
-    const EXTENSION_TAG = 'oro_message_queue.consumption.extension';
+    public const EXTENSION_TAG = 'oro_message_queue.consumption.extension';
 
     #[\Override]
     public function process(ContainerBuilder $container)

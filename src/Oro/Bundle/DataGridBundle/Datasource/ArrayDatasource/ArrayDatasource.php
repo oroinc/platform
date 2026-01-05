@@ -13,7 +13,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
  */
 class ArrayDatasource implements DatasourceInterface
 {
-    const TYPE = 'array';
+    public const TYPE = 'array';
 
     /**
      * @var array

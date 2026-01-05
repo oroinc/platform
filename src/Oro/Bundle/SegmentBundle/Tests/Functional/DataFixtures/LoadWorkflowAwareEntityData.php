@@ -8,7 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 
 class LoadWorkflowAwareEntityData extends AbstractFixture
 {
-    const COUNT = 50;
+    public const COUNT = 50;
 
     #[\Override]
     public function load(ObjectManager $manager)

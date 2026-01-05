@@ -9,11 +9,11 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
  */
 class TranslatableProperty extends FieldProperty
 {
-    const TRANS_KEY = 'key';
-    const PARAMS_KEY = 'params';
-    const DIRECT_PARAMS_KEY = 'direct_params';
-    const DOMAIN_KEY = 'domain';
-    const LOCALE_KEY = 'locale';
+    public const TRANS_KEY = 'key';
+    public const PARAMS_KEY = 'params';
+    public const DIRECT_PARAMS_KEY = 'direct_params';
+    public const DOMAIN_KEY = 'domain';
+    public const LOCALE_KEY = 'locale';
 
     /** @var array */
     protected $excludeParams = [self::DOMAIN_KEY, self::LOCALE_KEY];

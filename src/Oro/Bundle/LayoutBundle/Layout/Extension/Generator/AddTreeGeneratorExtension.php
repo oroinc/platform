@@ -11,11 +11,11 @@ use Oro\Component\PhpUtils\ArrayUtil;
 
 class AddTreeGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionInterface
 {
-    const NODE_ITEMS = 'items';
-    const NODE_TREE = 'tree';
+    public const NODE_ITEMS = 'items';
+    public const NODE_TREE = 'tree';
 
-    const ACTION_ADD_TREE_KEY = '@addTree';
-    const ACTION_ADD_KEY = '@add';
+    public const ACTION_ADD_TREE_KEY = '@addTree';
+    public const ACTION_ADD_KEY = '@add';
 
     #[\Override]
     public function prepare(GeneratorData $data, VisitorCollection $collection)

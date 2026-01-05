@@ -14,31 +14,31 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
  */
 class OrmQueryConfiguration
 {
-    const DISTINCT_PATH   = '[source][query][distinct]';
-    const SELECT_PATH     = '[source][query][select]';
-    const FROM_PATH       = '[source][query][from]';
-    const JOIN_PATH       = '[source][query][join]';
-    const INNER_JOIN_PATH = '[source][query][join][inner]';
-    const LEFT_JOIN_PATH  = '[source][query][join][left]';
-    const WHERE_PATH      = '[source][query][where]';
-    const WHERE_AND_PATH  = '[source][query][where][and]';
-    const WHERE_OR_PATH   = '[source][query][where][or]';
-    const HAVING_PATH     = '[source][query][having]';
-    const GROUP_BY_PATH   = '[source][query][groupBy]';
-    const ORDER_BY_PATH   = '[source][query][orderBy]';
-    const HINTS_PATH      = '[source][hints]';
+    public const DISTINCT_PATH   = '[source][query][distinct]';
+    public const SELECT_PATH     = '[source][query][select]';
+    public const FROM_PATH       = '[source][query][from]';
+    public const JOIN_PATH       = '[source][query][join]';
+    public const INNER_JOIN_PATH = '[source][query][join][inner]';
+    public const LEFT_JOIN_PATH  = '[source][query][join][left]';
+    public const WHERE_PATH      = '[source][query][where]';
+    public const WHERE_AND_PATH  = '[source][query][where][and]';
+    public const WHERE_OR_PATH   = '[source][query][where][or]';
+    public const HAVING_PATH     = '[source][query][having]';
+    public const GROUP_BY_PATH   = '[source][query][groupBy]';
+    public const ORDER_BY_PATH   = '[source][query][orderBy]';
+    public const HINTS_PATH      = '[source][hints]';
 
-    const TABLE_KEY          = 'table';
-    const ALIAS_KEY          = 'alias';
-    const JOIN_KEY           = 'join';
-    const CONDITION_TYPE_KEY = 'conditionType';
-    const CONDITION_KEY      = 'condition';
-    const COLUMN_KEY         = 'column';
-    const DIRECTION_KEY      = 'dir';
-    const NAME_KEY           = 'name';
-    const VALUE_KEY          = 'value';
+    public const TABLE_KEY          = 'table';
+    public const ALIAS_KEY          = 'alias';
+    public const JOIN_KEY           = 'join';
+    public const CONDITION_TYPE_KEY = 'conditionType';
+    public const CONDITION_KEY      = 'condition';
+    public const COLUMN_KEY         = 'column';
+    public const DIRECTION_KEY      = 'dir';
+    public const NAME_KEY           = 'name';
+    public const VALUE_KEY          = 'value';
 
-    const GENERATED_JOIN_ALIAS_TEMPLATE = 'auto_rel_%d';
+    public const GENERATED_JOIN_ALIAS_TEMPLATE = 'auto_rel_%d';
 
     /** @var DatagridConfiguration */
     private $config;

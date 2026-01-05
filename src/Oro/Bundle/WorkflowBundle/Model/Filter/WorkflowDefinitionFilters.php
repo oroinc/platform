@@ -10,8 +10,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class WorkflowDefinitionFilters
 {
-    const TYPE_DEFAULT = '';
-    const TYPE_SYSTEM = 'system';
+    public const TYPE_DEFAULT = '';
+    public const TYPE_SYSTEM = 'system';
 
     /** @var ArrayCollection|WorkflowDefinitionFilterInterface[] */
     protected $filters;

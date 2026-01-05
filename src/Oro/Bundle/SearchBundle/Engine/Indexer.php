@@ -23,16 +23,16 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class Indexer
 {
-    const TEXT_ALL_DATA_FIELD   = 'all_text';
-    const NAME_FIELD            = 'system_entity_name';
-    const ID_FIELD              = 'system_entity_id';
+    public const TEXT_ALL_DATA_FIELD   = 'all_text';
+    public const NAME_FIELD            = 'system_entity_name';
+    public const ID_FIELD              = 'system_entity_id';
 
-    const RELATION_ONE_TO_ONE   = 'one-to-one';
-    const RELATION_MANY_TO_MANY = 'many-to-many';
-    const RELATION_MANY_TO_ONE  = 'many-to-one';
-    const RELATION_ONE_TO_MANY  = 'one-to-many';
+    public const RELATION_ONE_TO_ONE   = 'one-to-one';
+    public const RELATION_MANY_TO_MANY = 'many-to-many';
+    public const RELATION_MANY_TO_ONE  = 'many-to-one';
+    public const RELATION_ONE_TO_MANY  = 'one-to-many';
 
-    const SEARCH_ENTITY_PERMISSION = 'VIEW';
+    public const SEARCH_ENTITY_PERMISSION = 'VIEW';
 
     /** @var ExtendedEngineInterface */
     protected $engine;

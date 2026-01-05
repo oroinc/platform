@@ -12,7 +12,7 @@ class OroDataAuditBundle implements Migration
     #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
-        // @codingStandardsIgnoreStart
+        // phpcs:disable
 
         /** Generate table oro_audit **/
         $table = $schema->createTable('oro_audit');
@@ -34,6 +34,6 @@ class OroDataAuditBundle implements Migration
         $table->addForeignKeyConstraint($schema->getTable('oro_user'), ['user_id'], ['id'], ['onDelete' => 'CASCADE', 'onUpdate' => null]);
         /** End of generate foreign keys for table oro_audit **/
 
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
     }
 }

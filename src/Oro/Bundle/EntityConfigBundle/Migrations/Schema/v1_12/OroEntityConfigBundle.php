@@ -15,9 +15,9 @@ class OroEntityConfigBundle implements Migration, AttachmentExtensionAwareInterf
 {
     use AttachmentExtensionAwareTrait;
 
-    const MAX_IMAGE_SIZE_IN_MB = 10;
-    const THUMBNAIL_WIDTH_SIZE_IN_PX = 100;
-    const THUMBNAIL_HEIGHT_SIZE_IN_PX = 100;
+    public const MAX_IMAGE_SIZE_IN_MB = 10;
+    public const THUMBNAIL_WIDTH_SIZE_IN_PX = 100;
+    public const THUMBNAIL_HEIGHT_SIZE_IN_PX = 100;
 
     #[\Override]
     public function up(Schema $schema, QueryBag $queries)

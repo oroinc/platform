@@ -42,7 +42,7 @@ class Localization implements DatesAwareInterface, ExtendEntityInterface
     use DatesAwareTrait;
     use ExtendEntityTrait;
 
-    const DEFAULT_LOCALIZATION = 'default';
+    public const DEFAULT_LOCALIZATION = 'default';
 
     #[ORM\Id]
     #[ORM\Column(type: Types::INTEGER)]

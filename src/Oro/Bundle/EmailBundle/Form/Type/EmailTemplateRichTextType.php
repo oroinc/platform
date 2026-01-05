@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class EmailTemplateRichTextType extends AbstractType
 {
-    const NAME = 'oro_email_template_rich_text';
+    public const NAME = 'oro_email_template_rich_text';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

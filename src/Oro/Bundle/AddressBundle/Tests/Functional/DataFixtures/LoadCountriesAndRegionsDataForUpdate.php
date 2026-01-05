@@ -9,13 +9,13 @@ use Oro\Bundle\AddressBundle\Entity\Region;
 
 class LoadCountriesAndRegionsDataForUpdate extends AbstractFixture
 {
-    const COUNTRY_YY = 'country.YY';
-    const COUNTRY_XX = 'country.XX';
-    const COUNTRY_QQ = 'country.QQ';
+    public const COUNTRY_YY = 'country.YY';
+    public const COUNTRY_XX = 'country.XX';
+    public const COUNTRY_QQ = 'country.QQ';
 
-    const REGION_YY_YY = 'region.YYYY';
-    const REGION_XX_XX = 'region.XXXX';
-    const REGION_QQ_QQ = 'region.QQQQ';
+    public const REGION_YY_YY = 'region.YYYY';
+    public const REGION_XX_XX = 'region.XXXX';
+    public const REGION_QQ_QQ = 'region.QQQQ';
 
     /** @var array */
     private $countries = [

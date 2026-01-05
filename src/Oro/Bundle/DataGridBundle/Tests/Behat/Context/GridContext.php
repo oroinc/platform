@@ -153,9 +153,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param string|null $entityTitle
      *
      * @When /^(?:|I )start inline editing on "(?P<field>[^"]+)" field I should see "(?P<value>.*)" value$/
-     * @codingStandardsIgnoreStart
+     * phpcs:disable
      * @When /^(?:|I )start inline editing on "(?P<entityTitle>[^"]+)" "(?P<field>.+)" field I should see "(?P<value>.*)" value$/
-     * @codingStandardsIgnoreEnd
+     * phpcs:enable
      */
     public function startInlineEditingAndAssertEditorValue($field, $value, $entityTitle = null)
     {
@@ -422,7 +422,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $grid->clickMassActionLink($title);
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Example: When I click "Delete" link from mass action dropdown
      * Example: And click Delete mass action
@@ -430,7 +430,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|I )click "(?P<title>(?:[^"]|\\")*)" link from select all mass action dropdown$/
      * @When /^(?:|I )click "(?P<title>(?:[^"]|\\")*)" link from select all mass action dropdown in "(?P<gridName>[^"]+)"$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function clickSelectAllLinkFromMassActionDropdown($title, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
@@ -566,7 +566,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $grid->checkFirstRecords($number);
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Checks first records in provided column number
      * Example: And I check first 5 records in 1 column
@@ -574,7 +574,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|I )check first (?P<number>(?:|one|two|\d+)) record(?:|s|) in (?P<column>(?:|one|two|\d+)) column$/
      * @When /^(?:|I )check first (?P<number>(?:|one|two|\d+)) record(?:|s|) in (?P<column>(?:|one|two|\d+)) column in "(?P<gridName>[^"]+)"$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iCheckRecordsInColumn($number, $column, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
@@ -584,7 +584,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         );
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Unchecks first records in provided column number
      * Example: And I uncheck first 2 records in 1 column
@@ -592,7 +592,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|I )uncheck first (?P<number>(?:[^"]|\\")*) records in (?P<column>(?:[^"]|\\")*) column$/
      * @When /^(?:|I )uncheck first (?P<number>(?:[^"]|\\")*) records in (?P<column>(?:[^"]|\\")*) column in "(?P<gridName>[^"]+)"$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iUncheckFirstRecordsInColumn($number, $column, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
@@ -774,12 +774,12 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $element->click();
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * @Then /^(?P<column>[\w\s]+) in (?P<rowNumber1>(?:|first|second|[\d]+)) row must be (?P<comparison>(?:|lower|greater|equal)) then in (?P<rowNumber2>(?:|first|second|[\d]+)) row$/
      * @Then /^(?P<column>[\w\s]+) in (?P<rowNumber1>(?:|first|second|[\d]+)) row in "(?P<gridName>[^"]+)" must be (?P<comparison>(?:|lower|greater|equal)) then in (?P<rowNumber2>(?:|first|second|[\d]+)) row$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function compareRowValues($column, $comparison, $rowNumber1, $rowNumber2, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
@@ -803,14 +803,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         }
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Assert that column value of specified row is equal to given value
      * Example: I should see that Translated Value in 1 row is equal to "some value"
      * @Then /^(?:|I )should see that (?P<column>[\w\s]+) in (?P<rowNumber>[\d]+) row is equal to "(?P<value>.*)"$/
      * @Then /^(?:|I )should see that (?P<column>[\w\s]+) in (?P<rowNumber>[\d]+) row in "(?P<gridName>[^"]+)" is equal to "(?P<value>.*)"$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function assertColumnValueEquals($column, $rowNumber, $value, $gridName = null)
     {
         $value = VariableStorage::normalizeValue($value);
@@ -819,7 +819,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         self::assertEquals($value, $rowValue);
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Assert that column value of specified row is empty (or not empty)
      * Example: I should see that Translated Value in 1 row is empty
@@ -827,7 +827,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @Then /^(?:|I )should see that (?P<column>[\w\s]+) in (?P<rowNumber>[\d]+) row is (?P<type>(?:|empty|not empty))$/
      * @Then /^(?:|I )should see that (?P<column>[\w\s]+) in (?P<rowNumber>[\d]+) row in "(?P<gridName>[^"]+)" is (?P<type>(?:|empty|not empty))$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function assertColumnValueIsEmpty($column, $rowNumber, $type, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
@@ -835,7 +835,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $type === 'empty' ? self::assertEmpty($rowValue) : self::assertNotEmpty($rowValue);
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Assert column values by given row
      * Example: Then I should see Charlie Sheen in grid with following data:
@@ -851,7 +851,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @Then /^(?:|I )should see "(?P<content>[\w\s\.\_\-\@\:\(\)]+)" in (?:|grid|(?P<gridName>[\s\w]+)) with following data:$/
      * @Then /^(?:|I )should see "(?P<content>[\w\s\.\_\-\@\:\(\)]+)" in "(?:|grid|(?P<gridName>[\s\w]+))" with following data:$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function assertRowValues($content, TableNode $table, $gridName = null)
     {
         $grid = $this->getGrid($gridName, $content);
@@ -892,7 +892,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         }
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Assert record position in grid
      * It is find record by text and assert its position
@@ -902,7 +902,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @Then /^(?P<content>[\w\d\s\-\.,%]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record$/
      * @Then /^(?P<content>[\w\d\s\-\.,%]+) must be (?P<rowNumber>(?:|first|second|[\d]+)) record in "(?P<gridName>[^"]+)"$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function assertRowContent($content, $rowNumber, $gridName = null)
     {
         $content = VariableStorage::normalizeValue($content);
@@ -968,7 +968,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         );
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
 
     /**
      * Set range price value in grid filter
@@ -1037,7 +1037,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterItem->open();
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Set string value in grid filter
      * Example: When I set filter First Name as contains "Adi"
@@ -1056,7 +1056,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param string $filterGridName
      * @param string $strictly
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function setValueInStringFilter(
         $filterName,
         $type,
@@ -1081,7 +1081,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         }
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Set string value in grid filter
      * Example: And set filter "Name" as is equal to "User" in frontend grid
@@ -1093,7 +1093,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param string $value
      * @param string $filterGridName
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function setValueInStringFilterFrontend(
         $filterName,
         $type,
@@ -1117,7 +1117,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         }
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Set string value in grid filter and press Enter key
      * Example: When I set filter First Name as contains "Adi" and press Enter key
@@ -1136,7 +1136,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param string $filterGridName
      * @param string $strictly
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function applyStringFilterByEnterKey(
         $filterName,
         $type,
@@ -1157,7 +1157,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $this->waitForAjax();
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Check input value in string grid filter
      * Example: When I should see filter First SKU field value is equal to "123"
@@ -1173,7 +1173,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param string $filterGridName
      * @param string $strictly
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function assertsInputValueInStringFilterEqualToExpectedValue(
         $filterName,
         $value = '',
@@ -1195,7 +1195,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             sprintf('The "%s" filter value is not equal to "%s"', $filterName, $value)
         );
     }
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Filter grid by string filter
      * Example: When I filter First Name as contains "Aadi"
@@ -1218,7 +1218,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param string $filterGridName
      * @param string $strictly
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function applyStringFilter(
         $filterName,
         $type,
@@ -1269,7 +1269,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterItem->close();
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Filter grid by string filter
      * Example: I filter "Price (USD)" as equals "12" use "item" unit
@@ -1288,7 +1288,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param string $filterGridName
      * @param string $strictly
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function applyPriceFilter(
         $filterName,
         $type,
@@ -1315,7 +1315,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterItem->submit();
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Filter grid by choice filter
      * Example: When I choose filter for Status as Is Any Of "Option 1"
@@ -1330,7 +1330,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param string $value
      * @param string $filterGridName
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function applyChoiceFilter($filterName, $type, $value = null, $filterGridName = 'Grid')
     {
         /** @var GridFilterStringItem $filterItem */
@@ -1404,7 +1404,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterItem->close();
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Filter grid by to dates between or not between
      * Date must be valid format for DateTime php class e.g. 2015-12-24, 2015-12-26 8:30:00, 30 Jun 2015
@@ -1423,7 +1423,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param string $filterGridName
      * @param string $strictly
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function applyDateTimeFilter(
         $filterName,
         $type,
@@ -1538,7 +1538,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterItem->checkItemsInFilterStrict($filterItems);
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Select value in select filter
      * Example: When I check "Task, Email" in "Activity Type" filter strictly
@@ -1550,7 +1550,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param string $filterItems
      * @param string $filterGridName
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iCheckItemsInFilterStrictly($filterLabel, $filterItems, $filterGridName = 'Grid')
     {
         /** @var MultipleChoice $filterItem */
@@ -1558,7 +1558,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterItem->checkItemsInFilter($filterItems);
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Verify checkbox state in checkbox grid filter
      *
@@ -1568,7 +1568,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @Then /^(?:|I )should see filter (?P<filterName>[\w\s]+) contains checked ""(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)"$/
      * @Then /^(?:|I )should see filter (?P<filterName>[\w\s]+) contains checked "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" grid$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function assertsInputValueInCheckboxFilterContainCheckedValue(
         string $filterName,
         string $value = '',
@@ -1579,7 +1579,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         self::assertTrue($filterItem->isItemChecked($value));
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Verify checkbox state in checkbox grid filter
      *
@@ -1589,7 +1589,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @Then /^(?:|I )should see filter (?P<filterName>[\w\s]+) contains unchecked ""(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)"$/
      * @Then /^(?:|I )should see filter (?P<filterName>[\w\s]+) contains unchecked "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" grid$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function assertsInputValueInCheckboxFilterContainUncheckedValue(
         string $filterName,
         string $value = '',
@@ -1949,7 +1949,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         }
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Example: And I click on "Delete" in "Product Kit Row 1 In Shopping List"
      * Example: And I click on "Delete" in second "Product Kit Row In Shopping List"
@@ -1957,7 +1957,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @Then /^(?:|I )click on "(?P<action>[^"]*)" in the (?P<rowNumber>[^"]*) "(?P<elementName>[^"]*)"$/
      * @Then /^(?:|I )click on "(?P<action>[^"]*)" in the (?P<rowNumber>[^"]*) "(?P<elementName>[^"]*)" in grid "(?P<gridName>[^"]+)"$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function clickOnActionForTheGridRowElementOnThePosition(
         string $action,
         string $elementName,
@@ -2241,7 +2241,7 @@ TEXT;
         }
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      *  Example: Then I should see in row #1 column "Values" contains items in "TestGrid" grid:
      *             | [attribute_1: attribute_1 "Option1", attribute_1: attribute_1 "Option2"] |
@@ -2249,7 +2249,7 @@ TEXT;
      *
      * @Then /^(?:|I )should see in row #(?P<rowNumber>\d+) column "(?P<columnName>(?:[^"]|\\")*)" contains items in "(?P<gridName>[^"]+)" grid:$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iShouldSeeInRowColumnContainsItemsInGrid(
         TableNode $table,
         $rowNumber,
@@ -3058,7 +3058,7 @@ TEXT;
         self::assertCount(0, $rows);
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Example: I should see mass action checkbox in row with "shirt_main" content for grid
      * Example: I should see mass action checkbox in row with "shirt_main" content for "Frontend Grid"
@@ -3066,7 +3066,7 @@ TEXT;
      * @Then /^I should see mass action checkbox in row with (?P<content>(?:[^"]|\\")*) content for grid$/
      * @Then /^I should see mass action checkbox in row with (?P<content>(?:[^"]|\\")*) content for "(?P<gridName>[^"]+)"$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iShouldSeeMassActionCheckbox(string $content, ?string $gridName = null)
     {
         static::assertTrue(
@@ -3075,7 +3075,7 @@ TEXT;
         );
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Example: I should not see mass action checkbox in row with "shirt_main" content for grid
      * Example: I should not see mass action checkbox in row with "shirt_main" content for "Frontend Grid"
@@ -3083,7 +3083,7 @@ TEXT;
      * @Then /^I should not see mass action checkbox in row with (?P<content>(?:[^"]|\\")*) content for grid$/
      * @Then /^I should not see mass action checkbox in row with (?P<content>(?:[^"]|\\")*) content for "(?P<gridName>[^"]+)"$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iShouldNotSeeMassActionCheckbox(string $content, ?string $gridName = null)
     {
         static::assertFalse(

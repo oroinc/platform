@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FilterType extends AbstractType
 {
-    const NAME = 'oro_query_designer_filter';
+    public const NAME = 'oro_query_designer_filter';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

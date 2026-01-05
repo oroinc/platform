@@ -9,7 +9,7 @@ use Oro\Bundle\ScopeBundle\Entity\Scope;
 
 class LoadScopeUserData extends AbstractFixture implements DependentFixtureInterface
 {
-    const SIMPLE_USER_SCOPE = 'simple_user_scope';
+    public const SIMPLE_USER_SCOPE = 'simple_user_scope';
 
     #[\Override]
     public function getDependencies()

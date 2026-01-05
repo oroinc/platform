@@ -27,12 +27,12 @@ class UpdateAccessAuditPermissions extends AbstractFixture implements ContainerA
     /**
      * @internal
      */
-    const ACL_ACTION_AUDIT = 'action:oro_dataaudit_history';
+    public const ACL_ACTION_AUDIT = 'action:oro_dataaudit_history';
 
     /**
      * @internal
      */
-    const ACL_ENTITY_AUDIT = 'entity:Oro\Bundle\DataAuditBundle\Entity\AbstractAudit';
+    public const ACL_ENTITY_AUDIT = 'entity:Oro\Bundle\DataAuditBundle\Entity\AbstractAudit';
 
     /**
      * @var ContainerInterface

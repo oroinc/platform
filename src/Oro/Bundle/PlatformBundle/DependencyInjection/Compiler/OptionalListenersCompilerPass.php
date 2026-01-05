@@ -10,15 +10,15 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class OptionalListenersCompilerPass implements CompilerPassInterface
 {
-    const KERNEL_LISTENER_TAG   = 'kernel.event_listener';
-    const KERNEL_SUBSCRIBER_TAG = 'kernel.event_subscriber';
+    public const KERNEL_LISTENER_TAG   = 'kernel.event_listener';
+    public const KERNEL_SUBSCRIBER_TAG = 'kernel.event_subscriber';
 
-    const DOCTRINE_ORM_LISTENER_TAG = 'doctrine.orm.entity_listener';
-    const DOCTRINE_LISTENER_TAG   = 'doctrine.event_listener';
-    const DOCTRINE_SUBSCRIBER_TAG = 'doctrine.event_subscriber';
+    public const DOCTRINE_ORM_LISTENER_TAG = 'doctrine.orm.entity_listener';
+    public const DOCTRINE_LISTENER_TAG   = 'doctrine.event_listener';
+    public const DOCTRINE_SUBSCRIBER_TAG = 'doctrine.event_subscriber';
 
-    const OPTIONAL_LISTENER_MANAGER = 'oro_platform.optional_listeners.manager';
-    const OPTIONAL_LISTENER_INTERFACE = 'Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface';
+    public const OPTIONAL_LISTENER_MANAGER = 'oro_platform.optional_listeners.manager';
+    public const OPTIONAL_LISTENER_INTERFACE = 'Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface';
 
     #[\Override]
     public function process(ContainerBuilder $container)

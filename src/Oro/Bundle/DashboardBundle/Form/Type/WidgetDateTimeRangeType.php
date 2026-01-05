@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class WidgetDateTimeRangeType extends AbstractType
 {
-    const NAME = 'oro_type_widget_datetime_range';
+    public const NAME = 'oro_type_widget_datetime_range';
 
     #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)

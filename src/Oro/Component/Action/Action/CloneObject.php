@@ -10,10 +10,10 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class CloneObject extends AbstractAction
 {
-    const OPTION_KEY_TARGET    = 'target';
-    const OPTION_KEY_ATTRIBUTE = 'attribute';
-    const OPTION_KEY_DATA      = 'data';
-    const OPTION_KEY_IGNORE    = 'ignore';
+    public const OPTION_KEY_TARGET    = 'target';
+    public const OPTION_KEY_ATTRIBUTE = 'attribute';
+    public const OPTION_KEY_DATA      = 'data';
+    public const OPTION_KEY_IGNORE    = 'ignore';
 
     /**
      * @var array

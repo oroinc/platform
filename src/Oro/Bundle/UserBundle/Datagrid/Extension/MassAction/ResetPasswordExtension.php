@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class ResetPasswordExtension extends AbstractExtension
 {
-    const USERS_GRID_NAME = 'users-grid';
+    public const USERS_GRID_NAME = 'users-grid';
 
     /** @var RequestStack */
     protected $requestStack;

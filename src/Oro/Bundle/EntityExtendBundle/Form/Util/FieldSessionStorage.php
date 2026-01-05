@@ -10,8 +10,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class FieldSessionStorage
 {
-    const SESSION_ID_FIELD_NAME = '_extendbundle_create_entity_%s_field_name';
-    const SESSION_ID_FIELD_TYPE = '_extendbundle_create_entity_%s_field_type';
+    public const SESSION_ID_FIELD_NAME = '_extendbundle_create_entity_%s_field_name';
+    public const SESSION_ID_FIELD_TYPE = '_extendbundle_create_entity_%s_field_type';
 
     /**
      * FieldSessionStorage constructor.

@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class FileItemType extends AbstractType
 {
-    const TYPE = 'oro_attachment_file_item';
+    public const TYPE = 'oro_attachment_file_item';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

@@ -42,7 +42,7 @@ class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface
 {
     use ExtendEntityTrait;
 
-    const GRID_PREFIX = 'oro_report_table_';
+    public const GRID_PREFIX = 'oro_report_table_';
 
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]

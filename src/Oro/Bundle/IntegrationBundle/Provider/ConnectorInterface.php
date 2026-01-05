@@ -7,7 +7,7 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
  */
 interface ConnectorInterface
 {
-    const CONTEXT_CONNECTOR_DATA_KEY = 'connectorData';
+    public const CONTEXT_CONNECTOR_DATA_KEY = 'connectorData';
 
     /**
      * Returns label for UI

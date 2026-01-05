@@ -61,7 +61,7 @@ class OroMainContext extends MinkContext implements
     use AppKernelAwareTrait;
     use ScreenshotTrait;
 
-    const SKIP_WAIT_PATTERN = '/' .
+    public const SKIP_WAIT_PATTERN = '/' .
         '^(?:|I )should see .+ flash message$|' .
         '^(?:|I )should see .+ flash message and I close it$|' .
         '^(?:|I )should see .+ error message$|' .
@@ -73,7 +73,7 @@ class OroMainContext extends MinkContext implements
     private bool $debug = false;
     private string $rememberedURL = '';
 
-    const POSITION_MAP = [
+    public const POSITION_MAP = [
         'first' => 0,
         'second' => 1,
         'third' => 2,
@@ -166,7 +166,8 @@ class OroMainContext extends MinkContext implements
      */
     public function afterStep(AfterStepScope $scope)
     {
-        if (!$this->getMink()->isSessionStarted()
+        if (
+            !$this->getMink()->isSessionStarted()
             || $this->isNextStepNeedSkip($scope->getStep(), $scope->getFeature())
         ) {
             return;
@@ -1292,6 +1293,7 @@ class OroMainContext extends MinkContext implements
         $button = 'Discount Popup Cancel Button';
         try {
             $this->elementFactory->createElement($button)->clickForce();
+            //phpcs:ignore
         } catch (\InvalidArgumentException|NoSuchElement $e) {
             $this->spin(function () use ($button) {
                 if ($this->elementFactory->hasElement($button)) {
@@ -2306,14 +2308,14 @@ JS;
         self::assertEquals($width, $driver->evaluateScript($javascipt));
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Example: When I move "Retail Supplies" before "Clearance" in tree
      *
      * @When /^(?:|I )move "(?P<nodeTitle>(?:[^"]|\\")+)" (?P<operation>before|into) "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree$/
      * @When /^(?:|I )move "(?P<nodeTitle>(?:[^"]|\\")+)" (?P<operation>before|into) "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iMoveNodeInTree(
         string $nodeTitle,
         string $operation,
@@ -2379,14 +2381,14 @@ JS;
         $nodeStateControl?->click();
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Example: When I click on "Retail Supplies" in tree
      *
      * @When /^(?:|I )click on (?:"(?P<nodeTitle>(?:[^"]|\\")+)"|first node) in tree$/
      * @When /^(?:|I )click on (?:"(?P<nodeTitle>(?:[^"]|\\")+)"|first node) in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iClickOnNodeInTree(string $nodeTitle = '', string $treeElementName = ''): void
     {
         $nodeTitle = $this->fixStepArgument($nodeTitle);
@@ -2414,7 +2416,7 @@ JS;
         }
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Check that some JS Tree node located right after another one node
      * Example: Then I see "By Brand" after "New Arrivals" in tree
@@ -2422,7 +2424,7 @@ JS;
      * @Then /^(?:|I )should see "(?P<nodeTitle>(?:[^"]|\\")+)" after "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree$/
      * @Then /^(?:|I )should see "(?P<nodeTitle>(?:[^"]|\\")+)" after "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iSeeNodeAfterAnotherOneInTree(
         string $nodeTitle,
         string $anotherNodeTitle,
@@ -2454,7 +2456,7 @@ JS;
         );
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Check that some JS Tree node belongs to another one node
      * Example: Then I should see "By Brand" belongs to "New Arrivals" in tree
@@ -2462,7 +2464,7 @@ JS;
      * @Then /^(?:|I )should see "(?P<nodeTitle>(?:[^"]|\\")+)" belongs to "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree$/
      * @Then /^(?:|I )should see "(?P<nodeTitle>(?:[^"]|\\")+)" belongs to "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iSeeNodeBelongsAnotherOneInTree(
         string $nodeTitle,
         string $anotherNodeTitle,
@@ -2494,7 +2496,7 @@ JS;
         );
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Check that some JS Tree node not belongs to another one node
      * Example: Then I should not see "By Brand" belongs to "New Arrivals" in tree
@@ -2502,7 +2504,7 @@ JS;
      * @Then /^(?:|I )should not see "(?P<nodeTitle>(?:[^"]|\\")+)" belongs to "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree$/
      * @Then /^(?:|I )should not see "(?P<nodeTitle>(?:[^"]|\\")+)" belongs to "(?P<anotherNodeTitle>(?:[^"]|\\")+)" in tree "(?P<treeElementName>(?:[^"]|\\")+)"$/
      */
-    //@codingStandardsIgnoreEnd
+    //phpcs:enable
     public function iNotSeeNodeBelongsAnotherOneInTree(
         string $nodeTitle,
         string $anotherNodeTitle,
@@ -3312,12 +3314,13 @@ JS;
         $this->assertSession()->pageTextMatches($this->fixStepArgument($pattern));
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Example: I should not see "Product 1" and continue checking the condition is met for maximum 10 seconds
      *
      * @Then /^(?:|I )should not see "(?P<text>.*)" and continue checking the condition is met for maximum (?P<number>\d+) seconds$/
      */
+    //phpcs:enable
     public function assertPageNotContainsTextWithWait($number, $text)
     {
         $result = $this->spin(function (OroMainContext $context) use ($text) {
@@ -3338,12 +3341,13 @@ JS;
         );
     }
 
-    //@codingStandardsIgnoreStart
+    //phpcs:disable
     /**
      * Example: I should see "Product 1" and continue checking the condition is met for maximum 10 seconds
      *
      * @Then /^(?:|I )should see "(?P<text>.*)" and continue checking the condition is met for maximum (?P<number>\d+) seconds$/
      */
+    //phpcs:enable
     public function assertPageContainsTextWithWait($number, $text)
     {
         $result = $this->spin(function (OroMainContext $context) use ($text) {
@@ -3499,11 +3503,13 @@ JS;
         VariableStorage::storeData($alias, $element->getText());
     }
 
+    //phpcs:disable
     /**
      * Example: And I extract text "Order number #(\d+)" from element "Add" and remember it as "my_data"
      *
      * @When /^(?:|I )extract text "(?P<regExp>(?:[^"]|\\")*)" from element "(?P<fieldName>(?:[^"]|\\")*)" and remember it as "(?P<alias>(?:[^"]|\\")*)"$/
      */
+    //phpcs:enable
     public function extractAndRememberElementText(string $regExp, string $elementName, string $alias)
     {
         $element = $this->createElement($elementName);

@@ -12,10 +12,10 @@ use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 class MultiRelationGuesser extends RelationGuesser
 {
     /** Frontend type */
-    const MULTI_RELATION = 'multi-relation';
+    public const MULTI_RELATION = 'multi-relation';
 
-    const DEFAULT_EDITOR_VIEW = 'oroform/js/app/views/editor/multi-relation-editor-view';
-    const DEFAULT_API_ACCESSOR_CLASS = 'oroui/js/tools/search-api-accessor';
+    public const DEFAULT_EDITOR_VIEW = 'oroform/js/app/views/editor/multi-relation-editor-view';
+    public const DEFAULT_API_ACCESSOR_CLASS = 'oroui/js/tools/search-api-accessor';
 
     #[\Override]
     public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)

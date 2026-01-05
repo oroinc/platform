@@ -10,10 +10,10 @@ use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\Gu
 
 class MultiCurrencyGuesser implements GuesserInterface
 {
-    const MULTI_CURRENCY_TYPE   = 'multi-currency';
-    const MULTI_CURRENCY_CONFIG = 'multicurrency_config';
-    const DEFAULT_EDITOR_VIEW   = 'orocurrency/js/app/views/editor/multi-currency-editor-view';
-    const SAVE_API_ACCESSOR     = 'orocurrency/js/datagrid/inline-editing/currency-save-api-accessor';
+    public const MULTI_CURRENCY_TYPE   = 'multi-currency';
+    public const MULTI_CURRENCY_CONFIG = 'multicurrency_config';
+    public const DEFAULT_EDITOR_VIEW   = 'orocurrency/js/app/views/editor/multi-currency-editor-view';
+    public const SAVE_API_ACCESSOR     = 'orocurrency/js/datagrid/inline-editing/currency-save-api-accessor';
 
     /**
      * @var array

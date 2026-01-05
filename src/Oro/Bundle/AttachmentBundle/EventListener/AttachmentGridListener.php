@@ -12,8 +12,8 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class AttachmentGridListener
 {
-    const GRID_PARAM_FIELD_NAME = 'entityField';
-    const GRID_PARAM_TABLE_NAME = 'entityTable';
+    public const GRID_PARAM_FIELD_NAME = 'entityField';
+    public const GRID_PARAM_TABLE_NAME = 'entityTable';
 
     /** @var array */
     protected $paramsToBind = [];

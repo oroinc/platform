@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class AutoResponseRuleType extends AbstractQueryDesignerType
 {
-    const NAME = 'oro_email_autoresponserule';
+    public const NAME = 'oro_email_autoresponserule';
 
     /** @var EventSubscriberInterface */
     protected $autoResponseRuleSubscriber;

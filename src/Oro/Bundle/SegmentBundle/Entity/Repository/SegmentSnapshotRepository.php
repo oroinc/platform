@@ -15,7 +15,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class SegmentSnapshotRepository extends EntityRepository
 {
-    const DELETE_BATCH_SIZE = 20;
+    public const DELETE_BATCH_SIZE = 20;
 
     /**
      * @param array    $entities

@@ -23,9 +23,9 @@ abstract class AbstractNavigationHistoryItem implements
     use OrganizationAwareTrait;
     use UrlAwareTrait;
 
-    const NAVIGATION_HISTORY_ITEM_TYPE          = 'history';
-    const NAVIGATION_HISTORY_COLUMN_VISITED_AT  = 'visitedAt';
-    const NAVIGATION_HISTORY_COLUMN_VISIT_COUNT = 'visitCount';
+    public const NAVIGATION_HISTORY_ITEM_TYPE          = 'history';
+    public const NAVIGATION_HISTORY_COLUMN_VISITED_AT  = 'visitedAt';
+    public const NAVIGATION_HISTORY_COLUMN_VISIT_COUNT = 'visitCount';
 
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: Types::INTEGER)]

@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class WorkflowTransitionSelectType extends AbstractType
 {
-    const NAME = 'oro_workflow_transition_select';
+    public const NAME = 'oro_workflow_transition_select';
 
     /** @var WorkflowRegistry $workflowRegistry */
     protected $workflowRegistry;

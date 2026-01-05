@@ -8,10 +8,10 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 
 class LoadTestActivitiesForScopes extends AbstractFixture
 {
-    const TEST_ACTIVITY_1 = 'test_activity_1';
-    const TEST_ACTIVITY_2 = 'test_activity_2';
-    const TEST_ACTIVITY_3 = 'test_activity_3';
-    const TEST_ACTIVITY_4 = 'test_activity_4';
+    public const TEST_ACTIVITY_1 = 'test_activity_1';
+    public const TEST_ACTIVITY_2 = 'test_activity_2';
+    public const TEST_ACTIVITY_3 = 'test_activity_3';
+    public const TEST_ACTIVITY_4 = 'test_activity_4';
 
     /**
      * @var array

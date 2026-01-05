@@ -4,9 +4,9 @@ namespace Oro\Bundle\SyncBundle\Content;
 
 class SimpleTagGenerator implements TagGeneratorInterface
 {
-    const STATIC_NAME_KEY = 'name';
-    const IDENTIFIER_KEY  = 'params';
-    const NESTED_DATA_KEY = 'children';
+    public const STATIC_NAME_KEY = 'name';
+    public const IDENTIFIER_KEY  = 'params';
+    public const NESTED_DATA_KEY = 'children';
 
     #[\Override]
     public function supports($data)

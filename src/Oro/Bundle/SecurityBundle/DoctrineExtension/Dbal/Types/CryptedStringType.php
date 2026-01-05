@@ -11,7 +11,7 @@ use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
  */
 class CryptedStringType extends StringType
 {
-    const TYPE = 'crypted_string';
+    public const TYPE = 'crypted_string';
 
     /** @var SymmetricCrypterInterface */
     private static $crypter;

@@ -55,8 +55,8 @@ class ActivityList implements
 {
     use ExtendEntityTrait;
 
-    const VERB_CREATE = 'create';
-    const VERB_UPDATE = 'update';
+    public const VERB_CREATE = 'create';
+    public const VERB_UPDATE = 'update';
 
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]

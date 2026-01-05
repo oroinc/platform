@@ -18,11 +18,11 @@ use Symfony\Component\Intl\Locales;
  */
 class LocaleSettings
 {
-    const ADDRESS_FORMAT_KEY  = 'format';
-    const PHONE_PREFIX_KEY    = 'phone_prefix';
-    const DEFAULT_LOCALE_KEY  = 'default_locale';
-    const CURRENCY_CODE_KEY   = 'currency_code';
-    const CURRENCY_SYMBOL_KEY = 'symbol';
+    public const ADDRESS_FORMAT_KEY  = 'format';
+    public const PHONE_PREFIX_KEY    = 'phone_prefix';
+    public const DEFAULT_LOCALE_KEY  = 'default_locale';
+    public const CURRENCY_CODE_KEY   = 'currency_code';
+    public const CURRENCY_SYMBOL_KEY = 'symbol';
 
     /** @var string[] */
     private static $locales;

@@ -26,7 +26,7 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
 {
     use ContextAccessorAwareTrait;
 
-    const NAME = 'is_granted_workflow_transition';
+    public const NAME = 'is_granted_workflow_transition';
 
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;

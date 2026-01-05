@@ -13,7 +13,7 @@ use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\CollectionNormalizer;
  */
 class PrimaryItemCollectionNormalizer extends CollectionNormalizer
 {
-    const PRIMARY_ITEM_TYPE = PrimaryItem::class;
+    public const PRIMARY_ITEM_TYPE = PrimaryItem::class;
 
     /**
      * Returned normalized data where first element is primary

@@ -13,12 +13,12 @@ use WebDriver\Exception\NoSuchElement;
  */
 class Grid extends Table implements GridInterface
 {
-    const TABLE_HEADER_ELEMENT = 'GridHeader';
-    const TABLE_ROW_STRICT_ELEMENT = 'GridRowStrict';
-    const TABLE_ROW_ELEMENT = 'GridRow';
-    const GRID_TABLE_ELEMENT = 'GridTable';
-    const ERROR_NO_ROW = "Can't get %s row, because there are only %s rows in grid";
-    const ERROR_NO_ROW_CONTENT = 'Grid has no record with "%s" content';
+    public const TABLE_HEADER_ELEMENT = 'GridHeader';
+    public const TABLE_ROW_STRICT_ELEMENT = 'GridRowStrict';
+    public const TABLE_ROW_ELEMENT = 'GridRow';
+    public const GRID_TABLE_ELEMENT = 'GridTable';
+    public const ERROR_NO_ROW = "Can't get %s row, because there are only %s rows in grid";
+    public const ERROR_NO_ROW_CONTENT = 'Grid has no record with "%s" content';
 
     #[\Override]
     public function getRows()

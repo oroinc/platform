@@ -7,8 +7,8 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 
 class EntityPaginationExtension extends AbstractExtension
 {
-    const ENTITY_PAGINATION_PATH = '[options][entity_pagination]';
-    const ENTITY_PAGINATION_TARGET_PATH = '[options][entity_pagination_target]';
+    public const ENTITY_PAGINATION_PATH = '[options][entity_pagination]';
+    public const ENTITY_PAGINATION_TARGET_PATH = '[options][entity_pagination_target]';
 
     #[\Override]
     public function isApplicable(DatagridConfiguration $config)

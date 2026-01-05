@@ -14,7 +14,7 @@ use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\AvgStrateg
  */
 class StatisticRepository implements BatchRepositoryInterface, ObjectRepository, AvgStrategyAwareInterface
 {
-    const MAX_LIMIT = 10000;
+    public const MAX_LIMIT = 10000;
 
     protected Connection $connection;
 

@@ -10,8 +10,8 @@ use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
  */
 abstract class AbstractSearchQuery implements SearchQueryInterface
 {
-    const WHERE_AND = 'and';
-    const WHERE_OR  = 'or';
+    public const WHERE_AND = 'and';
+    public const WHERE_OR  = 'or';
 
     /**
      * @var Query

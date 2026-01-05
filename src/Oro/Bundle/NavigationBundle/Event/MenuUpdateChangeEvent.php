@@ -9,7 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class MenuUpdateChangeEvent extends Event
 {
-    const NAME = 'oro_menu.menu_update_change';
+    public const NAME = 'oro_menu.menu_update_change';
 
     /**
      * @var string

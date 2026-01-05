@@ -12,7 +12,7 @@ use Psr\Log\NullLogger;
 class LoggerStrategy implements LoggerInterface
 {
     use LoggerAwareTrait;
-    const FORMAT = '[%.2F MiB/%.2F MiB] %s';
+    public const FORMAT = '[%.2F MiB/%.2F MiB] %s';
 
     /** @var bool */
     protected $debug;

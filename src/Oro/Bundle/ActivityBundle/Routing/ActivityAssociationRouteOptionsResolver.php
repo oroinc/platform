@@ -16,15 +16,15 @@ use Symfony\Component\Routing\Route;
  */
 class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInterface
 {
-    const ROUTE_GROUP = 'activity_association';
-    const ACTIVITY_ATTRIBUTE = 'activity';
-    const ACTIVITY_PLACEHOLDER = '{activity}';
-    const ACTIVITY_ID_ATTRIBUTE = 'id';
-    const ACTIVITY_ID_PLACEHOLDER = '{id}';
-    const ENTITY_ATTRIBUTE = 'entity';
-    const ENTITY_PLACEHOLDER = '{entity}';
-    const ENTITY_ID_ATTRIBUTE = 'entityId';
-    const ENTITY_ID_PLACEHOLDER = '{entityId}';
+    public const ROUTE_GROUP = 'activity_association';
+    public const ACTIVITY_ATTRIBUTE = 'activity';
+    public const ACTIVITY_PLACEHOLDER = '{activity}';
+    public const ACTIVITY_ID_ATTRIBUTE = 'id';
+    public const ACTIVITY_ID_PLACEHOLDER = '{id}';
+    public const ENTITY_ATTRIBUTE = 'entity';
+    public const ENTITY_PLACEHOLDER = '{entity}';
+    public const ENTITY_ID_ATTRIBUTE = 'entityId';
+    public const ENTITY_ID_PLACEHOLDER = '{entityId}';
 
     /** @var ConfigProvider */
     protected $groupingConfigProvider;

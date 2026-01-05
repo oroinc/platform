@@ -13,7 +13,7 @@ use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
  */
 class ImportsLayoutUpdateExtension implements ConfigLayoutUpdateGeneratorExtensionInterface
 {
-    const NODE_IMPORTS = 'imports';
+    public const NODE_IMPORTS = 'imports';
 
     #[\Override]
     public function prepare(GeneratorData $data, VisitorCollection $visitorCollection)

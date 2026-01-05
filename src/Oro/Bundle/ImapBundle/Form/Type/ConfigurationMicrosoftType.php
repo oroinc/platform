@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class ConfigurationMicrosoftType extends AbstractOAuthAwareConfigurationType
 {
-    const NAME = 'oro_imap_configuration_microsoft';
+    public const NAME = 'oro_imap_configuration_microsoft';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

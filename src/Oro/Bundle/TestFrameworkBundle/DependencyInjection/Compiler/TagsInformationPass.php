@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class TagsInformationPass implements CompilerPassInterface
 {
-    const INFORMATION_PROVIDER_SERVICE = 'oro_test.provider.container_tags_documentation_information';
+    public const INFORMATION_PROVIDER_SERVICE = 'oro_test.provider.container_tags_documentation_information';
 
     #[\Override]
     public function process(ContainerBuilder $container)

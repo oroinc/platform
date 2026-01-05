@@ -4,9 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 
 interface EventTriggerInterface
 {
-    const EVENT_CREATE = 'create';
-    const EVENT_UPDATE = 'update';
-    const EVENT_DELETE = 'delete';
+    public const EVENT_CREATE = 'create';
+    public const EVENT_UPDATE = 'update';
+    public const EVENT_DELETE = 'delete';
 
     /**
      * @return int

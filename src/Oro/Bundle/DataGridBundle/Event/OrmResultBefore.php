@@ -15,7 +15,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class OrmResultBefore extends Event implements GridEventInterface
 {
-    const NAME = 'oro_datagrid.orm_datasource.result.before';
+    public const NAME = 'oro_datagrid.orm_datasource.result.before';
 
     /**
      * @var DatagridInterface

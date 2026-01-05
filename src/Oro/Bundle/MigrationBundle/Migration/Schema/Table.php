@@ -17,7 +17,7 @@ class Table extends BaseTable
      * Important: your class must extend Oro\Bundle\MigrationBundle\Migration\Schema\Column class
      *            or extend Doctrine\DBAL\Schema\Column class and must have __construct(array $args) method
      */
-    const COLUMN_CLASS = 'Doctrine\DBAL\Schema\Column';
+    public const COLUMN_CLASS = 'Doctrine\DBAL\Schema\Column';
 
     /**
      * Creates an instance of COLUMN_CLASS class
@@ -59,7 +59,7 @@ class Table extends BaseTable
         return $this->getColumn($columnName);
     }
 
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     #[\Override]
     protected function _addColumn(BaseColumn $column)
     {
@@ -68,5 +68,5 @@ class Table extends BaseTable
         }
         parent::_addColumn($column);
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 }

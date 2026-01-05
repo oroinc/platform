@@ -14,10 +14,10 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  */
 class DuplicateEntity extends AbstractAction
 {
-    const OPTION_KEY_ENTITY = 'entity';
-    const OPTION_KEY_TARGET = 'target';
-    const OPTION_KEY_SETTINGS = 'settings';
-    const OPTION_KEY_ATTRIBUTE = 'attribute';
+    public const OPTION_KEY_ENTITY = 'entity';
+    public const OPTION_KEY_TARGET = 'target';
+    public const OPTION_KEY_SETTINGS = 'settings';
+    public const OPTION_KEY_ATTRIBUTE = 'attribute';
 
     /**
      * @var Duplicator

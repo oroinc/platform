@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class DatagridType extends AbstractContainerType
 {
-    const NAME = 'datagrid';
+    public const NAME = 'datagrid';
 
     /** @var NameStrategyInterface */
     protected $nameStrategy;

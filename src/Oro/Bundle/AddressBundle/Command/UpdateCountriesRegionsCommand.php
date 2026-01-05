@@ -72,7 +72,6 @@ class UpdateCountriesRegionsCommand extends Command
                 'Actualized countries and regions data for updating database.'
             )
             ->setHelp(
-                // @codingStandardsIgnoreStart
                 <<<'HELP'
 The <info>%command.name%</info> command for getting sql queries which will be implemented in case of force option set.
 
@@ -84,7 +83,6 @@ The <info>--force</info> option can be used to force updating.
 HELP
             )
             ->addUsage('--force')
-            // @codingStandardsIgnoreEnd
         ;
     }
 

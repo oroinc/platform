@@ -8,7 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 
 class LoadNoteTargets extends AbstractFixture
 {
-    const TARGET_ONE = 'note_target_1';
+    public const TARGET_ONE = 'note_target_1';
 
     #[\Override]
     public function load(ObjectManager $manager)

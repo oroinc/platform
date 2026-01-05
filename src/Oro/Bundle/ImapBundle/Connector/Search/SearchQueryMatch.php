@@ -8,17 +8,17 @@ namespace Oro\Bundle\ImapBundle\Connector\Search;
 class SearchQueryMatch
 {
     /** It is equal to SUBSTRING_MATCH */
-    const DEFAULT_MATCH = 0;
+    public const DEFAULT_MATCH = 0;
 
     /**
      * Checks the substring exists anywhere in the property value.
      */
-    const SUBSTRING_MATCH = 1;
+    public const SUBSTRING_MATCH = 1;
 
     /**
      * Checks the word exists anywhere in the property value.
      * Examples: "product" matches "product" only, but not "products" or "production".
      * Not all IMAP servers supports this type of the match.
      */
-    const EXACT_MATCH = 2;
+    public const EXACT_MATCH = 2;
 }

@@ -11,12 +11,12 @@ class ImportExportConfigurationRegistryCompilerPass implements CompilerPassInter
     /**
      * @internal
      */
-    const REGISTRY_SERVICE = 'oro_importexport.configuration.registry';
+    public const REGISTRY_SERVICE = 'oro_importexport.configuration.registry';
 
     /**
      * @internal
      */
-    const SERVICE_TAG = 'oro_importexport.configuration';
+    public const SERVICE_TAG = 'oro_importexport.configuration';
 
     #[\Override]
     public function process(ContainerBuilder $container)

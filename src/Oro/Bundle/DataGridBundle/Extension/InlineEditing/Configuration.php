@@ -11,25 +11,25 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    const ENABLED_CONFIG_PATH           = '[inline_editing][enable]';
-    const BEHAVIOUR_CONFIG_PATH         = '[inline_editing][behaviour]';
+    public const ENABLED_CONFIG_PATH           = '[inline_editing][enable]';
+    public const BEHAVIOUR_CONFIG_PATH         = '[inline_editing][behaviour]';
 
-    const BEHAVIOUR_ENABLE_SELECTED     = 'enable_selected';
-    const BEHAVIOUR_ENABLE_ALL_VALUE    = 'enable_all';
-    const DEFAULT_ROUTE                 = 'oro_api_patch_entity_data';
+    public const BEHAVIOUR_ENABLE_SELECTED     = 'enable_selected';
+    public const BEHAVIOUR_ENABLE_ALL_VALUE    = 'enable_all';
+    public const DEFAULT_ROUTE                 = 'oro_api_patch_entity_data';
 
-    const CONFIG_ENABLE_KEY             = 'enable';
-    const BASE_CONFIG_KEY               = 'inline_editing';
-    const CONFIG_ACL_KEY                = 'acl_resource';
-    const CONFIG_ENTITY_KEY             = 'entity_name';
-    const AUTOCOMPLETE_API_ACCESSOR_KEY = 'autocomplete_api_accessor';
-    const SAVE_API_ACCESSOR_KEY         = 'save_api_accessor';
-    const CLASS_KEY                     = 'class';
-    const EDITOR_KEY                    = 'editor';
-    const VIEW_KEY                      = 'view';
-    const VIEW_OPTIONS_KEY              = 'view_options';
-    const VALUE_FIELD_NAME_KEY          = 'value_field_name';
-    const CHOICES_KEY                   = 'choices';
+    public const CONFIG_ENABLE_KEY             = 'enable';
+    public const BASE_CONFIG_KEY               = 'inline_editing';
+    public const CONFIG_ACL_KEY                = 'acl_resource';
+    public const CONFIG_ENTITY_KEY             = 'entity_name';
+    public const AUTOCOMPLETE_API_ACCESSOR_KEY = 'autocomplete_api_accessor';
+    public const SAVE_API_ACCESSOR_KEY         = 'save_api_accessor';
+    public const CLASS_KEY                     = 'class';
+    public const EDITOR_KEY                    = 'editor';
+    public const VIEW_KEY                      = 'view';
+    public const VIEW_OPTIONS_KEY              = 'view_options';
+    public const VALUE_FIELD_NAME_KEY          = 'value_field_name';
+    public const CHOICES_KEY                   = 'choices';
 
     /**
      * @var array

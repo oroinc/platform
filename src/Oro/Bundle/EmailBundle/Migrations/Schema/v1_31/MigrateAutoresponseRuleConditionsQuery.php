@@ -15,10 +15,10 @@ class MigrateAutoresponseRuleConditionsQuery implements MigrationQuery, Connecti
 {
     use ConnectionAwareTrait;
 
-    const LIMIT = 100;
+    public const LIMIT = 100;
 
-    const AUTO_RESPONSE_RULE_TABLE = 'oro_email_auto_response_rule';
-    const AUTO_RESPONSE_RULE_CONDITION_TABLE = 'oro_email_response_rule_cond';
+    public const AUTO_RESPONSE_RULE_TABLE = 'oro_email_auto_response_rule';
+    public const AUTO_RESPONSE_RULE_CONDITION_TABLE = 'oro_email_response_rule_cond';
 
     #[\Override]
     public function execute(LoggerInterface $logger)

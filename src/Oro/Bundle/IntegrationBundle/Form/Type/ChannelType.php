@@ -14,8 +14,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ChannelType extends AbstractType
 {
-    const NAME            = 'oro_integration_channel_form';
-    const TYPE_FIELD_NAME = 'type';
+    public const NAME            = 'oro_integration_channel_form';
+    public const TYPE_FIELD_NAME = 'type';
 
     /** @var DefaultOwnerSubscriber */
     protected $defaultOwnerSubscriber;

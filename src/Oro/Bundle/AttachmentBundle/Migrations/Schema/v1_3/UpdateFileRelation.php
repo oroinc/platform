@@ -9,7 +9,7 @@ use Psr\Log\LoggerInterface;
 
 class UpdateFileRelation extends ParametrizedMigrationQuery
 {
-    const ENTITY_PATH = 'Oro\\Bundle\\AttachmentBundle\\Entity\\File';
+    public const ENTITY_PATH = 'Oro\\Bundle\\AttachmentBundle\\Entity\\File';
 
     #[\Override]
     public function getDescription()

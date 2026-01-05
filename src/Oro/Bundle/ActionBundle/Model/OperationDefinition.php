@@ -9,12 +9,12 @@ namespace Oro\Bundle\ActionBundle\Model;
  */
 class OperationDefinition
 {
-    const PREACTIONS = 'preactions';
-    const FORM_INIT = 'form_init';
-    const ACTIONS = 'actions';
+    public const PREACTIONS = 'preactions';
+    public const FORM_INIT = 'form_init';
+    public const ACTIONS = 'actions';
 
-    const PRECONDITIONS = 'preconditions';
-    const CONDITIONS = 'conditions';
+    public const PRECONDITIONS = 'preconditions';
+    public const CONDITIONS = 'conditions';
 
     /** @var string */
     private $name;

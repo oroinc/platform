@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class MassActionDispatcher
 {
-    const REQUEST_TYPE = 'request_type';
+    public const REQUEST_TYPE = 'request_type';
 
     /**
      * @var ManagerInterface

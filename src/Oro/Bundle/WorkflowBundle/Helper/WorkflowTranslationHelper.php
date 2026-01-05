@@ -14,7 +14,7 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
 class WorkflowTranslationHelper
 {
-    const TRANSLATION_DOMAIN = 'workflows';
+    public const TRANSLATION_DOMAIN = 'workflows';
 
     /** @var Translator */
     private $translator;

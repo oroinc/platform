@@ -18,7 +18,7 @@ use Oro\Component\Layout\Util\BlockUtils;
  */
 class AttributeGroupRestType extends AbstractContainerType
 {
-    const NAME = 'attribute_group_rest';
+    public const NAME = 'attribute_group_rest';
 
     /** @var AttributeRenderRegistry */
     protected $attributeRenderRegistry;

@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class EmailUserAdded extends Event
 {
-    const NAME = 'oro_email.email_user_added';
+    public const NAME = 'oro_email.email_user_added';
 
     /**
      * @var EmailUser

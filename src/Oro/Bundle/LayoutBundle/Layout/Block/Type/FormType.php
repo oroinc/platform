@@ -13,7 +13,7 @@ use Oro\Component\Layout\BlockBuilderInterface;
  */
 class FormType extends AbstractType
 {
-    const NAME = 'form';
+    public const NAME = 'form';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

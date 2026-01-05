@@ -15,7 +15,7 @@ use Symfony\Component\Security\Acl\Util\ClassUtils;
  */
 class EntityWriter implements ItemWriterInterface, StepExecutionAwareInterface
 {
-    const SKIP_CLEAR = 'writer_skip_clear';
+    public const SKIP_CLEAR = 'writer_skip_clear';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;

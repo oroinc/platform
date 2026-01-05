@@ -28,7 +28,7 @@ final class ResetOnEntityChangeListenerTest extends TestCase
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $this->unitOfWork = $this->createMock(UnitOfWork::class);
         $this->eventArgs = $this->createMock(OnFlushEventArgs::class);
-        $this->sampleEntity = new class() {
+        $this->sampleEntity = new class () {
         };
 
         $this->listener = new ResetOnEntityChangeListener(

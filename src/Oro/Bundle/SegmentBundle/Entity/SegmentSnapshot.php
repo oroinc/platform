@@ -18,8 +18,8 @@ use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository;
 #[ORM\HasLifecycleCallbacks]
 class SegmentSnapshot
 {
-    const ENTITY_REF_FIELD         = 'entityId';
-    const ENTITY_REF_INTEGER_FIELD = 'integerEntityId';
+    public const ENTITY_REF_FIELD         = 'entityId';
+    public const ENTITY_REF_INTEGER_FIELD = 'integerEntityId';
 
     /**
      * @var int|null

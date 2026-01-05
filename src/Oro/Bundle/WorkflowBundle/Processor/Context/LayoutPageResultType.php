@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Processor\Context;
 
 class LayoutPageResultType implements LayoutResultTypeInterface
 {
-    const NAME = 'layout_page';
+    public const NAME = 'layout_page';
 
     /** @var string */
     private $formRouteName;

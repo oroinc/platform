@@ -11,7 +11,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class UpdateSchemaEvent extends Event
 {
-    const NAME = 'oro.entity_extend.entity.schema.update';
+    public const NAME = 'oro.entity_extend.entity.schema.update';
 
     /**
      * @var CommandExecutor

@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class WidgetDateType extends AbstractType
 {
-    const NAME = 'oro_type_widget_date';
+    public const NAME = 'oro_type_widget_date';
 
     public function getName()
     {

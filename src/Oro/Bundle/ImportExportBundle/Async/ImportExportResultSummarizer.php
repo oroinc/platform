@@ -16,10 +16,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class ImportExportResultSummarizer
 {
-    const TEMPLATE_IMPORT_RESULT = 'import_result';
-    const TEMPLATE_IMPORT_VALIDATION_RESULT = 'import_validation_result';
-    const TEMPLATE_EXPORT_RESULT = 'export_result';
-    const TEMPLATE_IMPORT_ERROR = 'import_error';
+    public const TEMPLATE_IMPORT_RESULT = 'import_result';
+    public const TEMPLATE_IMPORT_VALIDATION_RESULT = 'import_validation_result';
+    public const TEMPLATE_EXPORT_RESULT = 'export_result';
+    public const TEMPLATE_IMPORT_ERROR = 'import_error';
 
     /**
      * @var UrlGeneratorInterface

@@ -42,7 +42,7 @@ abstract class AbstractDebugCommand extends Command
                 $this->getDefaultRequestType()
             )
             ->setHelp(
-                // @codingStandardsIgnoreStart
+                // phpcs:disable
                 $this->getHelp() .
                 <<<'HELP'
 
@@ -56,7 +56,7 @@ Available types: <comment>rest</comment>, <comment>json_api</comment>, <comment>
   <info>php %command.full_name% --request-type=any</info> <fg=green;options=underscore>other options and arguments</>
 
 HELP
-                // @codingStandardsIgnoreEnd
+                // phpcs:enable
             )
             ->addUsage('--request-type=rest [other options and arguments]')
             ->addUsage('--request-type=json_api [other options and arguments]')

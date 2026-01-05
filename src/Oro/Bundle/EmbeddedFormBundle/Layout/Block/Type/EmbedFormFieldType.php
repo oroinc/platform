@@ -11,9 +11,9 @@ use Symfony\Component\Form\FormView;
 
 class EmbedFormFieldType extends AbstractFormType
 {
-    const NAME = 'embed_form_field';
+    public const NAME = 'embed_form_field';
 
-    const SHORT_NAME = 'field';
+    public const SHORT_NAME = 'field';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

@@ -11,8 +11,8 @@ use Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler;
  */
 class InvalidateCacheActionScheduledHandler implements InvalidateCacheActionHandlerInterface
 {
-    const PARAM_INVALIDATE_TIME = 'invalidateTime';
-    const PARAM_HANDLER_SERVICE_NAME = 'service';
+    public const PARAM_INVALIDATE_TIME = 'invalidateTime';
+    public const PARAM_HANDLER_SERVICE_NAME = 'service';
 
     /**
      * @var DeferredScheduler

@@ -9,7 +9,7 @@ use Behat\Mink\Element\NodeElement;
  */
 class TableRow extends Element
 {
-    const HEADER_ELEMENT = 'TableHeader';
+    public const HEADER_ELEMENT = 'TableHeader';
 
     /**
      * @var Table

@@ -10,7 +10,7 @@ use Oro\Bundle\FormBundle\Autocomplete\FullNameSearchHandler;
  */
 class UserSearchHandler extends FullNameSearchHandler
 {
-    const IMAGINE_AVATAR_FILTER = 'avatar_xsmall';
+    public const IMAGINE_AVATAR_FILTER = 'avatar_xsmall';
 
     /** @var PictureSourcesProviderInterface */
     protected $pictureSourcesProvider;

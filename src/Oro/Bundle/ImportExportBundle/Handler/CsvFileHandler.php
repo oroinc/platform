@@ -10,9 +10,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class CsvFileHandler
 {
-    const CRLF_LINE_ENDING = "\r\n";
-    const LF_LINE_ENDING = "\n";
-    const CR_LINE_ENDING = "\r";
+    public const CRLF_LINE_ENDING = "\r\n";
+    public const LF_LINE_ENDING = "\n";
+    public const CR_LINE_ENDING = "\r";
 
     /**
      * Convert the ending-lines CR and LF in CRLF.

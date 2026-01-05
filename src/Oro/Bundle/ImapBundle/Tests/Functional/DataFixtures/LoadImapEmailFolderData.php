@@ -12,13 +12,13 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
 class LoadImapEmailFolderData extends AbstractFixture implements DependentFixtureInterface
 {
-    const INBOX_EMAIL_FOLDER = 'email_folder.inbox';
-    const SENT_EMAIL_FOLDER = 'email_folder.sent';
-    const OTHER_EMAIL_FOLDER = 'email_folder.other';
+    public const INBOX_EMAIL_FOLDER = 'email_folder.inbox';
+    public const SENT_EMAIL_FOLDER = 'email_folder.sent';
+    public const OTHER_EMAIL_FOLDER = 'email_folder.other';
 
-    const INBOX_IMAP_EMAIL_FOLDER = 'imap_email_folder.inbox';
-    const SENT_IMAP_EMAIL_FOLDER = 'imap_email_folder.sent';
-    const OTHER_IMAP_EMAIL_FOLDER = 'imap_email_folder.other';
+    public const INBOX_IMAP_EMAIL_FOLDER = 'imap_email_folder.inbox';
+    public const SENT_IMAP_EMAIL_FOLDER = 'imap_email_folder.sent';
+    public const OTHER_IMAP_EMAIL_FOLDER = 'imap_email_folder.other';
 
     #[\Override]
     public function load(ObjectManager $manager)

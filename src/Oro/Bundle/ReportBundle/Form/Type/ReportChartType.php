@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ReportChartType extends AbstractType
 {
-    const VIEW_MODULE_NAME = 'ororeport/js/app/views/report-chart-view';
+    public const VIEW_MODULE_NAME = 'ororeport/js/app/views/report-chart-view';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

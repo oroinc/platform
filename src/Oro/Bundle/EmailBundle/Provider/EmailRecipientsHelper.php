@@ -32,8 +32,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EmailRecipientsHelper
 {
-    const ORGANIZATION_PROPERTY = 'organization';
-    const EMAIL_IDS_SEPARATOR = ';';
+    public const ORGANIZATION_PROPERTY = 'organization';
+    public const EMAIL_IDS_SEPARATOR = ';';
 
     /** @var AclHelper */
     protected $aclHelper;

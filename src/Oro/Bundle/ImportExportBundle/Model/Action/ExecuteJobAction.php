@@ -21,7 +21,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  */
 class ExecuteJobAction extends AbstractAction
 {
-    const NAME = 'execute_job';
+    public const NAME = 'execute_job';
 
     /** @var string */
     protected $jobType;

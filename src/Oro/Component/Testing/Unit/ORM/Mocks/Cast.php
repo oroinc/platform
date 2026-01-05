@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Declare custom SQL functions available in the Mock platform
  */

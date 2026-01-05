@@ -11,15 +11,16 @@ use Symfony\Component\Process\Process;
  */
 class PermissionsHandler
 {
-    const SETFACL = 'setfacl -Rm "u:{user}:rwX,d:u:{user}:rwX,g:{group}:rw,d:g:{group}:rw" {path}';
-    const CHMOD   = 'chmod +a "{user} allow delete,write,append,file_inherit,directory_inherit" {path}';
-    const PS_AUX  = "ps aux|grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx'|grep -v root|head -1|cut -d' ' -f1";
+    public const SETFACL = 'setfacl -Rm "u:{user}:rwX,d:u:{user}:rwX,g:{group}:rw,d:g:{group}:rw" {path}';
+    public const CHMOD   = 'chmod +a "{user} allow delete,write,append,file_inherit,directory_inherit" {path}';
+    public const PS_AUX =
+        "ps aux|grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx'|grep -v root|head -1|cut -d' ' -f1";
 
-    const USER = '`whoami`';
+    public const USER = '`whoami`';
 
-    const VAR_PATH  = '{path}';
-    const VAR_USER  = '{user}';
-    const VAR_GROUP = '{group}';
+    public const VAR_PATH  = '{path}';
+    public const VAR_USER  = '{user}';
+    public const VAR_GROUP = '{group}';
 
     /**
      * @param string $directory

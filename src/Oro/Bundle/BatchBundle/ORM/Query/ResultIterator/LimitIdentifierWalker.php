@@ -10,7 +10,7 @@ use Doctrine\ORM\Query\TreeWalkerAdapter;
  */
 class LimitIdentifierWalker extends TreeWalkerAdapter
 {
-    const PARAMETER_IDS = 'buffered_result_iterator_keys';
+    public const PARAMETER_IDS = 'buffered_result_iterator_keys';
 
     #[\Override]
     public function walkSelectStatement(AST\SelectStatement $AST)

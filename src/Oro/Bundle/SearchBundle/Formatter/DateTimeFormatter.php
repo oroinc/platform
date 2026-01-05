@@ -9,7 +9,7 @@ use Oro\Component\Exception\UnexpectedTypeException;
  */
 class DateTimeFormatter implements ValueFormatterInterface
 {
-    const DATETIME_FORMAT = 'Y-m-d H:i:s';
+    public const DATETIME_FORMAT = 'Y-m-d H:i:s';
 
     /**
      * Format \DateTime object into string format by specific format in DateTimeFormatter::DATETIME_FORMAT

@@ -30,7 +30,7 @@ class WorkflowManager implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    const MASS_START_BATCH_SIZE = 100;
+    public const MASS_START_BATCH_SIZE = 100;
     private const METHOD_TRANSIT = 1;
     private const METHOD_TRANSIT_UNCONDITIONALLY = 2;
     private const METHOD_TRANSIT_WITHOUT_ANY_CHECKS = 3;

@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DateTimeRangeType extends AbstractType
 {
-    const NAME = 'oro_type_datetime_range';
+    public const NAME = 'oro_type_datetime_range';
 
     public function getName()
     {

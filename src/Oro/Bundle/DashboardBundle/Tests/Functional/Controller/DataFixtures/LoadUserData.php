@@ -14,8 +14,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LoadUserData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
-    const USER_NAME     = 'user_wo_permissions';
-    const USER_PASSWORD = 'user_api_key';
+    public const USER_NAME     = 'user_wo_permissions';
+    public const USER_PASSWORD = 'user_api_key';
 
     /**
      * @var ContainerInterface

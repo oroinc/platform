@@ -15,9 +15,9 @@ use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigValueRepository;
 #[ORM\HasLifecycleCallbacks]
 class ConfigValue
 {
-    const FIELD_SCALAR_TYPE = 'scalar';
-    const FIELD_OBJECT_TYPE = 'object';
-    const FIELD_ARRAY_TYPE  = 'array';
+    public const FIELD_SCALAR_TYPE = 'scalar';
+    public const FIELD_OBJECT_TYPE = 'object';
+    public const FIELD_ARRAY_TYPE  = 'array';
 
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]

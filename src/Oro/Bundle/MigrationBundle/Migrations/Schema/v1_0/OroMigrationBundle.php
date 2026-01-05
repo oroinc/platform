@@ -8,7 +8,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroMigrationBundle implements Migration
 {
-    const MIGRATION_DATA_TABLE = 'oro_migrations_data';
+    public const MIGRATION_DATA_TABLE = 'oro_migrations_data';
 
     #[\Override]
     public function up(Schema $schema, QueryBag $queries)

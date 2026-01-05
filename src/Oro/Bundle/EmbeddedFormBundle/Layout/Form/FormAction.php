@@ -9,9 +9,9 @@ use Oro\Component\Layout\ContextItemInterface;
  */
 class FormAction implements \ArrayAccess, ContextItemInterface
 {
-    const PATH = 'path';
-    const ROUTE_NAME = 'route_name';
-    const ROUTE_PARAMETERS = 'route_parameters';
+    public const PATH = 'path';
+    public const ROUTE_NAME = 'route_name';
+    public const ROUTE_PARAMETERS = 'route_parameters';
 
     /** @var array */
     protected $data;

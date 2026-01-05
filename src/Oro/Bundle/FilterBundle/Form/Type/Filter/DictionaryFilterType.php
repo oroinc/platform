@@ -17,11 +17,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class DictionaryFilterType extends AbstractType
 {
-    const NAME = 'oro_type_dictionary_filter';
-    const TYPE_IN = 1;
-    const TYPE_NOT_IN = 2;
-    const EQUAL = 3;
-    const NOT_EQUAL = 4;
+    public const NAME = 'oro_type_dictionary_filter';
+    public const TYPE_IN = 1;
+    public const TYPE_NOT_IN = 2;
+    public const EQUAL = 3;
+    public const NOT_EQUAL = 4;
 
     /**
      * @var TranslatorInterface

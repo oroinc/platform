@@ -7,8 +7,8 @@ use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 
 class ButtonStub implements ButtonInterface
 {
-    const TITLE = 'Stub button title';
-    const LABEL = 'Stub button label';
+    public const TITLE = 'Stub button title';
+    public const LABEL = 'Stub button label';
 
     /** @var array */
     protected $buttonOptions;

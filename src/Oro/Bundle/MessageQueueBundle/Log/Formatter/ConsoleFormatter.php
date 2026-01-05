@@ -10,9 +10,9 @@ use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter as BaseConsoleFormatter;
  */
 class ConsoleFormatter extends BaseConsoleFormatter
 {
-    const SIMPLE_FORMAT =
+    public const SIMPLE_FORMAT =
         "%datetime% %start_tag%%channel%.%level_name%%end_tag%: %message%%context%%extra%\n";
-    const SIMPLE_DATE = 'Y-m-d H:i:s';
+    public const SIMPLE_DATE = 'Y-m-d H:i:s';
 
     public function __construct(array $options = [])
     {

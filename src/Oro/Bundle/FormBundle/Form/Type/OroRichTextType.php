@@ -20,10 +20,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class OroRichTextType extends AbstractType
 {
-    const NAME            = 'oro_rich_text';
-    const TOOLBAR_DEFAULT = 'default';
-    const TOOLBAR_SMALL   = 'small';
-    const TOOLBAR_LARGE   = 'large';
+    public const NAME            = 'oro_rich_text';
+    public const TOOLBAR_DEFAULT = 'default';
+    public const TOOLBAR_SMALL   = 'small';
+    public const TOOLBAR_LARGE   = 'large';
 
     /** @var AssetHelper */
     protected $assetHelper;

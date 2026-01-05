@@ -12,13 +12,13 @@ use Oro\Component\Layout\Model\LayoutUpdateImport;
  */
 class ImportLayoutManipulator implements LayoutManipulatorInterface
 {
-    const ROOT_PLACEHOLDER = '__root';
+    public const ROOT_PLACEHOLDER = '__root';
 
-    const NAMESPACE_PLACEHOLDER = '__';
-    const NAMESPACE_SUFFIX = '_';
+    public const NAMESPACE_PLACEHOLDER = '__';
+    public const NAMESPACE_SUFFIX = '_';
 
-    const ADDITIONAL_BLOCK_PREFIX_OPTION = 'additional_block_prefixes';
-    const ADDITIONAL_BLOCK_PREFIX_PATTERN = '__%s%s';
+    public const ADDITIONAL_BLOCK_PREFIX_OPTION = 'additional_block_prefixes';
+    public const ADDITIONAL_BLOCK_PREFIX_PATTERN = '__%s%s';
 
     /**
      * @var LayoutManipulatorInterface

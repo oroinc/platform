@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class StorageDataCollector
 {
-    const PAGINGATION_PARAM = 'entity_pagination';
+    public const PAGINGATION_PARAM = 'entity_pagination';
 
     /**
      * @var ServiceLink

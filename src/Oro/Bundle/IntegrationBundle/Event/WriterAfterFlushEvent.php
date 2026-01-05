@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class WriterAfterFlushEvent extends Event
 {
-    const NAME = 'oro_integration.writer_after_flush';
+    public const NAME = 'oro_integration.writer_after_flush';
 
     /**
      * @var EntityManager

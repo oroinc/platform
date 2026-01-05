@@ -31,7 +31,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class AutoResponseManager
 {
-    const INDEX_PLACEHOLDER = '__index__';
+    public const INDEX_PLACEHOLDER = '__index__';
 
     /** @var ManagerRegistry */
     protected $registry;

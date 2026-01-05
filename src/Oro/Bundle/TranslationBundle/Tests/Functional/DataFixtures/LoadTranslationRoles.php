@@ -16,7 +16,7 @@ class LoadTranslationRoles extends AbstractFixture implements ContainerAwareInte
     use ContainerAwareTrait;
     use SetRolePermissionsTrait;
 
-    const ROLE_TRANSLATOR = 'ROLE_TRANSLATOR';
+    public const ROLE_TRANSLATOR = 'ROLE_TRANSLATOR';
 
     #[\Override]
     public function load(ObjectManager $manager)

@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 
 class MixinConfigurationHelper
 {
-    const ROOT_ALIAS_PLACEHOLDER = '__root_entity__';
+    public const ROOT_ALIAS_PLACEHOLDER = '__root_entity__';
 
     /** @var ConfigurationProviderInterface */
     protected $configurationProvider;

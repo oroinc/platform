@@ -9,8 +9,8 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 
 class LoadWorkflowSteps extends AbstractFixture
 {
-    const STEP_1 = 'workflow.step.1';
-    const STEP_2 = 'workflow.step.2';
+    public const STEP_1 = 'workflow.step.1';
+    public const STEP_2 = 'workflow.step.2';
 
     /**
      * @var array

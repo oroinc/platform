@@ -10,7 +10,7 @@ use Oro\Bundle\BatchBundle\Entity\StepExecution;
  */
 class ContextRegistry
 {
-    const DEFAULT_ALIAS = 'default';
+    public const DEFAULT_ALIAS = 'default';
 
     /**
      * @var array

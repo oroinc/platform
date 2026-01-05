@@ -8,7 +8,7 @@ use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
 class TagVirtualFieldProvider implements VirtualFieldProviderInterface
 {
-    const TAG_FIELD = 'tag_field';
+    public const TAG_FIELD = 'tag_field';
 
     /** @var TaggableHelper */
     protected $taggableHelper;

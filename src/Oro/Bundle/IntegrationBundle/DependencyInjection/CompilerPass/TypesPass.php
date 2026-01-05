@@ -10,10 +10,10 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class TypesPass implements CompilerPassInterface
 {
-    const MANAGER_ID               = 'oro_integration.manager.types_registry';
-    const CHANNEL_TYPES_TAG_NAME   = 'oro_integration.channel';
-    const TRANSPORT_TYPES_TAG_NAME = 'oro_integration.transport';
-    const CONNECTOR_TYPES_TAG_NAME = 'oro_integration.connector';
+    public const MANAGER_ID               = 'oro_integration.manager.types_registry';
+    public const CHANNEL_TYPES_TAG_NAME   = 'oro_integration.channel';
+    public const TRANSPORT_TYPES_TAG_NAME = 'oro_integration.transport';
+    public const CONNECTOR_TYPES_TAG_NAME = 'oro_integration.connector';
 
     #[\Override]
     public function process(ContainerBuilder $container)

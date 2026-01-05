@@ -11,11 +11,11 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class Substring extends AbstractAction
 {
-    const OPTION_START_POSITION = 'startPos';
-    const OPTION_LENGTH = 'length';
-    const OPTION_STRING = 'string';
-    const OPTION_ATTRIBUTE = 'attribute';
-    const DEFAULT_STARTING_POSITION = 0;
+    public const OPTION_START_POSITION = 'startPos';
+    public const OPTION_LENGTH = 'length';
+    public const OPTION_STRING = 'string';
+    public const OPTION_ATTRIBUTE = 'attribute';
+    public const DEFAULT_STARTING_POSITION = 0;
 
     /**
      * @var array

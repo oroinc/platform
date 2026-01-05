@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WorkflowReplacementType extends AbstractType
 {
-    const NAME = 'oro_workflow_replacement';
+    public const NAME = 'oro_workflow_replacement';
 
     /** @var WorkflowDeactivationHelper */
     protected $helper;

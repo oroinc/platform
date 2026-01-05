@@ -10,16 +10,16 @@ namespace Oro\Component\Layout;
 class RawLayout
 {
     /** The block type */
-    const BLOCK_TYPE = 'block_type';
+    public const BLOCK_TYPE = 'block_type';
 
     /** Additional options which are used for building the layout block */
-    const OPTIONS = 'options';
+    public const OPTIONS = 'options';
 
     /** The full set of options (additional and default) which are used for building the layout block */
-    const RESOLVED_OPTIONS = 'resolved_options';
+    public const RESOLVED_OPTIONS = 'resolved_options';
 
     /** The layout item path */
-    const PATH = 'path';
+    public const PATH = 'path';
 
     /**
      * @var array

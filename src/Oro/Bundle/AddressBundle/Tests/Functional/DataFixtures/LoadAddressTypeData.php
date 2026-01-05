@@ -8,9 +8,9 @@ use Oro\Bundle\AddressBundle\Entity\AddressType;
 
 class LoadAddressTypeData extends AbstractFixture
 {
-    const TYPE_HOME = 'home';
-    const TYPE_WORK = 'work';
-    const TYPE_SECRET = 'secret';
+    public const TYPE_HOME = 'home';
+    public const TYPE_WORK = 'work';
+    public const TYPE_SECRET = 'secret';
 
     /**
      * @var array

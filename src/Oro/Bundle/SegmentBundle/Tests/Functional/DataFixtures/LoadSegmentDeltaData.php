@@ -14,16 +14,16 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganizatio
 
 class LoadSegmentDeltaData extends AbstractFixture implements DependentFixtureInterface
 {
-    const SEGMENT = 'collection-segment';
+    public const SEGMENT = 'collection-segment';
 
-    const SEGMENT_EXISTING = LoadSegmentData::SEGMENT_STATIC;
-    const SEGMENT_REMOVED = LoadSegmentData::SEGMENT_DYNAMIC;
-    const SEGMENT_ADDED = LoadSegmentData::SEGMENT_STATIC_WITH_FILTER_AND_SORTING;
+    public const SEGMENT_EXISTING = LoadSegmentData::SEGMENT_STATIC;
+    public const SEGMENT_REMOVED = LoadSegmentData::SEGMENT_DYNAMIC;
+    public const SEGMENT_ADDED = LoadSegmentData::SEGMENT_STATIC_WITH_FILTER_AND_SORTING;
 
     /**
      * @var array
      */
-    const SEGMENT_DEFINITION = [
+    public const SEGMENT_DEFINITION = [
         'columns' => [
             [
                 'func' => null,

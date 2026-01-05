@@ -6,7 +6,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ConditionBuilderOptionsLoadEvent extends Event
 {
-    const EVENT_NAME = 'oro_segment.condition_builder_options_load';
+    public const EVENT_NAME = 'oro_segment.condition_builder_options_load';
 
     /** @var array */
     protected $options;

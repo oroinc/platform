@@ -25,11 +25,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FieldType extends AbstractType
 {
-    const ORIGINAL_FIELD_NAMES_ATTRIBUTE = 'original_field_names';
-    const TYPE_LABEL_PREFIX              = 'oro.entity_extend.form.data_type.';
-    const GROUP_TYPE_PREFIX              = 'oro.entity_extend.form.data_type_group.';
-    const GROUP_FIELDS                   = 'fields';
-    const GROUP_RELATIONS                = 'relations';
+    public const ORIGINAL_FIELD_NAMES_ATTRIBUTE = 'original_field_names';
+    public const TYPE_LABEL_PREFIX              = 'oro.entity_extend.form.data_type.';
+    public const GROUP_TYPE_PREFIX              = 'oro.entity_extend.form.data_type_group.';
+    public const GROUP_FIELDS                   = 'fields';
+    public const GROUP_RELATIONS                = 'relations';
 
     /** @var ConfigManager */
     protected $configManager;

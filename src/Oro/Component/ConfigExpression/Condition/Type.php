@@ -7,7 +7,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class Type extends AbstractComparison
 {
-    const NAME = 'type';
+    public const NAME = 'type';
 
     #[\Override]
     public function initialize(array $options)

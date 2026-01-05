@@ -11,10 +11,10 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class StoreSqlExtension extends AbstractExtension
 {
-    const DISPLAY_SQL_QUERY  = 'display_sql_query';
-    const STORED_SQL_PATH    = 'metadata[stored_sql]';
-    const SQL                = 'sql';
-    const STORE_SQL          = 'store_sql';
+    public const DISPLAY_SQL_QUERY  = 'display_sql_query';
+    public const STORED_SQL_PATH    = 'metadata[stored_sql]';
+    public const SQL                = 'sql';
+    public const STORE_SQL          = 'store_sql';
 
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;

@@ -9,7 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Product;
 class LoadSearchProductData extends AbstractFixture
 {
     /** @var array */
-    const PRODUCTS = [
+    public const PRODUCTS = [
         ['name' => '220 Lumen Rechargeable Headlamp'],
         ['name' => '500-watt Work Light'],
         ['name' => 'Basic Women’s 4-Pocket Black Scrub Set'],

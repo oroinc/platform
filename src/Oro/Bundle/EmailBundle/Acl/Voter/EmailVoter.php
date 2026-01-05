@@ -26,7 +26,7 @@ class EmailVoter implements VoterInterface, ServiceSubscriberInterface
      * Oro\Bundle\EmailBundle\Migrations\Data\ORM\UpdateEmailEditAclRule
      * Oro\Bundle\EmailBundle\EventListener\RoleSubscriber
      */
-    const SUPPORTED_CLASSES = [
+    public const SUPPORTED_CLASSES = [
         Email::class,
         EmailBody::class,
         EmailAttachment::class,

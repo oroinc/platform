@@ -16,13 +16,13 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterface
 {
-    const TYPE_BOOLEAN = 'boolean';
-    const TYPE_INTEGER = 'integer';
-    const TYPE_STRING = 'string';
-    const TYPE_ENUM = 'enum';
+    public const TYPE_BOOLEAN = 'boolean';
+    public const TYPE_INTEGER = 'integer';
+    public const TYPE_STRING = 'string';
+    public const TYPE_ENUM = 'enum';
 
-    const CONFIG_TYPE = 'value_type';
-    const CONFIG_DEFAULT = 'default_value';
+    public const CONFIG_TYPE = 'value_type';
+    public const CONFIG_DEFAULT = 'default_value';
 
     /** @var ManagerRegistry */
     protected $registry;

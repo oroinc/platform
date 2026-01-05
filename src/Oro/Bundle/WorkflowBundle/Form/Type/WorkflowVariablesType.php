@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class WorkflowVariablesType extends AbstractType
 {
-    const NAME = 'oro_workflow_variables';
+    public const NAME = 'oro_workflow_variables';
 
     /**
      * @var VariableGuesser

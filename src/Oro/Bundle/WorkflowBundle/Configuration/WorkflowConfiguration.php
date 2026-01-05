@@ -22,33 +22,33 @@ use Symfony\Component\Config\Definition\Processor;
  */
 class WorkflowConfiguration extends AbstractConfiguration implements ConfigurationInterface
 {
-    const NODE_STEPS = 'steps';
-    const NODE_ATTRIBUTES = 'attributes';
-    const NODE_TRANSITIONS = 'transitions';
-    const NODE_TRANSITION_DEFINITIONS = 'transition_definitions';
-    const NODE_VARIABLE_DEFINITIONS = 'variable_definitions';
-    const NODE_VARIABLES = 'variables';
-    const NODE_ENTITY_RESTRICTIONS = 'entity_restrictions';
-    const NODE_EXCLUSIVE_ACTIVE_GROUPS = 'exclusive_active_groups';
-    const NODE_EXCLUSIVE_RECORD_GROUPS = 'exclusive_record_groups';
-    const NODE_TRANSITION_TRIGGERS = 'triggers';
-    const NODE_INIT_ENTITIES = 'init_entities';
-    const NODE_INIT_ROUTES = 'init_routes';
-    const NODE_INIT_DATAGRIDS = 'init_datagrids';
-    const NODE_INIT_CONTEXT_ATTRIBUTE = 'init_context_attribute';
-    const NODE_DISABLE_OPERATIONS = 'disable_operations';
-    const NODE_APPLICATIONS = 'applications';
+    public const NODE_STEPS = 'steps';
+    public const NODE_ATTRIBUTES = 'attributes';
+    public const NODE_TRANSITIONS = 'transitions';
+    public const NODE_TRANSITION_DEFINITIONS = 'transition_definitions';
+    public const NODE_VARIABLE_DEFINITIONS = 'variable_definitions';
+    public const NODE_VARIABLES = 'variables';
+    public const NODE_ENTITY_RESTRICTIONS = 'entity_restrictions';
+    public const NODE_EXCLUSIVE_ACTIVE_GROUPS = 'exclusive_active_groups';
+    public const NODE_EXCLUSIVE_RECORD_GROUPS = 'exclusive_record_groups';
+    public const NODE_TRANSITION_TRIGGERS = 'triggers';
+    public const NODE_INIT_ENTITIES = 'init_entities';
+    public const NODE_INIT_ROUTES = 'init_routes';
+    public const NODE_INIT_DATAGRIDS = 'init_datagrids';
+    public const NODE_INIT_CONTEXT_ATTRIBUTE = 'init_context_attribute';
+    public const NODE_DISABLE_OPERATIONS = 'disable_operations';
+    public const NODE_APPLICATIONS = 'applications';
 
-    const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
-    const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
-    const DEFAULT_INIT_CONTEXT_ATTRIBUTE = 'init_context';
-    const DEFAULT_FORM_CONFIGURATION_TEMPLATE = '@OroWorkflow/actions/update.html.twig';
-    const DEFAULT_FORM_CONFIGURATION_HANDLER = 'default';
+    public const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
+    public const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
+    public const DEFAULT_INIT_CONTEXT_ATTRIBUTE = 'init_context';
+    public const DEFAULT_FORM_CONFIGURATION_TEMPLATE = '@OroWorkflow/actions/update.html.twig';
+    public const DEFAULT_FORM_CONFIGURATION_HANDLER = 'default';
 
-    const NODE_FORM_OPTIONS_CONFIGURATION = 'configuration';
+    public const NODE_FORM_OPTIONS_CONFIGURATION = 'configuration';
 
-    const TRANSITION_DISPLAY_TYPE_DIALOG = 'dialog';
-    const TRANSITION_DISPLAY_TYPE_PAGE = 'page';
+    public const TRANSITION_DISPLAY_TYPE_DIALOG = 'dialog';
+    public const TRANSITION_DISPLAY_TYPE_PAGE = 'page';
 
     public const METADATA = 'metadata';
 

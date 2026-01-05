@@ -4,9 +4,9 @@ namespace Oro\Bundle\EntityBundle\Entity\Manager\Field;
 
 class EntityFieldBlackList
 {
-    const EDIT_BLACK_LIST_ID         = 'id';
-    const EDIT_BLACK_LIST_CREATED_AT = 'createdAt';
-    const EDIT_BLACK_LIST_UPDATED_AT = 'updatedAt';
+    public const EDIT_BLACK_LIST_ID         = 'id';
+    public const EDIT_BLACK_LIST_CREATED_AT = 'createdAt';
+    public const EDIT_BLACK_LIST_UPDATED_AT = 'updatedAt';
 
     /**
      * @return array

@@ -9,18 +9,18 @@ namespace Oro\Bundle\LocaleBundle\Model;
  */
 class Calendar
 {
-    const DOW_SUNDAY    = 1;
-    const DOW_MONDAY    = 2;
-    const DOW_TUESDAY   = 3;
-    const DOW_WEDNESDAY = 4;
-    const DOW_THURSDAY  = 5;
-    const DOW_FRIDAY    = 6;
-    const DOW_SATURDAY  = 7;
+    public const DOW_SUNDAY    = 1;
+    public const DOW_MONDAY    = 2;
+    public const DOW_TUESDAY   = 3;
+    public const DOW_WEDNESDAY = 4;
+    public const DOW_THURSDAY  = 5;
+    public const DOW_FRIDAY    = 6;
+    public const DOW_SATURDAY  = 7;
 
-    const WIDTH_WIDE        = 'wide';        // Tuesday | September
-    const WIDTH_ABBREVIATED = 'abbreviated'; // Tues    | Sept
-    const WIDTH_SHORT       = 'short';       // Tu      | Sept
-    const WIDTH_NARROW      = 'narrow';      // T       | S
+    public const WIDTH_WIDE        = 'wide';        // Tuesday | September
+    public const WIDTH_ABBREVIATED = 'abbreviated'; // Tues    | Sept
+    public const WIDTH_SHORT       = 'short';       // Tu      | Sept
+    public const WIDTH_NARROW      = 'narrow';      // T       | S
 
     /**
      * @var string

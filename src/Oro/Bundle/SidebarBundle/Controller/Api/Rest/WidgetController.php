@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class WidgetController extends AbstractFOSRestController
 {
-    const SIDEBAR_WIDGET_FEATURE_NAME = 'sidebar_widgets';
+    public const SIDEBAR_WIDGET_FEATURE_NAME = 'sidebar_widgets';
 
     /**
      * REST GET list

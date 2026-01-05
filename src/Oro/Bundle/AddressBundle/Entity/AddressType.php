@@ -19,8 +19,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 #[Config(defaultValues: ['grouping' => ['groups' => ['dictionary']]])]
 class AddressType implements Translatable
 {
-    const TYPE_BILLING  = 'billing';
-    const TYPE_SHIPPING = 'shipping';
+    public const TYPE_BILLING  = 'billing';
+    public const TYPE_SHIPPING = 'shipping';
 
     #[ORM\Column(name: 'name', type: Types::STRING, length: 16)]
     #[ORM\Id]

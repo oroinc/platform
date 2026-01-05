@@ -7,7 +7,7 @@ namespace Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
  */
 class TransitionAttributeLabelTemplate extends TransitionAttributeTemplate
 {
-    const NAME = 'transition_attribute_label';
+    public const NAME = 'transition_attribute_label';
 
     #[\Override]
     public function getTemplate(): string

@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints\Valid;
  */
 class MultiFileType extends AbstractType
 {
-    const TYPE = 'oro_attachment_multi_file';
+    public const TYPE = 'oro_attachment_multi_file';
 
     /** @var EventSubscriberInterface */
     private $eventSubscriber;

@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class UpdateActivityListOwner extends AbstractFixture implements DependentFixtureInterface, ContainerAwareInterface
 {
-    const BATCH_SIZE = 200;
+    public const BATCH_SIZE = 200;
 
     /** @var ContainerInterface */
     protected $container;

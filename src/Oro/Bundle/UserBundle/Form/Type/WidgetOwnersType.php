@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class WidgetOwnersType extends AbstractType
 {
-    const NAME = 'oro_type_widget_owners';
+    public const NAME = 'oro_type_widget_owners';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

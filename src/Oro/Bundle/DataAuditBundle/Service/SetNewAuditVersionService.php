@@ -13,7 +13,7 @@ use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
  */
 class SetNewAuditVersionService
 {
-    const MAX_ATTEMPTS_LIMIT = 100;
+    public const MAX_ATTEMPTS_LIMIT = 100;
 
     /**
      * @var EntityManagerInterface

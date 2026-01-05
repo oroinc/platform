@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class EmailAddressRecipientsType extends AbstractType
 {
-    const NAME = 'oro_email_email_address_recipients';
+    public const NAME = 'oro_email_email_address_recipients';
 
     /** @var ConfigManager */
     protected $cm;

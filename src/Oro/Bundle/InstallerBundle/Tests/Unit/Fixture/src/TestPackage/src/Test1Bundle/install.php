@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @OroScript("Test1 Bundle Installer")
  */

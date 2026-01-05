@@ -4,7 +4,7 @@ namespace Oro\Bundle\CurrencyBundle\Form\Type;
 
 class CurrencySelectionType extends AbstractCurrencySelectionType
 {
-    const NAME = 'oro_currency_selection';
+    public const NAME = 'oro_currency_selection';
 
     public function getName()
     {

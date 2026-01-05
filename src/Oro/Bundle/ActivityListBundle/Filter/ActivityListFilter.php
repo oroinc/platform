@@ -32,8 +32,8 @@ use Symfony\Component\Form\FormInterface;
  */
 class ActivityListFilter extends EntityFilter
 {
-    const TYPE_HAS_ACTIVITY = 'hasActivity';
-    const TYPE_HAS_NOT_ACTIVITY = 'hasNotActivity';
+    public const TYPE_HAS_ACTIVITY = 'hasActivity';
+    public const TYPE_HAS_NOT_ACTIVITY = 'hasNotActivity';
 
     /** @var FilterExecutionContext */
     protected $filterExecutionContext;

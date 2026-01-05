@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class MergeListener
 {
-    const TRANSLATE_KEY = 'label';
+    public const TRANSLATE_KEY = 'label';
 
     /** @var TranslatorInterface */
     protected $translator;

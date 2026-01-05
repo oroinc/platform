@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class TransitionsAttributeEvent extends Event
 {
-    const BEFORE_ADD = 'oro_workflow.transitions.attribute.before_add';
+    public const BEFORE_ADD = 'oro_workflow.transitions.attribute.before_add';
 
     /** @var Attribute */
     protected $attribute;

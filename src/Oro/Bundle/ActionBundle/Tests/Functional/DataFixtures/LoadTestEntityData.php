@@ -8,8 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 
 class LoadTestEntityData extends AbstractFixture
 {
-    const TEST_ENTITY_1 = 'test_entity_1';
-    const TEST_ENTITY_2 = 'test_entity_2';
+    public const TEST_ENTITY_1 = 'test_entity_1';
+    public const TEST_ENTITY_2 = 'test_entity_2';
 
     /**
      * @var array

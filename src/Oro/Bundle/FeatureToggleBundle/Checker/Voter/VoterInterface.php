@@ -4,9 +4,9 @@ namespace Oro\Bundle\FeatureToggleBundle\Checker\Voter;
 
 interface VoterInterface
 {
-    const FEATURE_ENABLED = 1;
-    const FEATURE_ABSTAIN = 0;
-    const FEATURE_DISABLED = -1;
+    public const FEATURE_ENABLED = 1;
+    public const FEATURE_ABSTAIN = 0;
+    public const FEATURE_DISABLED = -1;
 
     /**
      * @param string $feature

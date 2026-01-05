@@ -8,12 +8,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OwnershipType extends AbstractType
 {
-    const NAME = 'oro_type_choice_ownership_type';
+    public const NAME = 'oro_type_choice_ownership_type';
 
-    const OWNER_TYPE_NONE = 'NONE';
-    const OWNER_TYPE_USER = 'USER';
-    const OWNER_TYPE_BUSINESS_UNIT = 'BUSINESS_UNIT';
-    const OWNER_TYPE_ORGANIZATION = 'ORGANIZATION';
+    public const OWNER_TYPE_NONE = 'NONE';
+    public const OWNER_TYPE_USER = 'USER';
+    public const OWNER_TYPE_BUSINESS_UNIT = 'BUSINESS_UNIT';
+    public const OWNER_TYPE_ORGANIZATION = 'ORGANIZATION';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

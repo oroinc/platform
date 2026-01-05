@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class IntegrationUpdateEvent extends Event
 {
-    const NAME = 'oro_integration.integration_update';
+    public const NAME = 'oro_integration.integration_update';
 
     /**
      * @var Integration

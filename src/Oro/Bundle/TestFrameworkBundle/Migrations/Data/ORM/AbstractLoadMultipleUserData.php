@@ -19,8 +19,8 @@ abstract class AbstractLoadMultipleUserData extends AbstractFixture implements C
 {
     use ContainerAwareTrait;
 
-    const ACL_PERMISSION = 'permission';
-    const ACL_LEVEL = 'level';
+    public const ACL_PERMISSION = 'permission';
+    public const ACL_LEVEL = 'level';
 
     public function getDependencies()
     {

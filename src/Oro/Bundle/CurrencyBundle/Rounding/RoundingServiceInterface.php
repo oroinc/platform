@@ -9,13 +9,13 @@ use Oro\Bundle\CurrencyBundle\Exception\InvalidRoundingTypeException;
  */
 interface RoundingServiceInterface
 {
-    const ROUND_CEILING = \NumberFormatter::ROUND_CEILING;
-    const ROUND_FLOOR = \NumberFormatter::ROUND_FLOOR;
-    const ROUND_DOWN = \NumberFormatter::ROUND_DOWN;
-    const ROUND_UP = \NumberFormatter::ROUND_UP;
-    const ROUND_HALF_EVEN = \NumberFormatter::ROUND_HALFEVEN;
-    const ROUND_HALF_DOWN = \NumberFormatter::ROUND_HALFDOWN;
-    const ROUND_HALF_UP = \NumberFormatter::ROUND_HALFUP;
+    public const ROUND_CEILING = \NumberFormatter::ROUND_CEILING;
+    public const ROUND_FLOOR = \NumberFormatter::ROUND_FLOOR;
+    public const ROUND_DOWN = \NumberFormatter::ROUND_DOWN;
+    public const ROUND_UP = \NumberFormatter::ROUND_UP;
+    public const ROUND_HALF_EVEN = \NumberFormatter::ROUND_HALFEVEN;
+    public const ROUND_HALF_DOWN = \NumberFormatter::ROUND_HALFDOWN;
+    public const ROUND_HALF_UP = \NumberFormatter::ROUND_HALFUP;
 
     /**
      * @param float|int $value

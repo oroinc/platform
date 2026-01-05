@@ -10,10 +10,10 @@ use Symfony\Component\Routing\Route;
 
 class DictionaryEntityApiDocHandler implements HandlerInterface
 {
-    const DESCRIPTION_TEMPLATE = 'Get {plural_name}';
-    const DOCUMENTATION_TEMPLATE = 'Get {plural_name}';
-    const FALLBACK_DESCRIPTION_TEMPLATE = 'Get values of {class}';
-    const FALLBACK_DOCUMENTATION_TEMPLATE = 'Get values of {class}';
+    public const DESCRIPTION_TEMPLATE = 'Get {plural_name}';
+    public const DOCUMENTATION_TEMPLATE = 'Get {plural_name}';
+    public const FALLBACK_DESCRIPTION_TEMPLATE = 'Get values of {class}';
+    public const FALLBACK_DOCUMENTATION_TEMPLATE = 'Get values of {class}';
 
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;

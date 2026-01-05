@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class TagsReportFilterType extends DictionaryFilterType
 {
-    const NAME = 'oro_type_tags_report_filter';
+    public const NAME = 'oro_type_tags_report_filter';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

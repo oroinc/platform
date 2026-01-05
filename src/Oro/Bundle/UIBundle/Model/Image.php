@@ -7,9 +7,9 @@ namespace Oro\Bundle\UIBundle\Model;
  */
 class Image implements \JsonSerializable
 {
-    const TYPE_ICON = 'icon';
-    const TYPE_FILE = 'file';
-    const TYPE_FILE_PATH = 'file-path';
+    public const TYPE_ICON = 'icon';
+    public const TYPE_FILE = 'file';
+    public const TYPE_FILE_PATH = 'file-path';
 
     /** @var string */
     protected $type;

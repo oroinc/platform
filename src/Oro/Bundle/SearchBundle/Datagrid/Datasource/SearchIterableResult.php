@@ -13,7 +13,7 @@ class SearchIterableResult implements IterableResultInterface
     /**
      * @var int
      */
-    const DEFAULT_BUFFER_SIZE = 2000;
+    public const DEFAULT_BUFFER_SIZE = 2000;
 
     /**
      * @var SearchQueryInterface

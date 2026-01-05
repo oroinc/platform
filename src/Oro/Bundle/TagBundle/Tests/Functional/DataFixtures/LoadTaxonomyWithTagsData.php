@@ -11,13 +11,13 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 
 class LoadTaxonomyWithTagsData extends AbstractFixture
 {
-    const FIRST_TAG = 'first_tag';
-    const SECOND_TAG = 'second_tag';
-    const THIRD_TAG = 'third_tag';
+    public const FIRST_TAG = 'first_tag';
+    public const SECOND_TAG = 'second_tag';
+    public const THIRD_TAG = 'third_tag';
 
-    const FIRST_TAXONOMY = 'first_taxonomy';
-    const SECOND_TAXONOMY = 'second_taxonomy';
-    const THIRD_TAXONOMY = 'third_taxonomy';
+    public const FIRST_TAXONOMY = 'first_taxonomy';
+    public const SECOND_TAXONOMY = 'second_taxonomy';
+    public const THIRD_TAXONOMY = 'third_taxonomy';
 
     #[\Override]
     public function load(ObjectManager $manager)

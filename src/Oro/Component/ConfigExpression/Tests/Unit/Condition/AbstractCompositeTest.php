@@ -16,7 +16,7 @@ class AbstractCompositeTest extends TestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->condition = new class() extends AbstractComposite {
+        $this->condition = new class () extends AbstractComposite {
             protected function isConditionAllowed($context)
             {
             }

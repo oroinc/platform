@@ -29,10 +29,10 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     use LoggerAwareTrait;
 
     /** Determines how many emails can be stored in a database at once */
-    const DB_BATCH_SIZE = 100;
+    public const DB_BATCH_SIZE = 100;
 
     /** Max time in seconds between saved DB batches */
-    const DB_BATCH_TIME = 30;
+    public const DB_BATCH_TIME = 30;
 
     /** @var EntityManager */
     protected $em;

@@ -25,8 +25,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\DiscriminatorMap(['grid_view' => GridView::class])]
 abstract class AbstractGridView implements ViewInterface
 {
-    const TYPE_PRIVATE = 'private';
-    const TYPE_PUBLIC  = 'public';
+    public const TYPE_PRIVATE = 'private';
+    public const TYPE_PUBLIC  = 'public';
 
     /** @var array */
     protected static $types = [

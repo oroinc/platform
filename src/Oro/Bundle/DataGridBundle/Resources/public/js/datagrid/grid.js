@@ -1096,7 +1096,7 @@ const Grid = Backgrid.Grid.extend({
         this._deferredRender();
         this.initLayout({
             datagrid: this
-        }).done(() => {
+        }).finally(() => {
             this.rendered = true;
             /**
              * Backbone event. Fired when the grid has been successfully rendered.

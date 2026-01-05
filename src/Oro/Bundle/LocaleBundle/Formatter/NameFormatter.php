@@ -23,13 +23,13 @@ class NameFormatter
         $this->localeSettings = $localeSettings;
     }
 
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     /**
      * @param NamePrefixInterface|FirstNameInterface|MiddleNameInterface|LastNameInterface|NameSuffixInterface|NameInterface $person
      * @param null|string $locale
      * @return string
      */
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
     public function format($person, $locale = null)
     {
         $nameParts = [];

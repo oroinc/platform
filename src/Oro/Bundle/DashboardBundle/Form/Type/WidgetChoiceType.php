@@ -7,7 +7,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class WidgetChoiceType extends AbstractType
 {
-    const NAME = 'oro_type_widget_choice';
+    public const NAME = 'oro_type_widget_choice';
 
     public function getName()
     {

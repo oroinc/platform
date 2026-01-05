@@ -7,8 +7,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class GeneratedValueStrategyListenerPass implements CompilerPassInterface
 {
-    const SERVICE_NAME = 'oro_entity.listener.orm.generated_value_strategy_listener';
-    const DOCTRINE_CONNECTIONS_PARAM = 'doctrine.connections';
+    public const SERVICE_NAME = 'oro_entity.listener.orm.generated_value_strategy_listener';
+    public const DOCTRINE_CONNECTIONS_PARAM = 'doctrine.connections';
 
     #[\Override]
     public function process(ContainerBuilder $container)

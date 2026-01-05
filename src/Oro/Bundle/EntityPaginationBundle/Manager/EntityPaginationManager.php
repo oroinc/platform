@@ -12,8 +12,8 @@ use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
  */
 class EntityPaginationManager
 {
-    const VIEW_SCOPE = 'view';
-    const EDIT_SCOPE = 'edit';
+    public const VIEW_SCOPE = 'view';
+    public const EDIT_SCOPE = 'edit';
 
     public function __construct(private ConfigManager $configManager)
     {

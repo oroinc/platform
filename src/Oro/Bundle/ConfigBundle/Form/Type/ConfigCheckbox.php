@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormEvents;
  */
 class ConfigCheckbox extends AbstractType
 {
-    const NAME = 'oro_config_checkbox';
+    public const NAME = 'oro_config_checkbox';
 
     public function getName()
     {

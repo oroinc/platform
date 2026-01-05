@@ -16,7 +16,7 @@ use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
  */
 class TotalHeaderHandler implements IncludeHandlerInterface
 {
-    const HEADER_NAME = 'X-Include-Total-Count';
+    public const HEADER_NAME = 'X-Include-Total-Count';
 
     /** @var CountQueryBuilderOptimizer */
     protected $countQueryBuilderOptimizer;

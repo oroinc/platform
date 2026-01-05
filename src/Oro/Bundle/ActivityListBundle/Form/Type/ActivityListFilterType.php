@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class ActivityListFilterType extends AbstractType
 {
-    const NAME = 'oro_type_activity_list_filter';
+    public const NAME = 'oro_type_activity_list_filter';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

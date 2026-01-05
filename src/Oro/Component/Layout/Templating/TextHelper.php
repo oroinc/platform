@@ -9,7 +9,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class TextHelper
 {
-    const DEFAULT_TRANS_DOMAIN = 'messages';
+    public const DEFAULT_TRANS_DOMAIN = 'messages';
 
     /** @var TranslatorInterface */
     protected $translator;

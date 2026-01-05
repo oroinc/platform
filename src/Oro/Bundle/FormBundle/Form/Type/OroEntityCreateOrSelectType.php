@@ -22,12 +22,12 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  */
 class OroEntityCreateOrSelectType extends AbstractType
 {
-    const NAME = 'oro_entity_create_or_select';
+    public const NAME = 'oro_entity_create_or_select';
 
-    const MODE_CREATE = 'create';
-    const MODE_GRID   = 'grid';
-    const MODE_VIEW   = 'view';
-    const MODE_EDIT   = 'edit'; // this mode is fully supported in choice type only
+    public const MODE_CREATE = 'create';
+    public const MODE_GRID   = 'grid';
+    public const MODE_VIEW   = 'view';
+    public const MODE_EDIT   = 'edit'; // this mode is fully supported in choice type only
 
     /**
      * @var DoctrineHelper

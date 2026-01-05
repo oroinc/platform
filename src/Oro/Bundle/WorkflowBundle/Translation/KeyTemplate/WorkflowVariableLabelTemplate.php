@@ -7,7 +7,7 @@ namespace Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
  */
 class WorkflowVariableLabelTemplate extends WorkflowVariableTemplate
 {
-    const NAME = 'workflow_variable_label';
+    public const NAME = 'workflow_variable_label';
 
     #[\Override]
     public function getTemplate(): string

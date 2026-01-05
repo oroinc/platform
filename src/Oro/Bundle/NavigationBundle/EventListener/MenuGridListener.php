@@ -6,8 +6,8 @@ use Oro\Bundle\DataGridBundle\Event\PreBuild;
 
 class MenuGridListener
 {
-    const PATH_VIEW_LINK_ROUTE = '[properties][view_link][route]';
-    const PATH_VIEW_LINK_ID = '[properties][view_link][direct_params]';
+    public const PATH_VIEW_LINK_ROUTE = '[properties][view_link][route]';
+    public const PATH_VIEW_LINK_ID = '[properties][view_link][direct_params]';
 
     public function onPreBuild(PreBuild $event)
     {

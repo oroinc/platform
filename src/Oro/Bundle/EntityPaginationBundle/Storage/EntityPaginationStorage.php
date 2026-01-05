@@ -12,10 +12,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class EntityPaginationStorage
 {
-    const STORAGE_NAME = 'entity_pagination_storage';
-    const ENTITY_IDS   = 'entity_ids';
-    const HASH         = 'hash';
-    const INFO_MESSAGE = 'info_message';
+    public const STORAGE_NAME = 'entity_pagination_storage';
+    public const ENTITY_IDS   = 'entity_ids';
+    public const HASH         = 'hash';
+    public const INFO_MESSAGE = 'info_message';
 
     public function __construct(
         protected DoctrineHelper $doctrineHelper,

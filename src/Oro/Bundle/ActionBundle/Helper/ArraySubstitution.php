@@ -6,7 +6,7 @@ use Oro\Bundle\ActionBundle\Exception\CircularReferenceException;
 
 class ArraySubstitution
 {
-    const SUBSTITUTION_PATH_MAX_DEPTH = 10;
+    public const SUBSTITUTION_PATH_MAX_DEPTH = 10;
 
     /* @var array */
     private $map;

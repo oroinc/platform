@@ -67,11 +67,11 @@ class TransitionLabel extends Label
      *
      * @return TransitionLabel A new instance of a TransitionLabel object
      */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     #[\Override]
     public static function __set_state($data)
     {
         return new TransitionLabel($data['label'], $data['toLabel'], $data['fromLabel']);
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 }

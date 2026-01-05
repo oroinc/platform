@@ -12,8 +12,8 @@ use Psr\Log\LoggerInterface;
 
 class UpdateAnonymousRole extends ParametrizedMigrationQuery implements Migration
 {
-    const IS_AUTHENTICATED_ANONYMOUSLY  = 'IS_AUTHENTICATED_ANONYMOUSLY';
-    const PUBLIC_ACCESS  = 'PUBLIC_ACCESS';
+    public const IS_AUTHENTICATED_ANONYMOUSLY  = 'IS_AUTHENTICATED_ANONYMOUSLY';
+    public const PUBLIC_ACCESS  = 'PUBLIC_ACCESS';
 
     #[\Override]
     public function getDescription()

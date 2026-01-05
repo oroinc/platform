@@ -12,8 +12,8 @@ use Psr\Log\LoggerInterface;
  */
 class SplitGroupsToIndividualFieldsQuery extends ParametrizedMigrationQuery
 {
-    const GROUP_TYPE_EXCLUSIVE_ACTIVE = 10;
-    const GROUP_TYPE_EXCLUSIVE_RECORD = 20;
+    public const GROUP_TYPE_EXCLUSIVE_ACTIVE = 10;
+    public const GROUP_TYPE_EXCLUSIVE_RECORD = 20;
 
     #[\Override]
     public function getDescription()

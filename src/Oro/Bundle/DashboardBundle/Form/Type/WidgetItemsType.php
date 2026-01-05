@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WidgetItemsType extends AbstractType
 {
-    const NAME = 'oro_type_widget_items';
+    public const NAME = 'oro_type_widget_items';
 
     /** @var EventSubscriberInterface */
     private $itemsSubscriber;

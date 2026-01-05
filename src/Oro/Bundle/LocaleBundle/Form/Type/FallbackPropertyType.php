@@ -16,7 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FallbackPropertyType extends AbstractType
 {
-    const NAME = 'oro_locale_fallback_property';
+    public const NAME = 'oro_locale_fallback_property';
 
     /**
      * @var TranslatorInterface

@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class LocalizationScopeExtension extends AbstractTypeExtension
 {
-    const SCOPE_FIELD = 'localization';
+    public const SCOPE_FIELD = 'localization';
 
     /**
      * @var string

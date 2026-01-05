@@ -20,7 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class WorkflowDefinitionSelectType extends AbstractType
 {
-    const NAME = 'oro_workflow_definition_select';
+    public const NAME = 'oro_workflow_definition_select';
 
     /** @var WorkflowRegistry */
     protected $workflowRegistry;

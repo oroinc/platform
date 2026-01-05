@@ -9,7 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class OrmResultAfter extends Event implements GridEventInterface
 {
-    const NAME = 'oro_datagrid.orm_datasource.result.after';
+    public const NAME = 'oro_datagrid.orm_datasource.result.after';
 
     /**
      * @var DatagridInterface

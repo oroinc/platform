@@ -13,10 +13,10 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class FixRestAnnotationsPass implements CompilerPassInterface
 {
-    const ROUTING_LOADER_SERVICE = 'routing.loader.attribute';
-    const REST_ROUTING_LOADER_SERVICE = 'fos_rest.routing.loader.reader.action';
-    const ANNOTATION_READER_SERVICE_SUFFIX = '.annotation_reader';
-    const ANNOTATION_READER_CLASS = 'Oro\Bundle\SoapBundle\Routing\RestAnnotationReader';
+    public const ROUTING_LOADER_SERVICE = 'routing.loader.attribute';
+    public const REST_ROUTING_LOADER_SERVICE = 'fos_rest.routing.loader.reader.action';
+    public const ANNOTATION_READER_SERVICE_SUFFIX = '.annotation_reader';
+    public const ANNOTATION_READER_CLASS = 'Oro\Bundle\SoapBundle\Routing\RestAnnotationReader';
 
     #[\Override]
     public function process(ContainerBuilder $container)

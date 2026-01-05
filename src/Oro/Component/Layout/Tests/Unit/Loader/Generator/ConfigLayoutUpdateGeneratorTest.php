@@ -215,7 +215,7 @@ class ConfigLayoutUpdateGeneratorTest extends TestCase
         $this->generator->generate('testClassName', new GeneratorData($data));
     }
 
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     public function testGenerate(): void
     {
         self::assertSame(
@@ -271,5 +271,5 @@ CODE
             )
         );
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 }

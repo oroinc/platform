@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailAddressFromType extends AbstractType
 {
-    const NAME = 'oro_email_email_address_from';
+    public const NAME = 'oro_email_email_address_from';
 
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;

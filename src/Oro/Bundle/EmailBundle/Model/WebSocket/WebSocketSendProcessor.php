@@ -13,7 +13,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class WebSocketSendProcessor
 {
-    const TOPIC = 'oro/email_event/%s/%s';
+    public const TOPIC = 'oro/email_event/%s/%s';
 
     /**
      * @var WebsocketClientInterface

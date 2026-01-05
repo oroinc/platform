@@ -6,11 +6,11 @@ use Oro\Bundle\QueryDesignerBundle\Exception\InvalidFiltersException;
 
 class FiltersParserContext
 {
-    const NONE_TOKEN        = 0;
-    const OPERATOR_TOKEN    = 1;
-    const FILTER_TOKEN      = 2;
-    const BEGIN_GROUP_TOKEN = 3;
-    const END_GROUP_TOKEN   = 4;
+    public const NONE_TOKEN        = 0;
+    public const OPERATOR_TOKEN    = 1;
+    public const FILTER_TOKEN      = 2;
+    public const BEGIN_GROUP_TOKEN = 3;
+    public const END_GROUP_TOKEN   = 4;
 
     /**
      * @var int

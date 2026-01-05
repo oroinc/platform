@@ -13,7 +13,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class HistoryItemRepository extends EntityRepository implements NavigationRepositoryInterface
 {
-    const DEFAULT_SORT_ORDER = 'DESC';
+    public const DEFAULT_SORT_ORDER = 'DESC';
 
     #[\Override]
     public function getNavigationItems($user, Organization $organization, $type = null, $options = array())

@@ -16,10 +16,10 @@ use Oro\Component\Layout\Extension\Theme\Model\Theme;
  */
 class ImageFilterLoader
 {
-    const IMAGE_QUALITY = 85;
-    const BACKGROUND_COLOR = '#fff';
-    const RESIZE_MODE = 'inset';
-    const INTERLACE_MODE = 'line';
+    public const IMAGE_QUALITY = 85;
+    public const BACKGROUND_COLOR = '#fff';
+    public const RESIZE_MODE = 'inset';
+    public const INTERLACE_MODE = 'line';
 
     /** @var ImageTypeProvider */
     protected $imageTypeProvider;

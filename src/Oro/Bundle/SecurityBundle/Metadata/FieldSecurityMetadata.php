@@ -138,7 +138,7 @@ class FieldSecurityMetadata
      *
      * @return FieldSecurityMetadata
      */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     public static function __set_state($data)
     {
         return new FieldSecurityMetadata(
@@ -150,5 +150,5 @@ class FieldSecurityMetadata
             $data['isHidden']
         );
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 }

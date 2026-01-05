@@ -28,7 +28,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
  */
 class MailboxType extends AbstractType
 {
-    const RELOAD_MARKER = '_reloadForm';
+    public const RELOAD_MARKER = '_reloadForm';
 
     /** @var MailboxProcessStorage */
     private $storage;

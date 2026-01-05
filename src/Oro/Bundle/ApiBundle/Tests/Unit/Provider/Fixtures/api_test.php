@@ -1,6 +1,6 @@
 <?php
 
-// @codingStandardsIgnoreStart
+// phpcs:disable
 return array(
     'config' => array(
         'api_test.yml' => array(

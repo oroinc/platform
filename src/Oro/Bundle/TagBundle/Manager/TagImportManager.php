@@ -11,7 +11,7 @@ use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
 class TagImportManager
 {
-    const TAGS_FIELD = 'tags';
+    public const TAGS_FIELD = 'tags';
 
     /** @var TagStorage */
     protected $tagStorage;

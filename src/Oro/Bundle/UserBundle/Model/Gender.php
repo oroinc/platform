@@ -4,6 +4,6 @@ namespace Oro\Bundle\UserBundle\Model;
 
 class Gender
 {
-    const MALE = 'male';
-    const FEMALE = 'female';
+    public const MALE = 'male';
+    public const FEMALE = 'female';
 }

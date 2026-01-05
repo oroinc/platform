@@ -31,14 +31,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class JobExecutor
 {
-    const CONNECTOR_NAME = 'oro_importexport';
+    public const CONNECTOR_NAME = 'oro_importexport';
 
-    const JOB_EXPORT_TO_CSV              = 'entity_export_to_csv';
-    const JOB_EXPORT_TEMPLATE_TO_CSV     = 'entity_export_template_to_csv';
-    const JOB_IMPORT_FROM_CSV            = 'entity_import_from_csv';
-    const JOB_IMPORT_VALIDATION_FROM_CSV = 'entity_import_validation_from_csv';
-    const JOB_CONTEXT_DATA_KEY           = 'contextData';
-    const JOB_CONTEXT_AGGREGATOR_TYPE    = 'job_context_aggregator_type';
+    public const JOB_EXPORT_TO_CSV              = 'entity_export_to_csv';
+    public const JOB_EXPORT_TEMPLATE_TO_CSV     = 'entity_export_template_to_csv';
+    public const JOB_IMPORT_FROM_CSV            = 'entity_import_from_csv';
+    public const JOB_IMPORT_VALIDATION_FROM_CSV = 'entity_import_validation_from_csv';
+    public const JOB_CONTEXT_DATA_KEY           = 'contextData';
+    public const JOB_CONTEXT_AGGREGATOR_TYPE    = 'job_context_aggregator_type';
 
     /** @var EntityManager */
     protected $entityManager;

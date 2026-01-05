@@ -6,7 +6,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class WidgetConfigurationLoadEvent extends Event
 {
-    const EVENT_NAME = 'oro_dashboard.widget_configuration_load';
+    public const EVENT_NAME = 'oro_dashboard.widget_configuration_load';
 
     /**
      * @var array

@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class UniqueExtendEntityFieldValidator extends AbstractFieldValidator
 {
-    const ALIAS = 'oro_entity_extend.validator.unique_extend_entity_field';
+    public const ALIAS = 'oro_entity_extend.validator.unique_extend_entity_field';
 
     #[\Override]
     public function validate($value, Constraint $constraint)

@@ -100,7 +100,7 @@ class Imap extends \Laminas\Mail\Protocol\Imap
         stream_set_timeout($this->socket, ini_get('default_socket_timeout'));
     }
 
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
 
     protected function _nextLine()
     {
@@ -116,7 +116,7 @@ class Imap extends \Laminas\Mail\Protocol\Imap
 
         return $line;
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 
     /**
      *

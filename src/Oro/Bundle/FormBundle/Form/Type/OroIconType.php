@@ -14,7 +14,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class OroIconType extends AbstractType
 {
-    const NAME = 'oro_icon_select';
+    public const NAME = 'oro_icon_select';
 
     /**
      * @var KernelInterface

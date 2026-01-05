@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class ConfigurationGmailType extends AbstractOAuthAwareConfigurationType
 {
-    const NAME = 'oro_imap_configuration_gmail';
+    public const NAME = 'oro_imap_configuration_gmail';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)

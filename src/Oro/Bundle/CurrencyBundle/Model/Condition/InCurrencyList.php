@@ -16,7 +16,7 @@ class InCurrencyList extends AbstractCondition implements ContextAccessorAwareIn
 {
     use ContextAccessorAwareTrait;
 
-    const NAME = 'in_currency_list';
+    public const NAME = 'in_currency_list';
 
     /** @var MultiCurrency */
     protected $entity;

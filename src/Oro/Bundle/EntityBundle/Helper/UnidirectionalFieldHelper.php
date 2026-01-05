@@ -11,7 +11,7 @@ namespace Oro\Bundle\EntityBundle\Helper;
  */
 class UnidirectionalFieldHelper
 {
-    const DELIMITER = '::';
+    public const DELIMITER = '::';
 
     /**
      * @param string $fieldName

@@ -61,7 +61,7 @@ class CreateUserCommand extends Command
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
                 'Organizations'
             )
-            // @codingStandardsIgnoreStart
+            // phpcs:disable
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command creates a user.
@@ -80,7 +80,7 @@ HELP
             )
             ->addUsage('--user-name=<username> --user-email=<email> --user-password=<password> --user-business-unit=<business-unit-id>')
             ->addUsage('--user-name=<username> --user-email=<email> --user-password=<password> --user-business-unit=<business-unit-id> --user-firstname=<firstname> --user-lastname=<lastname> --user-role=<role>')
-            // @codingStandardsIgnoreEnd
+            // phpcs:enable
         ;
 
         if ($this->featureChecker->isFeatureEnabled('user_login_password')) {

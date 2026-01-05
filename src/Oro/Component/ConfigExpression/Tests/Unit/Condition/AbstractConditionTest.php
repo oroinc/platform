@@ -34,7 +34,7 @@ class AbstractConditionTest extends TestCase
 
     private function createCondition(bool $allowed): AbstractCondition
     {
-        return new class($allowed) extends AbstractCondition {
+        return new class ($allowed) extends AbstractCondition {
             private bool $isConditionAllowed;
 
             public function __construct($isConditionAllowed)

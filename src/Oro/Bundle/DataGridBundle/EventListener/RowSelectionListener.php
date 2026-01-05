@@ -48,15 +48,15 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
  */
 class RowSelectionListener
 {
-    const ROW_SELECTION_OPTION_PATH = '[options][rowSelection]';
-    const REQUIRED_MODULES_KEY      = '[options][jsmodules]';
-    const ROW_SELECTION_JS_MODULE   = 'orodatagrid/js/datagrid/listener/column-form-listener';
+    public const ROW_SELECTION_OPTION_PATH = '[options][rowSelection]';
+    public const REQUIRED_MODULES_KEY      = '[options][jsmodules]';
+    public const ROW_SELECTION_JS_MODULE   = 'orodatagrid/js/datagrid/listener/column-form-listener';
 
     /**
      * Included/excluded param names populated by orodatagrid/js/datagrid/listener/column-form-listener on frontend
      */
-    const GRID_PARAM_DATA_IN     = 'data_in';
-    const GRID_PARAM_DATA_NOT_IN = 'data_not_in';
+    public const GRID_PARAM_DATA_IN     = 'data_in';
+    public const GRID_PARAM_DATA_NOT_IN = 'data_not_in';
 
     /**
      * @var DoctrineHelper

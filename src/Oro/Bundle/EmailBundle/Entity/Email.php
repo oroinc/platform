@@ -50,9 +50,9 @@ class Email implements ActivityInterface, ExtendEntityInterface
     use ExtendActivity;
     use ExtendEntityTrait;
 
-    const LOW_IMPORTANCE    = -1;
-    const NORMAL_IMPORTANCE = 0;
-    const HIGH_IMPORTANCE   = 1;
+    public const LOW_IMPORTANCE    = -1;
+    public const NORMAL_IMPORTANCE = 0;
+    public const HIGH_IMPORTANCE   = 1;
 
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
     #[ORM\Id]

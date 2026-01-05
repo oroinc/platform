@@ -9,8 +9,8 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
  */
 class CallbackProperty extends AbstractProperty
 {
-    const CALLABLE_KEY = 'callable';
-    const PARAMS_KEY = 'params';
+    public const CALLABLE_KEY = 'callable';
+    public const PARAMS_KEY = 'params';
 
     /** @var array */
     protected $excludeParams = [self::CALLABLE_KEY, self::PARAMS_KEY];

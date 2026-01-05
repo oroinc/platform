@@ -14,10 +14,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class LocalizedPropertyType extends AbstractType
 {
-    const NAME = 'oro_locale_localized_property';
+    public const NAME = 'oro_locale_localized_property';
 
-    const FIELD_DEFAULT = 'default';
-    const FIELD_LOCALIZATIONS = 'localizations';
+    public const FIELD_DEFAULT = 'default';
+    public const FIELD_LOCALIZATIONS = 'localizations';
 
     public function getName()
     {

@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ScriptExecutor
 {
-    const ORO_SCRIPT_ANNOTATION = 'OroScript';
+    public const ORO_SCRIPT_ANNOTATION = 'OroScript';
 
     /**
      * @var OutputInterface

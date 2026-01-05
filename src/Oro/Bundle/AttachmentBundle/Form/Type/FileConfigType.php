@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FileConfigType extends AbstractType
 {
-    const NAME = 'oro_attachment_file_config';
+    public const NAME = 'oro_attachment_file_config';
 
     /** @var ConfigManager */
     protected $configManager;

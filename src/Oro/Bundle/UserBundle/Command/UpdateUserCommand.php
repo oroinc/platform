@@ -39,7 +39,7 @@ class UpdateUserCommand extends CreateUserCommand
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
                 'Organizations'
             )
-            // @codingStandardsIgnoreStart
+            // phpcs:disable
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command updates user details.
@@ -64,7 +64,7 @@ HELP
             ->addUsage('--user-email=<email> --user-firstname=<firstname> --user-lastname=<lastname> <username>')
             ->addUsage('--user-password=<password> <username>')
             ->addUsage('--user-name=<new-username> <old-username>')
-            // @codingStandardsIgnoreEnd
+            // phpcs:enable
         ;
 
         if ($this->featureChecker->isFeatureEnabled('user_login_password')) {

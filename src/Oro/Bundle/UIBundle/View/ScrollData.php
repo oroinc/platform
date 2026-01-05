@@ -10,13 +10,13 @@ namespace Oro\Bundle\UIBundle\View;
  */
 class ScrollData
 {
-    const TITLE = 'title';
-    const USE_SUB_BLOCK_DIVIDER = 'useSubBlockDivider';
-    const SUB_BLOCKS = 'subblocks';
-    const PRIORITY = 'priority';
-    const BLOCK_CLASS = 'class';
-    const DATA_BLOCKS = 'dataBlocks';
-    const DATA = 'data';
+    public const TITLE = 'title';
+    public const USE_SUB_BLOCK_DIVIDER = 'useSubBlockDivider';
+    public const SUB_BLOCKS = 'subblocks';
+    public const PRIORITY = 'priority';
+    public const BLOCK_CLASS = 'class';
+    public const DATA_BLOCKS = 'dataBlocks';
+    public const DATA = 'data';
 
     /**
      * @var array

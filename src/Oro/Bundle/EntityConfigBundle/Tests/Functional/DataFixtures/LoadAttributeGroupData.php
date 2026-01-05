@@ -14,11 +14,11 @@ class LoadAttributeGroupData extends AbstractFixture implements DependentFixture
 {
     use ContainerAwareTrait;
 
-    const DEFAULT_ATTRIBUTE_GROUP_1 = 'default_attribute_group_1';
-    const DEFAULT_ATTRIBUTE_GROUP_2 = 'default_attribute_group_2';
-    const REGULAR_ATTRIBUTE_GROUP_1 = 'regular_attribute_group_1';
-    const REGULAR_ATTRIBUTE_GROUP_2 = 'regular_attribute_group_2';
-    const EMPTY_ATTRIBUTE_GROUP = 'empty_attribute_group';
+    public const DEFAULT_ATTRIBUTE_GROUP_1 = 'default_attribute_group_1';
+    public const DEFAULT_ATTRIBUTE_GROUP_2 = 'default_attribute_group_2';
+    public const REGULAR_ATTRIBUTE_GROUP_1 = 'regular_attribute_group_1';
+    public const REGULAR_ATTRIBUTE_GROUP_2 = 'regular_attribute_group_2';
+    public const EMPTY_ATTRIBUTE_GROUP = 'empty_attribute_group';
 
     /** @var array */
     protected $groups = [

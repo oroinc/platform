@@ -9,9 +9,9 @@ use Oro\Bundle\DataGridBundle\Tools\MixinConfigurationHelper;
 
 class MixinListener
 {
-    const MIXINS = 'mixins';
+    public const MIXINS = 'mixins';
 
-    const GRID_MIXIN = 'grid-mixin';
+    public const GRID_MIXIN = 'grid-mixin';
 
     /** @var MixinConfigurationHelper */
     protected $mixinConfigurationHelper;

@@ -20,7 +20,7 @@ class PhpLayoutUpdateGeneratorTest extends TestCase
         $this->generator = new PhpLayoutUpdateGenerator();
     }
 
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     /**
      * @dataProvider sourceCodeProvider
      */
@@ -50,7 +50,7 @@ CODE
             $this->generator->generate('testClassName', $data)
         );
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 
     public function sourceCodeProvider(): array
     {
@@ -62,7 +62,7 @@ CODE
         ];
     }
 
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     public function testShouldCompileConditions(): void
     {
         self::assertSame(
@@ -90,5 +90,5 @@ CODE
             )
         );
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 }

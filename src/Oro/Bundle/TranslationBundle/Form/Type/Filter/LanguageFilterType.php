@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormView;
 
 class LanguageFilterType extends AbstractType
 {
-    const NAME = 'oro_translation_filter_language';
+    public const NAME = 'oro_translation_filter_language';
 
     /** @var LanguageCodeFormatter */
     protected $formatter;

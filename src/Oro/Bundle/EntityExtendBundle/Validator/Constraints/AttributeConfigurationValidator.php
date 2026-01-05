@@ -14,7 +14,7 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class AttributeConfigurationValidator extends ConstraintValidator
 {
-    const ALIAS = 'oro_entity_extend.validator.attribute_configuration';
+    public const ALIAS = 'oro_entity_extend.validator.attribute_configuration';
 
     /**
      * @var AttributeTypeRegistry

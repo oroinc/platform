@@ -16,7 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AttributeFamilyType extends AbstractType
 {
-    const NAME = 'oro_attribute_family';
+    public const NAME = 'oro_attribute_family';
 
     /**
      * @var TranslatorInterface

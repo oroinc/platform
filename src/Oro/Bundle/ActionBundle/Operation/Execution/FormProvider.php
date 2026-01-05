@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
  */
 class FormProvider
 {
-    const CSRF_TOKEN_FIELD = 'operation_execution_csrf_token';
+    public const CSRF_TOKEN_FIELD = 'operation_execution_csrf_token';
 
     /** @var FormFactoryInterface */
     protected $formFactory;

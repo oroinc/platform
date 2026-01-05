@@ -10,11 +10,11 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
  */
 class PasswordComplexityConfigProvider
 {
-    const CONFIG_MIN_LENGTH = 'oro_user.password_min_length';
-    const CONFIG_NUMBERS = 'oro_user.password_numbers';
-    const CONFIG_LOWER_CASE = 'oro_user.password_lower_case';
-    const CONFIG_UPPER_CASE = 'oro_user.password_upper_case';
-    const CONFIG_SPECIAL_CHARS = 'oro_user.password_special_chars';
+    public const CONFIG_MIN_LENGTH = 'oro_user.password_min_length';
+    public const CONFIG_NUMBERS = 'oro_user.password_numbers';
+    public const CONFIG_LOWER_CASE = 'oro_user.password_lower_case';
+    public const CONFIG_UPPER_CASE = 'oro_user.password_upper_case';
+    public const CONFIG_SPECIAL_CHARS = 'oro_user.password_special_chars';
 
     /**
      * @var array Map of password config keys and type

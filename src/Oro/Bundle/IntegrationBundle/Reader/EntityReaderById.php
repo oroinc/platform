@@ -9,7 +9,7 @@ use Oro\Bundle\ImportExportBundle\Reader\EntityReader as BaseReader;
 
 class EntityReaderById extends BaseReader
 {
-    const ID_FILTER = 'id';
+    public const ID_FILTER = 'id';
 
     /** @var QueryBuilder */
     protected $qb;

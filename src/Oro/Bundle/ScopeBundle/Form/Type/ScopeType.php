@@ -13,9 +13,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ScopeType extends AbstractType
 {
-    const NAME = 'oro_scope';
-    const SCOPE_TYPE_OPTION = 'scope_type';
-    const SCOPE_FIELDS_OPTION = 'scope_fields';
+    public const NAME = 'oro_scope';
+    public const SCOPE_TYPE_OPTION = 'scope_type';
+    public const SCOPE_FIELDS_OPTION = 'scope_fields';
 
     /**
      * @var ScopeManager

@@ -9,7 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ActivityListPreQueryBuildEvent extends Event
 {
-    const EVENT_NAME = 'oro_activity_list.activity_list_pre_query_build';
+    public const EVENT_NAME = 'oro_activity_list.activity_list_pre_query_build';
 
     /** @var string */
     protected $targetClass;

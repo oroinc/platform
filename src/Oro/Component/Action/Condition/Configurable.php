@@ -11,7 +11,7 @@ class Configurable extends AbstractCondition implements ContextAccessorAwareInte
 {
     use ContextAccessorAwareTrait;
 
-    const ALIAS = 'configurable';
+    public const ALIAS = 'configurable';
 
     /**
      * @var array

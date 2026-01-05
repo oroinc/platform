@@ -92,7 +92,7 @@ class MysqlDatabaseRequirementsProviderTest extends TestCase
             ->method('getServerVersion')
             ->willReturn($version);
 
-        $connection = new class([], new DriverMock(), $driverConnection) extends ConnectionMock {
+        $connection = new class ([], new DriverMock(), $driverConnection) extends ConnectionMock {
             private DriverConnection $wrappedConnection;
 
             public function __construct(array $params, DriverMock $driver, DriverConnection $wrappedConnection)
@@ -120,7 +120,7 @@ class MysqlDatabaseRequirementsProviderTest extends TestCase
         ManagerRegistry $doctrine,
         array $grantedPrivileges = []
     ): MysqlDatabaseRequirementsProvider {
-        return new class($doctrine, $grantedPrivileges) extends MysqlDatabaseRequirementsProvider {
+        return new class ($doctrine, $grantedPrivileges) extends MysqlDatabaseRequirementsProvider {
             protected array $grantedPrivileges;
 
             public function __construct(ManagerRegistry $doctrine, array $grantedPrivileges)

@@ -15,7 +15,7 @@ use Twig\Environment;
  */
 class CustomFormTemplateResponseProcessor implements ProcessorInterface
 {
-    const DEFAULT_TRANSITION_CUSTOM_FORM_TEMPLATE = '@OroWorkflow/Widget/widget/transitionCustomForm.html.twig';
+    public const DEFAULT_TRANSITION_CUSTOM_FORM_TEMPLATE = '@OroWorkflow/Widget/widget/transitionCustomForm.html.twig';
 
     /** @var Environment */
     private $twig;

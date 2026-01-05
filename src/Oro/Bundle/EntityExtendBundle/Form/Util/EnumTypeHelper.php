@@ -12,8 +12,8 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class EnumTypeHelper extends ConfigTypeHelper
 {
-    const MULTI_ENUM = 'multiEnum';
-    const TYPE_ENUM = 'enum';
+    public const MULTI_ENUM = 'multiEnum';
+    public const TYPE_ENUM = 'enum';
 
     /**
      * Checks if the given entity/field has an enum code

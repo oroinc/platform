@@ -12,7 +12,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
  */
 class CookieTokenStorage implements TokenStorageInterface
 {
-    const CSRF_COOKIE_ATTRIBUTE = '_csrf_cookie';
+    public const CSRF_COOKIE_ATTRIBUTE = '_csrf_cookie';
 
     /** @var mixed true, false, 'auto' */
     private $secure;

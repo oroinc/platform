@@ -31,7 +31,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class WorkflowAttributesType extends AbstractType
 {
-    const NAME = 'oro_workflow_attributes';
+    public const NAME = 'oro_workflow_attributes';
 
     /**
      * @var WorkflowRegistry

@@ -9,12 +9,12 @@ class ResultsObject extends ConfigObject
     /**
      * Path to total records parameter
      */
-    const TOTAL_RECORDS_PATH = '[options][totalRecords]';
+    public const TOTAL_RECORDS_PATH = '[options][totalRecords]';
 
     /**
      * Path tp results data
      */
-    const DATA_PATH = '[data]';
+    public const DATA_PATH = '[data]';
 
     /**
      * Gets total records parameter from results object

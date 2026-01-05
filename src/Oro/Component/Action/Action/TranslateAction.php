@@ -11,11 +11,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TranslateAction extends AbstractAction
 {
-    const OPTION_KEY_ATTRIBUTE  = 'attribute';
-    const OPTION_KEY_ID         = 'id';
-    const OPTION_KEY_PARAMETERS = 'params';
-    const OPTION_KEY_DOMAIN     = 'domain';
-    const OPTION_KEY_LOCALE     = 'locale';
+    public const OPTION_KEY_ATTRIBUTE  = 'attribute';
+    public const OPTION_KEY_ID         = 'id';
+    public const OPTION_KEY_PARAMETERS = 'params';
+    public const OPTION_KEY_DOMAIN     = 'domain';
+    public const OPTION_KEY_LOCALE     = 'locale';
 
     /** @var TranslatorInterface */
     protected $translator;

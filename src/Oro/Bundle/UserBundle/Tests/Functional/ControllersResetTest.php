@@ -190,11 +190,11 @@ class ControllersResetTest extends WebTestCase
 
         self::assertStringContainsString('The passwords must match.', $result->getContent());
 
-        // @codingStandardsIgnoreStart
+        // phpcs:disable
         $errorDiv = $crawler->filterXPath(
             "//*/form[contains(@class, 'form-signin--reset')]/*/div[contains(@class, 'control-group')][2][contains(@class, 'error')]"
         );
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
 
         $this->assertEquals(1, $errorDiv->count());
 
@@ -252,11 +252,11 @@ class ControllersResetTest extends WebTestCase
 
         self::assertStringContainsString('This value should not be blank.', $result->getContent());
 
-        // @codingStandardsIgnoreStarts
+        // phpcs:disables
         $errorDiv = $crawler->filterXPath(
             "//*/form[contains(@class, 'form-signin--reset')]/*/div[contains(@class, 'control-group')][2][contains(@class, 'error')]"
         );
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
 
         $this->assertEquals(1, $errorDiv->count());
     }

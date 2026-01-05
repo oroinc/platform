@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class WidgetItemsLoadDataEvent extends Event
 {
-    const EVENT_NAME = 'oro_dashboard.widget_items_load_data';
+    public const EVENT_NAME = 'oro_dashboard.widget_items_load_data';
 
     /** @var array */
     protected $items;

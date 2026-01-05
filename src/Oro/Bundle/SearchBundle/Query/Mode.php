@@ -7,15 +7,15 @@ final class Mode
     /**
      * Involve only entities of given class
      */
-    const NORMAL = 'normal';
+    public const NORMAL = 'normal';
 
     /**
      * Involve entities of given class and descendants
      */
-    const WITH_DESCENDANTS = 'with_descendants';
+    public const WITH_DESCENDANTS = 'with_descendants';
 
     /**
      * Involve descendants entities for given class
      */
-    const ONLY_DESCENDANTS = 'only_descendants';
+    public const ONLY_DESCENDANTS = 'only_descendants';
 }

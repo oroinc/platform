@@ -153,7 +153,7 @@ class OwnershipMetadata implements OwnershipMetadataInterface
      *
      * @return OwnershipMetadataInterface A new instance of a OwnershipMetadataInterface object
      */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     public static function __set_state($data)
     {
         $result = new static();
@@ -165,7 +165,7 @@ class OwnershipMetadata implements OwnershipMetadataInterface
 
         return $result;
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 
     protected function resolveOwnerType(string $ownerType): int
     {

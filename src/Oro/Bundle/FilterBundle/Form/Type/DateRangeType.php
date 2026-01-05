@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DateRangeType extends AbstractType
 {
-    const NAME = 'oro_type_date_range';
+    public const NAME = 'oro_type_date_range';
 
     /** @var LocaleSettings */
     private $localeSettings;

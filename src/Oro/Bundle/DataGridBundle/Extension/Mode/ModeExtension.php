@@ -8,10 +8,10 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 
 class ModeExtension extends AbstractExtension
 {
-    const MODE_OPTION_PATH = '[options][mode]';
+    public const MODE_OPTION_PATH = '[options][mode]';
 
-    const MODE_SERVER = 'server';
-    const MODE_CLIENT = 'client';
+    public const MODE_SERVER = 'server';
+    public const MODE_CLIENT = 'client';
 
     #[\Override]
     public function isApplicable(DatagridConfiguration $config)

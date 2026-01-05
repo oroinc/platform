@@ -13,8 +13,8 @@ use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationProvide
  */
 class AttributeImportExportConfigurationProvider implements ImportExportConfigurationProviderInterface
 {
-    const ATTRIBUTE_IMPORT_FROM_CSV_JOB_NAME = 'attribute_import_from_csv';
-    const ATTRIBUTE_IMPORT_VALIDATION_FROM_CSV_JOB_NAME = 'attribute_import_validation_from_csv';
+    public const ATTRIBUTE_IMPORT_FROM_CSV_JOB_NAME = 'attribute_import_from_csv';
+    public const ATTRIBUTE_IMPORT_VALIDATION_FROM_CSV_JOB_NAME = 'attribute_import_validation_from_csv';
 
     #[\Override]
     public function get(): ImportExportConfigurationInterface

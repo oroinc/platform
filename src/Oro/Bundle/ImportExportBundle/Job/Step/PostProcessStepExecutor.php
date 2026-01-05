@@ -21,8 +21,8 @@ use Oro\Bundle\ImportExportBundle\Job\JobResult;
  */
 class PostProcessStepExecutor extends StepExecutor implements StepExecutionAwareInterface
 {
-    const JOB_TYPE_KEY = 'type';
-    const JOB_NAME_KEY = 'name';
+    public const JOB_TYPE_KEY = 'type';
+    public const JOB_NAME_KEY = 'name';
 
     /**
      * @var array

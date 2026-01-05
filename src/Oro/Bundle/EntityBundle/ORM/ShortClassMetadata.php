@@ -60,7 +60,7 @@ class ShortClassMetadata
      *
      * @return ShortClassMetadata
      */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     public static function __set_state($data)
     {
         return new ShortClassMetadata(
@@ -69,5 +69,5 @@ class ShortClassMetadata
             $data['hasAssociations']
         );
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 }

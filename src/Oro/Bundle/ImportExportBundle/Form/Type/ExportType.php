@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ExportType extends AbstractType
 {
-    const NAME = 'oro_importexport_export';
+    public const NAME = 'oro_importexport_export';
 
     /**
      * @var ProcessorRegistry

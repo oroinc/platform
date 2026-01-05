@@ -12,7 +12,7 @@ use Oro\Component\Layout\Util\BlockUtils;
  */
 class BaseType extends AbstractType
 {
-    const NAME = 'block';
+    public const NAME = 'block';
 
     #[\Override]
     public function configureOptions(OptionsResolver $optionsResolver)

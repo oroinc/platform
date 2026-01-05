@@ -9,7 +9,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class InMemoryAnonymousTicket implements UserInterface
 {
-    public function __construct(readonly private string $userIdentifier)
+    public function __construct(private readonly string $userIdentifier)
     {
     }
 

@@ -71,9 +71,9 @@ class User extends AbstractUser implements
 {
     use ExtendEntityTrait;
 
-    const ROLE_DEFAULT = 'ROLE_USER';
-    const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
-    const ROLE_ANONYMOUS = 'PUBLIC_ACCESS';
+    public const ROLE_DEFAULT = 'ROLE_USER';
+    public const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
+    public const ROLE_ANONYMOUS = 'PUBLIC_ACCESS';
 
     #[ORM\Id]
     #[ORM\Column(type: Types::INTEGER)]

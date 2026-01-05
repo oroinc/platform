@@ -6,7 +6,7 @@ use Oro\Bundle\ActionBundle\Model\EntityParameterInterface;
 
 class Variable implements EntityParameterInterface
 {
-    const INTERNAL_TYPE_VARIABLE = 'variable';
+    public const INTERNAL_TYPE_VARIABLE = 'variable';
 
     /**
      * @var string

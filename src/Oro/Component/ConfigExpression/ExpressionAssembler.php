@@ -4,8 +4,8 @@ namespace Oro\Component\ConfigExpression;
 
 class ExpressionAssembler extends AbstractAssembler
 {
-    const PARAMETERS_KEY = 'parameters';
-    const MESSAGE_KEY = 'message';
+    public const PARAMETERS_KEY = 'parameters';
+    public const MESSAGE_KEY = 'message';
 
     /** @var ExpressionFactoryInterface */
     protected $factory;

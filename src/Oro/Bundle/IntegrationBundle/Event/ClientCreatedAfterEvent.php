@@ -14,7 +14,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ClientCreatedAfterEvent extends Event
 {
-    const NAME = 'oro_integration.client_created_after';
+    public const NAME = 'oro_integration.client_created_after';
 
     /**
      * @var RestClientInterface

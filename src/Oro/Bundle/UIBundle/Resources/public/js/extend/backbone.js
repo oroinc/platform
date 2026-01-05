@@ -192,9 +192,9 @@ define(function(require) {
         const initPromise = this.initPageComponents(options);
         if (!this.deferredRender) {
             this._deferredRender();
-            initPromise.always(this._resolveDeferredRender.bind(this));
+            initPromise.finally(this._resolveDeferredRender.bind(this));
         }
-        return initPromise.fail(function(e) {
+        return initPromise.catch(function(e) {
             console.error(e);
         });
     };

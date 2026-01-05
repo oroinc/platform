@@ -11,8 +11,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class StrategyEvent extends Event
 {
-    const PROCESS_BEFORE = 'oro_importexport.strategy.process_before';
-    const PROCESS_AFTER  = 'oro_importexport.strategy.process_after';
+    public const PROCESS_BEFORE = 'oro_importexport.strategy.process_before';
+    public const PROCESS_AFTER  = 'oro_importexport.strategy.process_after';
 
     /**
      * @var StrategyInterface

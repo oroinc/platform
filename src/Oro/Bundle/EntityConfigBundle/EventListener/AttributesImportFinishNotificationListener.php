@@ -13,7 +13,7 @@ use Oro\Bundle\ImportExportBundle\Job\JobResult;
  */
 class AttributesImportFinishNotificationListener
 {
-    const ENTITY_CONFIG_MODEL_ID_KEY = 'entity_id';
+    public const ENTITY_CONFIG_MODEL_ID_KEY = 'entity_id';
 
     /**
      * @var AttributesImportTopicSender

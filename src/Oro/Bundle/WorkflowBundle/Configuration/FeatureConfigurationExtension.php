@@ -10,8 +10,8 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class FeatureConfigurationExtension implements ConfigurationExtensionInterface
 {
-    const WORKFLOWS_NODE_NAME = 'workflows';
-    const PROCESSES_NODE_NAME = 'processes';
+    public const WORKFLOWS_NODE_NAME = 'workflows';
+    public const PROCESSES_NODE_NAME = 'processes';
 
     #[\Override]
     public function extendConfigurationTree(NodeBuilder $node)

@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ReportChartSchemaType extends AbstractType
 {
-    const VIEW_MODULE_NAME = 'ororeport/js/app/views/report-chart-data-schema-view';
+    public const VIEW_MODULE_NAME = 'ororeport/js/app/views/report-chart-data-schema-view';
 
     /**
      * @var Manager

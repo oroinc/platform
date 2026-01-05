@@ -9,16 +9,16 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 class LoadProcessEntities extends AbstractFixture
 {
-    const FIRST_DEFINITION = 'first';
-    const SECOND_DEFINITION = 'second';
-    const DISABLED_DEFINITION = 'disabled';
-    const UPDATE_TRIGGER_FIELD = 'name';
+    public const FIRST_DEFINITION = 'first';
+    public const SECOND_DEFINITION = 'second';
+    public const DISABLED_DEFINITION = 'disabled';
+    public const UPDATE_TRIGGER_FIELD = 'name';
 
-    const TRIGGER_UPDATE = 'trigger_update';
-    const TRIGGER_CREATE = 'trigger_create';
-    const TRIGGER_DELETE = 'trigger_delete';
-    const TRIGGER_CRON = 'trigger_cron';
-    const TRIGGER_DISABLED = 'trigger_disabled';
+    public const TRIGGER_UPDATE = 'trigger_update';
+    public const TRIGGER_CREATE = 'trigger_create';
+    public const TRIGGER_DELETE = 'trigger_delete';
+    public const TRIGGER_CRON = 'trigger_cron';
+    public const TRIGGER_DISABLED = 'trigger_disabled';
 
     /** @var array */
     protected $definitions = [

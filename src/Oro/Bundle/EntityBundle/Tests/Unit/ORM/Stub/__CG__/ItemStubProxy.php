@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\__CG__;
 use Doctrine\Persistence\Proxy;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 
-// @codingStandardsIgnoreStart
+// phpcs:disable
 class ItemStubProxy extends ItemStub implements Proxy
 {
     #[\Override]
@@ -19,4 +19,4 @@ class ItemStubProxy extends ItemStub implements Proxy
     {
     }
 }
-// @codingStandardsIgnoreEnd
+// phpcs:enable

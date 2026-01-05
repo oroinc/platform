@@ -18,7 +18,7 @@ class UpdateBidirectionalExtendedRelationsQuery extends AbstractEntityConfigQuer
 {
     use ConfigurationHandlerAwareTrait;
 
-    const LIMIT = 100;
+    public const LIMIT = 100;
 
     #[\Override]
     public function getDescription()

@@ -11,7 +11,7 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\VariableStorage;
 
 class GridRow extends TableRow
 {
-    const HEADER_ELEMENT = 'GridHeader';
+    public const HEADER_ELEMENT = 'GridHeader';
 
     /**
      * @param int $cellNumber

@@ -13,13 +13,13 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class ContextHelper
 {
-    const ROUTE_PARAM = 'route';
-    const ROUTE_PARAMETERS = 'route_params';
-    const ENTITY_ID_PARAM = 'entityId';
-    const ENTITY_CLASS_PARAM = 'entityClass';
-    const DATAGRID_PARAM = 'datagrid';
-    const GROUP_PARAM = 'group';
-    const FROM_URL_PARAM = 'fromUrl';
+    public const ROUTE_PARAM = 'route';
+    public const ROUTE_PARAMETERS = 'route_params';
+    public const ENTITY_ID_PARAM = 'entityId';
+    public const ENTITY_CLASS_PARAM = 'entityClass';
+    public const DATAGRID_PARAM = 'datagrid';
+    public const GROUP_PARAM = 'group';
+    public const FROM_URL_PARAM = 'fromUrl';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;

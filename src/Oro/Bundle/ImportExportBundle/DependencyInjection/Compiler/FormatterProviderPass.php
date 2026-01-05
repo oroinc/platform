@@ -7,8 +7,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class FormatterProviderPass implements CompilerPassInterface
 {
-    const SERVICE_ID = 'oro_importexport.formatter.formatter_provider';
-    const TAG_NAME   = 'oro_importexport.formatter.formatter';
+    public const SERVICE_ID = 'oro_importexport.formatter.formatter_provider';
+    public const TAG_NAME   = 'oro_importexport.formatter.formatter';
 
     #[\Override]
     public function process(ContainerBuilder $container)

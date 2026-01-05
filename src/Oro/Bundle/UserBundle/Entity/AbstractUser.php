@@ -28,8 +28,8 @@ abstract class AbstractUser implements
     PasswordRecoveryInterface,
     EquatableInterface
 {
-    const ROLE_DEFAULT = 'ROLE_USER';
-    const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
+    public const ROLE_DEFAULT = 'ROLE_USER';
+    public const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
 
     #[ORM\Id]
     #[ORM\Column(type: Types::INTEGER)]

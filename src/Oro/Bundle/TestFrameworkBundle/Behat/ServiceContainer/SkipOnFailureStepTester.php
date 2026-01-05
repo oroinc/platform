@@ -20,7 +20,7 @@ use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\SilencedFa
  */
 class SkipOnFailureStepTester implements StepTester
 {
-    const string SILENCED_STEP_MESSAGE_PREFIX = "Step is silenced: \n";
+    public const string SILENCED_STEP_MESSAGE_PREFIX = "Step is silenced: \n";
 
     public function __construct(
         protected StepTester $baseTester,

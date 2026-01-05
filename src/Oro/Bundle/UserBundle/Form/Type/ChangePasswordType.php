@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 
 class ChangePasswordType extends AbstractType
 {
-    const NAME = 'oro_change_password';
+    public const NAME = 'oro_change_password';
 
     /** @var ChangePasswordSubscriber */
     protected $subscriber;

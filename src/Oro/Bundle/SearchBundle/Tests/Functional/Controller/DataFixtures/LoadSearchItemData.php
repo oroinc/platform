@@ -10,7 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganizatio
 
 class LoadSearchItemData extends LoadOrganization implements OrderedFixtureInterface
 {
-    const COUNT = 9;
+    public const COUNT = 9;
 
     #[\Override]
     public function load(ObjectManager $manager)

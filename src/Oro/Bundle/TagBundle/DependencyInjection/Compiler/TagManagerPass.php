@@ -8,8 +8,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class TagManagerPass implements CompilerPassInterface
 {
-    const SERVICE_KEY = 'oro_tag.tag.manager';
-    const TAG = 'oro_tag.tag_manager';
+    public const SERVICE_KEY = 'oro_tag.tag.manager';
+    public const TAG = 'oro_tag.tag_manager';
 
     #[\Override]
     public function process(ContainerBuilder $container)

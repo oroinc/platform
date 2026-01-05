@@ -20,9 +20,9 @@ class MailboxGridListener implements FeatureToggleableInterface
 {
     use FeatureCheckerHolderTrait;
 
-    const REDIRECT_DATA_KEY = 'redirectData';
+    public const REDIRECT_DATA_KEY = 'redirectData';
 
-    const PATH_UPDATE_LINK_DIRECT_PARAMS = '[properties][update_link][direct_params]';
+    public const PATH_UPDATE_LINK_DIRECT_PARAMS = '[properties][update_link][direct_params]';
 
     /** @var ManagerRegistry */
     protected $doctrine;

@@ -20,7 +20,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
 #[Config(defaultValues: ['grouping' => ['groups' => ['dictionary']], 'dictionary' => ['search_fields' => ['name']]])]
 class Region implements Translatable
 {
-    const SEPARATOR = '-';
+    public const SEPARATOR = '-';
 
     #[ORM\Id]
     #[ORM\Column(name: 'combined_code', type: Types::STRING, length: 16)]

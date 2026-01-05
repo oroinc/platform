@@ -23,13 +23,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class GridViewsExtension extends AbstractExtension
 {
-    const GRID_VIEW_ROOT_PARAM = '_grid_view';
-    const DISABLED_PARAM       = '_disabled';
+    public const GRID_VIEW_ROOT_PARAM = '_grid_view';
+    public const DISABLED_PARAM       = '_disabled';
 
-    const VIEWS_LIST_KEY           = 'views_list';
-    const VIEWS_PARAM_KEY          = 'view';
-    const MINIFIED_VIEWS_PARAM_KEY = 'v';
-    const DEFAULT_VIEW_ID = '__all__';
+    public const VIEWS_LIST_KEY           = 'views_list';
+    public const VIEWS_PARAM_KEY          = 'view';
+    public const MINIFIED_VIEWS_PARAM_KEY = 'v';
+    public const DEFAULT_VIEW_ID = '__all__';
 
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;

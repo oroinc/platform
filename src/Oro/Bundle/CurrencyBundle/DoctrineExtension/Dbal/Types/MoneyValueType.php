@@ -7,7 +7,7 @@ use Oro\DBAL\Types\MoneyType;
 
 class MoneyValueType extends MoneyType
 {
-    const TYPE = 'money_value';
+    public const TYPE = 'money_value';
 
     #[\Override]
     public function getName()

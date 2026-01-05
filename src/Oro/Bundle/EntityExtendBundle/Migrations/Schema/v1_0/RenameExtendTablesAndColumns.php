@@ -30,7 +30,7 @@ class RenameExtendTablesAndColumns implements
     use ExtendNameGeneratorAwareTrait;
     use ContainerAwareTrait;
 
-    const OLD_CUSTOM_TABLE_PREFIX = 'oro_extend_';
+    public const OLD_CUSTOM_TABLE_PREFIX = 'oro_extend_';
 
     #[\Override]
     public function up(Schema $schema, QueryBag $queries)

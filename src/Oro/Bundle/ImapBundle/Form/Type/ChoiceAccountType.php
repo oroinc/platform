@@ -21,7 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ChoiceAccountType extends AbstractType
 {
-    const NAME = 'oro_imap_choice_account_type';
+    public const NAME = 'oro_imap_choice_account_type';
 
     /** @var TranslatorInterface */
     protected $translator;

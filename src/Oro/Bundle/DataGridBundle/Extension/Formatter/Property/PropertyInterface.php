@@ -9,34 +9,34 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
  */
 interface PropertyInterface
 {
-    const TYPE_DATE         = 'date';
-    const TYPE_DATETIME     = 'datetime';
-    const TYPE_TIME         = 'time';
-    const TYPE_DECIMAL      = 'decimal';
-    const TYPE_INTEGER      = 'integer';
-    const TYPE_PERCENT      = 'percent';
-    const TYPE_CURRENCY     = 'currency';
-    const TYPE_SELECT       = 'select';
-    const TYPE_MULTI_SELECT = 'multi-select';
-    const TYPE_STRING       = 'string';
-    const TYPE_HTML         = 'html';
-    const TYPE_BOOLEAN      = 'boolean';
-    const TYPE_ARRAY        = 'array';
-    const TYPE_SIMPLE_ARRAY = 'simple_array';
-    const TYPE_ROW_ARRAY    = 'row_array';
+    public const TYPE_DATE         = 'date';
+    public const TYPE_DATETIME     = 'datetime';
+    public const TYPE_TIME         = 'time';
+    public const TYPE_DECIMAL      = 'decimal';
+    public const TYPE_INTEGER      = 'integer';
+    public const TYPE_PERCENT      = 'percent';
+    public const TYPE_CURRENCY     = 'currency';
+    public const TYPE_SELECT       = 'select';
+    public const TYPE_MULTI_SELECT = 'multi-select';
+    public const TYPE_STRING       = 'string';
+    public const TYPE_HTML         = 'html';
+    public const TYPE_BOOLEAN      = 'boolean';
+    public const TYPE_ARRAY        = 'array';
+    public const TYPE_SIMPLE_ARRAY = 'simple_array';
+    public const TYPE_ROW_ARRAY    = 'row_array';
 
-    const METADATA_NAME_KEY = 'name';
-    const METADATA_TYPE_KEY = 'type';
+    public const METADATA_NAME_KEY = 'name';
+    public const METADATA_TYPE_KEY = 'type';
 
-    const DISABLED_KEY      = 'disabled';
-    const TYPE_KEY          = 'type';
-    const NAME_KEY          = 'name';
-    const DATA_NAME_KEY     = 'data_name';
-    const COLUMN_NAME       = 'column_name';
-    const SOURCE_NAME       = 'source_name';
-    const TRANSLATABLE_KEY  = 'translatable';
-    const FRONTEND_TYPE_KEY = 'frontend_type';
-    const DIVISOR_KEY       = 'divisor';
+    public const DISABLED_KEY      = 'disabled';
+    public const TYPE_KEY          = 'type';
+    public const NAME_KEY          = 'name';
+    public const DATA_NAME_KEY     = 'data_name';
+    public const COLUMN_NAME       = 'column_name';
+    public const SOURCE_NAME       = 'source_name';
+    public const TRANSLATABLE_KEY  = 'translatable';
+    public const FRONTEND_TYPE_KEY = 'frontend_type';
+    public const DIVISOR_KEY       = 'divisor';
 
     /**
      * Initialize property for each cell

@@ -44,10 +44,10 @@ class Label
      *
      * @return Label
      */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     public static function __set_state($data)
     {
         return new Label($data['label']);
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 }

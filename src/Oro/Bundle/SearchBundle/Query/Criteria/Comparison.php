@@ -6,12 +6,12 @@ use Doctrine\Common\Collections\Expr\Comparison as BaseComparison;
 
 class Comparison extends BaseComparison
 {
-    const NOT_CONTAINS  = 'NOT CONTAINS';
-    const STARTS_WITH = 'STARTS WITH';
-    const EXISTS  = 'EXISTS';
-    const NOT_EXISTS  = 'NOT EXISTS';
-    const LIKE = 'LIKE';
-    const NOT_LIKE = 'NOT LIKE';
+    public const NOT_CONTAINS  = 'NOT CONTAINS';
+    public const STARTS_WITH = 'STARTS WITH';
+    public const EXISTS  = 'EXISTS';
+    public const NOT_EXISTS  = 'NOT EXISTS';
+    public const LIKE = 'LIKE';
+    public const NOT_LIKE = 'NOT LIKE';
 
     /** @var array */
     public static $filteringOperators = [

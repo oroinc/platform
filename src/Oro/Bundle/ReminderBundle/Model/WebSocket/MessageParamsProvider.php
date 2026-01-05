@@ -13,7 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class MessageParamsProvider
 {
-    const DEFAULT_IDENTIFIER = 'default';
+    public const DEFAULT_IDENTIFIER = 'default';
 
     /**
      * @var DateTimeFormatterInterface

@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class ImportLayoutUpdateVisitorTest extends TestCase
 {
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     public function testVisit(): void
     {
         $condition = new ImportLayoutUpdateVisitor();

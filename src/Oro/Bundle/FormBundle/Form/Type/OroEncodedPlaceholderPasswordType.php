@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class OroEncodedPlaceholderPasswordType extends AbstractType
 {
     /** @internal */
-    const PASSWORD_PLACEHOLDER = '*';
+    public const PASSWORD_PLACEHOLDER = '*';
 
     /**
      * @var SymmetricCrypterInterface

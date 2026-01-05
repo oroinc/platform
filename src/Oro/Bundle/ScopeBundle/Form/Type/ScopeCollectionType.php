@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ScopeCollectionType extends AbstractType
 {
-    const NAME = 'oro_scope_collection';
+    public const NAME = 'oro_scope_collection';
 
     #[\Override]
     public function getParent(): ?string

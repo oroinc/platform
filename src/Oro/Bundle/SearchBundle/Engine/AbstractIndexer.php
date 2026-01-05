@@ -17,7 +17,7 @@ use Psr\Log\LogLevel;
  */
 abstract class AbstractIndexer implements IndexerInterface
 {
-    const BATCH_SIZE = 1000;
+    public const BATCH_SIZE = 1000;
 
     /** @var ManagerRegistry */
     protected $registry;

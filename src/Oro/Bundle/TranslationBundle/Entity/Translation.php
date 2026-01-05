@@ -15,9 +15,9 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 #[ORM\UniqueConstraint(name: 'language_key_uniq', columns: ['language_id', 'translation_key_id'])]
 class Translation
 {
-    const SCOPE_SYSTEM = 0;
-    const SCOPE_INSTALLED = 1;
-    const SCOPE_UI = 2;
+    public const SCOPE_SYSTEM = 0;
+    public const SCOPE_INSTALLED = 1;
+    public const SCOPE_UI = 2;
 
     #[ORM\Id]
     #[ORM\Column(type: Types::INTEGER)]

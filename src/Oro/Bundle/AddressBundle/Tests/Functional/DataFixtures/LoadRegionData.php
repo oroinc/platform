@@ -8,9 +8,9 @@ use Oro\Bundle\AddressBundle\Entity\Region;
 
 class LoadRegionData extends AbstractFixture
 {
-    const REGION_AD_07 = 'region.ad07';
-    const REGION_DK_85 = 'region.dk85';
-    const REGION_US_NY = 'region.usny';
+    public const REGION_AD_07 = 'region.ad07';
+    public const REGION_DK_85 = 'region.dk85';
+    public const REGION_US_NY = 'region.usny';
 
     /** @var array */
     protected $regions = [

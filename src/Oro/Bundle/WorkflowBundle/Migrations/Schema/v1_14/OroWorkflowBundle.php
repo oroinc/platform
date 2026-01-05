@@ -16,10 +16,10 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
 {
     use DatabasePlatformAwareTrait;
 
-    const OLD_ITEMS_RELATION = 'workflowItem';
-    const OLD_STEPS_RELATION = 'workflowStep';
-    const NEW_ITEMS_RELATION = WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME;
-    const NEW_STEPS_RELATION = WorkflowVirtualRelationProvider::STEPS_RELATION_NAME;
+    public const OLD_ITEMS_RELATION = 'workflowItem';
+    public const OLD_STEPS_RELATION = 'workflowStep';
+    public const NEW_ITEMS_RELATION = WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME;
+    public const NEW_STEPS_RELATION = WorkflowVirtualRelationProvider::STEPS_RELATION_NAME;
 
     #[\Override]
     public function up(Schema $schema, QueryBag $queries)

@@ -15,10 +15,10 @@ class LoadLocalizedEmailTemplateData extends AbstractFixture implements
     ContainerAwareInterface,
     DependentFixtureInterface
 {
-    const DEFAULT_SUBJECT = 'Default subject';
-    const DEFAULT_CONTENT = 'Default content';
-    const FRENCH_LOCALIZED_SUBJECT = 'French subject';
-    const FRENCH_LOCALIZED_CONTENT = 'French content';
+    public const DEFAULT_SUBJECT = 'Default subject';
+    public const DEFAULT_CONTENT = 'Default content';
+    public const FRENCH_LOCALIZED_SUBJECT = 'French subject';
+    public const FRENCH_LOCALIZED_CONTENT = 'French content';
 
     /** @var ContainerInterface */
     private $container;

@@ -14,7 +14,7 @@ class OroConfigBundle implements Migration
     #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
-        // @codingStandardsIgnoreStart
+        // phpcs:disable
 
         /** Generate table oro_config **/
         $table = $schema->createTable('oro_config');
@@ -45,6 +45,6 @@ class OroConfigBundle implements Migration
         $table->addForeignKeyConstraint($schema->getTable('oro_config'), ['config_id'], ['id'], ['onDelete' => null, 'onUpdate' => null]);
         /** End of generate foreign keys for table oro_config_value **/
 
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
     }
 }

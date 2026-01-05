@@ -8,8 +8,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class EntityFieldHandlerPass implements CompilerPassInterface
 {
-    const HANDLER_PROCESSOR_SERVICE = 'oro_entity.form.entity_field.handler.processor.handler_processor';
-    const TAG = 'oro_entity.form.entity_field.handler';
+    public const HANDLER_PROCESSOR_SERVICE = 'oro_entity.form.entity_field.handler.processor.handler_processor';
+    public const TAG = 'oro_entity.form.entity_field.handler';
 
     #[\Override]
     public function process(ContainerBuilder $container)

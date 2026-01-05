@@ -8,7 +8,7 @@ use Oro\Bundle\ScopeBundle\Entity\Scope;
 
 class LoadScopeData extends AbstractFixture
 {
-    const DEFAULT_SCOPE = 'default_scope';
+    public const DEFAULT_SCOPE = 'default_scope';
 
     #[\Override]
     public function load(ObjectManager $manager)

@@ -12,8 +12,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AclAccessLevelSelectorType extends AbstractType
 {
-    const NAME = 'oro_acl_access_level_selector';
-    const TRANSLATE_KEY_ACCESS_LEVEL = 'oro.security.access-level';
+    public const NAME = 'oro_acl_access_level_selector';
+    public const TRANSLATE_KEY_ACCESS_LEVEL = 'oro.security.access-level';
 
     #[\Override]
     public function getParent(): ?string

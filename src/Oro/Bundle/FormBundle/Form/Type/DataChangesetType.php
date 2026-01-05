@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DataChangesetType extends AbstractType
 {
-    const NAME = 'oro_data_changeset';
+    public const NAME = 'oro_data_changeset';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

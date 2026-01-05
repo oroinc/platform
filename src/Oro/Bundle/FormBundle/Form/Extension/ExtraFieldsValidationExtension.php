@@ -10,7 +10,7 @@ class ExtraFieldsValidationExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
 
-    const EXTRA_FIELDS_MESSAGE = 'oro.form.extra_fields';
+    public const EXTRA_FIELDS_MESSAGE = 'oro.form.extra_fields';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

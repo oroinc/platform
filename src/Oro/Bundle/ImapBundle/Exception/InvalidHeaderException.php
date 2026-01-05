@@ -9,7 +9,7 @@ use Laminas\Mail\Header\HeaderName;
  */
 class InvalidHeaderException extends \RuntimeException
 {
-    const MESSAGE_PATTERN = 'Unable to parse the header "%s". Reason: "%s".';
+    public const MESSAGE_PATTERN = 'Unable to parse the header "%s". Reason: "%s".';
 
     public function __construct(string $header, \Throwable $exception)
     {

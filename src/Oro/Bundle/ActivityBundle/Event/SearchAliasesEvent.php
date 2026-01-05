@@ -9,7 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class SearchAliasesEvent extends Event
 {
-    const EVENT_NAME = 'oro_activity.search_aliases';
+    public const EVENT_NAME = 'oro_activity.search_aliases';
 
     /** @var array */
     protected $aliases;

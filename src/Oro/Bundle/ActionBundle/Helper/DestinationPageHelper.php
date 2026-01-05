@@ -20,10 +20,10 @@ class DestinationPageHelper
     /** @var RouterInterface */
     protected $router;
 
-    const DEFAULT_DESTINATION = 'prev';
-    const AVAILABLE_DESTINATIONS = ['view', 'name', self::DEFAULT_DESTINATION];
+    public const DEFAULT_DESTINATION = 'prev';
+    public const AVAILABLE_DESTINATIONS = ['view', 'name', self::DEFAULT_DESTINATION];
 
-    const PARAM_ORIGINAL_URL = 'originalUrl';
+    public const PARAM_ORIGINAL_URL = 'originalUrl';
 
     public function __construct(
         RequestStack $requestStack,

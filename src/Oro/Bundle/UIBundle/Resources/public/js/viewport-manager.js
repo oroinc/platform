@@ -12,7 +12,6 @@ const viewportManager = {
      */
     initialize() {
         this.mediaTypes = this._prepareMediaTypes(this.getBreakpoints());
-
         this._subscribeToAll();
     },
 

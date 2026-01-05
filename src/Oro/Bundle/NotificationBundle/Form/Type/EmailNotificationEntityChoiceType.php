@@ -6,7 +6,7 @@ use Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType;
 
 class EmailNotificationEntityChoiceType extends EntityChoiceType
 {
-    const NAME = 'oro_email_notification_entity_choice';
+    public const NAME = 'oro_email_notification_entity_choice';
 
     #[\Override]
     public function getName()

@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints\LessThan;
 
 class OroMoneyType extends AbstractType
 {
-    const NAME = 'oro_money';
+    public const NAME = 'oro_money';
 
     /**
      * @var LocaleSettings

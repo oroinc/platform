@@ -11,8 +11,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class SyncEvent extends Event
 {
-    const SYNC_BEFORE = 'oro_integration.event.sync_before';
-    const SYNC_AFTER  = 'oro_integration.event.sync_after';
+    public const SYNC_BEFORE = 'oro_integration.event.sync_before';
+    public const SYNC_AFTER  = 'oro_integration.event.sync_after';
 
     /** @var string */
     protected $jobName;

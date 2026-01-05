@@ -9,7 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class PrepareContextTitleEvent extends Event
 {
-    const EVENT_NAME = 'oro_activity.context_title';
+    public const EVENT_NAME = 'oro_activity.context_title';
 
     /** @var array */
     protected $item;

@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class SkipTagTrackingPass implements CompilerPassInterface
 {
-    const SERVICE_ID = 'oro_sync.event_listener.doctrine_tag';
+    public const SERVICE_ID = 'oro_sync.event_listener.doctrine_tag';
 
     /** @var array */
     protected $skippedEntityClasses = [

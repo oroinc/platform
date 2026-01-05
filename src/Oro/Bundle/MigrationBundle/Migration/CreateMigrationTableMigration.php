@@ -6,7 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 
 class CreateMigrationTableMigration implements Migration
 {
-    const MIGRATION_TABLE = 'oro_migrations';
+    public const MIGRATION_TABLE = 'oro_migrations';
 
     #[\Override]
     public function up(Schema $schema, QueryBag $queries)

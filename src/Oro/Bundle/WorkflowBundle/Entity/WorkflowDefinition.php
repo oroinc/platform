@@ -41,9 +41,9 @@ use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
 )]
 class WorkflowDefinition implements DomainObjectInterface
 {
-    const CONFIG_SCOPES = 'scopes';
-    const CONFIG_DATAGRIDS = 'datagrids';
-    const CONFIG_FORCE_AUTOSTART = 'force_autostart';
+    public const CONFIG_SCOPES = 'scopes';
+    public const CONFIG_DATAGRIDS = 'datagrids';
+    public const CONFIG_FORCE_AUTOSTART = 'force_autostart';
 
     #[ORM\Id]
     #[ORM\Column(type: Types::STRING, length: 255)]

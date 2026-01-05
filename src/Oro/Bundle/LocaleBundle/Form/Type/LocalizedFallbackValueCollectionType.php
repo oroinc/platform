@@ -20,10 +20,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class LocalizedFallbackValueCollectionType extends AbstractType
 {
-    const NAME = 'oro_locale_localized_fallback_value_collection';
+    public const NAME = 'oro_locale_localized_fallback_value_collection';
 
-    const FIELD_VALUES = 'values';
-    const FIELD_IDS    = 'ids';
+    public const FIELD_VALUES = 'values';
+    public const FIELD_IDS    = 'ids';
 
     /**
      * @var ManagerRegistry

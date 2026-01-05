@@ -37,7 +37,7 @@ trait EntityExtendTransportTrait
 
     protected function getEmptyMetadataProvider(): ExtendEntityMetadataProviderInterface
     {
-        return new class() implements ExtendEntityMetadataProviderInterface {
+        return new class () implements ExtendEntityMetadataProviderInterface {
             public function getExtendEntityMetadata(string $class): ?ConfigInterface
             {
                 return null;

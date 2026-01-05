@@ -18,7 +18,7 @@ use Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException;
  */
 class TemplateEmailNotification implements SenderAwareInterface, TemplateEmailNotificationInterface
 {
-    const CONFIG_FIELD = 'reminder_template_name';
+    public const CONFIG_FIELD = 'reminder_template_name';
 
     /**
      * @var ObjectManager

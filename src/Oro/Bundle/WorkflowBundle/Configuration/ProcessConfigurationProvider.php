@@ -10,9 +10,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class ProcessConfigurationProvider extends AbstractConfigurationProvider
 {
-    const NODE_ROOT = 'processes';
-    const NODE_DEFINITIONS = 'definitions';
-    const NODE_TRIGGERS = 'triggers';
+    public const NODE_ROOT = 'processes';
+    public const NODE_DEFINITIONS = 'definitions';
+    public const NODE_TRIGGERS = 'triggers';
 
     protected string $configFilePattern = 'processes.yml';
     protected ProcessDefinitionListConfiguration $definitionConfiguration;

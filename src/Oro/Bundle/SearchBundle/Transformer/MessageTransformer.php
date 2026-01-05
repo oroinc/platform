@@ -9,7 +9,7 @@ class MessageTransformer implements MessageTransformerInterface
     /**
      * The maximum number of IDs per one reindex request message
      */
-    const CHUNK_SIZE = 100;
+    public const CHUNK_SIZE = 100;
 
     /** @var DoctrineHelper */
     private $doctrineHelper;

@@ -20,7 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EntityFieldFallbackValueType extends AbstractType
 {
-    const NAME = 'oro_entity_fallback_value';
+    public const NAME = 'oro_entity_fallback_value';
 
     /**
      * @var EntityFallbackResolver

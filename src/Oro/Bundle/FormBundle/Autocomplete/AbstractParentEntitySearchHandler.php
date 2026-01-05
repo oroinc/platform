@@ -7,7 +7,7 @@ namespace Oro\Bundle\FormBundle\Autocomplete;
  */
 abstract class AbstractParentEntitySearchHandler extends SearchHandler
 {
-    const DELIMITER = ';';
+    public const DELIMITER = ';';
 
     #[\Override]
     public function search($query, $page, $perPage, $searchById = false)

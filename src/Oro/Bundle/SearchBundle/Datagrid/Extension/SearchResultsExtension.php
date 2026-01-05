@@ -18,8 +18,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class SearchResultsExtension extends AbstractExtension
 {
-    const TYPE_PATH  = '[columns][entity][type]';
-    const TYPE_VALUE = 'search-result';
+    public const TYPE_PATH  = '[columns][entity][type]';
+    public const TYPE_VALUE = 'search-result';
 
     /** @var ResultFormatter */
     protected $resultFormatter;

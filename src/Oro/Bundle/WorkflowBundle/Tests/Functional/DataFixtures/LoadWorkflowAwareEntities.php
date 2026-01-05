@@ -12,7 +12,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 
 class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixtureInterface
 {
-    const COUNT = 20;
+    public const COUNT = 20;
 
     /** @var int */
     private $lastEntityId = 1;

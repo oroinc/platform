@@ -9,10 +9,10 @@ use Oro\Bundle\UserBundle\Entity\UserInterface;
  */
 class Processor
 {
-    const TEMPLATE_USER_RESET_PASSWORD          = 'user_reset_password';
-    const TEMPLATE_USER_CHANGE_PASSWORD         = 'user_change_password';
-    const TEMPLATE_FORCE_RESET_PASSWORD         = 'force_reset_password';
-    const TEMPLATE_USER_IMPERSONATE             = 'user_impersonate';
+    public const TEMPLATE_USER_RESET_PASSWORD          = 'user_reset_password';
+    public const TEMPLATE_USER_CHANGE_PASSWORD         = 'user_change_password';
+    public const TEMPLATE_FORCE_RESET_PASSWORD         = 'force_reset_password';
+    public const TEMPLATE_USER_IMPERSONATE             = 'user_impersonate';
 
     /**
      * @var UserTemplateEmailSender

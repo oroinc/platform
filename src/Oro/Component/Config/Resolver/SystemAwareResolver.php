@@ -15,8 +15,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
 {
-    const PARENT_NODE = 'parent_node';
-    const NODE_KEY    = 'node_key';
+    public const PARENT_NODE = 'parent_node';
+    public const NODE_KEY    = 'node_key';
 
     /** @var ContainerInterface */
     protected $container;

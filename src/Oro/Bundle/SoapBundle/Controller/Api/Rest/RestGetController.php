@@ -33,7 +33,7 @@ abstract class RestGetController extends AbstractFOSRestController implements
     EntityManagerAwareInterface,
     RestApiReadInterface
 {
-    const ITEMS_PER_PAGE = 10;
+    public const ITEMS_PER_PAGE = 10;
 
     #[\Override]
     public function handleGetListRequest($page = 1, $limit = self::ITEMS_PER_PAGE, $filters = [], $joins = [])

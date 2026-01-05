@@ -16,7 +16,7 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
 {
     use ConnectionAwareTrait;
 
-    const LIMIT = 100;
+    public const LIMIT = 100;
 
     #[\Override]
     public function getDescription()

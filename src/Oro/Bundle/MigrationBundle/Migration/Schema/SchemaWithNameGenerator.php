@@ -9,7 +9,7 @@ use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 class SchemaWithNameGenerator extends Schema
 {
-    const TABLE_CLASS = 'Oro\Bundle\MigrationBundle\Migration\Schema\TableWithNameGenerator';
+    public const TABLE_CLASS = 'Oro\Bundle\MigrationBundle\Migration\Schema\TableWithNameGenerator';
 
     /**
      * @var DbIdentifierNameGenerator

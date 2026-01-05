@@ -20,7 +20,7 @@ use Psr\Log\LoggerInterface;
  */
 class IndexEntitiesByTypeMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    const BATCH_SIZE = 1000;
+    public const BATCH_SIZE = 1000;
 
     /**
      * @var ManagerRegistry

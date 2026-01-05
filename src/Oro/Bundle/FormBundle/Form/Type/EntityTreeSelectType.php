@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class EntityTreeSelectType extends AbstractType
 {
-    const NAME = 'oro_entity_tree_select';
+    public const NAME = 'oro_entity_tree_select';
 
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)

@@ -47,16 +47,19 @@ const layout = {
     init: function(container) {
         const $container = $(container);
 
-        this.styleForm($container);
+        (async () => {
+            await this.styleFormAsync($container);
+            await window.scheduler.yield();
 
-        scrollspy.init($container);
+            scrollspy.init($container);
 
-        $container.trigger('initLayout');
+            $container.trigger('initLayout');
 
-        $container.on({
-            'content:changed': this.onContentChanged,
-            'content:remove': this.onContentRemove
-        });
+            $container.on({
+                'content:changed': this.onContentChanged,
+                'content:remove': this.onContentRemove
+            });
+        })();
     },
 
     initPopover: function(container, options) {
@@ -241,6 +244,10 @@ const layout = {
      */
     styleForm: function($container) {
         $container.inputWidget('seekAndCreate');
+    },
+
+    styleFormAsync: async function($container) {
+        return $container.inputWidget('seekAndCreateAsync');
     },
 
     /**

@@ -9,9 +9,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 interface RestApiCrudInterface extends RestApiReadInterface
 {
-    const ACTION_CREATE = 'create';
-    const ACTION_UPDATE = 'update';
-    const ACTION_DELETE = 'delete';
+    public const ACTION_CREATE = 'create';
+    public const ACTION_UPDATE = 'update';
+    public const ACTION_DELETE = 'delete';
 
     /**
      * Handles CREATE request for a single item

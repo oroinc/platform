@@ -6,7 +6,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 class LocalizationCodeFormatter
 {
-    const DEFAULT_LOCALIZATION = 'default';
+    public const DEFAULT_LOCALIZATION = 'default';
 
     /**
      * @param Localization|string $localization

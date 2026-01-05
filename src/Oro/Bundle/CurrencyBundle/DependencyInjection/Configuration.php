@@ -10,12 +10,12 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const DEFAULT_CURRENCY = 'USD';
-    const DEFAULT_VIEW = ViewTypeProviderInterface::VIEW_TYPE_SYMBOL;
+    public const DEFAULT_CURRENCY = 'USD';
+    public const DEFAULT_VIEW = ViewTypeProviderInterface::VIEW_TYPE_SYMBOL;
 
-    const ROOT_NAME = 'oro_currency';
-    const KEY_DEFAULT_CURRENCY = 'default_currency';
-    const KEY_CURRENCY_DISPLAY = 'currency_display';
+    public const ROOT_NAME = 'oro_currency';
+    public const KEY_DEFAULT_CURRENCY = 'default_currency';
+    public const KEY_CURRENCY_DISPLAY = 'currency_display';
 
     /**
      * Returns full key name by it's last part

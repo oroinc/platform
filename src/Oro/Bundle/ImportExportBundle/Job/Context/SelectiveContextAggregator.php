@@ -13,13 +13,13 @@ use Oro\Bundle\ImportExportBundle\Job\ContextHelper;
  */
 class SelectiveContextAggregator implements ContextAggregatorInterface
 {
-    const TYPE = 'selective';
+    public const TYPE = 'selective';
 
     /**
      * The name of parameter that should be added to a step parameters
      * to add the step summary to the result context object.
      */
-    const STEP_PARAMETER_NAME = 'add_to_job_summary';
+    public const STEP_PARAMETER_NAME = 'add_to_job_summary';
 
     /** @var ContextRegistry */
     protected $contextRegistry;

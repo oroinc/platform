@@ -9,9 +9,9 @@ use Oro\Bundle\DataAuditBundle\Exception\UnsupportedDataTypeException;
  */
 class AuditFieldTypeRegistry
 {
-    const COLLECTION_TYPE = 'collection';
-    const TYPE_TEXT = 'text';
-    const TYPE_STRING = 'string';
+    public const COLLECTION_TYPE = 'collection';
+    public const TYPE_TEXT = 'text';
+    public const TYPE_STRING = 'string';
 
     /** @var string[] */
     protected static $typeMap = [

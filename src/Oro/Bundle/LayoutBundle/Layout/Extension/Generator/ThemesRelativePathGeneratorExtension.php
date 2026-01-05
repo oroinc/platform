@@ -13,9 +13,9 @@ use Symfony\Component\Finder\Finder;
  */
 class ThemesRelativePathGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionInterface
 {
-    const THEMES_KEY = 'themes';
-    const ACTION_SET_FORM_THEME = '@setFormTheme';
-    const ACTION_SET_BLOCK_THEME = '@setBlockTheme';
+    public const THEMES_KEY = 'themes';
+    public const ACTION_SET_FORM_THEME = '@setFormTheme';
+    public const ACTION_SET_BLOCK_THEME = '@setBlockTheme';
 
     private string $projectDir;
 

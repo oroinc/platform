@@ -10,7 +10,7 @@ interface OrderedConnectorInterface extends ConnectorInterface
     /**
      * Default order of connector
      */
-    const DEFAULT_ORDER = 0;
+    public const DEFAULT_ORDER = 0;
 
     /**
      * Get the order of this connector. Connectors with lesser value will be processed first.

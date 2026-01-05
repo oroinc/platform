@@ -12,8 +12,8 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Exception\InvalidBodyFormatException;
  */
 class Body
 {
-    const FORMAT_TEXT = false;
-    const FORMAT_HTML = true;
+    public const FORMAT_TEXT = false;
+    public const FORMAT_HTML = true;
 
     /**
      * @var Part

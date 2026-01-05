@@ -8,7 +8,7 @@ use Symfony\Component\Config\Definition\Processor;
 
 class WorkflowListConfiguration implements ConfigurationInterface
 {
-    const NODE_WORKFLOWS = 'workflows';
+    public const NODE_WORKFLOWS = 'workflows';
 
     /**
      * @var WorkflowConfiguration

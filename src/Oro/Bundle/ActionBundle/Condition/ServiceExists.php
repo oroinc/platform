@@ -17,7 +17,7 @@ class ServiceExists extends AbstractCondition implements ContextAccessorAwareInt
 {
     use ContextAccessorAwareTrait;
 
-    const NAME = 'service_exists';
+    public const NAME = 'service_exists';
 
     /**
      * @var ContainerInterface

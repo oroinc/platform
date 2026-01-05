@@ -150,7 +150,7 @@ class EntitySecurityMetadata implements ClassSecurityMetadata
      *
      * @return EntitySecurityMetadata
      */
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     public static function __set_state($data)
     {
         return new EntitySecurityMetadata(
@@ -164,5 +164,5 @@ class EntitySecurityMetadata implements ClassSecurityMetadata
             $data['fields']
         );
     }
-    // @codingStandardsIgnoreEnd
+    // phpcs:enable
 }

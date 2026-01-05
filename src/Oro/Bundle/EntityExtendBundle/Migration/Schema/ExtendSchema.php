@@ -11,7 +11,7 @@ use Oro\Bundle\MigrationBundle\Migration\Schema\SchemaWithNameGenerator;
 
 class ExtendSchema extends SchemaWithNameGenerator
 {
-    const TABLE_CLASS = 'Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendTable';
+    public const TABLE_CLASS = 'Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendTable';
 
     /**
      * @var ExtendOptionsManager

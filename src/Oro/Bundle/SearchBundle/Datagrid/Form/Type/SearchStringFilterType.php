@@ -9,7 +9,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SearchStringFilterType extends AbstractType
 {
-    const NAME = 'oro_search_type_string_filter';
+    public const NAME = 'oro_search_type_string_filter';
 
     /**
      * @var TranslatorInterface

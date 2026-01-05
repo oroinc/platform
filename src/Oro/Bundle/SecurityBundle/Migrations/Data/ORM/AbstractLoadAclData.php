@@ -24,7 +24,7 @@ abstract class AbstractLoadAclData extends AbstractFixture implements
 {
     use ContainerAwareTrait;
 
-    const ALL_ROLES = '*';
+    public const ALL_ROLES = '*';
 
     #[\Override]
     public function getDependencies()

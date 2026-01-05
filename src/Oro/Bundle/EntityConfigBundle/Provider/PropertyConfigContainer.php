@@ -11,9 +11,9 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
  */
 class PropertyConfigContainer
 {
-    const TYPE_ENTITY = 'entity';
-    const TYPE_FIELD = 'field';
-    const ALL_CACHE_KEY = '__all__';
+    public const TYPE_ENTITY = 'entity';
+    public const TYPE_FIELD = 'field';
+    public const ALL_CACHE_KEY = '__all__';
 
     /** @var array */
     protected $config;

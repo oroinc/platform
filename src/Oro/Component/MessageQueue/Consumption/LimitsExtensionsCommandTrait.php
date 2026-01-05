@@ -38,7 +38,7 @@ trait LimitsExtensionsCommandTrait
                 'scenarios. Not intended to be used in production'
             )
             ->setHelp(
-                // @codingStandardsIgnoreStart
+                // phpcs:disable
                 $this->getHelp().<<<'HELP'
 
 The <info>--message-limit</info> option can be used to limit the maximum number of messages
@@ -63,7 +63,7 @@ The <info>--gc-limit</info> option defines the maximum amount GC calls:
 
   <info>php %command.full_name% --gc-limit=<number></info></info> <fg=green;options=underscore>other options and arguments</>
 HELP
-                // @codingStandardsIgnoreEnd
+                // phpcs:enable
             )
             ->addUsage('--message-limit=<number> [other options and arguments]')
             ->addUsage('--time-limit=<date-time-string> [other options and arguments]')

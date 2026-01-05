@@ -7,10 +7,10 @@ use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
 class NumberTypeFormatter implements TypeFormatterInterface
 {
-    const TYPE_CURRENCY = 'currency';
-    const TYPE_PERCENT  = 'percent';
-    const TYPE_INTEGER  = 'integer';
-    const TYPE_DECIMAL  = 'decimal';
+    public const TYPE_CURRENCY = 'currency';
+    public const TYPE_PERCENT  = 'percent';
+    public const TYPE_INTEGER  = 'integer';
+    public const TYPE_DECIMAL  = 'decimal';
 
     protected $numberFormatter;
 

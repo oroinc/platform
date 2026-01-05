@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Oro" xsi:noNamespaceSchemaLocation="https://schema.phpcodesniffer.com/phpcs.xsd">
+    <description>Oro custom coding standard based on PSR12.</description>
+
+    <!-- Include PSR12 standard (supersedes PSR2) -->
+    <rule ref="PSR12"/>
+
+    <!-- Oro custom sniffs are automatically included from Sniffs directory -->
+    <!-- No need to explicitly reference Oro.Commenting.ClassComment or Oro.Commenting.Deprecated -->
+
+    <!-- Configure ClassComment sniff exclusions -->
+    <rule ref="Oro.Commenting.ClassComment">
+        <exclude-pattern>*/Tests/*</exclude-pattern>
+        <exclude-pattern>*/DependencyInjection/*Extension.php</exclude-pattern>
+        <exclude-pattern>*/DependencyInjection/*Configuration.php</exclude-pattern>
+        <exclude-pattern>*/*Bundle.php</exclude-pattern>
+        <exclude-pattern>*/Migrations/Schema/*</exclude-pattern>
+    </rule>
+
+    <!-- Include Generic.Commenting.Todo as an error -->
+    <rule ref="Generic.Commenting.Todo">
+        <type>error</type>
+    </rule>
+
+    <!-- Configure Deprecated sniff as an error -->
+    <rule ref="Oro.Commenting.Deprecated">
+        <type>error</type>
+    </rule>
+</ruleset>
+

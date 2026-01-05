@@ -39,7 +39,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class SegmentFilterBuilderType extends AbstractType
 {
-    const NAME = 'oro_segment_filter_builder';
+    public const NAME = 'oro_segment_filter_builder';
 
     /**
      * @var DoctrineHelper

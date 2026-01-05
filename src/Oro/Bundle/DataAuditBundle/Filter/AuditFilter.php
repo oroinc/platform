@@ -22,8 +22,8 @@ use Symfony\Component\Form\FormInterface;
  */
 class AuditFilter extends EntityFilter
 {
-    const TYPE_CHANGED = 'changed';
-    const TYPE_CHANGED_TO_VALUE = 'changed_to_value';
+    public const TYPE_CHANGED = 'changed';
+    public const TYPE_CHANGED_TO_VALUE = 'changed_to_value';
 
     /** @var FilterExecutionContext */
     protected $filterExecutionContext;

@@ -4,10 +4,10 @@ namespace Oro\Bundle\SoapBundle\Handler;
 
 interface IncludeHandlerInterface
 {
-    const HEADER_INCLUDE     = 'X-Include';
-    const HEADER_UNSUPPORTED = 'X-Include-Unsupported';
-    const HEADER_UNKNOWN     = 'X-Include-Unknown';
-    const DELIMITER          = ';';
+    public const HEADER_INCLUDE     = 'X-Include';
+    public const HEADER_UNSUPPORTED = 'X-Include-Unsupported';
+    public const HEADER_UNKNOWN     = 'X-Include-Unknown';
+    public const DELIMITER          = ';';
 
     /**
      * Is handler object supports "include request"

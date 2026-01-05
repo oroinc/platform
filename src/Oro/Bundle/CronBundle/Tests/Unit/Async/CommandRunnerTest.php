@@ -11,7 +11,7 @@ class CommandRunnerTest extends TestCase
 {
     public function testShouldBeConstructedWithAllRequiredArguments(): void
     {
-        new  CommandRunner($this->createMock(MessageProducerInterface::class));
+        new CommandRunner($this->createMock(MessageProducerInterface::class));
     }
 
     public function testShouldSendMessageWithCommandParams(): void

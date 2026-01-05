@@ -25,7 +25,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class ExtendFieldValueRenderListener
 {
-    const ENTITY_VIEW_ROUTE = 'oro_entity_view';
+    public const ENTITY_VIEW_ROUTE = 'oro_entity_view';
 
     /** @var ConfigProvider */
     protected $extendProvider;

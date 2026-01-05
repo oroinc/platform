@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ValidateBeforeRemoveFieldEvent extends Event
 {
-    const NAME = 'oro.entity_extend.field.validate.before_remove';
+    public const NAME = 'oro.entity_extend.field.validate.before_remove';
 
     /** @var FieldConfigModel */
     protected $fieldConfig;

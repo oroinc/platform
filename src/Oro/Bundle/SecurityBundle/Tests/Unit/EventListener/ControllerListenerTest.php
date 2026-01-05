@@ -117,7 +117,7 @@ class ControllerListenerTest extends TestCase
 
     public function testInvokableControllerAccessGranted(): void
     {
-        $controller = new class() {
+        $controller = new class () {
             public function __invoke(): array
             {
                 return [];
@@ -150,7 +150,7 @@ class ControllerListenerTest extends TestCase
     {
         $this->expectException(AccessDeniedException::class);
 
-        $controller = new class() {
+        $controller = new class () {
             public function __invoke(): array
             {
                 return [];
@@ -179,7 +179,7 @@ class ControllerListenerTest extends TestCase
 
     public function testInvokableControllerAccessDeniedForSubRequest(): void
     {
-        $controller = new class() {
+        $controller = new class () {
             public function __invoke(): array
             {
                 return [];

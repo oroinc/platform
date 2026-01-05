@@ -6,7 +6,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 
 interface AvgStrategyInterface
 {
-    const TIME_FIELD_NAME = 'time';
+    public const TIME_FIELD_NAME = 'time';
 
     public function addSelect(QueryBuilder $builder);
 }

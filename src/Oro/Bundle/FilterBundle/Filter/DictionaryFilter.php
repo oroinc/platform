@@ -13,7 +13,7 @@ use Oro\Component\Exception\UnexpectedTypeException;
  */
 class DictionaryFilter extends BaseMultiChoiceFilter
 {
-    const FILTER_TYPE_NAME = 'dictionary';
+    public const FILTER_TYPE_NAME = 'dictionary';
 
     #[\Override]
     public function init($name, array $params)

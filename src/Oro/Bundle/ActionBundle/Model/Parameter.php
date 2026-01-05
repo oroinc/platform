@@ -7,7 +7,7 @@ namespace Oro\Bundle\ActionBundle\Model;
  */
 class Parameter
 {
-    const NO_DEFAULT = INF;
+    public const NO_DEFAULT = INF;
 
     /* @var string */
     private $name;

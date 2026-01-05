@@ -11,7 +11,7 @@ class OroWindowsBundle implements Migration
     #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
-        // @codingStandardsIgnoreStart
+        // phpcs:disable
 
         /** Generate table oro_windows_state **/
         $table = $schema->createTable('oro_windows_state');
@@ -29,6 +29,6 @@ class OroWindowsBundle implements Migration
         $table->addForeignKeyConstraint($schema->getTable('oro_user'), ['user_id'], ['id'], ['onDelete' => 'CASCADE', 'onUpdate' => null]);
         /** End of generate foreign keys for table oro_windows_state **/
 
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
     }
 }

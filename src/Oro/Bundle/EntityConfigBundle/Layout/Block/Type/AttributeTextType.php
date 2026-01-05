@@ -17,7 +17,7 @@ use Oro\Component\Layout\Util\BlockUtils;
  */
 class AttributeTextType extends AbstractType
 {
-    const NAME = 'attribute_text';
+    public const NAME = 'attribute_text';
 
     /** @var AttributeConfigurationProviderInterface */
     protected $attributeConfigurationProvider;

@@ -262,7 +262,7 @@ describe('Component Manager', function() {
         describe('after click event', () => {
             beforeEach(async function() {
                 $('#init-on').trigger('click');
-                return $.when(...Object.values(manager.initPromises).map(({promise}) => promise));
+                return await Promise.all(Object.values(manager.initPromises).map(({promise}) => promise));
             });
 
             it('component gets initialized', () => {
@@ -315,10 +315,10 @@ describe('Component Manager', function() {
 
             managerA = new ComponentManager($('#container-a'));
             managerB = new ComponentManager($('#container-b'));
-            return $.when(
+            return await Promise.all([
                 managerA.init(),
                 managerB.init()
-            );
+            ]);
         });
 
         it('component im outer layout is not initially initialized`', () => {
@@ -354,7 +354,7 @@ describe('Component Manager', function() {
         describe('after click event', () => {
             beforeEach(async function() {
                 $('#init-on').trigger('click');
-                return $.when(...Object.values(manager.initPromises).map(({promise}) => promise));
+                return await Promise.all(Object.values(manager.initPromises).map(({promise}) => promise));
             });
 
             it('component gets initialized', () => {

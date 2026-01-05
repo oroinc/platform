@@ -11,10 +11,10 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 class Traverse extends AbstractAction
 {
-    const OPTION_KEY_ARRAY   = 'array';
-    const OPTION_KEY_KEY     = 'key';
-    const OPTION_KEY_VALUE   = 'value';
-    const OPTION_KEY_ACTIONS = 'actions';
+    public const OPTION_KEY_ARRAY   = 'array';
+    public const OPTION_KEY_KEY     = 'key';
+    public const OPTION_KEY_VALUE   = 'value';
+    public const OPTION_KEY_ACTIONS = 'actions';
 
     /**
      * @var array

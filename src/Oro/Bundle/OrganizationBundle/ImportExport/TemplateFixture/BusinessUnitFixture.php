@@ -7,7 +7,7 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 class BusinessUnitFixture extends AbstractTemplateRepository
 {
-    const MAIN_BUSINESS_UNIT = 'Main';
+    public const MAIN_BUSINESS_UNIT = 'Main';
 
     #[\Override]
     public function getEntityClass()

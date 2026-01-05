@@ -22,15 +22,15 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 abstract class AbstractConfigGridListener
 {
-    const TYPE_HTML     = 'html';
-    const TYPE_TWIG     = 'twig';
-    const TYPE_NAVIGATE = 'navigate';
-    const TYPE_DELETE   = 'delete';
+    public const TYPE_HTML     = 'html';
+    public const TYPE_TWIG     = 'twig';
+    public const TYPE_NAVIGATE = 'navigate';
+    public const TYPE_DELETE   = 'delete';
 
-    const PATH_COLUMNS  = '[columns]';
-    const PATH_SORTERS  = '[sorters]';
-    const PATH_FILTERS  = '[filters]';
-    const PATH_ACTIONS  = '[actions]';
+    public const PATH_COLUMNS  = '[columns]';
+    public const PATH_SORTERS  = '[sorters]';
+    public const PATH_FILTERS  = '[filters]';
+    public const PATH_ACTIONS  = '[actions]';
 
     /** @var ConfigManager */
     protected $configManager;

@@ -13,9 +13,9 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  */
 class LoadOrganizationAndBusinessUnitData extends AbstractFixture implements OrderedFixtureInterface
 {
-    const MAIN_ORGANIZATION  = 'default';
-    const MAIN_BUSINESS_UNIT = 'Main';
-    const REFERENCE_DEFAULT_ORGANIZATION = 'default_organization';
+    public const MAIN_ORGANIZATION  = 'default';
+    public const MAIN_BUSINESS_UNIT = 'Main';
+    public const REFERENCE_DEFAULT_ORGANIZATION = 'default_organization';
 
     #[\Override]
     public function getOrder()

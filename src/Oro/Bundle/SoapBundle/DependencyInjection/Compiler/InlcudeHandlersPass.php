@@ -7,8 +7,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class InlcudeHandlersPass implements CompilerPassInterface
 {
-    const TAG                         = 'oro_soap.include_handler';
-    const DELEGATE_HANDLER_SERVICE_ID = 'oro_soap.handler.include_delegate';
+    public const TAG                         = 'oro_soap.include_handler';
+    public const DELEGATE_HANDLER_SERVICE_ID = 'oro_soap.handler.include_delegate';
 
     #[\Override]
     public function process(ContainerBuilder $container)

@@ -21,7 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FlashMessage extends AbstractAction
 {
-    const DEFAULT_MESSAGE_TYPE = 'info';
+    public const DEFAULT_MESSAGE_TYPE = 'info';
 
     /** @var TranslatorInterface */
     protected $translator;

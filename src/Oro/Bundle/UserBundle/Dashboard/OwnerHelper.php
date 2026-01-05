@@ -23,8 +23,8 @@ class OwnerHelper
     /** @var OwnerTreeProviderInterface */
     protected $ownerTreeProvider;
 
-    const CURRENT_USER          = 'current_user';
-    const CURRENT_BUSINESS_UNIT = 'current_business_unit';
+    public const CURRENT_USER          = 'current_user';
+    public const CURRENT_BUSINESS_UNIT = 'current_business_unit';
 
     /** @var array */
     protected $ownerIds;

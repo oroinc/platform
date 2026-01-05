@@ -19,9 +19,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class IdentityConfigChoiceType extends AbstractConfigType
 {
-    const CHOICE_NO = 0;
-    const CHOICE_WHEN_NOT_EMPTY = -1;
-    const CHOICE_ALWAYS = 1;
+    public const CHOICE_NO = 0;
+    public const CHOICE_WHEN_NOT_EMPTY = -1;
+    public const CHOICE_ALWAYS = 1;
 
     /**
      * @var ManagerRegistry

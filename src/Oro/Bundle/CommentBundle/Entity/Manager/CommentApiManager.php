@@ -30,7 +30,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class CommentApiManager extends ApiEntityManager
 {
-    const AVATAR_FIELD_NAME = 'avatar';
+    public const AVATAR_FIELD_NAME = 'avatar';
 
     /** @var ObjectManager */
     protected $em;

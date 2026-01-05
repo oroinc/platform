@@ -10,7 +10,7 @@ use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
  */
 abstract class AbstractNativeQueryWriter implements ItemWriterInterface
 {
-    const QUERY_BUILDER = 'query_builder';
+    public const QUERY_BUILDER = 'query_builder';
 
     /**
      * @var string

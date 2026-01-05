@@ -7,7 +7,7 @@ use Doctrine\DBAL\Types\IntegerType;
 
 class DurationType extends IntegerType
 {
-    const TYPE = 'duration';
+    public const TYPE = 'duration';
 
     #[\Override]
     public function getName()

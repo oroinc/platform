@@ -60,7 +60,7 @@ class DumpMetadataCommand extends AbstractDebugCommand
             ->addOption('parentAction', null, InputOption::VALUE_REQUIRED, 'Parent action name')
             ->addOption('hateoas', null, InputOption::VALUE_NONE, 'Add HATEOAS links')
             ->setHelp(
-                // @codingStandardsIgnoreStart
+                // phpcs:disable
                 <<<'HELP'
 The <info>%command.name%</info> command dumps API metadata for a given entity.
 
@@ -84,7 +84,7 @@ The <info>--hateoas</info> option can be used to include the HATEOAS links to th
   <info>php %command.full_name% --hateoas <entity></info>
 
 HELP
-                // @codingStandardsIgnoreEnd
+                // phpcs:enable
             )
             ->addUsage('--extra=definition --extra=<extra> <entity>')
             ->addUsage('--extra=definition --extra=<extra1> --extra=<extra2> --extra=<extraN> <entity>')

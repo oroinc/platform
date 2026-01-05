@@ -10,7 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ImpersonationSuccessEvent extends Event
 {
-    const EVENT_NAME = 'oro_user.impersonation_success';
+    public const EVENT_NAME = 'oro_user.impersonation_success';
 
     /**
      * @var Impersonation

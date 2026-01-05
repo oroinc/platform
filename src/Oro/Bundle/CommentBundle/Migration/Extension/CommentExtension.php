@@ -16,7 +16,7 @@ class CommentExtension implements ExtendExtensionAwareInterface
 {
     use ExtendExtensionAwareTrait;
 
-    const COMMENT_TABLE_NAME = 'oro_comment';
+    public const COMMENT_TABLE_NAME = 'oro_comment';
 
     /**
      * @param Schema      $schema

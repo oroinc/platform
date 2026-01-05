@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class DefaultRelationFieldValidator extends AbstractFieldValidator
 {
-    const ALIAS = 'oro_entity_extend.validator.default_relation_field';
+    public const ALIAS = 'oro_entity_extend.validator.default_relation_field';
 
     #[\Override]
     public function validate($value, Constraint $constraint)

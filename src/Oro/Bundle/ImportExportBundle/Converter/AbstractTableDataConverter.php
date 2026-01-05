@@ -17,8 +17,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 abstract class AbstractTableDataConverter extends DefaultDataConverter
 {
-    const BACKEND_TO_FRONTEND = 'backend_to_frontend';
-    const FRONTEND_TO_BACKEND = 'frontend_to_backend';
+    public const BACKEND_TO_FRONTEND = 'backend_to_frontend';
+    public const FRONTEND_TO_BACKEND = 'frontend_to_backend';
 
     /** @var EventDispatcherInterface|null */
     protected $dispatcher;

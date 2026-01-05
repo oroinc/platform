@@ -11,7 +11,7 @@ class OroSidebarBundle implements Migration
     #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
-        // @codingStandardsIgnoreStart
+        // phpcs:disable
 
         /** Generate table oro_sidebar_state **/
         $table = $schema->createTable('oro_sidebar_state');
@@ -49,6 +49,6 @@ class OroSidebarBundle implements Migration
         $table->addForeignKeyConstraint($schema->getTable('oro_user'), ['user_id'], ['id'], ['onDelete' => 'CASCADE', 'onUpdate' => null]);
         /** End of generate foreign keys for table oro_sidebar_widget **/
 
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
     }
 }

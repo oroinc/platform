@@ -13,10 +13,10 @@ class SchemaManagerMock extends \Doctrine\DBAL\Schema\AbstractSchemaManager
         parent::__construct($conn);
     }
 
-    // @codingStandardsIgnoreStart
+    // phpcs:disable
     #[\Override]
     protected function _getPortableTableColumnDefinition($tableColumn)
     {
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
     }
 }

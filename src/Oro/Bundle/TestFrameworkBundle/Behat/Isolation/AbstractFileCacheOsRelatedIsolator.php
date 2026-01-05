@@ -19,7 +19,7 @@ use Symfony\Component\Process\Process;
  */
 abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsolator implements IsolatorInterface
 {
-    const int TIMEOUT = 240;
+    public const int TIMEOUT = 240;
 
     protected array $cacheDirectories;
     protected string $cacheDir;

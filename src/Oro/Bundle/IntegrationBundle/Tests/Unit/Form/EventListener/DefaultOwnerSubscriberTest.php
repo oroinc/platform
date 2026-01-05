@@ -71,7 +71,7 @@ class DefaultOwnerSubscriberTest extends TestCase
                 ->method('setData');
         }
 
-        $event = new  FormEvent($form, $formData);
+        $event = new FormEvent($form, $formData);
         $this->subscriber->postSet($event);
     }
 
@@ -121,7 +121,7 @@ class DefaultOwnerSubscriberTest extends TestCase
             )
             ->willReturn($form);
 
-        $event = new  FormEvent($form, $integration);
+        $event = new FormEvent($form, $integration);
         $this->subscriber->preSet($event);
     }
 
@@ -198,7 +198,7 @@ class DefaultOwnerSubscriberTest extends TestCase
             )
             ->willReturn($form);
 
-        $event = new  FormEvent($form, $integration);
+        $event = new FormEvent($form, $integration);
         $this->subscriber->preSet($event);
     }
 
@@ -264,7 +264,7 @@ class DefaultOwnerSubscriberTest extends TestCase
         $form->expects($this->never())
             ->method('add');
 
-        $event = new  FormEvent($form, $integration);
+        $event = new FormEvent($form, $integration);
         $this->subscriber->preSet($event);
     }
 

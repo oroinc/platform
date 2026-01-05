@@ -8,7 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class OrganizationSwitchAfter extends Event
 {
-    const NAME = 'oro_security.event.organization_switch.after';
+    public const NAME = 'oro_security.event.organization_switch.after';
 
     /** @var User */
     protected $user;

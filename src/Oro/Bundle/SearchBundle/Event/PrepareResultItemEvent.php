@@ -11,7 +11,7 @@ class PrepareResultItemEvent extends Event
      * Event name
      * @const string
      */
-    const EVENT_NAME = 'oro_search.prepare_result_item';
+    public const EVENT_NAME = 'oro_search.prepare_result_item';
 
     /**
      * @var \Oro\Bundle\SearchBundle\Query\Result\Item

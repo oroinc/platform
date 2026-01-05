@@ -25,9 +25,9 @@ final class SubPatternsLexer implements LexerInterface
 {
     use IsAServiceTrait;
 
-    const REFERENCE_LEXER = 'reference';
+    public const REFERENCE_LEXER = 'reference';
 
-    const PATTERNS = [
+    public const PATTERNS = [
         '/^((?:\d+|<.+>)%\? [^:]+:[^\ ]+)/' => null,
         '/^((?:\d+|\d*\.\d+|<.+>)%\? [^:]+(?:\: +\S+)?)/' => TokenType::OPTIONAL_TYPE,
         '/^((?:\d+|\d*\.\d+|<.+>)%\? : ?[^\ ]+?)/' => null,

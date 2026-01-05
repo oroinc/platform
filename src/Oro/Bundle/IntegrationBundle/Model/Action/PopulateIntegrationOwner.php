@@ -18,7 +18,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
  */
 class PopulateIntegrationOwner extends AbstractAction
 {
-    const NAME = "populate_channel_owner";
+    public const NAME = "populate_channel_owner";
 
     /**
      * @var mixed

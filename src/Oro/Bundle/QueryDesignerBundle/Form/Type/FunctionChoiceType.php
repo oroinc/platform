@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FunctionChoiceType extends AbstractType
 {
-    const NAME = 'oro_function_choice';
+    public const NAME = 'oro_function_choice';
 
     /** @var Manager */
     protected $manager;

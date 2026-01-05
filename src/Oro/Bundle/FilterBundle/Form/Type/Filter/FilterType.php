@@ -16,7 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FilterType extends AbstractType
 {
-    const NAME = 'oro_type_filter';
+    public const NAME = 'oro_type_filter';
 
     /**
      * @var TranslatorInterface

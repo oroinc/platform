@@ -6,7 +6,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ActivityConditionOptionsLoadEvent extends Event
 {
-    const EVENT_NAME = 'oro_activity_list.activity_condition_options_load';
+    public const EVENT_NAME = 'oro_activity_list.activity_condition_options_load';
 
     /** @var array */
     protected $options;

@@ -9,7 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class SearchResultBefore extends Event implements GridEventInterface
 {
-    const NAME = 'oro_datagrid.search_datasource.result.before';
+    public const NAME = 'oro_datagrid.search_datasource.result.before';
 
     /**
      * @var DatagridInterface

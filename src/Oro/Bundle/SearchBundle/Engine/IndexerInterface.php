@@ -7,7 +7,7 @@ namespace Oro\Bundle\SearchBundle\Engine;
  */
 interface IndexerInterface
 {
-    const WEIGHT_FIELD = 'relevance_weight';
+    public const WEIGHT_FIELD = 'relevance_weight';
 
     /**
      * Save one of several entities to search index

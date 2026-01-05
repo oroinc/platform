@@ -40,7 +40,7 @@ class ResourceDocProvider
         ],
         ApiAction::UPDATE_LIST           => [
             'description'   => 'Create or update a list of {name}',
-            // @codingStandardsIgnoreStart
+            // phpcs:disable
             'documentation' => <<<MARKDOWN
 Create or update a list of {singular_name|lower} records.
 
@@ -137,7 +137,7 @@ Example:
 }
 ```
 MARKDOWN
-        // @codingStandardsIgnoreEnd
+        // phpcs:enable
         ],
         ApiAction::GET_SUBRESOURCE     => [
             'description'   => 'Get {association}',

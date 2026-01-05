@@ -14,7 +14,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class LoadReportsData extends AbstractFixture
 {
-    const REPORTS = [
+    public const REPORTS = [
         [
             'name' => 'Report 1',
             'description' => 'First rest report',

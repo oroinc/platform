@@ -34,7 +34,7 @@ class ImapEmailManager
     /**
      * According to RFC 2822
      */
-    const SUBJECT_MAX_LENGTH = 998;
+    public const SUBJECT_MAX_LENGTH = 998;
 
     /** @var ImapConnector */
     protected $connector;

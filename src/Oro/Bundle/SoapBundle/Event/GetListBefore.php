@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class GetListBefore extends Event
 {
-    const NAME = 'oro_api.request.get_list.before';
+    public const NAME = 'oro_api.request.get_list.before';
 
     /**
      * @var string

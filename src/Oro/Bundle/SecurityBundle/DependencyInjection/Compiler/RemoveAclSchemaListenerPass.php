@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class RemoveAclSchemaListenerPass implements CompilerPassInterface
 {
-    const ACL_SCHEMA_LISTENER_SERVICE_ID = 'security.acl.dbal.schema_listener';
+    public const ACL_SCHEMA_LISTENER_SERVICE_ID = 'security.acl.dbal.schema_listener';
 
     #[\Override]
     public function process(ContainerBuilder $container)

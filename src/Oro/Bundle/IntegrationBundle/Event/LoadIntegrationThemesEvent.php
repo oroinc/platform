@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class LoadIntegrationThemesEvent extends Event
 {
-    const NAME = 'oro_integration.load_integration_themes';
+    public const NAME = 'oro_integration.load_integration_themes';
 
     /** @var FormView */
     protected $formView;

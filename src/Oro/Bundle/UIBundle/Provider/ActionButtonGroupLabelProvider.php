@@ -10,10 +10,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ActionButtonGroupLabelProvider implements LabelProviderInterface
 {
-    const DEFAULT_GROUP           = 'actions';
-    const DEFAULT_LABEL           = 'oro.ui.actions';
-    const DEFAULT_GROUP_LABEL     = 'oro.ui.actions.%s';
-    const ENTITY_NAME_PLACEHOLDER = '%entityName%';
+    public const DEFAULT_GROUP           = 'actions';
+    public const DEFAULT_LABEL           = 'oro.ui.actions';
+    public const DEFAULT_GROUP_LABEL     = 'oro.ui.actions.%s';
+    public const ENTITY_NAME_PLACEHOLDER = '%entityName%';
 
     /** @var TranslatorInterface */
     protected $translator;

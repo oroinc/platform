@@ -6,5 +6,5 @@ use Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchI
 
 class LoadSearchItemData extends BaseLoadSearchItemData
 {
-    const COUNT = 1001;
+    public const COUNT = 1001;
 }

@@ -7,7 +7,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class MailboxGridType extends AbstractType
 {
-    const NAME = 'oro_email_mailbox_grid';
+    public const NAME = 'oro_email_mailbox_grid';
 
     public function getName()
     {

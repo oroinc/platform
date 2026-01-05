@@ -7,9 +7,9 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
 
 abstract class AbstractLocalizedProperty extends FieldProperty
 {
-    const FORMATTER_METHOD = 'method';
-    const RESOLVER_KEY     = 'context_resolver';
-    const CONTEXT_KEY      = 'context';
+    public const FORMATTER_METHOD = 'method';
+    public const RESOLVER_KEY     = 'context_resolver';
+    public const CONTEXT_KEY      = 'context';
 
     #[\Override]
     protected function getRawValue(ResultRecordInterface $record)

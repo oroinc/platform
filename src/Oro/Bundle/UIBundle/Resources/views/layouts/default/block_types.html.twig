@@ -105,7 +105,8 @@
     {% set attr_img = layout_attr_defaults(attr_img, {
         'src': src,
         '~class': ' logo-img',
-        'alt': 'oro_frontend.logo.alt.label'|trans
+        'alt': 'oro_frontend.logo.alt.label'|trans,
+        'fetchpriority': 'high'
     }) %}
 
     {% if width is defined and width is not null %}
@@ -126,7 +127,7 @@
                 {% if searchType == 'integrated' %}
                     <source {{ UI.attributes(attr_img_small) }}>
                 {% endif %}
-                <img {{ UI.attributes(attr_img) }} loading="lazy">
+                <img {{ UI.attributes(attr_img) }}>
             </picture>
         </a>
     {% else %}

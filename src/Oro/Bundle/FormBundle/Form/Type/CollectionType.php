@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CollectionType extends AbstractType
 {
-    const NAME = 'oro_collection';
+    public const NAME = 'oro_collection';
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
