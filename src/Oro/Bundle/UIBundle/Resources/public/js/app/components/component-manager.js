@@ -24,34 +24,37 @@ ComponentManager.prototype = {
      * @param {jQuery?} $container
      * @return {Promise}
      */
-    init(options, $container) {
+    async init(options, $container) {
+        const disableScheduler = options?.disableScheduler || false;
+        delete options?.disableScheduler;
         this.initOptions = options || {};
 
         const elements = this._collectElements($container);
         const elementsData = this._readElementsData(elements);
         this._bindReferentialInitOnEvents($container);
-
         // collect nested elements' data
         elementsData.forEach(data => {
             data.subElementsData = elementsData.filter(subElementData => {
                 return data.options._sourceElement.has(subElementData.options._sourceElement).length;
             });
         });
-
         // initialize components in order reversed to what jQuery returns
         // (nested items have to be initialized first)
         elementsData.reverse();
-
         const promises = elementsData.map(data => {
             // collect promises of dependencies
             data.options._subPromises = Object.fromEntries(data.subElementsData.map(subElementData => {
                 return [subElementData.options.name, subElementData.promise];
             }));
-            return (data.promise = this._loadAndInitializeComponent(data));
+
+            const promise = this._loadAndInitializeComponent(data, disableScheduler);
+            data.promise = promise;
+
+            return promise;
         });
 
-        return $.when(...promises.filter(Boolean))
-            .then((...args) => args.filter(Boolean));
+        const results = await Promise.all(promises.filter(Boolean));
+        return results.filter(Boolean);
     },
 
     /**
@@ -68,7 +71,7 @@ ComponentManager.prototype = {
                 return;
             }
             event.preventDefault();
-            this.init(this.initOptions).done(() => {
+            this.init(this.initOptions).then(() => {
                 $(event.target).trigger('content:initialized');
                 if (onInitialized) {
                     onInitialized();
@@ -134,10 +137,11 @@ ComponentManager.prototype = {
             const initOptions = Object.assign({}, this.initOptions, {
                 get _initEvent() {
                     return event;
-                }
+                },
+                disableScheduler: true
             });
             this.init(initOptions, $initOnContainer)
-                .done(() => {
+                .then(() => {
                     $target.off(tempNS);
                 });
         };
@@ -316,20 +320,34 @@ ComponentManager.prototype = {
      * @returns {Promise}
      * @private
      */
-    _loadAndInitializeComponent(data) {
-        const initDeferred = $.Deferred();
+    async _loadAndInitializeComponent(data, disableScheduler) {
+        const initDeferred = {};
+        const name = data.options.name;
 
-        this._loadModules(data.module)
-            .then(this._onComponentLoaded.bind(this, initDeferred, data.options))
-            .catch(this._onComponentLoadError.bind(this, initDeferred));
-
-        const initPromise = initDeferred
-            .promise(Object.create({targetData: data}))
-            .always(() => {
-                delete this.initPromises[data.options.name];
+        let initPromise = new Promise((resolve, reject) => {
+            Object.assign(initDeferred, {
+                resolve,
+                reject
             });
+        });
 
-        this.initPromises[data.options.name] = {promise: initPromise, dependsOn: []};
+        initPromise.targetData = data;
+
+        this.initPromises[name] = {promise: initPromise, dependsOn: []};
+
+        try {
+            if (!disableScheduler) {
+                await window.scheduler.yield();
+            }
+            const module = await this._loadModules(data.module);
+            this._onComponentLoaded(initDeferred, data.options, module);
+        } catch (error) {
+            this._onComponentLoadError(initDeferred, error);
+        }
+
+        initPromise = initPromise.finally(() => {
+            delete this.initPromises[name];
+        });
 
         return initPromise;
     },

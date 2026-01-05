@@ -81,6 +81,10 @@ const InputWidgetManager = {
             widget.Widget.prototype instanceof AbstractInputWidget;
     },
 
+    findWidgetByElement: function($input) {
+        return this.getWidgetsByPriority().find(widget => this.isApplicable($input, widget));
+    },
+
     /**
      * Walk by each input and create widget for applicable inputs without widget
      *
@@ -89,28 +93,36 @@ const InputWidgetManager = {
      * @param {Object|null} options
      */
     create: function($inputs, widgetKey, options) {
-        const self = this;
-        const widgetsByPriority = this.getWidgetsByPriority();
-
         if (options || widgetKey) {
             // create new widget with options
             $inputs.inputWidget('dispose');
         }
 
-        _.each($inputs, function(input) {
+        $inputs.toArray().forEach(input => {
             const $input = $(input);
-            if (self.hasWidget($input)) {
+            if (this.hasWidget($input)) {
                 return;
             }
 
-            for (let i = 0; i < widgetsByPriority.length; i++) {
-                const widget = widgetsByPriority[i];
-                if (self.isApplicable($input, widget, widgetKey)) {
-                    self.createWidget($input, widget.Widget, options || {});
-                    break;
-                }
+            const widget = widgetKey ? this.widgets[widgetKey] : this.findWidgetByElement($input);
+
+            if (widget) {
+                this.createWidget($input, widget.Widget, options || {});
             }
         });
+    },
+
+    createByInput: function(input) {
+        const $input = $(input);
+        if (this.hasWidget($input)) {
+            return;
+        }
+
+        const widget = this.findWidgetByElement($input);
+
+        if (widget) {
+            this.createWidget($input, widget.Widget);
+        }
     },
 
     /**
@@ -171,12 +183,8 @@ const InputWidgetManager = {
 
     getCompoundQuery: function() {
         if (!this._cachedCompoundQuery) {
-            const queries = [];
             const widgetsByPriority = this.getWidgetsByPriority();
-            for (let i = 0; i < widgetsByPriority.length; i++) {
-                const widget = widgetsByPriority[i];
-                queries.push(widget.selector);
-            }
+            const queries = widgetsByPriority.reduce((selectors, widget) => [...selectors, widget.selector], []);
             this._cachedCompoundQuery = queries.join(',');
         }
         return this._cachedCompoundQuery;
@@ -195,9 +203,32 @@ const InputWidgetManager = {
             // add data-skip-input-widgets to any container to disable widgets inside this container(for example when container is hidden)
             return $(this).closest('[data-skip-input-widgets]').length === 0;
         });
-        this.create(foundElements);
+        foundElements.toArray().forEach(input => {
+            this.createByInput(input);
+        });
         $container.data('attachedWidgetsCount',
             ($container.data('attachedWidgetsCount') || 0) + foundElements.length);
+    },
+
+    seekAndCreateWidgetsInContainerAsync: async function($container) {
+        const foundElements = $container.find(this.getCompoundQuery()).filter(
+            ':not(' +
+            (this.noWidgetSelector ? (this.noWidgetSelector + ',') : '') +
+            '[data-bound-input-widget], [data-page-component-module], [data-bound-component]' +
+            ')'
+        ).filter(function() {
+            // add data-skip-input-widgets to any container to
+            // disable widgets inside this container(for example when container is hidden)
+            return $(this).closest('[data-skip-input-widgets]').length === 0;
+        });
+        const promises = foundElements.toArray().map(input => (async () => {
+            await window.scheduler.yield();
+            this.createByInput(input);
+        })());
+        $container.data('attachedWidgetsCount',
+            ($container.data('attachedWidgetsCount') || 0) + foundElements.length);
+
+        return Promise.all(promises);
     },
 
     /**
@@ -264,6 +295,11 @@ $.fn.extend({
             args.unshift(this);
             InputWidgetManager.create(...args);
             return this;
+        }
+        if (command === 'seekAndCreateAsync') {
+            args.unshift(this);
+            return window.scheduler.yield()
+                .then(() => InputWidgetManager.seekAndCreateWidgetsInContainerAsync(...args));
         }
         if (command === 'seekAndCreate') {
             args.unshift(this);

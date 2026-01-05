@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import _ from 'underscore';
 import BaseComponent from 'oroui/js/app/components/base/component';
 import loadModules from 'oroui/js/app/services/load-modules';
@@ -34,7 +33,7 @@ const ViewComponent = BaseComponent.extend({
         this._deferredInit();
         if (subPromises.length && !options.ignoreSubPromises) {
             // ensure that all nested components are already initialized
-            $.when(...subPromises).then(function() {
+            Promise.all(subPromises).then(() => {
                 loadModules(options.view, initializeView);
             });
         } else {

@@ -7,14 +7,16 @@ if ('publicPath' in config) {
     __webpack_public_path__ = config.publicPath;
 }
 
-if (!window.sleep) {
-    window.sleep = async function(duration) {
-        return new Promise(resolve => setTimeout(() => resolve(0), duration));
+// scheduler-polyfill for Safari until it has native support.
+if (!window.scheduler?.yield) {
+    window.scheduler = {
+        yield: () => new Promise(resolve => setTimeout(resolve, 0))
     };
 }
 
 // Add loadModules to global scope for inline scripts
-window.loadModules = await import('oroui/js/app/services/load-modules').then(module => module.default);
+const {default: LoadModules} = await import('oroui/js/app/services/load-modules');
+window.loadModules = LoadModules;
 
 const domReady = new Promise(resolve => {
     if (document.readyState === 'loading') {
@@ -29,7 +31,7 @@ await Promise.all([
     import('orotranslation/js/translation-loader')
 ]);
 
-const promises = await import('app-modules').then(m => m.default ?? m);
+const {default: promises} = await import('app-modules');
 
 promises.push(domReady);
 

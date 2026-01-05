@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import ComponentManager from 'oroui/js/app/components/component-manager';
 
 const componentContainerMixin = {
@@ -75,7 +74,7 @@ const componentContainerMixin = {
     initPageComponents: function(options) {
         if (!this.hasOwnLayout()) {
             const error = new Error('PageComponents can not be initialized for the element without own layout');
-            return $.Deferred().reject(error);
+            return Promise.reject(error);
         }
         return this._getComponentManager().init(options);
     },
