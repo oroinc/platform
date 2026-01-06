@@ -72,6 +72,6 @@ class TwigTemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriber
     {
         return
             str_ends_with($file, '.yml')
-            && preg_match('/^@\w+\/layouts\//', $file);
+            && preg_match('/^@!?\w+\/layouts\//', $file);
     }
 }
