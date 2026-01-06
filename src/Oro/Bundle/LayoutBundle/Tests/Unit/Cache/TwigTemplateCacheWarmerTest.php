@@ -36,7 +36,9 @@ class TwigTemplateCacheWarmerTest extends TestCase
             '@Acme/layouts/another.jpg',
             '@Acme/layouts/theme/template.html.twig',
             '@Acme/layouts/theme/update.yml',
-            '@Acme/layouts/theme/another.jpg'
+            '@Acme/layouts/theme/another.jpg',
+            '@!Acme/layouts/update.yml',
+            '@!Acme/layouts/theme/update.yml'
         ];
 
         $twig->expects(self::exactly(9))
