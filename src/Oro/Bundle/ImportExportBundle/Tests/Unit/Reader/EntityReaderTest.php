@@ -418,12 +418,8 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         $query = $this->createMock(AbstractQuery::class);
         $query->expects(self::once())
             ->method('getResult')
-            ->with(AbstractQuery::HYDRATE_ARRAY)
-            ->willReturn([
-                1 => 'a',
-                2 => 'b',
-                3 => 'c',
-            ]);
+            ->with('IdentifierHydrator')
+            ->willReturn([1,2,3]);
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->expects(self::exactly(2))
@@ -464,6 +460,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         $entityName = 'entityName';
         $options = [];
 
+        $configuration = $this->createMock(Configuration::class);
         $classMetadata = $this->createMock(ClassMetadata::class);
 
         $classMetadata->expects(self::once())
@@ -477,8 +474,9 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
             ->method('getClassMetadata')
             ->with($entityName)
             ->willReturn($classMetadata);
-        $entityManager->expects(self::never())
-            ->method('getConfiguration');
+        $entityManager->expects(self::once())
+            ->method('getConfiguration')
+            ->willReturn($configuration);
 
         $query = $this->createMock(AbstractQuery::class);
         $query->expects(self::never())

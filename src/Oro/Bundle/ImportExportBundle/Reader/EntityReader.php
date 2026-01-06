@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
@@ -10,6 +9,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
+use Oro\Bundle\BatchBundle\ORM\Query\ResultIterator\IdentifierHydrator;
 use Oro\Bundle\BatchBundle\Step\ItemStep;
 use Oro\Bundle\EntityConfigBundle\Provider\ExportQueryProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -153,9 +153,13 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
      */
     public function getIds($entityName, array $options = [])
     {
+        $identifierHydrationMode = 'IdentifierHydrator';
         /** @var EntityManager $entityManager */
         $entityManager = $this->registry
             ->getManagerForClass($entityName);
+
+        $entityManager->getConfiguration()
+            ->addCustomHydrationMode($identifierHydrationMode, IdentifierHydrator::class);
 
         $metadata = $entityManager->getClassMetadata($entityName);
 
@@ -178,9 +182,8 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
         $organization = $options['organization'] ?? null;
         $this->addOrganizationLimits($queryBuilder, $entityName, $organization);
         $this->applyAcl($queryBuilder);
-        $result = $queryBuilder->getQuery()->getResult(AbstractQuery::HYDRATE_ARRAY);
 
-        return array_keys($result);
+        return $queryBuilder->getQuery()->getResult($identifierHydrationMode);
     }
 
     /**
