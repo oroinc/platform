@@ -3,7 +3,10 @@
     <description>Oro custom coding standard based on PSR12.</description>
 
     <!-- Include PSR12 standard (supersedes PSR2) -->
-    <rule ref="PSR12"/>
+    <rule ref="PSR12">
+        <!-- Exclude PSR12 ControlStructureSpacing; replaced by Oro.ControlStructures.ControlStructureSpacing -->
+        <exclude name="PSR12.ControlStructures.ControlStructureSpacing"/>
+    </rule>
 
     <!-- Oro custom sniffs are automatically included from Sniffs directory -->
     <!-- No need to explicitly reference Oro.Commenting.ClassComment or Oro.Commenting.Deprecated -->
