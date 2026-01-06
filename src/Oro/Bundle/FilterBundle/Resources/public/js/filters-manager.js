@@ -110,8 +110,7 @@ const FiltersManager = BaseView.extend({
      * @inheritdoc
      */
     listen: {
-        'filters:update mediator': '_onChangeFilterSelect',
-        'filters:reset mediator': '_onReset'
+        'filters:update mediator': '_onChangeFilterSelect'
     },
 
     noWrap: true,
@@ -213,6 +212,10 @@ const FiltersManager = BaseView.extend({
     delegateListeners: function() {
         if (!_.isEmpty(this.filters)) {
             this.listenTo(mediator, 'datagrid:metadata-loaded', this.updateFilters);
+        }
+
+        if (this.collection?.inputName) {
+            this.listenTo(mediator, 'filters:reset:' + this.collection.inputName, this._onReset);
         }
 
         return FiltersManager.__super__.delegateListeners.call(this);
@@ -646,7 +649,8 @@ const FiltersManager = BaseView.extend({
         e.preventDefault();
         const dialogWidget = new FilterDialogWidget({
             title: this.filterDialogTitle,
-            content: this.dropdownContainer
+            content: this.dropdownContainer,
+            gridName: this.collection?.inputName
         });
 
         dialogWidget.render();

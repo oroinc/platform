@@ -20,6 +20,11 @@ const FilterDialogWidget = DialogWidget.extend({
     content: null,
 
     /**
+     * @property {String}
+     */
+    gridName: null,
+
+    /**
      * @property {Object}
      */
     dialogOptions: {
@@ -43,7 +48,7 @@ const FilterDialogWidget = DialogWidget.extend({
         if (_.isEmpty(options.content)) {
             throw new TypeError('"content" property should be not empty');
         }
-        _.extend(this, _.pick(options, ['content']));
+        _.extend(this, _.pick(options, ['content', 'gridName']));
 
         options.dialogOptions = _.extend({}, this.dialogOptions, options.dialogOptions);
 
@@ -69,7 +74,7 @@ const FilterDialogWidget = DialogWidget.extend({
      * @param {jQuery.Event} e
      */
     onResetAll: function(e) {
-        mediator.trigger('filters:reset', e);
+        mediator.trigger('filters:reset:' + this.gridName, e);
     },
 
     /**
