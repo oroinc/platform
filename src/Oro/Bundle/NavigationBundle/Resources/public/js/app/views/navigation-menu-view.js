@@ -3,25 +3,16 @@ import _ from 'underscore';
 import BaseView from 'oroui/js/app/views/base/view';
 
 import tools from 'oroui/js/tools';
+import KEY_CODES from 'oroui/js/tools/keyboard-key-codes';
 
 import 'jquery-ui/scroll-parent';
 
-const KEY_CODES = {
-    ENTER: 13,
-    ESC: 27,
-    SPACE: 32,
-    END: 35,
-    HOME: 36,
-    LEFT: 37,
-    RIGHT: 39,
-    UP: 38,
-    DOWN: 40
-};
 
 const MAX_TRY_ATTEND = 1000;
 
 const MENU_BAR_ATTR = 'data-menu-bar';
 const MENU_ITEM_INDEX_ATTR = 'data-relative-index';
+const SKIP_FOCUS_DECORATION_ATTR = 'data-skip-focus-decoration-inner-elements';
 
 const NavigationMenuView = BaseView.extend({
     /**
@@ -32,7 +23,6 @@ const NavigationMenuView = BaseView.extend({
             'keydown': 'onKeyDown',
             [`focus ${this.options.focusableElements}`]: 'onFocus',
             [`focusin ${this.options.focusableElements}`]: 'onFocusInToFocusable',
-            [`focusout ${this.options.focusableElements}`]: 'onFocusOutToFocusable',
             'focusout': 'onFocusOut',
             'show.bs.dropdown': 'onDropdownToggle',
             'hide.bs.dropdown': 'onDropdownToggle'
@@ -98,28 +88,28 @@ const NavigationMenuView = BaseView.extend({
         this.markPlainMenu();
         this.setRovingTabIndex();
 
-        this.registerKey(KEY_CODES.ESC, this.onPressedEsc);
+        this.registerKey(KEY_CODES.ESCAPE, this.onPressedEsc);
         this.registerKey(KEY_CODES.SPACE, this.onPressedSpace);
         this.registerKey(KEY_CODES.END, this.onPressedEnd);
         this.registerKey(KEY_CODES.HOME, this.onPressedHome);
 
         if (this.isPlainMenu) {
-            this.registerKey(KEY_CODES.LEFT, this.onPressedStartSide);
-            this.registerKey(KEY_CODES.RIGHT, this.onPressedEndSide);
+            this.registerKey(KEY_CODES.ARROW_LEFT, this.onPressedStartSide);
+            this.registerKey(KEY_CODES.ARROW_RIGHT, this.onPressedEndSide);
             // For simple (plain) menu buttons TOP and BOTTOM are doing the same behaviour as LEFT and RIGHT
-            this.registerKey(KEY_CODES.UP, this.onPressedStartSide);
-            this.registerKey(KEY_CODES.DOWN, this.onPressedEndSide);
+            this.registerKey(KEY_CODES.ARROW_UP, this.onPressedStartSide);
+            this.registerKey(KEY_CODES.ARROW_DOWN, this.onPressedEndSide);
         } else {
             if (_.isRTL()) {
-                this.registerKey(KEY_CODES.RIGHT, this.onPressedStartSide);
-                this.registerKey(KEY_CODES.LEFT, this.onPressedEndSide);
+                this.registerKey(KEY_CODES.ARROW_RIGHT, this.onPressedStartSide);
+                this.registerKey(KEY_CODES.ARROW_LEFT, this.onPressedEndSide);
             } else {
-                this.registerKey(KEY_CODES.LEFT, this.onPressedStartSide);
-                this.registerKey(KEY_CODES.RIGHT, this.onPressedEndSide);
+                this.registerKey(KEY_CODES.ARROW_LEFT, this.onPressedStartSide);
+                this.registerKey(KEY_CODES.ARROW_RIGHT, this.onPressedEndSide);
             }
 
-            this.registerKey(KEY_CODES.UP, this.onPressedUp);
-            this.registerKey(KEY_CODES.DOWN, this.onPressedDown);
+            this.registerKey(KEY_CODES.ARROW_UP, this.onPressedUp);
+            this.registerKey(KEY_CODES.ARROW_DOWN, this.onPressedDown);
         }
 
         NavigationMenuView.__super__.initialize.call(this, options);
@@ -132,6 +122,9 @@ const NavigationMenuView = BaseView.extend({
         if (this.disposed) {
             return;
         }
+
+        const menuBar = $(`[${MENU_BAR_ATTR}]`);
+        menuBar.attr(SKIP_FOCUS_DECORATION_ATTR, '');
 
         delete this._keysMap;
         delete this._searchData;
@@ -156,7 +149,7 @@ const NavigationMenuView = BaseView.extend({
     },
 
     /**
-     * Add specific attribute to first level menu
+     * Add specific attributes to first level menu
      */
     markMenuBar() {
         const $firstLevelMenu = this.$el
@@ -168,6 +161,11 @@ const NavigationMenuView = BaseView.extend({
         }
 
         $firstLevelMenu.attr(MENU_BAR_ATTR, '');
+
+        const isKeyboardTriggered = this.$el.closest('[data-focus-visible]').length > 0;
+        if (!isKeyboardTriggered) {
+            $firstLevelMenu.attr(SKIP_FOCUS_DECORATION_ATTR, '');
+        }
     },
 
     /**
@@ -208,6 +206,9 @@ const NavigationMenuView = BaseView.extend({
      * @param {Object} event
      */
     onKeyDown(event) {
+        const menuBar = this.$el.find(`[${MENU_BAR_ATTR}]`);
+        menuBar.removeAttr(SKIP_FOCUS_DECORATION_ATTR);
+
         if ($(event.target).is(this.options.focusableElements)) {
             this.navigateTo(event);
         }
@@ -217,14 +218,19 @@ const NavigationMenuView = BaseView.extend({
      * @param {Object} event
      */
     onFocusInToFocusable(event) {
-        this.toggleFocusableClass(event.target, true);
-    },
+        const menuBar = this.$el.find(`[${MENU_BAR_ATTR}]`);
 
-    /**
-     * @param {Object} event
-     */
-    onFocusOutToFocusable(event) {
-        this.toggleFocusableClass(event.target, false);
+        if (!this.interactionTypeDetermined) {
+            this.interactionTypeDetermined = true;
+
+            const isKeyboardTriggered = this.$el.closest('[data-focus-visible]').length > 0;
+
+            if (isKeyboardTriggered) {
+                menuBar.removeAttr(SKIP_FOCUS_DECORATION_ATTR);
+            }
+        } else if (event.relatedTarget && !this.el.contains(event.relatedTarget)) {
+            menuBar.removeAttr(SKIP_FOCUS_DECORATION_ATTR);
+        }
     },
 
     /**
@@ -255,6 +261,7 @@ const NavigationMenuView = BaseView.extend({
         if (!$.contains(event.currentTarget, event.relatedTarget)) {
             this.openNextRootMenu = false;
             this.hasFocus = false;
+            this.interactionTypeDetermined = false;
             this.setRovingTabIndex(this.getRootFocusableElement($(event.target)));
             this.hideSubMenu();
         }
@@ -1052,14 +1059,6 @@ const NavigationMenuView = BaseView.extend({
                 this.hideSubMenu();
             }
         }
-    },
-
-    /**
-     * @param {HTMLElement} el
-     * @param {boolean} state
-     */
-    toggleFocusableClass(el, state) {
-        $(el).toggleClass('focus-via-arrows-keys', state);
     }
 });
 
