@@ -22,6 +22,8 @@ const MAX_TRY_ATTEND = 1000;
 
 const MENU_BAR_ATTR = 'data-menu-bar';
 const MENU_ITEM_INDEX_ATTR = 'data-relative-index';
+const SKIP_FOCUS_DECORATION_ATTR = 'data-skip-focus-decoration-inner-elements';
+const IS_NATIVE_FOCUS_BEHAVIOUR = true;
 
 const NavigationMenuView = BaseView.extend({
     /**
@@ -133,6 +135,9 @@ const NavigationMenuView = BaseView.extend({
             return;
         }
 
+        const menuBar = $(`[${MENU_BAR_ATTR}]`);
+        menuBar.attr(SKIP_FOCUS_DECORATION_ATTR, '');
+
         delete this._keysMap;
         delete this._searchData;
         delete this.$lastFocusedElementInRow;
@@ -156,7 +161,7 @@ const NavigationMenuView = BaseView.extend({
     },
 
     /**
-     * Add specific attribute to first level menu
+     * Add specific attributes to first level menu
      */
     markMenuBar() {
         const $firstLevelMenu = this.$el
@@ -168,6 +173,11 @@ const NavigationMenuView = BaseView.extend({
         }
 
         $firstLevelMenu.attr(MENU_BAR_ATTR, '');
+
+        const isKeyboardTriggered = this.$el.closest('[data-focus-visible]').length > 0;
+        if (!isKeyboardTriggered) {
+            $firstLevelMenu.attr(SKIP_FOCUS_DECORATION_ATTR, '');
+        }
     },
 
     /**
@@ -208,6 +218,9 @@ const NavigationMenuView = BaseView.extend({
      * @param {Object} event
      */
     onKeyDown(event) {
+        const menuBar = this.$el.find(`[${MENU_BAR_ATTR}]`);
+        menuBar.removeAttr(SKIP_FOCUS_DECORATION_ATTR);
+
         if ($(event.target).is(this.options.focusableElements)) {
             this.navigateTo(event);
         }
@@ -218,6 +231,20 @@ const NavigationMenuView = BaseView.extend({
      */
     onFocusInToFocusable(event) {
         this.toggleFocusableClass(event.target, true);
+
+        const menuBar = this.$el.find(`[${MENU_BAR_ATTR}]`);
+
+        if (!this.interactionTypeDetermined) {
+            this.interactionTypeDetermined = true;
+
+            const isKeyboardTriggered = this.$el.closest('[data-focus-visible]').length > 0;
+
+            if (isKeyboardTriggered) {
+                menuBar.removeAttr(SKIP_FOCUS_DECORATION_ATTR);
+            }
+        } else if (event.relatedTarget && !this.el.contains(event.relatedTarget)) {
+            menuBar.removeAttr(SKIP_FOCUS_DECORATION_ATTR);
+        }
     },
 
     /**
@@ -255,6 +282,7 @@ const NavigationMenuView = BaseView.extend({
         if (!$.contains(event.currentTarget, event.relatedTarget)) {
             this.openNextRootMenu = false;
             this.hasFocus = false;
+            this.interactionTypeDetermined = false;
             this.setRovingTabIndex(this.getRootFocusableElement($(event.target)));
             this.hideSubMenu();
         }
@@ -1059,7 +1087,9 @@ const NavigationMenuView = BaseView.extend({
      * @param {boolean} state
      */
     toggleFocusableClass(el, state) {
-        $(el).toggleClass('focus-via-arrows-keys', state);
+        if (!IS_NATIVE_FOCUS_BEHAVIOUR) {
+            $(el).toggleClass('focus-via-arrows-keys', state);
+        }
     }
 });
 
