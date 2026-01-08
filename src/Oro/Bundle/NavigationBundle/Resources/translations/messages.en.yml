@@ -76,3 +76,6 @@ oro:
             manage_menus:
                 label: Manage Menus
                 description: Allows users to add/edit/remove menu items
+        route:
+            form:
+                placeholder_multiple: Select one or more system pages
