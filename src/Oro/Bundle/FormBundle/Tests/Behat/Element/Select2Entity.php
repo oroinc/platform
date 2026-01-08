@@ -448,7 +448,7 @@ JS;
      * @param bool $failOnEmpty
      * @return NodeElement|null
      */
-    private function getSearchInput(bool $failOnEmpty = true)
+    public function getSearchInput(bool $failOnEmpty = true)
     {
         $inputs = array_filter(
             $this->getPage()->findAll('css', $this->searchInputSelector),

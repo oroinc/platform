@@ -12,3 +12,8 @@ services:
             - '@oro_navigation.provider.menu_names'
         tags:
             - { name: form.type}
+
+    Oro\Bundle\NavigationBundle\Form\Type\RouteMultipleChoiceType:
+        parent: oro_navigation.form.type.route_select
+        tags:
+            - { name: form.type }
