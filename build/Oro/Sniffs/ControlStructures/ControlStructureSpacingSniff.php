@@ -139,73 +139,88 @@ class ControlStructureSpacingSniff implements Sniff
         }
 
         // Check the first expression.
-        $allowSameLineOpen = $this->shouldAllowSameLineFirstExpression($phpcsFile, $parenOpener, $parenCloser, $next);
+        $firstExpressionCheck = $this->checkFirstExpression($phpcsFile, $parenOpener, $parenCloser, $next);
+        $allowSameLineOpen = $firstExpressionCheck['allow'];
 
         if (
             $allowSameLineOpen === false
             && $tokens[$next]['line'] !== ($tokens[$parenOpener]['line'] + 1)
         ) {
-            $error = 'The first expression of a multi-line control structure'
-                . ' must be on the line after the opening parenthesis';
-            $fix = $phpcsFile->addFixableError($error, $next, 'FirstExpressionLine');
-            if ($fix === true) {
-                $phpcsFile->fixer->beginChangeset();
-                if ($tokens[$next]['line'] > ($tokens[$parenOpener]['line'] + 1)) {
-                    for ($i = ($parenOpener + 1); $i < $next; $i++) {
-                        if ($tokens[$next]['line'] === $tokens[$i]['line']) {
-                            break;
+            // Provide a more specific error when it's a call-like construct with closing parens on separate lines.
+            if ($firstExpressionCheck['callLikeWithSeparateClose'] ?? false) {
+                $error = 'When a multi-line call is the entire condition of a control structure,'
+                    . ' the closing parentheses must be on the same line';
+                $phpcsFile->addError($error, $parenCloser, 'CallClosingParensSameLine');
+            } else {
+                $error = 'The first expression of a multi-line control structure'
+                    . ' must be on the line after the opening parenthesis';
+                $fix = $phpcsFile->addFixableError($error, $next, 'FirstExpressionLine');
+                if ($fix === true) {
+                    $phpcsFile->fixer->beginChangeset();
+                    if ($tokens[$next]['line'] > ($tokens[$parenOpener]['line'] + 1)) {
+                        for ($i = ($parenOpener + 1); $i < $next; $i++) {
+                            if ($tokens[$next]['line'] === $tokens[$i]['line']) {
+                                break;
+                            }
+
+                            $phpcsFile->fixer->replaceToken($i, '');
                         }
-
-                        $phpcsFile->fixer->replaceToken($i, '');
                     }
-                }
 
-                $phpcsFile->fixer->addNewline($parenOpener);
-                $phpcsFile->fixer->endChangeset();
+                    $phpcsFile->fixer->addNewline($parenOpener);
+                    $phpcsFile->fixer->endChangeset();
+                }
             }
         }
 
         // Check the indent of each line.
+        // Skip this check when the entire condition is a single call-like construct,
+        // as the indentation inside the call should follow the call's own rules.
+        // Also skip when it's a call-like construct with closing parens on separate lines,
+        // since the real issue is the closing parens, not the indentation.
         $first = $phpcsFile->findFirstOnLine(T_WHITESPACE, $stackPtr, true);
-        $requiredIndent = ($tokens[$first]['column'] + $this->indent - 1);
-        for ($i = $parenOpener; $i < $parenCloser; $i++) {
-            if (
-                $tokens[$i]['column'] !== 1
-                || $tokens[($i + 1)]['line'] > $tokens[$i]['line']
-                || isset(Tokens::COMMENT_TOKENS[$tokens[$i]['code']]) === true
-            ) {
-                continue;
-            }
+        $callLikeWithSeparateClose = $firstExpressionCheck['callLikeWithSeparateClose'] ?? false;
+        if ($allowSameLineOpen === false && $callLikeWithSeparateClose === false) {
+            $requiredIndent = ($tokens[$first]['column'] + $this->indent - 1);
+            for ($i = $parenOpener; $i < $parenCloser; $i++) {
+                if (
+                    $tokens[$i]['column'] !== 1
+                    || $tokens[($i + 1)]['line'] > $tokens[$i]['line']
+                    || isset(Tokens::COMMENT_TOKENS[$tokens[$i]['code']]) === true
+                ) {
+                    continue;
+                }
 
-            if (($i + 1) === $parenCloser) {
-                break;
-            }
+                if (($i + 1) === $parenCloser) {
+                    break;
+                }
 
-            // Leave indentation inside multi-line strings.
-            if (
-                isset(Tokens::TEXT_STRING_TOKENS[$tokens[$i]['code']]) === true
-                || isset(Tokens::HEREDOC_TOKENS[$tokens[$i]['code']]) === true
-            ) {
-                continue;
-            }
+                // Leave indentation inside multi-line strings.
+                if (
+                    isset(Tokens::TEXT_STRING_TOKENS[$tokens[$i]['code']]) === true
+                    || isset(Tokens::HEREDOC_TOKENS[$tokens[$i]['code']]) === true
+                ) {
+                    continue;
+                }
 
-            if ($tokens[$i]['code'] !== T_WHITESPACE) {
-                $foundIndent = 0;
-            } else {
-                $foundIndent = $tokens[$i]['length'];
-            }
+                if ($tokens[$i]['code'] !== T_WHITESPACE) {
+                    $foundIndent = 0;
+                } else {
+                    $foundIndent = $tokens[$i]['length'];
+                }
 
-            if ($foundIndent < $requiredIndent) {
-                $error = 'Each line in a multi-line control structure must be indented at least once;'
-                    . ' expected at least %s spaces, but found %s';
-                $data = [$requiredIndent, $foundIndent];
-                $fix = $phpcsFile->addFixableError($error, $i, 'LineIndent', $data);
-                if ($fix === true) {
-                    $padding = \str_repeat(' ', $requiredIndent);
-                    if ($foundIndent === 0) {
-                        $phpcsFile->fixer->addContentBefore($i, $padding);
-                    } else {
-                        $phpcsFile->fixer->replaceToken($i, $padding);
+                if ($foundIndent < $requiredIndent) {
+                    $error = 'Each line in a multi-line control structure must be indented at least once;'
+                        . ' expected at least %s spaces, but found %s';
+                    $data = [$requiredIndent, $foundIndent];
+                    $fix = $phpcsFile->addFixableError($error, $i, 'LineIndent', $data);
+                    if ($fix === true) {
+                        $padding = \str_repeat(' ', $requiredIndent);
+                        if ($foundIndent === 0) {
+                            $phpcsFile->fixer->addContentBefore($i, $padding);
+                        } else {
+                            $phpcsFile->fixer->replaceToken($i, $padding);
+                        }
                     }
                 }
             }
@@ -279,61 +294,69 @@ class ControlStructureSpacingSniff implements Sniff
      * - the call-like construct starts on the same line as the control opener,
      * - and the call-like construct spans multiple lines.
      *
+     * @return array{allow: bool, callLikeWithSeparateClose?: bool}
+     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    private function shouldAllowSameLineFirstExpression(
+    private function checkFirstExpression(
         File $phpcsFile,
         int $parenOpener,
         int $parenCloser,
         int $next
-    ): bool {
+    ): array {
         $tokens = $phpcsFile->getTokens();
 
         // We only consider relaxing when the first expression is on the same line as the opening parenthesis.
         if ($tokens[$next]['line'] !== $tokens[$parenOpener]['line']) {
-            return false;
+            return ['allow' => false];
         }
 
         // Find the last non-whitespace token before the control closer.
         $prev = $phpcsFile->findPrevious(T_WHITESPACE, ($parenCloser - 1), $parenOpener, true);
         if ($prev === false) {
-            return false;
+            return ['allow' => false];
         }
 
         // The last token must be a closing parenthesis.
         if ($tokens[$prev]['code'] !== T_CLOSE_PARENTHESIS) {
-            return false;
+            return ['allow' => false];
         }
 
         // Get the opener of this closing parenthesis.
         $callOpener = $tokens[$prev]['parenthesis_opener'] ?? null;
         if (\is_int($callOpener) === false) {
-            return false;
+            return ['allow' => false];
         }
 
         // The call opener must be inside the control-structure parentheses.
         if ($callOpener <= $parenOpener || $callOpener >= $parenCloser) {
-            return false;
+            return ['allow' => false];
         }
 
         // The call opener must be on the same line as the control opener.
         // This ensures the entire condition is a single call-like construct.
         if ($tokens[$callOpener]['line'] !== $tokens[$parenOpener]['line']) {
-            return false;
+            return ['allow' => false];
         }
 
         // Check if this is a call-like construct.
         if ($this->isCallLikeOpenParen($phpcsFile, $callOpener) === false) {
-            return false;
+            return ['allow' => false];
         }
 
         // The call-like construct must span multiple lines.
         if ($tokens[$callOpener]['line'] >= $tokens[$prev]['line']) {
-            return false;
+            return ['allow' => false];
         }
 
-        return true;
+        // The call's closing `)` must be on the same line as the control's closing `)`.
+        // This ensures the pattern is `))` not `) )` on separate lines.
+        if ($tokens[$prev]['line'] !== $tokens[$parenCloser]['line']) {
+            return ['allow' => false, 'callLikeWithSeparateClose' => true];
+        }
+
+        return ['allow' => true];
     }
 
     /**
@@ -426,6 +449,7 @@ class ControlStructureSpacingSniff implements Sniff
 
         // Common call-like patterns:
         // - foo( ... )            => T_STRING before '('
+        // - \Foo\bar( ... )       => T_NAME_FULLY_QUALIFIED before '('
         // - $fn( ... )            => T_VARIABLE before '('
         // - ($factory)( ... )     => T_CLOSE_PARENTHESIS before '(' (callable returned from expression)
         // - $obj->method( ... )   => T_STRING (method name) before '('; object operator is earlier
@@ -433,6 +457,7 @@ class ControlStructureSpacingSniff implements Sniff
         // - $arr['k']( ... )      => T_CLOSE_SQUARE_BRACKET before '(' (array deref call)
         $callLikePredecessors = [
             T_STRING,
+            T_NAME_FULLY_QUALIFIED,
             T_VARIABLE,
             T_CLOSE_PARENTHESIS,
             T_CLOSE_SQUARE_BRACKET,
