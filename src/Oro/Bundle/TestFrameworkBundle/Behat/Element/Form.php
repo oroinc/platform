@@ -6,6 +6,8 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Carbon\Carbon;
+use Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entities;
+use Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity;
 use Oro\Bundle\TestFrameworkBundle\Behat\Environment\BehatSecretsReader;
 use Oro\Bundle\TestFrameworkBundle\Exception\BehatSecretsReaderException;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\VariableStorage;
@@ -61,6 +63,10 @@ class Form extends Element
      * @param string $value
      *
      * @throws ElementNotFoundException
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function typeInField($label, $value, $clearField = true)
     {
@@ -71,9 +77,11 @@ class Form extends Element
             $field = $this->getPage()->find('named', ['field', $label]);
         }
 
+        $isElementFromFactory = false;
         if (null === $field && $this->elementFactory->hasElement($label)) {
             // try to find field among defined elements
             $field = $this->elementFactory->createElement($label);
+            $isElementFromFactory = true;
         }
 
         if (null === $field) {
@@ -87,7 +95,31 @@ class Form extends Element
 
         self::assertTrue($field->isVisible(), "Field with '$label' was found, but it not visible");
 
-        $this->getDriver()->typeIntoInput($field->getXpath(), $value, $clearField);
+        // Wrap the field to handle special field types (like Select2) - but only if it's not already wrapped
+        if (!$isElementFromFactory && $field instanceof NodeElement) {
+            $field = $this->wrapField($label, $field);
+        }
+
+        // Check if this is a Select2 field that needs special handling
+        if ($field instanceof Select2Entity || $field instanceof Select2Entities) {
+            // For Select2 fields, we need to activate it first by clicking on the select2-choice
+            // This is more reliable than calling open() which tries to click the arrow
+            $select2Choice = $field->getParent()->find('css', '.select2-choice');
+            if ($select2Choice && $select2Choice->isVisible()) {
+                $select2Choice->click();
+                $this->getDriver()->waitForAjax();
+            } else {
+                // Fallback to the standard open method
+                $field->open();
+            }
+
+            // Now get the search input and type into it
+            $searchInput = $field->getSearchInput();
+            $this->getDriver()->typeIntoInput($searchInput->getXpath(), $value, $clearField);
+        } else {
+            // For regular fields, use the driver's typeIntoInput
+            $this->getDriver()->typeIntoInput($field->getXpath(), $value, $clearField);
+        }
     }
 
     public function assertFields(TableNode $table)
@@ -322,6 +354,7 @@ class Form extends Element
     /**
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function autoWrapField(?NodeElement $field): NodeElement
     {
@@ -362,18 +395,65 @@ class Form extends Element
             return $this->elementFactory->wrapElement('Checkbox', $field);
         }
 
-        if (in_array('select2-offscreen', $classes, true)) {
-            if (strtolower($field->getTagName()) === 'select' && $field->hasAttribute('multiple')) {
-                $select2Input = $field->getParent()->find('css', '.select2-input');
-                if ($select2Input) {
-                    return $this->elementFactory->wrapElement('Select2Entities', $select2Input);
-                }
-            } else {
+        if (\in_array('select2-offscreen', $classes, true)) {
+            // The focusser element is inside .select2-container and is the correct element to wrap
+            // for Select2Entity. Select2Entity expects $this->getParent() to return .select2-container
+            // so that it can find .select2-arrow, .select2-chosen, etc.
+            // Do NOT navigate to the hidden input - it breaks Select2Entity's parent-based lookups.
+            if (\in_array('select2-focusser', $classes, true)) {
                 return $this->elementFactory->wrapElement('Select2Entity', $field);
             }
+
+            // For <select> elements, check the 'multiple' attribute
+            if (\strtolower($field->getTagName()) === 'select') {
+                if ($field->hasAttribute('multiple')) {
+                    // Find the .select2-input for multi-select
+                    $select2Input = $field->getParent()->find('css', '.select2-input');
+                    if ($select2Input) {
+                        return $this->elementFactory->wrapElement('Select2Entities', $select2Input);
+                    }
+                }
+                // Single-select <select> - wrap the select element itself
+                return $this->elementFactory->wrapElement('Select2Entity', $field);
+            }
+
+            // For <input type="hidden"> fields, we need to determine if it's single or multi-select
+            // Multi-select fields have a .select2-input element (without select2-input-single class)
+            // already in the DOM inside <ul class="select2-choices">
+            // Single-select fields have a .select2-focusser, and a NEW .select2-input.select2-input-single
+            // appears in a popup when opened
+            $parent = $field->getParent();
+
+            // Look for .select2-input that is for multi-select (already in DOM, not single-select)
+            $select2Inputs = $parent->findAll('css', '.select2-input');
+            foreach ($select2Inputs as $select2Input) {
+                $inputClasses = \preg_split(
+                    '/\s+/',
+                    (string) $select2Input->getAttribute('class'),
+                    -1,
+                    PREG_SPLIT_NO_EMPTY
+                );
+
+                // Skip focusser elements - those are for single-select
+                if (\in_array('select2-focusser', $inputClasses, true)) {
+                    continue;
+                }
+
+                // Skip single-select input fields (these appear in popups, not in the original DOM)
+                if (\in_array('select2-input-single', $inputClasses, true)) {
+                    continue;
+                }
+
+                // This is a multi-select input (already in DOM, no select2-input-single class)
+                return $this->elementFactory->wrapElement('Select2Entities', $select2Input);
+            }
+
+            // No multi-select .select2-input found, this is a single-select field
+            // For <input type="hidden"> autocomplete fields - wrap as Select2Entity (single select)
+            return $this->elementFactory->wrapElement('Select2Entity', $field);
         }
 
-        if (in_array('select2-input', $classes, true)) {
+        if (\in_array('select2-input', $classes, true)) {
             return $this->elementFactory->wrapElement('Select2Entities', $field);
         }
 

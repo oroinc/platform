@@ -55,7 +55,7 @@ class SystemConfigForm extends Form
      * @return NodeElement|null
      * @throws ElementNotFoundException
      */
-    private function getSettingControlByLabel($label, $inputLabel = null, $section = null)
+    protected function getSettingControlByLabel($label, $inputLabel = null, $section = null)
     {
         $container = $this->getContainer($label, $section);
 
@@ -68,14 +68,17 @@ class SystemConfigForm extends Form
             $input = $container->find('css', '[data-name="field__value"]');
         }
 
-        $colorsBlock = $container->find('css', '.simplecolorpicker');
-        if ($input->getAttribute('type') == 'hidden' && !empty($colorsBlock)) {
-            $input = $this->elementFactory->wrapElement('ColorsConfigBlock', $colorsBlock->getParent());
-        }
-
         self::assertNotNull($input, "Input element for $label not found");
 
-        return $input;
+        // Handle special color picker fields (Config-bundle-specific)
+        $colorsBlock = $container->find('css', '.simplecolorpicker');
+        if ($input->getAttribute('type') == 'hidden' && !empty($colorsBlock)) {
+            return $this->elementFactory->wrapElement('ColorsConfigBlock', $colorsBlock->getParent());
+        }
+
+        // Delegate to base Form's auto-wrapping for all other field types
+        // (Select2, checkboxes, date pickers, etc.)
+        return $this->autoWrapField($input);
     }
 
     /**
@@ -83,7 +86,7 @@ class SystemConfigForm extends Form
      * @param null|string $section
      * @return NodeElement
      */
-    private function getContainer($label, $section = null)
+    protected function getContainer($label, $section = null)
     {
         if ($section) {
             $labelElement = $this->find(
