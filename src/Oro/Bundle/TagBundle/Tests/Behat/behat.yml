@@ -21,6 +21,21 @@ oro_behat_extension:
             locator: '//input[@type="text"]'
             element: Select2Entities
 
+    Grid Tags Cell:
+      selector:
+        type: xpath
+        locator: '//td[contains(@class, "tags-cell")]'
+
+    Grid Tags Edit Button:
+      selector:
+        type: xpath
+        locator: '//td[contains(@class, "tags-cell")]//span[@class="inline-editor-edit-action"]//button[@data-role="edit"]'
+
+    Grid Tags Inline Form Search:
+      selector:
+        type: xpath
+        locator: '//form[contains(@class, "tags-column-editor")]//input[contains(@class, "select2-input")]'
+
   suites:
     OroTagBundle:
       contexts:
