@@ -44,7 +44,7 @@ define(function(require) {
             const $source = this.options.elementSelector !== null ? $(this.options.elementSelector) : this.$el;
             const textToCopy = this.options.sourceAttribute === null
                 ? $source.text()
-                : $source.attr(this.options.sourceAttribute);
+                : $source.prop(this.options.sourceAttribute);
 
             const $textarea = this.createUtilityTextarea(textToCopy);
 
