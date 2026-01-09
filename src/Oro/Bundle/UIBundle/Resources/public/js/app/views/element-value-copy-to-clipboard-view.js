@@ -12,6 +12,7 @@ define(function(require) {
     const ElementValueCopyToClipboardView = BaseView.extend({
         options: {
             elementSelector: null,
+            sourceAttribute: null,
             messages: {
                 copy_not_supported: 'oro.ui.element_value.messages.copy_not_supported',
                 copied: 'oro.ui.element_value.messages.copied',
@@ -41,7 +42,10 @@ define(function(require) {
 
         clickHandler: function() {
             const $source = this.options.elementSelector !== null ? $(this.options.elementSelector) : this.$el;
-            const textToCopy = $source.text();
+            const textToCopy = this.options.sourceAttribute === null
+                ? $source.text()
+                : $source.prop(this.options.sourceAttribute);
+
             const $textarea = this.createUtilityTextarea(textToCopy);
 
             $source.closest('.ui-dialog, body').append($textarea);

@@ -47,7 +47,10 @@ class OroSSOExtension extends Extension implements PrependExtensionInterface
             if (isset($config['firewalls']['main']['oauth']['resource_owners'])) {
                 $oauthResourceOwners = $config['firewalls']['main']['oauth']['resource_owners'];
                 foreach ($oauthResourceOwners as $name => $path) {
-                    $oauthResourceOwners[$name] = $backendPrefix . $path;
+                    // do not add backend prefix if path is the route name
+                    if (str_starts_with($path, '/')) {
+                        $oauthResourceOwners[$name] = $backendPrefix . $path;
+                    }
                 }
                 $config['firewalls']['main']['oauth']['resource_owners'] = $oauthResourceOwners;
             }
