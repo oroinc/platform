@@ -4,6 +4,12 @@ namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures;
 
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * Resolves fixture identifiers for Alice fixtures, handling bundle resource paths.
+ *
+ * This resolver converts fixture objects and strings to their identifiers, supporting
+ * Symfony bundle resource notation (e.g., `@AcmeBundle/Resources/fixtures/data.yml`).
+ */
 class AliceFixtureIdentifierResolver implements FixtureIdentifierResolverInterface
 {
     /** @var KernelInterface */

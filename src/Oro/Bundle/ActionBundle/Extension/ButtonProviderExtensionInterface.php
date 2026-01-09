@@ -7,6 +7,13 @@ use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 
+/**
+ * Defines the contract for button provider extensions that find and validate buttons.
+ *
+ * Implementations of this interface are responsible for finding buttons matching
+ * a given search context and determining their availability based on permissions
+ * and other restrictions.
+ */
 interface ButtonProviderExtensionInterface
 {
     /**

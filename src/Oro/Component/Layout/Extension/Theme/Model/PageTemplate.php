@@ -2,6 +2,12 @@
 
 namespace Oro\Component\Layout\Extension\Theme\Model;
 
+/**
+ * Represents a page template configuration with metadata and display properties.
+ *
+ * A page template defines a layout template that can be used for specific routes, with properties like
+ * label, description, screenshot, and enabled status. Templates can inherit properties from parent templates.
+ */
 class PageTemplate
 {
     /** @var string */

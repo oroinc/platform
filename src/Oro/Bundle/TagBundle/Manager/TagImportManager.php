@@ -9,6 +9,14 @@ use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Entity\TagManager as TagStorage;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
+/**
+ * Manages tag operations during import and export processes.
+ *
+ * This manager handles the conversion of tag data between string and object representations,
+ * manages pending tags during import operations, and coordinates with the tag storage to
+ * persist tags for entities. It supports batch loading of tags for multiple entities and
+ * maintains a cache of loaded tags to prevent duplicate tag creation during imports.
+ */
 class TagImportManager
 {
     public const TAGS_FIELD = 'tags';

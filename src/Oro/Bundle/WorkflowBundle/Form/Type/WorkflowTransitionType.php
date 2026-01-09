@@ -7,6 +7,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for workflow transition forms with attribute handling and validation.
+ *
+ * This form type extends workflow attributes form to provide transition-specific functionality,
+ * including validation that the transition is allowed for the current workflow item.
+ */
 class WorkflowTransitionType extends AbstractType
 {
     public const NAME = 'oro_workflow_transition';

@@ -11,6 +11,14 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\LessThan;
 
+/**
+ * Form type for entering monetary amounts with locale-aware formatting.
+ *
+ * This type extends Symfony's {@see MoneyType} with locale-specific currency symbols,
+ * grouping settings, and currency symbol positioning. It automatically configures
+ * the currency based on system locale settings and applies validation constraints
+ * to prevent excessively large values.
+ */
 class OroMoneyType extends AbstractType
 {
     public const NAME = 'oro_money';

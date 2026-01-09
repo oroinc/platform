@@ -8,6 +8,13 @@ use Oro\Bundle\TagBundle\Entity\Taxonomy;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Handles form submission and processing for taxonomy entities.
+ *
+ * This handler manages the complete lifecycle of taxonomy form processing, including form data binding,
+ * request validation, and persistence of taxonomy entities to the database. It supports both POST and PUT
+ * HTTP methods for creating and updating taxonomies.
+ */
 class TaxonomyHandler
 {
     use RequestHandlerTrait;

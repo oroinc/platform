@@ -4,6 +4,13 @@ namespace Oro\Bundle\EmbeddedFormBundle\Layout\Form;
 
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * Provides access to a Symfony form and its metadata for layout rendering.
+ *
+ * This class wraps a Symfony FormInterface and provides convenient access to form properties
+ * such as action, method, and enctype. It maintains a hash of the form configuration for identification purposes
+ * and extends {@see AbstractFormAccessor} to inherit common form accessor functionality.
+ */
 class FormAccessor extends AbstractFormAccessor
 {
     /** @var FormInterface */

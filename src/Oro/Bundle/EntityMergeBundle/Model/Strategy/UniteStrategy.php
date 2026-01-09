@@ -8,6 +8,14 @@ use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
+/**
+ * Implements the unite merge strategy for collection fields.
+ *
+ * Combines collection values from all source entities into a single collection on the master entity,
+ * removing duplicates based on entity identifiers. This strategy is only applicable to collection fields
+ * when the `UNITE` merge mode is selected. For fields marked as needing cloning, creates deep copies of
+ * collection elements to prevent shared references across entities.
+ */
 class UniteStrategy implements StrategyInterface
 {
     /**

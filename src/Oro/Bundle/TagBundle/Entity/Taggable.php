@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\TagBundle\Entity;
 
+/**
+ * Defines the contract for entities that support tagging functionality.
+ *
+ * Implementing classes can be tagged with one or more tags, allowing for flexible
+ * categorization and organization of entities throughout the application.
+ */
 interface Taggable
 {
     /**

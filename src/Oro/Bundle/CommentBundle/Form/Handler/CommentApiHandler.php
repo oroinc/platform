@@ -9,6 +9,14 @@ use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Handles form submission and processing for comment API requests.
+ *
+ * This handler processes `POST` and `PUT` requests for comment creation and updates,
+ * validates the submitted form data, and persists valid comments to the database.
+ * It integrates with the request stack to extract HTTP request data and uses the
+ * entity manager to persist changes.
+ */
 class CommentApiHandler
 {
     use RequestHandlerTrait;

@@ -4,6 +4,13 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 
+/**
+ * Provides common functionality for Behat page objects.
+ *
+ * This base class implements the page object pattern for Behat tests, providing access to the element factory
+ * and route information. Subclasses should extend this to create specific page objects representing
+ * different application pages with their unique elements and interactions.
+ */
 abstract class Page
 {
     /**

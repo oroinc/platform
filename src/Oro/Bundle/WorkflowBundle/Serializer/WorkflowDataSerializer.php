@@ -6,6 +6,12 @@ use Oro\Bundle\ImportExportBundle\Serializer\Serializer;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
+/**
+ * Serializes and deserializes workflow data with workflow context awareness.
+ *
+ * This serializer extends the base serializer to provide workflow-specific serialization
+ * capabilities, enabling proper handling of workflow attributes and data.
+ */
 class WorkflowDataSerializer extends Serializer implements WorkflowAwareSerializer
 {
     /**

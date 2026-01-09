@@ -6,6 +6,12 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers email recipient providers in the dependency injection container.
+ *
+ * Collects all services tagged with `oro_email.recipients_provider`, sorts them by priority,
+ * and injects them into the email recipients provider service for use in email composition.
+ */
 class EmailRecipientsProviderPass implements CompilerPassInterface
 {
     public const SERVICE_KEY = 'oro_email.email_recipients.provider';

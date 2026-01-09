@@ -6,6 +6,13 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Utils\EditModeUtils;
 
+/**
+ * Provides configuration for datagrid actions based on integration channel state.
+ *
+ * This class determines which actions (schedule sync, activate, deactivate, delete) should be
+ * available for each integration channel in the datagrid, based on the channel's enabled state,
+ * integration type capabilities, and edit mode restrictions.
+ */
 class ActionConfiguration
 {
     /**

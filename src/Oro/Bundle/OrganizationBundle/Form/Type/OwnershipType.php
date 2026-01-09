@@ -6,6 +6,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Provides a form type for selecting ownership types in entity configuration.
+ *
+ * This form type renders as a choice field with four ownership options: NONE, USER, BUSINESS_UNIT,
+ * and ORGANIZATION. It is used in entity configuration forms to define the ownership model for
+ * custom entities, determining which entity type (`User`, `BusinessUnit`, or `Organization`) can own
+ * instances of the entity.
+ */
 class OwnershipType extends AbstractType
 {
     public const NAME = 'oro_type_choice_ownership_type';

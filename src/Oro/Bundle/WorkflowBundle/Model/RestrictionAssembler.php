@@ -12,6 +12,12 @@ use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Model\AbstractAssembler as ComponentAbstractAssembler;
 
+/**
+ * Assembles workflow restriction objects from configuration arrays.
+ *
+ * This assembler creates {@see Restriction} instances from workflow configuration, validating
+ * steps and attributes, and building the complete restriction structure.
+ */
 class RestrictionAssembler extends ComponentAbstractAssembler
 {
     /**

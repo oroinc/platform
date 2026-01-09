@@ -9,6 +9,13 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Handles form submission and processing for user group management.
+ *
+ * This handler manages the complete lifecycle of group form processing, including
+ * validation, user assignment/removal, and persistence. It coordinates the addition
+ * and removal of users from groups based on form data.
+ */
 class GroupHandler
 {
     use RequestHandlerTrait;

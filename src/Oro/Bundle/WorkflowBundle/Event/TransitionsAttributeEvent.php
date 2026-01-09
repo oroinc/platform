@@ -5,6 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Event;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Event dispatched before adding an attribute to workflow transitions.
+ *
+ * This event allows listeners to modify attribute options and transition options before
+ * an attribute is added to the workflow transition configuration.
+ */
 class TransitionsAttributeEvent extends Event
 {
     public const BEFORE_ADD = 'oro_workflow.transitions.attribute.before_add';

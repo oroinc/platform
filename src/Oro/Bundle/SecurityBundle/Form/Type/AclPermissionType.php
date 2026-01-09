@@ -7,6 +7,13 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for editing individual ACL permissions.
+ *
+ * This form type provides fields for configuring an ACL permission, including
+ * the access level selector and the permission name. It is typically used as a
+ * child form within permission collection forms.
+ */
 class AclPermissionType extends AbstractType
 {
     #[\Override]

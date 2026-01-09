@@ -5,6 +5,12 @@ namespace Oro\Component\Layout;
 use Oro\Component\Layout\Form\FormRendererInterface;
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
 
+/**
+ * Renders layout blocks using form rendering infrastructure.
+ *
+ * This renderer delegates block rendering to a form renderer and manages block and form themes
+ * through a form renderer engine, providing a unified rendering interface for layout blocks.
+ */
 class LayoutRenderer implements LayoutRendererInterface
 {
     /** @var FormRendererInterface */

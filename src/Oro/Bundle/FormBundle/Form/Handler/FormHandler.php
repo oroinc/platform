@@ -10,6 +10,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Handles form processing with event dispatching and transaction support.
+ *
+ * This handler provides comprehensive form processing with lifecycle events,
+ * allowing listeners to intervene at key points (before data set, before submit,
+ * before flush, after flush). It manages database transactions to ensure data
+ * consistency and supports interrupting the processing flow when needed.
+ */
 class FormHandler implements FormHandlerInterface
 {
     use RequestHandlerTrait;

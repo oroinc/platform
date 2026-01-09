@@ -2,6 +2,12 @@
 
 namespace Oro\Component\Layout\Loader\Generator;
 
+/**
+ * Holds source data and filename information for layout update generation.
+ *
+ * This class encapsulates the source data (array or string) and optional filename
+ * that are passed to layout update generators for processing.
+ */
 class GeneratorData
 {
     /** @var array|string */

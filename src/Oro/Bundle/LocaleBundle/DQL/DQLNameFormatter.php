@@ -5,6 +5,16 @@ namespace Oro\Bundle\LocaleBundle\DQL;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Generates DQL expressions for formatting person names in database queries.
+ *
+ * This class provides functionality to build DQL expressions that format person names
+ * according to locale-specific name format patterns. It analyzes entity
+ * classes to determine which name parts (prefix, first, middle, last, suffix) are available
+ * based on implemented interfaces, then constructs appropriate `CONCAT` and `CASE` expressions
+ * to format the complete name in a single database query. This enables efficient name
+ * formatting at the database level rather than in application code.
+ */
 class DQLNameFormatter
 {
     /** @var NameFormatter */

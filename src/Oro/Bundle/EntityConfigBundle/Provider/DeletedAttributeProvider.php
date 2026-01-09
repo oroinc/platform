@@ -6,6 +6,13 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
+/**
+ * Provides access to deleted attributes and manages their value removal from attribute families.
+ *
+ * This provider retrieves deleted attribute field configuration models from the database and delegates
+ * attribute value removal to an underlying attribute value provider, supporting cleanup operations when
+ * attributes are deleted from the system.
+ */
 class DeletedAttributeProvider implements DeletedAttributeProviderInterface
 {
     /**

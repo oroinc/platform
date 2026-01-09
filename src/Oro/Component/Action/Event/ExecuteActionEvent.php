@@ -5,6 +5,13 @@ namespace Oro\Component\Action\Event;
 use Oro\Component\Action\Action\ActionInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Event dispatched before and after action execution.
+ *
+ * This event carries the execution context and the action being executed, allowing listeners
+ * to inspect or modify the context before or after action execution. Used with {@see ExecuteActionEvents}
+ * constants to distinguish between pre-execution and post-execution events.
+ */
 class ExecuteActionEvent extends Event
 {
     /** @var mixed */

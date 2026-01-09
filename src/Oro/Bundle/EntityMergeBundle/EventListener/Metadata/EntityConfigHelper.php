@@ -7,6 +7,14 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
+/**
+ * Provides access to entity and field configuration for merge operations.
+ *
+ * Acts as a helper to retrieve configuration from the entity config manager for both
+ * entities and fields. It supports querying configuration by scope (e.g., `entity`, `extend`),
+ * class name, and field name. Additionally, it provides utilities for preparing field metadata
+ * by checking extend configuration and setting appropriate property paths and display flags.
+ */
 class EntityConfigHelper
 {
     public const EXTEND_CONFIG_SCOPE = 'extend';

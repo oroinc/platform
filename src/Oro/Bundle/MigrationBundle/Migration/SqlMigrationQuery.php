@@ -5,6 +5,15 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Executes raw SQL queries during migrations.
+ *
+ * This class provides a simple implementation of {@see MigrationQuery} for executing one or more
+ * raw SQL statements. It supports adding queries dynamically and provides descriptions
+ * for logging. The class requires a database connection to be set via the {@see ConnectionAwareInterface}.
+ * This is useful for migrations that need to execute SQL that cannot be expressed through
+ * the schema modification API.
+ */
 class SqlMigrationQuery implements MigrationQuery, ConnectionAwareInterface
 {
     /**

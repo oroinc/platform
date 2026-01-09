@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\SoapBundle\Model;
 
+/**
+ * Represents the identifiers for a relationship between two entities.
+ *
+ * Encapsulates the class names and IDs of both the owner entity and the target entity
+ * in a relationship, providing a value object for passing relation information through
+ * the SOAP API processing pipeline.
+ */
 class RelationIdentifier
 {
     /** @var string */

@@ -4,6 +4,13 @@ namespace Oro\Component\ConfigExpression;
 
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Defines the contract for accessing and manipulating values within an evaluation context.
+ *
+ * The context accessor provides a unified interface for getting, setting, and checking the
+ * existence of values in a context object. It supports both direct property access and
+ * property path expressions, enabling flexible data access patterns in expressions.
+ */
 interface ContextAccessorInterface
 {
     /**

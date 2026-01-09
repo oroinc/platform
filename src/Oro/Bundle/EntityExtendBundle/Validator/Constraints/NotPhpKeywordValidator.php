@@ -6,6 +6,13 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Validator for ensuring field names are not PHP reserved keywords.
+ *
+ * This validator checks that custom field names do not conflict with PHP reserved words
+ * and language constructs. Using reserved keywords as field names would cause syntax errors
+ * when the entity class is generated or used in PHP code.
+ */
 class NotPhpKeywordValidator extends ConstraintValidator
 {
     private $reservedWords = [

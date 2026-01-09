@@ -6,6 +6,15 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\Config\Resolver\ResolverInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Filters widget configuration items based on visibility rules.
+ *
+ * This filter evaluates multiple criteria to determine which widgets and widget items
+ * should be visible to the current user, including ACL permissions, applicability conditions,
+ * enabled/disabled state, and feature toggle settings. It ensures that only authorized and
+ * applicable widgets are displayed on dashboards, providing a secure and context-aware
+ * widget selection experience.
+ */
 class WidgetConfigVisibilityFilter
 {
     /** @var AuthorizationCheckerInterface */

@@ -8,6 +8,14 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers integration types (channels, transports, and connectors) with the types registry during compilation.
+ *
+ * This compiler pass collects all services tagged with integration type tags (`oro_integration.channel`,
+ * `oro_integration.transport`, `oro_integration.connector`) and registers them with the types registry manager.
+ * This enables the system to discover and manage all available integration types, allowing developers to
+ * extend the platform with custom channel types, transport implementations, and connector providers.
+ */
 class TypesPass implements CompilerPassInterface
 {
     public const MANAGER_ID               = 'oro_integration.manager.types_registry';

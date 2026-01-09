@@ -7,6 +7,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting available embedded forms.
+ *
+ * This form type extends the Symfony {@see ChoiceType} and provides a dropdown list of all
+ * available embedded forms registered in the system. It automatically populates the
+ * choices from the embedded form manager, allowing users to select from all configured
+ * embedded forms.
+ */
 class AvailableEmbeddedFormType extends AbstractType
 {
     /**

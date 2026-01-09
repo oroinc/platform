@@ -5,6 +5,14 @@ namespace Oro\Bundle\SearchBundle\Query\Criteria;
 use Doctrine\Common\Collections\Expr\Value;
 use Doctrine\Common\Collections\ExpressionBuilder as BaseExpressionBuilder;
 
+/**
+ * Builds search query expressions with extended comparison operators.
+ *
+ * This class extends Doctrine's {@see ExpressionBuilder} to provide additional comparison
+ * operators specific to search queries, including `notContains`, `startsWith`, `exists`,
+ * `notExists`, `like`, and `notLike` operations. These operators enable more sophisticated
+ * search filtering capabilities beyond standard Doctrine comparisons.
+ */
 class ExpressionBuilder extends BaseExpressionBuilder
 {
     /**

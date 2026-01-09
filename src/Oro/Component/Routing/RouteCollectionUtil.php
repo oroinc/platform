@@ -5,6 +5,12 @@ namespace Oro\Component\Routing;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
+/**
+ * Provides utility methods for working with route collections.
+ *
+ * This utility class offers helper methods for filtering and copying routes,
+ * particularly for handling hidden routes and managing route visibility.
+ */
 class RouteCollectionUtil
 {
     /**

@@ -9,6 +9,15 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 
+/**
+ * Handles datagrid result events to maintain entity pagination storage consistency.
+ *
+ * This listener responds to ORM datagrid result events and clears the pagination storage
+ * for the affected entity type. This ensures that cached pagination data is invalidated
+ * whenever datagrid results change, preventing stale or inconsistent pagination state.
+ * The listener only acts when entity pagination is enabled and the datagrid is applicable
+ * for pagination.
+ */
 class EntityPaginationListener
 {
     /** @var DoctrineHelper */

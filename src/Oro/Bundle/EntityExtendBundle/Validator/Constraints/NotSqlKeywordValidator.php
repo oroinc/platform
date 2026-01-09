@@ -7,6 +7,13 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Validator for ensuring field names are not SQL reserved keywords.
+ *
+ * This validator checks that custom field names do not conflict with SQL reserved words
+ * for the configured database platform. Using reserved keywords as column names would cause
+ * SQL syntax errors when the database schema is created or modified.
+ */
 class NotSqlKeywordValidator extends ConstraintValidator
 {
     public const ALIAS = 'oro_entity_extend.validator.not_sql_keyword';

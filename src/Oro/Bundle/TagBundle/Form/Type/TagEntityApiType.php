@@ -8,6 +8,13 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * API form type for individual tag entities.
+ *
+ * This form type provides API-specific form configuration for tag entities, including a required name field
+ * with validation constraints. It is designed to be used within tag collections in API contexts and
+ * disables error bubbling to provide granular validation feedback.
+ */
 class TagEntityApiType extends AbstractType
 {
     #[\Override]

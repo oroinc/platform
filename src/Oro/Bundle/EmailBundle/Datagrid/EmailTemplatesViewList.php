@@ -5,6 +5,12 @@ namespace Oro\Bundle\EmailBundle\Datagrid;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\AbstractViewsList;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 
+/**
+ * Provides predefined grid views for email templates filtering.
+ *
+ * Defines views for filtering email templates by type, including views for all templates
+ * and system-only templates to facilitate template management in the admin interface.
+ */
 class EmailTemplatesViewList extends AbstractViewsList
 {
     #[\Override]

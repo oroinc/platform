@@ -6,8 +6,11 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 
 /**
- * Class RelationGuesser
- * @package Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions
+ * Provides inline editing configuration for relation datagrid columns.
+ *
+ * This guesser automatically configures inline editing options for columns that display entity relations.
+ * It sets up the appropriate editor view and API accessor for relation fields, enabling users to select
+ * related entities directly within the datagrid interface using autocomplete functionality.
  */
 class RelationGuesser implements GuesserInterface
 {

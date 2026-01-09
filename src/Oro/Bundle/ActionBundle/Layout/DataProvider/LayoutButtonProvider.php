@@ -8,6 +8,13 @@ use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
+/**
+ * Provides buttons for layout rendering based on entity and datagrid context.
+ *
+ * This data provider retrieves available buttons for layout templates, supporting
+ * filtering by entity, datagrid, and button group, with automatic context preparation
+ * from the current request and entity information.
+ */
 class LayoutButtonProvider
 {
     /** @var ButtonProvider */

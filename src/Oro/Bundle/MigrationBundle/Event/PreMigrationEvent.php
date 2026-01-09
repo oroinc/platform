@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\MigrationBundle\Event;
 
+/**
+ * Represents an event dispatched before migrations are executed.
+ *
+ * This event provides access to loaded migration versions for each bundle and allows listeners
+ * to register additional migrations that should be executed. It is used to initialize the migration
+ * state and prepare the system for the migration process.
+ */
 class PreMigrationEvent extends MigrationEvent
 {
     /**

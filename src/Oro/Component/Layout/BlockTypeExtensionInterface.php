@@ -5,6 +5,12 @@ namespace Oro\Component\Layout;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\Options;
 
+/**
+ * Defines the contract for extending block types with additional functionality.
+ *
+ * Block type extensions allow modifying the build and view processes of existing block types,
+ * overriding their default options, and extending their behavior without modifying the original type.
+ */
 interface BlockTypeExtensionInterface
 {
     /**

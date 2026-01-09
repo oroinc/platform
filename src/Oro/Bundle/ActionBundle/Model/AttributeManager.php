@@ -6,6 +6,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Exception\UnknownAttributeException;
 
+/**
+ * Manages action attributes with support for entity attribute designation and type filtering.
+ *
+ * This manager maintains a collection of attributes, designates one as the entity attribute,
+ * and provides methods to retrieve attributes by type or filter for entity-type attributes.
+ */
 class AttributeManager
 {
     /**

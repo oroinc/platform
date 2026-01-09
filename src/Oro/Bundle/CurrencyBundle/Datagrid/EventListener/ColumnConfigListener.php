@@ -7,6 +7,14 @@ use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
+/**
+ * Handles datagrid column configuration for multi-currency fields.
+ *
+ * This listener processes datagrid build events to automatically configure columns
+ * that display multi-currency values. It sets up the necessary field mappings for
+ * the original field, value field, and currency field, enabling proper display and
+ * inline editing of multi-currency data in datagrids.
+ */
 class ColumnConfigListener
 {
     /** @var array  */

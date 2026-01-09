@@ -4,6 +4,14 @@ namespace Oro\Component\MessageQueue\Client;
 
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 
+/**
+ * Creates driver instances based on the connection type.
+ *
+ * This factory maps connection classes to their corresponding driver implementations,
+ * allowing the message queue system to support multiple transport backends. It instantiates
+ * the appropriate driver for a given connection and configuration, enabling flexible
+ * integration with different message brokers.
+ */
 class DriverFactory implements DriverFactoryInterface
 {
     /** @var array [connection class => driver class, ...] */

@@ -9,6 +9,13 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting colors from a predefined palette.
+ *
+ * This type extends {@see AbstractSimpleColorPickerType} to provide a choice-based color
+ * picker with support for custom color schemas or predefined color palettes. It
+ * allows optional empty color selection and supports translatable color labels.
+ */
 class OroSimpleColorChoiceType extends AbstractSimpleColorPickerType
 {
     #[\Override]

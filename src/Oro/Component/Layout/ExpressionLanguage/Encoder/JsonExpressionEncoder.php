@@ -6,6 +6,12 @@ use Oro\Component\Layout\Action;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
+/**
+ * Encodes parsed expressions and actions into JSON format.
+ *
+ * This encoder converts Symfony expression language expressions and layout actions into JSON strings,
+ * using an expression manipulator to transform expressions into array representations suitable for JSON serialization.
+ */
 class JsonExpressionEncoder implements ExpressionEncoderInterface
 {
     /**

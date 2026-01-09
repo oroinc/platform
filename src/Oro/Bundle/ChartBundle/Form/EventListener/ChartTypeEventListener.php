@@ -7,6 +7,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Handles form events for chart type forms to manage chart-specific data structure.
+ *
+ * This event listener subscribes to form events (`PRE_SET_DATA` and `SUBMIT`) to transform
+ * chart form data between two formats: a flat structure used by the form and a nested
+ * structure organized by chart name and options groups (settings, data_schema). It ensures
+ * that chart configuration data is properly structured when loading and submitting forms.
+ */
 class ChartTypeEventListener implements EventSubscriberInterface
 {
     /**

@@ -2,6 +2,13 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Defines the contract for a block in the layout hierarchy.
+ *
+ * A block represents a structural element in a layout that can have a type, options, parent/child relationships,
+ * and associated data. Blocks are the fundamental building blocks of the layout system and provide access to
+ * their type information, context, and data through this interface.
+ */
 interface BlockInterface
 {
     /**

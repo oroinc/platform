@@ -12,11 +12,11 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * The abstract class for form types are used to work with entity config attributes
- * which can impact a schema of extend entities.
- * Supported options:
- *  require_schema_update - if set to true an entity will be marked as "Required Update" in case
- *                          when a value of an entity config attribute is changed
+ * Provides common functionality for form types that work with entity config attributes affecting extend entity schemas.
+ *
+ * This base class extends the entity config form type to add schema update tracking. When config attributes
+ * that impact the database schema are changed, it marks the entity as requiring a schema update.
+ * The 'schema_update_required' option controls when entities should be flagged for schema regeneration.
  */
 abstract class AbstractConfigType extends BaseAbstractConfigType
 {

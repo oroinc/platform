@@ -8,6 +8,14 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Starts a workflow for an entity and stores the resulting workflow item.
+ *
+ * This action initiates a workflow by name, optionally for a specific entity and transition.
+ * It supports passing additional data to the workflow item and stores the created workflow item
+ * in a specified attribute for use in subsequent operations. The workflow name, target attribute,
+ * and optional entity, transition, and data parameters are configured during initialization.
+ */
 class StartWorkflow extends ComponentAbstractAction
 {
     /**

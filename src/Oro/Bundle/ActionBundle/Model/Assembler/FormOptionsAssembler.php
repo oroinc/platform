@@ -7,6 +7,13 @@ use Oro\Bundle\ActionBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 
+/**
+ * Assembles and validates form options for action operations.
+ *
+ * This assembler processes form options configuration, validates that referenced
+ * attributes exist, applies configuration passes, and ensures consistency between
+ * attribute fields and default values.
+ */
 class FormOptionsAssembler implements ConfigurationPassesAwareInterface
 {
     use ConfigurationPassesAwareTrait;

@@ -8,6 +8,12 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for email address input fields.
+ *
+ * Provides a text-based form field for entering email addresses with support for both
+ * single and multiple email addresses through a data transformer.
+ */
 class EmailAddressType extends AbstractType
 {
     #[\Override]

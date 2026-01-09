@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
+/**
+ * Provides common functionality for workflow configuration processing.
+ *
+ * This base class implements helper methods for merging configuration arrays with field aliases.
+ * Subclasses should extend this to implement specific configuration processing logic
+ * for different workflow configuration types.
+ */
 abstract class AbstractConfiguration
 {
     /**

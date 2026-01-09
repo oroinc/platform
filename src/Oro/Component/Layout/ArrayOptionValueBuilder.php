@@ -5,6 +5,12 @@ namespace Oro\Component\Layout;
 use Oro\Component\Layout\Exception\InvalidArgumentException;
 use Oro\Component\Layout\Exception\UnexpectedTypeException;
 
+/**
+ * Builds array option values by managing a collection of array elements.
+ *
+ * This builder supports adding, removing, and replacing array elements, with optional support
+ * for scalar values that are automatically wrapped in arrays.
+ */
 class ArrayOptionValueBuilder implements OptionValueBuilderInterface
 {
     /** @var bool */

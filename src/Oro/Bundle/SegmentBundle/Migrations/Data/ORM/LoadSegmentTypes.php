@@ -6,6 +6,15 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 
+/**
+ * Data fixture that loads available segment types into the database.
+ *
+ * This fixture creates and persists the standard segment types (dynamic and static)
+ * during the data loading phase of application installation or migration. These types
+ * define the fundamental segment categories available in the system. Dynamic segments
+ * are computed based on criteria, while static segments contain a fixed list of entities.
+ * This fixture ensures that the application always has these core segment types available.
+ */
 class LoadSegmentTypes extends AbstractFixture
 {
     /**

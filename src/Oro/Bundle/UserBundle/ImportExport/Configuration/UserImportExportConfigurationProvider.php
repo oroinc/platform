@@ -7,6 +7,13 @@ use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterfa
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Provides import/export configuration for user entities.
+ *
+ * This provider defines the configuration for user import and export operations,
+ * specifying the entity class and the processors to use for handling user data
+ * during import/export workflows.
+ */
 class UserImportExportConfigurationProvider implements ImportExportConfigurationProviderInterface
 {
     #[\Override]

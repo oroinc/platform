@@ -6,6 +6,13 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * Form type for custom entity forms.
+ *
+ * This form type aggregates block configuration from child form fields and makes it
+ * available at the parent form level. It enables custom entity forms to organize
+ * fields into logical blocks with shared configuration.
+ */
 class CustomEntityType extends AbstractType
 {
     #[\Override]

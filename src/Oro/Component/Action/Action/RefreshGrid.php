@@ -5,6 +5,13 @@ namespace Oro\Component\Action\Action;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+/**
+ * Marks one or more datagrids for refresh in the current context.
+ *
+ * This action adds grid names to a special context property that signals the frontend to refresh
+ * the specified datagrids. It supports multiple grid names and merges them with any existing refresh
+ * requests, ensuring each grid is refreshed only once.
+ */
 class RefreshGrid extends AbstractAction
 {
     /**

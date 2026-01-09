@@ -4,6 +4,12 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Dispatched after all Behat tests have finished execution.
+ *
+ * This event allows isolators to perform cleanup operations after the entire test suite completes,
+ * such as removing temporary files, restoring system state, or generating reports.
+ */
 final class AfterFinishTestsEvent implements TestIsolationEvent
 {
     /**

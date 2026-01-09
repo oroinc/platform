@@ -24,6 +24,12 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
+ * Handles email entity creation and updates through the API.
+ *
+ * This handler processes email form submissions from API requests, converting between {@see EmailModel}
+ * and {@see Email} entities. It manages email properties, recipients, folders, attachments, and related entities,
+ * coordinating with the email entity builder to persist changes and dispatch appropriate events.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EmailApiHandler extends ApiFormHandler

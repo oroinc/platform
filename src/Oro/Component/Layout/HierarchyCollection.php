@@ -2,6 +2,13 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Manages a hierarchical tree structure of layout items.
+ *
+ * This collection maintains a nested array structure representing parent-child relationships between
+ * layout items. It supports adding, removing, and querying items within the hierarchy, with special
+ * handling for item positioning relative to siblings.
+ */
 class HierarchyCollection
 {
     /**

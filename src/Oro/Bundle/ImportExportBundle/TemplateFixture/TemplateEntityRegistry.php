@@ -9,6 +9,14 @@ use Oro\Bundle\ImportExportBundle\Event\LoadTemplateFixturesEvent;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Registry for managing template fixture entities.
+ *
+ * This class maintains a registry of template entities organized by entity class and key.
+ * It supports lazy initialization of entity data through repositories, dispatches events
+ * to allow listeners to modify entities, and ensures all entities are fully initialized
+ * before being used for export template generation or import validation.
+ */
 class TemplateEntityRegistry
 {
     /** @var EventDispatcherInterface */

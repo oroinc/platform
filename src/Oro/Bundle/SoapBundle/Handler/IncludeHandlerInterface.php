@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\SoapBundle\Handler;
 
+/**
+ * Defines the contract for handlers that process `X-Include` requests in SOAP API responses.
+ *
+ * Implementing handlers determine whether they can process a specific include request
+ * and perform the necessary operations to include additional data in the API response.
+ * Handlers communicate unsupported or unknown includes via response headers.
+ */
 interface IncludeHandlerInterface
 {
     public const HEADER_INCLUDE     = 'X-Include';

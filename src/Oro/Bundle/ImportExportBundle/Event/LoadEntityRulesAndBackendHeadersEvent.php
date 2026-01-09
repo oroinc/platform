@@ -4,6 +4,14 @@ namespace Oro\Bundle\ImportExportBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Event dispatched when loading entity rules and backend headers for import/export.
+ *
+ * This event provides access to entity metadata including headers, conversion rules,
+ * delimiters, and conversion type information. Listeners can modify headers and rules
+ * to customize how entities are exported or imported, enabling dynamic configuration
+ * of the import/export process based on entity type and conversion context.
+ */
 class LoadEntityRulesAndBackendHeadersEvent extends Event
 {
     /** @var string */

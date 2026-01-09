@@ -7,6 +7,13 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Handles form events for password change operations.
+ *
+ * This event subscriber manages the password change form lifecycle, including
+ * validation of the current password and handling of empty password fields.
+ * It ensures proper password field management during form submission.
+ */
 class ChangePasswordSubscriber extends UserSubscriber
 {
     #[\Override]

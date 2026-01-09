@@ -6,6 +6,12 @@ use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
+/**
+ * Helper for managing workflow transition widget entity references.
+ *
+ * This helper provides methods to retrieve or create entity references needed for
+ * rendering and processing workflow transition widgets.
+ */
 class TransitionWidgetHelper
 {
     /** @var DoctrineHelper */

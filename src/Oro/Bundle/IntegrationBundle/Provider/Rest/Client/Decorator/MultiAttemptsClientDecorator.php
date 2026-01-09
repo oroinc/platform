@@ -8,6 +8,14 @@ use Oro\Bundle\IntegrationBundle\Provider\Rest\Exception\RestException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Decorates a REST client to automatically retry failed requests with configurable delays.
+ *
+ * This decorator wraps a REST client and implements automatic retry logic for failed HTTP requests.
+ * It retries requests that fail with specific HTTP status codes (bad gateway, service unavailable,
+ * gateway timeout) with configurable delays between attempts. This improves reliability when
+ * communicating with external APIs that may experience temporary issues.
+ */
 class MultiAttemptsClientDecorator implements RestClientInterface
 {
     /**

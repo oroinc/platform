@@ -7,6 +7,12 @@ use Oro\Bundle\EntityBundle\Grid\GridHelper as BaseGridHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides helper methods for configuring email template datagrids.
+ *
+ * Extends the base grid helper to provide email template-specific functionality including
+ * action visibility configuration, type choice lists, and entity name filtering for templates.
+ */
 class EmailTemplateGridHelper extends BaseGridHelper
 {
     /** @var TranslatorInterface */

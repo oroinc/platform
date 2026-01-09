@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
+/**
+ * Provides schema customization utilities for database migrations.
+ *
+ * This trait offers methods to override Doctrine's default schema handling behavior.
+ * It allows classes to replace Doctrine's `RemoveNamespacedAssets` and `SchemaDiff` classes
+ * with custom implementations that provide extended functionality for managing namespaced
+ * assets and schema differences in the context of extended entities.
+ */
 trait SchemaTrait
 {
     /**

@@ -5,6 +5,13 @@ namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
+/**
+ * Provides common functionality for dumper extensions that handle many-to-many associations.
+ *
+ * This class extends the abstract association dumper extension to specifically handle many-to-many relationships
+ * where multiple entity classes can be associated.
+ * It processes configurations where the association attribute contains a collection of entity classes.
+ */
 abstract class MultipleAssociationEntityConfigDumperExtension extends AbstractAssociationEntityConfigDumperExtension
 {
     #[\Override]

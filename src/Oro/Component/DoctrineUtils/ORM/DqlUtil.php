@@ -2,6 +2,12 @@
 
 namespace Oro\Component\DoctrineUtils\ORM;
 
+/**
+ * Provides utility methods for working with DQL (Doctrine Query Language) strings.
+ *
+ * This utility class offers methods for analyzing and manipulating DQL queries,
+ * including parameter detection, alias extraction, and expression building.
+ */
 class DqlUtil
 {
     /**

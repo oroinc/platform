@@ -6,6 +6,13 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
+/**
+ * Provides utility methods for working with entity and field configuration identifiers.
+ *
+ * This helper class offers methods to extract field names and types from configuration identifiers,
+ * and to check immutability constraints on entity and field configurations. It serves as a bridge
+ * between configuration identifiers and the configuration manager for form type implementations.
+ */
 class ConfigTypeHelper
 {
     /** @var ConfigManager */

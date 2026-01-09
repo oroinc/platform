@@ -4,6 +4,13 @@ namespace Oro\Bundle\EntityExtendBundle\Tools\ConfigFilter;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 
+/**
+ * Provides common functionality for entity configuration filters.
+ *
+ * This base class implements the callable interface (`__invoke`) to allow filters to be used as functions,
+ * validating that they receive a single {@see ConfigInterface} argument. Subclasses should implement
+ * the `filter` method to define specific filtering logic for entity configurations.
+ */
 abstract class AbstractFilter
 {
     /**

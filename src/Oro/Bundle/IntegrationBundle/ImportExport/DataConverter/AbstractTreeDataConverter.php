@@ -6,6 +6,13 @@ use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 
+/**
+ * Provides common functionality for converting hierarchical/tree-structured data.
+ *
+ * This base class supports nested data conversion by allowing registration of node-specific data converters
+ * for different parts of the tree structure.
+ * It handles both one-to-one and one-to-many relationships in the tree hierarchy.
+ */
 abstract class AbstractTreeDataConverter extends IntegrationAwareDataConverter
 {
     /**

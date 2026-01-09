@@ -6,6 +6,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for creating and editing reminders.
+ *
+ * This form type provides fields for configuring a reminder entity, including the
+ * notification method (email, web socket, etc.) and the interval at which the reminder
+ * should be triggered. It is used in forms for entities that implement the
+ * {@see RemindableInterface} to allow users to set up and manage reminders.
+ */
 class ReminderType extends AbstractType
 {
     #[\Override]

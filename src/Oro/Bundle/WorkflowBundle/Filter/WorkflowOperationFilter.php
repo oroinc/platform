@@ -8,6 +8,12 @@ use Oro\Bundle\ActionBundle\Model\OperationRegistryFilterInterface;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
+/**
+ * Filters workflow operations based on disabled workflow definitions.
+ *
+ * This filter removes operations that are associated with disabled workflows, preventing
+ * users from executing operations on entities with inactive workflows.
+ */
 class WorkflowOperationFilter implements OperationRegistryFilterInterface
 {
     public const WILDCARD = 'break'; //reserved word never will be used as class name

@@ -5,6 +5,13 @@ namespace Oro\Bundle\DataGridBundle\Tools;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 
+/**
+ * Helper for extending datagrid configurations with mixins.
+ *
+ * This class handles the merging of mixin configurations into base datagrid configurations,
+ * including proper alias replacement and recursive array merging. Mixins allow reusable
+ * configuration fragments to be composed into datagrids.
+ */
 class MixinConfigurationHelper
 {
     public const ROOT_ALIAS_PLACEHOLDER = '__root_entity__';

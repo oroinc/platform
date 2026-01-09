@@ -6,6 +6,13 @@ use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Exception\ValidationException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Validates entity data before merge execution.
+ *
+ * Executes validation constraints on the entity data being merged and throws a
+ * ValidationException if any constraint violations are found. This step ensures that
+ * the merge operation only proceeds with valid data, preventing inconsistent state.
+ */
 class ValidateStep implements MergeStepInterface
 {
     /**

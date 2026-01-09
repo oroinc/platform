@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\MigrationBundle\Migration;
 
+/**
+ * Represents the execution state of a migration.
+ *
+ * This class encapsulates information about a migration including the migration instance,
+ * bundle name, version, and execution status (not executed, successful, or failed).
+ * It is used by the migration executor to track the progress and results of migration execution.
+ */
 class MigrationState
 {
     /** @var Migration */

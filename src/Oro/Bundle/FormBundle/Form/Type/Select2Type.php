@@ -19,6 +19,14 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Base form type for Select2-enhanced form fields.
+ *
+ * This type provides the foundation for Select2 integration, wrapping various
+ * Symfony form types with Select2 JavaScript functionality. It handles configuration
+ * of Select2 options, data transformation for hidden fields, and block prefix
+ * management for proper template rendering.
+ */
 class Select2Type extends AbstractType
 {
     public const HIDDEN_TYPE = 'Symfony\Component\Form\Extension\Core\Type\HiddenType';

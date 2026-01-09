@@ -5,6 +5,9 @@ namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 
+/**
+ * Repository for managing process definition entities.
+ */
 class ProcessDefinitionRepository extends EntityRepository
 {
     /**

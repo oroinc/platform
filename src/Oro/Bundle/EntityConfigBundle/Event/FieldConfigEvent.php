@@ -4,6 +4,13 @@ namespace Oro\Bundle\EntityConfigBundle\Event;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
+/**
+ * Dispatched when field configuration is modified.
+ *
+ * This event is triggered during field configuration changes and provides access to the entity class name,
+ * field name, and the configuration manager.
+ * Listeners can use this event to react to field-level configuration updates.
+ */
 class FieldConfigEvent extends Event
 {
     /** @var string */

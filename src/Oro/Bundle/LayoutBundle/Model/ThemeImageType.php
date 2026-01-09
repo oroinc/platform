@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\LayoutBundle\Model;
 
+/**
+ * Represents a theme image type with associated dimensions and constraints.
+ *
+ * This model encapsulates the configuration for a specific image type used in a theme,
+ * including its name, display label, supported dimensions, and optional maximum number
+ * of images allowed. It is used to define and validate image uploads and processing
+ * in theme-aware image handling.
+ */
 class ThemeImageType
 {
     /**

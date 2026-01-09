@@ -6,6 +6,14 @@ use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
+/**
+ * Initializes merge modes for field metadata during entity merge configuration.
+ *
+ * Listens to entity metadata creation events and assigns default merge modes to fields
+ * that don't have explicit modes configured. All fields support the `REPLACE` mode, while
+ * collection fields additionally support the `UNITE` mode, allowing users to choose between
+ * replacing or combining collection values during merge operations.
+ */
 class MergeModesListener
 {
     public function onCreateMetadata(EntityMetadataEvent $event)

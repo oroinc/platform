@@ -5,6 +5,13 @@ namespace Oro\Bundle\UIBundle\Provider;
 use Doctrine\Common\Util\ClassUtils;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides localized labels and widget titles for action buttons.
+ *
+ * Manages a registry of action button labels and widget titles, keyed by entity class name.
+ * Supports class-specific labels with fallback to default labels for unregistered classes.
+ * Handles translation of labels through the Symfony translator service.
+ */
 class ActionButtonLabelProvider
 {
     /** @var TranslatorInterface */

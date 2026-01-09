@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\ImportExportBundle\Converter;
 
+/**
+ * Defines the contract for converting data between export and import formats.
+ *
+ * Implementations handle the transformation of entity data between complex internal
+ * representations and flat export formats (e.g., CSV, Excel), managing the conversion
+ * of nested structures and relationships into a tabular format suitable for export,
+ * and vice versa for import operations.
+ */
 interface DataConverterInterface
 {
     /**

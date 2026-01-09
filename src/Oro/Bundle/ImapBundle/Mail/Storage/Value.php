@@ -4,6 +4,13 @@ namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 
+/**
+ * Encapsulates an email header value with character encoding information.
+ *
+ * This class represents a single email header value (such as subject, sender, or recipient)
+ * along with its character encoding. It provides methods to retrieve both the raw value
+ * and the decoded value with proper character set conversion for correct display and processing.
+ */
 class Value
 {
     /**

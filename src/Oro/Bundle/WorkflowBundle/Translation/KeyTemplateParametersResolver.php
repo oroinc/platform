@@ -6,6 +6,12 @@ use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Resolves translation key template parameters for workflow components.
+ *
+ * This resolver matches provided parameters against known translation key templates
+ * for workflows, transitions, steps, and attributes, enabling proper translation key generation.
+ */
 class KeyTemplateParametersResolver
 {
     /** @var TranslatorInterface */

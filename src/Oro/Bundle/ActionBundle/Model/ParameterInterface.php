@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
+/**
+ * Defines the contract for action parameters with type and label information.
+ */
 interface ParameterInterface extends OptionAwareInterface
 {
     /**

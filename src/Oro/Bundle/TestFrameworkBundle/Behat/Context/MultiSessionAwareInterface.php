@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Context;
 
+/**
+ * Defines the contract for managing multiple browser sessions with named aliases.
+ *
+ * Classes implementing this interface can work with multiple concurrent browser sessions,
+ * each identified by a unique alias, and can store and retrieve session-specific values.
+ */
 interface MultiSessionAwareInterface
 {
     /**

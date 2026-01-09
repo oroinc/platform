@@ -5,6 +5,13 @@ namespace Oro\Bundle\ActionBundle\Model\Criteria;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 
+/**
+ * Encapsulates search criteria for finding operations.
+ *
+ * This class holds the criteria used to search for operations, including entity class,
+ * route, datagrid, and button group information, with support for creation from
+ * button search context and group normalization.
+ */
 class OperationFindCriteria
 {
     /** @var string */

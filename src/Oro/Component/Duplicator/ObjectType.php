@@ -2,6 +2,12 @@
 
 namespace Oro\Component\Duplicator;
 
+/**
+ * Represents a type of object with its associated keyword and class name.
+ *
+ * This class encapsulates the metadata for an object type, including the
+ * keyword identifier and the fully qualified class name it represents.
+ */
 class ObjectType
 {
     /**

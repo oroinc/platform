@@ -5,6 +5,12 @@ namespace Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Widget;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
 
+/**
+ * Represents a widget-based mass action for datagrids.
+ *
+ * This mass action opens a widget (modal, dialog, or embedded component) to handle bulk
+ * operations, allowing for complex user interactions before processing selected records.
+ */
 class WidgetMassAction extends AbstractMassAction
 {
     /** @var array */

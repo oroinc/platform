@@ -6,8 +6,12 @@ use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * This event is fired during building detailed information about entities.
- * @see \Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider
+ * Dispatched during the building of detailed entity structure information.
+ *
+ * This event allows listeners to modify or extend the entity structure data that describes
+ * entities, their fields, and relationships.
+ * It is used by {@see \Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider} to collect entity metadata
+ * for various purposes such as form building, API documentation, and UI rendering.
  */
 class EntityStructureOptionsEvent extends Event
 {

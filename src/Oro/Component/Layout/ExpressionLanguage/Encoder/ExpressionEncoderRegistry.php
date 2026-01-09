@@ -2,6 +2,12 @@
 
 namespace Oro\Component\Layout\ExpressionLanguage\Encoder;
 
+/**
+ * Registry for managing multiple expression encoders by format.
+ *
+ * This registry maintains a collection of expression encoders indexed by format name (e.g., 'json'),
+ * allowing the layout system to encode expressions in different formats as needed.
+ */
 class ExpressionEncoderRegistry
 {
     /**

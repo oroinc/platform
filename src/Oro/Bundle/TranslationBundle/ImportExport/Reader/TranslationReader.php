@@ -7,6 +7,14 @@ use Oro\Bundle\ImportExportBundle\Reader\AbstractReader;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
+/**
+ * Reader for translation import/export operations.
+ *
+ * Reads translation messages from the database for a specified language and prepares them
+ * for export. Merges translations with their default English counterparts and provides
+ * them in a format suitable for import/export processes. Handles caching of messages
+ * to optimize performance during bulk operations.
+ */
 class TranslationReader extends AbstractReader
 {
     /** @var array */

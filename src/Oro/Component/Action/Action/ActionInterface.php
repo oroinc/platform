@@ -5,6 +5,13 @@ namespace Oro\Component\Action\Action;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
+/**
+ * Defines the contract for all action implementations.
+ *
+ * Actions are executable units that perform operations within a workflow or automation context.
+ * Each action must support initialization with configuration options, execution within a context,
+ * and optional condition evaluation before execution.
+ */
 interface ActionInterface
 {
     /**

@@ -9,6 +9,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Handles CLI options for grouping test suites into sets for parallel execution.
+ *
+ * This controller supports two strategies for grouping suites: by count (fixed number of suites per set)
+ * or by maximum execution time (based on historical test duration statistics).
+ */
 class SuiteSetDividerController implements Controller
 {
     /**

@@ -4,6 +4,13 @@ namespace Oro\Bundle\NavigationBundle\Entity\Builder;
 
 use Doctrine\ORM\EntityManager;
 
+/**
+ * Provides common functionality for navigation entity builders.
+ *
+ * This base class manages entity persistence and provides helper methods for finding or creating navigation entities.
+ * Subclasses should implement specific builder logic for different types of navigation items
+ * (e.g., menu items, history items, pinned items).
+ */
 abstract class AbstractBuilder
 {
     /**

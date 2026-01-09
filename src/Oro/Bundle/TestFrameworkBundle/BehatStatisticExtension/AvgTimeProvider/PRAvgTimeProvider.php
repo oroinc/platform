@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider;
 
+/**
+ * Provides average test execution times for pull request branches.
+ *
+ * This provider calculates average execution times based on historical data from builds
+ * on a pull request branch and its target branch, enabling optimized test distribution for PRs.
+ */
 class PRAvgTimeProvider extends AbstractAvgTimeProvider
 {
     #[\Override]

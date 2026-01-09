@@ -7,6 +7,14 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * Populates initialization data for workflow start transitions.
+ *
+ * This processor enriches the initialization data for start transitions by retrieving the button
+ * search context from the action button provider. This context is stored in the initialization data
+ * under the attribute name specified by the transition's init context attribute configuration.
+ * This allows workflows to access information about the context in which they were started.
+ */
 class StartInitDataProcessor implements ProcessorInterface
 {
     /** @var ButtonSearchContextProvider */

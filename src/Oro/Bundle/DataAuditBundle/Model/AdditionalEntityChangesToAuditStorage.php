@@ -4,6 +4,15 @@ namespace Oro\Bundle\DataAuditBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 
+/**
+ * Stores additional entity changes that should be included in audit logs.
+ *
+ * This storage service maintains a collection of entity updates that need to be audited but are not
+ * automatically detected by Doctrine's change tracking (e.g., programmatically triggered changes,
+ * computed field updates, or changes from external systems). It uses {@see \SplObjectStorage} to organize
+ * changes by entity manager and entity instance, allowing the audit system to process these additional
+ * changes alongside the standard Doctrine-tracked modifications during the flush operation.
+ */
 class AdditionalEntityChangesToAuditStorage
 {
     /**

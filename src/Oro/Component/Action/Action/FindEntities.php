@@ -12,6 +12,14 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Queries the database for entities matching specified conditions and stores the results.
+ *
+ * This action builds and executes a Doctrine query to find entities based on `WHERE` conditions
+ * and `ORDER BY` clauses. It supports dynamic parameter binding and stores the resulting collection
+ * in a context attribute.
+ * Throws {@see NotManageableEntityException} if the entity class is not managed by Doctrine.
+ */
 class FindEntities extends AbstractAction
 {
     /** @var array */

@@ -7,6 +7,14 @@ use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * Provides a form type for managing collections of email addresses.
+ *
+ * This form type extends the base collection type to handle multiple email entries
+ * with automatic identifier management. It integrates an event subscriber to ensure
+ * proper handling of item identifiers within the collection, making it suitable for
+ * forms that need to manage multiple email addresses with unique identification.
+ */
 class EmailCollectionType extends AbstractType
 {
     #[\Override]

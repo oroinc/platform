@@ -7,6 +7,12 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
 use Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction\MarkMassActionHandler;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Configures mass action for marking emails as unread in datagrids.
+ *
+ * Extends the base mass action to provide email-specific configuration for marking
+ * emails as unread, including handler setup, frontend type, routing, and mark type settings.
+ */
 class MarkUnreadMassAction extends AbstractMassAction
 {
     /** @var array */

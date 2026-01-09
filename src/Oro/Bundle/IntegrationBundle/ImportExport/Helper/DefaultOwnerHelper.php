@@ -10,6 +10,14 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
+/**
+ * Populates ownership information on imported entities based on integration channel configuration.
+ *
+ * This helper class is used during import/export operations to automatically assign the default
+ * owner (user or organization) from the integration channel to imported entities. It respects
+ * the entity's ownership metadata to determine which ownership fields should be populated,
+ * ensuring that imported data maintains proper ownership relationships and security constraints.
+ */
 class DefaultOwnerHelper
 {
     /** @var ManagerRegistry */

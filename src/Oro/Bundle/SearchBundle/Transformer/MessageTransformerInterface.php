@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\SearchBundle\Transformer;
 
+/**
+ * Defines the contract for transforming entities into reindexing messages.
+ *
+ * This interface specifies the method for converting entity objects into message
+ * arrays suitable for asynchronous processing. Implementations handle batching
+ * and formatting of entity data for message queue systems used in search indexing.
+ */
 interface MessageTransformerInterface
 {
     public const MESSAGE_FIELD_ENTITY_CLASS = 'class';

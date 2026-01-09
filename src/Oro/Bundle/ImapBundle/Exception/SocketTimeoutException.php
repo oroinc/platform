@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\ImapBundle\Exception;
 
+/**
+ * Thrown when a socket timeout occurs during IMAP server communication.
+ *
+ * This exception is raised when the IMAP connector fails to receive a response from the server
+ * within the configured timeout period. It includes socket metadata that can help diagnose
+ * connection issues and understand the state of the socket when the timeout occurred.
+ */
 class SocketTimeoutException extends \RuntimeException
 {
     /** @var array */

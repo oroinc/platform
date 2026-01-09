@@ -7,6 +7,16 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides searchable data for system configuration fields.
+ *
+ * Implements the {@see SearchProviderInterface} to extract and return searchable content
+ * from individual configuration field definitions. This includes field labels, tooltips,
+ * and field values (for text fields) or choice labels (for choice fields). The provider
+ * translates all text content to the current locale and is used by the configuration
+ * search functionality to enable users to find configuration options by their labels
+ * and values.
+ */
 class FieldSearchProvider implements SearchProviderInterface
 {
     /** @var ConfigBag */

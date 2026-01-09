@@ -5,6 +5,15 @@ namespace Oro\Bundle\ImportExportBundle\TemplateFixture;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
+/**
+ * Manages template fixtures and entity repositories for export template generation.
+ *
+ * This class maintains a registry of template entity repositories and provides access
+ * to them by entity class name. It supports lazy initialization of repositories,
+ * automatically creating empty fixtures for entities without explicit repositories.
+ * Once initialized, the manager is frozen to prevent further repository additions,
+ * ensuring a stable set of fixtures for the duration of the operation.
+ */
 class TemplateManager
 {
     /**

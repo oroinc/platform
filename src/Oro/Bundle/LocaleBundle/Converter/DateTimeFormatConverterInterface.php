@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\LocaleBundle\Converter;
 
+/**
+ * Defines the contract for converting date/time formats between different standards.
+ *
+ * Implementations of this interface are responsible for converting date and time format strings
+ * from one standard (e.g., ICU format) to another (e.g., PHP date format, Moment.js format).
+ * This is essential for bridging different formatting standards used across the application
+ * and third-party libraries.
+ */
 interface DateTimeFormatConverterInterface
 {
     /**

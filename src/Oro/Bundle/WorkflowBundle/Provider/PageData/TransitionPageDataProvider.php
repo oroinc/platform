@@ -9,6 +9,12 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * Provides page data for workflow transition rendering.
+ *
+ * This provider prepares data needed to display transition pages for existing workflow items,
+ * including transition details and route parameters.
+ */
 class TransitionPageDataProvider
 {
     /** @var WorkflowManager */

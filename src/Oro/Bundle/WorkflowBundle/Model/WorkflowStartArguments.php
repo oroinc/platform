@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
+/**
+ * Encapsulates arguments required to start a workflow instance.
+ *
+ * This class holds the workflow name, entity, initial data, and optional transition name
+ * needed to initiate a new workflow instance.
+ */
 class WorkflowStartArguments
 {
     /** @var Workflow */

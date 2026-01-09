@@ -11,6 +11,13 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Workflow action for copying tags from a source entity to a destination entity.
+ *
+ * This action enables tag replication within workflow processes, allowing tags assigned to a source entity
+ * to be copied to a destination entity. It supports organization-specific tag loading and persisting, ensuring
+ * that tags are properly associated with the correct organization context during the copy operation.
+ */
 class CopyTagging extends AbstractAction
 {
     public const PATH_SOURCE       = 'source';

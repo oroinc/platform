@@ -4,6 +4,13 @@ namespace Oro\Bundle\IntegrationBundle\EventListener;
 
 use Oro\Bundle\IntegrationBundle\Event\ClientCreatedAfterEvent;
 
+/**
+ * Provides common functionality for listeners that decorate integration clients.
+ *
+ * This base class implements the client decoration pattern, checking applicability and configuration
+ * before attaching decorators to newly created integration clients. Subclasses should implement
+ * specific decorator attachment logic for different client types or features.
+ */
 abstract class AbstractClientDecoratorListener
 {
     /**

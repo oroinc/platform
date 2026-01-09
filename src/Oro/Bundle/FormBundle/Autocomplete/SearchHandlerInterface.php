@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\FormBundle\Autocomplete;
 
+/**
+ * Defines the contract for handling autocomplete search operations.
+ *
+ * Implementations of this interface provide search functionality for autocomplete fields,
+ * including querying entities, converting results to view format, and exposing searchable
+ * properties and entity information to the UI layer.
+ */
 interface SearchHandlerInterface extends ConverterInterface
 {
     /**

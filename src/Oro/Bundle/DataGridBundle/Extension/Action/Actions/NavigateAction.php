@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Action\Actions;
 
+/**
+ * Represents a navigation action for datagrid rows.
+ *
+ * This action navigates the user to a different page, typically used for viewing or editing
+ * the selected row's entity. It supports customizable launcher options for controlling
+ * navigation behavior.
+ */
 class NavigateAction extends AbstractAction
 {
     /**

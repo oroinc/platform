@@ -2,6 +2,15 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Navigation;
 
+/**
+ * Represents the result of an entity pagination navigation operation.
+ *
+ * This value object encapsulates the outcome of navigating to a related entity in a
+ * paginated collection. It holds the entity identifier and flags indicating whether the
+ * entity is available (exists) and accessible (user has permission to view it). These
+ * flags allow callers to distinguish between entities that don't exist and those that
+ * exist but are not accessible due to security restrictions.
+ */
 class NavigationResult
 {
     /** @var int|null  */

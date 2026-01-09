@@ -5,6 +5,15 @@ namespace Oro\Bundle\DataAuditBundle\Loggable;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
+/**
+ * Maps user entity classes to their corresponding audit entry and audit field entity classes.
+ *
+ * This service maintains the relationship between different user types (e.g., `User`, `CustomerUser`)
+ * and their associated audit entities. Since different user types may require separate audit tables
+ * for data isolation or multi-tenancy purposes, this mapper ensures that audit operations use the
+ * correct audit entity classes based on the user performing the action. It provides methods to
+ * register mappings and retrieve the appropriate audit classes for a given user instance.
+ */
 class AuditEntityMapper
 {
     /**

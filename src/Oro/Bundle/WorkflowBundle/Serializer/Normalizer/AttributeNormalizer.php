@@ -6,6 +6,12 @@ use Oro\Bundle\ActionBundle\Model\ParameterInterface;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
+/**
+ * Defines the contract for normalizing and denormalizing workflow attribute values.
+ *
+ * Implementations handle conversion of attribute values between their model representation
+ * and scalar form for serialization and storage.
+ */
 interface AttributeNormalizer
 {
     /**

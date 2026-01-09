@@ -7,6 +7,15 @@ use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 
+/**
+ * Provides automatic options configuration and view variable assignment for block types.
+ *
+ * This trait enables block types and extensions to declaratively define options
+ * through an `optionsConfig` array, automatically handling option resolution with
+ * support for required options and default values. It also automatically passes
+ * configured options to the block view, reducing boilerplate code in block type
+ * implementations.
+ */
 trait OptionsConfigTrait
 {
     /**

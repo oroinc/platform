@@ -5,6 +5,12 @@ namespace Oro\Component\Layout\Model;
 use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\ImportsAwareLayoutUpdateInterface;
 
+/**
+ * Represents a layout update import with metadata about the imported layout update.
+ *
+ * This class stores information about an imported layout update including its ID, root block,
+ * and namespace, and maintains the parent-child relationship in the import hierarchy.
+ */
 class LayoutUpdateImport
 {
     /**

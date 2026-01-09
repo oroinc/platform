@@ -4,6 +4,12 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 
+/**
+ * Encapsulates arguments and execution context for action group execution.
+ *
+ * This class holds the action group name and parameters, providing methods to
+ * add parameters and execute the action group through the action group registry.
+ */
 class ActionGroupExecutionArgs
 {
     /** @var string */

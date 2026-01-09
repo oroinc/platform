@@ -4,6 +4,12 @@ namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Parses mass action parameters from HTTP requests.
+ *
+ * This class extracts and normalizes mass action parameters including selected values,
+ * inset/exclusion mode, and filter criteria from request data.
+ */
 class MassActionParametersParser
 {
     /**

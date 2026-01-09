@@ -9,6 +9,12 @@ use Oro\Bundle\WorkflowBundle\Event\ProcessHandleEvent;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Handles the execution of workflow processes triggered by process triggers.
+ *
+ * This handler manages the lifecycle of process execution, including creating process instances,
+ * executing process actions, and dispatching process-related events.
+ */
 class ProcessHandler
 {
     /**

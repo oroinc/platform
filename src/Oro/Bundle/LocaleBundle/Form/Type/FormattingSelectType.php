@@ -7,6 +7,14 @@ use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting formatting options based on available localizations.
+ *
+ * This form type provides a dropdown selector for choosing formatting preferences
+ * (such as date/time or number formats) from the available localizations configured
+ * in the system. It extends {@see OroChoiceType} to provide autocomplete functionality and
+ * is typically used in system configuration forms.
+ */
 class FormattingSelectType extends AbstractType
 {
     public const NAME = 'oro_formatting_select';

@@ -10,6 +10,12 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
+/**
+ * Processes workflow translations and extends workflow definition building.
+ *
+ * This processor handles translation key generation and storage for workflow components,
+ * and provides extension capabilities for workflow definition building.
+ */
 class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDefinitionBuilderExtensionInterface
 {
     /** @var WorkflowTranslationHelper */

@@ -5,6 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Exception\TransitionTriggerVerifierException;
 
+/**
+ * Verifies that transition event triggers have required relation configuration.
+ *
+ * This verifier ensures that event triggers on non-workflow-related entities specify
+ * the required relation property to establish the connection to the workflow entity.
+ */
 class TransitionEventTriggerRelationVerifier implements TransitionEventTriggerVerifierInterface
 {
     /**

@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\ImportExportBundle\Context;
 
+/**
+ * Defines the contract for managing import/export operation context.
+ *
+ * The context maintains state and metadata for import/export jobs, including error messages,
+ * postponed rows, operation counters (read, add, update, replace, delete, error entries),
+ * and configuration options. It serves as a central repository for tracking progress and
+ * collecting information throughout the lifecycle of an import/export operation.
+ */
 interface ContextInterface
 {
     /**

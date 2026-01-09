@@ -5,6 +5,14 @@ namespace Oro\Component\ConfigExpression;
 use Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension;
 use Oro\Component\ConfigExpression\Extension\ExtensionInterface;
 
+/**
+ * Creates and manages expression instances from registered extensions.
+ *
+ * This factory implementation manages a collection of extensions that provide expression types.
+ * It creates expression instances by delegating to the appropriate extension, handles context
+ * accessor injection for expressions that require it, and provides methods to query available
+ * expression types across all registered extensions.
+ */
 class ExpressionFactory implements ExpressionFactoryInterface, FactoryWithTypesInterface
 {
     /** @var ContextAccessorInterface */

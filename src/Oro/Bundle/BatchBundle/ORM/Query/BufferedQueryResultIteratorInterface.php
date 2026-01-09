@@ -5,6 +5,15 @@ namespace Oro\Bundle\BatchBundle\ORM\Query;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
+/**
+ * Defines the contract for iterating over large database query results in buffered chunks.
+ *
+ * This interface provides a memory-efficient way to process large result sets from Doctrine ORM queries
+ * by loading data in configurable buffer sizes rather than loading all results into memory at once.
+ * It extends both `Iterator` and `Countable`, allowing it to be used in `foreach` loops and with `count()`.
+ * Implementations support callbacks for handling page transitions and loaded data, as well as
+ * configurable Doctrine hydration modes for flexible result formatting.
+ */
 interface BufferedQueryResultIteratorInterface extends \Iterator, \Countable
 {
     /**

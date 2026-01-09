@@ -4,6 +4,9 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 
+/**
+ * Defines the contract for filtering operations based on search criteria.
+ */
 interface OperationRegistryFilterInterface
 {
     /**

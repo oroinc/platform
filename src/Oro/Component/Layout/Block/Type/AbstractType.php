@@ -8,6 +8,13 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\BlockView;
 
+/**
+ * Provides common functionality for layout block types.
+ *
+ * This base class implements the {@see BlockTypeInterface} with default no-op implementations
+ * for build and view methods.
+ * Subclasses should override specific methods to define their block type behavior, configuration, and rendering logic.
+ */
 abstract class AbstractType implements BlockTypeInterface
 {
     #[\Override]

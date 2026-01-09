@@ -13,6 +13,15 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for configuring query filters in dashboard widgets.
+ *
+ * This form type provides a sophisticated filtering interface for widgets that display
+ * entity data. It integrates with the query designer to allow users to build complex
+ * filter conditions, supporting collapsible sections and dynamic entity selection.
+ * The form handles filter definition serialization and provides options for controlling
+ * the filter UI appearance and behavior.
+ */
 class WidgetFilterType extends AbstractType
 {
     #[\Override]

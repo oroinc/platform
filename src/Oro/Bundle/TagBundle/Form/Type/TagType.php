@@ -7,6 +7,13 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for tag entities with optional taxonomy classification.
+ *
+ * This form type provides the standard form configuration for tag entities, including a required name field
+ * and an optional taxonomy selection field. It is the base form type for tag management and can be extended
+ * for API-specific contexts.
+ */
 class TagType extends AbstractType
 {
     #[\Override]

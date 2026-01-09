@@ -7,6 +7,12 @@ use Oro\Bundle\WorkflowBundle\Button\AbstractTransitionButton;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Translation\Helper\TransitionTranslationHelper;
 
+/**
+ * Processes static translations for workflow transition buttons.
+ *
+ * This listener responds to button matching events to ensure that transition button labels
+ * and other translatable content are properly registered for static translation extraction.
+ */
 class ProcessButtonsStaticTranslations
 {
     /** @var Transition[] */

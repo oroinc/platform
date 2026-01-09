@@ -4,6 +4,12 @@ namespace Oro\Component\Layout\Loader;
 
 use Oro\Component\Layout\LayoutUpdateInterface;
 
+/**
+ * Defines the contract for loading layout updates from files.
+ *
+ * Implementations of this interface load layout update instances from files and provide
+ * filename patterns that identify layout update files for all supported formats.
+ */
 interface LayoutUpdateLoaderInterface
 {
     /**

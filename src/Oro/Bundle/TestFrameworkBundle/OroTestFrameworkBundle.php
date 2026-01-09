@@ -10,6 +10,14 @@ use Oro\Bundle\TestFrameworkBundle\DependencyInjection\Compiler\TagsInformationP
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+/**
+ * Provides core testing infrastructure and utilities for the Oro application.
+ *
+ * This bundle serves as the foundation for testing functionality across the platform,
+ * offering test fixtures, Behat integration, test entities, and various testing utilities.
+ * It includes support for functional testing, Behat acceptance testing, and provides
+ * test-specific services and configurations.
+ */
 class OroTestFrameworkBundle extends Bundle
 {
     #[\Override]

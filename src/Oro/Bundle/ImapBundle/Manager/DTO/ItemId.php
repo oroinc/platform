@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\ImapBundle\Manager\DTO;
 
+/**
+ * Data transfer object representing a unique IMAP message identifier.
+ *
+ * This DTO encapsulates the IMAP UID (unique identifier) and UID validity values that together
+ * uniquely identify a message within an IMAP mailbox. These values are essential for tracking
+ * messages across synchronization operations and ensuring message consistency when the mailbox
+ * state changes.
+ */
 class ItemId
 {
     /**

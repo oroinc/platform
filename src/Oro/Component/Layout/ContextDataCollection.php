@@ -2,6 +2,12 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Manages context data items with support for default values and lazy loading.
+ *
+ * This collection stores data items associated with a layout context and supports setting default values
+ * that can be either static values or callables that are invoked when the data is first accessed.
+ */
 class ContextDataCollection
 {
     /** @var ContextInterface */

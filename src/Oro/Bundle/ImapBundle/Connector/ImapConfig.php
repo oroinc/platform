@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\ImapBundle\Connector;
 
+/**
+ * Encapsulates IMAP server connection configuration parameters.
+ *
+ * This class holds all the necessary configuration details required to establish a connection
+ * to an IMAP server, including host, port, SSL/TLS settings, user credentials, and OAuth2 access tokens.
+ * It provides a clean interface for managing and retrieving these configuration values throughout
+ * the IMAP connector lifecycle.
+ */
 class ImapConfig
 {
     /**

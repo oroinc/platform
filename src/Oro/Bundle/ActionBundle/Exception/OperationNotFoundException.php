@@ -4,6 +4,9 @@ namespace Oro\Bundle\ActionBundle\Exception;
 
 use Oro\Component\Action\Exception\RuntimeException;
 
+/**
+ * Thrown when a requested operation is not found in the operation registry.
+ */
 class OperationNotFoundException extends RuntimeException
 {
     /**

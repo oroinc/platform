@@ -5,6 +5,13 @@ namespace Oro\Bundle\EntityBundle\Manager\Db;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
+/**
+ * Manages database triggers for a specific entity table.
+ *
+ * This manager coordinates with database-specific trigger drivers to enable and disable
+ * triggers for an entity's table. It automatically selects the appropriate driver based
+ * on the database platform being used.
+ */
 class EntityTriggerManager
 {
     /**

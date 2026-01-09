@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
+/**
+ * Defines the contract for processing configuration imports with support for nested imports.
+ *
+ * Implementations handle loading and processing configuration content from various sources,
+ * with the ability to delegate nested import processing to parent processors to ensure
+ * correct merge order and dependency resolution.
+ */
 interface ConfigImportProcessorInterface
 {
     public function process(array $content, \SplFileInfo $contentSource): array;

@@ -5,6 +5,13 @@ namespace Oro\Bundle\EntityExtendBundle\Event;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Event dispatched when rendering an extended entity field value.
+ *
+ * This event allows listeners to customize how a field value is displayed in the user interface.
+ * Listeners can modify the display value, control field visibility, and apply custom formatting
+ * or transformations to the field value before it is rendered to the user.
+ */
 class ValueRenderEvent extends Event
 {
     /**

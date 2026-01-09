@@ -6,6 +6,14 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Component\DependencyInjection\ServiceLink;
 
+/**
+ * Provides icons for integration channels based on their type.
+ *
+ * This provider retrieves the appropriate icon for an integration channel by looking up
+ * the channel's type in the types registry and checking if the type implements the
+ * IconAwareIntegrationInterface. If an icon is available, it returns the icon path;
+ * otherwise, it returns null.
+ */
 class IntegrationIconProvider implements IntegrationIconProviderInterface
 {
     /**

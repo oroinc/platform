@@ -6,6 +6,12 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 
+/**
+ * Handles incoming email grid configuration and data enrichment.
+ *
+ * Listens to datagrid build events to add sender email address information to incoming email records,
+ * enhancing the display of email data in the incoming emails grid.
+ */
 class IncomingEmailGridListener
 {
     /** @var  EmailQueryFactory */

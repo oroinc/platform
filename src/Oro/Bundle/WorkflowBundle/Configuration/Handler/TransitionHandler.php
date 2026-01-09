@@ -4,6 +4,15 @@ namespace Oro\Bundle\WorkflowBundle\Configuration\Handler;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
+/**
+ * Handles workflow transition configuration normalization.
+ *
+ * Processes raw transition configurations from workflow definitions, ensuring each transition has a unique name,
+ * valid target step, and associated transition definition. Validates that all referenced steps exist in the workflow.
+ * Processes form options for transitions, including attribute field validation and constraint handling. Automatically
+ * generates transition definitions for transitions that lack them. This handler ensures transitions are properly
+ * configured and maintains referential integrity with workflow steps and attributes.
+ */
 class TransitionHandler extends AbstractHandler
 {
     #[\Override]

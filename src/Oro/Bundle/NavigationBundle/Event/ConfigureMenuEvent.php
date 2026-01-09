@@ -6,6 +6,13 @@ use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Event dispatched when a menu is being configured.
+ *
+ * This event allows listeners to modify menu structure by adding, removing, or editing menu items.
+ * It provides access to the menu factory and the menu item being configured, enabling dynamic
+ * menu customization based on application state, user permissions, or feature toggles.
+ */
 class ConfigureMenuEvent extends Event
 {
     public const EVENT_NAME = 'oro_menu.configure';

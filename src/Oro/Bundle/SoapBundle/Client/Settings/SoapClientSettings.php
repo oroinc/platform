@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\SoapBundle\Client\Settings;
 
+/**
+ * Encapsulates configuration settings for SOAP client operations.
+ *
+ * Stores the WSDL file path, SOAP method name, and SOAP options (such as connection timeout)
+ * needed to execute a SOAP request. Acts as a value object for passing configuration
+ * through the SOAP client processing pipeline.
+ */
 class SoapClientSettings implements SoapClientSettingsInterface
 {
     public const OPTION_TIMEOUT = 'connection_timeout';

@@ -11,6 +11,14 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for color table/palette selection.
+ *
+ * This type provides a color picker interface with table-based color selection,
+ * supporting various picker controls (hue, brightness, saturation, wheel). It handles
+ * JSON serialization of color data and applies data transformers to ensure proper
+ * value handling across form submission cycles.
+ */
 class OroColorTableType extends AbstractType
 {
     #[\Override]

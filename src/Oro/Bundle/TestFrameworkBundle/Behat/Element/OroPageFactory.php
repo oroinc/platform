@@ -4,6 +4,13 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Transformers\PageSuffixTransformer;
 
+/**
+ * Factory for creating page objects from configuration.
+ *
+ * This factory instantiates page objects based on their names, using flexible name matching
+ * with support for various separators and transformations. It caches page aliases to optimize
+ * repeated lookups and provides access to the element factory for page initialization.
+ */
 class OroPageFactory
 {
     /**

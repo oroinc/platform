@@ -4,6 +4,13 @@ namespace Oro\Bundle\EntityBundle\Provider;
 
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 
+/**
+ * Defines the contract for providing entity aliases.
+ *
+ * Implementations of this interface supply singular and plural aliases for entity classes.
+ * Providers can return an {@see EntityAlias}, `null` if they don't know the alias, or `false`
+ * if the entity should be excluded from alias resolution.
+ */
 interface EntityAliasProviderInterface
 {
     /**

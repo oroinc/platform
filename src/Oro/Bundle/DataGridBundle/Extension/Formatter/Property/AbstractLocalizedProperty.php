@@ -5,6 +5,13 @@ namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 
+/**
+ * Provides common functionality for datagrid properties that require localization formatting.
+ *
+ * This base class implements value formatting using a configurable formatter method with context resolution.
+ * It allows properties to format values using localization-aware formatters (e.g., number, date, currency formatters)
+ * with dynamic context. Subclasses must provide the formatter instance.
+ */
 abstract class AbstractLocalizedProperty extends FieldProperty
 {
     public const FORMATTER_METHOD = 'method';

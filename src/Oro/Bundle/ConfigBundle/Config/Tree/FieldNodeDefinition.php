@@ -2,6 +2,15 @@
 
 namespace Oro\Bundle\ConfigBundle\Config\Tree;
 
+/**
+ * Represents a configuration field node in the system configuration tree.
+ *
+ * Extends {@see AbstractNodeDefinition} to provide field-specific functionality for system
+ * configuration fields. This class encapsulates field metadata including type, options,
+ * property path, ACL resources, and page reload requirements. It allows manipulation
+ * of field options and provides access to field configuration details used during
+ * form building and configuration management.
+ */
 class FieldNodeDefinition extends AbstractNodeDefinition
 {
     /**

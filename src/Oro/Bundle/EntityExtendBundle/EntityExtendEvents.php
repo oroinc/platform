@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle;
 
+/**
+ * Defines event names for entity extend operations.
+ */
 final class EntityExtendEvents
 {
     /**

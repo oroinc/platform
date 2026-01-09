@@ -5,6 +5,13 @@ namespace Oro\Bundle\LayoutBundle\Layout\Extension;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\ContextInterface;
 
+/**
+ * Configures layout context options for expression evaluation.
+ *
+ * This configurator sets up context options that control expression evaluation behavior,
+ * including whether expressions should be evaluated immediately or deferred, and the
+ * character encoding to use for expression processing.
+ */
 class ExpressionContextConfigurator implements ContextConfiguratorInterface
 {
     #[\Override]

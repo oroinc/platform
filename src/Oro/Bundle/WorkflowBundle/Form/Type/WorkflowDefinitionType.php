@@ -13,6 +13,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * Form type for creating and editing workflow definitions.
+ *
+ * This form type provides fields for configuring workflow properties including label,
+ * related entity, icon, and other workflow-specific settings.
+ */
 class WorkflowDefinitionType extends AbstractType
 {
     public const NAME = 'oro_workflow_definition';

@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
+/**
+ * Defines the contract for column options guessers.
+ *
+ * Column options guessers automatically determine appropriate formatter, sorter, and filter
+ * configurations for datagrid columns based on entity property metadata. This allows datagrids
+ * to be configured with minimal manual setup by inferring column behavior from entity definitions.
+ */
 interface ColumnOptionsGuesserInterface
 {
     /**

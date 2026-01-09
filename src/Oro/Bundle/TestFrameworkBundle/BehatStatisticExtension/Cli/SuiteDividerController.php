@@ -9,6 +9,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Handles the --suite-divider CLI option to split test suites into smaller chunks.
+ *
+ * This controller divides a test suite into multiple smaller suites based on a specified
+ * number of features per suite, enabling parallel test execution across multiple processes.
+ */
 class SuiteDividerController implements Controller
 {
     /**

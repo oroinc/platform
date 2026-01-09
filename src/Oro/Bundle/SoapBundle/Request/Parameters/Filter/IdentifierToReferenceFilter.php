@@ -5,6 +5,13 @@ namespace Oro\Bundle\SoapBundle\Request\Parameters\Filter;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * Filters request parameters by converting identifiers to entity references or instances.
+ *
+ * Converts entity identifiers to either lazy-loaded entity references or fully loaded
+ * entity instances. Supports filtering by a specific field when provided, allowing
+ * lookups by alternative identifiers beyond the primary key.
+ */
 class IdentifierToReferenceFilter implements ParameterFilterInterface
 {
     /** @var ManagerRegistry */

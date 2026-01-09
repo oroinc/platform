@@ -15,6 +15,15 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowAttributeLabelTemp
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowVariableFormOptionTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowVariableLabelTemplate;
 
+/**
+ * Provides common functionality for iterating over translatable fields in workflow configurations.
+ *
+ * This abstract class implements the core logic for extracting translatable fields from workflow configuration arrays.
+ * It provides protected methods to iterate over attributes, steps, transitions, and variables,
+ * yielding translation keys and their corresponding values.
+ * Subclasses can use these methods to build complete translation field iterators
+ * for different workflow configuration sources.
+ */
 abstract class AbstractWorkflowTranslationFieldsIterator implements TranslationFieldsIteratorInterface
 {
     use TranslationFieldsIteratorTrait;

@@ -4,6 +4,14 @@ namespace Oro\Bundle\ImportExportBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Event dispatched during data format conversion in import/export operations.
+ *
+ * This event allows listeners to intercept and modify data during format conversion,
+ * such as when converting between internal entity representations and export formats.
+ * Listeners can access the original record and the conversion result, and modify
+ * either as needed.
+ */
 class FormatConversionEvent extends Event
 {
     /** @var array */

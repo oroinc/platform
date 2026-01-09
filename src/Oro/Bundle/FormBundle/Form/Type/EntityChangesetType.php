@@ -8,6 +8,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for tracking changes to entity fields.
+ *
+ * This type captures and represents the changes made to an entity's fields,
+ * storing the original and modified values. It extends {@see DataChangesetType} with
+ * entity-specific functionality and uses {@see EntityChangesetTransformer} to handle
+ * the conversion between entity data and changeset representation.
+ */
 class EntityChangesetType extends AbstractType
 {
     public const NAME = 'oro_entity_changeset';

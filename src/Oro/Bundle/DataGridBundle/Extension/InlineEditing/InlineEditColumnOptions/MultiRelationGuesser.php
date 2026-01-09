@@ -6,8 +6,11 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 
 /**
- * Class MultiRelationGuesser
- * @package Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions
+ * Provides inline editing configuration for multi-relation datagrid columns.
+ *
+ * This guesser extends {@see RelationGuesser} to configure inline editing for columns that display
+ * multiple related entities (e.g., many-to-many relationships). It sets up the multi-relation editor
+ * view and API accessor, enabling users to select multiple related entities within the datagrid.
  */
 class MultiRelationGuesser extends RelationGuesser
 {

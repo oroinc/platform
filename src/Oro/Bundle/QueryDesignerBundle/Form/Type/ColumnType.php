@@ -8,6 +8,14 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for configuring query designer columns.
+ *
+ * This form type provides a user interface for defining columns in a query designer query.
+ * It allows users to select a field, provide a display label, optionally apply an aggregation
+ * function, and configure sorting direction. The form integrates with the entity field selection
+ * system to provide context-aware field choices based on the query type.
+ */
 class ColumnType extends AbstractType
 {
     public const NAME = 'oro_query_designer_column';

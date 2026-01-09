@@ -6,6 +6,14 @@ use Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface as SID;
 
+/**
+ * Manages security identities in the ACL system.
+ *
+ * This class handles updates and deletions of security identities (users and roles)
+ * in the ACL database. It provides methods to update security identity names and
+ * delete security identities, with special handling for role identities to preserve
+ * ACE index integrity.
+ */
 class AclSidManager extends AbstractAclManager
 {
     public const ROLE_DISABLED_FLAG = '-DISABLED-';

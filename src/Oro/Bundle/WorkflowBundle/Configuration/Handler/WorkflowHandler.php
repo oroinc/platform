@@ -2,6 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration\Handler;
 
+/**
+ * Orchestrates workflow configuration processing through a chain of specialized handlers.
+ *
+ * Acts as a composite handler that coordinates the normalization of workflow configurations by delegating
+ * to specialized handlers for attributes, steps, transitions, variables, and other workflow components.
+ * Performs initial workflow-level validation such as ensuring unique workflow names and validating entity
+ * class references. This handler is the main entry point for processing complete workflow definitions and
+ * ensures all workflow components are properly normalized before the workflow is registered with the engine.
+ */
 class WorkflowHandler extends AbstractHandler
 {
     /**

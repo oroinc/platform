@@ -5,6 +5,13 @@ namespace Oro\Component\ConfigExpression\Extension;
 use Oro\Component\ConfigExpression\Exception;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
+/**
+ * Provides a base implementation for expression extensions with lazy-loading of expressions.
+ *
+ * This abstract class implements the extension interface and handles lazy initialization of
+ * expressions. Subclasses should override the {@see loadExpressions()} method to provide their
+ * expression implementations. Expressions are loaded on-demand and cached for subsequent access.
+ */
 class AbstractExtension implements ExtensionInterface
 {
     /**

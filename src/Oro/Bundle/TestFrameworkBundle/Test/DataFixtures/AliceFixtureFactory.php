@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures;
 
+/**
+ * Factory for creating Alice fixtures from class names or file paths.
+ *
+ * This factory creates fixture instances from either fixture class names or Alice YAML/PHP
+ * fixture files, providing flexible fixture loading for functional tests.
+ */
 class AliceFixtureFactory implements FixtureFactoryInterface
 {
     #[\Override]

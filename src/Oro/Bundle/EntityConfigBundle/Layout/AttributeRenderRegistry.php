@@ -6,6 +6,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 
+/**
+ * Tracks which attribute groups and attributes have been rendered in layouts.
+ *
+ * This registry maintains state about which attribute groups and individual attributes have been rendered
+ * for each attribute family, allowing layout blocks to determine which groups and attributes still need
+ * to be rendered and avoiding duplicate rendering.
+ */
 class AttributeRenderRegistry
 {
     /** @var array */

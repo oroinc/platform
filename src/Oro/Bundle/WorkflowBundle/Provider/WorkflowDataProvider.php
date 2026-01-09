@@ -9,6 +9,12 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 
+/**
+ * Provides comprehensive workflow data for UI rendering and display.
+ *
+ * This provider aggregates workflow information including transitions, steps, and
+ * current state, enabling the display of complete workflow information in the UI.
+ */
 class WorkflowDataProvider
 {
     /** @var TransitionDataProvider */

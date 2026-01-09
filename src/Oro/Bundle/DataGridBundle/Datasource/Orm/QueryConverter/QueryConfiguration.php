@@ -7,6 +7,13 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
+/**
+ * Defines the configuration structure for ORM query definitions.
+ *
+ * This class provides the Symfony Config component configuration tree for validating and
+ * normalizing ORM query definitions used in datagrids. It supports standard SQL query
+ * components including `SELECT`, `FROM`, `JOIN`, `WHERE`, `GROUP BY`, `HAVING`, and `ORDER BY` clauses.
+ */
 class QueryConfiguration implements ConfigurationInterface
 {
     #[\Override]

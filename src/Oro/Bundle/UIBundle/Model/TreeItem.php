@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\UIBundle\Model;
 
+/**
+ * Represents a single node in a tree hierarchy.
+ *
+ * Provides a flexible tree structure implementation with support for parent-child relationships,
+ * recursive parent traversal, and child management. Each item has a unique key, optional label,
+ * and maintains references to its parent and children. Useful for building hierarchical data
+ * structures such as category trees, menu hierarchies, or organizational structures.
+ */
 class TreeItem
 {
     /**

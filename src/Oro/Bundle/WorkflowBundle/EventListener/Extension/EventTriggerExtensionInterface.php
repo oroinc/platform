@@ -4,6 +4,12 @@ namespace Oro\Bundle\WorkflowBundle\EventListener\Extension;
 
 use Doctrine\Persistence\ObjectManager;
 
+/**
+ * Defines the contract for event trigger extensions that manage workflow trigger scheduling and processing.
+ *
+ * Implementations handle the scheduling of workflow triggers based on entity lifecycle events,
+ * checking for applicable triggers, and processing scheduled triggers through the object manager.
+ */
 interface EventTriggerExtensionInterface
 {
     /**

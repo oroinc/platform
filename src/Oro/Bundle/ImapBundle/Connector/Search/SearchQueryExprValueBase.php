@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\ImapBundle\Connector\Search;
 
+/**
+ * Provides common functionality for IMAP search query expression values.
+ *
+ * This base class encapsulates a search value (word phrase or nested expression) and its match type,
+ * providing the foundation for building IMAP search criteria. Subclasses should implement specific
+ * value types for different IMAP search keys.
+ */
 abstract class SearchQueryExprValueBase implements SearchQueryExprValueInterface
 {
     /**

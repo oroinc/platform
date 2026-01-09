@@ -5,6 +5,13 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Artifacts;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\TokenGenerator;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 
+/**
+ * Handles uploading test artifacts to an FTP server.
+ *
+ * This handler manages the connection to an FTP server and uploads test artifacts (such as screenshots)
+ * to a specified directory on the remote server. It supports environment variable substitution in
+ * configuration values and provides proper error handling for FTP operations.
+ */
 class FtpHandler implements ArtifactsHandlerInterface
 {
     /**

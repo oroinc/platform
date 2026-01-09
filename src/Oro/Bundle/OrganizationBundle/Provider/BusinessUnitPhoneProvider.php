@@ -5,6 +5,13 @@ namespace Oro\Bundle\OrganizationBundle\Provider;
 use Oro\Bundle\AddressBundle\Provider\PhoneProviderInterface;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
+/**
+ * Provides phone number information for business unit entities.
+ *
+ * This provider implements the {@see PhoneProviderInterface} to extract phone numbers from
+ * {@see BusinessUnit} entities. It retrieves the primary phone number and can provide a list
+ * of all available phone numbers associated with a business unit.
+ */
 class BusinessUnitPhoneProvider implements PhoneProviderInterface
 {
     /**

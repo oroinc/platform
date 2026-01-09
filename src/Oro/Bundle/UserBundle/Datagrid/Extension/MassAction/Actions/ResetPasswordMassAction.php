@@ -6,6 +6,13 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Defines a mass action for resetting user passwords.
+ *
+ * This mass action allows administrators to reset passwords for multiple users
+ * at once through the users datagrid. It extends {@see AbstractMassAction} to provide
+ * password reset functionality with configurable handlers, routes, and UI options.
+ */
 class ResetPasswordMassAction extends AbstractMassAction
 {
     /** @var array */

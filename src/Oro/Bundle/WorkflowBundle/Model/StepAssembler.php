@@ -9,6 +9,12 @@ use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
 
+/**
+ * Assembles workflow step objects from configuration arrays.
+ *
+ * This assembler creates Step instances from workflow configuration, validating attributes
+ * and building the complete step structure with all required properties.
+ */
 class StepAssembler extends BaseAbstractAssembler
 {
     /**

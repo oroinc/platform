@@ -8,6 +8,14 @@ use Symfony\Component\Form\Extension\Core\Type\LocaleType as SymfonyLocaleType;
 use Symfony\Component\Intl\Locales;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for selecting locales with localized names.
+ *
+ * This form type extends Symfony's {@see LocaleType} to provide a customized locale
+ * selector that loads locale names dynamically in English locale. It uses a
+ * callback choice loader to fetch the list of available locales from the Intl
+ * component, enabling flexible locale selection in forms.
+ */
 class LocaleType extends AbstractType
 {
     #[\Override]

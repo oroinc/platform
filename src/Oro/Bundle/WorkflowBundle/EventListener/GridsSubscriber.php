@@ -6,6 +6,12 @@ use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Subscribes to datagrid query events to filter disabled processes and workflows.
+ *
+ * This subscriber uses feature toggles to exclude disabled processes and workflows from
+ * datagrid results, ensuring that only enabled items are displayed to users.
+ */
 class GridsSubscriber implements EventSubscriberInterface
 {
     /** @var FeatureChecker */

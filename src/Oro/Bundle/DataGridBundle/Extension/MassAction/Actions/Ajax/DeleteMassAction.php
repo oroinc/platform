@@ -5,6 +5,12 @@ namespace Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Represents a mass delete action for datagrid rows.
+ *
+ * This specialized AJAX mass action handles bulk deletion of multiple selected records,
+ * with built-in support for confirmation dialogs and appropriate frontend handling.
+ */
 class DeleteMassAction extends AjaxMassAction
 {
     /** @var array */

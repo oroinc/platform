@@ -6,6 +6,12 @@ use Behat\Behat\EventDispatcher\Event\AfterStepTested;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Pauses test execution after each step in interactive mode.
+ *
+ * This event subscriber listens for step completion events and prompts the user to press
+ * RETURN to continue, allowing developers to inspect the test state between steps.
+ */
 class InteractiveExecutionSubscriber implements EventSubscriberInterface
 {
     /**

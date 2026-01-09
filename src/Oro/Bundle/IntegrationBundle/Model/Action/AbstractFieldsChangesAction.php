@@ -6,6 +6,13 @@ use Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager;
 use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
 
+/**
+ * Provides common functionality for actions that track entity field changes.
+ *
+ * This base class integrates with the {@see FieldsChangesManager} to handle field change tracking
+ * for integration-related entities.
+ * Subclasses should implement specific actions that either save or retrieve field change information.
+ */
 abstract class AbstractFieldsChangesAction extends AbstractAction
 {
     public const OPTION_KEY_ENTITY = 'entity';

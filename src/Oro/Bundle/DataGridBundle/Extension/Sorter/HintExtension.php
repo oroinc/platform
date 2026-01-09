@@ -7,6 +7,13 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration as OrmQuery;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
 
+/**
+ * Adds Doctrine query hints to ORM datasource queries.
+ *
+ * This extension automatically adds configured query hints to datagrid ORM queries, allowing
+ * for query optimization and behavior customization at the Doctrine level. It prevents duplicate
+ * hints and respects explicitly disabled hints in the configuration.
+ */
 class HintExtension extends AbstractExtension
 {
     /**

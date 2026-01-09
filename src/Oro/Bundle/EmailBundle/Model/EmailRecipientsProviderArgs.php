@@ -4,6 +4,12 @@ namespace Oro\Bundle\EmailBundle\Model;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
+/**
+ * Arguments container for email recipients provider queries.
+ *
+ * Encapsulates parameters for email recipient queries including related entity context, search query,
+ * result limit, excluded recipients, and organization scope for filtering available recipients.
+ */
 class EmailRecipientsProviderArgs
 {
     /** @var object|null */

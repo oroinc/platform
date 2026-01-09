@@ -10,6 +10,13 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Extends datagrid functionality to support password reset mass actions.
+ *
+ * This extension applies password reset capabilities to the users datagrid
+ * when the `reset_password action` is requested. It modifies the datasource
+ * query to ensure proper data selection for the mass password reset operation.
+ */
 class ResetPasswordExtension extends AbstractExtension
 {
     public const USERS_GRID_NAME = 'users-grid';

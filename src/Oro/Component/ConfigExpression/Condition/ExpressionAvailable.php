@@ -5,6 +5,13 @@ namespace Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\Exception;
 use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
 
+/**
+ * Checks whether an expression type is available in the factory.
+ *
+ * This condition verifies that a specific expression type can be created by the factory,
+ * allowing dynamic validation of expression availability at runtime. It is useful for
+ * conditional logic that depends on whether certain expression types are registered.
+ */
 class ExpressionAvailable extends AbstractCondition
 {
     /** @var FactoryWithTypesInterface */

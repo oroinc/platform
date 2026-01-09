@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\SoapBundle\Client\Factory;
 
+/**
+ * Factory for creating native PHP {@see \SoapClient} instances.
+ *
+ * Wraps the native PHP {@see \SoapClient} constructor to provide a factory interface
+ * for creating SOAP client instances with specified WSDL files and options.
+ */
 class NativeSoapClientFactory
 {
     /**

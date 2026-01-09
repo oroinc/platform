@@ -4,6 +4,13 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Psr\Log\LoggerInterface;
 
+/**
+ * Defines the contract for custom SQL queries executed during migrations.
+ *
+ * This interface allows migrations to execute custom SQL queries that cannot be expressed
+ * through the schema modification API. Implementations provide a description of the query
+ * for logging purposes and an execute method to run the query with access to a logger.
+ */
 interface MigrationQuery
 {
     /**

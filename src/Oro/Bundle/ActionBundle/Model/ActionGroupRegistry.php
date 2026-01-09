@@ -6,6 +6,12 @@ use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Exception\ActionGroupNotFoundException;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 
+/**
+ * Registry for managing and retrieving action groups.
+ *
+ * This registry loads action groups from configuration on demand and provides
+ * methods to find, retrieve, and list available action groups by name.
+ */
 class ActionGroupRegistry
 {
     /** @var ConfigurationProviderInterface */

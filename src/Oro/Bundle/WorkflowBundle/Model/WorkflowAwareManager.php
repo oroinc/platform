@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
+/**
+ * Manages workflow operations for a specific workflow by delegating to the workflow manager.
+ *
+ * This manager provides a workflow-aware interface for starting workflows, retrieving workflow
+ * items, and accessing workflow information for a configured workflow name.
+ */
 class WorkflowAwareManager implements WorkflowAwareInterface
 {
     /** @var string */

@@ -7,6 +7,13 @@ use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
+/**
+ * Provides common functionality for actions that parse email addresses.
+ *
+ * This base class handles the extraction and parsing of email addresses from strings,
+ * using the {@see EmailAddressHelper} to perform the actual parsing. Subclasses should implement
+ * specific parsing logic to extract different parts of email addresses (e.g., name, email).
+ */
 abstract class AbstractParseEmailAddressAction extends AbstractAction
 {
     /** @var string */

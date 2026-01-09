@@ -13,6 +13,15 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for configuring file attachment field settings.
+ *
+ * This form type is used in the entity configuration system to manage file attachment field
+ * configuration. It handles the configuration of file-related fields and automatically manages
+ * the entity state transitions when file attachments are configured. The form listens to
+ * `POST_SUBMIT` events to update the entity configuration state from `UPDATE` to `ACTIVE` when
+ * appropriate, ensuring proper synchronization with the entity extend configuration system.
+ */
 class FileConfigType extends AbstractType
 {
     public const NAME = 'oro_attachment_file_config';

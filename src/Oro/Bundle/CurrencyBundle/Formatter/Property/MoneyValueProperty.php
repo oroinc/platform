@@ -8,6 +8,13 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\AbstractProperty;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Datagrid property formatter for monetary values.
+ *
+ * This property formatter handles the display of monetary values in datagrids by
+ * applying appropriate rounding and number formatting. It uses the {@see MoneyValueTypeFormatter}
+ * to ensure consistent presentation of currency amounts across the application's grid views.
+ */
 class MoneyValueProperty extends AbstractProperty
 {
     protected $formatter;

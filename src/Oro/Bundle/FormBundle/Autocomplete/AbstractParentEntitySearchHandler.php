@@ -3,7 +3,11 @@
 namespace Oro\Bundle\FormBundle\Autocomplete;
 
 /**
- * The base class for search handlers to search by a parent entity.
+ * Base class for autocomplete search handlers that filter parent entities.
+ *
+ * Extends {@see SearchHandler} to prevent circular hierarchies by excluding an entity and its children
+ * from search results. Uses a delimiter-separated format to pass both search terms and entity IDs.
+ * Subclasses must implement {@see getChildrenIds()} to provide entity-specific child retrieval logic.
  */
 abstract class AbstractParentEntitySearchHandler extends SearchHandler
 {

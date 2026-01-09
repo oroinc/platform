@@ -7,6 +7,13 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Makes ownership decisions for entities based on the current user.
+ *
+ * This decision maker determines whether the current user owns an entity by checking
+ * if the user is the owner of the entity. It supports the standard user-based ownership
+ * model and is used to enforce ownership-based access control in the system.
+ */
 class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker
 {
     /** @var TokenAccessorInterface */

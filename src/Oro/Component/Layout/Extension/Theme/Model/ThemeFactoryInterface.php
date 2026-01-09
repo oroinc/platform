@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Layout\Extension\Theme\Model;
 
+/**
+ * Defines the contract for creating {@see Theme} instances from theme definitions.
+ */
 interface ThemeFactoryInterface
 {
     /**

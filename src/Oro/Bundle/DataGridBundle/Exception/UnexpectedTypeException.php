@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Exception;
 
+/**
+ * Thrown when a value of an unexpected type is encountered in datagrid processing.
+ */
 class UnexpectedTypeException extends InvalidArgumentException
 {
     /**

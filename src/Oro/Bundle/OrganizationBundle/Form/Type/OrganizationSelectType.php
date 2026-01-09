@@ -6,6 +6,13 @@ use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Provides a form type for selecting organizations using jQuery Select2 autocomplete.
+ *
+ * This form type renders as a hidden input field with autocomplete functionality, allowing
+ * users to search and select organizations from a list. It uses the `user_organizations`
+ * autocomplete alias to populate available options.
+ */
 class OrganizationSelectType extends AbstractType
 {
     #[\Override]

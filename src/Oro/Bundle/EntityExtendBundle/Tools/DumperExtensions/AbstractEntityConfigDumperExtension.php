@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
+/**
+ * Provides common functionality for entity configuration dumper extensions.
+ *
+ * This base class defines the extension point interface for modifying entity configurations
+ * before and after entity schema generation. Subclasses should implement the `supports` method
+ * to declare which action types they handle, and override preUpdate/postUpdate as needed.
+ */
 abstract class AbstractEntityConfigDumperExtension
 {
     /**

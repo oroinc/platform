@@ -5,6 +5,13 @@ namespace Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\Exception;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
+/**
+ * Provides common functionality for composite conditions that combine multiple expressions.
+ *
+ * This base class manages a collection of operand expressions and provides methods for adding
+ * and evaluating them. Subclasses should implement the specific logic for combining operands
+ * (e.g., AND, OR logic) in the `isConditionAllowed` method.
+ */
 abstract class AbstractComposite extends AbstractCondition
 {
     /** @var ExpressionInterface[] */

@@ -5,6 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 use Oro\Bundle\ActionBundle\Model\ParameterInterface;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
+/**
+ * Normalizes and denormalizes standard workflow attribute types.
+ *
+ * This normalizer handles conversion of scalar and object attribute values between
+ * their model representation and serializable form.
+ */
 class StandardAttributeNormalizer implements AttributeNormalizer
 {
     protected $normalTypes = array(

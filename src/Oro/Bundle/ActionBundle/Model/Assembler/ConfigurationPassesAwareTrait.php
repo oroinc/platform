@@ -4,6 +4,12 @@ namespace Oro\Bundle\ActionBundle\Model\Assembler;
 
 use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 
+/**
+ * Provides functionality for managing and applying configuration passes.
+ *
+ * This trait implements the {@see ConfigurationPassesAwareInterface}, allowing classes
+ * to register and apply configuration passes to transform configuration data.
+ */
 trait ConfigurationPassesAwareTrait
 {
     /**

@@ -4,6 +4,15 @@ namespace Oro\Bundle\DashboardBundle\Provider\BigNumber;
 
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
+/**
+ * Formats numeric values for display in big number dashboard widgets.
+ *
+ * This formatter provides specialized formatting for large numbers, currency values,
+ * and percentages displayed in dashboard widgets. It supports deviation formatting
+ * for trend comparisons, automatically handling sign display and precision based on
+ * the data type. The formatter integrates with the locale-aware number formatter to
+ * ensure values are displayed according to user locale preferences.
+ */
 class BigNumberFormatter
 {
     /** @var NumberFormatter */

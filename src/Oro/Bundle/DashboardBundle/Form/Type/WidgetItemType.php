@@ -7,6 +7,14 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * Form type for individual widget item configuration.
+ *
+ * This form type represents a single item within a widget's item collection,
+ * providing fields for item identification, display order, and visibility control.
+ * It is typically used as an entry type within a collection form to manage
+ * multiple widget items that can be shown, hidden, or reordered.
+ */
 class WidgetItemType extends AbstractType
 {
     public const NAME = 'oro_type_widget_item';

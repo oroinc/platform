@@ -5,6 +5,12 @@ namespace Oro\Bundle\DataGridBundle\Extension\Appearance;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Defines the configuration structure for datagrid appearance options.
+ *
+ * This configuration class validates and normalizes appearance settings that control how
+ * datagrids are displayed, including grid view, board view, and their associated labels and icons.
+ */
 class Configuration implements ConfigurationInterface
 {
     public const GRID_APPEARANCE_TYPE = 'grid';

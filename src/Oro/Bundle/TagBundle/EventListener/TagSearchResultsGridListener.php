@@ -8,6 +8,13 @@ use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\TagBundle\Security\SecurityProvider;
 
+/**
+ * Handles the configuration of tag search results grid after datasource construction.
+ *
+ * This listener adjusts the query for the tag-results-grid by applying security ACL rules
+ * and filtering results based on the requested tag and source entity type. It ensures that
+ * only authorized tag search results are displayed to the user.
+ */
 class TagSearchResultsGridListener
 {
     /** @var SecurityProvider */

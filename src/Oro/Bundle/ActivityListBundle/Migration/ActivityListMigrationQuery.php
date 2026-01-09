@@ -15,6 +15,16 @@ use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Executes database queries to establish activity list associations.
+ *
+ * This migration query class performs the actual database operations needed to create
+ * many-to-many associations between the {@see ActivityList} entity and all target entities
+ * that support activity tracking. It compares the current schema with the desired schema
+ * and generates the necessary SQL statements to create missing tables and relationships.
+ * The query is executed during the post-migration phase and supports dry-run mode for
+ * previewing changes without applying them.
+ */
 class ActivityListMigrationQuery extends ParametrizedMigrationQuery
 {
     /** @var Schema */

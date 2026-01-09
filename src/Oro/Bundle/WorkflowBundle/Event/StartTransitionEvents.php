@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Event;
 
+/**
+ * Defines event names for workflow start transition lifecycle events.
+ *
+ * This class provides constants for events that are dispatched during the start transition
+ * process, allowing listeners to hook into specific points of the workflow initialization.
+ */
 class StartTransitionEvents
 {
     /**

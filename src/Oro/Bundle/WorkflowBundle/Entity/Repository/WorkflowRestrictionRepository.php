@@ -4,6 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+/**
+ * Repository for managing workflow restriction entities.
+ */
 class WorkflowRestrictionRepository extends EntityRepository
 {
     /**

@@ -6,6 +6,13 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
 
+/**
+ * Filters ACL privileges based on capability configurability.
+ *
+ * This filter determines whether an ACL privilege for a capability should be included
+ * in the privilege list based on whether the capability is configurable according to
+ * the provided configurable permission settings.
+ */
 class AclPrivilegeCapabilityFilter implements AclPrivilegeConfigurableFilterInterface
 {
     #[\Override]

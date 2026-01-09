@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\IntegrationBundle\Utils;
 
+/**
+ * Provides configuration management for multi-attempt retry logic in REST clients.
+ *
+ * This trait is used by client decorators to manage retry configuration, including
+ * enabling/disabling retries and configuring sleep intervals between retry attempts.
+ * It provides default configuration parameters and helper methods for accessing
+ * retry-related settings.
+ */
 trait MultiAttemptsConfigTrait
 {
     public static $multiAttemptsConfigKey = 'multipleAttempts';

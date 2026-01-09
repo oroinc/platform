@@ -6,6 +6,13 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Provides common functionality for migration queries that use parameterized SQL statements.
+ *
+ * This base class handles connection management and provides helper methods for logging parameterized queries
+ * with proper type handling.
+ * Subclasses should implement the actual query execution logic using prepared statements with parameters.
+ */
 abstract class ParametrizedMigrationQuery implements MigrationQuery, ConnectionAwareInterface
 {
     /**

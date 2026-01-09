@@ -4,6 +4,14 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Psr\Log\LoggerInterface;
 
+/**
+ * Executes parameterized SQL queries during migrations.
+ *
+ * This class extends {@see ParametrizedMigrationQuery} to provide a concrete implementation for
+ * executing multiple SQL queries with parameter binding. It supports adding queries with
+ * parameters and types, and provides descriptions of the queries for logging purposes.
+ * This is useful for migrations that need to execute complex SQL with dynamic values.
+ */
 class ParametrizedSqlMigrationQuery extends ParametrizedMigrationQuery
 {
     /**

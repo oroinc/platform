@@ -4,6 +4,13 @@ namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * Provides common functionality for transforming between arrays and delimited strings.
+ *
+ * This base class handles bidirectional transformation between array values and string representations
+ * using a configurable delimiter. It supports optional filtering of unique values and provides
+ * template methods for subclasses to customize the transformation logic.
+ */
 abstract class AbstractArrayToStringTransformer implements DataTransformerInterface
 {
     /**

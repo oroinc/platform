@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Generator;
 
+/**
+ * Generates URL-friendly slugs from arbitrary strings.
+ *
+ * This generator converts strings into slugs suitable for use in URLs by transliterating non-ASCII characters,
+ * removing special characters, normalizing whitespace and hyphens, and converting to lowercase. The resulting
+ * slugs are safe for use in URLs and human-readable.
+ */
 class SlugGenerator
 {
     /**

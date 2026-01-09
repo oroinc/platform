@@ -4,6 +4,13 @@ namespace Oro\Bundle\NavigationBundle\Entity\Builder;
 
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 
+/**
+ * Builds navigation history item instances.
+ *
+ * This builder is responsible for creating new navigation history item instances and retrieving
+ * existing ones from the database. It extends the abstract builder to provide specialized behavior
+ * for history items, which track the user's navigation history within the application.
+ */
 class HistoryItemBuilder extends AbstractBuilder
 {
     /**

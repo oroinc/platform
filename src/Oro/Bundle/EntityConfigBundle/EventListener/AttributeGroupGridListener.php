@@ -6,6 +6,13 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 
+/**
+ * Enriches attribute group datagrid records with attribute labels.
+ *
+ * This listener processes datagrid results for attribute groups, fetching and adding the labels of all
+ * attributes contained in each group to the result records, providing users with a comprehensive view
+ * of group contents in the datagrid.
+ */
 class AttributeGroupGridListener
 {
     /**

@@ -7,6 +7,12 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
+/**
+ * Helper for managing workflow deactivation and replacement.
+ *
+ * This helper provides methods to identify workflows that can be deactivated and to
+ * manage the workflow replacement process when activating new workflows.
+ */
 class WorkflowDeactivationHelper
 {
     /** @var WorkflowRegistry */

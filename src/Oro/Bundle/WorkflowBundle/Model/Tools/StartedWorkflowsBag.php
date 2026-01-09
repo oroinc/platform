@@ -4,6 +4,13 @@ namespace Oro\Bundle\WorkflowBundle\Model\Tools;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+/**
+ * Manages a collection of entities associated with started workflows.
+ *
+ * This class maintains a mapping of workflow names to their associated entities,
+ * allowing for tracking of which entities have been processed by specific workflows.
+ * It provides methods to add, remove, and query entities for a given workflow.
+ */
 class StartedWorkflowsBag
 {
     /** @var ArrayCollection */

@@ -4,6 +4,13 @@ namespace Oro\Bundle\ActionBundle\Helper;
 
 use Oro\Bundle\ActionBundle\Exception\CircularReferenceException;
 
+/**
+ * Performs substitution of array keys with mapped replacement keys.
+ *
+ * This class handles the replacement of array keys based on a substitution map,
+ * with support for circular reference detection, configurable depth limits,
+ * and optional cleanup of unbounded substitutions.
+ */
 class ArraySubstitution
 {
     public const SUBSTITUTION_PATH_MAX_DEPTH = 10;

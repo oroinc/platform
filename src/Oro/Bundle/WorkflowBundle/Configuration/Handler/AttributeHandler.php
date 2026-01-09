@@ -4,6 +4,14 @@ namespace Oro\Bundle\WorkflowBundle\Configuration\Handler;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
+/**
+ * Handles workflow attribute configuration normalization.
+ *
+ * Processes raw attribute configurations from workflow definitions, ensuring each attribute
+ * has a unique name. If an attribute lacks a name, a unique identifier is automatically generated.
+ * This handler is part of the workflow configuration processing pipeline that validates and
+ * normalizes workflow definitions before they are used by the workflow engine.
+ */
 class AttributeHandler extends AbstractHandler
 {
     #[\Override]

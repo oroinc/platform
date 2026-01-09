@@ -7,6 +7,14 @@ use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Encapsulates form update operation with handler and template data provider.
+ *
+ * This class coordinates form processing by holding references to the form,
+ * form data, handler, and template data provider. It delegates form processing
+ * to the handler and template data retrieval to the provider, serving as a
+ * facade for form update operations.
+ */
 class Update implements UpdateInterface
 {
     /** @var FormInterface */

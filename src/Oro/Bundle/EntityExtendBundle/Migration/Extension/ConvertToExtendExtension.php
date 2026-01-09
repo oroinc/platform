@@ -13,6 +13,15 @@ use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
+/**
+ * Migration extension for converting existing fields to extended entity fields.
+ *
+ * This extension provides utilities for migrations to convert regular entity fields into
+ * extended fields with custom configurations. It handles the creation of many-to-one relations,
+ * manages extend field options, and ensures that required extend field attributes are properly
+ * set. It also handles the cleanup of old field configurations when fields are renamed or
+ * converted to relations.
+ */
 class ConvertToExtendExtension
 {
     /** @var ExtendOptionsManager */

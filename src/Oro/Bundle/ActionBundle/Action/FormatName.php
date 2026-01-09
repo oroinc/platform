@@ -7,6 +7,13 @@ use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
+/**
+ * Formats the name of an entity using the entity name resolver.
+ *
+ * This action resolves and formats the display name of an entity object,
+ * storing the result in a specified attribute. It leverages the {@see EntityNameResolver}
+ * to provide consistent entity naming across the application.
+ */
 class FormatName extends AbstractAction
 {
     /**

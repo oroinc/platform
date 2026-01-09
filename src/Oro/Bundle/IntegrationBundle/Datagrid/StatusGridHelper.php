@@ -9,6 +9,13 @@ use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides helper methods for configuring and managing the integration status datagrid.
+ *
+ * This class handles datagrid event listeners for building the status grid, including
+ * filtering connectors by integration type and binding integration IDs to queries.
+ * It also provides callable properties for rendering connector codes with translated labels.
+ */
 class StatusGridHelper
 {
     /** @var TypesRegistry */

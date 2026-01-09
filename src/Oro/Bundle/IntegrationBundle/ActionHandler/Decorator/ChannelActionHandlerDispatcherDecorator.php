@@ -9,6 +9,14 @@ use Oro\Bundle\IntegrationBundle\Event\Action\ChannelActionEvent;
 use Oro\Bundle\IntegrationBundle\Factory\Event\ChannelActionEventFactoryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Dispatches channel action events and handles errors before delegating to the actual action handler.
+ *
+ * This decorator wraps a channel action handler and provides event dispatching capabilities.
+ * It creates and dispatches a channel action event, handles any errors that occur during event
+ * processing, and only delegates to the wrapped action handler if no errors were encountered.
+ * This allows listeners to intercept and validate channel actions before they are executed.
+ */
 class ChannelActionHandlerDispatcherDecorator implements ChannelActionHandlerInterface
 {
     /**

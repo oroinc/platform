@@ -6,6 +6,13 @@ use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\Extension\AbstractExtension;
 use Oro\Component\ConfigExpression\Func;
 
+/**
+ * Provides core configuration expressions and functions.
+ *
+ * This extension registers the standard set of conditions (logical operators,
+ * comparisons, string operations) and utility functions that form the foundation
+ * of the configuration expression language.
+ */
 class CoreExtension extends AbstractExtension
 {
     #[\Override]

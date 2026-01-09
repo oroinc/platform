@@ -5,6 +5,13 @@ namespace Oro\Bundle\EntityConfigBundle\Event;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 
+/**
+ * Dispatched after entity and field configuration changes have been persisted to the database.
+ *
+ * This event is triggered after the configuration manager flushes all pending configuration changes,
+ * allowing listeners to perform post-flush operations such as cache invalidation or secondary updates
+ * based on the persisted configuration models.
+ */
 class PostFlushConfigEvent extends Event
 {
     /** @var ConfigModel[] */

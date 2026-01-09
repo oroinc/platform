@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\LocaleBundle\Model;
 
+/**
+ * Defines the contract for creating calendar instances.
+ *
+ * Implementations of this interface are responsible for creating {@see Calendar} objects
+ * configured with specific locale and language settings.
+ */
 interface CalendarFactoryInterface
 {
     /**

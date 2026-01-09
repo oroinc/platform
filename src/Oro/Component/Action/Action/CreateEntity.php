@@ -8,6 +8,14 @@ use Oro\Component\Action\Exception\ActionException;
 use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
+/**
+ * Creates a Doctrine-managed entity instance and persists it to the database.
+ *
+ * This action extends CreateObject to add Doctrine ORM integration. It creates an entity instance
+ * using the parent class logic, then persists it to the database through the appropriate entity manager.
+ * Optionally, it can flush the entity manager immediately after persistence, or defer flushing for later.
+ * Throws {@see NotManageableEntityException} if the entity class is not managed by Doctrine.
+ */
 class CreateEntity extends CreateObject
 {
     public const OPTION_KEY_FLUSH = 'flush';

@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Grid;
 
+/**
+ * Defines configuration path constants for query designer grid queries.
+ */
 final class QueryDesignerQueryConfiguration
 {
     public const TABLE_ALIASES  = '[source][query_config][table_aliases]';

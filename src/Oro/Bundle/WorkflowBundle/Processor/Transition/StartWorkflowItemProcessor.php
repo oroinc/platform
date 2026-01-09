@@ -9,6 +9,15 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
+/**
+ * Creates workflow items for workflow start transitions.
+ *
+ * This processor creates a new workflow item for start transitions. It retrieves or creates the entity
+ * that the workflow will operate on based on the entity ID from the context. If an entity ID is provided,
+ * it loads the existing entity; otherwise, it creates a new instance. The processor then creates a workflow
+ * item from the entity and initialization data, making it available for subsequent processing.
+ * Errors during entity retrieval or creation are converted to HTTP exceptions.
+ */
 class StartWorkflowItemProcessor implements ProcessorInterface
 {
     /** @var DoctrineHelper */

@@ -5,6 +5,12 @@ namespace Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Redirect;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
 
+/**
+ * Represents a redirect-based mass action for datagrids.
+ *
+ * This mass action redirects the user to a specified route with selected record identifiers
+ * as parameters, allowing for custom processing pages for bulk operations.
+ */
 class RedirectMassAction extends AbstractMassAction
 {
     /** @var array */

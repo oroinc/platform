@@ -4,6 +4,14 @@ namespace Oro\Bundle\NavigationBundle\Entity\Builder;
 
 use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
 
+/**
+ * Builds navigation item instances.
+ *
+ * This builder is responsible for creating new navigation item instances and retrieving existing ones
+ * from the database. It extends the abstract builder to provide specialized behavior for navigation items,
+ * including setting the item type during creation. Navigation items represent user-specific navigation
+ * elements such as shortcuts and bookmarks.
+ */
 class NavigationItemBuilder extends AbstractBuilder
 {
     /**

@@ -6,6 +6,13 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfig;
 use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
 
+/**
+ * Provides default currency configuration from the system configuration.
+ *
+ * This provider retrieves the default currency setting from the application's
+ * configuration manager and implements the {@see CurrencyProviderInterface} to supply
+ * currency information to other components.
+ */
 class DefaultCurrencyConfigProvider implements CurrencyProviderInterface
 {
     /**

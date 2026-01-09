@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Event;
 
 /**
- * Workflow and transition events
+ * Defines event names for workflow lifecycle and transition operations.
  */
 class WorkflowEvents
 {

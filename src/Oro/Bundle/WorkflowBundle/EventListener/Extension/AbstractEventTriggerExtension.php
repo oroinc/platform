@@ -8,6 +8,14 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 
+/**
+ * Provides common functionality for event trigger extensions.
+ *
+ * This abstract class serves as a base for implementing event trigger extensions that handle workflow event triggers.
+ * It manages trigger caching, provides methods to check for triggers on entities and events,
+ * and includes utility methods for comparing entity instances.
+ * Subclasses must implement the getRepository() method to provide access to the trigger repository.
+ */
 abstract class AbstractEventTriggerExtension implements EventTriggerExtensionInterface
 {
     /** @var EventTriggerCache */

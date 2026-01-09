@@ -2,6 +2,12 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Registry for managing layout renderers by name with a default renderer.
+ *
+ * This registry stores layout renderers indexed by name and maintains a default renderer
+ * that is used when no specific renderer is requested.
+ */
 class LayoutRendererRegistry implements LayoutRendererRegistryInterface
 {
     /** @var LayoutRendererInterface[] */

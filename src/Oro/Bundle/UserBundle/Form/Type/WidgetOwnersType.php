@@ -6,6 +6,13 @@ use Oro\Bundle\OrganizationBundle\Form\Type\WidgetBusinessUnitSelectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * Form type for selecting widget owners (business units, roles, and users).
+ *
+ * This form type provides fields for selecting business units, roles, and users
+ * as owners for dashboard widgets. It allows filtering widget data by multiple
+ * ownership criteria.
+ */
 class WidgetOwnersType extends AbstractType
 {
     public const NAME = 'oro_type_widget_owners';

@@ -8,6 +8,15 @@ use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Provides navigation methods for paginating through entities in a collection.
+ *
+ * This service enables navigation through a paginated list of entities, allowing retrieval
+ * of the first, last, next, and previous entity identifiers relative to a current entity.
+ * It respects security permissions and validates entity availability, skipping entities that
+ * are no longer accessible or for which the user lacks view permissions. The service supports
+ * multiple scopes (e.g., view, edit) for different pagination contexts.
+ */
 class EntityPaginationNavigation
 {
     public const FIRST    = 'first';

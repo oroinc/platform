@@ -6,6 +6,14 @@ use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\TransitionTriggerVerifierException;
 
+/**
+ * Provides common functionality for transition trigger assemblers.
+ *
+ * This abstract class implements the core logic for assembling transition triggers from configuration options.
+ * It handles validation of options, creation of trigger instances, and verification of assembled triggers.
+ * Subclasses must implement the assembleTrigger() and verifyTrigger() methods to provide specific trigger assembly
+ * and validation logic for different trigger types.
+ */
 abstract class AbstractTransitionTriggerAssembler implements TransitionTriggerAssemblerInterface
 {
     /**

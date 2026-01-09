@@ -4,6 +4,14 @@ namespace Oro\Component\MessageQueue\Checker;
 
 use Oro\Component\MessageQueue\Job\Job;
 
+/**
+ * Checks the status of asynchronous jobs to determine if they have finished or stopped.
+ *
+ * This utility class provides methods to query job status against predefined sets of
+ * finished and stopped statuses. It helps determine whether a job has completed execution
+ * (successfully or with failure) or has been stopped (including cancellation and stale states),
+ * enabling proper job lifecycle management and monitoring.
+ */
 class JobStatusChecker
 {
     /** @var string[] */

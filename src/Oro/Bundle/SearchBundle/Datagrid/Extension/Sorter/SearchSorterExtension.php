@@ -9,6 +9,14 @@ use Oro\Bundle\DataGridBundle\Extension\Sorter\AbstractSorterExtension;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException;
 
+/**
+ * Applies sorting to search engine queries in datagrids.
+ *
+ * This extension extends the datagrid sorter functionality to work with search
+ * datasources. It maps configuration data types to search engine data types and
+ * applies sort parameters to search queries, enabling users to sort search results
+ * by various fields and data types.
+ */
 class SearchSorterExtension extends AbstractSorterExtension
 {
     // data type mapping from configuration type to search engine type

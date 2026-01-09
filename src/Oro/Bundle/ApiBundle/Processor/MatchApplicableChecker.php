@@ -6,6 +6,16 @@ use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\ChainProcessor\MatchApplicableChecker as BaseMatchApplicableChecker;
 
+/**
+ * Extends the base match applicable checker to support class-based attribute matching.
+ *
+ * This checker enhances the chain processor's applicability matching by allowing certain attributes
+ * to be compared using the `instanceof` operator instead of equality comparison. This is particularly
+ * useful for matching processor configurations that specify class names as attributes. It includes
+ * special handling for outdated enum option entities to prevent double execution of processors
+ * in scenarios where both `customize_loaded_data` and `customize_form_data` actions are involved.
+ * Attributes can be marked as `class` attributes via the constructor or the {@see addClassAttribute} method.
+ */
 class MatchApplicableChecker extends BaseMatchApplicableChecker
 {
     /** @var array [attribute name => true, ...] */

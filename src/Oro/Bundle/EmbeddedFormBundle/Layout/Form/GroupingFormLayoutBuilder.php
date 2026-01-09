@@ -5,6 +5,14 @@ namespace Oro\Bundle\EmbeddedFormBundle\Layout\Form;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 
+/**
+ * Builds layout blocks for form fields organized into groups.
+ *
+ * This builder extends FormLayoutBuilder to add support for grouping form fields into
+ * fieldset blocks. It allows configuration of field groups with optional default groups,
+ * and automatically creates fieldset blocks for groups that contain fields. This enables
+ * better organization and visual presentation of complex forms.
+ */
 class GroupingFormLayoutBuilder extends FormLayoutBuilder
 {
     /** @var array */

@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\MigrationBundle\Migration;
 
+/**
+ * Container for SQL queries to be executed before and after schema migrations.
+ *
+ * This class manages two sets of queries: pre-queries that execute before schema changes
+ * and post-queries that execute after schema changes. Queries can be plain SQL strings or
+ * instances of MigrationQuery for more complex operations. This allows migrations to perform
+ * data manipulation and other operations in coordination with schema changes.
+ */
 class QueryBag
 {
     /**

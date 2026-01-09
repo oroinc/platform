@@ -2,6 +2,13 @@
 
 namespace Oro\Component\PhpUtils;
 
+/**
+ * Provides reflection-based utilities for analyzing and validating class methods and arguments.
+ *
+ * This helper class uses PHP reflection to inspect class methods, validate method arguments,
+ * and complete argument lists with default values. It caches reflection instances for
+ * performance and tracks errors that occur during validation.
+ */
 class ReflectionClassHelper
 {
     /** @var string */

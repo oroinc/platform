@@ -6,6 +6,12 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Logs process execution details for debugging and monitoring.
+ *
+ * This logger records information about process triggers and data during execution,
+ * providing visibility into process behavior and helping with troubleshooting.
+ */
 class ProcessLogger
 {
     /**

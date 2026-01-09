@@ -4,6 +4,12 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Dispatched before Behat tests begin execution.
+ *
+ * This event allows isolators to perform initialization operations before the test suite starts,
+ * such as setting up databases, clearing caches, or preparing test fixtures.
+ */
 final class BeforeStartTestsEvent implements TestIsolationEvent
 {
     /**

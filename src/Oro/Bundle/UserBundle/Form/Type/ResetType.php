@@ -9,6 +9,13 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for password reset operations.
+ *
+ * This form type provides a repeated password field for password reset scenarios,
+ * typically used when users reset their password via a reset token. It includes
+ * password complexity validation and confirmation matching.
+ */
 class ResetType extends AbstractType
 {
     /** @var string */

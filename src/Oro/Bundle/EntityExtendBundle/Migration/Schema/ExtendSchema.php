@@ -9,6 +9,14 @@ use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Migration\Schema\SchemaWithNameGenerator;
 
+/**
+ * Extended database schema for managing custom entity fields and relations.
+ *
+ * This schema class extends the base schema with support for managing extend options
+ * that control custom field behavior, relations, and configurations. It creates ExtendTable
+ * instances instead of regular tables, allowing tables to store and manage extend-specific
+ * metadata alongside standard Doctrine schema information.
+ */
 class ExtendSchema extends SchemaWithNameGenerator
 {
     public const TABLE_CLASS = 'Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendTable';

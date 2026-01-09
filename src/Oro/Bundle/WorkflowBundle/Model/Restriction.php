@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
+/**
+ * Represents a workflow restriction that controls field access based on workflow step.
+ *
+ * This class defines restrictions on entity fields that apply when a workflow item is in
+ * a specific step, controlling whether fields can be edited, hidden, or have read-only access.
+ */
 class Restriction
 {
     /** @var string */

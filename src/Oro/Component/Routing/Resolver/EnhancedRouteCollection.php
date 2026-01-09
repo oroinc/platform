@@ -5,6 +5,13 @@ namespace Oro\Component\Routing\Resolver;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
+/**
+ * Extends Symfony's {@see RouteCollection} with advanced route insertion capabilities.
+ *
+ * This collection allows inserting routes at specific positions relative to
+ * existing routes, enabling fine-grained control over route ordering and
+ * collection composition.
+ */
 class EnhancedRouteCollection extends RouteCollection
 {
     /**

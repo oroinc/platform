@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Exception;
 
+/**
+ * Thrown when email folder synchronization exceeds the maximum time limit.
+ *
+ * This exception is raised when synchronizing a specific email folder takes longer than allowed,
+ * preventing the synchronization process from consuming excessive resources.
+ */
 class SyncFolderTimeoutException extends \RuntimeException
 {
     /**

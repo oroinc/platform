@@ -6,6 +6,15 @@ use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Provides utility methods for checking activity association configuration and accessibility.
+ *
+ * This helper class encapsulates logic for determining whether specific activity types are
+ * enabled for target entities, checking if entities have any activity associations, and
+ * verifying that associations are accessible for use in business logic. It abstracts the
+ * complexity of querying entity configuration and extend field metadata, making it easier
+ * for other components to work with activity associations throughout the application.
+ */
 class ActivityAssociationHelper
 {
     /** @var ConfigManager */

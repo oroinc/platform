@@ -4,6 +4,13 @@ namespace Oro\Bundle\EntityBundle\ORM;
 
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * Provides access to all configured Doctrine object managers.
+ *
+ * This class maintains a list of registered object managers and returns them all
+ * when requested. It includes the default manager plus any additional managers
+ * that have been explicitly registered.
+ */
 class ManagerBag implements ManagerBagInterface
 {
     /** @var ManagerRegistry */

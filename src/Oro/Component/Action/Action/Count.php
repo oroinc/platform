@@ -5,6 +5,13 @@ namespace Oro\Component\Action\Action;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Counts elements in an array or countable object and stores the result.
+ *
+ * This action retrieves a value from the context (which must be an array or implement Countable),
+ * counts its elements, and stores the count in a specified attribute. Non-countable values are
+ * treated as empty arrays with a count of zero.
+ */
 class Count extends AbstractAction
 {
     /** @var array */

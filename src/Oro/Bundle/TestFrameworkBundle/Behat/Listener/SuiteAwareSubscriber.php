@@ -6,6 +6,13 @@ use Behat\Testwork\EventDispatcher\Event\BeforeSuiteTested;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\SuiteAwareInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Injects the current test suite into suite-aware services.
+ *
+ * This event subscriber listens for suite initialization events and injects the current
+ * suite into all registered services that implement SuiteAwareInterface, allowing them
+ * to access suite-specific configuration.
+ */
 class SuiteAwareSubscriber implements EventSubscriberInterface
 {
     /** @var  SuiteAwareInterface[] */

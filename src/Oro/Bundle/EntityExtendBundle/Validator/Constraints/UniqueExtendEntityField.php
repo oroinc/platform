@@ -4,6 +4,13 @@ namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * Constraint for validating that extended entity field names are unique.
+ *
+ * This constraint ensures that new custom fields do not have names that conflict with
+ * existing fields in the entity. It detects both exact name matches and similar names
+ * that could cause confusion or naming conflicts.
+ */
 class UniqueExtendEntityField extends Constraint
 {
     /** @var string */

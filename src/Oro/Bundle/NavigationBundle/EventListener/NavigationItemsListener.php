@@ -6,6 +6,14 @@ use Knp\Menu\ItemInterface;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 
+/**
+ * Disables navigation items based on feature toggle configuration.
+ *
+ * This listener responds to menu configuration events and hides navigation items that have been
+ * disabled through the feature toggle system. It supports multiple menu path separators to handle
+ * different menu hierarchy notations and recursively disables parent items when all their children
+ * are hidden, maintaining a clean menu structure without empty parent items.
+ */
 class NavigationItemsListener
 {
     protected static $menuPathSeparators = [

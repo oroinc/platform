@@ -6,6 +6,12 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Event dispatched when a process is being handled.
+ *
+ * This event provides access to the process trigger and process data, allowing listeners
+ * to monitor and customize process execution.
+ */
 class ProcessHandleEvent extends Event
 {
     /**
