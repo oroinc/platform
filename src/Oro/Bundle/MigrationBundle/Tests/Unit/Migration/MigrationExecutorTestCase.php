@@ -3,7 +3,7 @@
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
@@ -32,11 +32,11 @@ abstract class MigrationExecutorTestCase extends TestCase
             ->method('createSchemaConfig')
             ->willReturn(null);
         $this->connection->expects(self::atLeastOnce())
-            ->method('getSchemaManager')
+            ->method('createSchemaManager')
             ->willReturn($sm);
         $this->connection->expects(self::atLeastOnce())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
 
         $this->logger = new ArrayLogger();
 

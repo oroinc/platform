@@ -49,14 +49,14 @@ class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageIn
         $cacheItem = $this->tokenCache->getItem($this->getCacheKey($tokenId));
         $token = $cacheItem->get();
         if (null === $token) {
-            throw new TokenNotFoundException('The CSRF token with ID '.$tokenId.' does not exist.');
+            throw new TokenNotFoundException('The CSRF token with ID ' . $tokenId . ' does not exist.');
         }
 
         return $token;
     }
 
     #[\Override]
-    public function setToken($tokenId, $token)
+    public function setToken($tokenId, $token): void
     {
         $cacheItem = $this->tokenCache->getItem($this->getCacheKey($tokenId));
         $cacheItem
@@ -83,7 +83,7 @@ class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageIn
     }
 
     #[\Override]
-    public function clear()
+    public function clear(): void
     {
         $this->tokenCache->clear();
     }

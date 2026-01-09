@@ -11,6 +11,7 @@ use Oro\Bundle\EntityExtendBundle\Validator\Constraints\AttributeField;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\AttributeFieldValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class AttributeFieldValidatorTest extends ConstraintValidatorTestCase
@@ -27,7 +28,7 @@ class AttributeFieldValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new AttributeFieldValidator(
             $this->validationHelper,

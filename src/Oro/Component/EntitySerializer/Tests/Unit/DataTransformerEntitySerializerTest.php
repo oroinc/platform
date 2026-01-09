@@ -2,6 +2,7 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
+use Doctrine\DBAL\ParameterType;
 use Oro\Component\EntitySerializer\DataTransformerInterface;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Product;
@@ -31,7 +32,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $this->container->expects(self::once())
@@ -78,7 +79,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $this->container->expects(self::once())
@@ -118,7 +119,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $context = ['key' => 'context value'];
@@ -180,7 +181,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $transformer = $this->createMock(FormDataTransformerInterface::class);
@@ -236,7 +237,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $context = ['key' => 'context value'];
@@ -285,7 +286,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $transformer = $this->createMock(DataTransformerInterface::class);
@@ -350,7 +351,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $transformer = $this->createMock(DataTransformerInterface::class);

@@ -105,9 +105,8 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     }
 
     #[\Override]
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
-        return $this;
     }
 
     #[\Override]

@@ -16,12 +16,13 @@ use Oro\Bundle\PlatformBundle\Validator\Constraints\ValidLoadedItems;
 use Oro\Bundle\PlatformBundle\Validator\Constraints\ValidLoadedItemsValidator;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class ValidLoadedItemsValidatorTest extends ConstraintValidatorTestCase
 {
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new ValidLoadedItemsValidator();
     }

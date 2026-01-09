@@ -70,7 +70,7 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (null === $value) {
             return null;
@@ -131,7 +131,7 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (null === $value) {
             return null;

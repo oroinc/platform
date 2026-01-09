@@ -43,7 +43,7 @@ class MysqlDatabaseRequirementsProvider extends AbstractDatabaseRequirementsProv
     protected function getGrantedPrivileges(Connection $connection): array
     {
         return DbPrivilegesProvider::getMySqlGrantedPrivileges(
-            $connection->getWrappedConnection(),
+            $connection->getNativeConnection(),
             $connection->getDatabase()
         );
     }

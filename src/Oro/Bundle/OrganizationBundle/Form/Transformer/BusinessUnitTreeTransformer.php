@@ -7,6 +7,9 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * Transforms business unit data between form representation and entity objects.
+ */
 class BusinessUnitTreeTransformer implements DataTransformerInterface
 {
     /** @var BusinessUnitManager */
@@ -21,7 +24,7 @@ class BusinessUnitTreeTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (!$value) {
             return null;
@@ -32,6 +35,9 @@ class BusinessUnitTreeTransformer implements DataTransformerInterface
                     $ids[] = $val;
                 }
             }
+            if (empty($ids)) {
+                return [];
+            }
 
             return $this->manager->getBusinessUnitRepo()->findBy(['id' => $ids]);
         }
@@ -40,7 +46,7 @@ class BusinessUnitTreeTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (!is_array($value) && !$value) {
             return null;

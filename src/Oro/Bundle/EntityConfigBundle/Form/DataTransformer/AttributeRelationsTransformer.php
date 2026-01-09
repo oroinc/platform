@@ -24,7 +24,7 @@ class AttributeRelationsTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function transform($collectionToArray)
+    public function transform($collectionToArray): mixed
     {
         if (null === $collectionToArray) {
             return [];
@@ -40,7 +40,7 @@ class AttributeRelationsTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($arrayToCollection)
+    public function reverseTransform($arrayToCollection): mixed
     {
         // New group(null) passed - create empty instance
         if (!$this->attributeGroup instanceof AttributeGroup) {

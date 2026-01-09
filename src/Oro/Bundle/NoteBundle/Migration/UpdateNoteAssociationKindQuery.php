@@ -254,7 +254,7 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
             $this->connection->executeStatement($sql);
         }
 
-        $schemaManager = $this->connection->getSchemaManager();
+        $schemaManager = $this->connection->createSchemaManager();
         foreach ($schemaManager->listTableForeignKeys(self::NOTE_TABLE) as $foreignKey) {
             if (in_array($noteAssociationColumnName, $foreignKey->getColumns(), true)) {
                 $schemaManager->dropForeignKey($foreignKey, self::NOTE_TABLE);

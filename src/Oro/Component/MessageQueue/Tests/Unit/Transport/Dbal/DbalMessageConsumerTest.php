@@ -3,8 +3,9 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Dbal;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\PDOException;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Driver\Exception as DriverException;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Types;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
@@ -65,6 +66,11 @@ class DbalMessageConsumerTest extends TestCase
 
     public function testReceiveWithMessage(): void
     {
+        $updateResult = $this->createMock(Result::class);
+        $updateResult->expects(self::once())
+            ->method('rowCount')
+            ->willReturn(1);
+
         $updateStatement = $this->createMock(Statement::class);
         $updateStatement->expects(self::once())
             ->method('executeQuery')
@@ -73,21 +79,12 @@ class DbalMessageConsumerTest extends TestCase
                     self::containsEqual('test_queue'),
                     self::containsEqual($this->consumer->getConsumerId())
                 )
-            );
-        $updateStatement->expects(self::once())
-            ->method('rowCount')
-            ->willReturn(1);
+            )
+            ->willReturn($updateResult);
 
-        $selectStatement = $this->createMock(Statement::class);
-        $selectStatement->expects(self::once())
-            ->method('executeQuery')
-            ->with([
-                'consumerId' => $this->consumer->getConsumerId(),
-                'queue' => 'test_queue',
-            ]);
-        $selectStatement->expects(self::once())
-            ->method('fetch')
-            ->with(2)
+        $selectResult = $this->createMock(Result::class);
+        $selectResult->expects(self::once())
+            ->method('fetchAssociative')
             ->willReturn([
                 'id' => 25,
                 'body' => 'message.body',
@@ -97,9 +94,18 @@ class DbalMessageConsumerTest extends TestCase
                 'properties' => '{"property.key":"property.value"}',
             ]);
 
+        $selectStatement = $this->createMock(Statement::class);
+        $selectStatement->expects(self::once())
+            ->method('executeQuery')
+            ->with([
+                'consumerId' => $this->consumer->getConsumerId(),
+                'queue' => 'test_queue',
+            ])
+            ->willReturn($selectResult);
+
         $this->dbal->expects(self::once())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
         $this->dbal->expects(self::exactly(2))
             ->method('prepare')
             ->willReturn($updateStatement, $selectStatement);
@@ -124,6 +130,11 @@ class DbalMessageConsumerTest extends TestCase
 
     public function testReceiveWithMessageLogicException(): void
     {
+        $updateResult = $this->createMock(Result::class);
+        $updateResult->expects(self::once())
+            ->method('rowCount')
+            ->willReturn(1);
+
         $updateStatement = $this->createMock(Statement::class);
         $updateStatement->expects(self::once())
             ->method('executeQuery')
@@ -132,10 +143,13 @@ class DbalMessageConsumerTest extends TestCase
                     self::containsEqual('test_queue'),
                     self::containsEqual($this->consumer->getConsumerId())
                 )
-            );
-        $updateStatement->expects(self::once())
-            ->method('rowCount')
-            ->willReturn(1);
+            )
+            ->willReturn($updateResult);
+
+        $selectResult = $this->createMock(Result::class);
+        $selectResult->expects(self::once())
+            ->method('fetchAssociative')
+            ->willReturn(false);
 
         $selectStatement = $this->createMock(Statement::class);
         $selectStatement->expects(self::once())
@@ -143,15 +157,12 @@ class DbalMessageConsumerTest extends TestCase
             ->with([
                 'consumerId' => $this->consumer->getConsumerId(),
                 'queue' => 'test_queue',
-            ]);
-        $selectStatement->expects(self::once())
-            ->method('fetch')
-            ->with(2)
-            ->willReturn(false);
+            ])
+            ->willReturn($selectResult);
 
         $this->dbal->expects(self::once())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
         $this->dbal->expects(self::exactly(2))
             ->method('prepare')
             ->willReturn($updateStatement, $selectStatement);
@@ -174,6 +185,11 @@ class DbalMessageConsumerTest extends TestCase
 
     public function testReceiveWithoutMessage(): void
     {
+        $updateResult = $this->createMock(Result::class);
+        $updateResult->expects(self::once())
+            ->method('rowCount')
+            ->willReturn(0);
+
         $updateStatement = $this->createMock(Statement::class);
         $updateStatement->expects(self::once())
             ->method('executeQuery')
@@ -182,14 +198,12 @@ class DbalMessageConsumerTest extends TestCase
                     self::containsEqual('test_queue'),
                     self::containsEqual($this->consumer->getConsumerId())
                 )
-            );
-        $updateStatement->expects(self::once())
-            ->method('rowCount')
-            ->willReturn(0);
+            )
+            ->willReturn($updateResult);
 
         $this->dbal->expects(self::once())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
         $this->dbal->expects(self::once())
             ->method('prepare')
             ->willReturn($updateStatement);
@@ -220,18 +234,20 @@ class DbalMessageConsumerTest extends TestCase
 
     public function testAcknowledge(): void
     {
-        $deleteStatement = $this->createMock(Statement::class);
-        $deleteStatement->expects(self::once())
-            ->method('executeQuery')
-            ->with(['messageId' => 25]);
-
-        $deleteStatement->expects(self::once())
+        $deleteResult = $this->createMock(Result::class);
+        $deleteResult->expects(self::once())
             ->method('rowCount')
             ->willReturn(1);
 
+        $deleteStatement = $this->createMock(Statement::class);
+        $deleteStatement->expects(self::once())
+            ->method('executeQuery')
+            ->with(['messageId' => 25])
+            ->willReturn($deleteResult);
+
         $this->dbal->expects(self::once())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
         $this->dbal->expects(self::once())
             ->method('prepare')
             ->willReturn($deleteStatement);
@@ -244,23 +260,25 @@ class DbalMessageConsumerTest extends TestCase
 
     public function testAcknowledgeWithRetry(): void
     {
-        $deleteStatement = $this->createMock(Statement::class);
-        $deleteStatement->expects(self::exactly(2))
-            ->method('executeQuery')
-            ->with(['messageId' => 25]);
+        $driverException = $this->createMock(DriverException::class);
 
-        $deleteStatement->expects(self::exactly(2))
+        $deleteResult = $this->createMock(Result::class);
+        $deleteResult->expects(self::exactly(2))
             ->method('rowCount')
-            ->willReturn(
-                self::returnCallback(function () {
-                    throw new PDOException(new \PDOException());
-                }),
+            ->willReturnOnConsecutiveCalls(
+                self::throwException($driverException),
                 1
             );
 
+        $deleteStatement = $this->createMock(Statement::class);
+        $deleteStatement->expects(self::exactly(2))
+            ->method('executeQuery')
+            ->with(['messageId' => 25])
+            ->willReturn($deleteResult);
+
         $this->dbal->expects(self::once())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
         $this->dbal->expects(self::once())
             ->method('prepare')
             ->willReturn($deleteStatement);
@@ -273,18 +291,20 @@ class DbalMessageConsumerTest extends TestCase
 
     public function testAcknowledgeLogicException(): void
     {
-        $deleteStatement = $this->createMock(Statement::class);
-        $deleteStatement->expects(self::once())
-            ->method('executeQuery')
-            ->with(['messageId' => 25]);
-
-        $deleteStatement->expects(self::once())
+        $deleteResult = $this->createMock(Result::class);
+        $deleteResult->expects(self::once())
             ->method('rowCount')
             ->willReturn(0);
 
+        $deleteStatement = $this->createMock(Statement::class);
+        $deleteStatement->expects(self::once())
+            ->method('executeQuery')
+            ->with(['messageId' => 25])
+            ->willReturn($deleteResult);
+
         $this->dbal->expects(self::once())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
         $this->dbal->expects(self::once())
             ->method('prepare')
             ->willReturn($deleteStatement);
@@ -311,17 +331,20 @@ class DbalMessageConsumerTest extends TestCase
 
     public function testReject(): void
     {
-        $deleteStatement = $this->createMock(Statement::class);
-        $deleteStatement->expects(self::once())
-            ->method('executeQuery')
-            ->with(['messageId' => 25]);
-        $deleteStatement->expects(self::once())
+        $deleteResult = $this->createMock(Result::class);
+        $deleteResult->expects(self::once())
             ->method('rowCount')
             ->willReturn(1);
 
+        $deleteStatement = $this->createMock(Statement::class);
+        $deleteStatement->expects(self::once())
+            ->method('executeQuery')
+            ->with(['messageId' => 25])
+            ->willReturn($deleteResult);
+
         $this->dbal->expects(self::once())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
         $this->dbal->expects(self::once())
             ->method('prepare')
             ->willReturn($deleteStatement);
@@ -334,23 +357,25 @@ class DbalMessageConsumerTest extends TestCase
 
     public function testRejectWithRetry(): void
     {
-        $deleteStatement = $this->createMock(Statement::class);
-        $deleteStatement->expects(self::exactly(2))
-            ->method('executeQuery')
-            ->with(['messageId' => 25]);
+        $driverException = $this->createMock(DriverException::class);
 
-        $deleteStatement->expects(self::exactly(2))
+        $deleteResult = $this->createMock(Result::class);
+        $deleteResult->expects(self::exactly(2))
             ->method('rowCount')
-            ->willReturn(
-                self::returnCallback(function () {
-                    throw new PDOException(new \PDOException());
-                }),
+            ->willReturnOnConsecutiveCalls(
+                self::throwException($driverException),
                 1
             );
 
+        $deleteStatement = $this->createMock(Statement::class);
+        $deleteStatement->expects(self::exactly(2))
+            ->method('executeQuery')
+            ->with(['messageId' => 25])
+            ->willReturn($deleteResult);
+
         $this->dbal->expects(self::once())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
         $this->dbal->expects(self::once())
             ->method('prepare')
             ->willReturn($deleteStatement);
@@ -391,17 +416,20 @@ class DbalMessageConsumerTest extends TestCase
 
     public function testRejectThrowsExceptionWhenNoAffectedRows(): void
     {
-        $deleteStatement = $this->createMock(Statement::class);
-        $deleteStatement->expects(self::once())
-            ->method('executeQuery')
-            ->with(['messageId' => 25]);
-        $deleteStatement->expects(self::once())
+        $deleteResult = $this->createMock(Result::class);
+        $deleteResult->expects(self::once())
             ->method('rowCount')
             ->willReturn(0);
 
+        $deleteStatement = $this->createMock(Statement::class);
+        $deleteStatement->expects(self::once())
+            ->method('executeQuery')
+            ->with(['messageId' => 25])
+            ->willReturn($deleteResult);
+
         $this->dbal->expects(self::once())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
         $this->dbal->expects(self::once())
             ->method('prepare')
             ->willReturn($deleteStatement);

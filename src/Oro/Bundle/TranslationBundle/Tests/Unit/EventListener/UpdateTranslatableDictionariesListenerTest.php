@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\EventListener;
 
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
@@ -234,7 +235,7 @@ class UpdateTranslatableDictionariesListenerTest extends OrmTestCase
             . ' WHERE foreign_key = ? AND locale = ? AND object_class = ? AND field = ?',
             null,
             [1 => 'trans: country.iso2.us', 2 => 'us', 3 => 'en_US', 4 => Country::class, 5 => 'iso2'],
-            array_fill(1, 5, \PDO::PARAM_STR),
+            array_fill(1, 5, ParameterType::STRING),
             1
         );
         $this->addQueryExpectation(
@@ -242,7 +243,7 @@ class UpdateTranslatableDictionariesListenerTest extends OrmTestCase
             . ' WHERE foreign_key = ? AND locale = ? AND object_class = ? AND field = ?',
             null,
             [1 => 'trans: country.iso2.fr', 2 => 'fr', 3 => 'en_US', 4 => Country::class, 5 => 'iso2'],
-            array_fill(1, 5, \PDO::PARAM_STR),
+            array_fill(1, 5, ParameterType::STRING),
             0
         );
         $this->addQueryExpectation(
@@ -250,14 +251,14 @@ class UpdateTranslatableDictionariesListenerTest extends OrmTestCase
             . ' VALUES (?, ?, ?, ?, ?)',
             null,
             [1 => 'fr', 2 => 'en_US', 3 => Country::class, 4 => 'iso2', 5 => 'trans: country.iso2.fr'],
-            array_fill(1, 5, \PDO::PARAM_STR)
+            array_fill(1, 5, ParameterType::STRING)
         );
         $this->addQueryExpectation(
             'UPDATE oro_dictionary_country_trans SET content = ?'
             . ' WHERE foreign_key = ? AND locale = ? AND object_class = ? AND field = ?',
             null,
             [1 => 'trans: country.iso3.us', 2 => 'us', 3 => 'en_US', 4 => Country::class, 5 => 'iso3'],
-            array_fill(1, 5, \PDO::PARAM_STR),
+            array_fill(1, 5, ParameterType::STRING),
             1
         );
         $this->addQueryExpectation(
@@ -265,7 +266,7 @@ class UpdateTranslatableDictionariesListenerTest extends OrmTestCase
             . ' WHERE foreign_key = ? AND locale = ? AND object_class = ? AND field = ?',
             null,
             [1 => 'trans: region.us_ny', 2 => 'us_ny', 3 => 'en_US', 4 => Region::class, 5 => 'code'],
-            array_fill(1, 5, \PDO::PARAM_STR),
+            array_fill(1, 5, ParameterType::STRING),
             1
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
@@ -286,21 +287,21 @@ class UpdateTranslatableDictionariesListenerTest extends OrmTestCase
             . ' WHERE foreign_key IN (?, ?) AND locale = ? AND object_class = ? AND field = ?',
             null,
             [1 => 'us', 2 => 'fr', 3 => 'en_US', 4 => Country::class, 5 => 'iso2'],
-            array_fill(1, 5, \PDO::PARAM_STR)
+            array_fill(1, 5, ParameterType::STRING)
         );
         $this->addQueryExpectation(
             'DELETE FROM oro_dictionary_country_trans'
             . ' WHERE foreign_key IN (?) AND locale = ? AND object_class = ? AND field = ?',
             null,
             [1 => 'us', 2 => 'en_US', 3 => Country::class, 4 => 'iso3'],
-            array_fill(1, 4, \PDO::PARAM_STR)
+            array_fill(1, 4, ParameterType::STRING)
         );
         $this->addQueryExpectation(
             'DELETE FROM oro_dictionary_region_trans'
             . ' WHERE foreign_key IN (?) AND locale = ? AND object_class = ? AND field = ?',
             null,
             [1 => 'us_ny', 2 => 'en_US', 3 => Region::class, 4 => 'code'],
-            array_fill(1, 4, \PDO::PARAM_STR)
+            array_fill(1, 4, ParameterType::STRING)
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 

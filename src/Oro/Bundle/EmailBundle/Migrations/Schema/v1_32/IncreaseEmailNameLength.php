@@ -19,7 +19,7 @@ class IncreaseEmailNameLength implements Migration
     {
         $table = $schema->getTable('oro_email');
         if ($table->getColumn('from_name')->getLength() < 320) {
-            $table->changeColumn('from_name', ['length' => 320]);
+            $table->modifyColumn('from_name', ['length' => 320]);
         }
     }
 
@@ -27,7 +27,7 @@ class IncreaseEmailNameLength implements Migration
     {
         $table = $schema->getTable('oro_email_recipient');
         if ($table->getColumn('name')->getLength() < 320) {
-            $table->changeColumn('name', ['length' => 320]);
+            $table->modifyColumn('name', ['length' => 320]);
         }
     }
 }

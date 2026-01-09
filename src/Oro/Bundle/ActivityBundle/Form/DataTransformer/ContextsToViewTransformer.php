@@ -36,7 +36,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (!$value) {
             return '';
@@ -62,7 +62,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (!$value) {
             return [];
@@ -83,7 +83,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
         }
 
         foreach ($filters as $entityClass => $ids) {
-            $entities = $this->doctrine->getRepository($entityClass)->findBy(['id' => $ids]);
+            $entities = $ids ? $this->doctrine->getRepository($entityClass)->findBy(['id' => $ids]) : [];
             $result = array_merge($result, $entities);
         }
 

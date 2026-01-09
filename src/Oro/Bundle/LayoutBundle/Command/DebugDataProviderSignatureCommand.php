@@ -58,7 +58,7 @@ HELP
      * @noinspection PhpMissingParentCallCommonInspection
      */
     #[\Override]
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->layoutRegistry = $this->layoutManager->getLayoutFactory()->getRegistry();
         $io = new SymfonyStyle($input, $output);

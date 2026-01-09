@@ -7,6 +7,9 @@ use Oro\Bundle\ScopeBundle\Form\Type\ScopeType;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * Extends ScopeType form to add a localization selection field.
+ */
 class LocalizationScopeExtension extends AbstractTypeExtension
 {
     public const SCOPE_FIELD = 'localization';
@@ -17,7 +20,7 @@ class LocalizationScopeExtension extends AbstractTypeExtension
     protected $extendedType;
 
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (array_key_exists(self::SCOPE_FIELD, $options['scope_fields'])) {
             $builder->add(

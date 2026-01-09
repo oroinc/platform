@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\ORM\QueryBuilder;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
-use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
@@ -467,7 +467,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
                     . 'FROM ' . User::class . ' u '
                     . 'GROUP BY _groupByPart0 '
                     . 'HAVING _groupByPart0 > :date',
-                'platformClass' => MySqlPlatform::class
+                'platformClass' => MySQLPlatform::class
             ],
             'having_by_expr_with_function_postgresql' => [
                 'queryBuilder' => function ($em) {
@@ -481,7 +481,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
                     . 'FROM ' . User::class . ' u '
                     . 'GROUP BY _groupByPart0 '
                     . 'HAVING DATE(u.createdAt) > :date',
-                'platformClass' => PostgreSqlPlatform::class
+                'platformClass' => PostgreSQLPlatform::class
             ],
             'having_by_expr_with_nested_functions_mysql' => [
                 'queryBuilder' => function ($em) {
@@ -498,7 +498,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
                     . 'FROM ' . User::class . ' u '
                     . 'GROUP BY _groupByPart0 '
                     . 'HAVING _groupByPart0 > :date',
-                'platformClass' => MySqlPlatform::class
+                'platformClass' => MySQLPlatform::class
             ],
             'having_by_expr_with_nested_functions_postgresql' => [
                 'queryBuilder' => function ($em) {
@@ -515,7 +515,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
                     . 'FROM ' . User::class . ' u '
                     . 'GROUP BY _groupByPart0 '
                     . 'HAVING DATE(CONVERT_TZ(u.createdAt, \'+00:00\', \'+03:00\')) > :date',
-                'platformClass' => PostgreSqlPlatform::class
+                'platformClass' => PostgreSQLPlatform::class
             ],
             'join_on_table_that_has_with_join_condition' => [
                 'queryBuilder' => function ($em) {

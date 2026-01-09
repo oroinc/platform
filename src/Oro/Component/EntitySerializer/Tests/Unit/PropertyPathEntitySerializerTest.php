@@ -2,6 +2,7 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\Query;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Product;
@@ -30,7 +31,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(
@@ -78,7 +79,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(
@@ -127,7 +128,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(
@@ -179,7 +180,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT t0.name AS name_1, t0.label AS label_2'
@@ -192,7 +193,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 'user_category_name'],
-            [1 => \PDO::PARAM_STR]
+            [1 => ParameterType::STRING]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
@@ -255,7 +256,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT t0.name AS name_1, t0.label AS label_2'
@@ -268,7 +269,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 'user_category_name'],
-            [1 => \PDO::PARAM_STR]
+            [1 => ParameterType::STRING]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
@@ -341,7 +342,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT t0.name AS name_1, t0.label AS label_2'
@@ -354,7 +355,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 'user_category_name'],
-            [1 => \PDO::PARAM_STR]
+            [1 => ParameterType::STRING]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
@@ -412,7 +413,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT t0.name AS name_1, t0.label AS label_2'
@@ -425,7 +426,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 'user_category_name'],
-            [1 => \PDO::PARAM_STR]
+            [1 => ParameterType::STRING]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
@@ -484,7 +485,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT t0.name AS name_1, t0.label AS label_2'
@@ -497,7 +498,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 'user_category_name'],
-            [1 => \PDO::PARAM_STR]
+            [1 => ParameterType::STRING]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
@@ -560,7 +561,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT t0.name AS name_1, t0.label AS label_2'
@@ -573,7 +574,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 'user_category_name'],
-            [1 => \PDO::PARAM_STR]
+            [1 => ParameterType::STRING]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
@@ -637,7 +638,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT t0.name AS name_1, t0.label AS label_2'
@@ -650,7 +651,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 'user_category_name'],
-            [1 => \PDO::PARAM_STR]
+            [1 => ParameterType::STRING]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
@@ -712,7 +713,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT t0.name AS name_1, t0.label AS label_2'
@@ -725,7 +726,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 'user_category_name'],
-            [1 => \PDO::PARAM_STR]
+            [1 => ParameterType::STRING]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
@@ -790,7 +791,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT t0.name AS name_1, t0.label AS label_2'
@@ -803,7 +804,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 'user_category_name'],
-            [1 => \PDO::PARAM_STR]
+            [1 => ParameterType::STRING]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
@@ -870,7 +871,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(
@@ -943,7 +944,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT t0.name AS name_1, t0.label AS label_2'
@@ -956,7 +957,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 'user_category_name'],
-            [1 => \PDO::PARAM_STR]
+            [1 => ParameterType::STRING]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
@@ -1019,7 +1020,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(
@@ -1076,7 +1077,7 @@ class PropertyPathEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(

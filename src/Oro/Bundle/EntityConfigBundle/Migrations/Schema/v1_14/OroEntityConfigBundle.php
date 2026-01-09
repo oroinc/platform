@@ -12,6 +12,6 @@ class OroEntityConfigBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_attribute_group');
-        $table->changeColumn('code', ['notnull' => true]);
+        $table->modifyColumn('code', ['notnull' => true]);
     }
 }

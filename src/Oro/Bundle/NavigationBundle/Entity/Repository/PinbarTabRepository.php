@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Entity\Repository;
 
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
@@ -50,8 +51,8 @@ class PinbarTabRepository extends EntityRepository implements NavigationReposito
                     $qb->expr()->eq('p.organization', ':organization')
                 )
             )
-            ->setParameter('item_id', $navigationItemId, \PDO::PARAM_INT)
-            ->setParameter('type', 'frontend_pinbar', \PDO::PARAM_STR)
+            ->setParameter('item_id', $navigationItemId, ParameterType::INTEGER)
+            ->setParameter('type', 'frontend_pinbar', ParameterType::STRING)
             ->setParameter('user', $user)
             ->setParameter('organization', $organization)
             ->getQuery()
@@ -154,7 +155,7 @@ class PinbarTabRepository extends EntityRepository implements NavigationReposito
                 )
             )
             ->setParameter('title_short', $titleShort)
-            ->setParameter('title_short_like', $titleShort.' (%');
+            ->setParameter('title_short_like', $titleShort . ' (%');
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }

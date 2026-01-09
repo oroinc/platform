@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\UIBundle\Tests\Unit\Twig\Fixture\EnvironmentExtension;
@@ -136,8 +138,6 @@ class EnvironmentTest extends TestCase
         $this->assertArrayHasKey('foo_filter', $twig->getFilters());
         $this->assertArrayHasKey('foo_function', $twig->getFunctions());
         $this->assertArrayHasKey('foo_test', $twig->getTests());
-        $this->assertArrayHasKey('foo_unary', $twig->getUnaryOperators());
-        $this->assertArrayHasKey('foo_binary', $twig->getBinaryOperators());
         $this->assertArrayHasKey('foo_global', $twig->getGlobals());
         $visitors = $twig->getNodeVisitors();
         $this->assertInstanceOf(EnvironmentNodeVisitor::class, end($visitors));

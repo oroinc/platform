@@ -28,7 +28,7 @@ class VariableOrArrayNode extends ArrayNode
     }
 
     #[\Override]
-    protected function validateType($value)
+    protected function validateType($value): void
     {
     }
 

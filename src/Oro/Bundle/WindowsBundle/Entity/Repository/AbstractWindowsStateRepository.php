@@ -56,7 +56,7 @@ abstract class AbstractWindowsStateRepository extends EntityRepository
                     $qb->expr()->eq('w.id', ':id')
                 )
             )
-            ->setParameter('data', $connection->convertToDatabaseValue($data, Types::JSON_ARRAY))
+            ->setParameter('data', $connection->convertToDatabaseValue($data, Types::JSON))
             ->setParameter(
                 'updatedAt',
                 $connection

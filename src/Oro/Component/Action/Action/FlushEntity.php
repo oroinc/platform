@@ -4,6 +4,7 @@ namespace Oro\Component\Action\Action;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
@@ -76,12 +77,13 @@ class FlushEntity extends AbstractAction
         try {
             $entityManager->persist($entity);
             $entityManager->flush($entity);
-            $entityManager->refresh($entity);
             $entityManager->commit();
         } catch (\Exception $e) {
             $entityManager->rollback();
             throw $e;
         }
+
+        $this->refreshEntity($entity, $entityManager);
     }
 
     /**
@@ -93,5 +95,16 @@ class FlushEntity extends AbstractAction
         return $this->entity
             ? $this->contextAccessor->getValue($context, $this->entity)
             : $context->getEntity();
+    }
+
+    private function refreshEntity(object $entity, EntityManagerInterface $entityManager): void
+    {
+        $class = $entityManager->getClassMetadata(ClassUtils::getClass($entity));
+        $uow = $entityManager->getUnitOfWork();
+
+        $uow->getEntityPersister($class->name)->refresh(
+            array_combine($class->getIdentifierFieldNames(), $uow->getEntityIdentifier($entity)),
+            $entity,
+        );
     }
 }

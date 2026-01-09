@@ -7,9 +7,9 @@ use Oro\Bundle\UserBundle\Entity\BaseUserManager;
 use Oro\Bundle\UserBundle\Exception\UserHolderExceptionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
  * The default implementation of {@see LoginAttemptsHandlerInterface} that just logs success and failed logins.
@@ -65,7 +65,7 @@ class LoginAttemptsHandler implements LoginAttemptsHandlerInterface
     public function onAuthenticationFailure(LoginFailureEvent $event): void
     {
         $user = $event->getRequest()->attributes->get('user');
-        $contextInnerUser = $event->getRequest()->attributes->get(Security::LAST_USERNAME, '');
+        $contextInnerUser = $event->getRequest()->attributes->get(SecurityRequestAttributes::LAST_USERNAME, '');
 
         if (null === $user && \is_string($contextInnerUser)) {
             $user = $this->userManager->findUserByUsernameOrEmail($contextInnerUser);

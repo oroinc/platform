@@ -24,12 +24,12 @@ class UpdateIntegrationChannelSettingFieldsTypes implements Migration, DatabaseP
             $configType = Type::getType(ConfigObjectType::TYPE);
             $table = $schema->getTable('oro_integration_channel');
 
-            $table->changeColumn('synchronization_settings', [
+            $table->modifyColumn('synchronization_settings', [
                 'type' => $configType,
                 'comment' => '(DC2Type:config_object)'
             ]);
 
-            $table->changeColumn('mapping_settings', [
+            $table->modifyColumn('mapping_settings', [
                 'type' => $configType,
                 'comment' => '(DC2Type:config_object)'
             ]);

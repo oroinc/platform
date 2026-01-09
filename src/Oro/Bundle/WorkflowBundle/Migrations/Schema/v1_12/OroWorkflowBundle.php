@@ -12,7 +12,7 @@ class OroWorkflowBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_process_trigger');
-        $table->changeColumn('event', ['length' => 255, 'notnull' => false]);
+        $table->modifyColumn('event', ['length' => 255, 'notnull' => false]);
         $table->addColumn('cron', 'string', ['length' => 100, 'notnull' => false]);
         $table->dropIndex('process_trigger_unique_idx');
         $table->addUniqueIndex(['event', 'field', 'definition_name', 'cron'], 'process_trigger_unique_idx');

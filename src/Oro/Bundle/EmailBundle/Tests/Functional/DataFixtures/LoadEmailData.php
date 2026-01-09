@@ -11,8 +11,8 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
+use Oro\Component\DependencyInjection\ContainerAwareTrait;
 
 class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
@@ -37,7 +37,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
     private function loadEmailTemplates(string $dataDir): array
     {
         $templates = [];
-        $handle = fopen($dataDir . DIRECTORY_SEPARATOR. 'emails.csv', 'r');
+        $handle = fopen($dataDir . DIRECTORY_SEPARATOR . 'emails.csv', 'r');
         if ($handle) {
             $headers = [];
             if (($data = fgetcsv($handle, 1000, ",")) !== false) {
@@ -56,7 +56,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
     {
         $emailEntityBuilder = $this->container->get('oro_email.email.entity.builder');
         $emailOriginHelper = $this->container->get('oro_email.tools.email_origin_helper');
-        $attachmentContent = base64_encode(file_get_contents($dataDir . DIRECTORY_SEPARATOR. 'test.png'));
+        $attachmentContent = base64_encode(file_get_contents($dataDir . DIRECTORY_SEPARATOR . 'test.png'));
 
         foreach ($templates as $index => $template) {
             $owner = $this->getEmailOwner();

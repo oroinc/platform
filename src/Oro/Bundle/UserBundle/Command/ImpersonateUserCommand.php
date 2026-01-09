@@ -66,8 +66,8 @@ class ImpersonateUserCommand extends Command
             )
             ->addOption('route', 'r', InputOption::VALUE_REQUIRED, 'Route of the generated URL', 'oro_default')
             ->addOption(
-                'silent',
-                'S',
+                'no-notification',
+                'N',
                 InputOption::VALUE_NONE,
                 'Do not send email notification to the impersonated user'
             )
@@ -83,9 +83,9 @@ Unused tokens expire in 1 day, unless overridden with the <info>--lifetime</info
   <info>%command.full_name% --lifetime="10 minutes" <username></info>
 
 The impersonated user will be notified by email when the impersonation link is used to log in.
-Use the <info>--silent</info> option to avoid it:
+Use the <info>--no-notification</info> option to avoid it:
 
-  <info>%command.full_name% --silent <username></info>
+  <info>%command.full_name% --no-notification <username></info>
 
 Specify a custom target URL route via the <info>--route</info> option:
 
@@ -97,7 +97,7 @@ HELP
             ->addUsage('--lifetime="15 minutes" <username>')
             ->addUsage('--lifetime="2 hours" <username>')
             ->addUsage('--route=<route> <username>')
-            ->addUsage('--silent <username>')
+            ->addUsage('--no-notification <username>')
         ;
     }
 
@@ -124,7 +124,7 @@ HELP
             $impersonation = $this->createImpersonation(
                 $user,
                 $input->getOption('lifetime'),
-                !$input->getOption('silent')
+                !$input->getOption('no-notification')
             );
             $url = $this->generateUrl($input->getOption('route'), $impersonation->getToken());
 

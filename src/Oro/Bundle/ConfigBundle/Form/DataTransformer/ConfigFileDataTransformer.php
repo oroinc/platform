@@ -44,7 +44,7 @@ class ConfigFileDataTransformer implements DataTransformerInterface
      * @return null|object
      */
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (!$value) {
             return null;
@@ -63,7 +63,7 @@ class ConfigFileDataTransformer implements DataTransformerInterface
      * @return int|null
      */
     #[\Override]
-    public function reverseTransform($file)
+    public function reverseTransform($file): mixed
     {
         if (null === $file) {
             return '';

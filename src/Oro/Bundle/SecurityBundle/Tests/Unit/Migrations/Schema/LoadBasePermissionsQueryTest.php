@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Migrations\Schema;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\SecurityBundle\Migrations\Schema\LoadBasePermissionsQuery;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -19,7 +19,7 @@ class LoadBasePermissionsQueryTest extends TestCase
         $this->connection = $this->createMock(Connection::class);
         $this->connection->expects($this->any())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
     }
 
     public function testExecute(): void

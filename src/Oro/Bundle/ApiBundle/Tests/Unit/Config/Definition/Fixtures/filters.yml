@@ -40,7 +40,7 @@ null_exclusion_policy:
         filters:
             exclusion_policy: null
     expected: []
-    error: 'The value null is not allowed for path "entity.filters.exclusion_policy". Permissible values: "all", "none"'
+    error: 'The value of type "null" is not allowed for path "entity.filters.exclusion_policy". Permissible values: "all", "none"'
 
 invalid_exclusion_policy:
     config:

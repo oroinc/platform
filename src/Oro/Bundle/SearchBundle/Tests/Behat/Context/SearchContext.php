@@ -28,7 +28,10 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
         $entityTypes = $this->getPage()->find('css', '.search-entity-types-column');
         self::assertNotNull($entityTypes, 'Search entity types column not found');
 
-        $crawler = new Crawler($entityTypes->getHtml());
+        $crawler = new Crawler(
+            node:$entityTypes->getHtml(),
+            useHtml5Parser: false
+        );
         $links = [];
 
         /** @var \DOMElement $link */
@@ -77,7 +80,10 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
         $entityTypes = $this->getPage()->find('css', '.search-entity-types-column');
 
         if ($entityTypes) {
-            $crawler = new Crawler($entityTypes->getHtml());
+            $crawler = new Crawler(
+                node: $entityTypes->getHtml(),
+                useHtml5Parser: false
+            );
             $links = [];
 
             /** @var \DOMElement $link */
@@ -107,7 +113,10 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
         $gridBody = $this->getPage()->find('css', '.grid-container tbody');
         self::assertNotNull($gridBody, 'Search results table not found');
 
-        $crawler = new Crawler($gridBody->getHtml());
+        $crawler = new Crawler(
+            node: $gridBody->getHtml(),
+            useHtml5Parser: false
+        );
         $results = [];
         $crawler->filter('tr')->each(function (Crawler $tr) use (&$results) {
             $results[trim($tr->filter('h1')->first()->text())] = [

@@ -53,7 +53,7 @@ class JmsJob implements Migration
         $table->addColumn('executeAfter', 'datetime', ['notnull' => false]);
         $table->addColumn('closedAt', 'datetime', ['notnull' => false]);
         $table->addColumn('command', 'string', ['length' => 255]);
-        $table->addColumn('args', 'json_array', []);
+        $table->addColumn('args', 'json', []);
         $table->addColumn('output', 'text', ['notnull' => false]);
         $table->addColumn('errorOutput', 'text', ['notnull' => false]);
         $table->addColumn('exitCode', 'smallint', ['notnull' => false, 'unsigned' => true]);

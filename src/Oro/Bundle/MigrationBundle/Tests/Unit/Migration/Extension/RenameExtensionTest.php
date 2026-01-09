@@ -3,10 +3,10 @@
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Extension;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
-use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
-use Doctrine\DBAL\Platforms\SQLServer2005Platform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Sequence;
@@ -170,17 +170,19 @@ class RenameExtensionTest extends TestCase
     public function renameTableProvider(): array
     {
         return [
-            'mysql' => [new MySqlPlatform(), 'ALTER TABLE old_table RENAME TO new_table'],
+            'mysql' => [new MySQLPlatform(), 'ALTER TABLE old_table RENAME TO new_table'],
             'mssql' => [
-                new SQLServer2005Platform(),
+                new SQLServerPlatform(),
                 [
                     "sp_rename 'old_table', 'new_table'",
-                    "DECLARE @sql NVARCHAR(MAX) = N''; "
-                    . "SELECT @sql += N'EXEC sp_rename N''' + dc.name + ''', N'''"
-                    . " + REPLACE(dc.name, '50BD45A0', 'EBFCC9B') + ''', ''OBJECT'';' "
-                    . 'FROM sys.default_constraints dc JOIN sys.tables tbl ON dc.parent_object_id = tbl.object_id '
-                    . "WHERE tbl.name = 'new_table';"
-                    . 'EXEC sp_executesql @sql'
+                    "DECLARE @sql NVARCHAR(MAX) = N'';\n" .
+                    "SELECT @sql += N'EXEC sp_rename N''' + dc.name + ''', N'''\n" .
+                    "    + REPLACE(dc.name, '50BD45A0', 'EBFCC9B') + ''', ''OBJECT'';'\n" .
+                    "    FROM sys.default_constraints dc\n" .
+                    "    JOIN sys.tables tbl\n" .
+                    "        ON dc.parent_object_id = tbl.object_id\n" .
+                    "    WHERE tbl.name = 'new_table';\n" .
+                    "EXEC sp_executesql @sql"
                 ]
             ],
         ];
@@ -190,7 +192,7 @@ class RenameExtensionTest extends TestCase
     {
         return [
             'postgre' => [
-                new PostgreSqlPlatform(),
+                new PostgreSQLPlatform(),
                 [
                     'ALTER TABLE old_table RENAME TO new_table',
                     'ALTER SEQUENCE old_table_id_seq RENAME TO new_table_id_seq'
@@ -208,31 +210,31 @@ class RenameExtensionTest extends TestCase
     public function renameColumnProvider(): array
     {
         return [
-            [new MySqlPlatform(), 'ALTER TABLE test_table CHANGE old_column new_column VARCHAR(100) NOT NULL'],
-            [new PostgreSqlPlatform(), 'ALTER TABLE test_table RENAME COLUMN old_column TO new_column'],
+            [new MySQLPlatform(), 'ALTER TABLE test_table CHANGE old_column new_column VARCHAR(100) NOT NULL'],
+            [new PostgreSQLPlatform(), 'ALTER TABLE test_table RENAME COLUMN old_column TO new_column'],
             [new OraclePlatform(), 'ALTER TABLE test_table RENAME COLUMN old_column TO new_column'],
-            [new SQLServer2005Platform(), "sp_rename 'test_table.old_column', 'new_column', 'COLUMN'",],
+            [new SQLServerPlatform(), "sp_rename 'test_table.old_column', 'new_column', 'COLUMN'",],
         ];
     }
 
     public function addIndexProvider(): array
     {
         return [
-            [new MySqlPlatform(), 'CREATE INDEX idx_test_table_new_column ON test_table (new_column)'],
-            [new PostgreSqlPlatform(), 'CREATE INDEX idx_test_table_new_column ON test_table (new_column)'],
+            [new MySQLPlatform(), 'CREATE INDEX idx_test_table_new_column ON test_table (new_column)'],
+            [new PostgreSQLPlatform(), 'CREATE INDEX idx_test_table_new_column ON test_table (new_column)'],
             [new OraclePlatform(), 'CREATE INDEX idx_test_table_new_column ON test_table (new_column)'],
-            [new SQLServer2005Platform(), 'CREATE INDEX idx_test_table_new_column ON test_table (new_column)'],
+            [new SQLServerPlatform(), 'CREATE INDEX idx_test_table_new_column ON test_table (new_column)'],
         ];
     }
 
     public function addUniqueIndexProvider(): array
     {
         return [
-            [new MySqlPlatform(), 'CREATE UNIQUE INDEX uniq_test_table_new_column ON test_table (new_column)'],
-            [new PostgreSqlPlatform(), 'CREATE UNIQUE INDEX uniq_test_table_new_column ON test_table (new_column)'],
+            [new MySQLPlatform(), 'CREATE UNIQUE INDEX uniq_test_table_new_column ON test_table (new_column)'],
+            [new PostgreSQLPlatform(), 'CREATE UNIQUE INDEX uniq_test_table_new_column ON test_table (new_column)'],
             [new OraclePlatform(), 'CREATE UNIQUE INDEX uniq_test_table_new_column ON test_table (new_column)'],
             [
-                new SQLServer2005Platform(),
+                new SQLServerPlatform(),
                 'CREATE UNIQUE INDEX uniq_test_table_new_column ON test_table (new_column) WHERE new_column IS NOT NULL'
             ],
         ];
@@ -242,12 +244,12 @@ class RenameExtensionTest extends TestCase
     {
         return [
             [
-                new MySqlPlatform(),
+                new MySQLPlatform(),
                 'ALTER TABLE test_table ADD CONSTRAINT fk_test_table_local_column '
                 . 'FOREIGN KEY (local_column) REFERENCES foreign_table (foreign_column) ON DELETE CASCADE'
             ],
             [
-                new PostgreSqlPlatform(),
+                new PostgreSQLPlatform(),
                 'ALTER TABLE test_table ADD CONSTRAINT fk_test_table_local_column '
                 . 'FOREIGN KEY (local_column) REFERENCES foreign_table (foreign_column) ON DELETE CASCADE '
                 . 'NOT DEFERRABLE INITIALLY IMMEDIATE'
@@ -258,7 +260,7 @@ class RenameExtensionTest extends TestCase
                 . 'FOREIGN KEY (local_column) REFERENCES foreign_table (foreign_column) ON DELETE CASCADE'
             ],
             [
-                new SQLServer2005Platform(),
+                new SQLServerPlatform(),
                 'ALTER TABLE test_table ADD CONSTRAINT fk_test_table_local_column '
                 . 'FOREIGN KEY (local_column) REFERENCES foreign_table (foreign_column) ON DELETE CASCADE'
             ],

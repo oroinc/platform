@@ -273,7 +273,7 @@ class Translator extends BaseTranslator
     }
 
     #[\Override]
-    public function warmUp(string $cacheDir): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         // skip warmUp when translator doesn't use cache
         if (null !== $this->options['cache_dir']) {
@@ -489,7 +489,7 @@ class Translator extends BaseTranslator
             . $locale
             . '.'
             . strtr(
-                substr(base64_encode(hash('sha256', serialize($this->cacheVary), true)), 0, 7),
+                substr(base64_encode(hash('xxh128', serialize($this->cacheVary), true)), 0, 7),
                 '/',
                 '_'
             )

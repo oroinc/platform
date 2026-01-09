@@ -26,7 +26,7 @@ class OroWindowsBundleInstaller implements Installation
         $table = $schema->createTable('oro_windows_state');
         $table->addColumn('id', Types::INTEGER, ['autoincrement' => true]);
         $table->addColumn('user_id', Types::INTEGER);
-        $table->addColumn('data', Types::JSON_ARRAY, ['comment' => '(DC2Type:json_array)']);
+        $table->addColumn('data', Types::JSON, ['comment' => '(DC2Type:json)']);
         $table->addColumn('created_at', Types::DATETIME_MUTABLE);
         $table->addColumn('updated_at', Types::DATETIME_MUTABLE);
         $table->setPrimaryKey(['id']);

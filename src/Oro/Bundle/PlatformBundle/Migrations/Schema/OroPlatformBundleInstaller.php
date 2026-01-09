@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\PlatformBundle\Migrations\Schema;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
@@ -62,9 +62,9 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
     private function createOroSessionTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_session');
-        if ($this->platform instanceof MySqlPlatform) {
+        if ($this->platform instanceof MySQLPlatform) {
             $table->addColumn('id', Types::BINARY, ['length' => 128]);
-            $table->addColumn('sess_data', Types::BLOB, ['length' => MySqlPlatform::LENGTH_LIMIT_BLOB]);
+            $table->addColumn('sess_data', Types::BLOB, ['length' => MySQLPlatform::LENGTH_LIMIT_BLOB]);
         } else {
             $table->addColumn('id', Types::STRING, ['length' => 128]);
             $table->addColumn('sess_data', Types::BLOB);

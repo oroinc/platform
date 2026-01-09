@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

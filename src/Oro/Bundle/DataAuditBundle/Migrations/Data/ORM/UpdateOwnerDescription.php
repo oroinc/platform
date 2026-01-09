@@ -6,7 +6,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -35,11 +35,11 @@ class UpdateOwnerDescription extends AbstractFixture implements ContainerAwareIn
         $connection = $doctrine->getConnection();
 
         $statement = $connection->prepare('SELECT min(id) as min FROM oro_audit');
-        $statement->executeQuery();
-        $min = $statement->fetchOne();
+        $result = $statement->executeQuery();
+        $min = $result->fetchOne();
         $statement = $connection->prepare('SELECT max(id) as max FROM oro_audit');
-        $statement->executeQuery();
-        $max = $statement->fetchOne();
+        $result = $statement->executeQuery();
+        $max = $result->fetchOne();
 
         $ownerWithQuery = <<<SQL
 UPDATE oro_audit

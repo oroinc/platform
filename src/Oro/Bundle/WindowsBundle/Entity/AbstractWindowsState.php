@@ -27,7 +27,7 @@ abstract class AbstractWindowsState implements CreatedAtAwareInterface, UpdatedA
     /**
      * @var string $data
      */
-    #[ORM\Column(name: 'data', type: 'json_array', nullable: false)]
+    #[ORM\Column(name: 'data', type: 'json', nullable: false)]
     protected $data;
 
     /**

@@ -23,7 +23,7 @@ class Schema extends BaseSchema
     {
         $this->uniqueTableName = $uniqueTableName;
 
-        $schemaConfig = $connection->getSchemaManager()->createSchemaConfig();
+        $schemaConfig = $connection->createSchemaManager()->createSchemaConfig();
 
         parent::__construct([], [], $schemaConfig);
 

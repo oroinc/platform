@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Repository;
 
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
@@ -42,7 +43,7 @@ class EmailUserRepositoryTest extends OrmTestCase
             . ' ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) AND unsyncedFlagCount = 0',
             null,
             [1 => true, ...$firstBatch],
-            [1 => \PDO::PARAM_BOOL, ...array_fill(1, count($firstBatch), \PDO::PARAM_INT)],
+            [1 => ParameterType::BOOLEAN, ...array_fill(1, count($firstBatch), ParameterType::INTEGER)],
             count($firstBatch)
         );
         $this->addQueryExpectation(
@@ -50,7 +51,7 @@ class EmailUserRepositoryTest extends OrmTestCase
             . ' ?, ?, ?, ?, ?, ?, ?) AND unsyncedFlagCount = 0',
             null,
             [1 => true, ...$secondBatch],
-            [1 => \PDO::PARAM_BOOL, ...array_fill(1, count($secondBatch), \PDO::PARAM_INT)],
+            [1 => ParameterType::BOOLEAN, ...array_fill(1, count($secondBatch), ParameterType::INTEGER)],
             count($secondBatch)
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));

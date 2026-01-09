@@ -2,6 +2,7 @@
 
 namespace Oro\Component\MessageQueue\Log\Processor;
 
+use Monolog\LogRecord;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Log\ConsumerState;
@@ -31,35 +32,40 @@ class AddConsumerStateProcessor
     /**
      * Adds message queue related information to the log record.
      *
-     * @param array $record
+     * @param LogRecord $record
      *
-     * @return array
+     * @return LogRecord
      */
-    public function __invoke(array $record)
+    public function __invoke(LogRecord $record)
     {
         if ($this->consumerState->isConsumptionStarted()) {
+            $extra = $record['extra'];
+            $context = $record['context'];
+
             // add info about a consumption extension
             $extension = $this->consumerState->getExtension();
             if (null !== $extension) {
-                $record['extra']['extension'] = $this->getExtensionClass($extension);
+                $extra['extension'] = $this->getExtensionClass($extension);
             }
             // add info about a message and a message processor
             $message = $this->consumerState->getMessage();
             if (null !== $message) {
                 $messageProcessorClass = $this->consumerState->getMessageProcessorClass();
                 if ($messageProcessorClass !== '') {
-                    $record['extra']['processor'] = $messageProcessorClass;
+                    $extra['processor'] = $messageProcessorClass;
                 }
-                $this->addMessageInfo($message, $record['extra']);
+                $this->addMessageInfo($message, $extra);
             }
             // add info about a job
             $job = $this->consumerState->getJob();
             if (null !== $job) {
-                $this->addJobInfo($job, $record['extra']);
+                $this->addJobInfo($job, $extra);
             }
-            $this->addTimeInfo($record['extra']);
-            $this->addMemoryUsageInfo($record['extra']);
-            $this->moveMemoryUsageInfoFromContext($record, ['peak_memory', 'memory_taken']);
+            $this->addTimeInfo($extra);
+            $this->addMemoryUsageInfo($extra);
+            $this->moveMemoryUsageInfoFromContext($context, $extra, ['peak_memory', 'memory_taken']);
+
+            return $record->with(extra: $extra, context: $context);
         }
 
         return $record;
@@ -78,12 +84,12 @@ class AddConsumerStateProcessor
     /**
      * Move memory usage from context to extra parameters
      */
-    protected function moveMemoryUsageInfoFromContext(array &$record, array $keys)
+    protected function moveMemoryUsageInfoFromContext(array &$context, array &$extra, array $keys)
     {
         foreach ($keys as $key) {
-            if (isset($record['context'][$key])) {
-                $record['extra'][$key] = $record['context'][$key];
-                unset($record['context'][$key]);
+            if (isset($context[$key])) {
+                $extra[$key] = $context[$key];
+                unset($context[$key]);
             }
         }
     }

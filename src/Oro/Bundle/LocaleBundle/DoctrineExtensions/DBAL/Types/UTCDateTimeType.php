@@ -24,7 +24,7 @@ class UTCDateTimeType extends DateTimeType
         /** @var \DateTime $value */
         $timezone = (self::$utc) ?: (self::$utc = new \DateTimeZone('UTC'));
         if ($value->getTimezone() !== $timezone) {
-            $value->setTimezone($timezone);
+            $value = $value->setTimezone($timezone);
         }
 
         return parent::convertToDatabaseValue($value, $platform);
@@ -40,9 +40,7 @@ class UTCDateTimeType extends DateTimeType
         $timezone = (self::$utc) ?: (self::$utc = new \DateTimeZone('UTC'));
 
         if ($value instanceof \DateTimeInterface && $value->getTimezone() !== $timezone) {
-            $value->setTimezone($timezone);
-
-            return $value;
+            return $value->setTimezone($timezone);
         }
 
         $val = \DateTime::createFromFormat($platform->getDateTimeFormatString(), $value, $timezone);

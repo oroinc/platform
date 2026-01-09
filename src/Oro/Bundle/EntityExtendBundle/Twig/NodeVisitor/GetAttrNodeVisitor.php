@@ -33,12 +33,16 @@ class GetAttrNodeVisitor implements NodeVisitorInterface
 
         $attributes = [
             'type' => $node->getAttribute('type'),
-            'is_defined_test' => $node->getAttribute('is_defined_test'),
             'ignore_strict_check' => $node->getAttribute('ignore_strict_check'),
             'optimizable' => $node->getAttribute('optimizable'),
         ];
 
-        return new GetAttrNode($nodes, $attributes, $node->getTemplateLine(), $node->getNodeTag());
+        $getAttrNode =  new GetAttrNode($nodes, $attributes, $node->getTemplateLine(), $node->getNodeTag());
+        if ($node->isDefinedTestEnabled()) {
+            $getAttrNode->enableDefinedTest();
+        }
+
+        return $getAttrNode;
     }
 
     #[\Override]

@@ -53,7 +53,7 @@ class TestAllDataTypes implements TestFrameworkEntityInterface
     #[ORM\Column(name: 'field_simple_array', type: Types::SIMPLE_ARRAY, nullable: true)]
     public ?array $fieldSimpleArray = null;
 
-    #[ORM\Column(name: 'field_json_array', type: 'json_array', nullable: true)]
+    #[ORM\Column(name: 'field_json_array', type: 'json', nullable: true)]
     public ?array $fieldJsonArray = null;
 
     #[ORM\Column(name: 'field_json', type: Types::JSON, nullable: true)]

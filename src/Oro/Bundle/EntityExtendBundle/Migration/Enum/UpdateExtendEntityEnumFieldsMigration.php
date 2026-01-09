@@ -56,7 +56,8 @@ class UpdateExtendEntityEnumFieldsMigration implements Migration, ConnectionAwar
                     'array'
                 );
                 if (!isset($fieldConfigData['enum']['enum_code'])
-                    || !isset($fieldConfigData['extend']['target_entity'])) {
+                    || !isset($fieldConfigData['extend']['target_entity'])
+                ) {
                     continue;
                 }
                 $enumCode = $fieldConfigData['enum']['enum_code'];
@@ -151,7 +152,8 @@ class UpdateExtendEntityEnumFieldsMigration implements Migration, ConnectionAwar
             }
             foreach ($serializedOptions as $serializedOption) {
                 if (ExtendHelper::buildEnumOptionId($fieldConfig['data']['enum']['enum_code'], $targetValue)
-                    !== $serializedOption['id']) {
+                    !== $serializedOption['id']
+                ) {
                     continue;
                 }
                 $previousSerializedData = null !== $targetRow['serialized_data']
@@ -220,7 +222,7 @@ class UpdateExtendEntityEnumFieldsMigration implements Migration, ConnectionAwar
     private function getTableIdColumn(Schema $schema, string $tableName): Column
     {
         $table = $schema->getTable($tableName);
-        $primaryKeyColumns = $table->getPrimaryKeyColumns();
+        $primaryKeyColumns = $table->getPrimaryKey()->getColumns();
         $id = reset($primaryKeyColumns);
 
         return $table->getColumn($id);

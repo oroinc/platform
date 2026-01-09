@@ -39,7 +39,7 @@ class UpdateEmailUserQuery extends ParametrizedMigrationQuery
      * @param LoggerInterface $logger
      * @param bool $dryRun
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function updateOrigin(LoggerInterface $logger, $dryRun = false)
     {
@@ -57,7 +57,7 @@ class UpdateEmailUserQuery extends ParametrizedMigrationQuery
      * @param LoggerInterface $logger
      * @param bool $dryRun
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function fillFolders(LoggerInterface $logger, $dryRun = false)
     {
@@ -78,7 +78,7 @@ class UpdateEmailUserQuery extends ParametrizedMigrationQuery
      * @param LoggerInterface $logger
      * @param bool $dryRun
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function updateEmailUserId(LoggerInterface $logger, $dryRun = false)
     {
@@ -97,7 +97,7 @@ class UpdateEmailUserQuery extends ParametrizedMigrationQuery
      * @param LoggerInterface $logger
      * @param bool $dryRun
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function removeDuplicates(LoggerInterface $logger, $dryRun = false)
     {

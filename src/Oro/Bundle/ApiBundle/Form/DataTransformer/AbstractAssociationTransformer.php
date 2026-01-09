@@ -12,7 +12,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 abstract class AbstractAssociationTransformer implements DataTransformerInterface
 {
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         return null;
     }
@@ -22,7 +22,7 @@ abstract class AbstractAssociationTransformer implements DataTransformerInterfac
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (null === $value || '' === $value) {
             return null;

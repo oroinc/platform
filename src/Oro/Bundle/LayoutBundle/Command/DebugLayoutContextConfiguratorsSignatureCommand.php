@@ -46,7 +46,7 @@ HELP
      * @noinspection PhpMissingParentCallCommonInspection
      */
     #[\Override]
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         sort($this->contextConfigurators);
         $configs = [];

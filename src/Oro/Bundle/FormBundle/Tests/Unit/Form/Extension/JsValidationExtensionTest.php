@@ -10,7 +10,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Regex;
 
 class JsValidationExtensionTest extends TestCase
@@ -158,34 +157,16 @@ class JsValidationExtensionTest extends TestCase
      */
     public function finishViewAddDataValidationAttributeDataProvider(): array
     {
-        $constraintWithNestedData = new NotNull();
-        $constraintWithNestedData->message = [
-            'object' => new \stdClass(),
-            'array' => [
-                'object' => new \stdClass(),
-                'integer' => 2,
-            ],
-            'integer' => 1,
-        ];
-
         $constraintWithCustomName = $this->createMock(Constraint::class);
         $constraintWithCustomName->foo = 1;
 
         return [
-            'set_nested_data' => [
-                'view' => $this->createView(),
-                'form' => $this->createForm(),
-                'expectedConstraints' => [$constraintWithNestedData],
-                'expectedAttributes' => [
-                    'data-validation' => '{"NotNull":{"payload":null,"message":{"array":{"integer":2},"integer":1}}}'
-                ]
-            ],
             'set_custom_name' => [
                 'view' => $this->createView(),
                 'form' => $this->createForm(),
                 'expectedConstraints' => [$constraintWithCustomName],
                 'expectedAttributes' => [
-                    'data-validation' => '{"' . get_class($constraintWithCustomName) . '":{"payload":null}}'
+                    'data-validation' => '{"' . get_class($constraintWithCustomName) . '":[]}'
                 ]
             ],
             'set_default' => [

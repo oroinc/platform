@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\Async\Extension;
 
 use Oro\Bundle\LoggerBundle\Async\Extension\InterruptionDetailConsumptionExtension;
@@ -13,6 +15,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class InterruptionDetailConsumptionExtensionTest extends TestCase
@@ -54,15 +57,24 @@ class InterruptionDetailConsumptionExtensionTest extends TestCase
         $this->extension->onPostReceived($context);
 
         $this->container->expects(self::exactly(2))
+            ->method('initialized')
+            ->willReturn(true);
+
+        $this->container->expects(self::exactly(2))
             ->method('get')
             ->willReturnMap([
-                ['oro_logger.cache', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $logger],
+                [
+                    'oro_logger.cache',
+                    ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                    $this->createMock(ArrayAdapter::class),
+                ],
                 [
                     'oro_config.user',
                     ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
                     $this->createMock(ConfigManagerProxyStub::class),
                 ]
             ]);
+
         $logger->expects(self::once())
             ->method('info')
             ->with(
@@ -130,9 +142,17 @@ class InterruptionDetailConsumptionExtensionTest extends TestCase
             ->willReturn($messageProcessorClass);
 
         $this->container->expects(self::exactly(2))
+            ->method('initialized')
+            ->willReturn(true);
+
+        $this->container->expects(self::exactly(2))
             ->method('get')
             ->willReturnMap([
-                ['oro_logger.cache', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $logger],
+                [
+                    'oro_logger.cache',
+                    ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                    $this->createMock(ArrayAdapter::class),
+                ],
                 [
                     'oro_config.user',
                     ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,

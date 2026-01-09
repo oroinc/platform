@@ -2,6 +2,8 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Log\Handler;
 
+use Monolog\Level;
+use Monolog\LogRecord;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use Oro\Component\MessageQueue\Log\Handler\ResendJobHandler;
@@ -26,23 +28,36 @@ class ResendJobHandlerTest extends TestCase
 
     public function testIsHandlingWithoutJob(): void
     {
-        self::assertFalse($this->handler->isHandling([]));
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Debug,
+            message: 'test'
+        );
+        self::assertFalse($this->handler->isHandling($record));
     }
 
     public function testIsHandlingWithJob(): void
     {
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Debug,
+            message: 'test'
+        );
         $this->consumerState->setJob($this->createMock(Job::class));
-        self::assertTrue($this->handler->isHandling([]));
+        self::assertTrue($this->handler->isHandling($record));
     }
 
     public function testHandleWithoutJob(): void
     {
-        $record = [
-            'message' => 'test message',
-            'level'   => 100,
-            'channel' => 'test_channel',
-            'context' => []
-        ];
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test_channel',
+            level: Level::Debug,
+            message: 'test message',
+            context: []
+        );
 
         $this->jobLogger->expects(self::never())
             ->method('log');
@@ -52,19 +67,20 @@ class ResendJobHandlerTest extends TestCase
 
     public function testHandleWithJob(): void
     {
-        $record = [
-            'message' => 'test message',
-            'level'   => 100,
-            'channel' => 'test_channel',
-            'context' => ['key' => 'value']
-        ];
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test_channel',
+            level: Level::Debug,
+            message: 'test message',
+            context: ['key' => 'value']
+        );
 
         $this->jobLogger->expects(self::once())
             ->method('log')
             ->with(
-                $record['level'],
-                $record['message'],
-                ['key' => 'value', 'log_channel' => $record['channel']]
+                Level::Debug->value,
+                'test message',
+                ['key' => 'value', 'log_channel' => 'test_channel']
             );
 
         $this->consumerState->setJob($this->createMock(Job::class));

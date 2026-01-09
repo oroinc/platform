@@ -197,6 +197,7 @@ class ConfigModelManagerTest extends TestCase
             ->method('findOneBy')
             ->with(['className' => self::TEST_ENTITY])
             ->willReturn($entityModel);
+        $this->prepareQueryBuilderForLoadEntityModels();
 
         $this->assertSame(
             $entityModel,
@@ -218,7 +219,7 @@ class ConfigModelManagerTest extends TestCase
             ->method('findOneBy')
             ->with(['className' => self::TEST_ENTITY])
             ->willReturn($entityModel);
-
+        $this->prepareQueryBuilderForLoadEntityModels();
         $this->prepareCheckDetached([UnitOfWork::STATE_MANAGED, UnitOfWork::STATE_MANAGED]);
 
         $this->assertSame(
@@ -233,24 +234,45 @@ class ConfigModelManagerTest extends TestCase
         );
     }
 
-    public function testFindEntityModelLoadSeveralModelCheckThatAllOfThemLoadedSeparately(): void
+    public function testFindEntityModelLoadSeveralModelCheckThatAllOfThemLoaded(): void
     {
         $entityModel1 = $this->createEntityModel(self::TEST_ENTITY);
         $entityModel2 = $this->createEntityModel(self::TEST_ENTITY2);
 
-        $this->repo->expects($this->exactly(2))
+        $this->repo->expects($this->once())
             ->method('findOneBy')
-            ->willReturnMap([
-                [['className' => self::TEST_ENTITY], null, $entityModel1],
-                [['className' => self::TEST_ENTITY2], null, $entityModel2]
-            ]);
+            ->with(['className' => self::TEST_ENTITY])
+            ->willReturn($entityModel1);
+
+        $this->repo->expects($this->never())
+            ->method('findAll');
+
+        $query = $this->createMock(AbstractQuery::class);
+        $qb = $this->createMock(QueryBuilder::class);
+        $this->repo->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('e')
+            ->willReturn($qb);
+        $qb->expects($this->once())
+            ->method('where')
+            ->with('e.id NOT IN (:exclusions)')
+            ->willReturnSelf();
+        $qb->expects($this->once())
+            ->method('setParameter')
+            ->with('exclusions', [$entityModel1->getId()])
+            ->willReturnSelf();
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+        $query->expects($this->once())
+            ->method('getResult')
+            ->willReturn([$entityModel2]);
 
         $this->prepareCheckDetached(
             [
                 UnitOfWork::STATE_MANAGED,
                 UnitOfWork::STATE_MANAGED,
                 UnitOfWork::STATE_MANAGED,
-                UnitOfWork::STATE_MANAGED
             ]
         );
 
@@ -258,6 +280,8 @@ class ConfigModelManagerTest extends TestCase
             $entityModel1,
             $this->configModelManager->findEntityModel(self::TEST_ENTITY)
         );
+
+        // test that the second entity model is also loaded
         $this->assertSame(
             $entityModel2,
             $this->configModelManager->findEntityModel(self::TEST_ENTITY2)
@@ -267,10 +291,6 @@ class ConfigModelManagerTest extends TestCase
         $this->assertSame(
             $entityModel1,
             $this->configModelManager->findEntityModel(self::TEST_ENTITY)
-        );
-        $this->assertSame(
-            $entityModel2,
-            $this->configModelManager->findEntityModel(self::TEST_ENTITY2)
         );
     }
 
@@ -450,6 +470,8 @@ class ConfigModelManagerTest extends TestCase
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
         $fieldModel = $this->createFieldModel($entityModel, self::TEST_FIELD);
+
+        $this->prepareQueryBuilderForLoadEntityModels();
 
         $this->prepareEntityConfigRepository(
             [$entityModel, $this->createEntityModel('Test\Entity\AnotherEntity')],
@@ -632,6 +654,8 @@ class ConfigModelManagerTest extends TestCase
             ->method('findOneBy')
             ->with(['className' => self::TEST_ENTITY])
             ->willReturn($entityModel);
+
+        $this->prepareQueryBuilderForLoadEntityModels();
         $this->prepareCheckDetached([UnitOfWork::STATE_MANAGED]);
 
         $this->assertEquals(
@@ -1109,6 +1133,28 @@ class ConfigModelManagerTest extends TestCase
         $uow->expects($this->exactly(count($entityStates)))
             ->method('getEntityState')
             ->willReturnOnConsecutiveCalls(...$entityStates);
+    }
+
+    private function prepareQueryBuilderForLoadEntityModels(): void
+    {
+        $query = $this->createMock(AbstractQuery::class);
+        $qbMock = $this->createMock(QueryBuilder::class);
+        $this->repo->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('e')
+            ->willReturn($qbMock);
+        $qbMock->expects($this->once())
+            ->method('where')
+            ->willReturnSelf();
+        $qbMock->expects($this->once())
+            ->method('setParameter')
+            ->willReturnSelf();
+        $qbMock->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+        $query->expects($this->once())
+            ->method('getResult')
+            ->willReturn([]);
     }
 
     private function createEntityModel(string $className): EntityConfigModel

@@ -45,7 +45,7 @@ class EmptyValueComparisonExpression implements ComparisonExpressionInterface
         string $parameterName,
         bool $isEmpty
     ): mixed {
-        if (Types::JSON === $dataType || Types::JSON_ARRAY === $dataType) {
+        if (Types::JSON === $dataType) {
             $expression = 'LENGTH(CAST(' . $expression . ' AS text))';
             $visitor->addParameter($parameterName, 2);
 

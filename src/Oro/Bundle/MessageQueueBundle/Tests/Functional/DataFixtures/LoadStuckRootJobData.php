@@ -6,10 +6,10 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
 use Oro\Component\MessageQueue\Test\Async\Topic\UniqueJobTestTopic;
 use Oro\Component\MessageQueue\Test\Async\UniqueMessageProcessor;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LoadStuckRootJobData extends AbstractFixture implements ContainerAwareInterface
@@ -61,7 +61,7 @@ class LoadStuckRootJobData extends AbstractFixture implements ContainerAwareInte
         $dbal = $connection->getDBALConnection();
 
         $sql = sprintf(
-            'INSERT INTO %s (body, headers, properties, redelivered, queue, priority) VALUES '.
+            'INSERT INTO %s (body, headers, properties, redelivered, queue, priority) VALUES ' .
             '(:body, :headers, :properties, :redelivered, :queue, :priority)',
             $connection->getTableName()
         );
@@ -85,9 +85,9 @@ class LoadStuckRootJobData extends AbstractFixture implements ContainerAwareInte
                 'priority' => 2,
             ],
             [
-                'body' => Types::JSON_ARRAY,
-                'headers' => Types::JSON_ARRAY,
-                'properties' => Types::JSON_ARRAY,
+                'body' => Types::JSON,
+                'headers' => Types::JSON,
+                'properties' => Types::JSON,
                 'redelivered' => Types::BOOLEAN,
                 'queue' => Types::TEXT,
                 'priority' => Types::SMALLINT,

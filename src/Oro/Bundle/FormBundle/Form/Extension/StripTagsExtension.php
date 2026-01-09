@@ -38,7 +38,7 @@ class StripTagsExtension extends AbstractTypeExtension implements ServiceSubscri
     }
 
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         parent::buildForm($builder, $options);
 
@@ -48,7 +48,7 @@ class StripTagsExtension extends AbstractTypeExtension implements ServiceSubscri
     }
 
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(self::OPTION_NAME);
     }

@@ -6,8 +6,8 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Migration\FilteredAttachmentMigrationServiceInterface;
 use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
+use Oro\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * Migrate filtered attachments to new directory structure. Applicable for CE
@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 class MigrateFilteredAttachments implements FixtureInterface, ContainerAwareInterface, VersionedFixtureInterface
 {
     use ContainerAwareTrait;
+
     protected const PREFIX = 'attachment/resize';
 
     #[\Override]

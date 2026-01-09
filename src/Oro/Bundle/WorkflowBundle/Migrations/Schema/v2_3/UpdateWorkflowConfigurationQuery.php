@@ -46,7 +46,7 @@ class UpdateWorkflowConfigurationQuery extends ParametrizedMigrationQuery
                 $this->connection->quoteIdentifier('configuration')
             )
             ->from('oro_workflow_definition')
-            ->where($this->connection->getExpressionBuilder()->eq(
+            ->where($this->connection->createExpressionBuilder()->eq(
                 $this->connection->quoteIdentifier('system'),
                 ':isSystem'
             ))
@@ -64,7 +64,7 @@ class UpdateWorkflowConfigurationQuery extends ParametrizedMigrationQuery
             $updateQb = $this->connection->createQueryBuilder()
                 ->update('oro_workflow_definition')
                 ->set($this->connection->quoteIdentifier('configuration'), ':configuration')
-                ->where($this->connection->getExpressionBuilder()->eq(
+                ->where($this->connection->createExpressionBuilder()->eq(
                     $this->connection->quoteIdentifier('name'),
                     ':name'
                 ));

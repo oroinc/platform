@@ -121,7 +121,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         $parsedQuery = QueryUtil::parseQuery($query);
 
         return [
-            $connection->executeQuery(QueryUtil::getExecutableSql($query, $parsedQuery)),
+            $connection->executeQuery(QueryUtil::getExecutableSql($query, $parsedQuery))->iterateAssociative(),
             array_flip($parsedQuery->getResultSetMapping()->scalarMappings)
         ];
     }

@@ -6,8 +6,8 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
+use Oro\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * This fixtures aims to update forms' types for oro_contact_us.embedded_form and oro_magento_contact_us.embedded_form

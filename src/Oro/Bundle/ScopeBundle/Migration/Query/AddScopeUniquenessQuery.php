@@ -31,7 +31,7 @@ class AddScopeUniquenessQuery extends AbstractScopeQuery
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function fillScopeHashesForExistingRows(
         LoggerInterface $logger,
@@ -46,7 +46,7 @@ class AddScopeUniquenessQuery extends AbstractScopeQuery
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function switchReferencesFromOldToNewScopes(
         array $newToOldScopeIdMap,
@@ -74,7 +74,7 @@ class AddScopeUniquenessQuery extends AbstractScopeQuery
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function getNewToOldScopeIdMapping(LoggerInterface $logger): array
     {
@@ -108,7 +108,7 @@ class AddScopeUniquenessQuery extends AbstractScopeQuery
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function removeScopeDuplicates(array $newToOldScopeIdMap, LoggerInterface $logger, bool $dryRun): void
     {
@@ -124,7 +124,7 @@ class AddScopeUniquenessQuery extends AbstractScopeQuery
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function removeDuplicatesForUniqueRecords(
         string $tableName,

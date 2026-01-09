@@ -45,8 +45,8 @@ class Table extends BaseTable
             $baseTable->getName(),
             $baseTable->getColumns(),
             $baseTable->getIndexes(),
+            [],
             $baseTable->getForeignKeys(),
-            false,
             $baseTable->getOptions()
         );
     }

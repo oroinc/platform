@@ -36,7 +36,7 @@ class Renderer implements FormRendererInterface
     }
 
     #[\Override]
-    public function setTheme(FormView $view, $themes, $useDefaultThemes = true)
+    public function setTheme(FormView $view, $themes, $useDefaultThemes = true): void
     {
         $this->engine->setTheme($view, $themes, $useDefaultThemes);
     }

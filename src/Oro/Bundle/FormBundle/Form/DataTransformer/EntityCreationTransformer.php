@@ -41,7 +41,7 @@ class EntityCreationTransformer extends EntityToIdTransformer
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (!$value) {
             return null;

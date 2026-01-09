@@ -4,6 +4,7 @@ namespace Oro\Bundle\LoggerBundle\Monolog;
 
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\HandlerWrapper;
+use Monolog\LogRecord;
 
 /**
  * Disables Monolog handler when detailed logs are active.
@@ -20,7 +21,7 @@ class DisableHandlerWrapper extends HandlerWrapper
     }
 
     #[\Override]
-    public function isHandling(array $record): bool
+    public function isHandling(LogRecord $record): bool
     {
         return !$this->logLevelConfig->isActive();
     }

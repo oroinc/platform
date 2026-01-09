@@ -65,7 +65,7 @@ class FixBrokenDeletedFieldsQuery extends ParametrizedMigrationQuery
      * @param array $fields
      * @param LoggerInterface $logger
      * @param bool $dryRun
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function deleteRemovedAttributesFromFamily(array $fields, LoggerInterface $logger, $dryRun = false)
     {

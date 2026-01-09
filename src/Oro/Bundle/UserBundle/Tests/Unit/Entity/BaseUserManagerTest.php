@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Persisters\Entity\EntityPersister;
+use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\UserBundle\Entity\BaseUserManager;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -251,12 +256,39 @@ class BaseUserManagerTest extends TestCase
 
     public function testReloadUser(): void
     {
-        $user = $this->createMock(User::class);
+        $identifier = 777;
+        $user = new User();
+
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $classMetadata->name = User::class;
+        $classMetadata->expects(self::once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
 
         $em = $this->expectGetEntityManager();
         $em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with(User::class)
+            ->willReturn($classMetadata);
+
+        $entityPersister = $this->createMock(EntityPersister::class);
+        $entityPersister->expects(self::once())
             ->method('refresh')
-            ->with(self::identicalTo($user));
+            ->with(['id' => $identifier], self::identicalTo($user));
+
+        $uow = $this->createMock(UnitOfWork::class);
+        $uow->expects(self::once())
+            ->method('getEntityIdentifier')
+            ->with(self::identicalTo($user))
+            ->willReturn([$identifier]);
+        $uow->expects(self::once())
+            ->method('getEntityPersister')
+            ->with(User::class)
+            ->willReturn($entityPersister);
+
+        $em->expects(self::once())
+            ->method('getUnitOfWork')
+            ->willReturn($uow);
 
         $this->userManager->reloadUser($user);
     }

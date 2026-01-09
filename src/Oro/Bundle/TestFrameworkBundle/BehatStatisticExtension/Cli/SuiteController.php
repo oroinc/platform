@@ -97,7 +97,7 @@ class SuiteController implements Controller
             $output->writeln(sprintf('<info>Feature "%s" already tested and skipped.</info>', array_pop($parts)));
         }
 
-        return $this->exitIfNoAvailableFeatures($input);
+        return $this->exitIfNoAvailableFeatures($input, $output);
     }
 
     /**
@@ -135,7 +135,7 @@ class SuiteController implements Controller
      * @param InputInterface $input
      * @return int|null
      */
-    private function exitIfNoAvailableFeatures(InputInterface $input)
+    private function exitIfNoAvailableFeatures(InputInterface $input, OutputInterface $output)
     {
         $suites = $this->behatSuiteRegistry->getSuites();
         if ($suites) {
@@ -147,6 +147,10 @@ class SuiteController implements Controller
         }
 
         if (!$suites) {
+            $output->writeln(
+                'No test suites found. If you are running it locally, ' .
+                'delete the vendor folder and reinstall vendors using COMPOSER_MIRROR_PATH_REPOS=1.'
+            );
             return 0;
         }
 

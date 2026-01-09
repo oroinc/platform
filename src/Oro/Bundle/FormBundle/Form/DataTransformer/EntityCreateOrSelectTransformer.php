@@ -40,7 +40,7 @@ class EntityCreateOrSelectTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if ($value !== null && !is_object($value)) {
             throw new UnexpectedTypeException($value, 'object');
@@ -77,7 +77,7 @@ class EntityCreateOrSelectTransformer implements DataTransformerInterface
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if ($value !== null && !is_array($value)) {
             throw new UnexpectedTypeException($value, 'array');

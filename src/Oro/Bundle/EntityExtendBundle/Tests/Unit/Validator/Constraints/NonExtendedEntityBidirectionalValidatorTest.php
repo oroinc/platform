@@ -12,6 +12,7 @@ use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NonExtendedEntityBidirec
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NonExtendedEntityBidirectionalValidatorTest extends ConstraintValidatorTestCase
@@ -115,7 +116,7 @@ class NonExtendedEntityBidirectionalValidatorTest extends ConstraintValidatorTes
     }
 
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new NonExtendedEntityBidirectionalValidator($this->configManager);
     }

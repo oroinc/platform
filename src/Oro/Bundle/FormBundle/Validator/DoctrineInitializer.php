@@ -23,7 +23,7 @@ class DoctrineInitializer implements ObjectInitializerInterface
     }
 
     #[\Override]
-    public function initialize($object)
+    public function initialize($object): void
     {
         if ($object instanceof FormInterface
             || $object instanceof OrderedHashMap

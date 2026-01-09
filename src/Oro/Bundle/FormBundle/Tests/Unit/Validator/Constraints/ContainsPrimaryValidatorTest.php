@@ -7,13 +7,14 @@ use Oro\Bundle\FormBundle\Entity\PrimaryItem;
 use Oro\Bundle\FormBundle\Validator\Constraints\ContainsPrimary;
 use Oro\Bundle\FormBundle\Validator\Constraints\ContainsPrimaryValidator;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class ContainsPrimaryValidatorTest extends ConstraintValidatorTestCase
 {
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new ContainsPrimaryValidator();
     }

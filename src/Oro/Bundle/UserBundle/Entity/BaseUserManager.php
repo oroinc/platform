@@ -154,7 +154,15 @@ class BaseUserManager
      */
     public function reloadUser(UserInterface $user): void
     {
-        $this->getEntityManager()->refresh($user);
+        // Refresh strictly user avoiding cascade refresh
+        $em = $this->getEntityManager();
+        $class = $em->getClassMetadata(get_class($user));
+        $uow = $em->getUnitOfWork();
+
+        $uow->getEntityPersister($class->name)->refresh(
+            array_combine($class->getIdentifierFieldNames(), $uow->getEntityIdentifier($user)),
+            $user,
+        );
     }
 
     protected function getPasswordHasher(UserInterface $user): PasswordHasherInterface

@@ -54,7 +54,7 @@ class Symfony54NumberToLocalizedStringTransformer implements DataTransformerInte
      *                                       or if the value cannot be transformed
      */
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (null === $value) {
             return '';
@@ -91,7 +91,7 @@ class Symfony54NumberToLocalizedStringTransformer implements DataTransformerInte
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (null !== $value && !\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');

@@ -47,7 +47,7 @@ class AddSegmentNameValidationColumn implements Migration, DatabasePlatformAware
         $schemaWithModifiedColumn = clone $schemaWithNewColumn;
         $schemaWithModifiedColumn
             ->getTable('oro_segment')
-            ->changeColumn('name_lowercase', ['notnull' => true])
+            ->modifyColumn('name_lowercase', ['notnull' => true])
             ->addUniqueIndex(['name_lowercase'], 'uniq_d02603b37edd63ff')
             ->dropIndex('uniq_d02603b35e237e06');
 

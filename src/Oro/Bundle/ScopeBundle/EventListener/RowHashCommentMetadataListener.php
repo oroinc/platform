@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ScopeBundle\EventListener;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
-use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\Persistence\Mapping\ClassMetadata;
@@ -47,6 +47,6 @@ class RowHashCommentMetadataListener
     {
         $platform = $em->getConnection()->getDatabasePlatform();
 
-        return ($platform instanceof PostgreSqlPlatform || $platform instanceof MySqlPlatform);
+        return ($platform instanceof PostgreSQLPlatform || $platform instanceof MySQLPlatform);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Consumption\Extension;
 
+use Monolog\Level;
 use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\MessageQueueBundle\Test\Async\ChangeConfigProcessor;
 use Oro\Bundle\MessageQueueBundle\Test\Async\Topic\ChangeConfigTestTopic;
@@ -82,6 +83,6 @@ class InterruptConsumptionExtensionTest extends WebTestCase
 
     private function assertInterruptionMessage(string $expectedMessage): void
     {
-        self::assertTrue(self::getLoggerTestHandler()->hasRecord($expectedMessage, 'warning'));
+        self::assertTrue(self::getLoggerTestHandler()->hasRecord($expectedMessage, Level::Warning));
     }
 }

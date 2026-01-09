@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Mapping;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Oro\Bundle\EntityBundle\ORM\MappingDriverChain;
 use Oro\Bundle\EntityBundle\ORM\OroClassMetadataFactory;
@@ -31,10 +30,8 @@ class ExtendClassMetadataFactory extends OroClassMetadataFactory
     /**
      * Sets mapping drivers to read metadata from the cache instead of YAML files
      */
-    public function setMappingDriver(EntityManager $entityManager, YamlDriver $entityDriver): void
+    public function setMappingDriver(MappingDriverChain $driverChain, YamlDriver $entityDriver): void
     {
-        /** @var MappingDriverChain $driver */
-        $driver = $entityManager->getConfiguration()->getMetadataDriverImpl();
-        $driver->addDriver($entityDriver, ExtendClassLoadingUtils::getEntityNamespace());
+        $driverChain->addDriver($entityDriver, ExtendClassLoadingUtils::getEntityNamespace());
     }
 }

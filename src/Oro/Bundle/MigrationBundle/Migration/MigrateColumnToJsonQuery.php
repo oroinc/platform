@@ -127,7 +127,7 @@ class MigrateColumnToJsonQuery implements MigrationQuery, ConnectionAwareInterfa
 
     protected function getPrimaryKeyColumn(string $tableName): ?string
     {
-        $indexes = $this->connection->getSchemaManager()?->listTableIndexes($tableName);
+        $indexes = $this->connection->createSchemaManager()?->listTableIndexes($tableName);
 
         if (!empty($indexes['primary'])) {
             $columns = $indexes['primary']->getColumns();

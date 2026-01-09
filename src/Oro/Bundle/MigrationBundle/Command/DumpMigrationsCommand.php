@@ -17,8 +17,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 
 /**
  * Displays database schema as code.
@@ -202,7 +202,7 @@ HELP
     protected function initializeBundleMetadataRestrictions(?string $bundle): bool
     {
         if ($bundle && !$this->allowedTables) {
-            $this->io->error('No related entities were found to '.$bundle);
+            $this->io->error('No related entities were found to ' . $bundle);
 
             return false;
         }
@@ -288,14 +288,14 @@ HELP
             $bundleClass = $this->bundles[$bundle];
             $bundleFile  = (new \ReflectionClass($bundleClass))->getFileName();
 
-            $migrationFolder = dirname($bundleFile).'/Migrations/Schema';
+            $migrationFolder = dirname($bundleFile) . '/Migrations/Schema';
         } else {
             $migrationFolder = $this->getApplication()->getKernel()->getProjectDir();
         }
 
         $filesystem = new Filesystem();
 
-        $migrationFile = $migrationFolder.'/'.$this->className.'.php';
+        $migrationFile = $migrationFolder . '/' . $this->className . '.php';
         $migrationExists = $filesystem->exists($migrationFile);
         if ($migrationExists) {
             if ($this->isOverwriteMigration($migrationFile)) {

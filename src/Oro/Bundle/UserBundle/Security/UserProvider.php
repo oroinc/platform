@@ -58,12 +58,16 @@ class UserProvider implements UserProviderInterface
         // otherwise, entity may be replaced with another as some field may be changed in memory.
         // Example: a user changed username, the change was rejected by validation but in memory value was changed.
         // Calling to refreshUser and using username as criteria will lead to user replacing with another user.
-        // UoW has internal identity cache which will not actually reload user just by calling to findOneBy.
+        //
+        // We first try refresh() for managed entities. If the entity is not managed,
+        // refresh() throws ORMInvalidArgumentException, so we detach it from identity map and
+        // reload a copy from the database to ensure we get the actual persisted state.
         try {
             // try to reload existing entity to revert it's state to initial
             $manager->refresh($user);
         } catch (ORMInvalidArgumentException $e) {
             // if entity is not managed and can not be reloaded - load it by ID from the database
+            $manager->detach($user);
             $user = $manager->find($userClass, $user->getId());
         }
 

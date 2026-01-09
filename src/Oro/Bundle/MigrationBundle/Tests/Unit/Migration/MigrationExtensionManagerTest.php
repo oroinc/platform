@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Oro\Bundle\MigrationBundle\Migration\MigrationExtensionManager;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\AnotherNoAwareInterfaceExtension;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\AnotherTestExtension;
@@ -22,7 +22,7 @@ class MigrationExtensionManagerTest extends TestCase
     {
         $migration = new MigrationWithTestExtension();
         $extension = new TestExtension();
-        $platform = new MySqlPlatform();
+        $platform = new MySQLPlatform();
         $nameGenerator = new DbIdentifierNameGenerator();
         $logger = $this->createMock(LoggerInterface::class);
 
@@ -57,7 +57,7 @@ class MigrationExtensionManagerTest extends TestCase
     {
         $migration = new MigrationWithTestExtension();
         $extension = new AnotherTestExtension();
-        $platform = new MySqlPlatform();
+        $platform = new MySQLPlatform();
         $nameGenerator = new DbIdentifierNameGenerator();
         $logger = $this->createMock(LoggerInterface::class);
 
@@ -92,7 +92,7 @@ class MigrationExtensionManagerTest extends TestCase
     {
         $migration = new MigrationWithTestExtension();
         $extension = new TestExtension();
-        $platform = new MySqlPlatform();
+        $platform = new MySQLPlatform();
         $nameGenerator = new DbIdentifierNameGenerator();
         $logger = $this->createMock(LoggerInterface::class);
 
@@ -116,7 +116,7 @@ class MigrationExtensionManagerTest extends TestCase
     {
         $migration = new MigrationWithTestExtension();
         $extension = new AnotherTestExtension();
-        $platform = new MySqlPlatform();
+        $platform = new MySQLPlatform();
         $nameGenerator = new DbIdentifierNameGenerator();
         $logger = $this->createMock(LoggerInterface::class);
 

@@ -19,8 +19,8 @@ class UpdateEmailUser implements Migration, OrderedMigrationInterface
     public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->getTable('oro_email_user');
-        $table->changeColumn('folder_id', ['notnull' => true]);
-        $table->changeColumn('email_id', ['notnull' => true]);
+        $table->modifyColumn('folder_id', ['notnull' => true]);
+        $table->modifyColumn('email_id', ['notnull' => true]);
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_email'),
             ['email_id'],

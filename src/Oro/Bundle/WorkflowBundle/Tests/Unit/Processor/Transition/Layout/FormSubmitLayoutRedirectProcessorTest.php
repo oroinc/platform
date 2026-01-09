@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Transition\Layout;
 
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\SecurityBundle\Util\SameSiteUrlHelper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
@@ -12,6 +11,7 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Layout\FormSubmitLayoutRedirectProcessor;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 
 class FormSubmitLayoutRedirectProcessorTest extends TestCase
@@ -89,7 +89,7 @@ class FormSubmitLayoutRedirectProcessorTest extends TestCase
             ->willReturn(new WorkflowData([]));
 
         $request = new Request();
-        $request->query = new ParameterBag(['originalUrl' => '///original url']);
+        $request->query = new InputBag(['originalUrl' => '///original url']);
 
         $context = new TransitionContext();
         $context->setWorkflowItem($workflowItem);

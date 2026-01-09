@@ -62,9 +62,9 @@ class OroMessageQueueBundleInstaller implements Installation, DatabasePlatformAw
         $table->addColumn('started_at', 'datetime', ['notnull' => false]);
         $table->addColumn('last_active_at', 'datetime', ['notnull' => false]);
         $table->addColumn('stopped_at', 'datetime', ['notnull' => false]);
-        $table->addColumn('data', 'json_array', [
+        $table->addColumn('data', 'json', [
             'notnull' => false,
-            'comment' => '(DC2Type:json_array)',
+            'comment' => '(DC2Type:json)',
         ]);
         $table->addColumn('job_progress', 'percent', ['notnull' => false, 'precision' => 0]);
         $table->setPrimaryKey(['id']);

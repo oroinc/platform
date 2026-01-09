@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\Exception\ExceptionInterface;
 use Symfony\Component\Lock\LockFactory;
-use Symfony\Component\Lock\LockInterface;
+use Symfony\Component\Lock\SharedLockInterface;
 
 class FileLockManagerTest extends TestCase
 {
@@ -28,7 +28,7 @@ class FileLockManagerTest extends TestCase
     public function testAcquire(): void
     {
         $lockFileName = 'test.lock';
-        $lock = $this->createMock(LockInterface::class);
+        $lock = $this->createMock(SharedLockInterface::class);
 
         $this->lockFactory->expects(self::once())
             ->method('createLock')
@@ -47,7 +47,7 @@ class FileLockManagerTest extends TestCase
     public function testAcquireWhenLockAlreadyAcquiredAndAttemptLimitExceeded(): void
     {
         $lockFileName = 'test.lock';
-        $lock = $this->createMock(LockInterface::class);
+        $lock = $this->createMock(SharedLockInterface::class);
 
         $this->lockFactory->expects(self::exactly(10))
             ->method('createLock')
@@ -108,7 +108,7 @@ class FileLockManagerTest extends TestCase
     public function testAcquireWhenSomeAttemptsCannotBeAcquired(): void
     {
         $lockFileName = 'test.lock';
-        $lock = $this->createMock(LockInterface::class);
+        $lock = $this->createMock(SharedLockInterface::class);
 
         $this->lockFactory->expects(self::exactly(3))
             ->method('createLock')
@@ -137,7 +137,7 @@ class FileLockManagerTest extends TestCase
     public function testAcquireWhenSomeAcquireAttemptsFailed(): void
     {
         $lockFileName = 'test.lock';
-        $lock = $this->createMock(LockInterface::class);
+        $lock = $this->createMock(SharedLockInterface::class);
         $e = $this->createMock(ExceptionInterface::class);
         $attemptNumber = 0;
 
@@ -175,7 +175,7 @@ class FileLockManagerTest extends TestCase
     public function testRelease(): void
     {
         $lockFileName = 'test.lock';
-        $lock = $this->createMock(LockInterface::class);
+        $lock = $this->createMock(SharedLockInterface::class);
 
         $this->lockFactory->expects(self::once())
             ->method('createLock')
@@ -185,8 +185,7 @@ class FileLockManagerTest extends TestCase
             ->method('acquire')
             ->willReturn(true);
         $lock->expects(self::once())
-            ->method('release')
-            ->willReturn(true);
+            ->method('release');
 
         $this->logger->expects(self::never())
             ->method(self::anything());
@@ -198,7 +197,7 @@ class FileLockManagerTest extends TestCase
     public function testReleaseWhenLockAlreadyReleased(): void
     {
         $lockFileName = 'test.lock';
-        $lock = $this->createMock(LockInterface::class);
+        $lock = $this->createMock(SharedLockInterface::class);
 
         $this->lockFactory->expects(self::once())
             ->method('createLock')
@@ -208,8 +207,7 @@ class FileLockManagerTest extends TestCase
             ->method('acquire')
             ->willReturn(true);
         $lock->expects(self::once())
-            ->method('release')
-            ->willReturn(true);
+            ->method('release');
 
         $this->logger->expects(self::never())
             ->method(self::anything());
@@ -224,7 +222,7 @@ class FileLockManagerTest extends TestCase
     public function testReleaseWhenReleaseFailed(): void
     {
         $lockFileName = 'test.lock';
-        $lock = $this->createMock(LockInterface::class);
+        $lock = $this->createMock(SharedLockInterface::class);
         $e = $this->createMock(ExceptionInterface::class);
 
         $this->lockFactory->expects(self::once())

@@ -8,6 +8,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
+/**
+ * Loads routes from Oro bundle routing configuration and filters them to only expose routes marked as exposable.
+ */
 class OroExposeLoader extends AbstractLoader
 {
     public function __construct(
@@ -23,7 +26,7 @@ class OroExposeLoader extends AbstractLoader
     }
 
     #[\Override]
-    public function load($file, $type = null)
+    public function load($file, $type = null): mixed
     {
         $routes = parent::load($file, $type);
 

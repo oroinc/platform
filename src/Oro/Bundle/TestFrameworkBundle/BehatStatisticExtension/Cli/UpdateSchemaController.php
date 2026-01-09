@@ -65,7 +65,7 @@ class UpdateSchemaController implements Controller
             $model::declareSchema($schema);
         }
 
-        $currentSchema = $this->connection->getSchemaManager()->createSchema();
+        $currentSchema = $this->connection->createSchemaManager()->introspectSchema();
 
         $comparator = new Comparator();
         $schemaDiff = $comparator->compare($currentSchema, $schema);

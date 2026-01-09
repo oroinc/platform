@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 
 /**
  * Check MySQL Full Text compatibility
@@ -15,7 +15,7 @@ trait MysqlVersionCheckTrait
      */
     protected function isMysqlPlatform()
     {
-        return $this->platform instanceof MySqlPlatform;
+        return $this->platform instanceof MySQLPlatform;
     }
 
     /**

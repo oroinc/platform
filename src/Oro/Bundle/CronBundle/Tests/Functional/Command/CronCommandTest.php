@@ -100,7 +100,7 @@ class CronCommandTest extends WebTestCase
         $featureChecker = self::getContainer()->get('oro_featuretoggle.checker.feature_checker');
         $featureChecker->setResourceTypeEnabled('cron_jobs', false);
         try {
-            $result = self::runCommand('oro:cron');
+            $result = self::runCommand('oro:cron', ['-vvv']);
         } finally {
             $featureChecker->setResourceTypeEnabled('cron_jobs', null);
         }

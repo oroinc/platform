@@ -136,11 +136,11 @@ class EmailTemplateProviderTest extends TestCase
             ->method('error')
             ->with(
                 'Failed to load email template "{name}": {message}',
-                [
-                    'name' => $emailTemplateCriteria->getName(),
-                    'message' => $exception->getMessage(),
-                    'exception' => $exception,
-                ]
+                self::callback(function ($context) use ($emailTemplateCriteria, $exception) {
+                    return $context['name'] === $emailTemplateCriteria->getName()
+                        && $context['message'] === $exception->getMessage()
+                        && $context['exception'] instanceof LoaderError;
+                })
             );
 
         $this->provider->loadEmailTemplate($emailTemplateCriteria, $templateContext);

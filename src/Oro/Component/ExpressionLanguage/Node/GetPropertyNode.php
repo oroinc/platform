@@ -36,7 +36,7 @@ class GetPropertyNode extends Node
     }
 
     #[\Override]
-    public function evaluate(array $functions, array $values)
+    public function evaluate(array $functions, array $values): mixed
     {
         $evaluatedNode = $this->nodes['node']->evaluate($functions, $values);
         if (!\is_object($evaluatedNode) && !$evaluatedNode instanceof \ArrayAccess && !is_array($evaluatedNode)) {

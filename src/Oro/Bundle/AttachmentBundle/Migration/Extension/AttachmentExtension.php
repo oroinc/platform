@@ -178,7 +178,7 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
         $attachmentTable = $schema->getTable(self::ATTACHMENT_TABLE_NAME);
         $targetTable     = $schema->getTable($targetTableName);
 
-        $primaryKeyColumns = $targetTable->getPrimaryKeyColumns();
+        $primaryKeyColumns = $targetTable->getPrimaryKey()->getColumns();
         $targetColumnName  = array_shift($primaryKeyColumns);
 
         $options = new OroOptions();

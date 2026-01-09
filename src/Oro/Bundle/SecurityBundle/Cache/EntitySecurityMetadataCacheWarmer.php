@@ -21,16 +21,17 @@ class EntitySecurityMetadataCacheWarmer implements CacheWarmerInterface
      * {inheritdoc}
      */
     #[\Override]
-    public function warmUp($cacheDir)
+    public function warmUp($cacheDir, ?string $buildDir = null): array
     {
         $this->provider->warmUpCache();
+        return [];
     }
 
     /**
      * {inheritdoc}
      */
     #[\Override]
-    public function isOptional()
+    public function isOptional(): bool
     {
         return true;
     }

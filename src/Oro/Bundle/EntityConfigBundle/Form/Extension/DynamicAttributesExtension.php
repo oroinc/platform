@@ -63,7 +63,7 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
     }
 
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!$this->isApplicable($options)) {
             return;
@@ -86,7 +86,7 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
     }
 
     #[\Override]
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         if (!$this->isApplicable($options)) {
             return;

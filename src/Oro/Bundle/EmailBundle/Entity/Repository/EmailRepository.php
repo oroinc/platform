@@ -32,6 +32,9 @@ class EmailRepository extends EntityRepository
      */
     public function findEmailsByIds($ids)
     {
+        if (empty($ids)) {
+            return [];
+        }
         return $this->findBy(['id' => $ids], ['sentAt' => Criteria::DESC]);
     }
 

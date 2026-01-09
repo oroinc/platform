@@ -3,7 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Migration;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -54,7 +54,7 @@ class DeleteTranslationKeysQuery extends ParametrizedMigrationQuery
             'domain' => $domain
         ];
 
-        $keyField = $this->connection->getDatabasePlatform() instanceof MySqlPlatform ? '`key`' : 'key';
+        $keyField = $this->connection->getDatabasePlatform() instanceof MySQLPlatform ? '`key`' : 'key';
 
         $types  = [
             'translation_keys' => Connection::PARAM_STR_ARRAY,

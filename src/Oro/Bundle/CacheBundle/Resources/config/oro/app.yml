@@ -18,6 +18,3 @@ framework:
                     - oro.cache.adapter.persistent
             oro.data.cache.without_memory_cache:
                 adapter: oro.cache.adapter.persistent
-
-    annotations:
-        cache: php_array

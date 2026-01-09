@@ -23,7 +23,7 @@ class PostgreSqlOrderByNullsOutputResultModifier extends AbstractOutputResultMod
     protected $resolvedColumnAliases = [];
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     private function isOrderByModificationAllowed(): bool
     {

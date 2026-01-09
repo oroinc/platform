@@ -8,7 +8,6 @@ use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Behat\Testwork\Suite\ServiceContainer\SuiteExtension;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\PDOException;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\ConnectionException;
 use Doctrine\DBAL\Exception\DriverException;
@@ -232,13 +231,13 @@ final class BehatStatisticExtension implements TestworkExtension
     /**
      * @throws ConnectionException
      * @throws DriverException
-     * @throws PDOException
+     * @throws \Doctrine\DBAL\Driver\Exception
      */
     private function pingConnection(ContainerBuilder $container)
     {
         /** @var Connection $connection */
         $connection = $container->get('oro_behat_statistic.database.connection');
-        $connection->ping();
+        $connection->executeQuery('SELECT 1');
     }
 
     private function showAlert(OutputInterface $output, \Exception $e)

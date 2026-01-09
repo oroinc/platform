@@ -110,7 +110,7 @@ class QueryCountCalculator
                     is_object($query) ? get_class($query) : gettype($query)
                 ));
             }
-            $result = $statement->fetchColumn();
+            $result = $statement->fetchOne();
         }
 
         return $result ? (int)$result : 0;
@@ -145,7 +145,8 @@ class QueryCountCalculator
     private function executeOrmCountQuery(Query $query)
     {
         $parserResult = QueryUtil::parseQuery($query);
-        $sql = $parserResult->getSqlExecutor()->getSqlStatements();
+        $sqlExecutor = $parserResult->prepareSqlExecutor($query);
+        $sql = $sqlExecutor->getSqlStatements();
         $parameterMappings = $parserResult->getParameterMappings();
         [$params, $types] = QueryUtil::processParameterMappings($query, $parameterMappings);
 

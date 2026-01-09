@@ -92,6 +92,7 @@ class PlaceholderExtensionTest extends TestCase
             'placeholder',
             [
                 $this->environment,
+                [],
                 self::PLACEHOLDER_NAME,
                 $variables,
                 ['delimiter' => self::DELIMITER]
@@ -118,6 +119,7 @@ class PlaceholderExtensionTest extends TestCase
             'placeholder',
             [
                 $this->environment,
+                [],
                 self::INVALID_PLACEHOLDER_NAME,
                 [],
                 ['delimiter' => self::DELIMITER]

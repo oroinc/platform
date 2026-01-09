@@ -32,7 +32,7 @@ abstract class AbstractCollectionMethodCallNode extends Node
     abstract public static function getMethod(): string;
 
     #[\Override]
-    public function evaluate(array $functions, array $values)
+    public function evaluate(array $functions, array $values): mixed
     {
         $evaluatedNode = $this->nodes['node']->evaluate($functions, $values);
 

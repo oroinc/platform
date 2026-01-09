@@ -64,7 +64,7 @@ class UpdateExtendRelationDataQuery extends ParametrizedMigrationQuery
     /**
      * @param LoggerInterface $logger
      * @param bool $dryRun
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {

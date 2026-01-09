@@ -205,7 +205,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
             // customization start
             && !$objectOrArray instanceof \ArrayAccess
             // customization end
-            && false === strpbrk((string)$propertyPath, '.[')) {
+            && false === strpbrk((string)$propertyPath, '.[')
+        ) {
             return $this->readProperty($zval, $propertyPath, $this->ignoreInvalidProperty)[self::VALUE];
         }
 
@@ -221,7 +222,7 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
     }
 
     #[\Override]
-    public function setValue(&$objectOrArray, $propertyPath, $value)
+    public function setValue(&$objectOrArray, $propertyPath, $value): void
     {
         if (\is_object($objectOrArray) && false === strpbrk((string)$propertyPath, '.[')) {
             $zval = [
@@ -345,7 +346,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
             '/^\S+::\S+\(\): Argument #\d+ \(\$\S+\) must be of type (\S+), (\S+) given/',
             $message,
             $matches
-        )) {
+        )
+        ) {
             [, $expectedType, $actualType] = $matches;
 
             throw new InvalidArgumentException(
@@ -403,7 +405,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
                         return false;
                     }
                 } elseif (!\is_object($zval[self::VALUE])
-                    || !$this->isPropertyWritable($zval[self::VALUE], $propertyPath->getElement($i))) {
+                    || !$this->isPropertyWritable($zval[self::VALUE], $propertyPath->getElement($i))
+                ) {
                     return false;
                 }
 
@@ -506,13 +509,15 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
             // the final value of the path must not be validated
             if ($i + 1 < $propertyPath->getLength()
                 && !\is_object($zval[self::VALUE])
-                && !\is_array($zval[self::VALUE])) {
+                && !\is_array($zval[self::VALUE])
+            ) {
                 throw new UnexpectedTypeException($zval[self::VALUE], $propertyPath, $i + 1);
             }
             // customization start
             // if (isset($zval[self::REF]) && (0 === $i || isset($propertyValues[$i - 1][self::IS_REF_CHAINED]))) {
             if (!empty($zval[self::REF])
-                && (0 === $i || isset($propertyValues[$i - 1][self::IS_REF_CHAINED]))) {
+                && (0 === $i || isset($propertyValues[$i - 1][self::IS_REF_CHAINED]))
+            ) {
                 // customization end
                 // Set the IS_REF_CHAINED flag to true if:
                 // current property is passed by reference and
@@ -638,7 +643,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
                     if ($access->canBeReference()
                         && !isset($object->$name)
                         && !\array_key_exists($name, (array)$object)
-                        && (\PHP_VERSION_ID < 70400 || !(new \ReflectionProperty($class, $name))->hasType())) {
+                        && (\PHP_VERSION_ID < 70400 || !(new \ReflectionProperty($class, $name))->hasType())
+                    ) {
                         throw new UninitializedPropertyException(
                             sprintf(
                                 'The property "%s::$%s" is not initialized.',
@@ -915,7 +921,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
         $mutatorForArray = $this->getWriteInfo(\get_class($object), $property, []);
 
         if (PropertyWriteInfo::TYPE_NONE !== $mutatorForArray->getType()
-            || ($object instanceof \stdClass && property_exists($object, $property))) {
+            || ($object instanceof \stdClass && property_exists($object, $property))
+        ) {
             return true;
         }
 
@@ -1046,7 +1053,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
         $values = $this->readPropertiesUntil($zval, $propertyPath, -1);
 
         if (($object instanceof \ArrayObject || $object instanceof \ArrayAccess)
-            && $object->count() < count($path) - 1) {
+            && $object->count() < count($path) - 1
+        ) {
             return;
         }
 
@@ -1116,7 +1124,8 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
             } elseif ($this->isMethodAccessible($reflClass, '__unset', 1)) {
                 unset($object->$property);
             } elseif ($this->magicMethodsFlags
-                && $this->isMethodAccessible($reflClass, '__call', 2)) {
+                && $this->isMethodAccessible($reflClass, '__call', 2)
+            ) {
                 // we call the unsetter and hope the __call do the job
                 $object->$unsetter();
             } else {

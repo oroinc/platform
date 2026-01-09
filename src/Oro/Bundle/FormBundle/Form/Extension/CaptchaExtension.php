@@ -52,7 +52,7 @@ class CaptchaExtension extends AbstractTypeExtension
     }
 
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('captcha_protection_enabled', false);
         $resolver->setAllowedTypes('captcha_protection_enabled', ['bool']);

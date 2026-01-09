@@ -100,6 +100,7 @@ class TransitionCronTriggerHandlerTest extends TestCase
     {
         $trigger = new TransitionCronTrigger();
         $trigger->setWorkflowDefinition($this->getEntity(WorkflowDefinition::class, ['name' => self::WORKFLOW_NAME]));
+        $trigger->setTransitionName('non_existing_transition');
 
         $workflow = $this->getWorkflow();
 

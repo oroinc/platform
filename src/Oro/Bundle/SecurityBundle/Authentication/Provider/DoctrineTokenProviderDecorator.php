@@ -5,7 +5,6 @@ namespace Oro\Bundle\SecurityBundle\Authentication\Provider;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
-use Symfony\Bridge\Doctrine\Security\RememberMe\DoctrineTokenProvider;
 
 /**
  * Decorate doctrine token storage that is set in “remember-me” cookies.
@@ -18,7 +17,7 @@ class DoctrineTokenProviderDecorator extends DoctrineTokenProvider
     }
 
     #[\Override]
-    public function configureSchema(Schema $schema, Connection $forConnection): void
+    public function configureSchema(Schema $schema, Connection $forConnection, \Closure $isSameDatabase): void
     {
         if ($forConnection !== $this->connection) {
             return;

@@ -45,7 +45,7 @@ class StatisticContext implements Context
      */
     public function prepareProcess()
     {
-        $this->testAppPath = realpath(__DIR__.'/../../TestApp');
+        $this->testAppPath = realpath(__DIR__ . '/../../TestApp');
         $phpFinder = new PhpExecutableFinder();
         if (false === $php = $phpFinder->find()) {
             throw new \RuntimeException('Unable to find the PHP executable.');
@@ -56,13 +56,13 @@ class StatisticContext implements Context
     /** @BeforeScenario */
     public function prepareBehatYaml()
     {
-        $behatYaml = $this->testAppPath.'/behat.yml';
+        $behatYaml = $this->testAppPath . '/behat.yml';
 
         if (file_exists($behatYaml)) {
             unlink($behatYaml);
         }
 
-        copy($this->testAppPath.'/behat.yml.dist', $behatYaml);
+        copy($this->testAppPath . '/behat.yml.dist', $behatYaml);
     }
 
     /**
@@ -82,7 +82,7 @@ class StatisticContext implements Context
             escapeshellarg(BEHAT_BIN_PATH),
             $argumentsString,
             strtr('--format-settings=\'{"timer": false}\'', ['\'' => '"', '"' => '\"']),
-            $this->testAppPath.'/behat.yml'
+            $this->testAppPath . '/behat.yml'
         );
         $this->process = Process::fromShellCommandline($command, $this->testAppPath);
         $this->process->start();
@@ -94,12 +94,12 @@ class StatisticContext implements Context
      */
     public function enabledExtensionInBehatYml(PyStringNode $extensionConfig)
     {
-        $config = Yaml::parse(file_get_contents($this->testAppPath.'/behat.yml'));
+        $config = Yaml::parse(file_get_contents($this->testAppPath . '/behat.yml'));
         $extensionConfig = Yaml::parse($extensionConfig->getRaw());
         $config['default']['extensions'] = $extensionConfig;
         $this->dbConfig = array_shift($extensionConfig)['connection'];
 
-        file_put_contents($this->testAppPath.'/behat.yml', Yaml::dump($config, 6));
+        file_put_contents($this->testAppPath . '/behat.yml', Yaml::dump($config, 6));
     }
 
     /**
@@ -107,11 +107,11 @@ class StatisticContext implements Context
      */
     public function enabledSuitesInBehatYml(PyStringNode $suitesConfig)
     {
-        $config = Yaml::parse(file_get_contents($this->testAppPath.'/behat.yml'));
+        $config = Yaml::parse(file_get_contents($this->testAppPath . '/behat.yml'));
         $suitesConfig = Yaml::parse($suitesConfig->getRaw());
         $config['default']['suites'] = $suitesConfig;
 
-        file_put_contents($this->testAppPath.'/behat.yml', Yaml::dump($config, 6));
+        file_put_contents($this->testAppPath . '/behat.yml', Yaml::dump($config, 6));
     }
 
     /**
@@ -206,7 +206,7 @@ class StatisticContext implements Context
      */
     public function sqliteDatabaseExists($dbname)
     {
-        $dbFile = $this->testAppPath.'/'.$dbname;
+        $dbFile = $this->testAppPath . '/' . $dbname;
 
         if (file_exists($dbFile)) {
             unlink($dbFile);
@@ -230,13 +230,13 @@ class StatisticContext implements Context
         $dbConfig['dbname'] = null;
 
         $conn = DriverManager::getConnection($dbConfig);
-        $sm = $conn->getSchemaManager();
+        $sm = $conn->createSchemaManager();
 
         if (in_array($dbName, $sm->listDatabases())) {
             $sm->dropDatabase($dbName);
         }
 
-        $conn->getSchemaManager()->createDatabase($dbName);
+        $conn->createSchemaManager()->createDatabase($dbName);
     }
 
     /**
@@ -333,10 +333,10 @@ class StatisticContext implements Context
      */
     public function iReconfigureStatisticExtension(PyStringNode $extensionConfig)
     {
-        $config = Yaml::parse(file_get_contents($this->testAppPath.'/behat.yml'));
+        $config = Yaml::parse(file_get_contents($this->testAppPath . '/behat.yml'));
         $extensionConfig = Yaml::parse($extensionConfig->getRaw());
         $config['default']['extensions'][BehatStatisticExtension::class] = $extensionConfig;
 
-        file_put_contents($this->testAppPath.'/behat.yml', Yaml::dump($config, 6));
+        file_put_contents($this->testAppPath . '/behat.yml', Yaml::dump($config, 6));
     }
 }

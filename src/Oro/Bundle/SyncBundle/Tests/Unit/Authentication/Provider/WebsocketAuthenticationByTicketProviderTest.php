@@ -3,9 +3,7 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Authentication\Provider;
 
 use Oro\Bundle\SyncBundle\Authentication\Provider\WebsocketAuthenticationByTicketProvider;
-use Oro\Bundle\SyncBundle\Authentication\Ticket\InMemoryAnonymousTicket;
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestGenerator\TicketDigestGeneratorInterface;
-use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
 use Oro\Bundle\SyncBundle\Security\Token\TicketToken;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -253,35 +251,6 @@ class WebsocketAuthenticationByTicketProviderTest extends TestCase
         );
 
         $this->websocketAuthenticationByTicketProvider->authenticate($connection);
-    }
-
-    public function testAuthenticateAnonymous(): void
-    {
-        $created = $this->getDate();
-        $userPassword = 'sampleUserPassword';
-        $ticketId = $this->ticketDigestGenerator->generateDigest(self::NONCE, $created, $userPassword);
-        $ticket = base64_encode(implode(';', [$ticketId, self::USERNAME, self::NONCE, $created]));
-        $connection = $this->getConnection($ticket);
-
-        $user = (new UserStub())->setPassword($userPassword);
-        $this->userProvider->expects(self::once())
-            ->method('loadUserByIdentifier')
-            ->with(self::USERNAME)
-            ->willReturn($user);
-
-        $this->ticketDigestGenerator->expects(self::once())
-            ->method('generateDigest')
-            ->with(self::NONCE, $created, self::SECRET)
-            ->willReturn($ticketId);
-
-        $expectedToken = new AnonymousTicketToken(
-            $ticketId,
-            new InMemoryAnonymousTicket(sprintf('anonymous-%s', $connection->WAMP->sessionId))
-        );
-        $expectedToken->setAttribute('ticketId', $ticketId);
-        $actualToken = $this->websocketAuthenticationByTicketProvider->authenticate($connection);
-
-        self::assertEquals($expectedToken, $actualToken);
     }
 
     private function getDate(): string

@@ -38,7 +38,7 @@ class LoadEntityConfigStateMigrationQuery extends ParametrizedMigrationQuery
 
     protected function loadEntityConfigStates(LoggerInterface $logger)
     {
-        if (!$this->connection->getSchemaManager()->tablesExist(['oro_entity_config', 'oro_entity_config_field'])) {
+        if (!$this->connection->createSchemaManager()->tablesExist(['oro_entity_config', 'oro_entity_config_field'])) {
             return;
         }
 

@@ -7,6 +7,9 @@ use Symfony\Component\Form\Extension\Validator\Type\BaseValidatorExtension;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Provides a form type validator extension stub with backward compatibility across Symfony versions.
+ */
 class FormTypeValidatorExtensionStub extends BaseValidatorExtension
 {
     /**
@@ -22,7 +25,7 @@ class FormTypeValidatorExtensionStub extends BaseValidatorExtension
     }
 
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 

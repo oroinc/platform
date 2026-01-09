@@ -40,7 +40,7 @@ class ConfigCacheWarmer implements CacheWarmerInterface
     }
 
     #[\Override]
-    public function warmUp($cacheDir): array
+    public function warmUp($cacheDir, ?string $buildDir = null): array
     {
         $this->configCache->warmUpCache();
         return [];

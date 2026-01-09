@@ -12,13 +12,13 @@ use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 use Oro\Bundle\MigrationBundle\Migration\RenameDataFixturesFixture;
 use Oro\Bundle\MigrationBundle\Migration\Sorter\DataFixturesSorter;
 use Oro\Bundle\MigrationBundle\Migration\UpdateDataFixturesFixture;
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides list of data fixtures to perform
  */
-class DataFixturesLoader extends ContainerAwareLoader
+class DataFixturesLoader extends Loader
 {
     /** @var DataFixture[] */
     private $loadedFixtures;
@@ -26,9 +26,22 @@ class DataFixturesLoader extends ContainerAwareLoader
 
     public function __construct(
         private EntityManagerInterface $em,
-        ContainerInterface $container
+        private ContainerInterface $container
     ) {
-        parent::__construct($container);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    #[\Override]
+    public function addFixture(FixtureInterface $fixture): void
+    {
+        // Inject container into fixtures that need it (similar to old ContainerAwareLoader)
+        if ($fixture instanceof ContainerAwareInterface) {
+            $fixture->setContainer($this->container);
+        }
+
+        parent::addFixture($fixture);
     }
 
     #[\Override]

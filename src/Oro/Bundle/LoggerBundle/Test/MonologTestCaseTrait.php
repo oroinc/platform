@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\LoggerBundle\Test;
 
+use Monolog\Level;
 use Monolog\Logger;
+use Monolog\LogRecord;
 
 /**
  * Provides methods to test monolog logs handle
@@ -10,17 +12,18 @@ use Monolog\Logger;
  */
 trait MonologTestCaseTrait
 {
-    protected function getLogRecord($level = Logger::WARNING, $message = 'test', array $context = []): array
+    protected function getLogRecord($level = Logger::WARNING, $message = 'test', array $context = []): LogRecord
     {
-        return [
-            'message' => (string)$message,
-            'context' => $context,
-            'level' => $level,
-            'level_name' => Logger::getLevelName($level),
-            'channel' => 'test',
-            'datetime' => \DateTime::createFromFormat('U.u', sprintf('%.6F', microtime(true))),
-            'extra' => [],
-        ];
+        $levelEnum = is_int($level) ? Level::fromValue($level) : Level::fromName($level);
+
+        return new LogRecord(
+            datetime: \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', microtime(true))),
+            channel: 'test',
+            level: $levelEnum,
+            message: (string)$message,
+            context: $context,
+            extra: []
+        );
     }
 
     protected function getMultipleLogRecords(): array

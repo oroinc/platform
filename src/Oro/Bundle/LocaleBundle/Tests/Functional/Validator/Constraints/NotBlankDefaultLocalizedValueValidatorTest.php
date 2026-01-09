@@ -8,13 +8,13 @@ use Oro\Bundle\LocaleBundle\Validator\Constraints\NotBlankDefaultLocalizedFallba
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class NotBlankDefaultLocalizedValueValidatorTest extends WebTestCase
 {
-    /** @var ValidatorInterface */
-    private $validator;
+    private ValidatorInterface $validator;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +24,7 @@ class NotBlankDefaultLocalizedValueValidatorTest extends WebTestCase
         $this->validator = self::getContainer()->get('validator');
     }
 
-    public function testValidatorDoesNotAddValidationErrorIfLocalizedFallbackCollectionHasDefaultLocalizedValue()
+    public function testValidatorDoesNotAddValidationErrorIfLocalizedFallbackCollectionHasDefaultLocalizedValue(): void
     {
         $constraint = new NotBlankDefaultLocalizedFallbackValue();
 
@@ -40,15 +40,15 @@ class NotBlankDefaultLocalizedValueValidatorTest extends WebTestCase
         $defaultFallback->setLocalization(null);
         $entity->addTitle($defaultFallback);
 
-        $this->clearEntityMetadataConstraints($entity);
         $this->addPropertyValidationConstraint($entity, $expectedPropertyName, $constraint);
 
         $result = $this->validator->validate($entity);
+        $result = $this->filterResult($result);
 
-        self::assertEquals(0, $result->count());
+        self::assertCount(0, $result);
     }
 
-    public function testValidateAddAnErrorToTheContextIfLocalizedFallbackCollectionDoesNotContainDefaultValue()
+    public function testValidateAddAnErrorToTheContextIfLocalizedFallbackCollectionDoesNotContainDefaultValue(): void
     {
         $constraint = new NotBlankDefaultLocalizedFallbackValue();
 
@@ -64,10 +64,10 @@ class NotBlankDefaultLocalizedValueValidatorTest extends WebTestCase
         $expectedInvalidValue = $entity->getTitles();
         self::assertCount(1, $expectedInvalidValue, 'Precondition failed title was not set');
 
-        $this->clearEntityMetadataConstraints($entity);
         $this->addPropertyValidationConstraint($entity, $expectedPropertyName, $constraint);
 
         $result = $this->validator->validate($entity);
+        $result = $this->filterResult($result);
 
         self::assertCount(1, $result);
 
@@ -80,7 +80,7 @@ class NotBlankDefaultLocalizedValueValidatorTest extends WebTestCase
         self::assertEquals($expectedInvalidValue, $actualConstraintViolation->getInvalidValue());
     }
 
-    public function testValidateAddAnErrorToTheContextIfLocalizedFallbackCollectionIsEmpty()
+    public function testValidateAddAnErrorToTheContextIfLocalizedFallbackCollectionIsEmpty(): void
     {
         $constraint = new NotBlankDefaultLocalizedFallbackValue();
 
@@ -90,10 +90,10 @@ class NotBlankDefaultLocalizedValueValidatorTest extends WebTestCase
         $entity = new Localization();
         $expectedInvalidValue = $entity->getTitles();
 
-        $this->clearEntityMetadataConstraints($entity);
         $this->addPropertyValidationConstraint($entity, $expectedPropertyName, $constraint);
 
         $result = $this->validator->validate($entity);
+        $result = $this->filterResult($result);
 
         self::assertCount(1, $result);
 
@@ -104,24 +104,6 @@ class NotBlankDefaultLocalizedValueValidatorTest extends WebTestCase
         self::assertEquals($expectedMessage, $actualConstraintViolation->getMessage());
         self::assertEquals($expectedPropertyName, $actualConstraintViolation->getPropertyPath());
         self::assertEquals($expectedInvalidValue, $actualConstraintViolation->getInvalidValue());
-    }
-
-    /**
-     * Helps to clear unnecessary validation constraints to be able to check only specific constraint work
-     */
-    private function clearEntityMetadataConstraints(object $entity): void
-    {
-        /** @var ClassMetadata $metadata */
-        $metadata = $this->validator->getMetadataFor($entity);
-
-        $metadata->constraints = [];
-        $metadata->constraintsByGroup = [];
-
-        foreach ($metadata->getConstrainedProperties() as $propertyName) {
-            $propertyMetadata = $metadata->properties[$propertyName];
-            $propertyMetadata->constraints = [];
-            $propertyMetadata->constraintsByGroup = [];
-        }
     }
 
     private function addPropertyValidationConstraint(
@@ -132,5 +114,25 @@ class NotBlankDefaultLocalizedValueValidatorTest extends WebTestCase
         /** @var ClassMetadata $metadata */
         $metadata = $this->validator->getMetadataFor($entity);
         $metadata->addPropertyConstraint($propertyName, $constraint);
+    }
+
+    /**
+     * Helps to clear unnecessary violations to be able to check only specific constraint work
+     */
+    private function filterResult(ConstraintViolationList $result): array
+    {
+        $result = iterator_to_array($result);
+        $result = array_unique($result);
+
+        $result = array_filter(
+            $result,
+            static function (ConstraintViolation $violation): bool {
+                $constraint = $violation->getConstraint();
+
+                return $constraint instanceof NotBlankDefaultLocalizedFallbackValue;
+            }
+        );
+
+        return array_values($result);
     }
 }

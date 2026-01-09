@@ -27,7 +27,7 @@ class DeduplicationHandlerCacheWarmer implements CacheWarmerInterface
      * {inheritdoc}
      */
     #[\Override]
-    public function warmUp($cacheDir): array
+    public function warmUp($cacheDir, ?string $buildDir = null): array
     {
         if ($this->deduplicationHandler) {
             $this->deduplicationHandler->flush();

@@ -116,10 +116,10 @@ class IndexListener implements OptionalListenerInterface
         $uow = $entityManager->getUnitOfWork();
         foreach ($uow->getScheduledEntityDeletions() as $objId => $entity) {
             if (empty($this->deletedEntities[$objId]) && $this->isSupported($entity)) {
-                $this->deletedEntities[$objId] = $entityManager->getReference(
-                    $this->doctrineHelper->getEntityClass($entity),
-                    $this->doctrineHelper->getSingleEntityIdentifier($entity)
-                );
+                $this->deletedEntities[$objId] = [
+                    'id' => $this->doctrineHelper->getSingleEntityIdentifier($entity),
+                    'class' => $this->doctrineHelper->getEntityClass($entity),
+                ];
             }
         }
     }
@@ -225,7 +225,7 @@ class IndexListener implements OptionalListenerInterface
         }
 
         if ($this->hasEntitiesToIndex()) {
-            $this->indexEntities();
+            $this->indexEntities($args);
         }
     }
 
@@ -266,7 +266,7 @@ class IndexListener implements OptionalListenerInterface
     /**
      * Synchronise all changed entities with search index
      */
-    protected function indexEntities()
+    protected function indexEntities(?PostFlushEventArgs $args = null)
     {
         foreach ($this->deletedEntities as $objId => $entity) {
             if (array_key_exists($objId, $this->savedEntities)) {
@@ -284,6 +284,18 @@ class IndexListener implements OptionalListenerInterface
         }
 
         if ($this->deletedEntities) {
+            if ($args) {
+                $entityManager = $args->getObjectManager();
+                foreach ($this->deletedEntities as $objId => $map) {
+                    $ref = $entityManager->getReference(
+                        $map['class'],
+                        $map['id'],
+                    );
+
+                    $this->deletedEntities[$objId] = $ref;
+                }
+            }
+
             $this->searchIndexer->delete($this->deletedEntities);
 
             $this->deletedEntities = [];

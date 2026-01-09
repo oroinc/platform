@@ -14,6 +14,9 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Extends form types to enforce workflow restrictions on entity fields.
+ */
 class RestrictionsExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
@@ -44,7 +47,7 @@ class RestrictionsExtension extends AbstractTypeExtension
     }
 
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['disable_workflow_restrictions'] ||
             empty($options['data_class']) ||
@@ -76,7 +79,7 @@ class RestrictionsExtension extends AbstractTypeExtension
     }
 
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(['disable_workflow_restrictions' => false]);
     }

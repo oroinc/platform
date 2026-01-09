@@ -15,6 +15,7 @@ use Oro\Bundle\EntityExtendBundle\Validator\Constraints\MultiEnumSnapshotFieldVa
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class MultiEnumSnapshotFieldValidatorTest extends ConstraintValidatorTestCase
@@ -22,7 +23,7 @@ class MultiEnumSnapshotFieldValidatorTest extends ConstraintValidatorTestCase
     private const ENTITY_CLASS = 'Test\Entity';
 
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         $extendConfigProvider = new ConfigProviderMock($this->createMock(ConfigManager::class), 'extend');
         $extendConfigProvider->addFieldConfig(

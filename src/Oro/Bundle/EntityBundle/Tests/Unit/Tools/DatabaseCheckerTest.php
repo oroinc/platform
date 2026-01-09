@@ -101,7 +101,7 @@ class DatabaseCheckerTest extends TestCase
         $connection->expects(self::once())
             ->method('connect');
         $connection->expects(self::once())
-            ->method('getSchemaManager')
+            ->method('createSchemaManager')
             ->willReturn($schemaManager);
         $schemaManager->expects(self::once())
             ->method('tablesExist')

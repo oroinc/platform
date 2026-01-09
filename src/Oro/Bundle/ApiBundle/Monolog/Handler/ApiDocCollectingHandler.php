@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Monolog\Handler;
 
 use Monolog\Handler\AbstractHandler;
+use Monolog\LogRecord;
 use Oro\Bundle\ApiBundle\Collector\ApiDocWarningsCollector;
 
 /**
@@ -23,7 +24,7 @@ class ApiDocCollectingHandler extends AbstractHandler
     }
 
     #[\Override]
-    public function handle(array $record): bool
+    public function handle(LogRecord $record): bool
     {
         $message = $record['message'];
 

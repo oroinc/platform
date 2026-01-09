@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 
 /**
@@ -56,7 +56,7 @@ class FulltextIndexManager
     {
         try {
             $this->connection->executeQuery($this->getQuery());
-        } catch (DBALException $exception) {
+        } catch (Exception $exception) {
             return false;
         }
 

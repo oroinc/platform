@@ -2,6 +2,10 @@
 
 namespace Oro\Component\Testing\Unit\ORM\Mocks;
 
+use Doctrine\DBAL\Driver\Result;
+use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\ParameterType;
+
 /**
  * This class is a clone of namespace Doctrine\Tests\Mocks\DriverConnectionMock that is excluded from doctrine
  * package since v2.4.
@@ -9,23 +13,24 @@ namespace Oro\Component\Testing\Unit\ORM\Mocks;
 class DriverConnectionMock implements \Doctrine\DBAL\Driver\Connection
 {
     #[\Override]
-    public function prepare($prepareString)
-    {
-    }
-
-    #[\Override]
-    public function query()
+    public function prepare($sql): Statement
     {
         return new StatementMock();
     }
 
     #[\Override]
-    public function quote($input, $type = \PDO::PARAM_STR)
+    public function query(string $sql): Result
+    {
+        return new ResultMock();
+    }
+
+    #[\Override]
+    public function quote($value, $type = ParameterType::STRING)
     {
     }
 
     #[\Override]
-    public function exec($statement)
+    public function exec($sql): int
     {
     }
 
@@ -46,16 +51,6 @@ class DriverConnectionMock implements \Doctrine\DBAL\Driver\Connection
 
     #[\Override]
     public function rollBack()
-    {
-    }
-
-    #[\Override]
-    public function errorCode()
-    {
-    }
-
-    #[\Override]
-    public function errorInfo()
     {
     }
 }

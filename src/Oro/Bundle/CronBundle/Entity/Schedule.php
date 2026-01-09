@@ -31,7 +31,7 @@ class Schedule
     /**
      * @var array
      */
-    #[ORM\Column(name: 'args', type: 'json_array')]
+    #[ORM\Column(name: 'args', type: 'json')]
     protected $arguments;
 
     #[ORM\Column(name: 'args_hash', type: Types::STRING, length: 32)]

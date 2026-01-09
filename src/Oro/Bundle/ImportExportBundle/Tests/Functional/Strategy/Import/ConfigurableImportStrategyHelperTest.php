@@ -9,8 +9,8 @@ use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeGro
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableImportStrategyHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\Product;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\Testing\Logger\TestLogger;
 use Psr\Log\LogLevel;
-use Psr\Log\Test\TestLogger;
 
 /**
  * @dbIsolationPerTest
@@ -271,9 +271,9 @@ class ConfigurableImportStrategyHelperTest extends WebTestCase
                     'context' => [
                         'databaseEntityClass' => AttributeFamily::class,
                         'propertyName' => 'updatedAt',
-                        'databaseValue' => 'O:8:"DateTime":3:{s:4:"date";s:26:"2030-05-05 00:00:00.000000";s:13:'.
+                        'databaseValue' => 'O:8:"DateTime":3:{s:4:"date";s:26:"2030-05-05 00:00:00.000000";s:13:' .
                             '"timezone_type";i:3;s:8:"timezone";s:3:"UTC";}',
-                        'importedValue' => 'O:8:"DateTime":3:{s:4:"date";s:26:"2040-05-05 00:00:00.000000";s:13:'.
+                        'importedValue' => 'O:8:"DateTime":3:{s:4:"date";s:26:"2040-05-05 00:00:00.000000";s:13:' .
                             '"timezone_type";i:3;s:8:"timezone";s:3:"UTC";}',
                     ],
                 ],

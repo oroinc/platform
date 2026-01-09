@@ -3,8 +3,8 @@
 namespace Oro\Bundle\DataGridBundle\Provider;
 
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\TwigTemplateProperty;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

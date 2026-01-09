@@ -26,8 +26,8 @@ class UpdateTranslationColumns implements Migration, OrderedMigrationInterface
     {
         $table = $schema->getTable('oro_translation');
 
-        $table->changeColumn('translation_key_id', ['notnull' => true]);
-        $table->changeColumn('language_id', ['notnull' => true]);
+        $table->modifyColumn('translation_key_id', ['notnull' => true]);
+        $table->modifyColumn('language_id', ['notnull' => true]);
 
         $table->dropColumn('locale');
         $table->dropColumn('key');

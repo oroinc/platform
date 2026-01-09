@@ -42,7 +42,7 @@ class WorkflowDefinitionRepository extends EntityRepository
                 'active' => true
             ])
             ->getQuery()
-            ->useResultCache(true)
+            ->enableResultCache()
             ->setResultCacheId(self::ACTIVE_FOR_ENTITY_WORKFLOW_DEFINITIONS_CACHE_ID)
             ->getResult();
     }
@@ -58,7 +58,7 @@ class WorkflowDefinitionRepository extends EntityRepository
             ->setParameters(['relatedEntity' => ClassUtils::getRealClass($relatedEntity)])
             ->orderBy('wd.priority', 'ASC')
             ->getQuery()
-            ->useResultCache(true)
+            ->enableResultCache()
             ->setResultCacheId(self::ENTITY_WORKFLOW_DEFINITIONS_CACHE_ID)
             ->getResult();
     }
@@ -90,7 +90,7 @@ class WorkflowDefinitionRepository extends EntityRepository
             ->orderBy('wd.priority', 'ASC')
             ->setParameters(['active' => true])
             ->getQuery()
-            ->useResultCache(true)
+            ->enableResultCache()
             ->setResultCacheId(self::ACTIVE_WORKFLOW_DEFINITIONS_CACHE_ID)
             ->getResult();
     }
@@ -112,7 +112,7 @@ class WorkflowDefinitionRepository extends EntityRepository
 
         $data = $qb
             ->getQuery()
-            ->useResultCache(true)
+            ->enableResultCache()
             ->setResultCacheId(self::RELATED_ENTITY_CLASSES_CACHE_ID)
             ->getArrayResult();
 
@@ -124,7 +124,7 @@ class WorkflowDefinitionRepository extends EntityRepository
      */
     public function invalidateCache()
     {
-        $cache = $this->_em->getConfiguration()->getResultCacheImpl();
+        $cache = $this->_em->getConfiguration()->getResultCache();
         if (!$cache) {
             return;
         }

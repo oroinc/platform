@@ -94,6 +94,10 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
     #[\Override]
     public function loadChoicesForValues(array $values, $value = null): array
     {
+        if (empty($values)) {
+            return [];
+        }
+
         return $this->loadChoiceList($value)->getChoicesForValues($values);
     }
 
@@ -103,6 +107,10 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
         // check for multi-enum choices
         if (array_key_exists(0, $choices) && is_array($choices[0]) && array_is_list($choices[0])) {
             $choices = $choices[0];
+        }
+
+        if (empty($choices)) {
+            return [];
         }
 
         return $this->loadChoiceList($value)->getValuesForChoices($choices);

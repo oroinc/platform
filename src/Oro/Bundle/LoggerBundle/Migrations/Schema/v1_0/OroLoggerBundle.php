@@ -25,11 +25,11 @@ class OroLoggerBundle implements Migration
         $table = $schema->createTable('oro_logger_log_entry');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('message', 'text');
-        $table->addColumn('context', 'json_array', ['comment' => '(DC2Type:json_array)']);
+        $table->addColumn('context', 'json', ['comment' => '(DC2Type:json)']);
         $table->addColumn('level', 'smallint');
         $table->addColumn('channel', 'string', ['length' => 255]);
         $table->addColumn('datetime', 'datetime', ['comment' => '(DC2Type:datetime)']);
-        $table->addColumn('extra', 'json_array', ['comment' => '(DC2Type:json_array)']);
+        $table->addColumn('extra', 'json', ['comment' => '(DC2Type:json)']);
         $table->setPrimaryKey(['id']);
     }
 }

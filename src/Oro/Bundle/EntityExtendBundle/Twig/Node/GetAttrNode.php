@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Twig\Node;
 
-use ArrayAccess;
 use Doctrine\Inflector\Inflector;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
@@ -13,6 +12,8 @@ use Twig\Error\RuntimeError;
 use Twig\Extension\SandboxExtension;
 use Twig\Node\Expression\GetAttrExpression;
 use Twig\Node\Node;
+use Twig\Sandbox\SecurityNotAllowedMethodError;
+use Twig\Sandbox\SecurityNotAllowedPropertyError;
 use Twig\Source;
 use Twig\Template;
 
@@ -22,6 +23,21 @@ use Twig\Template;
  */
 class GetAttrNode extends GetAttrExpression
 {
+    public const ARRAY_LIKE_CLASSES = [
+        'ArrayIterator',
+        'ArrayObject',
+        'CachingIterator',
+        'RecursiveArrayIterator',
+        'RecursiveCachingIterator',
+        'SplDoublyLinkedList',
+        'SplFixedArray',
+        'SplObjectStorage',
+        'SplQueue',
+        'SplStack',
+        'WeakMap',
+        'Oro\Bundle\WorkflowBundle\Model\WorkflowData',
+    ];
+
     protected static ?Inflector $inflector = null;
 
     public function __construct(array $nodes = [], array $attributes = [], int $lineno = 0, ?string $tag = null)
@@ -34,11 +50,12 @@ class GetAttrNode extends GetAttrExpression
     public function compile(Compiler $compiler): void
     {
         $env = $compiler->getEnvironment();
+        $arrayAccessSandbox = false;
 
         // optimize array calls
         if ($this->getAttribute('optimizable')
             && (!$env->isStrictVariables() || $this->getAttribute('ignore_strict_check'))
-            && !$this->getAttribute('is_defined_test')
+            && !$this->isDefinedTestEnabled()
             && Template::ARRAY_CALL === $this->getAttribute('type')
         ) {
             $var = '$' . $compiler->getVarName();
@@ -46,16 +63,35 @@ class GetAttrNode extends GetAttrExpression
                 ->raw('((' . $var . ' = ')
                 ->subcompile($this->getNode('node'))
                 ->raw(') && is_array(')
-                ->raw($var)
+                ->raw($var);
+
+            if (!$env->hasExtension(SandboxExtension::class)) {
+                $compiler
+                    ->raw(') || ')
+                    ->raw($var)
+                    ->raw(' instanceof ArrayAccess ? (')
+                    ->raw($var)
+                    ->raw('[')
+                    ->subcompile($this->getNode('attribute'))
+                    ->raw('] ?? null) : null)')
+                ;
+
+                return;
+            }
+
+            $arrayAccessSandbox = true;
+
+            $compiler
                 ->raw(') || ')
                 ->raw($var)
-                ->raw(' instanceof ArrayAccess ? (')
+                ->raw(' instanceof ArrayAccess && in_array(')
+                ->raw($var . '::class')
+                ->raw(', \Oro\Bundle\EntityExtendBundle\Twig\Node\GetAttrNode::ARRAY_LIKE_CLASSES, true) ? (')
                 ->raw($var)
                 ->raw('[')
                 ->subcompile($this->getNode('attribute'))
-                ->raw('] ?? null) : null)');
-
-            return;
+                ->raw('] ?? null) : ')
+            ;
         }
 
         // START EDIT
@@ -80,11 +116,15 @@ class GetAttrNode extends GetAttrExpression
 
         $compiler->raw(', ')
             ->repr($this->getAttribute('type'))
-            ->raw(', ')->repr($this->getAttribute('is_defined_test'))
+            ->raw(', ')->repr($this->isDefinedTestEnabled())
             ->raw(', ')->repr($this->getAttribute('ignore_strict_check'))
             ->raw(', ')->repr($env->hasExtension(SandboxExtension::class))
             ->raw(', ')->repr($this->getNode('node')->getTemplateLine())
             ->raw(')');
+
+        if ($arrayAccessSandbox) {
+            $compiler->raw(')');
+        }
     }
 
     /**
@@ -159,82 +199,113 @@ class GetAttrNode extends GetAttrExpression
         );
     }
 
-    /**
-     * @copyright twig/twig/src/Extension/CoreExtension.php::twig_get_attribute()
-     */
-    private static function twigGetAttribute(
+    public static function twigGetAttribute(
         Environment $env,
         Source $source,
         $object,
         $item,
         array $arguments = [],
-        $type = /* Template::ANY_CALL */ 'any',
+        $type = Template::ANY_CALL,
         $isDefinedTest = false,
         $ignoreStrictCheck = false,
         $sandboxed = false,
         int $lineno = -1
     ) {
-        if (/* Template::METHOD_CALL */ 'method' !== $type) {
-            $arrayItem = \is_bool($item) || \is_float($item) ? (int)$item : $item;
+        $propertyNotAllowedError = null;
 
-            if (((\is_array($object) || $object instanceof \ArrayObject)
-                    && (isset($object[$arrayItem]) || \array_key_exists($arrayItem, (array)$object)))
-                || ($object instanceof ArrayAccess && isset($object[$arrayItem]))
+        // array
+        if (Template::METHOD_CALL !== $type) {
+            $arrayItem = \is_bool($item) || \is_float($item) ? (int) $item : $item;
+
+            if ($sandboxed
+                && $object instanceof \ArrayAccess
+                && !\in_array($object::class, self::ARRAY_LIKE_CLASSES, true)
             ) {
+                try {
+                    $env->getExtension(SandboxExtension::class)->checkPropertyAllowed(
+                        $object,
+                        $arrayItem,
+                        $lineno,
+                        $source
+                    );
+                } catch (SecurityNotAllowedPropertyError $propertyNotAllowedError) {
+                    goto methodCheck;
+                }
+            }
+
+            $hasArrayItem = match (true) {
+                \is_array($object) => \array_key_exists($arrayItem, $object),
+                $object instanceof \ArrayAccess => $object->offsetExists($arrayItem),
+                default => false,
+            };
+
+            if ($hasArrayItem) {
                 if ($isDefinedTest) {
                     return true;
                 }
 
                 return $object[$arrayItem];
             }
-            if (/* Template::ARRAY_CALL */ 'array' === $type || !\is_object($object)) {
+
+            if (Template::ARRAY_CALL === $type || !\is_object($object)) {
                 if ($isDefinedTest) {
                     return false;
                 }
+
                 if ($ignoreStrictCheck || !$env->isStrictVariables()) {
                     return;
                 }
-                if ($object instanceof ArrayAccess) {
-                    $message = sprintf(
+
+                if ($object instanceof \ArrayAccess) {
+                    $message = \sprintf(
                         'Key "%s" in object with ArrayAccess of class "%s" does not exist.',
                         $arrayItem,
-                        \get_class($object)
+                        $object::class
                     );
                 } elseif (\is_object($object)) {
-                    $format = 'Impossible to access a key "%s" on an object of class "%s" that '
-                        . 'does not implement ArrayAccess interface.';
-                    $message = sprintf($format, $item, \get_class($object));
+                    $message = \sprintf(
+                        'Impossible to access a key "%s" on an object of class "%s" that does not implement'
+                        . ' ArrayAccess interface.',
+                        $item,
+                        $object::class
+                    );
                 } elseif (\is_array($object)) {
-                    if (empty($object)) {
-                        $message = sprintf('Key "%s" does not exist as the array is empty.', $arrayItem);
+                    if (!$object) {
+                        $message = \sprintf(
+                            'Key "%s" does not exist as the sequence/mapping is empty.',
+                            $arrayItem
+                        );
                     } else {
-                        $message = sprintf(
-                            'Key "%s" for array with keys "%s" does not exist.',
+                        $message = \sprintf(
+                            'Key "%s" for sequence/mapping with keys "%s" does not exist.',
                             $arrayItem,
                             implode(', ', array_keys($object))
                         );
                     }
-                } elseif (/* Template::ARRAY_CALL */ 'array' === $type) {
+                } elseif (Template::ARRAY_CALL === $type) {
                     if (null === $object) {
-                        $message = sprintf('Impossible to access a key ("%s") on a null variable.', $item);
+                        $message = \sprintf(
+                            'Impossible to access a key ("%s") on a null variable.',
+                            $item
+                        );
                     } else {
-                        $message = sprintf(
+                        $message = \sprintf(
                             'Impossible to access a key ("%s") on a %s variable ("%s").',
                             $item,
-                            \gettype($object),
+                            get_debug_type($object),
                             $object
                         );
                     }
                 } elseif (null === $object) {
-                    $message = sprintf(
+                    $message = \sprintf(
                         'Impossible to access an attribute ("%s") on a null variable.',
                         $item
                     );
                 } else {
-                    $message = sprintf(
+                    $message = \sprintf(
                         'Impossible to access an attribute ("%s") on a %s variable ("%s").',
                         $item,
-                        \gettype($object),
+                        get_debug_type($object),
                         $object
                     );
                 }
@@ -242,72 +313,114 @@ class GetAttrNode extends GetAttrExpression
                 throw new RuntimeError($message, $lineno, $source);
             }
         }
+
+        $item = (string) $item;
+
         if (!\is_object($object)) {
             if ($isDefinedTest) {
                 return false;
             }
+
             if ($ignoreStrictCheck || !$env->isStrictVariables()) {
                 return;
             }
+
             if (null === $object) {
-                $message = sprintf('Impossible to invoke a method ("%s") on a null variable.', $item);
+                $message = \sprintf('Impossible to invoke a method ("%s") on a null variable.', $item);
             } elseif (\is_array($object)) {
-                $message = sprintf('Impossible to invoke a method ("%s") on an array.', $item);
+                $message = \sprintf('Impossible to invoke a method ("%s") on a sequence/mapping.', $item);
             } else {
-                $message = sprintf(
+                $message = \sprintf(
                     'Impossible to invoke a method ("%s") on a %s variable ("%s").',
                     $item,
-                    \gettype($object),
+                    get_debug_type($object),
                     $object
                 );
             }
 
             throw new RuntimeError($message, $lineno, $source);
         }
+
         if ($object instanceof Template) {
             throw new RuntimeError('Accessing \Twig\Template attributes is forbidden.', $lineno, $source);
         }
+
         // object property
-        if (/* Template::METHOD_CALL */ 'method' !== $type) {
-            if (isset($object->$item) || \array_key_exists((string)$item, (array)$object)) {
+        if (Template::METHOD_CALL !== $type) {
+            if ($sandboxed) {
+                try {
+                    $env->getExtension(SandboxExtension::class)->checkPropertyAllowed($object, $item, $lineno, $source);
+                } catch (SecurityNotAllowedPropertyError $propertyNotAllowedError) {
+                    goto methodCheck;
+                }
+            }
+
+            static $propertyCheckers = [];
+
+            if ($object instanceof \Closure && '__invoke' === $item) {
+                return $isDefinedTest ? true : $object();
+            }
+
+            if (isset($object->$item)
+                || ($propertyCheckers[$object::class][$item]
+                    ??= self::getPropertyChecker($object::class, $item))($object, $item)
+            ) {
                 if ($isDefinedTest) {
                     return true;
                 }
 
-                if ($sandboxed) {
-                    $env->getExtension(SandboxExtension::class)
-                        ->checkPropertyAllowed($object, $item, $lineno, $source);
-                }
-
                 return $object->$item;
             }
+
+            if ($object instanceof \DateTimeInterface
+                && \in_array($item, ['date', 'timezone', 'timezone_type'], true)
+            ) {
+                if ($isDefinedTest) {
+                    return true;
+                }
+
+                return ((array) $object)[$item];
+            }
+
+            if (\defined($object::class . '::' . $item)) {
+                if ($isDefinedTest) {
+                    return true;
+                }
+
+                return \constant($object::class . '::' . $item);
+            }
         }
+
+        methodCheck:
+
         static $cache = [];
-        $class = \get_class($object);
+
+        $class = $object::class;
 
         // object method
         // precedence: getXxx() > isXxx() > hasXxx()
         if (!isset($cache[$class])) {
             $methods = get_class_methods($object);
+            if ($object instanceof \Closure) {
+                $methods[] = '__invoke';
+            }
             sort($methods);
-            $lcMethods = array_map(function ($value) {
-                return strtr($value, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz');
-            }, $methods);
+            $lcMethods = array_map('strtolower', $methods);
             $classCache = [];
             foreach ($methods as $i => $method) {
                 $classCache[$method] = $method;
                 $classCache[$lcName = $lcMethods[$i]] = $method;
 
-                if ('g' === $lcName[0] && 0 === strpos($lcName, 'get')) {
+                if ('g' === $lcName[0] && str_starts_with($lcName, 'get')) {
                     $name = substr($method, 3);
                     $lcName = substr($lcName, 3);
-                } elseif ('i' === $lcName[0] && 0 === strpos($lcName, 'is')) {
+                } elseif ('i' === $lcName[0] && str_starts_with($lcName, 'is')) {
                     $name = substr($method, 2);
                     $lcName = substr($lcName, 2);
-                } elseif ('h' === $lcName[0] && 0 === strpos($lcName, 'has')) {
+                } elseif ('h' === $lcName[0] && str_starts_with($lcName, 'has')) {
                     $name = substr($method, 3);
                     $lcName = substr($lcName, 3);
-                    if (\in_array('is' . $lcName, $lcMethods)) {
+                    if (\in_array('is' . $lcName, $lcMethods, true)) {
                         continue;
                     }
                 } else {
@@ -329,11 +442,9 @@ class GetAttrNode extends GetAttrExpression
         }
 
         $call = false;
-        $upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $lowerChars = 'abcdefghijklmnopqrstuvwxyz';
         if (isset($cache[$class][$item])) {
             $method = $cache[$class][$item];
-        } elseif (isset($cache[$class][$lcItem = strtr($item, $upperChars, $lowerChars)])) {
+        } elseif (isset($cache[$class][$lcItem = strtolower($item)])) {
             $method = $cache[$class][$lcItem];
         } elseif (isset($cache[$class]['__call'])) {
             $method = $item;
@@ -342,20 +453,47 @@ class GetAttrNode extends GetAttrExpression
             if ($isDefinedTest) {
                 return false;
             }
+
+            if ($propertyNotAllowedError) {
+                throw $propertyNotAllowedError;
+            }
+
             if ($ignoreStrictCheck || !$env->isStrictVariables()) {
                 return;
             }
-            $format = 'Neither the property "%1$s" nor one of the methods "%1$s()", '
-                . '"get%1$s()"/"is%1$s()"/"has%1$s()" or "__call()" exist and have public access in class "%2$s".';
 
-            throw new RuntimeError(sprintf($format, $item, $class), $lineno, $source);
+            throw new RuntimeError(
+                \sprintf(
+                    'Neither the property "%1$s" nor one of the methods "%1$s()", "get%1$s()"/"is%1$s()"/"has%1$s()"'
+                    . ' or "__call()" exist and have public access in class "%2$s".',
+                    $item,
+                    $class
+                ),
+                $lineno,
+                $source
+            );
         }
+
+        if ($sandboxed) {
+            try {
+                $env->getExtension(SandboxExtension::class)->checkMethodAllowed($object, $method, $lineno, $source);
+            } catch (SecurityNotAllowedMethodError $e) {
+                if ($isDefinedTest) {
+                    return false;
+                }
+
+                if ($propertyNotAllowedError) {
+                    throw $propertyNotAllowedError;
+                }
+
+                throw $e;
+            }
+        }
+
         if ($isDefinedTest) {
             return true;
         }
-        if ($sandboxed) {
-            $env->getExtension(SandboxExtension::class)->checkMethodAllowed($object, $method, $lineno, $source);
-        }
+
         // Some objects throw exceptions when they have __call, and the method we try
         // to call is not supported. If ignoreStrictCheck is true, we should return null.
         try {
@@ -368,6 +506,29 @@ class GetAttrNode extends GetAttrExpression
         }
 
         return $ret;
+    }
+
+    private static function getPropertyChecker(string $class, string $property): \Closure
+    {
+        static $classReflectors = [];
+
+        $class = $classReflectors[$class] ??= new \ReflectionClass($class);
+
+        if (!$class->hasProperty($property)) {
+            static $propertyExists;
+
+            return $propertyExists ??= \Closure::fromCallable('property_exists');
+        }
+
+        $property = $class->getProperty($property);
+
+        if (!$property->isPublic() || $property->isStatic()) {
+            static $false;
+
+            return $false ??= static fn () => false;
+        }
+
+        return static fn ($object) => $property->isInitialized($object);
     }
 
     private static function isMethodWithPrefixExists(

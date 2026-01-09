@@ -88,7 +88,7 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
      * @param integer $fieldRowId
      * @param bool $dryRun
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function removeFieldConfig(LoggerInterface $logger, $fieldRowId, bool $dryRun = false)
     {

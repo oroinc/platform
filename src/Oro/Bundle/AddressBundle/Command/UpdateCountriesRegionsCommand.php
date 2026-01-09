@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Oro\Bundle\AddressBundle\Command;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
-use PDO;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -154,7 +154,7 @@ HELP
             ->where($queryBuilder->expr()->eq('c.deleted', ':deleted'))
             ->andWhere($queryBuilder->expr()->notIn('c.iso2_code', ':countries'))
             ->setParameter('countries', $countries, Connection::PARAM_STR_ARRAY)
-            ->setParameter('deleted', false, PDO::PARAM_BOOL);
+            ->setParameter('deleted', false, ParameterType::BOOLEAN);
 
         return $queryBuilder->execute()->fetchAllAssociative();
     }
@@ -201,7 +201,7 @@ HELP
             ->where($queryBuilder->expr()->eq('r.deleted', ':deleted'))
             ->andWhere($queryBuilder->expr()->notIn('r.combined_code', ':regions'))
             ->setParameter('regions', $regionsCode, Connection::PARAM_STR_ARRAY)
-            ->setParameter('deleted', false, PDO::PARAM_BOOL);
+            ->setParameter('deleted', false, ParameterType::BOOLEAN);
 
         return $queryBuilder->execute()->fetchAllAssociative();
     }
@@ -441,7 +441,7 @@ HELP
         $queryBuilder->select('*')
             ->from('oro_dictionary_country', 'c')
             ->where($queryBuilder->expr()->eq('c.deleted', ':deleted'))
-            ->setParameter('deleted', false, PDO::PARAM_BOOL);
+            ->setParameter('deleted', false, ParameterType::BOOLEAN);
 
         $internalCountries = $queryBuilder->execute()->fetchAllAssociative();
 
@@ -473,14 +473,14 @@ HELP
                 $translationQueryBuilder->where(
                     $expr->eq(
                         'translation_key_id',
-                        '('.$translationKeySubQuerySql.')'
+                        '(' . $translationKeySubQuerySql . ')'
                     )
                 );
                 $languageSubQuerySql = $this->getLanguageSql($connection);
                 $translationQueryBuilder->andWhere(
                     $expr->eq(
                         'language_id',
-                        '('.$languageSubQuerySql.')'
+                        '(' . $languageSubQuerySql . ')'
                     )
                 );
 
@@ -500,7 +500,7 @@ HELP
         $queryBuilder->select('*')
             ->from('oro_dictionary_region', 'r')
             ->where($queryBuilder->expr()->eq('r.deleted', ':deleted'))
-            ->setParameter('deleted', false, PDO::PARAM_BOOL);
+            ->setParameter('deleted', false, ParameterType::BOOLEAN);
 
         $internalRegions = $queryBuilder->execute()->fetchAllAssociative();
         foreach ($internalRegions as $region) {
@@ -531,7 +531,7 @@ HELP
                 $translationQueryBuilder->where(
                     $expr->eq(
                         'translation_key_id',
-                        '('.$translationKeySubQuerySql.')'
+                        '(' . $translationKeySubQuerySql . ')'
                     )
                 );
 
@@ -539,7 +539,7 @@ HELP
                 $translationQueryBuilder->andWhere(
                     $expr->eq(
                         'language_id',
-                        '('.$languageSubQuerySql.')'
+                        '(' . $languageSubQuerySql . ')'
                     )
                 );
 

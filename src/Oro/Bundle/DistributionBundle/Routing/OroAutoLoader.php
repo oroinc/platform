@@ -6,6 +6,9 @@ use Oro\Bundle\DistributionBundle\Event\RouteCollectionEvent;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * Loads routes from Oro bundle routing configuration files and dispatches an autoload event.
+ */
 class OroAutoLoader extends AbstractLoader
 {
     public function __construct(
@@ -21,7 +24,7 @@ class OroAutoLoader extends AbstractLoader
     }
 
     #[\Override]
-    public function load($file, $type = null)
+    public function load($file, $type = null): mixed
     {
         $routes = parent::load($file, $type);
 

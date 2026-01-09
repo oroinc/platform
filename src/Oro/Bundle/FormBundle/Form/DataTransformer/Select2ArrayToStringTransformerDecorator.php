@@ -20,13 +20,13 @@ class Select2ArrayToStringTransformerDecorator implements DataTransformerInterfa
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         return $this->transformer->transform($value);
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (is_array($value)) {
             return $value;

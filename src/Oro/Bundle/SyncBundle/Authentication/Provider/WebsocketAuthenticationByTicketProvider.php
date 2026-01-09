@@ -12,6 +12,7 @@ use Ratchet\ConnectionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -42,7 +43,7 @@ class WebsocketAuthenticationByTicketProvider implements WebsocketAuthentication
 
         $user = $this->loadUserByIdentifier($username, $ticketId);
         $password = $this->secret;
-        if (null !== $user) {
+        if ($user instanceof PasswordAuthenticatedUserInterface) {
             $password = $user->getPassword();
         }
         $expectedDigest = $this->ticketDigestGenerator->generateDigest($nonce, $created, $password);

@@ -70,7 +70,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
     }
 
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($this->isApplicable($options)) {
             $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData'], -255);
@@ -125,7 +125,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension implements ServiceSub
     }
 
     #[\Override]
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         if (!$this->isApplicable($options)) {
             return;

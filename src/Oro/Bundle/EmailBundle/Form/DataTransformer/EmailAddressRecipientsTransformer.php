@@ -11,7 +11,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 class EmailAddressRecipientsTransformer implements DataTransformerInterface
 {
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (!is_array($value)) {
             return $value;
@@ -21,7 +21,7 @@ class EmailAddressRecipientsTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (is_array($value)) {
             return $value;

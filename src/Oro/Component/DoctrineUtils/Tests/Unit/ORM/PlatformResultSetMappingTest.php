@@ -3,9 +3,9 @@
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
-use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Oro\Component\DoctrineUtils\ORM\PlatformResultSetMapping;
 use PHPUnit\Framework\TestCase;
 
@@ -52,7 +52,7 @@ class PlatformResultSetMappingTest extends TestCase
     {
         return [
             [
-                new MySqlPlatform(),
+                new MySQLPlatform(),
                 [
                     'fieldMappings'        => [
                         'testColumn_1' => 'field1'
@@ -77,7 +77,7 @@ class PlatformResultSetMappingTest extends TestCase
                 ]
             ],
             [
-                new PostgreSqlPlatform(),
+                new PostgreSQLPlatform(),
                 [
                     'fieldMappings'        => [
                         'testcolumn_1' => 'field1'

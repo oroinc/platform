@@ -2,6 +2,7 @@
 
 namespace Oro\Component\DoctrineUtils\Tests\Unit\DBAL;
 
+use Doctrine\DBAL\ParameterType;
 use Oro\Component\DoctrineUtils\DBAL\DbPrivilegesProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -73,8 +74,8 @@ class DbPrivilegesProviderTest extends TestCase
         $stmt->expects($this->exactly(2))
             ->method('bindValue')
             ->withConsecutive(
-                ['tableSchema', $dbName, \PDO::PARAM_STR],
-                ['tableName', 'oro_privileges_check', \PDO::PARAM_STR]
+                ['tableSchema', $dbName, ParameterType::STRING],
+                ['tableName', 'oro_privileges_check', ParameterType::STRING]
             );
         $stmt->expects($this->once())
             ->method('execute');

@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Log\Formatter;
 
-use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter as BaseConsoleFormatter;
+use Monolog\LogRecord;
 
 /**
  * Formats message queue consumer related log records for the console output
  * by coloring them depending on log level.
  */
-class ConsoleFormatter extends BaseConsoleFormatter
+class ConsoleFormatter extends SymfonyConsoleFormatter
 {
     public const SIMPLE_FORMAT =
         "%datetime% %start_tag%%channel%.%level_name%%end_tag%: %message%%context%%extra%\n";
@@ -27,7 +27,7 @@ class ConsoleFormatter extends BaseConsoleFormatter
     }
 
     #[\Override]
-    public function format(array $record): mixed
+    public function format(LogRecord $record): mixed
     {
         $formatted = parent::format($record);
 

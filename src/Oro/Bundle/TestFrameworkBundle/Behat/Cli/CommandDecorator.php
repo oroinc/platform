@@ -7,6 +7,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command as BaseCommand;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Helper\HelperInterface;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
@@ -37,17 +38,17 @@ class CommandDecorator extends BaseCommand
         return Command::getDefaultDescription();
     }
 
-    public function ignoreValidationErrors()
+    public function ignoreValidationErrors(): void
     {
         $this->command->ignoreValidationErrors();
     }
 
-    public function setApplication(?Application $application = null)
+    public function setApplication(?Application $application = null): void
     {
         $this->command->setApplication($application);
     }
 
-    public function setHelperSet(HelperSet $helperSet)
+    public function setHelperSet(HelperSet $helperSet): void
     {
         $this->command->setHelperSet($helperSet);
     }
@@ -62,7 +63,7 @@ class CommandDecorator extends BaseCommand
         return $this->command->getApplication();
     }
 
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->command->isEnabled();
     }
@@ -110,7 +111,8 @@ class CommandDecorator extends BaseCommand
         string $name,
         ?int $mode = null,
         string $description = '',
-        mixed $default = null
+        mixed $default = null,
+        array|\Closure $suggestedValues = []
     ): static {
         return $this->command->addArgument($name, $mode, $description, $default);
     }
@@ -120,7 +122,8 @@ class CommandDecorator extends BaseCommand
         array|string|null $shortcut = null,
         ?int $mode = null,
         string $description = '',
-        mixed $default = null
+        mixed $default = null,
+        array|\Closure $suggestedValues = []
     ): static {
         return $this->command->addOption($name, $shortcut, $mode, $description, $default);
     }
@@ -200,7 +203,7 @@ class CommandDecorator extends BaseCommand
         return $this->command->getUsages();
     }
 
-    public function getHelper(string $name): mixed
+    public function getHelper(string $name): HelperInterface
     {
         return $this->command->getHelper($name);
     }

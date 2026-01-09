@@ -166,7 +166,7 @@ class NoElementsTest extends TestCase
                 'message'  => null,
                 'expected' => '$factory->create(\'no_elements\', ['
                     . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath('
-                    . '\'foo[bar].baz\', [\'foo\', \'bar\', \'baz\'], [false, true, false])'
+                    . '\'foo[bar].baz\', [\'foo\', \'bar\', \'baz\'], [false, true, false], [false, false, false])'
                     . '])'
             ]
         ];

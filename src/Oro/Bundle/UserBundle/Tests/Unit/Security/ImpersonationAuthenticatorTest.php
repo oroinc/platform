@@ -20,9 +20,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class ImpersonationAuthenticatorTest extends TestCase
 {
@@ -75,7 +75,7 @@ class ImpersonationAuthenticatorTest extends TestCase
         $exception = new AuthenticationException();
         $session->expects($this->once())
             ->method('set')
-            ->with(Security::AUTHENTICATION_ERROR, $exception);
+            ->with(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
 
         $response = $this->authenticator->onAuthenticationFailure($request, $exception);
 
@@ -98,7 +98,7 @@ class ImpersonationAuthenticatorTest extends TestCase
         $exception = new AuthenticationException();
         $session->expects($this->once())
             ->method('set')
-            ->with(Security::AUTHENTICATION_ERROR, $exception);
+            ->with(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
 
         $response = $this->authenticator->start($request, $exception);
 

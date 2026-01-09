@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\UserBundle\Command;
 
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NoResultException;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
@@ -106,7 +106,7 @@ HELP
             $output->writeln($exception->getMessage());
 
             return $exception->getCode() ?: 1;
-        } catch (DBALException $exception) {
+        } catch (Exception $exception) {
             $output->writeln('User exists');
 
             return $exception->getCode() ?: 1;

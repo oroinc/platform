@@ -198,7 +198,7 @@ class ConfigDatabaseCheckerTest extends TestCase
         $connection->expects(self::once())
             ->method('connect');
         $connection->expects(self::once())
-            ->method('getSchemaManager')
+            ->method('createSchemaManager')
             ->willReturn($schemaManager);
 
         return $connection;

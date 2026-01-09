@@ -44,7 +44,7 @@ class NullValueTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (null === $value) {
             return null;
@@ -54,7 +54,7 @@ class NullValueTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         $result = $this->transformer->reverseTransform($value ?? '');
         if (null === $result && '' === $value) {

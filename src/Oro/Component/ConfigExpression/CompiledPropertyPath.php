@@ -31,15 +31,28 @@ final class CompiledPropertyPath implements \IteratorAggregate, PropertyPathInte
     private $isIndex = [];
 
     /**
+     * Contains a Boolean for each property in $elements denoting whether this
+     * element is null safe.
+     *
+     * @var bool[]
+     */
+    private $isNullSafe = [];
+
+    /**
      * @param string $path
      * @param array  $elements
      * @param bool[] $isIndex
+     * @param bool[] $isNullSafe
      */
-    public function __construct($path, array $elements, array $isIndex)
+    public function __construct($path, array $elements, array $isIndex, array $isNullSafe = [])
     {
-        $this->path     = $path;
-        $this->elements = $elements;
-        $this->isIndex  = $isIndex;
+        $this->path      = $path;
+        $this->elements  = $elements;
+        $this->isIndex   = $isIndex;
+        $elementCount    = count($elements);
+        $this->isNullSafe = count($isNullSafe) === $elementCount
+            ? $isNullSafe
+            : array_fill(0, $elementCount, false);
     }
 
     #[\Override]
@@ -66,6 +79,7 @@ final class CompiledPropertyPath implements \IteratorAggregate, PropertyPathInte
         $parent->path = substr($parent->path, 0, max(strrpos($parent->path, '.'), strrpos($parent->path, '[')));
         array_pop($parent->elements);
         array_pop($parent->isIndex);
+        array_pop($parent->isNullSafe);
 
         return $parent;
     }
@@ -113,5 +127,14 @@ final class CompiledPropertyPath implements \IteratorAggregate, PropertyPathInte
         }
 
         return $this->isIndex[$index];
+    }
+
+    public function isNullSafe(int $index): bool
+    {
+        if (!isset($this->isNullSafe[$index])) {
+            throw new Exception\OutOfBoundsException(sprintf('The index %s is not within the property path', $index));
+        }
+
+        return $this->isNullSafe[$index];
     }
 }

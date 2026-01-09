@@ -29,7 +29,7 @@ abstract class AbstractLoader extends Loader
      * @return RouteCollection
      */
     #[\Override]
-    public function load($resource, $type = null)
+    public function load($resource, $type = null): mixed
     {
         $routes = new EnhancedRouteCollection();
         $this->loadRoutes($routes);

@@ -12,6 +12,6 @@ class UpdateReminderSubjectLength implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_reminder');
-        $table->changeColumn('subject', ['length' => 255]);
+        $table->modifyColumn('subject', ['length' => 255]);
     }
 }

@@ -78,7 +78,7 @@ class OroIntegrationBundleInstaller implements Installation
         $table->addColumn('connector', 'string', ['length' => 255]);
         $table->addColumn('message', 'text');
         $table->addColumn('date', 'datetime');
-        $table->addColumn('data', Types::JSON_ARRAY, ['notnull' => false, 'comment' => '(DC2Type:json_array)']);
+        $table->addColumn('data', Types::JSON, ['notnull' => false, 'comment' => '(DC2Type:json)']);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['channel_id'], 'IDX_C0D7E5FB72F5A1AA');
         $table->addIndex(['date'], 'oro_intch_date_idx');

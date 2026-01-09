@@ -7,6 +7,7 @@ use Oro\Bundle\FormBundle\Captcha\CaptchaServiceRegistry;
 use Oro\Bundle\FormBundle\Validator\Constraints\IsCaptchaVerified;
 use Oro\Bundle\FormBundle\Validator\Constraints\IsCaptchaVerifiedValidator;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class IsCaptchaVerifiedValidatorTest extends ConstraintValidatorTestCase
@@ -14,7 +15,7 @@ class IsCaptchaVerifiedValidatorTest extends ConstraintValidatorTestCase
     private CaptchaServiceRegistry&MockObject $captchaServiceRegistry;
 
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         $this->captchaServiceRegistry = $this->createMock(CaptchaServiceRegistry::class);
 

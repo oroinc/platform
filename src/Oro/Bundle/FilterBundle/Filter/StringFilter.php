@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
-use Doctrine\DBAL\Platforms\PostgreSQL92Platform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 
@@ -192,7 +192,7 @@ class StringFilter extends AbstractFilter
     protected function setCaseSensitivity(FilterDatasourceAdapterInterface $ds)
     {
         $platform = $ds->getDatabasePlatform();
-        if ($platform instanceof PostgreSQL92Platform && $this->isCaseInsensitive()) {
+        if ($platform instanceof PostgreSQLPlatform && $this->isCaseInsensitive()) {
             $ds->expr()->setCaseInsensitive(true);
         }
     }

@@ -25,7 +25,7 @@ class JsValidationExtension extends AbstractTypeExtension
     }
 
     #[\Override]
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $this->addDataValidationOptionalGroupAttributes($view, $options);
         $this->addDataValidationAttribute($view, $form);

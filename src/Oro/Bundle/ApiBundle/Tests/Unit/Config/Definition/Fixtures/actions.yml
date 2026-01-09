@@ -1091,7 +1091,7 @@ null_field_direction:
                     field1:
                         direction: ~
     expected: []
-    error: 'The value null is not allowed for path "entity.actions.create.fields.field1.direction". Permissible values: "input-only", "output-only", "bidirectional"'
+    error: 'The value of type "null" is not allowed for path "entity.actions.create.fields.field1.direction". Permissible values: "input-only", "output-only", "bidirectional"'
 
 empty_field_direction:
     config:

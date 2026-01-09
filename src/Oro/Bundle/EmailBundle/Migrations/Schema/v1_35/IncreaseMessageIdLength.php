@@ -16,7 +16,7 @@ class IncreaseMessageIdLength implements Migration
     {
         $table = $schema->getTable('oro_email');
         if ($table->getColumn('message_id')->getLength() < 512) {
-            $table->changeColumn('message_id', ['length' => 512]);
+            $table->modifyColumn('message_id', ['length' => 512]);
         }
     }
 }

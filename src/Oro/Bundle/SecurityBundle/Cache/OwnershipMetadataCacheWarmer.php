@@ -5,6 +5,9 @@ namespace Oro\Bundle\SecurityBundle\Cache;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
+/**
+ * Warms up the ownership metadata cache.
+ */
 class OwnershipMetadataCacheWarmer implements CacheWarmerInterface
 {
     /**
@@ -18,7 +21,7 @@ class OwnershipMetadataCacheWarmer implements CacheWarmerInterface
     }
 
     #[\Override]
-    public function warmUp($cacheDir): array
+    public function warmUp($cacheDir, ?string $buildDir = null): array
     {
         $this->provider->warmUpCache();
         return [];

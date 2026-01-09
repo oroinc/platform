@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
+use Doctrine\DBAL\ParameterType;
 use Oro\Bundle\ApiBundle\Provider\EntityTitleProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
@@ -72,7 +73,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         self::assertEquals(
@@ -111,7 +112,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         self::assertEquals(
@@ -153,7 +154,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
                 ]
             ],
             [1 => 456],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         self::assertEquals(
@@ -207,7 +208,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
                 ]
             ],
             [1 => 123, 2 => 456],
-            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER, 2 => ParameterType::INTEGER]
         );
 
         self::assertEquals(
@@ -267,7 +268,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
                 ]
             ],
             [1 => 123, 2 => 456],
-            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER, 2 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT \'' . Entity\Category::class . '\' AS sclr_0, c0_.label AS label_1, c0_.name AS name_2'
@@ -281,7 +282,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
                 ]
             ],
             [1 => 'category1'],
-            [1 => \PDO::PARAM_STR]
+            [1 => ParameterType::STRING]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 

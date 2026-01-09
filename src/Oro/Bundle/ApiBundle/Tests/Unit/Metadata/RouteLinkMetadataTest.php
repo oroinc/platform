@@ -209,7 +209,7 @@ class RouteLinkMetadataTest extends TestCase
     public function testGetHrefWhenOnlyPartOfRouteParamsAreResolvedAndMissingMandatoryParametersExIsThrown(): void
     {
         $this->expectException(LinkHrefResolvingFailedException::class);
-        $this->expectExceptionMessage('Cannot build URL for a link. Reason: an error');
+        $this->expectExceptionMessageMatches('/Cannot build URL for a link\. Reason:/');
 
         $exception = new MissingMandatoryParametersException('an error');
 

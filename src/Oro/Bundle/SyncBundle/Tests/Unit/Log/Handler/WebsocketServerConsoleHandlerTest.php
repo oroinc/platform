@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Log\Handler;
 
 use Oro\Bundle\SyncBundle\Log\Handler\WebsocketServerConsoleHandler;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler as SymfonyConsoleHandler;
 use Symfony\Component\Console\Command\Command;
@@ -14,107 +15,102 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class WebsocketServerConsoleHandlerTest extends TestCase
 {
-    private SymfonyConsoleHandler&MockObject $consoleHandler;
+    private SymfonyConsoleHandler $consoleHandler;
     private WebsocketServerConsoleHandler $handler;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->consoleHandler = $this->createMock(SymfonyConsoleHandler::class);
-
+        $this->consoleHandler = new SymfonyConsoleHandler();
         $this->handler = new WebsocketServerConsoleHandler($this->consoleHandler);
     }
 
     public function testOnCommandDoesNothingWhenNoCommand(): void
     {
-        $event = new ConsoleCommandEvent(
-            null,
-            $this->createMock(InputInterface::class),
-            $this->createMock(OutputInterface::class)
-        );
-
-        $this->consoleHandler->expects(self::never())
-            ->method(self::anything());
-
+        $event = $this->createConsoleCommandEvent();
         $this->handler->onCommand($event);
+
+        self::assertNull($this->getConsoleHandlerOutput());
     }
 
     public function testOnCommandDoesNothingWhenCommandNotWebsocketServer(): void
     {
-        $event = new ConsoleCommandEvent(
-            new Command('sample-command'),
-            $this->createMock(InputInterface::class),
-            $this->createMock(OutputInterface::class)
-        );
-
-        $this->consoleHandler->expects(self::never())
-            ->method(self::anything());
-
+        $event = $this->createConsoleCommandEvent('sample-command');
         $this->handler->onCommand($event);
+
+        self::assertNull($this->getConsoleHandlerOutput());
     }
 
     public function testOnCommandSetsOutputWhenCommandWebsocketServer(): void
     {
         $output = $this->createMock(OutputInterface::class);
-        $event = new ConsoleCommandEvent(
-            new Command('gos:websocket:server'),
-            $this->createMock(InputInterface::class),
-            $output
-        );
-
-        $this->consoleHandler->expects(self::once())
-            ->method('setOutput')
-            ->with($output);
+        $event = $this->createConsoleCommandEvent('gos:websocket:server', $output);
 
         $this->handler->onCommand($event);
+        self::assertSame($output, $this->getConsoleHandlerOutput());
 
         // Ensures that nothing happens when nested level is higher than 1.
-        $this->handler->onCommand($event);
+        $this->handler->onCommand(clone $event);
+        self::assertSame($output, $this->getConsoleHandlerOutput());
     }
 
     public function testOnTerminateDoesNothingWhenCommandNotWebsocketServer(): void
     {
-        $event = new ConsoleTerminateEvent(
-            new Command('sample-command'),
-            $this->createMock(InputInterface::class),
-            $this->createMock(OutputInterface::class),
-            Command::SUCCESS
-        );
+        $event = $this->createConsoleCommandEvent();
+        $this->handler->onCommand($event);
 
-        $this->consoleHandler->expects(self::never())
-            ->method(self::anything());
-
+        $event = $this->createConsoleTerminateEvent('sample-command');
         $this->handler->onTerminate($event);
+
+        self::assertNull($this->getConsoleHandlerOutput());
     }
 
     public function testOnTerminateWhenCommandWebsocketServer(): void
     {
         $output = $this->createMock(OutputInterface::class);
-        $event = new ConsoleCommandEvent(
-            new Command('gos:websocket:server'),
-            $this->createMock(InputInterface::class),
-            $output
-        );
 
-        $this->consoleHandler->expects(self::once())
-            ->method('setOutput')
-            ->with($output);
-
-        $terminateEvent = new ConsoleTerminateEvent(
-            new Command('gos:websocket:server'),
-            $this->createMock(InputInterface::class),
-            $this->createMock(OutputInterface::class),
-            Command::SUCCESS
-        );
-
-        $this->consoleHandler->expects(self::once())
-            ->method('onTerminate')
-            ->with($terminateEvent);
+        $event = $this->createConsoleCommandEvent('gos:websocket:server', $output);
+        $terminateEvent = $this->createConsoleTerminateEvent('gos:websocket:server');
 
         $this->handler->onCommand($event);
         $this->handler->onTerminate($terminateEvent);
 
+        self::assertNull($this->getConsoleHandlerOutput());
+
         // Ensures that nothing happens when nested level is not 1.
         $this->handler->onTerminate($terminateEvent);
+        self::assertNull($this->getConsoleHandlerOutput());
+    }
+
+    private function createConsoleCommandEvent(
+        ?string $commandName = null,
+        ?OutputInterface $output = null
+    ): ConsoleCommandEvent {
+        return new ConsoleCommandEvent(
+            new Command($commandName),
+            $this->createMock(InputInterface::class),
+            $output ?: $this->createMock(OutputInterface::class)
+        );
+    }
+
+    private function createConsoleTerminateEvent(?string $commandName = null): ConsoleTerminateEvent
+    {
+        return new ConsoleTerminateEvent(
+            new Command($commandName),
+            $this->createMock(InputInterface::class),
+            $this->createMock(OutputInterface::class),
+            Command::SUCCESS
+        );
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    private function getConsoleHandlerOutput(): ?OutputInterface
+    {
+        $property = new \ReflectionProperty($this->consoleHandler, 'output');
+        $property->setAccessible(true);
+
+        return $property->getValue($this->consoleHandler);
     }
 }

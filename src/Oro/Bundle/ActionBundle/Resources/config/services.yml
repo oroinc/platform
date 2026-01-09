@@ -114,7 +114,7 @@ services:
             - [addDoctrineTypeMapping, ["text", "string"]]
             - [addDoctrineTypeMapping, ["array", "array"]]
             - [addDoctrineTypeMapping, ["simple_array", "array"]]
-            - [addDoctrineTypeMapping, ["json_array", "array"]]
+            - [addDoctrineTypeMapping, ["json", "array"]]
             - [addDoctrineTypeMapping, ["float", "float"]]
             - [addDoctrineTypeMapping, ["guid", "string"]]
             # custom types

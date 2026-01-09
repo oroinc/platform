@@ -27,7 +27,6 @@ class AuditFieldTypeRegistry
         'float' => 'float',
         'guid' => 'text',
         'integer' => 'integer',
-        'json_array' => 'jsonarray',
         'json' => 'json',
         'money' => 'float',
         'money_value' => 'float',

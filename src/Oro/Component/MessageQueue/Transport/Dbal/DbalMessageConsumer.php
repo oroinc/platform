@@ -4,9 +4,8 @@ namespace Oro\Component\MessageQueue\Transport\Dbal;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Exception as DbalDriverException;
-use Doctrine\DBAL\Driver\Statement;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Types;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidMessageException;
 use Oro\Component\MessageQueue\Transport\Exception\RuntimeException;
@@ -159,22 +158,22 @@ class DbalMessageConsumer implements MessageConsumerInterface
     private function receiveMessage(): ?MessageInterface
     {
         $now = time();
-        $this->getUpdateStatement()->executeQuery([
+        $updateResult = $this->getUpdateStatement()->executeQuery([
             'queue' => $this->queue->getQueueName(),
             'delayedUntil' => $now,
             'consumerId' => $this->consumerId
         ]);
-        $affectedRows = $this->getUpdateStatement()->rowCount();
+        $affectedRows = $updateResult->rowCount();
 
         if (1 === $affectedRows) {
             $selectStatement = $this->getSelectStatement();
-            $selectStatement->executeQuery(
+            $selectResult = $selectStatement->executeQuery(
                 [
                     'consumerId' => $this->consumerId,
                     'queue' => $this->queue->getQueueName(),
                 ]
             );
-            $dbalMessage = $selectStatement->fetch(\PDO::FETCH_ASSOC);
+            $dbalMessage = $selectResult->fetchAssociative();
 
             if (false === $dbalMessage) {
                 throw new \LogicException(sprintf(
@@ -233,7 +232,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
     {
         if (!$this->updateStatement) {
             $databasePlatform = $this->dbal->getDatabasePlatform();
-            if (is_a($databasePlatform, MySqlPlatform::class)) {
+            if (is_a($databasePlatform, \Doctrine\DBAL\Platforms\MySQLPlatform::class)) {
                 $this->updateStatement = $this->dbal->prepare(sprintf(
                     'UPDATE %s SET consumer_id=:consumerId'
                     . ' WHERE consumer_id IS NULL AND queue=:queue'
@@ -264,7 +263,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
     {
         if (!$this->deleteStatement) {
             $databasePlatform = $this->dbal->getDatabasePlatform();
-            if (is_a($databasePlatform, MySqlPlatform::class)) {
+            if (is_a($databasePlatform, \Doctrine\DBAL\Platforms\MySQLPlatform::class)) {
                 $this->deleteStatement = $this->dbal->prepare(
                     sprintf('DELETE FROM %s WHERE id=:messageId LIMIT 1', $this->connection->getTableName())
                 );
@@ -286,9 +285,9 @@ class DbalMessageConsumer implements MessageConsumerInterface
     private function deleteMessage(DbalMessageInterface $message): int
     {
         $deleteStatement = $this->getDeleteStatement();
-        $deleteStatement->executeQuery(['messageId' => $message->getId()]);
+        $result = $deleteStatement->executeQuery(['messageId' => $message->getId()]);
 
-        return $deleteStatement->rowCount();
+        return $result->rowCount();
     }
 
     /**

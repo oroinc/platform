@@ -34,6 +34,7 @@ class OroEntityBundle extends Bundle
     {
         parent::build($container);
 
+        $container->addCompilerPass(new Compiler\MappingDriverChainPass());
         $container->addCompilerPass(new Compiler\DatabaseCheckerCompilerPass());
         $container->addCompilerPass(new Compiler\QueryHintResolverPass());
         $container->addCompilerPass(new Compiler\EntityFieldHandlerPass());

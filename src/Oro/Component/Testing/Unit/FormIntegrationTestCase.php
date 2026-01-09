@@ -120,7 +120,7 @@ class FormIntegrationTestCase extends BaseTestCase
 
     protected function loadMetadata(ClassMetadata $meta): bool
     {
-        $configFile = $this->getConfigFile($meta->name);
+        $configFile = $this->getConfigFile($meta->getClassName());
         if ($configFile) {
             $loader = new YamlFileLoader($configFile);
             return $loader->loadClassMetadata($meta);

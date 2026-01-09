@@ -439,7 +439,7 @@ class ConfigManager
         );
     }
 
-    private function resetMemoryCache(): void
+    public function resetMemoryCache(): void
     {
         $this->memoryCache->deleteAll();
     }

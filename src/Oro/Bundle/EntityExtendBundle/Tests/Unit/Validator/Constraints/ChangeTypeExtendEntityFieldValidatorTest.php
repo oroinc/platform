@@ -8,6 +8,7 @@ use Oro\Bundle\EntityExtendBundle\Validator\Constraints\ChangeTypeExtendEntityFi
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\ChangeTypeExtendEntityFieldValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class ChangeTypeExtendEntityFieldValidatorTest extends ConstraintValidatorTestCase
@@ -24,7 +25,7 @@ class ChangeTypeExtendEntityFieldValidatorTest extends ConstraintValidatorTestCa
     }
 
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new ChangeTypeExtendEntityFieldValidator($this->fieldNameValidationHelper);
     }

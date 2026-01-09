@@ -10,7 +10,7 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
  * Manages the organization aware security context persistence through a session.
@@ -94,7 +94,7 @@ class ContextListener
 
         $request = $event->getRequest();
         if ($request->hasSession()) {
-            $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
+            $request->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
         }
 
         throw $exception;

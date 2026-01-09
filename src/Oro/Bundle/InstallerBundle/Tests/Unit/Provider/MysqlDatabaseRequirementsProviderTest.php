@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Oro\Bundle\InstallerBundle\Tests\Unit\Provider;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\PDO\Connection as DriverConnection;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\InstallerBundle\Enum\DatabasePlatform;
 use Oro\Bundle\InstallerBundle\Provider\MysqlDatabaseRequirementsProvider;
@@ -87,21 +86,27 @@ class MysqlDatabaseRequirementsProviderTest extends TestCase
         $platform = new DatabasePlatformMock();
         $platform->setName(DatabasePlatform::MYSQL);
 
-        $driverConnection = $this->createMock(DriverConnection::class);
-        $driverConnection->expects(self::any())
-            ->method('getServerVersion')
-            ->willReturn($version);
+        $driverConnection = new class ($version) {
+            public function __construct(private string $serverVersion)
+            {
+            }
+
+            public function getServerVersion(): string
+            {
+                return $this->serverVersion;
+            }
+        };
 
         $connection = new class ([], new DriverMock(), $driverConnection) extends ConnectionMock {
-            private DriverConnection $wrappedConnection;
+            private object $wrappedConnection;
 
-            public function __construct(array $params, DriverMock $driver, DriverConnection $wrappedConnection)
+            public function __construct(array $params, DriverMock $driver, object $wrappedConnection)
             {
                 parent::__construct($params, $driver);
                 $this->wrappedConnection = $wrappedConnection;
             }
 
-            public function getWrappedConnection(): DriverConnection
+            public function getWrappedConnection(): object
             {
                 return $this->wrappedConnection;
             }

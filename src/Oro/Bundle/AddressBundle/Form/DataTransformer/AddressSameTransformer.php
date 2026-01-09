@@ -27,7 +27,7 @@ class AddressSameTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if ($value === null) {
             return $value;
@@ -49,7 +49,7 @@ class AddressSameTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         return $value;
     }

@@ -14,6 +14,6 @@ class UpdateLengthSnapshotSegmentIdColumn implements Migration
     {
         $schema
             ->getTable('oro_segment_snapshot')
-            ->changeColumn('id', ['type' => BigIntType::getType('bigint')]);
+            ->modifyColumn('id', ['type' => BigIntType::getType('bigint')]);
     }
 }

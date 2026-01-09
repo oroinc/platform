@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\DataCollector;
 
-use Doctrine\DBAL\Logging\DebugStack;
+use Doctrine\Bundle\DoctrineBundle\Middleware\BacktraceDebugDataHolder;
 use Oro\Bundle\EntityBundle\DataCollector\DuplicateQueriesDataCollector;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,11 +11,13 @@ use Symfony\Component\HttpFoundation\Response;
 class DuplicateQueriesDataCollectorTest extends TestCase
 {
     private DuplicateQueriesDataCollector $collector;
+    private BacktraceDebugDataHolder $debugDataHolder;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->collector = new DuplicateQueriesDataCollector();
+        $this->debugDataHolder = $this->createMock(BacktraceDebugDataHolder::class);
+        $this->collector = new DuplicateQueriesDataCollector($this->debugDataHolder);
     }
 
     public function testGetName(): void
@@ -32,11 +34,10 @@ class DuplicateQueriesDataCollectorTest extends TestCase
         array $expectedIdentical,
         array $expectedSimilar
     ): void {
-        foreach ($loggers as $loggerName => $queries) {
-            $logger = new DebugStack();
-            $logger->queries = $queries;
-            $this->collector->addLogger($loggerName, $logger);
-        }
+        $this->debugDataHolder->expects($this->once())
+            ->method('getData')
+            ->willReturn($loggers);
+
         $request = $this->createMock(Request::class);
         $response = $this->createMock(Response::class);
         $this->collector->collect($request, $response);
@@ -134,6 +135,14 @@ class DuplicateQueriesDataCollectorTest extends TestCase
 
     public function testGet(): void
     {
+        $this->debugDataHolder->expects($this->once())
+            ->method('getData')
+            ->willReturn([]);
+
+        $request = $this->createMock(Request::class);
+        $response = $this->createMock(Response::class);
+        $this->collector->collect($request, $response);
+
         $this->assertEquals(0, $this->collector->getQueriesCount());
         $this->assertEquals(0, $this->collector->getIdenticalQueriesCount());
         $this->assertEquals([], $this->collector->getIdenticalQueries());

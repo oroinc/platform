@@ -6,10 +6,11 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
-use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
+use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityConfigBundle\Migration\RemoveAssociationQuery;
@@ -32,7 +33,7 @@ class RemoveAssociationQueryTest extends TestCase
         $this->schemaManager = $this->createMock(AbstractSchemaManager::class);
 
         $this->connection->expects($this->any())
-            ->method('getSchemaManager')
+            ->method('createSchemaManager')
             ->willReturn($this->schemaManager);
     }
 
@@ -110,7 +111,7 @@ class RemoveAssociationQueryTest extends TestCase
             ->willReturn($dataWithRelation);
         $this->connection->expects($this->any())
             ->method('getDatabasePlatform')
-            ->willReturn(new PostgreSqlPlatform());
+            ->willReturn(new PostgreSQLPlatform());
 
         $this->logger->expects(self::exactly(9))
             ->method('info')
@@ -157,8 +158,8 @@ class RemoveAssociationQueryTest extends TestCase
     public function getPlatformDropConstraints(): array
     {
         return [
-            [new MySqlPlatform(), 'ALTER TABLE source_table DROP FOREIGN KEY `FK_9876543210`'],
-            [new PostgreSqlPlatform(), 'ALTER TABLE source_table DROP CONSTRAINT "FK_9876543210"']
+            [new MySQLPlatform(), 'ALTER TABLE source_table DROP FOREIGN KEY `FK_9876543210`'],
+            [new PostgreSQLPlatform(), 'ALTER TABLE source_table DROP CONSTRAINT "FK_9876543210"']
         ];
     }
 
@@ -203,10 +204,15 @@ class RemoveAssociationQueryTest extends TestCase
             ->with(\serialize($dataWithRelation), Types::ARRAY)
             ->willReturn($dataWithRelation);
 
+        $primaryKey = $this->createMock(Index::class);
+        $primaryKey->expects($this->any())
+            ->method('getColumns')
+            ->willReturn(['primary']);
+
         $targetTable = $this->createMock(Table::class);
         $targetTable->expects($this->any())
-            ->method('getPrimaryKeyColumns')
-            ->willReturn(['primary']);
+            ->method('getPrimaryKey')
+            ->willReturn($primaryKey);
 
         $sourceTable = $this->createMock(Table::class);
         $sourceTable->expects($this->any())
@@ -226,7 +232,7 @@ class RemoveAssociationQueryTest extends TestCase
             ->willReturn([$foreignKey]);
 
         $this->schemaManager->expects($this->any())
-            ->method('listTableDetails')
+            ->method('introspectTable')
             ->willReturnMap([
                 ['source_table', $sourceTable],
                 ['target_table', $targetTable],
@@ -296,7 +302,7 @@ class RemoveAssociationQueryTest extends TestCase
     {
         $this->connection->expects($this->any())
             ->method('getDatabasePlatform')
-            ->willReturn(new PostgreSqlPlatform());
+            ->willReturn(new PostgreSQLPlatform());
 
         $dataWithRelation = [
             'extend' => [

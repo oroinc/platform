@@ -10,6 +10,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Extends field forms to manage attribute field configuration.
+ */
 class AttributeFieldConfigExtension extends AbstractTypeExtension
 {
     /**
@@ -23,7 +26,7 @@ class AttributeFieldConfigExtension extends AbstractTypeExtension
     }
 
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'onPostSetData']);
     }

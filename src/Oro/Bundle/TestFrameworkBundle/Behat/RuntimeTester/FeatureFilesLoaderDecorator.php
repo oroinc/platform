@@ -33,7 +33,7 @@ class FeatureFilesLoaderDecorator extends AbstractFileLoader
         return $this->baseFileLoader->supports($resource);
     }
 
-    public function load($resource): array
+    protected function doLoad($resource): array
     {
         if ($this->sessionHolder->isWatchFrom() && empty($this->preparedFeature)) {
             // override feature file cache if watch mode is use

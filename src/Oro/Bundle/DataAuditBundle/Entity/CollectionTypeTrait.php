@@ -13,7 +13,7 @@ trait CollectionTypeTrait
     /**
      * @var array
      */
-    #[ORM\Column(name: 'collection_diffs', type: 'json_array', nullable: true)]
+    #[ORM\Column(name: 'collection_diffs', type: 'json', nullable: true)]
     protected $collectionDiffs = [];
 
     /**
@@ -39,7 +39,7 @@ trait CollectionTypeTrait
         $this->dataType = AuditFieldTypeRegistry::getAuditType('collection');
 
         $thisCollectionDiffs = $this->getCollectionDiffs();
-        $thisCollectionDiffs['added'][$entityClass.$entityId] = [
+        $thisCollectionDiffs['added'][$entityClass . $entityId] = [
             'entity_class' => $entityClass,
             'entity_id' => $entityId,
             'entity_name' => $entityName,
@@ -76,7 +76,7 @@ trait CollectionTypeTrait
         $this->dataType = AuditFieldTypeRegistry::getAuditType('collection');
 
         $thisCollectionDiffs = $this->getCollectionDiffs();
-        $thisCollectionDiffs['removed'][$entityClass.$entityId] = [
+        $thisCollectionDiffs['removed'][$entityClass . $entityId] = [
             'entity_class' => $entityClass,
             'entity_id' => $entityId,
             'entity_name' => $entityName,
@@ -115,11 +115,11 @@ trait CollectionTypeTrait
         $thisCollectionDiffs = $this->getCollectionDiffs();
 
         $key = 'changed';
-        if (!empty($thisCollectionDiffs['added'][$entityClass.$entityId])) {
+        if (!empty($thisCollectionDiffs['added'][$entityClass . $entityId])) {
             $key = 'added';
         }
 
-        $thisCollectionDiffs[$key][$entityClass.$entityId] = [
+        $thisCollectionDiffs[$key][$entityClass . $entityId] = [
             'entity_class' => $entityClass,
             'entity_id' => $entityId,
             'entity_name' => $entityName,
@@ -138,7 +138,7 @@ trait CollectionTypeTrait
 
         $newValue = null;
         if ($thisCollectionDiffs['added']) {
-            $newValue .= 'Added: '.
+            $newValue .= 'Added: ' .
                 implode(
                     ', ',
                     array_map(
@@ -150,7 +150,7 @@ trait CollectionTypeTrait
                 );
         }
         if ($thisCollectionDiffs['changed']) {
-            $newValue .= "\nChanged: ".
+            $newValue .= "\nChanged: " .
                 implode(
                     ', ',
                     array_map(
@@ -165,7 +165,7 @@ trait CollectionTypeTrait
 
         $oldValue = null;
         if ($thisCollectionDiffs['removed']) {
-            $oldValue .= "Removed: ".
+            $oldValue .= "Removed: " .
                 implode(
                     ', ',
                     array_map(

@@ -10,8 +10,8 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateAttachment;
 use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadUserData;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
+use Oro\Component\DependencyInjection\ContainerAwareTrait;
 
 class LoadEmailAttachmentTypeData extends AbstractFixture implements DependentFixtureInterface, ContainerAwareInterface
 {

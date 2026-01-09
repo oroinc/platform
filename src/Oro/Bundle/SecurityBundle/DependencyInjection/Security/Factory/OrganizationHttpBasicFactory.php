@@ -40,7 +40,7 @@ class OrganizationHttpBasicFactory implements AuthenticatorFactoryInterface
     }
 
     #[\Override]
-    public function addConfiguration(NodeDefinition $builder)
+    public function addConfiguration(NodeDefinition $builder): void
     {
         $builder
             ->children()

@@ -113,7 +113,7 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['ownership_disabled']) {
             return;
@@ -176,7 +176,7 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
     }
 
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('ownership_disabled', false);
     }

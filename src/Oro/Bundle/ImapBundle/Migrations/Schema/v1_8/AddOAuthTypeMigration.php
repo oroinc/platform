@@ -28,10 +28,10 @@ class AddOAuthTypeMigration implements Migration
     private function alterTokenFieldsSize(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_origin');
-        $table->changeColumn('access_token', [
+        $table->modifyColumn('access_token', [
             'length' => 2048
         ]);
-        $table->changeColumn('refresh_token', [
+        $table->modifyColumn('refresh_token', [
             'length' => 2048
         ]);
     }

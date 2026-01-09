@@ -164,7 +164,7 @@ trait DecoratedSqlWalkerTrait
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }
 
-    public function walkDeleteClause(AST\DeleteClause $deleteClause)
+    public function walkDeleteClause($deleteClause)
     {
         return $this->makeDecoratedWalkCall(__FUNCTION__, func_get_args());
     }

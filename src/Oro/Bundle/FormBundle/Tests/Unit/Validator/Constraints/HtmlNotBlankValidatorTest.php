@@ -4,12 +4,13 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\FormBundle\Validator\Constraints\HtmlNotBlank;
 use Oro\Bundle\FormBundle\Validator\Constraints\HtmlNotBlankValidator;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class HtmlNotBlankValidatorTest extends ConstraintValidatorTestCase
 {
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new HtmlNotBlankValidator();
     }

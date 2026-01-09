@@ -7,6 +7,7 @@ use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\HandlerWrapper;
 use Monolog\Handler\NullHandler;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -49,7 +50,7 @@ class VerbosityFilterHandler extends HandlerWrapper implements EventSubscriberIn
     }
 
     #[\Override]
-    public function isHandling(array $record): bool
+    public function isHandling(LogRecord $record): bool
     {
         return
             $this->consumerState->isConsumptionStarted()
@@ -58,7 +59,7 @@ class VerbosityFilterHandler extends HandlerWrapper implements EventSubscriberIn
     }
 
     #[\Override]
-    public function handle(array $record): bool
+    public function handle(LogRecord $record): bool
     {
         return
             $this->consumerState->isConsumptionStarted()

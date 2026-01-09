@@ -119,14 +119,16 @@ class HasValueTest extends TestCase
                 'options'  => [new PropertyPath('value')],
                 'message'  => null,
                 'expected' => '$factory->create(\'has\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'value\', [\'value\'], [false])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath('
+                    . '\'value\', [\'value\'], [false], [false])'
                     . '])'
             ],
             [
                 'options'  => [new PropertyPath('value')],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'has\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'value\', [\'value\'], [false])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath('
+                    . '\'value\', [\'value\'], [false], [false])'
                     . '])->setMessage(\'Test\')'
             ]
         ];

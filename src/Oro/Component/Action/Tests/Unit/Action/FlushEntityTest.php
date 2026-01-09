@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Persisters\Entity\EntityPersister;
+use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Component\Action\Action\FlushEntity;
@@ -101,9 +106,36 @@ class FlushEntityTest extends TestCase
             $entityManager->expects($this->once())
                 ->method('flush');
             $entityManager->expects($this->once())
-                ->method('refresh');
-            $entityManager->expects($this->once())
                 ->method('commit');
+
+            $classMetadata = $this->createMock(ClassMetadata::class);
+            $classMetadata->expects($this->once())
+                ->method('getIdentifierFieldNames')
+                ->willReturn(['id']);
+
+            $entityPersister = $this->createMock(EntityPersister::class);
+            $entityPersister->expects($this->once())
+                ->method('refresh')
+                ->with($this->isType('array'), $entity);
+
+            $uow = $this->createMock(UnitOfWork::class);
+            $uow->expects($this->once())
+                ->method('getEntityPersister')
+                ->with($classMetadata->name)
+                ->willReturn($entityPersister);
+            $uow->expects($this->once())
+                ->method('getEntityIdentifier')
+                ->with($entity)
+                ->willReturn([123]);
+
+            $entityManager->expects($this->once())
+                ->method('getClassMetadata')
+                ->with(ClassUtils::getClass($entity))
+                ->willReturn($classMetadata);
+
+            $entityManager->expects($this->once())
+                ->method('getUnitOfWork')
+                ->willReturn($uow);
         }
 
         $this->registry->expects($this->once())

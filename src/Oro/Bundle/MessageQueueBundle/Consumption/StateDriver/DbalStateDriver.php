@@ -4,6 +4,7 @@ namespace Oro\Bundle\MessageQueueBundle\Consumption\StateDriver;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\MessageQueueBundle\Consumption\StateDriverInterface;
@@ -128,7 +129,7 @@ class DbalStateDriver implements StateDriverInterface
             ->from('oro_message_queue_state')
             ->select('updated_at')
             ->where('id = :id')
-            ->setParameter('id', $this->key, \PDO::PARAM_STR)
+            ->setParameter('id', $this->key, ParameterType::STRING)
             ->execute()
             ->fetchOne();
 

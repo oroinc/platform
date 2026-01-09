@@ -4,6 +4,7 @@ namespace Oro\Bundle\BatchBundle\Monolog\Handler;
 
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Monolog\Utils;
 
 /**
@@ -55,7 +56,7 @@ class BatchLogHandler extends StreamHandler
     }
 
     #[\Override]
-    public function write(array $record): void
+    public function write(LogRecord $record): void
     {
         if (!$this->isActive) {
             return;

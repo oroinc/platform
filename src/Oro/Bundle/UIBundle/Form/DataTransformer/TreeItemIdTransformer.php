@@ -6,6 +6,9 @@ use Oro\Bundle\UIBundle\Model\TreeItem;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
+/**
+ * Transforms tree item objects to their identifiers and back.
+ */
 class TreeItemIdTransformer implements DataTransformerInterface
 {
     /**
@@ -22,7 +25,7 @@ class TreeItemIdTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if ($value !== null && !$value instanceof TreeItem) {
             throw new TransformationFailedException("Unsupported value type");
@@ -32,7 +35,7 @@ class TreeItemIdTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if ($value !== null && !isset($this->treeItems[$value])) {
             throw new TransformationFailedException("Item with id = \"$value\" is undefined");

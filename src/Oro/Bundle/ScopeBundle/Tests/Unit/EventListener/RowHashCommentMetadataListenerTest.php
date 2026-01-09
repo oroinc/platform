@@ -3,8 +3,8 @@
 namespace Oro\Bundle\ScopeBundle\Tests\Unit\EventListener;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
-use Doctrine\DBAL\Platforms\SQLAzurePlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
@@ -35,7 +35,7 @@ class RowHashCommentMetadataListenerTest extends TestCase
 
     public function testPlatformNotSupported(): void
     {
-        $platform = new SQLAzurePlatform();
+        $platform = new SqlitePlatform();
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())
             ->method('getDatabasePlatform')
@@ -58,7 +58,7 @@ class RowHashCommentMetadataListenerTest extends TestCase
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())
             ->method('getDatabasePlatform')
-            ->willReturn(new PostgreSqlPlatform());
+            ->willReturn(new PostgreSQLPlatform());
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())
@@ -85,7 +85,7 @@ class RowHashCommentMetadataListenerTest extends TestCase
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())
             ->method('getDatabasePlatform')
-            ->willReturn(new PostgreSqlPlatform());
+            ->willReturn(new PostgreSQLPlatform());
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())

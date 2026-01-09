@@ -10,8 +10,8 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 use Oro\Bundle\SearchBundle\Migration\MysqlVersionCheckTrait;
 use Oro\Bundle\SearchBundle\Migration\UseMyIsamEngineQuery;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
+use Oro\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)

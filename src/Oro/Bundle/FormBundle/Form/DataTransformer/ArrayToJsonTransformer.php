@@ -18,7 +18,7 @@ class ArrayToJsonTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (null === $value || [] === $value) {
             return '';
@@ -36,7 +36,7 @@ class ArrayToJsonTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if ('' === $value || '[]' === $value || '{}' === $value || null === $value) {
             return $this->allowNull ? null : [];

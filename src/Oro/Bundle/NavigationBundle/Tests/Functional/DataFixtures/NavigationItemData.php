@@ -7,8 +7,8 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
 use Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserData;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
+use Oro\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class NavigationItemData extends AbstractFixture implements DependentFixtureInterface, ContainerAwareInterface

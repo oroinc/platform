@@ -167,7 +167,6 @@ oro_api:
         guid: string
         guid[]: array of strings
         json: object
-        json_array: object
         simple_array: array
         percent: float
         percent[]: array of floats
@@ -242,7 +241,6 @@ oro_api:
         data_type_aliases:
             nestedObject: object
             json: object
-            json_array: object
             config_object: object
             money_value: money
             blob: binary
@@ -380,11 +378,6 @@ oro_api:
             # to enable operators for a particular field the "operators" option should be
             # specified for this field in api.yml configuration file, in "filters" section
             supported_operators: []
-        json_array:
-            # by default, no any operators are enabled for json array fields,
-            # to enable operators for a particular field the "operators" option should be
-            # specified for this field in api.yml configuration file, in "filters" section
-            supported_operators: []
         json:
             # by default, no any operators are enabled for json fields,
             # to enable operators for a particular field the "operators" option should be
@@ -507,8 +500,6 @@ oro_api:
         array:
             form_type: Oro\Bundle\ApiBundle\Form\Type\ArrayType
         simple_array:
-            form_type: Oro\Bundle\ApiBundle\Form\Type\ArrayType
-        json_array:
             form_type: Oro\Bundle\ApiBundle\Form\Type\ArrayType
         json:
             form_type: Oro\Bundle\ApiBundle\Form\Type\ArrayType

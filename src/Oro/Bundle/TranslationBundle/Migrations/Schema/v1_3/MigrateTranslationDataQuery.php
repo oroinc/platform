@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Migrations\Schema\v1_3;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
@@ -45,7 +45,7 @@ class MigrateTranslationDataQuery extends ParametrizedMigrationQuery
 
         $keyField = 'key';
 
-        if ($this->connection->getDatabasePlatform() instanceof MySqlPlatform) {
+        if ($this->connection->getDatabasePlatform() instanceof MySQLPlatform) {
             $keyField = '`key`';
             //In cases when we have Case Insensitive characterset for `key` column
             $queries[] = [

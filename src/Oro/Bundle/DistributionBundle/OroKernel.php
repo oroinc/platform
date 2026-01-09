@@ -314,14 +314,14 @@ abstract class OroKernel extends Kernel
         ]);
 
         $rootCode = array_pop($content);
-        $dir = \dirname($cache->getPath()).'/';
+        $dir = \dirname($cache->getPath()) . '/';
         $fs = new Filesystem();
 
         foreach ($content as $file => $code) {
-            $fs->dumpFile($dir.$file, $code);
-            @chmod($dir.$file, 0666 & ~umask());
+            $fs->dumpFile($dir . $file, $code);
+            @chmod($dir . $file, 0666 & ~umask());
         }
-        $legacyFile = \dirname($dir.$file).'.legacy';
+        $legacyFile = \dirname($dir . $file) . '.legacy';
         if (file_exists($legacyFile)) {
             @unlink($legacyFile);
         }
@@ -349,7 +349,7 @@ abstract class OroKernel extends Kernel
         $class = $this->getContainerClass();
         $cacheDir = $this->warmupDir ?: $this->getCacheDir();
         $debug = $this->debug && ProfilerConfig::trackContainerChanges();
-        $cache = new ConfigCache($cacheDir.'/'.$class.'.php', $debug);
+        $cache = new ConfigCache($cacheDir . '/' . $class . '.php', $debug);
         $cachePath = $cache->getPath();
 
         $errorLevel = $this->getErrorReportingLevel();
@@ -381,7 +381,7 @@ abstract class OroKernel extends Kernel
                 $cache = new class ($cachePath, $this->debug) extends ConfigCache {
                     public $lock;
 
-                    public function write($content, ?array $metadata = null)
+                    public function write($content, ?array $metadata = null): void
                     {
                         rewind($this->lock);
                         ftruncate($this->lock, 0);

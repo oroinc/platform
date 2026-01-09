@@ -48,12 +48,25 @@ class ConstraintsProviderTest extends TestCase
 
         if ($expectGetMetadata) {
             $classMetadata = $this->createMock(ClassMetadata::class);
-            $classMetadata->properties = [];
-            foreach ($expectGetMetadata['propertyConstraints'] as $property => $constraints) {
-                $propertyMetadata = $this->createMock(PropertyMetadata::class);
-                $propertyMetadata->constraints = $constraints;
-                $classMetadata->properties[$property] = $propertyMetadata;
-            }
+            $propertyNames = array_keys($expectGetMetadata['propertyConstraints']);
+
+            $classMetadata->expects(self::once())
+                ->method('getConstrainedProperties')
+                ->willReturn($propertyNames);
+
+            $classMetadata->expects(self::any())
+                ->method('getPropertyMetadata')
+                ->willReturnCallback(function ($property) use ($expectGetMetadata) {
+                    if (isset($expectGetMetadata['propertyConstraints'][$property])) {
+                        $propertyMetadata = $this->createMock(PropertyMetadata::class);
+                        $propertyMetadata->expects(self::any())
+                            ->method('getConstraints')
+                            ->willReturn($expectGetMetadata['propertyConstraints'][$property]);
+                        return [$propertyMetadata];
+                    }
+                    return [];
+                });
+
             $this->metadataFactory->expects(self::once())
                 ->method('getMetadataFor')
                 ->with($expectGetMetadata['value'])

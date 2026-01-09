@@ -16,12 +16,12 @@ class UpdateObjectClassFieldLength implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_address_type_translation');
-        $table->changeColumn('object_class', ['length' => 191]);
+        $table->modifyColumn('object_class', ['length' => 191]);
 
         $table = $schema->getTable('oro_dictionary_country_trans');
-        $table->changeColumn('object_class', ['length' => 191]);
+        $table->modifyColumn('object_class', ['length' => 191]);
 
         $table = $schema->getTable('oro_dictionary_region_trans');
-        $table->changeColumn('object_class', ['length' => 191]);
+        $table->modifyColumn('object_class', ['length' => 191]);
     }
 }

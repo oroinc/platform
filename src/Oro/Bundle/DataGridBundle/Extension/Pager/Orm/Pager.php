@@ -188,7 +188,7 @@ class Pager extends AbstractPager
         /** @var QueryBuilder $query */
         $query = $this->getQueryBuilder();
 
-        $query->setFirstResult(null);
+        $query->setFirstResult(0);
         $query->setMaxResults(null);
 
         if (count($this->getParameters()) > 0) {

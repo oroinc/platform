@@ -26,7 +26,7 @@ class AssetConfigCacheWarmer implements CacheWarmerInterface
     }
 
     #[\Override]
-    public function warmUp(string $cacheDir): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         $this->cache->warmUp($cacheDir);
         return [];

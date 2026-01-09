@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
+use Oro\Component\DependencyInjection\ContainerAwareTrait;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * Remove enum field data.
@@ -98,7 +97,7 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery implements Contain
     }
 
     /**
-     * @throws DBALException|Exception
+     * @throws \Doctrine\DBAL\Exception|Exception
      */
     protected function executeQuery(LoggerInterface $logger, $sql, array $parameters = []): void
     {
@@ -110,7 +109,7 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery implements Contain
     #[\Override]
     public function getDescription(): string
     {
-        return 'Remove '. $this->enumField .' enum field data';
+        return 'Remove ' . $this->enumField . ' enum field data';
     }
 
     protected function getEntityClassTableName(): ?string

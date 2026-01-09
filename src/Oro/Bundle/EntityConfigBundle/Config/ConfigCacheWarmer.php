@@ -152,7 +152,7 @@ class ConfigCacheWarmer
         $classMap = [];
         $configValues = [];
         $entities = [];
-        foreach ($entityRows as $row) {
+        foreach ($entityRows->iterateAssociative() as $row) {
             $entityId = (int)$row['id'];
             $className = $row['class_name'];
             $isHidden = $row['mode'] === ConfigModel::MODE_HIDDEN;
@@ -190,7 +190,7 @@ class ConfigCacheWarmer
         $configurable = [];
         $configValues = [];
         $fields = [];
-        foreach ($fieldRows as $row) {
+        foreach ($fieldRows->iterateAssociative() as $row) {
             $entityId = (int)$row['entity_id'];
             if (!isset($classMap[$entityId])) {
                 continue;

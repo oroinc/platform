@@ -131,6 +131,9 @@ class UserRepository extends AbstractUserRepository implements EmailAwareReposit
      */
     public function findUsersByUsernames(array $usernames)
     {
+        if (empty($usernames)) {
+            return [];
+        }
         return $this->findBy(['username' => $usernames], ['username' => Criteria::ASC]);
     }
 
@@ -141,6 +144,9 @@ class UserRepository extends AbstractUserRepository implements EmailAwareReposit
      */
     public function findUsersByIds(array $ids)
     {
+        if (empty($ids)) {
+            return [];
+        }
         return $this->findBy(['id' => $ids], ['username' => Criteria::ASC]);
     }
 

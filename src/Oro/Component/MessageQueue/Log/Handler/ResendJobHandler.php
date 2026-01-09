@@ -3,6 +3,7 @@
 namespace Oro\Component\MessageQueue\Log\Handler;
 
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use Psr\Log\LoggerInterface;
 
@@ -31,7 +32,7 @@ class ResendJobHandler extends AbstractResendHandler
     }
 
     #[\Override]
-    protected function isResendRequired(array $record)
+    protected function isResendRequired(LogRecord $record)
     {
         return null !== $this->consumerState->getJob();
     }

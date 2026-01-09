@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Translation\Strategy;
 
-use Doctrine\DBAL\Exception\InvalidFieldNameException;
+use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
@@ -53,12 +53,12 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface, Cach
     }
 
     #[\Override]
-    public function warmUp($cacheDir): array
+    public function warmUp($cacheDir, ?string $buildDir = null): array
     {
         try {
             $this->clearCache();
             $this->getLocaleFallbacks();
-        } catch (InvalidFieldNameException $exception) {
+        } catch (DriverException $exception) {
             // Cache warming can be used during upgrade from the app version where not all required columns yet exist.
             // Silently skips warming of locale fallbacks in this case, considering as not an error.
         }

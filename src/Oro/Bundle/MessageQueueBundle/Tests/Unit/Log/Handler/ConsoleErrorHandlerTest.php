@@ -3,7 +3,9 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Handler;
 
 use Monolog\Handler\TestHandler;
+use Monolog\Level;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Oro\Bundle\MessageQueueBundle\Log\Handler\ConsoleErrorHandler;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -26,10 +28,31 @@ class ConsoleErrorHandlerTest extends TestCase
 
     public function testIsHandling(): void
     {
-        $this->assertFalse($this->handler->isHandling([]));
+        $emptyRecord = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Debug,
+            message: 'test'
+        );
+        $this->assertFalse($this->handler->isHandling($emptyRecord));
+
         $this->consumerState->startConsumption();
-        $this->assertTrue($this->handler->isHandling(['level' => Logger::CRITICAL]));
-        $this->assertFalse($this->handler->isHandling(['level' => Logger::DEBUG]));
+
+        $criticalRecord = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Critical,
+            message: 'test'
+        );
+        $this->assertTrue($this->handler->isHandling($criticalRecord));
+
+        $debugRecord = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Debug,
+            message: 'test'
+        );
+        $this->assertFalse($this->handler->isHandling($debugRecord));
     }
 
     public function testReset(): void

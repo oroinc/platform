@@ -63,9 +63,11 @@ class GetterMetadata extends MemberMetadata
     }
 
     #[\Override]
-    public function __sleep(): array
+    public function __serialize(): array
     {
-        return array_merge(parent::__sleep(), ['methodType']);
+        return parent::__serialize() + [
+            'methodType' => $this->methodType,
+        ];
     }
 
     protected function getExtendEntityMethod(string $class, string $property, ?string $method = null): ?string

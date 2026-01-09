@@ -4,6 +4,7 @@ namespace Oro\Component\MessageQueue\Log\Handler;
 
 use Monolog\Handler\AbstractHandler;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Oro\Component\MessageQueue\Log\Processor\RestoreOriginalChannelProcessor;
 use Psr\Log\LoggerInterface;
 
@@ -28,13 +29,13 @@ abstract class AbstractResendHandler extends AbstractHandler
     }
 
     #[\Override]
-    public function isHandling(array $record): bool
+    public function isHandling(LogRecord $record): bool
     {
         return $this->isResendRequired($record);
     }
 
     #[\Override]
-    public function handle(array $record): bool
+    public function handle(LogRecord $record): bool
     {
         if ($this->isResendRequired($record)) {
             /**
@@ -53,9 +54,9 @@ abstract class AbstractResendHandler extends AbstractHandler
     /**
      * Indicates whether the record should be resent to the target logger.
      *
-     * @param array $record The log record to handle
+     * @param LogRecord $record The log record to handle
      *
      * @return bool
      */
-    abstract protected function isResendRequired(array $record);
+    abstract protected function isResendRequired(LogRecord $record);
 }

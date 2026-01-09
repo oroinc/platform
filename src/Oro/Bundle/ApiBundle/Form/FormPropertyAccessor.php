@@ -25,7 +25,7 @@ class FormPropertyAccessor implements PropertyAccessorInterface
     }
 
     #[\Override]
-    public function setValue(&$objectOrArray, $propertyPath, $value)
+    public function setValue(&$objectOrArray, $propertyPath, $value): void
     {
         try {
             $this->propertyAccessor->setValue($objectOrArray, $propertyPath, $value);

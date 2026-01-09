@@ -11,7 +11,7 @@ class FileConstraintFromSystemConfig extends SymfonyFileConstraint
 {
     public string $maxSizeConfigPath = 'oro_attachment.maxsize';
 
-    public $mimeTypesMessage = 'oro.attachment.mimetypes.invalid_mime_type';
+    public string $mimeTypesMessage = 'oro.attachment.mimetypes.invalid_mime_type';
 
     #[\Override]
     public function getTargets(): string|array

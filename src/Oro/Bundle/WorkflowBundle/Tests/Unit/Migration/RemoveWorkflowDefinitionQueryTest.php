@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\WorkflowBundle\Migration\RemoveWorkflowDefinitionQuery;
 use PHPUnit\Framework\TestCase;
@@ -28,7 +28,7 @@ class RemoveWorkflowDefinitionQueryTest extends TestCase
         $connection = $this->createMock(Connection::class);
         $connection->expects(self::once())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
 
         $logger->expects(self::exactly(3))
             ->method('info')

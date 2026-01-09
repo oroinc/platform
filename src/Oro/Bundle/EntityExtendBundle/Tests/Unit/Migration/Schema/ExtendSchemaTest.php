@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Schema;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
@@ -269,7 +269,7 @@ class ExtendSchemaTest extends TestCase
 
     private function assertSchemaSql(Schema $schema, array $expectedSql)
     {
-        $sql = $schema->toSql(new MySqlPlatform());
+        $sql = $schema->toSql(new MySQLPlatform());
         foreach ($sql as &$el) {
             $el = str_replace(
                 ' DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` ENGINE = InnoDB',

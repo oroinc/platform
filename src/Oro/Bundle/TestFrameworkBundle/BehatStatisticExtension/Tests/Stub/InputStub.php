@@ -40,17 +40,17 @@ class InputStub implements InputInterface
     }
 
     #[\Override]
-    public function getParameterOption($values, $default = false, $onlyParams = false)
+    public function getParameterOption($values, $default = false, $onlyParams = false): mixed
     {
     }
 
     #[\Override]
-    public function bind(InputDefinition $definition)
+    public function bind(InputDefinition $definition): void
     {
     }
 
     #[\Override]
-    public function validate()
+    public function validate(): void
     {
     }
 
@@ -61,12 +61,12 @@ class InputStub implements InputInterface
     }
 
     #[\Override]
-    public function getArgument($name)
+    public function getArgument($name): mixed
     {
     }
 
     #[\Override]
-    public function setArgument($name, $value)
+    public function setArgument($name, $value): void
     {
     }
 
@@ -82,7 +82,7 @@ class InputStub implements InputInterface
     }
 
     #[\Override]
-    public function getOption($name)
+    public function getOption($name): mixed
     {
         if (isset($this->options[$name])) {
             return $this->options[$name];
@@ -92,7 +92,7 @@ class InputStub implements InputInterface
     }
 
     #[\Override]
-    public function setOption($name, $value)
+    public function setOption($name, $value): void
     {
     }
 
@@ -107,7 +107,7 @@ class InputStub implements InputInterface
     }
 
     #[\Override]
-    public function setInteractive($interactive)
+    public function setInteractive($interactive): void
     {
     }
 
@@ -115,7 +115,7 @@ class InputStub implements InputInterface
      * @return string
      */
     #[\Override]
-    public function __toString()
+    public function __toString(): string
     {
         return (string)$this->command;
     }

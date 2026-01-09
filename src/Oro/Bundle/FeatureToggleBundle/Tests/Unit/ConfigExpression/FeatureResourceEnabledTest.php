@@ -158,7 +158,7 @@ class FeatureResourceEnabledTest extends TestCase
                 'options'  => [new PropertyPath('resource'), 'type', 1],
                 'expected' => '$factory->create(\'feature_resource_enabled\', ' .
                     '[new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'resource\', [\'resource\'],' .
-                    ' [false]), \'type\', 1])'
+                    ' [false], [false]), \'type\', 1])'
             ]
         ];
     }

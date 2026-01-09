@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Monolog\Handler;
 
+use Monolog\Level;
+use Monolog\LogRecord;
 use Oro\Bundle\BatchBundle\Monolog\Handler\BatchLogHandler;
 use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\TestCase;
@@ -16,7 +18,13 @@ class BatchLogHandlerTest extends TestCase
         $batchLogHandler->setSubDirectory('batch_test');
 
         $messageText = 'batch.DEBUG: Job execution started';
-        $record = ['formatted' => $messageText];
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'batch',
+            level: Level::Debug,
+            message: 'Job execution started',
+            formatted: $messageText
+        );
 
         $batchLogHandler->write($record);
         $batchLogHandler->close();
@@ -29,7 +37,13 @@ class BatchLogHandlerTest extends TestCase
         $batchLogHandler = new BatchLogHandler($this->getTempDir('batch_log_handler'), false);
 
         $messageText = 'batch.DEBUG: Job execution started';
-        $record = ['formatted' => $messageText];
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'batch',
+            level: Level::Debug,
+            message: 'Job execution started',
+            formatted: $messageText
+        );
 
         $batchLogHandler->write($record);
         self::assertFileDoesNotExist($batchLogHandler->getFilename());

@@ -33,7 +33,7 @@ class PlaceholderExtension extends AbstractExtension implements ServiceSubscribe
             new TwigFunction(
                 'placeholder',
                 [$this, 'renderPlaceholder'],
-                ['needs_environment' => true, 'is_safe' => ['html']]
+                ['needs_environment' => true, 'needs_context' => true, 'is_safe' => ['html']]
             )
         ];
     }
@@ -42,6 +42,7 @@ class PlaceholderExtension extends AbstractExtension implements ServiceSubscribe
      * Render placeholder by name
      *
      * @param Environment       $environment
+     * @param array             $context
      * @param string            $name
      * @param array             $variables
      * @param array             $attributes  Supported attributes:
@@ -51,13 +52,14 @@ class PlaceholderExtension extends AbstractExtension implements ServiceSubscribe
      */
     public function renderPlaceholder(
         Environment $environment,
+        array $context,
         $name,
         array $variables = [],
         array $attributes = []
     ) {
         return implode(
             isset($attributes['delimiter']) ? $attributes['delimiter'] : '',
-            $this->getPlaceholderData($environment, $name, $variables)
+            $this->getPlaceholderData($environment, $name, array_merge($context, $variables))
         );
     }
 

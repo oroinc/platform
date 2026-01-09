@@ -37,7 +37,7 @@ class MigrationContainer extends DependencyInjectionContainer
     }
 
     #[\Override]
-    public function compile()
+    public function compile(): void
     {
         $this->publicContainer->compile();
     }
@@ -49,7 +49,7 @@ class MigrationContainer extends DependencyInjectionContainer
     }
 
     #[\Override]
-    public function set(string $id, ?object $service)
+    public function set(string $id, ?object $service): void
     {
         $this->publicContainer->set($id, $service);
     }
@@ -74,10 +74,26 @@ class MigrationContainer extends DependencyInjectionContainer
         return $this->publicContainer->initialized($id);
     }
 
+    /**
+     * Static flag to prevent recursive container resets during migrations
+     * This prevents infinite loops when services trigger migration events during reset
+     */
+    private static bool $isResetting = false;
+
     #[\Override]
-    public function reset()
+    public function reset(): void
     {
-        $this->publicContainer->reset();
+        // Prevent recursive reset calls - critical for Symfony 7 migration compatibility
+        if (self::$isResetting) {
+            return;
+        }
+
+        self::$isResetting = true;
+        try {
+            $this->publicContainer->reset();
+        } finally {
+            self::$isResetting = false;
+        }
     }
 
     #[\Override]

@@ -10,7 +10,7 @@ services:
     oro_entity_extend.orm.metadata_factory:
         class: Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory
         calls:
-            - [ 'setMappingDriver', [ '@doctrine.orm.entity_manager', '@oro_entity_extend.orm.mapping_driver' ] ]
+            - [ 'setMappingDriver', [ '@doctrine.orm.default_metadata_driver', '@oro_entity_extend.orm.mapping_driver' ] ]
 
     oro_entity_extend.orm.mapping_driver:
         class: Oro\Bundle\EntityExtendBundle\Tools\YamlDriver

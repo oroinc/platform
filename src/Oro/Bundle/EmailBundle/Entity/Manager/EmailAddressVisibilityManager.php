@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -79,7 +79,7 @@ class EmailAddressVisibilityManager
             'INSERT INTO %s (email, organization_id, is_visible) VALUES (?, ?, ?) ',
             $this->getEmailVisibilityTableName($em)
         );
-        if ($connection->getDatabasePlatform() instanceof MySqlPlatform) {
+        if ($connection->getDatabasePlatform() instanceof MySQLPlatform) {
             $sql .= 'ON DUPLICATE KEY UPDATE is_visible = ?';
         } else {
             $sql .= 'ON CONFLICT (email, organization_id) DO UPDATE SET is_visible = ?';

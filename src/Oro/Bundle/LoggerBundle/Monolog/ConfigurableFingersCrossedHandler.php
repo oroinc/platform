@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LoggerBundle\Monolog;
 
 use Monolog\Handler\FingersCrossedHandler;
+use Monolog\LogRecord;
 
 /**
  * Provides a possibility to change the logging level for a certain period of time
@@ -22,12 +23,12 @@ class ConfigurableFingersCrossedHandler extends FingersCrossedHandler
     }
 
     #[\Override]
-    public function handle(array $record): bool
+    public function handle(LogRecord $record): bool
     {
         if (!$this->config?->isActive()) {
             return parent::handle($record);
         }
-        if ($record['level'] >= $this->config->getMinLevel()) {
+        if ($record->level->value >= $this->config->getMinLevel()) {
             if ($this->processors) {
                 foreach ($this->processors as $processor) {
                     $record = call_user_func($processor, $record);
@@ -40,7 +41,7 @@ class ConfigurableFingersCrossedHandler extends FingersCrossedHandler
     }
 
     #[\Override]
-    public function reset()
+    public function reset(): void
     {
         $this->config->reset();
         parent::reset();

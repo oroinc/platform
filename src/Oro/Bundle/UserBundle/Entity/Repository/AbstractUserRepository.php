@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Entity\Repository;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
@@ -96,6 +96,6 @@ class AbstractUserRepository extends EntityRepository
             ->getConnection()
             ->getDatabasePlatform();
 
-        return $platform instanceof MySqlPlatform;
+        return $platform instanceof MySQLPlatform;
     }
 }

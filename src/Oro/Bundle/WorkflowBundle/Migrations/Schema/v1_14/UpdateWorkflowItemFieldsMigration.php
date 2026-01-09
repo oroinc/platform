@@ -19,7 +19,7 @@ class UpdateWorkflowItemFieldsMigration implements Migration
         }
 
         $table->addColumn('entity_class', 'string', ['length' => 255, 'notnull' => false]);
-        $table->changeColumn(
+        $table->modifyColumn(
             'entity_id',
             ['type' => StringType::getType('string'), 'length' => 255, 'notnull' => false]
         );

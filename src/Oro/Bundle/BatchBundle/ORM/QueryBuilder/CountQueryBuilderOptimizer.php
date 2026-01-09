@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\BatchBundle\ORM\QueryBuilder;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
@@ -79,7 +79,7 @@ class CountQueryBuilderOptimizer
     {
         $optimizedQueryBuilder = clone $this->context->getOriginalQueryBuilder();
         $optimizedQueryBuilder
-            ->setFirstResult(null)
+            ->setFirstResult(0)
             ->setMaxResults(null)
             ->resetDQLPart('orderBy')
             ->resetDQLPart('groupBy')
@@ -149,7 +149,7 @@ class CountQueryBuilderOptimizer
             ->getConnection()
             ->getDatabasePlatform();
 
-        if ($platform instanceof MySqlPlatform) {
+        if ($platform instanceof MySQLPlatform) {
             $fields = $this->qbTools->getFieldsWithoutAggregateFunctions($having);
 
             foreach ($fields as $field) {

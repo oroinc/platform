@@ -18,8 +18,8 @@ class UpdateColumns implements
     public function up(Schema $schema, QueryBag $queries): void
     {
         $auditTable = $schema->getTable('oro_audit');
-        $auditTable->changeColumn('type', ['length' => 30]);
-        $auditTable->changeColumn('transaction_id', ['length' => 36]);
+        $auditTable->modifyColumn('type', ['length' => 30]);
+        $auditTable->modifyColumn('transaction_id', ['length' => 36]);
     }
 
     #[\Override]

@@ -98,7 +98,7 @@ final class ConfigurationValidatorTest extends TestCase
                 'Cannot parse "Resources/views/layouts/*/theme.yml" configuration.'
                 . ' The value "radio2" is not allowed for'
                 . ' path "themes.wrong_supported_type.configuration.sections.general.options.button_color.type".'
-                . ' Permissible values: "select", "radio", "checkbox"'
+                . ' Permissible values: "select", "radio", "checkbox".'
             ],
             $result
         );

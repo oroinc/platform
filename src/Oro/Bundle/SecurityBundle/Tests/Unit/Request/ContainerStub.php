@@ -21,7 +21,7 @@ class ContainerStub extends Container
      * @return mixed
      */
     #[\Override]
-    public function getParameter($name)
+    public function getParameter($name): \UnitEnum|float|int|bool|array|string|null
     {
         if (!array_key_exists($name, $this->parameters)) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));

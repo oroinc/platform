@@ -50,21 +50,24 @@ class RemindersPersistentCollection extends AbstractLazyCollection
     }
 
     #[\Override]
-    protected function doInitialize()
+    protected function doInitialize(): void
     {
-        if (!$this->collection) {
-            $reminders        = $this->repository->findRemindersByEntity($this->className, $this->identifier);
-            $this->snapshot   = $reminders;
-            $this->collection = new ArrayCollection($reminders);
+        if ($this->initialized) {
+            return;
         }
+
+        $reminders        = $this->repository->findRemindersByEntity($this->className, $this->identifier);
+        $this->snapshot   = $reminders;
+        $this->collection = new ArrayCollection($reminders);
     }
 
     #[\Override]
     public function add($element)
     {
-        $result = parent::add($element);
+        parent::add($element);
         $this->changed();
-        return $result;
+
+        return true;
     }
 
     #[\Override]

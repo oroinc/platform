@@ -25,8 +25,8 @@ class OroEmailBundle implements Migration, DatabasePlatformAwareInterface, Order
         // update data in accordance with new column requirement
         $queries->addPreQuery(
             sprintf(
-                "UPDATE oro_email SET message_id = CONCAT('id.', REPLACE(%s, '-',''), '%s') WHERE message_id IS NULL",
-                $this->platform->getGuidExpression(),
+                "UPDATE oro_email SET message_id = CONCAT('id.', REPLACE(UUID_GENERATE_V4(), '-',''), '%s')"
+                . " WHERE message_id IS NULL",
                 '@bap.migration.generated'
             )
         );
@@ -35,7 +35,7 @@ class OroEmailBundle implements Migration, DatabasePlatformAwareInterface, Order
 
         // make message_id not null & add index
         $table = $schema->getTable('oro_email');
-        $table->changeColumn('message_id', ['notnull' => true]);
+        $table->modifyColumn('message_id', ['notnull' => true]);
         $table->addIndex(['message_id'], 'IDX_email_message_id');
 
         // migrate existing email-folder relations

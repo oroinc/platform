@@ -35,7 +35,9 @@ class WorkflowDefinitionCloner
         $newDefinition = self::copyMainFields(new WorkflowDefinition(), $definition)->setSteps($steps);
 
         $startStep = $definition->getStartStep();
-        $startStep = $steps->get($startStep ? $startStep->getName() : null);
+        if ($startStep?->getName()) {
+            $startStep = $steps->get($startStep->getName());
+        }
 
         $entityAcls = self::copyEntityAcls($definition);
         $restrictions = self::copyRestrictions($definition);

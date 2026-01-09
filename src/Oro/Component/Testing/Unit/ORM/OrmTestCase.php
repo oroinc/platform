@@ -9,7 +9,7 @@ use Oro\Component\Testing\TempDirExtension;
 use Oro\Component\Testing\Unit\ORM\Mocks\ConnectionMock;
 use Oro\Component\Testing\Unit\ORM\Mocks\DriverMock;
 use Oro\Component\Testing\Unit\ORM\Mocks\EntityManagerMock;
-use Oro\Component\Testing\Unit\ORM\Mocks\FetchIterator;
+use Oro\Component\Testing\Unit\ORM\Mocks\ResultMock;
 use Oro\Component\Testing\Unit\ORM\Mocks\StatementMock;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -96,6 +96,9 @@ abstract class OrmTestCase extends TestCase
         /** @var DriverMock $driver */
         $driver = $em->getConnection()->getDriver();
         $driver->setDriverConnection($connection);
+
+        // Close the connection to force reconnect with the new driver connection
+        $em->getConnection()->close();
     }
 
     /**
@@ -108,17 +111,8 @@ abstract class OrmTestCase extends TestCase
         ?int $affectedRowCount = null
     ): StatementMock|MockObject {
         $statement = $this->createMock(StatementMock::class);
-        if (null === $records) {
-            $statement->expects($this->never())
-                ->method('fetch');
-        } else {
-            $statement->expects($this->exactly(count($records) + 1))
-                ->method('fetch')
-                ->will(new ConsecutiveCalls(array_merge($records, [false])));
-        }
-        $statement->expects($this->any())
-            ->method('getIterator')
-            ->willReturn(new FetchIterator($statement));
+        $result = $this->createFetchResultMock($records, $affectedRowCount);
+
         if ($params) {
             if ($types) {
                 $withConsecutive = [];
@@ -129,20 +123,84 @@ abstract class OrmTestCase extends TestCase
                     ->method('bindValue')
                     ->withConsecutive(...$withConsecutive);
                 $statement->expects($this->once())
-                    ->method('execute');
+                    ->method('execute')
+                    ->willReturn($result);
             } else {
                 $statement->expects($this->once())
                     ->method('execute')
-                    ->with($params);
+                    ->with($params)
+                    ->willReturn($result);
             }
-            if (null !== $affectedRowCount) {
-                $statement->expects($this->once())
-                    ->method('rowCount')
-                    ->willReturn($affectedRowCount);
-            }
+        } else {
+            $statement->expects($this->any())
+                ->method('execute')
+                ->willReturn($result);
         }
 
         return $statement;
+    }
+
+    /**
+     * Creates a mock for a result which handles fetching the given records.
+     * Use this when Connection::query() needs to return a Result directly.
+     */
+    protected function createFetchResultMock(
+        ?array $records,
+        ?int $affectedRowCount = null
+    ): ResultMock|MockObject {
+        $result = $this->createMock(ResultMock::class);
+
+        if (null === $records) {
+            $result->expects($this->never())
+                ->method('fetchAssociative');
+            $result->expects($this->any())
+                ->method('fetchAllAssociative')
+                ->willReturn([]);
+            $result->expects($this->any())
+                ->method('fetchFirstColumn')
+                ->willReturn([]);
+        } else {
+            // DBAL 3.0: Doctrine ORM may call fetchAllAssociative() to get all rows at once
+            $result->expects($this->any())
+                ->method('fetchAllAssociative')
+                ->willReturn($records);
+
+            // DBAL 3.0: OR it may call fetchAssociative() in a loop
+            $result->expects($this->any())
+                ->method('fetchAssociative')
+                ->will(new ConsecutiveCalls(array_merge($records, [false])));
+
+            // DBAL 3.0: For fetchFirstColumn(), extract the first column from each record
+            $firstColumn = array_map(function ($record) {
+                return is_array($record) ? reset($record) : $record;
+            }, $records);
+            $result->expects($this->any())
+                ->method('fetchFirstColumn')
+                ->willReturn($firstColumn);
+        }
+
+        if (null !== $affectedRowCount) {
+            $result->expects($this->once())
+                ->method('rowCount')
+                ->willReturn($affectedRowCount);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Creates a mock for a result which handles counting a number of records.
+     * Use this when Connection::query() needs to return a Result directly.
+     */
+    protected function createCountResultMock(int $numberOfRecords): ResultMock|MockObject
+    {
+        $result = $this->createMock(ResultMock::class);
+
+        $result->expects($this->once())
+            ->method('fetchOne')
+            ->willReturn($numberOfRecords);
+
+        return $result;
     }
 
     /**
@@ -162,9 +220,15 @@ abstract class OrmTestCase extends TestCase
     protected function createCountStatementMock(int $numberOfRecords): StatementMock|MockObject
     {
         $countStatement = $this->createMock(StatementMock::class);
-        $countStatement->expects($this->once())
-            ->method('fetchColumn')
+        $result = $this->createMock(ResultMock::class);
+
+        $result->expects($this->once())
+            ->method('fetchOne')
             ->willReturn($numberOfRecords);
+
+        $countStatement->expects($this->any())
+            ->method('execute')
+            ->willReturn($result);
 
         return $countStatement;
     }
@@ -177,17 +241,19 @@ abstract class OrmTestCase extends TestCase
         array $types = [],
         ?int $affectedRowCount = null
     ): void {
-        $stmt = $this->createFetchStatementMock($records, $params, $types, $affectedRowCount);
         if ($params) {
+            $stmt = $this->createFetchStatementMock($records, $params, $types, $affectedRowCount);
             $conn->expects($this->once())
                 ->method('prepare')
                 ->with($sql)
                 ->willReturn($stmt);
         } else {
+            // In DBAL 3.0, queries without params use query() method
+            $result = $this->createFetchResultMock($records, $affectedRowCount);
             $conn->expects($this->once())
                 ->method('query')
                 ->with($sql)
-                ->willReturn($stmt);
+                ->willReturn($result);
         }
     }
 
@@ -198,11 +264,12 @@ abstract class OrmTestCase extends TestCase
         array $types = [],
         ?int $affectedRowCount = null
     ): void {
-        $stmt = $this->createFetchStatementMock($records, $params, $types, $affectedRowCount);
         if ($params) {
+            $stmt = $this->createFetchStatementMock($records, $params, $types, $affectedRowCount);
             $this->queryExpectations['prepare'][] = [$sql, $stmt];
         } else {
-            $this->queryExpectations['query'][] = [$sql, $stmt];
+            $result = $this->createFetchResultMock($records, $affectedRowCount);
+            $this->queryExpectations['query'][] = [$sql, $result];
         }
     }
 

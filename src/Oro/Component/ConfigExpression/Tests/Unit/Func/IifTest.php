@@ -151,24 +151,24 @@ class IifTest extends TestCase
                 'options'  => [new TrueCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'message'  => null,
                 'expected' => '$factory->create(\'iif\', [$factory->create(\'true\', []), '
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false]), '
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'bar\', [\'bar\'], [false])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false], [false]), '
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'bar\', [\'bar\'], [false], [false])'
                     . '])'
             ],
             [
                 'options'  => [new PropertyPath('foo'), new PropertyPath('bar')],
                 'message'  => null,
                 'expected' => '$factory->create(\'iif\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false]), '
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'bar\', [\'bar\'], [false])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false], [false]), '
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'bar\', [\'bar\'], [false], [false])'
                     . '])'
             ],
             [
                 'options'  => [new TrueCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'iif\', [$factory->create(\'true\', []), '
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false]), '
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'bar\', [\'bar\'], [false])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false], [false]), '
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'bar\', [\'bar\'], [false], [false])'
                     . '])->setMessage(\'Test\')'
             ]
         ];

@@ -25,12 +25,12 @@ class ConsoleErrorSubscriberTest extends TestCase
     private static array $defaultLoggers = [
         E_DEPRECATED => [null, LogLevel::INFO],
         E_USER_DEPRECATED => [null, LogLevel::INFO],
-        E_NOTICE => [null, LogLevel::WARNING],
-        E_USER_NOTICE => [null, LogLevel::WARNING],
-        E_WARNING => [null, LogLevel::WARNING],
-        E_USER_WARNING => [null, LogLevel::WARNING],
-        E_COMPILE_WARNING => [null, LogLevel::WARNING],
-        E_CORE_WARNING => [null, LogLevel::WARNING],
+        E_NOTICE => [null, LogLevel::ERROR],
+        E_USER_NOTICE => [null, LogLevel::ERROR],
+        E_WARNING => [null, LogLevel::ERROR],
+        E_USER_WARNING => [null, LogLevel::ERROR],
+        E_COMPILE_WARNING => [null, LogLevel::ERROR],
+        E_CORE_WARNING => [null, LogLevel::ERROR],
     ];
 
     #[\Override]

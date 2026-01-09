@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Voter;
 
-use Doctrine\DBAL\Types\StringType;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityBundle\Tests\Unit\Form\Stub\TestEntity;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -39,13 +38,13 @@ class EntityManagementConfigVoterTest extends TestCase
         $manageableEntityConfigModel = new EntityConfigModel(TestEntity::class);
         $manageableEntityConfigModel->fromArray(EntityManagementConfig::SECTION, ['enabled' => true]);
 
-        $manageableFieldConfigModel = new FieldConfigModel('testField', StringType::getType(Type::STRING));
+        $manageableFieldConfigModel = new FieldConfigModel('testField', Types::STRING);
         $manageableFieldConfigModel->setEntity($manageableEntityConfigModel);
 
-        $notManageableFieldConfigModel = new FieldConfigModel('testField', StringType::getType(Type::STRING));
+        $notManageableFieldConfigModel = new FieldConfigModel('testField', Types::STRING);
         $notManageableFieldConfigModel->setEntity($notManageableEntityConfigModel);
 
-        $fieldConfigModelWithoutEntity = new FieldConfigModel('testField', StringType::getType(Type::STRING));
+        $fieldConfigModelWithoutEntity = new FieldConfigModel('testField', Types::STRING);
 
         return [
             'unsupported subject' => [

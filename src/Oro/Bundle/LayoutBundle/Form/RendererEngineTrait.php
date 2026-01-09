@@ -14,7 +14,7 @@ trait RendererEngineTrait
     /**
      * @var array
      */
-    protected $resources = [];
+    protected array $resources = [];
 
     /**
      * @var array holds resources that were override by switchToNextParentResource

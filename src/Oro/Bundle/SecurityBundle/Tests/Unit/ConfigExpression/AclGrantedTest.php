@@ -355,7 +355,8 @@ class AclGrantedTest extends TestCase
                 'options'  => ['VIEW', new PropertyPath('entity')],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'acl\', [\'VIEW\', '
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'entity\', [\'entity\'], [false])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath('
+                    . '\'entity\', [\'entity\'], [false], [false])'
                     . '])->setMessage(\'Test\')'
             ]
         ];

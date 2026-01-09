@@ -46,7 +46,7 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
         $postSchema = clone $preSchema;
 
         $table = $postSchema->getTable('oro_workflow_definition');
-        $table->changeColumn('groups', ['notnull' => true]);
+        $table->modifyColumn('groups', ['notnull' => true]);
 
         foreach ($this->getSchemaDiff($preSchema, $postSchema) as $query) {
             $queries->addQuery($query);

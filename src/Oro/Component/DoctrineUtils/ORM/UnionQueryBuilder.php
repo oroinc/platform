@@ -3,9 +3,9 @@
 namespace Oro\Component\DoctrineUtils\ORM;
 
 use Doctrine\DBAL\Query\QueryException;
-use Doctrine\DBAL\SQLParserUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
+use Oro\Component\DoctrineUtils\DBAL\SqlParserUtils;
 
 /**
  * This class can be used to build UNION or UNION ALL SQL query.
@@ -74,7 +74,8 @@ class UnionQueryBuilder
             foreach ($subQuery->getParameters() as $parameter) {
                 $qb->setParameter(
                     $this->getSubqueryParameterName($index, $parameter->getName()),
-                    $parameter->getValue()
+                    $parameter->getValue(),
+                    $parameter->getType()
                 );
             }
         }
@@ -260,10 +261,10 @@ class UnionQueryBuilder
     private function getExecutableSql(int $index, Query $query): string
     {
         $parsedQuery = QueryUtil::parseQuery($query);
-        $sql = $parsedQuery->getSqlExecutor()->getSqlStatements();
+        $sql = $parsedQuery->prepareSqlExecutor($query)->getSqlStatements();
 
         $parameters = $parsedQuery->getParameterMappings();
-        $paramPos = SQLParserUtils::getPlaceholderPositions($sql);
+        $paramPos = SqlParserUtils::getPlaceholderPositions($sql);
 
         $parameterPositions = [];
         foreach ($parameters as $parameterName => $positions) {

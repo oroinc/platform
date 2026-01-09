@@ -13,8 +13,8 @@ use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeGro
 use Oro\Bundle\ImportExportBundle\Writer\CumulativeWriter;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\Testing\Logger\TestLogger;
 use Psr\Log\LogLevel;
-use Psr\Log\Test\TestLogger;
 
 /**
  * @dbIsolationPerTest
@@ -188,7 +188,7 @@ class CumulativeWriterTest extends WebTestCase
                             LocalizedFallbackValue::class => 2,
                         ],
                         'ScheduledCollectionDeletions' => [
-                            AttributeFamily::class.'#labels' => 2,
+                            AttributeFamily::class . '#labels' => 2,
                         ],
                     ],
                 ],

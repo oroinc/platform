@@ -38,7 +38,7 @@ class LogLevelConfig implements ResetInterface
     ) {
         $this->configManager = $configManager;
         $this->loggerCache = $loggerCache;
-        $this->defaultLevel = Logger::toMonologLevel($defaultLevel);
+        $this->defaultLevel = Logger::toMonologLevel($defaultLevel)->value;
         $this->applicationState = $applicationState;
     }
 
@@ -68,7 +68,7 @@ class LogLevelConfig implements ResetInterface
                     if (null !== $endTimestamp && $curTimestamp <= $endTimestamp) {
                         $logLevel = $this->configManager
                             ->get(Configuration::getFullConfigKey(Configuration::LOGS_LEVEL_KEY));
-                        $logLevel = Logger::toMonologLevel($logLevel);
+                        $logLevel = Logger::toMonologLevel($logLevel)->value;
                         $lifeTime = $endTimestamp - $curTimestamp;
                     }
                 }

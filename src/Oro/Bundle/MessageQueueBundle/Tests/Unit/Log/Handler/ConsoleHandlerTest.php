@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Handler;
 
-use Monolog\Logger;
+use Monolog\Level;
+use Monolog\LogRecord;
 use Oro\Bundle\MessageQueueBundle\Log\Handler\ConsoleHandler;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -36,7 +37,13 @@ class ConsoleHandlerTest extends TestCase
 
         $input = $this->createMock(InputInterface::class);
         $this->handler->onCommand(new ConsoleCommandEvent(null, $input, $this->output));
-        self::assertFalse($this->handler->isHandling([]));
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Debug,
+            message: 'test'
+        );
+        self::assertFalse($this->handler->isHandling($record));
     }
 
     public function testIsHandlingWhenConsumptionIsStarted(): void
@@ -48,7 +55,13 @@ class ConsoleHandlerTest extends TestCase
         $this->consumerState->startConsumption();
         $input = $this->createMock(InputInterface::class);
         $this->handler->onCommand(new ConsoleCommandEvent(null, $input, $this->output));
-        self::assertTrue($this->handler->isHandling(['level' => Logger::DEBUG]));
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Debug,
+            message: 'test'
+        );
+        self::assertTrue($this->handler->isHandling($record));
     }
 
     public function testHandleWhenConsumptionIsNotStarted(): void
@@ -60,7 +73,13 @@ class ConsoleHandlerTest extends TestCase
 
         $input = $this->createMock(InputInterface::class);
         $this->handler->onCommand(new ConsoleCommandEvent(null, $input, $this->output));
-        self::assertFalse($this->handler->handle([]));
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Debug,
+            message: 'test'
+        );
+        self::assertFalse($this->handler->handle($record));
     }
 
     public function testHandleWhenConsumptionIsStarted(): void
@@ -79,17 +98,15 @@ class ConsoleHandlerTest extends TestCase
         $this->consumerState->startConsumption();
         $input = $this->createMock(InputInterface::class);
         $this->handler->onCommand(new ConsoleCommandEvent(null, $input, $this->output));
-        self::assertFalse(
-            $this->handler->handle([
-                'datetime' => new \DateTime('2018-07-06 09:16:05'),
-                'message' => 'test message',
-                'level'   => Logger::DEBUG,
-                'level_name' => 'DEBUG',
-                'channel' => 'app',
-                'context' => ['key' => 'value'],
-                'extra'   => ['processor' => 'Test\Processor'],
-            ])
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable('2018-07-06 09:16:05'),
+            channel: 'app',
+            level: Level::Debug,
+            message: 'test message',
+            context: ['key' => 'value'],
+            extra: ['processor' => 'Test\Processor']
         );
+        self::assertFalse($this->handler->handle($record));
     }
 
     public function testCommandEventSubscriber(): void
@@ -122,17 +139,15 @@ class ConsoleHandlerTest extends TestCase
         $this->output->expects(self::once())
             ->method('write')
             ->with('2018-07-06 09:16:05 <fg=white>app.DEBUG</>: test message' . "\n");
-        self::assertFalse(
-            $this->handler->handle([
-                'datetime' => new \DateTime('2018-07-06 09:16:05'),
-                'message' => 'test message',
-                'level'   => Logger::DEBUG,
-                'level_name' => 'DEBUG',
-                'channel' => 'app',
-                'context' => [],
-                'extra'   => [],
-            ])
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable('2018-07-06 09:16:05'),
+            channel: 'app',
+            level: Level::Debug,
+            message: 'test message',
+            context: [],
+            extra: []
         );
+        self::assertFalse($this->handler->handle($record));
 
         // test that the output is not removed when a nested command terminates
         $handler->onTerminate(
@@ -143,7 +158,7 @@ class ConsoleHandlerTest extends TestCase
                 0
             )
         );
-        self::assertTrue($handler->isHandling(['level' => Logger::DEBUG]));
+        self::assertTrue($handler->isHandling($record));
 
         // test that the output is removed when a root command terminates
         $handler->onTerminate(
@@ -154,7 +169,7 @@ class ConsoleHandlerTest extends TestCase
                 0
             )
         );
-        self::assertFalse($handler->isHandling(['level' => Logger::DEBUG]));
+        self::assertFalse($handler->isHandling($record));
     }
 
     public function testOnCommandShouldSetStdoutNotStderr(): void

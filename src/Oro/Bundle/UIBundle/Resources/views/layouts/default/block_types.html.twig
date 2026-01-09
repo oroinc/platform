@@ -60,15 +60,17 @@
                         {% if breadcrumb.label is defined %}
                             {% if breadcrumb.uri is defined %}
                                 {% set url = breadcrumb.uri %}
-                            {% else %}
+                            {% elseif breadcrumb.url is defined %}
                                 {% set url = breadcrumb.url %}
+                            {% else %}
+                                {% set url = null %}
                             {% endif %}
 
                             {% if not loop.last %}
                                 <a href="{{ url|default('#') }}" class="breadcrumbs__link">{{ breadcrumb.label|trans }}</a>
                                 <span aria-hidden="true" class="breadcrumbs-separator">{{ renderIcon.icon({name: 'chevron-right', extraClass: 'theme-icon--small'}) }}</span>
                             {% else %}
-                                <a href="{{ url }}" class="breadcrumbs__link" aria-current="location">{{ breadcrumb.label|trans }}</a>
+                                <a href="{{ url|default('#') }}" class="breadcrumbs__link" aria-current="location">{{ breadcrumb.label|trans }}</a>
                             {% endif %}
                         {% else %}
                             {% if not loop.first %}

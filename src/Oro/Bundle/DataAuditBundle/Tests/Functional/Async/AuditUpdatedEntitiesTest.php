@@ -255,12 +255,6 @@ class AuditUpdatedEntitiesTest extends WebTestCase
                 'oldValue' => $oldArray,
                 'newValue' => $newArray,
             ],
-            'json array property' => [
-                'propertyName' => 'jsonArrayProperty',
-                'dataType' => 'jsonarray',
-                'oldValue' => $oldArray,
-                'newValue' => $newArray,
-            ],
         ];
     }
 

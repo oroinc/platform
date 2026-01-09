@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
@@ -89,7 +88,7 @@ class RemoveOutdatedEnumFieldQuery extends ParametrizedMigrationQuery
     }
 
     /**
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws Exception
      */
     protected function updateEntityData(LoggerInterface $logger, string $enumClass, string $data)
@@ -119,7 +118,7 @@ class RemoveOutdatedEnumFieldQuery extends ParametrizedMigrationQuery
     }
 
     /**
-     * @throws DBALException|Exception
+     * @throws \Doctrine\DBAL\Exception|Exception
      */
     protected function executeQuery(LoggerInterface $logger, $sql, array $parameters = []): void
     {
@@ -131,6 +130,6 @@ class RemoveOutdatedEnumFieldQuery extends ParametrizedMigrationQuery
     #[\Override]
     public function getDescription(): string
     {
-        return 'Remove outdated '. $this->enumField .' enum field data';
+        return 'Remove outdated ' . $this->enumField . ' enum field data';
     }
 }

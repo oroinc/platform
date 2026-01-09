@@ -53,7 +53,7 @@ class OroApiBundleInstaller implements Installation, ConnectionAwareInterface
         $table->addColumn('updated_at', 'datetime');
         $table->addColumn('elapsed_time', 'integer');
         $table->addColumn('has_errors', 'boolean', ['default' => false]);
-        $table->addColumn('summary', 'json_array', ['comment' => '(DC2Type:json_array)', 'notnull' => false]);
+        $table->addColumn('summary', 'json', ['comment' => '(DC2Type:json)', 'notnull' => false]);
         $table->addColumn('affected_entities', 'json', ['comment' => '(DC2Type:json)', 'notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_owner_id'], 'IDX_F4BCF3999EB185F9');

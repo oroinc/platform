@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ReminderBundle\EventListener;
 
-use Doctrine\Common\EventSubscriber;
-use Doctrine\ORM\Events;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
@@ -13,7 +11,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 /**
  * Handles entities that implements RemindableInterface.
  */
-class ReminderListener implements EventSubscriber, ServiceSubscriberInterface
+class ReminderListener implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     private $container;
@@ -28,15 +26,6 @@ class ReminderListener implements EventSubscriber, ServiceSubscriberInterface
     {
         return [
             'oro_reminder.entity.manager' => ReminderManager::class
-        ];
-    }
-
-    #[\Override]
-    public function getSubscribedEvents()
-    {
-        return [
-            Events::postLoad,
-            Events::postPersist
         ];
     }
 

@@ -8,6 +8,7 @@ use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\FormBundle\Validator\Constraints\EntityClass;
 use Oro\Bundle\FormBundle\Validator\Constraints\EntityClassValidator;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class EntityClassValidatorTest extends ConstraintValidatorTestCase
@@ -24,7 +25,7 @@ class EntityClassValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new EntityClassValidator($this->doctrineHelper, $this->entityClassNameHelper);
     }

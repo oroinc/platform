@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\IntegerType;
@@ -47,7 +47,7 @@ class SaveSchemaToolTest extends TestCase
 
         $this->connection->expects($this->any())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
 
         $this->schemaTool = $this->getMockBuilder(SaveSchemaTool::class)
             ->onlyMethods(['getSchemaFromMetadata'])
@@ -63,11 +63,11 @@ class SaveSchemaToolTest extends TestCase
 
         $schemaManager = $this->createMock(AbstractSchemaManager::class);
         $schemaManager->expects($this->once())
-            ->method('createSchema')
+            ->method('introspectSchema')
             ->willReturn($fromSchema);
 
         $this->connection->expects($this->once())
-            ->method('getSchemaManager')
+            ->method('createSchemaManager')
             ->willReturn($schemaManager);
         $this->schemaTool->expects($this->once())
             ->method('getSchemaFromMetadata')

@@ -860,7 +860,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $gridHeader = $grid->getElement($grid->getMappedChildElementName($grid::TABLE_HEADER_ELEMENT));
         $row = $grid->getRowByContent($content);
 
-        $crawler = new Crawler($row->getHtml());
+        $crawler = new Crawler(
+            node: $row->getHtml(),
+            useHtml5Parser: false
+        );
         /** @var Crawler[] $columns */
         $columns = $crawler->filter('td')->each(function (Crawler $td) {
             return $td;
@@ -2275,7 +2278,10 @@ TEXT;
         $row = $grid->getRowByNumber($rowNumber);
         $cell = $row->getCellByNumber($columnNumber);
 
-        $crawler = new Crawler($cell->getHtml());
+        $crawler = new Crawler(
+            node: $cell->getHtml(),
+            useHtml5Parser: false
+        );
 
         $normalizeValue = function (string $value): array {
             if (str_starts_with($value, '[')) {

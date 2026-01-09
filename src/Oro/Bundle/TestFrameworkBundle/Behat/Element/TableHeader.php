@@ -17,7 +17,10 @@ class TableHeader extends Element
      */
     public function getColumnNumber($headerText)
     {
-        $crawler = new Crawler($this->getHtml());
+        $crawler = new Crawler(
+            node: $this->getHtml(),
+            useHtml5Parser: false
+        );
 
         $i = 0;
         $headers = [];
@@ -49,7 +52,10 @@ class TableHeader extends Element
      */
     public function hasColumn($columnName)
     {
-        $crawler = new Crawler($this->getHtml());
+        $crawler = new Crawler(
+            node: $this->getHtml(),
+            useHtml5Parser: false
+        );
 
         /** @var \DOMElement $th */
         foreach ($crawler->filter('th') as $th) {
@@ -75,7 +81,10 @@ class TableHeader extends Element
      */
     public function getColumnsCount(): int
     {
-        $crawler = new Crawler($this->getHtml());
+        $crawler = new Crawler(
+            node: $this->getHtml(),
+            useHtml5Parser: false
+        );
         return $crawler->filter('th.grid-header-cell:not(.action-column):not(.grid-header-cell-massAction)')->count();
     }
 }

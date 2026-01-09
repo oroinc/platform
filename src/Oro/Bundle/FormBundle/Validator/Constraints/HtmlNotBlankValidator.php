@@ -15,7 +15,7 @@ class HtmlNotBlankValidator extends NotBlankValidator
      *
      */
     #[\Override]
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if ($value === null) {
             $value = '';

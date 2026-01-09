@@ -53,11 +53,8 @@ class ConstraintsProvider implements ConstraintsProviderInterface
 
     /**
      * Gets constraints for form view based on metadata
-     *
-     * @param FormInterface $form
-     * @return array
      */
-    protected function getMetadataConstraints(FormInterface $form)
+    protected function getMetadataConstraints(FormInterface $form): array
     {
         $isMapped = $form->getConfig()->getOption('mapped', true);
 
@@ -75,12 +72,12 @@ class ConstraintsProvider implements ConstraintsProviderInterface
 
         $result = [];
         if (isset($this->metadataConstraintsCache[$parentKey][$name])) {
-            $result = $this->metadataConstraintsCache[$parentKey][$name]->constraints;
+            $result = $this->metadataConstraintsCache[$parentKey][$name]->getConstraints();
         } else {
             //If no metadata for the fields name, try getting it with the property path
             $propertyPath = (string)$form->getPropertyPath();
             if (isset($this->metadataConstraintsCache[$parentKey][$propertyPath])) {
-                $result = $this->metadataConstraintsCache[$parentKey][$propertyPath]->constraints;
+                $result = $this->metadataConstraintsCache[$parentKey][$propertyPath]->getConstraints();
             }
         }
 
@@ -89,18 +86,21 @@ class ConstraintsProvider implements ConstraintsProviderInterface
 
     /**
      * Extracts constraints based on validation metadata
-     *
-     * @param FormInterface $form
-     * @return array
      */
-    protected function extractMetadataPropertiesConstraints(FormInterface $form)
+    protected function extractMetadataPropertiesConstraints(FormInterface $form): array
     {
         $constraints = [];
         $dataClass = $form->getConfig()->getDataClass() ?: $form->getConfig()->getOption('entity_class');
         if ($dataClass) {
             /** @var ClassMetadata $metadata */
             $metadata = $this->metadataFactory->getMetadataFor($dataClass);
-            $constraints = $metadata->properties;
+
+            foreach ($metadata->getConstrainedProperties() as $property) {
+                $propertyMetadata = $metadata->getPropertyMetadata($property);
+                if (!empty($propertyMetadata)) {
+                    $constraints[$property] = reset($propertyMetadata);
+                }
+            }
         }
         $errorMapping = $form->getConfig()->getOption('error_mapping');
         if (!empty($constraints) && !empty($errorMapping)) {

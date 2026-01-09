@@ -13,7 +13,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 class MimeTypesToStringTransformer implements DataTransformerInterface
 {
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (is_string($value)) {
             $value = MimeTypesConverter::convertToArray($value);
@@ -25,7 +25,7 @@ class MimeTypesToStringTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if ('' === $value) {
             return null;

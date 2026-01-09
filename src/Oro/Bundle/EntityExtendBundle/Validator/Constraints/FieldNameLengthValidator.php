@@ -21,7 +21,7 @@ class FieldNameLengthValidator extends LengthValidator
     }
 
     #[\Override]
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof FieldNameLength) {
             throw new UnexpectedTypeException($constraint, FieldNameLength::class);

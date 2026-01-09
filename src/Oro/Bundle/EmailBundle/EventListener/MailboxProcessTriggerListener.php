@@ -90,11 +90,14 @@ class MailboxProcessTriggerListener extends MailboxEmailListener implements
         EntityRepository $processRepository,
         MailboxProcessStorage $processStorage,
         ProcessHandler $handler
-    ) {
+    ): void {
         /*
          * Retrieve all process definitions to trigger
          */
         $definitions = $processStorage->getProcessDefinitionNames();
+        if (empty($definitions)) {
+            return;
+        }
         /** @var ProcessDefinition[] $definitions */
         $definitions = $processRepository->findBy(['name' => $definitions]);
 

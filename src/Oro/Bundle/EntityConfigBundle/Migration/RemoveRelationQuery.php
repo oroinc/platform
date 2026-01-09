@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -150,7 +149,7 @@ abstract class RemoveRelationQuery extends RemoveFieldQuery
      * @param string          $fieldName
      * @param string          $relationKey
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function updateEntityData(
         LoggerInterface $logger,

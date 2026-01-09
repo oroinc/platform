@@ -4,7 +4,7 @@ namespace Oro\Component\Testing\Doctrine;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Connection as DriverConnection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\TransactionIsolationLevel;
 
 /**
@@ -40,7 +40,7 @@ class PersistentConnection extends Connection
                 $this->setTransactionIsolation(TransactionIsolationLevel::READ_COMMITTED);
             }
 
-            if ($this->getDatabasePlatform() instanceof MySqlPlatform) {
+            if ($this->getDatabasePlatform() instanceof MySQLPlatform) {
                 // force default value
                 $this->_conn->executeStatement('SET SESSION wait_timeout=28800');
             }
@@ -76,7 +76,7 @@ class PersistentConnection extends Connection
         try {
             $this->wrapTransactionNestingLevel('rollBack');
         } catch (\PDOException $exception) {
-            if ($this->getDatabasePlatform() instanceof MySqlPlatform) {
+            if ($this->getDatabasePlatform() instanceof MySQLPlatform) {
                 // For MySql transactions with DDL are committed automatically and rollBack throws \PDOException,
                 // that is ignored to make DB isolation work the same for all supported DB platforms.
                 $this->setPersistentTransactionNestingLevel($this->getTransactionNestingLevel());

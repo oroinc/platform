@@ -2,7 +2,7 @@
 
 namespace Oro\Component\DoctrineUtils\ORM\Walker;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 
 /**
  * Force MySQL to use given index.
@@ -17,7 +17,7 @@ class MySqlUseIndexOutputResultModifier extends AbstractOutputResultModifier
     #[\Override]
     public function walkFromClause($fromClause, string $result)
     {
-        if ($this->getConnection()->getDatabasePlatform() instanceof MySqlPlatform) {
+        if ($this->getConnection()->getDatabasePlatform() instanceof MySQLPlatform) {
             if ($index = $this->getQuery()->getHint(self::HINT_USE_INDEX)) {
                 return preg_replace('/(\bFROM\s+\w+\s+\w+)/', '\1 USE INDEX (' . $index . ')', $result);
             }

@@ -3,8 +3,8 @@
 namespace Oro\Bundle\CronBundle\Tests\Unit\Filter;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
-use Doctrine\DBAL\Platforms\PostgreSQL92Platform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
@@ -87,7 +87,7 @@ class CommandWithArgsFilterTest extends TestCase
     {
         return [
             [
-                new MySqlPlatform(),
+                new MySQLPlatform(),
                 'cmd --id=1 --id=2',
                 TextFilterType::TYPE_EQUAL,
                 'SELECT j FROM TestEntity j '
@@ -97,7 +97,7 @@ class CommandWithArgsFilterTest extends TestCase
                 ]
             ],
             [
-                new MySqlPlatform(),
+                new MySQLPlatform(),
                 'cmd --id=1',
                 TextFilterType::TYPE_CONTAINS,
                 'SELECT j FROM TestEntity j '
@@ -109,7 +109,7 @@ class CommandWithArgsFilterTest extends TestCase
                 ]
             ],
             [
-                new MySqlPlatform(),
+                new MySQLPlatform(),
                 'cmd --id=1 --id=2',
                 TextFilterType::TYPE_NOT_CONTAINS,
                 'SELECT j FROM TestEntity j '
@@ -123,7 +123,7 @@ class CommandWithArgsFilterTest extends TestCase
                 ]
             ],
             [
-                new MySqlPlatform(),
+                new MySQLPlatform(),
                 'cmd --prm1=Test --prm1="Test Param2"',
                 TextFilterType::TYPE_CONTAINS,
                 'SELECT j FROM TestEntity j '
@@ -137,7 +137,7 @@ class CommandWithArgsFilterTest extends TestCase
                 ]
             ],
             [
-                new MySqlPlatform(),
+                new MySQLPlatform(),
                 '--prm1="Test Param\1"',
                 TextFilterType::TYPE_CONTAINS,
                 'SELECT j FROM TestEntity j '
@@ -147,7 +147,7 @@ class CommandWithArgsFilterTest extends TestCase
                 ]
             ],
             [
-                new PostgreSQL92Platform(),
+                new PostgreSQL94Platform(),
                 '--prm1="Test Param\1"',
                 TextFilterType::TYPE_CONTAINS,
                 'SELECT j FROM TestEntity j '
@@ -157,7 +157,7 @@ class CommandWithArgsFilterTest extends TestCase
                 ]
             ],
             [
-                new MySqlPlatform(),
+                new MySQLPlatform(),
                 'cmd "Acme\\Class"',
                 TextFilterType::TYPE_CONTAINS,
                 'SELECT j FROM TestEntity j '
@@ -169,7 +169,7 @@ class CommandWithArgsFilterTest extends TestCase
                 ]
             ],
             [
-                new PostgreSQL92Platform(),
+                new PostgreSQL94Platform(),
                 'cmd "Acme\\Class"',
                 TextFilterType::TYPE_CONTAINS,
                 'SELECT j FROM TestEntity j '

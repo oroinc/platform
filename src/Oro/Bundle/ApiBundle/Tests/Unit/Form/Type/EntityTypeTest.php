@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\ParameterType;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Form\Type\EntityType;
@@ -118,7 +119,7 @@ class EntityTypeTest extends OrmRelatedTestCase
                 ]
             ],
             [1 => $value['id']],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $associationMetadata = new AssociationMetadata();
@@ -151,7 +152,7 @@ class EntityTypeTest extends OrmRelatedTestCase
                 ]
             ],
             [1 => $value['id']],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $associationMetadata = new AssociationMetadata();

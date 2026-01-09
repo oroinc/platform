@@ -20,11 +20,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class LoginAttemptsHandlerTest extends TestCase
 {
@@ -181,7 +181,7 @@ class LoginAttemptsHandlerTest extends TestCase
         $username = 'john';
         $user = new User();
         $request = new Request();
-        $request->attributes->set(Security::LAST_USERNAME, $username);
+        $request->attributes->set(SecurityRequestAttributes::LAST_USERNAME, $username);
         $this->userManager->expects(self::once())
             ->method('findUserByUsernameOrEmail')
             ->with($username)
@@ -206,7 +206,7 @@ class LoginAttemptsHandlerTest extends TestCase
     {
         $username = 'john';
         $request = new Request();
-        $request->attributes->set(Security::LAST_USERNAME, $username);
+        $request->attributes->set(SecurityRequestAttributes::LAST_USERNAME, $username);
         $this->userManager->expects(self::once())
             ->method('findUserByUsernameOrEmail')
             ->with($username)

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Job;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\DriverException;
+use Doctrine\DBAL\Driver\Exception;
 use Doctrine\DBAL\Exception\DeadlockException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
@@ -118,14 +118,14 @@ class JobExecutorRedeliveryTest extends TestCase
 
     public function getRedeliveryExceptions(): array
     {
-        $driverException = $this->createMock(DriverException::class);
+        $driverException = $this->createMock(Exception::class);
 
         return [
             'UniqueConstraintViolationException' => [
-                new UniqueConstraintViolationException('Error 1', $driverException)
+                new UniqueConstraintViolationException($driverException, null)
             ],
             'DeadlockException' => [
-                new DeadlockException('Error 2', $driverException),
+                new DeadlockException($driverException, null),
             ]
         ];
     }

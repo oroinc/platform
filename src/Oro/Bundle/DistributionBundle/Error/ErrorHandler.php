@@ -14,7 +14,7 @@ class ErrorHandler extends BaseErrorHandler
     {
         $errorLevel = error_reporting();
         // Silence all PHP deprecation notices as many of them are triggered all over the ORO and vendor code
-        error_reporting($errorLevel & ~\E_DEPRECATED);
+        error_reporting($errorLevel & ~\E_DEPRECATED & ~\E_USER_DEPRECATED);
 
         return parent::register($handler, $replace);
     }

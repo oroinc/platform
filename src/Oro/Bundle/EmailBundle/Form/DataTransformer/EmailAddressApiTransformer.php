@@ -5,6 +5,9 @@ namespace Oro\Bundle\EmailBundle\Form\DataTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
+/**
+ * Transforms email addresses to/from API format, supporting both single and multiple addresses.
+ */
 class EmailAddressApiTransformer implements DataTransformerInterface
 {
     /**
@@ -21,7 +24,7 @@ class EmailAddressApiTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if ($this->multiple) {
             if (null === $value) {
@@ -47,7 +50,7 @@ class EmailAddressApiTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if ($this->multiple) {
             if (!$value) {

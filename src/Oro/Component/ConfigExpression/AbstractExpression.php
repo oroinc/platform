@@ -137,6 +137,8 @@ abstract class AbstractExpression implements ExpressionInterface
                         . $this->compilePathElements($param)
                         . '], ['
                         . $this->compilePathIndexes($param)
+                        . '], ['
+                        . $this->compilePathNullSafe($param)
                         . '])';
                 } elseif ($param instanceof ExpressionInterface) {
                     $compiledParams[] = $param->compile($factoryAccessor);
@@ -203,6 +205,30 @@ abstract class AbstractExpression implements ExpressionInterface
                     return $val ? 'true' : 'false';
                 },
                 $indexes
+            )
+        );
+    }
+
+    /**
+     * @param PropertyPathInterface $propertyPath
+     *
+     * @return string
+     */
+    protected function compilePathNullSafe(PropertyPathInterface $propertyPath)
+    {
+        $nullSafe = [];
+        $count    = count($propertyPath->getElements());
+        for ($i = 0; $i < $count; $i++) {
+            $nullSafe[] = $propertyPath->isNullSafe($i);
+        }
+
+        return implode(
+            ', ',
+            array_map(
+                function ($val) {
+                    return $val ? 'true' : 'false';
+                },
+                $nullSafe
             )
         );
     }

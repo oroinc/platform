@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 class EntityManagementConfigVoter implements VoterInterface
 {
     #[\Override]
-    public function vote(TokenInterface $token, mixed $subject, array $attributes)
+    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
         if (!($subject instanceof ConfigModel)) {
             return self::ACCESS_ABSTAIN;

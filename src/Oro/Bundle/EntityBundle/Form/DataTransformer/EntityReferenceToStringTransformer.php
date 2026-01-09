@@ -9,6 +9,9 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
+/**
+ * Transforms entity references to JSON strings and vice versa.
+ */
 class EntityReferenceToStringTransformer implements DataTransformerInterface
 {
     /** @var DoctrineHelper */
@@ -20,7 +23,7 @@ class EntityReferenceToStringTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function transform($entity)
+    public function transform($entity): mixed
     {
         if (null === $entity) {
             return '';
@@ -46,10 +49,10 @@ class EntityReferenceToStringTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (empty($value)) {
-            return;
+            return null;
         }
 
         if (!is_string($value)) {

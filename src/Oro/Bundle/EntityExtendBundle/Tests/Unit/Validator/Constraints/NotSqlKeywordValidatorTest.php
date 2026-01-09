@@ -3,16 +3,17 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeyword;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeywordValidator;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NotSqlKeywordValidatorTest extends ConstraintValidatorTestCase
 {
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         $connection = $this->createMock(Connection::class);
         $doctrine = $this->createMock(ManagerRegistry::class);
@@ -21,7 +22,7 @@ class NotSqlKeywordValidatorTest extends ConstraintValidatorTestCase
             ->willReturn($connection);
         $connection->expects($this->any())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
 
         return new NotSqlKeywordValidator($doctrine);
     }

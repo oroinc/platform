@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class ContextListenerTest extends TestCase
 {
@@ -101,7 +101,10 @@ class ContextListenerTest extends TestCase
         $session = $this->createMock(SessionInterface::class);
         $session->expects(self::once())
             ->method('set')
-            ->with(Security::AUTHENTICATION_ERROR, self::isInstanceOf(OrganizationAccessDeniedException::class));
+            ->with(
+                SecurityRequestAttributes::AUTHENTICATION_ERROR,
+                self::isInstanceOf(OrganizationAccessDeniedException::class)
+            );
 
         $request = $this->createMock(Request::class);
         $request->expects(self::any())
@@ -239,7 +242,10 @@ class ContextListenerTest extends TestCase
         $session = $this->createMock(SessionInterface::class);
         $session->expects(self::once())
             ->method('set')
-            ->with(Security::AUTHENTICATION_ERROR, self::isInstanceOf(OrganizationAccessDeniedException::class));
+            ->with(
+                SecurityRequestAttributes::AUTHENTICATION_ERROR,
+                self::isInstanceOf(OrganizationAccessDeniedException::class)
+            );
 
         $request = $this->createMock(Request::class);
         $request->expects(self::any())
