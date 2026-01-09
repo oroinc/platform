@@ -6,6 +6,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EmailBundle\Validator\Constraints\NotEmptyEmailTemplateTranslationSubject;
 use Oro\Bundle\EmailBundle\Validator\Constraints\NotEmptyEmailTemplateTranslationSubjectValidator;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -13,7 +14,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 class NotEmptyEmailTemplateTranslationSubjectValidatorTest extends ConstraintValidatorTestCase
 {
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new NotEmptyEmailTemplateTranslationSubjectValidator();
     }

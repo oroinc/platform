@@ -2,6 +2,7 @@
 
 namespace Oro\Component\DoctrineUtils\DBAL;
 
+use Doctrine\DBAL\ParameterType;
 use PDO;
 
 /**
@@ -26,8 +27,8 @@ class DbPrivilegesProvider
             WHERE table_catalog = :tableSchema
             AND table_name = :tableName"
         );
-        $stmt->bindValue('tableSchema', $dbName, PDO::PARAM_STR);
-        $stmt->bindValue('tableName', 'oro_privileges_check', PDO::PARAM_STR);
+        $stmt->bindValue('tableSchema', $dbName, ParameterType::STRING);
+        $stmt->bindValue('tableName', 'oro_privileges_check', ParameterType::STRING);
         $stmt->execute();
 
         $granted = array_merge(

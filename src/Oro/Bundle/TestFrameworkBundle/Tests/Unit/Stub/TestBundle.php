@@ -74,7 +74,7 @@ class TestBundle implements BundleInterface
     }
 
     #[\Override]
-    public function setContainer(?ContainerInterface $container = null)
+    public function setContainer(?ContainerInterface $container = null): void
     {
     }
 }

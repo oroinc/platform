@@ -6,6 +6,7 @@ use Oro\Bundle\SecurityBundle\Util\UriSecurityHelper;
 use Oro\Bundle\SecurityBundle\Validator\Constraints\NotDangerousProtocol;
 use Oro\Bundle\SecurityBundle\Validator\Constraints\NotDangerousProtocolValidator;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NotDangerousProtocolValidatorTest extends ConstraintValidatorTestCase
@@ -20,7 +21,7 @@ class NotDangerousProtocolValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new NotDangerousProtocolValidator($this->uriSecurityHelper);
     }

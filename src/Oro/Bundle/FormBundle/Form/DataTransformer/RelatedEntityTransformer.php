@@ -10,6 +10,9 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Transforms related entities to/from their identifier and class representation with authorization checks.
+ */
 class RelatedEntityTransformer implements DataTransformerInterface
 {
     /** @var DoctrineHelper */
@@ -32,7 +35,7 @@ class RelatedEntityTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (null === $value) {
             return null;
@@ -49,7 +52,7 @@ class RelatedEntityTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (!$value) {
             return null;

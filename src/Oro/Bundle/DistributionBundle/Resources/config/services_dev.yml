@@ -6,6 +6,7 @@ services:
                 {
                     '/^_profiler_.+$/': 100,
                     '/^_profiler$/': 100,
+                    '/^_wdt_stylesheet$/': 100,
                     '/^_wdt$/': 100,
                     '/^_preview_error$/': 100,
                 } ] ]

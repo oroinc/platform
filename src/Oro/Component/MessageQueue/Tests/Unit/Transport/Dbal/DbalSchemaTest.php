@@ -16,7 +16,7 @@ class DbalSchemaTest extends TestCase
 
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())
-            ->method('getSchemaManager')
+            ->method('createSchemaManager')
             ->willReturn($schemaManger);
 
         new DbalSchema($connection, 'table-name');
@@ -28,7 +28,7 @@ class DbalSchemaTest extends TestCase
 
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())
-            ->method('getSchemaManager')
+            ->method('createSchemaManager')
             ->willReturn($schemaManger);
 
         $schema = new DbalSchema($connection, 'table-name');

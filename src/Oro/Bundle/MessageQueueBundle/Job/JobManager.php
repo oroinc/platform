@@ -4,8 +4,8 @@ namespace Oro\Bundle\MessageQueueBundle\Job;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\LockMode;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\MessageQueueBundle\Entity\Job as JobEntity;
@@ -118,21 +118,21 @@ class JobManager implements JobManagerInterface
         $qb
             ->update($tableName)
             ->set('status', ':status')
-            ->setParameter('status', Job::STATUS_CANCELLED, Type::STRING)
+            ->setParameter('status', Job::STATUS_CANCELLED, Types::STRING)
             ->set('stopped_at', ':stoppedAt')
-            ->setParameter('stoppedAt', $stoppedAt, Type::DATETIME);
+            ->setParameter('stoppedAt', $stoppedAt, Types::DATETIME_MUTABLE);
 
         if ($startedAt) {
             $qb
                 ->set('started_at', ':startedAt')
-                ->setParameter('startedAt', $startedAt, Type::DATETIME);
+                ->setParameter('startedAt', $startedAt, Types::DATETIME_MUTABLE);
         }
 
         $qb
             ->where($qb->expr()->eq('root_job_id', ':rootJob'))
-            ->setParameter('rootJob', $rootJob->getId(), Type::INTEGER)
+            ->setParameter('rootJob', $rootJob->getId(), Types::INTEGER)
             ->andWhere($qb->expr()->in('status', ':statuses'))
-            ->setParameter('statuses', $statuses, Type::SIMPLE_ARRAY)
+            ->setParameter('statuses', $statuses, Types::SIMPLE_ARRAY)
             ->execute();
     }
 
@@ -186,18 +186,18 @@ class JobManager implements JobManagerInterface
                 'data' => $job->getData(),
                 'jobProgress' => $job->getJobProgress(),
             ], [
-                'ownerId' => Type::STRING,
-                'name' => Type::STRING,
-                'status' => Type::STRING,
-                'unique' => Type::BOOLEAN,
-                'interrupted' => Type::BOOLEAN,
-                'createdAt' => Type::DATETIME,
-                'startedAt' => Type::DATETIME,
-                'stoppedAt' => Type::DATETIME,
-                'lastActiveAt' => Type::DATETIME,
-                'rootJob' => Type::INTEGER,
-                'data' => Type::JSON_ARRAY,
-                'jobProgress' => Type::FLOAT,
+                'ownerId' => Types::STRING,
+                'name' => Types::STRING,
+                'status' => Types::STRING,
+                'unique' => Types::BOOLEAN,
+                'interrupted' => Types::BOOLEAN,
+                'createdAt' => Types::DATETIME_MUTABLE,
+                'startedAt' => Types::DATETIME_MUTABLE,
+                'stoppedAt' => Types::DATETIME_MUTABLE,
+                'lastActiveAt' => Types::DATETIME_MUTABLE,
+                'rootJob' => Types::INTEGER,
+                'data' => Types::JSON,
+                'jobProgress' => Types::FLOAT,
             ]);
 
         $qb->execute();
@@ -248,19 +248,19 @@ class JobManager implements JobManagerInterface
                 'jobProgress' => $job->getJobProgress(),
                 'id' => $job->getId(),
             ], [
-                'ownerId' => Type::STRING,
-                'name' => Type::STRING,
-                'status' => Type::STRING,
-                'unique' => Type::BOOLEAN,
-                'interrupted' => Type::BOOLEAN,
-                'createdAt' => Type::DATETIME,
-                'startedAt' => Type::DATETIME,
-                'stoppedAt' => Type::DATETIME,
-                'lastActiveAt' => Type::DATETIME,
-                'rootJob' => Type::INTEGER,
-                'data' => Type::JSON_ARRAY,
-                'jobProgress' => Type::FLOAT,
-                'id' => Type::INTEGER
+                'ownerId' => Types::STRING,
+                'name' => Types::STRING,
+                'status' => Types::STRING,
+                'unique' => Types::BOOLEAN,
+                'interrupted' => Types::BOOLEAN,
+                'createdAt' => Types::DATETIME_MUTABLE,
+                'startedAt' => Types::DATETIME_MUTABLE,
+                'stoppedAt' => Types::DATETIME_MUTABLE,
+                'lastActiveAt' => Types::DATETIME_MUTABLE,
+                'rootJob' => Types::INTEGER,
+                'data' => Types::JSON,
+                'jobProgress' => Types::FLOAT,
+                'id' => Types::INTEGER
             ]);
 
         $qb->execute();

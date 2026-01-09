@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Testing\Unit\ORM\Mocks;
 
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
@@ -14,22 +14,7 @@ class DatabasePlatformMock extends AbstractPlatform
     private $name = 'mock';
     private $sequenceNextValSql = '';
     private $prefersIdentityColumns = true;
-    private $prefersSequences = false;
     private $reservedKeywordsClass = null;
-
-    /**
-     * @override
-     */
-    public function getNativeDeclaration(array $field)
-    {
-    }
-
-    /**
-     * @override
-     */
-    public function getPortableDeclaration(array $field)
-    {
-    }
 
     /**
      * @override
@@ -40,63 +25,54 @@ class DatabasePlatformMock extends AbstractPlatform
         return $this->prefersIdentityColumns;
     }
 
-    /**
-     * @override
-     */
-    #[\Override]
-    public function prefersSequences()
-    {
-        return $this->prefersSequences;
-    }
-
     /** @override */
     #[\Override]
-    public function getSequenceNextValSQL($sequenceName)
+    public function getSequenceNextValSQL($sequence)
     {
         return $this->sequenceNextValSql;
     }
 
     /** @override */
     #[\Override]
-    public function getBooleanTypeDeclarationSQL(array $field)
+    public function getBooleanTypeDeclarationSQL(array $column)
     {
     }
 
     /** @override */
     #[\Override]
-    public function getIntegerTypeDeclarationSQL(array $field)
+    public function getIntegerTypeDeclarationSQL(array $column)
     {
     }
 
     /** @override */
     #[\Override]
-    public function getBigIntTypeDeclarationSQL(array $field)
+    public function getBigIntTypeDeclarationSQL(array $column)
     {
     }
 
     /** @override */
     #[\Override]
-    public function getSmallIntTypeDeclarationSQL(array $field)
+    public function getSmallIntTypeDeclarationSQL(array $column)
     {
     }
 
     /** @override */
     // phpcs:disable
     #[\Override]
-    protected function _getCommonIntegerTypeDeclarationSQL(array $columnDef)
+    protected function _getCommonIntegerTypeDeclarationSQL(array $column)
     {
         // phpcs:enable
     }
 
     /** @override */
     #[\Override]
-    public function getVarcharTypeDeclarationSQL(array $field)
+    public function getVarcharTypeDeclarationSQL(array $column)
     {
     }
 
     /** @override */
     #[\Override]
-    public function getClobTypeDeclarationSQL(array $field)
+    public function getClobTypeDeclarationSQL(array $column)
     {
     }
 
@@ -104,17 +80,13 @@ class DatabasePlatformMock extends AbstractPlatform
 
     public function setPrefersIdentityColumns($bool)
     {
-        $this->_prefersIdentityColumns = $bool;
+        $this->prefersIdentityColumns = $bool;
     }
 
-    public function setPrefersSequences($bool)
-    {
-        $this->_prefersSequences = $bool;
-    }
 
     public function setSequenceNextValSql($sql)
     {
-        $this->_sequenceNextValSql = $sql;
+        $this->sequenceNextValSql = $sql;
     }
 
     #[\Override]
@@ -137,9 +109,9 @@ class DatabasePlatformMock extends AbstractPlatform
      * Gets the SQL Snippet used to declare a BLOB column type.
      */
     #[\Override]
-    public function getBlobTypeDeclarationSQL(array $field)
+    public function getBlobTypeDeclarationSQL(array $column)
     {
-        throw DBALException::notSupported(__METHOD__);
+        throw Exception::notSupported(__METHOD__);
     }
 
     #[\Override]
@@ -163,5 +135,10 @@ class DatabasePlatformMock extends AbstractPlatform
     public function setReservedKeywordsClass(?string $reservedKeywordsClass): void
     {
         $this->reservedKeywordsClass = $reservedKeywordsClass;
+    }
+
+    public function getCurrentDatabaseExpression(): string
+    {
+        return 'CURRENT_DATABASE()';
     }
 }

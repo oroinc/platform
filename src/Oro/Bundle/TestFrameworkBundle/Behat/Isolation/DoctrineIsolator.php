@@ -13,9 +13,9 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EventListener\RestrictFlushInitializerListener;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver\AliceFixtureReferenceResolver;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 

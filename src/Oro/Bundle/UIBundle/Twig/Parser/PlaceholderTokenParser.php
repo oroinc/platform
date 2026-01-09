@@ -3,9 +3,7 @@
 namespace Oro\Bundle\UIBundle\Twig\Parser;
 
 use Twig\Node\Expression\ConstantExpression;
-use Twig\Node\Expression\Filter\DefaultFilter;
 use Twig\Node\Expression\FunctionExpression;
-use Twig\Node\Expression\NameExpression;
 use Twig\Node\Node;
 use Twig\Node\PrintNode;
 use Twig\Token;
@@ -31,23 +29,8 @@ class PlaceholderTokenParser extends AbstractTokenParser
             $currentValue = $currentToken->getValue();
             $currentLine  = $currentToken->getLine();
 
-            // Creates expression: placeholder_name|default('placeholder_name')
-            // To parse either variable value or name
-            $name = new DefaultFilter(
-                new NameExpression($currentValue, $currentLine),
-                new ConstantExpression('default', $currentLine),
-                new Node(
-                    array(
-                        new ConstantExpression(
-                            $currentValue,
-                            $currentLine
-                        )
-                    ),
-                    array(),
-                    $currentLine
-                ),
-                $currentLine
-            );
+            // Treat NAME tokens as string constants (placeholder names)
+            $name = new ConstantExpression($currentValue, $currentLine);
 
             $stream->next();
         } else {
@@ -63,14 +46,13 @@ class PlaceholderTokenParser extends AbstractTokenParser
         $stream->expect(Token::BLOCK_END_TYPE);
 
         // build expression to call 'placeholder' function
+        // Get the TwigFunction instance for Twig 3.12+ compatibility
+        $env = $this->parser->getEnvironment();
+        $placeholderFunction = $env->getFunction('placeholder');
+
         $expr = new FunctionExpression(
-            'placeholder',
-            new Node(
-                array(
-                    'name'       => $name,
-                    'variables'  => $variables
-                )
-            ),
+            $placeholderFunction,
+            new Node([$name, $variables]),
             $token->getLine()
         );
 

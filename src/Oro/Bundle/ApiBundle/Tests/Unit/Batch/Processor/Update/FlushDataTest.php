@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Processor\Update;
 
-use Doctrine\DBAL\Driver\DriverException;
+use Doctrine\DBAL\Driver\Exception;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchFlushDataHandlerFactoryInterface;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchFlushDataHandlerFactoryRegistry;
@@ -339,8 +339,8 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
         $items = [$item1, $item2];
 
         $exception = new UniqueConstraintViolationException(
-            'flushData exception',
-            $this->createMock(DriverException::class)
+            $this->createMock(Exception::class),
+            null
         );
 
         $flushDataHandler = $this->createMock(BatchFlushDataHandlerInterface::class);
@@ -432,8 +432,8 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
         $items = [$item1];
 
         $exception = new UniqueConstraintViolationException(
-            'flushData exception',
-            $this->createMock(DriverException::class)
+            $this->createMock(Exception::class),
+            null
         );
 
         $flushDataHandler = $this->createMock(BatchFlushDataHandlerInterface::class);

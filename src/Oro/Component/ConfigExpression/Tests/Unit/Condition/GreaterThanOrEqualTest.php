@@ -115,14 +115,14 @@ class GreaterThanOrEqualTest extends TestCase
                 'options'  => [new PropertyPath('foo'), 123],
                 'message'  => null,
                 'expected' => '$factory->create(\'gte\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false], [false])'
                     . ', 123])'
             ],
             [
                 'options'  => [new PropertyPath('foo'), 123],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'gte\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false], [false])'
                     . ', 123])->setMessage(\'Test\')'
             ]
         ];

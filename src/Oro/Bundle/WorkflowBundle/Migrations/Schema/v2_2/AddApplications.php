@@ -38,7 +38,7 @@ class AddApplications implements Migration, DatabasePlatformAwareInterface
         $postSchema = clone $preSchema;
 
         $table = $postSchema->getTable('oro_workflow_definition');
-        $table->changeColumn('applications', ['notnull' => true]);
+        $table->modifyColumn('applications', ['notnull' => true]);
 
         foreach ($this->getSchemaDiff($preSchema, $postSchema) as $query) {
             $queries->addQuery($query);

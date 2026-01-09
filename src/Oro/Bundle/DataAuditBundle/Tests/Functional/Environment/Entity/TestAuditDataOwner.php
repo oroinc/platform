@@ -193,7 +193,7 @@ class TestAuditDataOwner implements
     #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
     private ?int $integerProperty = null;
 
-    #[ORM\Column(name: 'json_array_property', type: Types::JSON_ARRAY, nullable: true)]
+    #[ORM\Column(name: 'json_array_property', type: Types::JSON, nullable: true)]
     #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
     private ?array $jsonArrayProperty = null;
 

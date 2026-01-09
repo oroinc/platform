@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_34;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
@@ -47,7 +47,7 @@ class MigrateEmailTemplatesQuery extends ParametrizedMigrationQuery
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     private function doExecute(LoggerInterface $logger, bool $dryRun): void
     {

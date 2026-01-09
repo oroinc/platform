@@ -5,6 +5,9 @@ namespace Oro\Bundle\DataGridBundle\Datagrid;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface as Property;
 
+/**
+ * Guesses frontend formatting options for datagrid columns based on column data types.
+ */
 class DefaultColumnOptionsGuesser extends AbstractColumnOptionsGuesser
 {
     /** @var array */
@@ -22,7 +25,7 @@ class DefaultColumnOptionsGuesser extends AbstractColumnOptionsGuesser
         'percent'      => Property::TYPE_PERCENT,
         'simple_array' => Property::TYPE_SIMPLE_ARRAY,
         'array'        => Property::TYPE_ARRAY,
-        'json_array'   => Property::TYPE_ARRAY,
+        'json'   => Property::TYPE_ARRAY,
         'row_array'    => Property::TYPE_ROW_ARRAY,
     ];
 

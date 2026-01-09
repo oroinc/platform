@@ -52,7 +52,12 @@ class ReplaceStrategy implements StrategyInterface
             $activityListItems = $this->getActivitiesByEntity($masterEntity, $activityClass);
             $activityIds = \array_column($activityListItems, 'relatedActivityId');
 
-            $activities = $this->doctrineHelper->getEntityRepository($activityClass)->findBy(['id' => $activityIds]);
+            if ($activityIds) {
+                $activities = $this->doctrineHelper->getEntityRepository($activityClass)
+                    ->findBy(['id' => $activityIds]);
+            } else {
+                $activities = [];
+            }
             foreach ($activities as $activity) {
                 $this->activityManager->removeActivityTarget($activity, $masterEntity);
             }

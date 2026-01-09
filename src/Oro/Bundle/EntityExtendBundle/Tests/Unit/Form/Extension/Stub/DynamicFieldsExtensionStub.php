@@ -16,7 +16,7 @@ class DynamicFieldsExtensionStub extends DynamicFieldsOptionsExtension
     }
 
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         foreach ($this->fieldsConfiguration as $field) {
             $builder->add($field[0], $field[1] ?? null, $field[2] ?? []);

@@ -24,7 +24,7 @@ class ChangeTokenFieldType implements Migration
     {
         $table = $schema->getTable('oro_email_origin');
         if ($table->getColumn('access_token')->getType()->getName() !== Types::TEXT) {
-            $table->changeColumn('access_token', ['type' => TextType::getType(Types::TEXT), 'length' => 8192]);
+            $table->modifyColumn('access_token', ['type' => TextType::getType(Types::TEXT), 'length' => 8192]);
         }
     }
 
@@ -32,7 +32,7 @@ class ChangeTokenFieldType implements Migration
     {
         $table = $schema->getTable('oro_email_origin');
         if ($table->getColumn('refresh_token')->getType()->getName() !== Types::TEXT) {
-            $table->changeColumn('refresh_token', ['type' => TextType::getType(Types::TEXT), 'length' => 8192]);
+            $table->modifyColumn('refresh_token', ['type' => TextType::getType(Types::TEXT), 'length' => 8192]);
         }
     }
 }

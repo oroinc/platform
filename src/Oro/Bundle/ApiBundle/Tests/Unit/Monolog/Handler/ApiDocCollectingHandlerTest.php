@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Monolog\Handler;
 
+use Monolog\Level;
+use Monolog\LogRecord;
 use Oro\Bundle\ApiBundle\Collector\ApiDocWarningsCollector;
 use Oro\Bundle\ApiBundle\Monolog\Handler\ApiDocCollectingHandler;
 use PHPUnit\Framework\TestCase;
@@ -19,7 +21,12 @@ class ApiDocCollectingHandlerTest extends TestCase
 
     public function testHandleAddsWarningToCollector(): void
     {
-        $record = ['message' => 'Test warning message'];
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Warning,
+            message: 'Test warning message'
+        );
 
         $this->collector->expects(self::once())
             ->method('addWarning')
@@ -30,7 +37,12 @@ class ApiDocCollectingHandlerTest extends TestCase
 
     public function testHandleDeduplicatesMessages(): void
     {
-        $record = ['message' => 'Duplicate warning'];
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Warning,
+            message: 'Duplicate warning'
+        );
 
         $this->collector->expects(self::once())
             ->method('addWarning')
@@ -45,8 +57,18 @@ class ApiDocCollectingHandlerTest extends TestCase
 
     public function testHandleProcessesDifferentMessages(): void
     {
-        $record1 = ['message' => 'Warning message 1'];
-        $record2 = ['message' => 'Warning message 2'];
+        $record1 = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Warning,
+            message: 'Warning message 1'
+        );
+        $record2 = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Warning,
+            message: 'Warning message 2'
+        );
 
         $this->collector->expects(self::exactly(2))
             ->method('addWarning')
@@ -58,7 +80,12 @@ class ApiDocCollectingHandlerTest extends TestCase
 
     public function testHandleAlwaysReturnsFalse(): void
     {
-        $record = ['message' => 'Any message'];
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Warning,
+            message: 'Any message'
+        );
 
         $result = $this->handler->handle($record);
 
@@ -67,7 +94,12 @@ class ApiDocCollectingHandlerTest extends TestCase
 
     public function testHandleWithEmptyMessage(): void
     {
-        $record = ['message' => ''];
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Warning,
+            message: ''
+        );
 
         $this->collector->expects(self::once())
             ->method('addWarning')
@@ -80,7 +112,12 @@ class ApiDocCollectingHandlerTest extends TestCase
 
     public function testHandleDeduplicatesEmptyMessages(): void
     {
-        $record = ['message' => ''];
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Warning,
+            message: ''
+        );
 
         $this->collector->expects(self::once())
             ->method('addWarning')

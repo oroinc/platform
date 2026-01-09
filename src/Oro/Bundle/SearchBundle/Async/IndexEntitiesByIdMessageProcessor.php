@@ -69,7 +69,7 @@ class IndexEntitiesByIdMessageProcessor implements
 
             $idFieldName = $this->doctrineHelper->getSingleEntityIdentifierFieldName($entityClass);
             $repository = $this->doctrineHelper->getEntityRepository($entityClass);
-            $result = $repository->findBy([$idFieldName => $ids]);
+            $result = $ids ? $repository->findBy([$idFieldName => $ids]) : [];
 
             if ($result) {
                 $this->indexer->save($result);

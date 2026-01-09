@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\ManagerRegistry;
@@ -90,7 +91,7 @@ class UpdateEmailVisibilitiesForOrganizationProcessorTest extends OrmTestCase
             . ' WHERE o1_.organization_id = ?',
             [['sclr_0' => $count]],
             [1 => $organizationId],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
     }
 
@@ -109,7 +110,7 @@ class UpdateEmailVisibilitiesForOrganizationProcessorTest extends OrmTestCase
             $sql,
             $data,
             [1 => $organizationId],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
     }
 

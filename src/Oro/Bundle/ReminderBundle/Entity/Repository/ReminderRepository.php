@@ -94,6 +94,9 @@ class ReminderRepository extends EntityRepository
      */
     public function findReminders(array $reminderIds)
     {
+        if (empty($reminderIds)) {
+            return [];
+        }
         return $this->findBy(['id' => $reminderIds]);
     }
 

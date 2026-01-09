@@ -9,7 +9,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity as DoctrineUnique
  */
 class UniqueEntity extends DoctrineUniqueEntityConstraint
 {
-    public $service = 'oro_form.validator_constraints.unique_entity';
+    public string $service = 'oro_form.validator_constraints.unique_entity';
 
     public ?bool $buildViolationAtEntityLevel = true;
 }

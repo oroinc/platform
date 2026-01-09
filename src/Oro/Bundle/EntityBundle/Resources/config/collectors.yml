@@ -39,5 +39,7 @@ services:
     oro_entity.profiler.duplicate_queries_data_collector:
         public: false
         class: Oro\Bundle\EntityBundle\DataCollector\DuplicateQueriesDataCollector
+        arguments:
+            - '@doctrine.debug_data_holder'
         tags:
             - { name: data_collector, template: '@OroEntity/Collector/duplicate_queries.html.twig', id: duplicate_queries }

@@ -15,6 +15,7 @@ use Oro\Bundle\EntityExtendBundle\Validator\Constraints\DefaultRelationFieldVali
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class DefaultRelationFieldValidatorTest extends ConstraintValidatorTestCase
@@ -22,7 +23,7 @@ class DefaultRelationFieldValidatorTest extends ConstraintValidatorTestCase
     private const ENTITY_CLASS = 'Test\Entity';
 
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         $extendConfigProvider = new ConfigProviderMock($this->createMock(ConfigManager::class), 'extend');
         $extendConfigProvider->addFieldConfig(self::ENTITY_CLASS, 'defaultField', 'int');

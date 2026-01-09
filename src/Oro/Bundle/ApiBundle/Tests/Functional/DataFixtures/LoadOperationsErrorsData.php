@@ -10,8 +10,8 @@ use Oro\Bundle\ApiBundle\Batch\Model\BatchError;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\GaufretteBundle\FileManager;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
+use Oro\Component\DependencyInjection\ContainerAwareTrait;
 
 class LoadOperationsErrorsData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {

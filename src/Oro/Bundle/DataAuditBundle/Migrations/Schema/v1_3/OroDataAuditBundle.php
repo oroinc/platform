@@ -56,13 +56,13 @@ class OroDataAuditBundle implements Migration
             'notnull' => false,
             'comment' => '(DC2Type:simple_array)'
         ]);
-        $oroAuditFieldTable->addColumn('old_jsonarray', 'json_array', [
+        $oroAuditFieldTable->addColumn('old_jsonarray', 'json', [
             'notnull' => false,
-            'comment' => '(DC2Type:json_array)',
+            'comment' => '(DC2Type:json)',
         ]);
-        $oroAuditFieldTable->addColumn('new_jsonarray', 'json_array', [
+        $oroAuditFieldTable->addColumn('new_jsonarray', 'json', [
             'notnull' => false,
-            'comment' => '(DC2Type:json_array)',
+            'comment' => '(DC2Type:json)',
         ]);
         $oroAuditFieldTable->setPrimaryKey(['id']);
         $oroAuditFieldTable->addIndex(['audit_id'], 'IDX_9A31A824BD29F359', []);

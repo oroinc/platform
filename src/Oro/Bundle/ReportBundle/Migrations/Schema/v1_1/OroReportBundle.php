@@ -12,6 +12,6 @@ class OroReportBundle implements Migration
     public function up(Schema $schema, QueryBag $queries): void
     {
         $schema->getTable('oro_report')
-            ->addColumn('chart_options', 'json_array', ['notnull' => false]);
+            ->addColumn('chart_options', 'json', ['notnull' => false]);
     }
 }

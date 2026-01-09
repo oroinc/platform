@@ -6,7 +6,7 @@ use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Bundle\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class RouterTest extends TestCase
 {
     private Request&MockObject $request;
-    private ParameterBag&MockObject $requestQuery;
+    private InputBag $requestQuery;
     private UrlGeneratorInterface&MockObject $urlGenerator;
     private AuthorizationCheckerInterface&MockObject $authorizationChecker;
     private Router $router;
@@ -27,7 +27,7 @@ class RouterTest extends TestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->requestQuery = $this->createMock(ParameterBag::class);
+        $this->requestQuery = new InputBag();
         $this->request = $this->createMock(Request::class);
         $this->request->query = $this->requestQuery;
 
@@ -124,9 +124,7 @@ class RouterTest extends TestCase
             ->with(Router::ACTION_PARAMETER)
             ->willReturn(json_encode($data['actionParameters'], JSON_THROW_ON_ERROR));
 
-        $this->requestQuery->expects($this->once())
-            ->method('all')
-            ->willReturn($data['queryParameters']);
+        $this->requestQuery->add($data['queryParameters']);
 
         $expectedUrl = 'http://expected.com';
         $this->urlGenerator->expects($this->once())

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Migration\ActivityListMigrationQuery;
@@ -66,7 +66,7 @@ class ActivityListMigrationQueryTest extends TestCase
 
         $connection->expects($this->any())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
         $this->migrationQuery->setConnection($connection);
 
         $table = $this->schema->createTable('acme_test');

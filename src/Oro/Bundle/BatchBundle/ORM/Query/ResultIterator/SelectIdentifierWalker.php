@@ -23,7 +23,7 @@ class SelectIdentifierWalker extends TreeWalkerAdapter
         $this->validate($AST);
 
         // Get the root entity and alias from the AST fromClause
-        $queryComponents = $this->_getQueryComponents();
+        $queryComponents = $this->getQueryComponents();
         $from = $AST->fromClause->identificationVariableDeclarations;
         if (count($from) !== 1) {
             throw new \LogicException('There is more then 1 From clause');

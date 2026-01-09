@@ -29,7 +29,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
         $template = $this->createTheme($blockName);
         $resource = [$template, $blockName];
 
-        $view = $this->createMock(FormView::class);
+        $view = new FormView();
         $view->vars['cache_key'] = $cacheKey;
 
         $this->environment->expects($this->any())
@@ -52,7 +52,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
         $firstTheme = $this->createTheme($blockName);
         $secondTheme = $this->createTheme($blockName);
 
-        $view = $this->createMock(FormView::class);
+        $view = new FormView();
         $view->vars['cache_key'] = $cacheKey;
 
         $this->engine->addDefaultThemes([$firstTheme, $secondTheme]);
@@ -76,7 +76,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
             '__datagrid__datagrid',
         ];
 
-        $view = $this->createMock(FormView::class);
+        $view = new FormView();
         $view->vars['cache_key'] = '_customer_role_datagrid';
 
         $this->engine->addDefaultThemes([

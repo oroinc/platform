@@ -4,6 +4,7 @@ namespace Oro\Bundle\LoggerBundle\Monolog;
 
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\HandlerWrapper;
+use Monolog\LogRecord;
 use Oro\Bundle\LoggerBundle\Provider\ErrorLogNotificationRecipientsProvider;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -40,7 +41,7 @@ class ErrorLogNotificationHandlerWrapper extends HandlerWrapper implements Logge
      *
      */
     #[\Override]
-    public function handle(array $record): bool
+    public function handle(LogRecord $record): bool
     {
         if (!$this->getRecipientsEmailAddresses()) {
             return false;
@@ -97,7 +98,7 @@ class ErrorLogNotificationHandlerWrapper extends HandlerWrapper implements Logge
      *
      */
     #[\Override]
-    public function isHandling(array $record): bool
+    public function isHandling(LogRecord $record): bool
     {
         return !$this->preventHandling && parent::isHandling($record) && $this->getRecipientsEmailAddresses();
     }

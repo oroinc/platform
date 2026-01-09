@@ -32,11 +32,11 @@ class ActivityListExtension implements ExtendExtensionAwareInterface, NameGenera
         $targetTable = $schema->getTable($targetTableName);
 
         // Column names are used to show a title of target entity
-        $targetTitleColumnNames = $targetTable->getPrimaryKeyColumns();
+        $targetTitleColumnNames = $targetTable->getPrimaryKey()->getColumns();
         // Column names are used to show detailed info about target entity
-        $targetDetailedColumnNames = $targetTable->getPrimaryKeyColumns();
+        $targetDetailedColumnNames = $targetTable->getPrimaryKey()->getColumns();
         // Column names are used to show target entity in a grid
-        $targetGridColumnNames = $targetTable->getPrimaryKeyColumns();
+        $targetGridColumnNames = $targetTable->getPrimaryKey()->getColumns();
 
         $associationName = ExtendHelper::buildAssociationName(
             $this->extendExtension->getEntityClassByTableName($targetTableName),

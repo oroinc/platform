@@ -173,29 +173,29 @@ class GetValueTest extends TestCase
                 'options'  => [new PropertyPath('foo')],
                 'message'  => null,
                 'expected' => '$factory->create(\'value\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false], [false])'
                     . '])'
             ],
             [
                 'options'  => [new PropertyPath('foo'), null],
                 'message'  => null,
                 'expected' => '$factory->create(\'value\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false], [false])'
                     . ', null])'
             ],
             [
                 'options'  => [new PropertyPath('foo'), new PropertyPath('bar')],
                 'message'  => null,
                 'expected' => '$factory->create(\'value\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false])'
-                    . ', new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'bar\', [\'bar\'], [false])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false], [false])'
+                    . ', new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'bar\', [\'bar\'], [false], [false])'
                     . '])'
             ],
             [
                 'options'  => [new PropertyPath('foo')],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'value\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false], [false])'
                     . '])->setMessage(\'Test\')'
             ]
         ];

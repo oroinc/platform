@@ -78,14 +78,15 @@ abstract class CleanupAttachmentFilesCommand extends Command implements Signalab
     }
 
     #[\Override]
-    public function handleSignal(int $signal): void
+    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
     {
         if (\SIGINT === $signal || \SIGTERM === $signal) {
             if ($this->needToRemoveSavedBatches) {
                 $this->dataFileManager->deleteAllFiles();
             }
-            exit(0);
+            return 0;
         }
+        return false;
     }
 
     /**

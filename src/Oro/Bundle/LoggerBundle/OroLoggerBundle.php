@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LoggerBundle;
 
 use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\ConfigurableLoggerPass;
+use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\DoctrineSQLLoggerPass;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\ErrorLogNotificationMailerHandlerPass;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\LoggerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -15,6 +16,7 @@ class OroLoggerBundle extends Bundle
     {
         parent::build($container);
 
+        $container->addCompilerPass(new DoctrineSQLLoggerPass());
         $container->addCompilerPass(new ErrorLogNotificationMailerHandlerPass());
         $container->addCompilerPass(new ConfigurableLoggerPass());
         $container->addCompilerPass(new LoggerPass());

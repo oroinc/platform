@@ -46,7 +46,7 @@ class MigrateUserLoginAttemptsQuery extends ParametrizedMigrationQuery
             foreach ($rows as $row) {
                 $lastId = $row['id'];
                 $row['datetime'] = $this->connection->convertToPHPValue($row['datetime'], Types::DATETIME_MUTABLE);
-                $row['context'] = $this->connection->convertToPHPValue($row['context'], Types::JSON_ARRAY);
+                $row['context'] = $this->connection->convertToPHPValue($row['context'], Types::JSON);
                 yield $row;
             }
         } while ($rows);

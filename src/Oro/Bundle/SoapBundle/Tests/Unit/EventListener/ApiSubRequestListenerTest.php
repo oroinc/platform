@@ -5,7 +5,7 @@ namespace Oro\Bundle\SoapBundle\Tests\Unit\EventListener;
 use Oro\Bundle\SoapBundle\EventListener\ApiSubRequestListener;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestMatcher;
+use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -17,9 +17,9 @@ class ApiSubRequestListenerTest extends TestCase
     protected function setUp(): void
     {
         $this->listener = new ApiSubRequestListener();
-        $this->listener->addRule(new RequestMatcher('^/api/rest'), ['stop' => false]);
-        $this->listener->addRule(new RequestMatcher('^/another_api'));
-        $this->listener->addRule(new RequestMatcher('^/'), ['stop' => true]);
+        $this->listener->addRule(new PathRequestMatcher('^/api/rest'), ['stop' => false]);
+        $this->listener->addRule(new PathRequestMatcher('^/another_api'));
+        $this->listener->addRule(new PathRequestMatcher('^/'), ['stop' => true]);
     }
 
     public function testOnKernelRequestForMainRequest(): void

@@ -39,7 +39,7 @@ class BinaryNode extends Node
     }
 
     #[\Override]
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         // [CUSTOM LINES]
         $operator = $this->getOperator();
@@ -85,7 +85,7 @@ class BinaryNode extends Node
     }
 
     #[\Override]
-    public function evaluate(array $functions, array $values)
+    public function evaluate(array $functions, array $values): mixed
     {
         // [CUSTOM LINES]
         $operator = $this->attributes['operator'];
@@ -162,7 +162,7 @@ class BinaryNode extends Node
             case '-':
                 return $left - $right;
             case '~':
-                return $left.$right;
+                return $left . $right;
             case '*':
                 return $left * $right;
             case '/':
@@ -183,9 +183,9 @@ class BinaryNode extends Node
     }
 
     #[\Override]
-    public function toArray()
+    public function toArray(): array
     {
-        return ['(', $this->nodes['left'], ' '.$this->attributes['operator'].' ', $this->nodes['right'], ')'];
+        return ['(', $this->nodes['left'], ' ' . $this->attributes['operator'] . ' ', $this->nodes['right'], ')'];
     }
 
     // [CUSTOM LINES]

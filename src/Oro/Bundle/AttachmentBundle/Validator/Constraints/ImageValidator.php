@@ -22,7 +22,7 @@ class ImageValidator extends BaseImageValidator
     }
 
     #[\Override]
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof Image) {
             throw new UnexpectedTypeException($constraint, Image::class);

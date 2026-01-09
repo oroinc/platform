@@ -25,7 +25,7 @@ class CreateEntityRestrictionsTable implements Migration
         $table->addColumn('field', 'string', ['length' => 255]);
         $table->addColumn('entity_class', 'string', ['length' => 255]);
         $table->addColumn('mode', 'string', ['length' => 255]);
-        $table->addColumn('mode_values', 'json_array', ['notnull' => false, 'comment' => '(DC2Type:json_array)']);
+        $table->addColumn('mode_values', 'json', ['notnull' => false, 'comment' => '(DC2Type:json)']);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(
             ['workflow_name', 'workflow_step_id', 'field', 'entity_class', 'mode'],

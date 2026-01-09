@@ -101,7 +101,7 @@ class UpdateNotificationRuleWorkflowTransitionQuery extends ParametrizedMigratio
     /**
      * Get quote_created template id
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     private function getTemplateId(): int
     {

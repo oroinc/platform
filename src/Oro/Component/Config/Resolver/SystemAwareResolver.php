@@ -3,7 +3,7 @@
 namespace Oro\Component\Config\Resolver;
 
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 

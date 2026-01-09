@@ -28,7 +28,7 @@ class TwigTemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriber
     }
 
     #[\Override]
-    public function warmUp($cacheDir): array
+    public function warmUp($cacheDir, ?string $buildDir = null): array
     {
         if (null === $this->twig) {
             $this->twig = $this->container->get('twig');

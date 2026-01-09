@@ -2,11 +2,11 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
 use Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer;
 use Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\LayoutUpdateWithDependency;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DependencyInitializerTest extends TestCase

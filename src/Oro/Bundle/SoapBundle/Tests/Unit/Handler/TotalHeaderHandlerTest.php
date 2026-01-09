@@ -221,7 +221,7 @@ class TotalHeaderHandlerTest extends TestCase
             ->willReturnSelf();
         $dbalQb->expects($this->once())
             ->method('setFirstResult')
-            ->with($this->identicalTo(null))
+            ->with($this->identicalTo(0))
             ->willReturnSelf();
 
         $this->handler->expects($this->once())

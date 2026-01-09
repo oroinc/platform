@@ -2,13 +2,15 @@
 
 namespace Oro\Component\Testing\Unit\ORM\Mocks;
 
+use PHPUnit\Framework\MockObject\MockObject;
+
 /**
- * Iterates over \Doctrine\DBAL\Driver\Statement->fetch()
+ * Iterates over \Doctrine\DBAL\Driver\Result->fetchAssociative()
  */
 class FetchIterator implements \Iterator
 {
-    /** @var StatementMock */
-    protected $statement;
+    /** @var ResultMock|MockObject */
+    protected $result;
 
     /** @var mixed */
     protected $row;
@@ -19,9 +21,9 @@ class FetchIterator implements \Iterator
     /**
      * FetchIterator constructor.
      */
-    public function __construct(StatementMock $statement)
+    public function __construct(ResultMock|MockObject $result)
     {
-        $this->statement = $statement;
+        $this->result = $result;
     }
 
     #[\Override]
@@ -33,7 +35,7 @@ class FetchIterator implements \Iterator
     #[\Override]
     public function next(): void
     {
-        $this->row = $this->statement->fetch();
+        $this->row = $this->result->fetchAssociative();
         $this->key++;
     }
 

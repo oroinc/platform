@@ -27,7 +27,7 @@ class PageCacheWarmer implements CacheWarmerInterface
     }
 
     #[\Override]
-    public function warmUp($cacheDir): array
+    public function warmUp($cacheDir, ?string $buildDir = null): array
     {
         foreach ($this->pageRequestProviders as $pageRequestProvider) {
             if (!$pageRequestProvider instanceof AbstractPageRequestProvider) {

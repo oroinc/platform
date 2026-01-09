@@ -226,7 +226,7 @@ abstract class BaseDriver implements DBALPersisterInterface
          */
         $qb->resetDQLPart('select');
         $qb->resetDQLPart('groupBy');
-        $qb->setFirstResult(null);
+        $qb->setFirstResult(0);
         $qb->setMaxResults(null);
 
         $qb->select([

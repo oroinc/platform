@@ -259,7 +259,7 @@ class AuditInsertedEntitiesTest extends WebTestCase
             ],
             'json array property' => [
                 'propertyName' => 'jsonArrayProperty',
-                'dataType' => 'jsonarray',
+                'dataType' => 'json',
                 'newValue' => $newArray,
             ],
         ];

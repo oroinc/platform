@@ -51,7 +51,6 @@ oro:
                 ref-one:            System relation
                 ref-many:           System relation
                 array:              Binary (Array)
-                json_array:         Binary (JSON array)
                 simple_array:       Binary (Simple array)
                 object:             Binary (Object)
 

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Api\Model;
 
-use Doctrine\DBAL\Driver\PDOException;
+use Doctrine\DBAL\Driver\Exception;
 use Doctrine\DBAL\Exception\DriverException;
 use Oro\Bundle\SearchBundle\Api\Exception\InvalidSearchQueryException;
 use Oro\Bundle\SearchBundle\Api\Model\SearchQueryExecutor;
@@ -134,9 +134,10 @@ class SearchResultTest extends TestCase
         $this->expectException(InvalidSearchQueryException::class);
         $searchResult = $this->getSearchResult();
 
+        $driverException = $this->createMock(Exception::class);
         $this->query->expects(self::once())
             ->method('getResult')
-            ->willThrowException(new DriverException('some error', $this->createMock(PDOException::class)));
+            ->willThrowException(new DriverException($driverException, null));
 
         $searchResult->getRecords();
     }
@@ -150,9 +151,10 @@ class SearchResultTest extends TestCase
         $this->query->expects(self::once())
             ->method('getResult')
             ->willReturn($result);
+        $driverException = $this->createMock(Exception::class);
         $result->expects(self::once())
             ->method('getElements')
-            ->willThrowException(new DriverException('some error', $this->createMock(PDOException::class)));
+            ->willThrowException(new DriverException($driverException, null));
 
         $searchResult->getRecords();
     }
@@ -192,9 +194,10 @@ class SearchResultTest extends TestCase
         $this->expectException(InvalidSearchQueryException::class);
         $searchResult = $this->getSearchResult();
 
+        $driverException = $this->createMock(Exception::class);
         $this->query->expects(self::once())
             ->method('getResult')
-            ->willThrowException(new DriverException('some error', $this->createMock(PDOException::class)));
+            ->willThrowException(new DriverException($driverException, null));
 
         $searchResult->getRecordsCount();
     }
@@ -240,9 +243,10 @@ class SearchResultTest extends TestCase
         $this->expectException(InvalidSearchQueryException::class);
         $searchResult = $this->getSearchResult();
 
+        $driverException = $this->createMock(Exception::class);
         $this->query->expects(self::once())
             ->method('getResult')
-            ->willThrowException(new DriverException('some error', $this->createMock(PDOException::class)));
+            ->willThrowException(new DriverException($driverException, null));
 
         $searchResult->getAggregatedData();
     }

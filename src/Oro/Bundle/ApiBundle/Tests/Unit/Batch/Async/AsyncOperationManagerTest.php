@@ -171,7 +171,7 @@ class AsyncOperationManagerTest extends TestCase
             ->willReturnMap([
                 ['updatedAt', 'string'],
                 ['status', 'string'],
-                ['summary', 'json_array'],
+                ['summary', 'json'],
                 ['hasErrors', 'boolean']
             ]);
         if (null === $exception) {
@@ -222,7 +222,7 @@ class AsyncOperationManagerTest extends TestCase
             ->method('getTypeOfField')
             ->willReturnMap([
                 ['updatedAt', 'string'],
-                ['summary', 'json_array']
+                ['summary', 'json']
             ]);
         $query->expects(self::once())
             ->method('execute')
@@ -268,7 +268,7 @@ class AsyncOperationManagerTest extends TestCase
             ->method('getTypeOfField')
             ->willReturnMap([
                 ['updatedAt', 'string'],
-                ['summary', 'json_array'],
+                ['summary', 'json'],
                 ['hasErrors', 'boolean']
             ]);
         $query->expects(self::once())

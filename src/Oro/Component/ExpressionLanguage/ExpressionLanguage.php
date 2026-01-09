@@ -29,7 +29,7 @@ class ExpressionLanguage extends SymfonyExpressionLanguage
     }
 
     #[\Override]
-    public function parse($expression, array $names): ParsedExpression
+    public function parse($expression, array $names, int $flags = 0): ParsedExpression
     {
         if ($expression instanceof ParsedExpression) {
             return $expression;
@@ -42,7 +42,7 @@ class ExpressionLanguage extends SymfonyExpressionLanguage
             $cacheKeyItems[] = \is_int($nameKey) ? $name : $nameKey . ':' . $name;
         }
 
-        $cacheItem = $this->cache->getItem(rawurlencode($expression.'//'.implode('|', $cacheKeyItems)));
+        $cacheItem = $this->cache->getItem(rawurlencode($expression . '//' . implode('|', $cacheKeyItems)));
 
         if (null === $parsedExpression = $cacheItem->get()) {
             $nodes = $this->getParser()->parse($this->getLexer()->tokenize((string)$expression), $names);
@@ -56,7 +56,7 @@ class ExpressionLanguage extends SymfonyExpressionLanguage
     }
 
     #[\Override]
-    public function lint($expression, ?array $names): void
+    public function lint($expression, ?array $names, int $flags = 0): void
     {
         if ($expression instanceof ParsedExpression) {
             return;

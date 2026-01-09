@@ -16,10 +16,10 @@ class IncreaseNotificationAlertColumnsLength implements Migration
     {
         $table = $schema->getTable('oro_notification_alert');
         if ($table->getColumn('operation')->getLength() < 50) {
-            $table->changeColumn('operation', ['length' => 50]);
+            $table->modifyColumn('operation', ['length' => 50]);
         }
         if ($table->getColumn('step')->getLength() < 50) {
-            $table->changeColumn('step', ['length' => 50]);
+            $table->modifyColumn('step', ['length' => 50]);
         }
     }
 }

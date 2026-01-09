@@ -7,6 +7,9 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
+/**
+ * Transforms entity changesets by enriching them with corresponding entity references.
+ */
 class EntityChangesetTransformer implements DataTransformerInterface
 {
     public const ENTITY_KEY = 'entity';
@@ -32,13 +35,13 @@ class EntityChangesetTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         return $value;
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (!$value) {
             return new ArrayCollection();

@@ -21,7 +21,7 @@ class ReplaceDateTimeFilterPartQuery extends ParametrizedSqlMigrationQuery
             $definition = $segment['definition'];
             $needUpdate = false;
             if ($definition) {
-                $definition = $this->connection->convertToPHPValue($definition, Types::JSON_ARRAY);
+                $definition = $this->connection->convertToPHPValue($definition, Types::JSON);
                 if (!empty($definition['filters'])) {
                     $updated = $this->processFilters($definition['filters'], $needUpdate);
                     if ($needUpdate) {
@@ -41,7 +41,7 @@ class ReplaceDateTimeFilterPartQuery extends ParametrizedSqlMigrationQuery
                 ],
                 [
                     'id' => Types::INTEGER,
-                    'definition' => Types::JSON_ARRAY
+                    'definition' => Types::JSON
                 ]
             );
         }

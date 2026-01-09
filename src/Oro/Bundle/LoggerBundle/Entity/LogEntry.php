@@ -23,7 +23,7 @@ class LogEntry
     /**
      * @var array
      */
-    #[ORM\Column(name: 'context', type: 'json_array')]
+    #[ORM\Column(name: 'context', type: 'json')]
     protected $context;
 
     #[ORM\Column(name: 'level', type: Types::SMALLINT)]
@@ -38,7 +38,7 @@ class LogEntry
     /**
      * @var array
      */
-    #[ORM\Column(name: 'extra', type: 'json_array')]
+    #[ORM\Column(name: 'extra', type: 'json')]
     protected $extra;
 
     /**

@@ -6,8 +6,8 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailBodyTopic;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
+use Oro\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * Adds `text_body` field to the `oro_email_body` table if needed and sends migration message to queue.

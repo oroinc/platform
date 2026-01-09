@@ -70,7 +70,7 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
     }
 
     #[\Override]
-    protected function loadResourcesFromTheme($cacheKey, &$theme)
+    protected function loadResourcesFromTheme($cacheKey, &$theme): void
     {
         parent::loadResourcesFromTheme($cacheKey, $theme);
 

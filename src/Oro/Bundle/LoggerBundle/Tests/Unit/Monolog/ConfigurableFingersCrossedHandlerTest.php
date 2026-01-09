@@ -44,7 +44,7 @@ class ConfigurableFingersCrossedHandlerTest extends TestCase
         $this->handler->handle($record);
 
         $this->assertTrue(
-            $this->testNestedHandler->hasError($record)
+            $this->testNestedHandler->hasErrorRecords()
         );
     }
 
@@ -62,7 +62,7 @@ class ConfigurableFingersCrossedHandlerTest extends TestCase
         $this->handler->handle($record);
 
         $this->assertTrue(
-            $this->testNestedHandler->hasError($record)
+            $this->testNestedHandler->hasErrorRecords()
         );
     }
 

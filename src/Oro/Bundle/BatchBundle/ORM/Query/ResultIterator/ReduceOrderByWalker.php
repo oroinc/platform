@@ -5,12 +5,15 @@ namespace Oro\Bundle\BatchBundle\ORM\Query\ResultIterator;
 use Doctrine\ORM\Query\AST;
 use Doctrine\ORM\Query\TreeWalkerAdapter;
 
+/**
+ * Removes non-identifier ORDER BY clauses from queries to optimize iteration.
+ */
 class ReduceOrderByWalker extends TreeWalkerAdapter
 {
     #[\Override]
     public function walkSelectStatement(AST\SelectStatement $AST)
     {
-        $queryComponents = $this->_getQueryComponents();
+        $queryComponents = $this->getQueryComponents();
         $from = $AST->fromClause->identificationVariableDeclarations;
         if (count($from) !== 1) {
             throw new \LogicException('There is more then 1 From clause');

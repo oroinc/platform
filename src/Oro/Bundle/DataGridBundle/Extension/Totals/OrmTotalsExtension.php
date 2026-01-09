@@ -180,7 +180,7 @@ class OrmTotalsExtension extends AbstractExtension
 
         $qb = clone $this->masterQB;
         if (!$perPage) {
-            $qb->setFirstResult(null)->setMaxResults(null);
+            $qb->setFirstResult(0)->setMaxResults(null);
         }
         $this->addPageLimits($qb);
         $qb->select($totalQueries);

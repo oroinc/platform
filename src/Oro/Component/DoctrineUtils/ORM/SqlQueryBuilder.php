@@ -2,7 +2,8 @@
 
 namespace Oro\Component\DoctrineUtils\ORM;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\ParameterType;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Query\QueryException;
@@ -227,7 +228,7 @@ class SqlQueryBuilder
      *
      * @return string the placeholder name used.
      */
-    public function createNamedParameter($value, $type = \PDO::PARAM_STR, $placeHolder = null)
+    public function createNamedParameter($value, $type = ParameterType::STRING, $placeHolder = null)
     {
         return $this->qb->createNamedParameter($value, $type, $placeHolder);
     }
@@ -240,7 +241,7 @@ class SqlQueryBuilder
      *
      * @return string
      */
-    public function createPositionalParameter($value, $type = \PDO::PARAM_STR)
+    public function createPositionalParameter($value, $type = ParameterType::STRING)
     {
         return $this->qb->createPositionalParameter($value, $type);
     }
@@ -254,7 +255,7 @@ class SqlQueryBuilder
      */
     public function setFirstResult($firstResult)
     {
-        $this->qb->setFirstResult($firstResult);
+        $this->qb->setFirstResult($firstResult ?? 0);
 
         return $this;
     }
@@ -777,7 +778,7 @@ class SqlQueryBuilder
      * Gets the complete Update SQL string formed by the current specifications of this QueryBuilder.
      *
      * @throws QueryException
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     private function getUpdateSQL(): string
     {
@@ -813,7 +814,7 @@ class SqlQueryBuilder
                     $joinFrom = array_shift($joinParts[$from['alias']]);
                     unset($joinParts[$from['alias']]);
                     $parts[] = 'FROM ' . $joinFrom['joinTable'] . ' ' . $joinFrom['joinAlias'];
-                    $where = $this->expr()->andX(
+                    $where = $this->expr()->and(
                         $joinFrom['joinCondition'],
                         $where
                     );
@@ -842,9 +843,9 @@ class SqlQueryBuilder
                     );
 
                     $pks = $this->getConnection()
-                        ->getSchemaManager()
-                        ->listTableDetails($from['table'])
-                        ->getPrimaryKeyColumns();
+                        ->createSchemaManager()
+                        ->introspectTable($from['table'])
+                        ->getPrimaryKey()->getColumns();
                     $pkExpr = $this->expr()->andX();
                     foreach ($pks as $pk) {
                         $pkExpr->add(
@@ -854,7 +855,7 @@ class SqlQueryBuilder
                             )
                         );
                     }
-                    $where = $this->expr()->andX(
+                    $where = $this->expr()->and(
                         $pkExpr,
                         $where
                     );

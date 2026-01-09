@@ -15,15 +15,21 @@ class MakeMailerMessageLoggerListenerPersistentPass extends RegisterPersistentSe
     {
         parent::process($container);
 
-        $container
-            ->findDefinition('mailer.message_logger_listener')
-            // Must be explicitly public to become persistent during MQ consumption.
-            ->setPublic(true);
+        if ($container->hasDefinition('mailer.message_logger_listener')) {
+            $container
+                ->findDefinition('mailer.message_logger_listener')
+                // Must be explicitly public to become persistent during MQ consumption.
+                ->setPublic(true);
+        }
     }
 
     #[\Override]
     protected function getPersistentServices(ContainerBuilder $container): array
     {
-        return ['mailer.message_logger_listener'];
+        if ($container->hasDefinition('mailer.message_logger_listener')) {
+            return ['mailer.message_logger_listener'];
+        }
+
+        return [];
     }
 }

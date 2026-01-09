@@ -84,7 +84,7 @@ class KernelStub extends OroKernel
     }
 
     #[\Override]
-    public function shutdown()
+    public function shutdown(): void
     {
     }
 

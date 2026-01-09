@@ -38,7 +38,7 @@ class AclProtectedTypeExtension extends AbstractTypeExtension
     }
 
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $aclHelper = $this->aclHelper;
         $loader = function (Options $options) use ($aclHelper) {

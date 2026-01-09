@@ -10,7 +10,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 class EmailTemplateTransformer implements DataTransformerInterface
 {
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         $value = $this->decodeTemplateVariables((string)$value);
 
@@ -18,7 +18,7 @@ class EmailTemplateTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         $value = $this->decodeTemplateVariables((string)$value);
 

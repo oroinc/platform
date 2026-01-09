@@ -36,14 +36,17 @@ class TitleNode extends Node
 
         $arguments = null;
 
-        $nodes = $node->getIterator();
-
-        // take first argument array node
-        foreach ($nodes as $childNode) {
-            if ($childNode instanceof ArrayExpression) {
-                $arguments = $childNode;
-
-                break;
+        // If the expression itself is an array, use it directly.
+        if ($node instanceof ArrayExpression) {
+            $arguments = $node;
+        } else {
+            $nodes = $node->getIterator();
+            // take first argument array node
+            foreach ($nodes as $childNode) {
+                if ($childNode instanceof ArrayExpression) {
+                    $arguments = $childNode;
+                    break;
+                }
             }
         }
 

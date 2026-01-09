@@ -6,8 +6,6 @@ use Oro\Bundle\LocaleBundle\Entity\AbstractTranslation;
 
 /**
  * EnumValueTranslation class is needed only for migration of outdated enum`s during a platform update.
- *
- * @deprecated
  */
 class EnumValueTranslation extends AbstractTranslation
 {

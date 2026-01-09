@@ -97,19 +97,19 @@ class OroDataAuditBundleInstaller implements Installation
             'notnull' => false,
             'comment' => '(DC2Type:simple_array)',
         ]);
-        $table->addColumn('old_jsonarray', 'json_array', [
+        $table->addColumn('old_jsonarray', 'json', [
             'notnull' => false,
-            'comment' => '(DC2Type:json_array)',
+            'comment' => '(DC2Type:json)',
         ]);
-        $table->addColumn('new_jsonarray', 'json_array', [
+        $table->addColumn('new_jsonarray', 'json', [
             'notnull' => false,
-            'comment' => '(DC2Type:json_array)',
+            'comment' => '(DC2Type:json)',
         ]);
         $table->addColumn('old_json', 'json', ['notnull' => false]);
         $table->addColumn('new_json', 'json', ['notnull' => false]);
-        $table->addColumn('collection_diffs', 'json_array', [
+        $table->addColumn('collection_diffs', 'json', [
             'notnull' => false,
-            'comment' => '(DC2Type:json_array)',
+            'comment' => '(DC2Type:json)',
         ]);
         $table->addColumn('translation_domain', 'string', ['length' => 100, 'notnull' => false]);
         $table->setPrimaryKey(['id']);

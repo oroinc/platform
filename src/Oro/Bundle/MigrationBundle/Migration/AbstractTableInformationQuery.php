@@ -36,7 +36,7 @@ abstract class AbstractTableInformationQuery extends ParametrizedMigrationQuery
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function getReferenceTables(string $tableName, ?LoggerInterface $logger): array
     {
@@ -56,7 +56,7 @@ abstract class AbstractTableInformationQuery extends ParametrizedMigrationQuery
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function getTableForeignKeys(string $tableName): array
     {
@@ -68,7 +68,7 @@ abstract class AbstractTableInformationQuery extends ParametrizedMigrationQuery
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function getListTableForeignKeysSQL(string $tableName): string
     {
@@ -148,7 +148,7 @@ abstract class AbstractTableInformationQuery extends ParametrizedMigrationQuery
      * @param array|string[] $ignoredFields
      * @param LoggerInterface|null $logger
      * @return array|string[]
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function getUniqueColumnNames(
         string $tableName,

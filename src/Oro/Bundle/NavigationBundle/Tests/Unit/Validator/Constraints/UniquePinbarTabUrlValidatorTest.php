@@ -13,6 +13,7 @@ use Oro\Bundle\NavigationBundle\Validator\Constraints\UniquePinbarTabUrlValidato
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class UniquePinbarTabUrlValidatorTest extends ConstraintValidatorTestCase
@@ -44,7 +45,7 @@ class UniquePinbarTabUrlValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new UniquePinbarTabUrlValidator($this->doctrineHelper, $this->pinbarTabUrlNormalizer);
     }

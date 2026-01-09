@@ -20,7 +20,7 @@ class EventTriggerCacheClearer implements CacheClearerInterface
     }
 
     #[\Override]
-    public function clear($cacheDir)
+    public function clear($cacheDir): void
     {
         foreach ($this->eventTriggerCaches as $eventTriggerCache) {
             $eventTriggerCache->invalidateCache();

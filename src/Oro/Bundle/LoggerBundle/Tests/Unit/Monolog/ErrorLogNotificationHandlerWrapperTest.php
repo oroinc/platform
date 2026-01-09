@@ -3,6 +3,8 @@
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\Monolog;
 
 use Monolog\Handler\HandlerInterface;
+use Monolog\Level;
+use Monolog\LogRecord;
 use Oro\Bundle\LoggerBundle\Monolog\ErrorLogNotificationHandlerWrapper;
 use Oro\Bundle\LoggerBundle\Provider\ErrorLogNotificationRecipientsProvider;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
@@ -51,7 +53,12 @@ class ErrorLogNotificationHandlerWrapperTest extends TestCase
             ->method('getRecipientsEmailAddresses')
             ->willReturn(['to@example.org']);
 
-        $records = ['sample_record'];
+        $records = [new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Error,
+            message: 'sample_record'
+        )];
         $this->innerHandler->expects(self::atLeastOnce())
             ->method('handleBatch')
             ->with($records);
@@ -71,7 +78,12 @@ class ErrorLogNotificationHandlerWrapperTest extends TestCase
             ->method('getRecipientsEmailAddresses')
             ->willReturn(['to@example.org']);
 
-        $records = ['sample_record'];
+        $records = [new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Error,
+            message: 'sample_record'
+        )];
         $this->innerHandler->expects(self::atLeastOnce())
             ->method('handleBatch')
             ->with($records)
@@ -107,10 +119,16 @@ class ErrorLogNotificationHandlerWrapperTest extends TestCase
         $this->innerHandler->expects(self::never())
             ->method(self::anything());
 
-        $this->handlerWrapper->handle([]);
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Error,
+            message: 'sample_record'
+        );
+        $this->handlerWrapper->handle($record);
 
         // Checks caching.
-        $this->handlerWrapper->handle([]);
+        $this->handlerWrapper->handle($record);
     }
 
     public function testHandleWhenHasRecipients(): void
@@ -119,7 +137,12 @@ class ErrorLogNotificationHandlerWrapperTest extends TestCase
             ->method('getRecipientsEmailAddresses')
             ->willReturn(['to@example.org']);
 
-        $record = ['sample_record'];
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Error,
+            message: 'sample_record'
+        );
         $this->innerHandler->expects(self::atLeastOnce())
             ->method('handle')
             ->with($record);
@@ -139,7 +162,12 @@ class ErrorLogNotificationHandlerWrapperTest extends TestCase
             ->method('getRecipientsEmailAddresses')
             ->willReturn(['to@example.org']);
 
-        $record = ['sample_record'];
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Error,
+            message: 'sample_record'
+        );
         $this->innerHandler->expects(self::atLeastOnce())
             ->method('handle')
             ->with($record)
@@ -164,7 +192,12 @@ class ErrorLogNotificationHandlerWrapperTest extends TestCase
             ->method('getRecipientsEmailAddresses')
             ->willReturn([]);
 
-        $record = ['sample_record'];
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Error,
+            message: 'sample_record'
+        );
         $this->innerHandler->expects(self::atLeastOnce())
             ->method('isHandling')
             ->with($record)
@@ -182,7 +215,12 @@ class ErrorLogNotificationHandlerWrapperTest extends TestCase
             ->method('getRecipientsEmailAddresses')
             ->willReturn(['to@example.org']);
 
-        $record = ['sample_record'];
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Error,
+            message: 'sample_record'
+        );
         $this->innerHandler->expects(self::atLeastOnce())
             ->method('isHandling')
             ->with($record)
@@ -199,7 +237,12 @@ class ErrorLogNotificationHandlerWrapperTest extends TestCase
         $this->recipientsProvider->expects(self::never())
             ->method('getRecipientsEmailAddresses');
 
-        $record = ['sample_record'];
+        $record = new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Error,
+            message: 'sample_record'
+        );
         $this->innerHandler->expects(self::once())
             ->method('isHandling')
             ->with($record)

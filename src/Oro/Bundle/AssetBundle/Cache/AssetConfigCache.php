@@ -34,7 +34,7 @@ class AssetConfigCache implements WarmableInterface
     }
 
     #[\Override]
-    public function warmUp(string $cacheDir): array
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         $config['paths'] = $this->getBundlesPath();
         $config['devServerOptions'] = $this->webpackDevServerOptions;
@@ -52,7 +52,7 @@ class AssetConfigCache implements WarmableInterface
 
     private function getFilePath(string $cacheDir): string
     {
-        return $cacheDir.'/asset-config.json';
+        return $cacheDir . '/asset-config.json';
     }
 
     private function getBundlesPath(): array

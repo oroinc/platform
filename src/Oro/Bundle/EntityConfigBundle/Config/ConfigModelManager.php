@@ -468,13 +468,16 @@ class ConfigModelManager
         if (null === $this->entities) {
             $this->entities = [];
         }
+
         if ($className) {
             if (!\array_key_exists($className, $this->entities)) {
                 $this->entities[$className] = !$this->entitiesAreLoaded
                     ? $this->loadEntityModel($className)
                     : null;
             }
-        } elseif (!$this->entitiesAreLoaded) {
+        }
+
+        if (!$this->entitiesAreLoaded) {
             $entityModels = $this->loadEntityModels();
             foreach ($entityModels as $model) {
                 $this->entities[$model->getClassName()] = $model;

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\ColumnDiff;
 use Doctrine\DBAL\Schema\Comparator;
@@ -294,7 +294,7 @@ class MigrationExecutor
                     sprintf(
                         'Could not create index for column with length more than %s. ' .
                         'Please correct "%s" column length "%s" in table in "%s" migration',
-                        MySqlPlatform::LENGTH_LIMIT_TINYTEXT,
+                        MySQLPlatform::LENGTH_LIMIT_TINYTEXT,
                         $columnName,
                         $table->getName(),
                         \get_class($migration)
@@ -322,7 +322,7 @@ class MigrationExecutor
     protected function getActualSchema(): Schema
     {
         $platform = $this->queryExecutor->getConnection()->getDatabasePlatform();
-        $sm = $this->queryExecutor->getConnection()->getSchemaManager();
+        $sm = $this->queryExecutor->getConnection()->createSchemaManager();
 
         return $this->createSchemaObject(
             $sm->listTables(),

@@ -11,7 +11,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 class FallbackValueTransformer implements DataTransformerInterface
 {
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         $result = [
             'value' => null,
@@ -30,7 +30,7 @@ class FallbackValueTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (!$value) {
             return null;

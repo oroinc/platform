@@ -18,13 +18,13 @@ class ResetTransformDataTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         return $value;
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         return $this->transformer->reverseTransform($value);
     }

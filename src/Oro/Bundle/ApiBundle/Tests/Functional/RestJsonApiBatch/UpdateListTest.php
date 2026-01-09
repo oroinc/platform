@@ -935,7 +935,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         self::assertNotNull($operation);
         self::assertEquals(AsyncOperation::STATUS_NEW, $operation->getStatus(), 'Status');
         self::assertNull($operation->getProgress(), 'Progress');
-        self::assertSame([], $operation->getSummary(), 'Summary');
+        self::assertNull($operation->getSummary(), 'Summary');
         self::assertEquals(ApiAction::UPDATE_LIST, $operation->getActionName(), 'ActionName');
         self::assertEquals(TestDepartment::class, $operation->getEntityClass(), 'EntityClass');
         self::assertNotNull($operation->getCreatedAt(), 'CreatedAt');

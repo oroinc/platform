@@ -12,7 +12,7 @@ use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\OroEntityManagerStub;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Container;
 
 class RegistryTest extends TestCase
 {
@@ -21,13 +21,13 @@ class RegistryTest extends TestCase
     private const TEST_ENTITY_CLASS = TestEntity::class;
     private const TEST_ENTITY_PROXY_CLASS = Proxy::class;
 
-    private ContainerInterface&MockObject $container;
+    private Container&MockObject $container;
     private Registry $registry;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->container = $this->createMock(ContainerInterface::class);
+        $this->container = $this->createMock(Container::class);
 
         $this->registry = new Registry(
             $this->container,
@@ -66,13 +66,14 @@ class RegistryTest extends TestCase
         $manager1 = $this->getManager();
         $manager2 = $this->getManager();
 
-        $this->container->expects(self::exactly(3))
+        $this->container->expects(self::exactly(2))
             ->method('get')
             ->with('service.default')
-            ->willReturnOnConsecutiveCalls($manager1, $manager1, $manager2);
+            ->willReturnOnConsecutiveCalls($manager1, $manager2);
         $this->container->expects(self::once())
             ->method('initialized')
-            ->willReturnMap([['service.default', true]]);
+            ->with('service.default')
+            ->willReturn(false);
 
         self::assertSame($manager1, $this->registry->getManager('default'));
         // test that a manager service cached
@@ -90,13 +91,14 @@ class RegistryTest extends TestCase
         $manager1 = $this->getManager();
         $manager2 = $this->getManager();
 
-        $this->container->expects(self::exactly(3))
+        $this->container->expects(self::exactly(2))
             ->method('get')
             ->with('service.default')
-            ->willReturnOnConsecutiveCalls($manager1, $manager1, $manager2);
+            ->willReturnOnConsecutiveCalls($manager1, $manager2);
         $this->container->expects(self::once())
             ->method('initialized')
-            ->willReturnMap([['service.default', true]]);
+            ->with('service.default')
+            ->willReturn(false);
 
         self::assertSame($manager1, $this->registry->getManagerForClass(self::TEST_ENTITY_CLASS));
         // test that a manager cached

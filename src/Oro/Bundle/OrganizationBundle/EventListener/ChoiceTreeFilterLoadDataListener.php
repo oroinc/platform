@@ -21,7 +21,12 @@ class ChoiceTreeFilterLoadDataListener
     public function fillData(ChoiceTreeFilterLoadDataEvent $event): void
     {
         if ($event->getClassName() === BusinessUnit::class) {
-            $entities = $this->doctrine->getRepository($event->getClassName())->findBy(['id' => $event->getValues()]);
+            if ($event->getValues()) {
+                $entities = $this->doctrine->getRepository($event->getClassName())
+                    ->findBy(['id' => $event->getValues()]);
+            } else {
+                $entities = [];
+            }
             $data = [];
             /** @var BusinessUnit $entity */
             foreach ($entities as $entity) {

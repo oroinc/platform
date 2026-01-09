@@ -43,9 +43,9 @@ class OrganizationRememberMeFactory extends RememberMeFactory implements Firewal
                 new Reference('security.authenticator.remember_me_handler.' . $firewallName)
             )
             ->setArgument('$secret', $config['secret'])
-            ->setArgument('$tokenStorage', $defRememberMeAuthenticator->getArgument(2))
+            ->setArgument('$tokenStorage', $defRememberMeAuthenticator->getArgument(1))
             ->setArgument('$cookieName', $config['name'])
-            ->setArgument('$logger', $defRememberMeAuthenticator->getArgument(4))
+            ->setArgument('$logger', $defRememberMeAuthenticator->getArgument(3))
             ->addMethodCall(
                 'setTokenFactory',
                 [new Reference('oro_security.token.factory.organization_rememberme')]

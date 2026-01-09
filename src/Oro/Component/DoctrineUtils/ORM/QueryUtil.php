@@ -3,10 +3,10 @@
 namespace Oro\Component\DoctrineUtils\ORM;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\SQLParserUtils;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\ParserResult;
 use Doctrine\ORM\Query\QueryException;
+use Oro\Component\DoctrineUtils\DBAL\SqlParserUtils;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
@@ -132,12 +132,13 @@ class QueryUtil
             $parsedQuery = static::parseQuery($query);
         }
 
-        $sql = $parsedQuery->getSqlExecutor()->getSqlStatements();
+        $sqlExecutor = $parsedQuery->prepareSqlExecutor($query);
+        $sql = $sqlExecutor->getSqlStatements();
 
         [$params, $types] = self::processParameterMappings($query, $parsedQuery->getParameterMappings());
-        [$sql, $params, $types] = SQLParserUtils::expandListParameters($sql, $params, $types);
+        [$sql, $params, $types] = SqlParserUtils::expandListParameters($sql, $params, $types);
 
-        $paramPos = SQLParserUtils::getPlaceholderPositions($sql);
+        $paramPos = SqlParserUtils::getPlaceholderPositions($sql);
         for ($i = count($paramPos) - 1; $i >= 0; $i--) {
             $sql = substr_replace(
                 $sql,

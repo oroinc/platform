@@ -81,7 +81,7 @@ abstract class WebTestCase extends BaseWebTestCase
     protected const BIGINT = 2147483647;
 
     /** @var string Default application kernel class */
-    protected static $class = 'AppKernel';
+    protected static ?string $class = 'AppKernel';
 
     /** @var bool[] */
     private static $dbIsolationPerTest = [];
@@ -132,6 +132,15 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     #[\Override]
     protected function tearDown(): void
+    {
+    }
+
+    /**
+     * In order to disable kernel shutdown
+     * @see \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase::tearDownAfterClass
+     */
+    #[\Override]
+    public static function tearDownAfterClass(): void
     {
     }
 
@@ -1334,7 +1343,7 @@ abstract class WebTestCase extends BaseWebTestCase
     {
         if (!self::$clientInstance->getContainer()->get(ApplicationState::class)->isInstalled()) {
             throw new \Exception(
-                "You must install an application in the test environment ".
+                "You must install an application in the test environment " .
                 "and try running the command in the test environment."
             );
         }

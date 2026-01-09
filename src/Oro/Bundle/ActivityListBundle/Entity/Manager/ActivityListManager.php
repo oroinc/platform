@@ -434,7 +434,7 @@ class ActivityListManager
      *
      * @return $this
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\ORM\Mapping\MappingException
      */
     public function replaceActivityTargetWithPlainQuery(

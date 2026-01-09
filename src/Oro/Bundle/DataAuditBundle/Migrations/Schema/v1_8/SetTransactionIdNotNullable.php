@@ -19,6 +19,6 @@ class SetTransactionIdNotNullable implements Migration, OrderedMigrationInterfac
     public function up(Schema $schema, QueryBag $queries)
     {
         $auditTable = $schema->getTable('oro_audit');
-        $auditTable->changeColumn('transaction_id', ['notnull' => true]);
+        $auditTable->modifyColumn('transaction_id', ['notnull' => true]);
     }
 }

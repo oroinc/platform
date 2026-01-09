@@ -9,8 +9,8 @@ use Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\Testing\Logger\TestLogger;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\Test\TestLogger;
 
 class MessageProcessorRouterExtensionTest extends TestCase
 {

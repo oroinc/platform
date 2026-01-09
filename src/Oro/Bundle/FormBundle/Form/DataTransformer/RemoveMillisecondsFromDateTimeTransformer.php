@@ -21,13 +21,13 @@ class RemoveMillisecondsFromDateTimeTransformer implements DataTransformerInterf
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         return $this->innerTransformer->transform($value);
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (is_string($value) && $value && preg_match(self::RFC_3339_PATTERN, $value, $matches)) {
             $value = $matches[1] . $matches[3];

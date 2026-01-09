@@ -31,7 +31,7 @@ class ExtractingEventDispatcher extends EventDispatcher implements EventSubscrib
     public static $subscriber;
 
     #[\Override]
-    public function addListener(string $eventName, $listener, int $priority = 0)
+    public function addListener(string $eventName, $listener, int $priority = 0): void
     {
         $this->listeners[] = [$eventName, $listener[1], $priority];
     }

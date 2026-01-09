@@ -3,7 +3,7 @@
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -19,7 +19,7 @@ class ParametrizedSqlMigrationQueryTest extends TestCase
         $this->connection = $this->createMock(Connection::class);
         $this->connection->expects($this->any())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
     }
 
     public function testConstructor(): void

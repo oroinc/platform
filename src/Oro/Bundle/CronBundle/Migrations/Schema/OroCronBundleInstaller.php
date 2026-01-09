@@ -29,7 +29,7 @@ class OroCronBundleInstaller implements Installation
         $table = $schema->createTable('oro_cron_schedule');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('command', 'string', ['length' => 255]);
-        $table->addColumn('args', 'json_array', ['comment' => '(DC2Type:json_array)']);
+        $table->addColumn('args', 'json', ['comment' => '(DC2Type:json)']);
         $table->addColumn('args_hash', 'string', ['length' => 32]);
         $table->addColumn('definition', 'string', ['notnull' => false, 'length' => 100]);
         $table->setPrimaryKey(['id']);

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Manager;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL100Platform;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
@@ -166,7 +166,7 @@ class EmailAddressVisibilityManagerTest extends TestCase
             );
         $this->connection->expects(self::once())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
 
         $this->manager->updateEmailAddressVisibility($emailAddress, $organizationId, $visible);
     }
@@ -229,7 +229,7 @@ class EmailAddressVisibilityManagerTest extends TestCase
             );
         $this->connection->expects(self::exactly(2))
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
 
         $this->manager->updateEmailAddressVisibilities($organizationId);
     }
@@ -266,7 +266,7 @@ class EmailAddressVisibilityManagerTest extends TestCase
             ->willReturn(true);
         $this->connection->expects(self::once())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
         $this->connection->expects(self::exactly(2))
             ->method('executeStatement')
             ->withConsecutive(
@@ -305,7 +305,7 @@ class EmailAddressVisibilityManagerTest extends TestCase
             ]);
         $this->connection->expects(self::once())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
         $this->connection->expects(self::exactly(2))
             ->method('executeStatement')
             ->withConsecutive(
@@ -342,7 +342,7 @@ class EmailAddressVisibilityManagerTest extends TestCase
             ->willReturn(false);
         $this->connection->expects(self::once())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
         $this->connection->expects(self::exactly(2))
             ->method('executeStatement')
             ->withConsecutive(

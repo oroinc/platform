@@ -85,7 +85,7 @@ class InsertEntityConfigIndexFieldValueQuery implements MigrationQuery, Connecti
     /**
      * @param LoggerInterface $logger
      * @param bool            $dryRun
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function insertEntityConfigIndexValue(LoggerInterface $logger, $dryRun = false)
     {

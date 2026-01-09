@@ -36,17 +36,20 @@ class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAw
         $queries->addQuery($renameQuery);
 
         if ($this->platform->supportsSequences()) {
-            $primaryKey = $schema->getTable($oldTableName)->getPrimaryKeyColumns();
-            if (count($primaryKey) === 1) {
-                $primaryKey = reset($primaryKey);
-                $oldSequenceName = $this->platform->getIdentitySequenceName($oldTableName, $primaryKey);
-                if ($schema->hasSequence($oldSequenceName)) {
-                    $newSequenceName = $this->platform->getIdentitySequenceName($newTableName, $primaryKey);
-                    if ($this->platform instanceof PostgreSqlPlatform) {
-                        $renameSequenceQuery = new SqlSchemaUpdateMigrationQuery(
-                            "ALTER SEQUENCE $oldSequenceName RENAME TO $newSequenceName"
-                        );
-                        $queries->addQuery($renameSequenceQuery);
+            $primaryKey = $schema->getTable($oldTableName)->getPrimaryKey();
+            if ($primaryKey !== null) {
+                $primaryKeyColumns = $primaryKey->getColumns();
+                if (count($primaryKeyColumns) === 1) {
+                    $primaryKeyColumn = reset($primaryKeyColumns);
+                    $oldSequenceName = $this->platform->getIdentitySequenceName($oldTableName, $primaryKeyColumn);
+                    if ($schema->hasSequence($oldSequenceName)) {
+                        $newSequenceName = $this->platform->getIdentitySequenceName($newTableName, $primaryKeyColumn);
+                        if ($this->platform instanceof PostgreSqlPlatform) {
+                            $renameSequenceQuery = new SqlSchemaUpdateMigrationQuery(
+                                "ALTER SEQUENCE $oldSequenceName RENAME TO $newSequenceName"
+                            );
+                            $queries->addQuery($renameSequenceQuery);
+                        }
                     }
                 }
             }
@@ -95,8 +98,7 @@ class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAw
             $indexName = $this->nameGenerator->generateIndexName($tableName, $columnNames);
         }
         $index = new Index($indexName, $columnNames);
-        $diff = new TableDiff($tableName);
-        $diff->addedIndexes = [$indexName => $index];
+        $diff = new TableDiff($tableName, addedIndexes: [$indexName => $index]);
 
         $renameQuery = new SqlSchemaUpdateMigrationQuery(
             $this->platform->getAlterTableSQL($diff)
@@ -126,8 +128,7 @@ class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAw
             $indexName = $this->nameGenerator->generateIndexName($tableName, $columnNames, true);
         }
         $index = new Index($indexName, $columnNames, true);
-        $diff = new TableDiff($tableName);
-        $diff->addedIndexes = [$indexName => $index];
+        $diff = new TableDiff($tableName, addedIndexes: [$indexName => $index]);
 
         $renameQuery = new SqlSchemaUpdateMigrationQuery(
             $this->platform->getAlterTableSQL($diff)
@@ -172,8 +173,7 @@ class RenameExtension implements DatabasePlatformAwareInterface, NameGeneratorAw
             $constraintName,
             $options
         );
-        $diff = new TableDiff($tableName);
-        $diff->addedForeignKeys = [$constraintName => $constraint];
+        $diff = new TableDiff($tableName, addedForeignKeys: [$constraintName => $constraint]);
 
         $renameQuery = new SqlSchemaUpdateMigrationQuery(
             $this->platform->getAlterTableSQL($diff)

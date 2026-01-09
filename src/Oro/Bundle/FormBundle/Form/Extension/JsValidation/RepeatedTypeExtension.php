@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormView;
 class RepeatedTypeExtension extends AbstractTypeExtension
 {
     #[\Override]
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $first = $view->children[$options['first_name']];
         $second = $view->children[$options['second_name']];

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Extension;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
@@ -452,7 +452,7 @@ class ExtendExtensionTest extends TestCase
             'with not allowed identify fields' => [
                 'exception' => \InvalidArgumentException::class,
                 'exceptionMessage' =>
-                    'The identification fields can only be: id, name. '.
+                    'The identification fields can only be: id, name. ' .
                     'Current invalid fields: priority, is_default.',
                 'identityFields' => ['id', 'name', 'priority', 'is_default']
             ],
@@ -1154,7 +1154,7 @@ class ExtendExtensionTest extends TestCase
     public function testAddOneToManyInverseRelationValidateTitleColumnName(): void
     {
         $this->expectException(SchemaException::class);
-        $this->expectExceptionMessage("There is no column with name 'title' on table 'table1'.");
+        $this->expectExceptionMessage('There is no column with name "title" on table "table1".');
 
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
@@ -1806,7 +1806,7 @@ class ExtendExtensionTest extends TestCase
     public function testAddManyToManyInverseRelationValidateTitleColumn(): void
     {
         $this->expectException(SchemaException::class);
-        $this->expectExceptionMessage("There is no column with name 'title' on table 'table1'.");
+        $this->expectExceptionMessage('There is no column with name "title" on table "table1".');
 
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
@@ -1838,7 +1838,7 @@ class ExtendExtensionTest extends TestCase
     public function testAddManyToManyInverseRelationValidateDetailedColumn(): void
     {
         $this->expectException(SchemaException::class);
-        $this->expectExceptionMessage("There is no column with name 'detailed' on table 'table1'.");
+        $this->expectExceptionMessage('There is no column with name "detailed" on table "table1".');
 
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
@@ -1871,7 +1871,7 @@ class ExtendExtensionTest extends TestCase
     public function testAddManyToManyInverseRelationValidateGridColumn(): void
     {
         $this->expectException(SchemaException::class);
-        $this->expectExceptionMessage("There is no column with name 'grid' on table 'table1'.");
+        $this->expectExceptionMessage('There is no column with name "grid" on table "table1".');
 
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
@@ -2265,7 +2265,7 @@ class ExtendExtensionTest extends TestCase
     public function testAddManyToOneInverseRelationValidateTitleColumn(): void
     {
         $this->expectException(SchemaException::class);
-        $this->expectExceptionMessage("There is no column with name 'title' on table 'table1'.");
+        $this->expectExceptionMessage('There is no column with name "title" on table "table1".');
 
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
@@ -2297,7 +2297,7 @@ class ExtendExtensionTest extends TestCase
     public function testAddManyToOneInverseRelationValidateDetailedColumn(): void
     {
         $this->expectException(SchemaException::class);
-        $this->expectExceptionMessage("There is no column with name 'detailed' on table 'table1'.");
+        $this->expectExceptionMessage('There is no column with name "detailed" on table "table1".');
 
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
@@ -2330,7 +2330,7 @@ class ExtendExtensionTest extends TestCase
     public function testAddManyToOneInverseRelationValidateGridColumn(): void
     {
         $this->expectException(SchemaException::class);
-        $this->expectExceptionMessage("There is no column with name 'grid' on table 'table1'.");
+        $this->expectExceptionMessage('There is no column with name "grid" on table "table1".');
 
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
@@ -2805,7 +2805,7 @@ class ExtendExtensionTest extends TestCase
 
     private function assertSchemaSql(Schema $schema, array $expectedSql)
     {
-        $sql = $schema->toSql(new MySqlPlatform());
+        $sql = $schema->toSql(new MySQLPlatform());
         foreach ($sql as &$el) {
             $el = str_replace(
                 ' DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` ENGINE = InnoDB',

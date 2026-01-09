@@ -12,6 +12,6 @@ class OroEmailBundle implements Migration
     public function up(Schema $schema, QueryBag $queries): void
     {
         $schema->getTable('oro_email')
-            ->changeColumn('subject', ['length' => 998]);
+            ->modifyColumn('subject', ['length' => 998]);
     }
 }

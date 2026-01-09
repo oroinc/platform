@@ -57,6 +57,9 @@ class UserAclHandler implements SearchHandlerInterface
     }
 
     #[\Override]
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     public function search($query, $page, $perPage, $searchById = false)
     {
         [$search, $entityClass, $permission, $entityId, $excludeCurrentUser] = explode(';', $query);
@@ -70,7 +73,12 @@ class UserAclHandler implements SearchHandlerInterface
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
         if ($this->authorizationChecker->isGranted($permission, $object)) {
             if ($searchById) {
-                $results = $this->doctrine->getRepository(User::class)->findBy(['id' => explode(',', $search)]);
+                $searchIds = explode(',', $search);
+                if ($searchIds) {
+                    $results = $this->doctrine->getRepository(User::class)->findBy(['id' => $searchIds]);
+                } else {
+                    $results = [];
+                }
             } else {
                 $page = (int)$page > 0 ? (int)$page : 1;
                 $perPage = (int)$perPage > 0 ? (int)$perPage : 10;

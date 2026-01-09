@@ -28,7 +28,7 @@ class TokenAccessor implements TokenAccessorInterface
     }
 
     #[\Override]
-    public function setToken(?TokenInterface $token = null)
+    public function setToken(?TokenInterface $token = null): void
     {
         $this->tokenStorage->setToken($token);
     }

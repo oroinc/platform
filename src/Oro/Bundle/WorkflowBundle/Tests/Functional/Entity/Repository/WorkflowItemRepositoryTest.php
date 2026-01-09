@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -313,7 +314,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
                 Join::WITH,
                 'CAST(e.id as string) = CAST(wi.entityId as string) AND wi.entityClass = ?1'
             )
-            ->setParameter(1, WorkflowAwareEntity::class, \PDO::PARAM_STR)
+            ->setParameter(1, WorkflowAwareEntity::class, ParameterType::STRING)
             ->orderBy('e.id', 'ASC');
 
         $entities = $qb->getQuery()->getResult();

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Twig;
 
+use Twig\ExpressionParser\Infix\ArgumentsTrait;
 use Twig\Node\Node;
 use Twig\Token;
 use Twig\TokenParser\AbstractTokenParser;
@@ -11,6 +12,8 @@ use Twig\TokenParser\AbstractTokenParser;
  */
 class TitleSetTokenParser extends AbstractTokenParser
 {
+    use ArgumentsTrait;
+
     /**
      * Parses a token and returns a node.
      *
@@ -22,7 +25,7 @@ class TitleSetTokenParser extends AbstractTokenParser
     {
         $lineno = $token->getLine();
 
-        $expr = $this->parser->getExpressionParser()->parseArguments();
+        $expr = $this->parseNamedArguments($this->parser);
         $this->parser->getStream()->expect(Token::BLOCK_END_TYPE);
 
         return new TitleNode($expr, $lineno);

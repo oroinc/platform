@@ -8,6 +8,9 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * Validates unique entity constraints with organization field support.
+ */
 class OrganizationUniqueEntityValidator extends UniqueEntityValidator
 {
     /** @var OwnershipMetadataProviderInterface */
@@ -28,7 +31,7 @@ class OrganizationUniqueEntityValidator extends UniqueEntityValidator
     }
 
     #[\Override]
-    public function validate($entity, Constraint $constraint)
+    public function validate($entity, Constraint $constraint): void
     {
         $className = $this->doctrineHelper->getEntityClass($entity);
         $organizationField = $this->metadataProvider->getMetadata($className)->getOrganizationFieldName();

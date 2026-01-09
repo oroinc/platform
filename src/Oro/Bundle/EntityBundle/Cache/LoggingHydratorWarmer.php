@@ -24,7 +24,7 @@ class LoggingHydratorWarmer extends CacheWarmer
      * {inheritdoc}
      */
     #[\Override]
-    public function warmUp($cacheDir): array
+    public function warmUp($cacheDir, ?string $buildDir = null): array
     {
         $this->createLoggingHydrators(
             $cacheDir . DIRECTORY_SEPARATOR . 'oro_entities' . DIRECTORY_SEPARATOR . 'OroLoggingHydrator'

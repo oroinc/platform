@@ -72,7 +72,7 @@ class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface
     /**
      * @var array
      */
-    #[ORM\Column(name: 'chart_options', type: 'json_array', nullable: true)]
+    #[ORM\Column(name: 'chart_options', type: 'json', nullable: true)]
     protected $chartOptions;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]

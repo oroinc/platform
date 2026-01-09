@@ -18,12 +18,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
  * Authenticator guard for impersonated authentication.
@@ -96,7 +96,7 @@ class ImpersonationAuthenticator implements AuthenticatorInterface, Authenticati
     #[\Override]
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
+        $request->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
 
         return new RedirectResponse($this->router->generate('oro_user_security_login'));
     }
@@ -105,7 +105,7 @@ class ImpersonationAuthenticator implements AuthenticatorInterface, Authenticati
     public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         if ($authException) {
-            $request->getSession()->set(Security::AUTHENTICATION_ERROR, $authException);
+            $request->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $authException);
         }
 
         return new RedirectResponse($this->router->generate('oro_user_security_login'));

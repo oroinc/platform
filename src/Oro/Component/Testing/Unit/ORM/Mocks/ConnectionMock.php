@@ -33,7 +33,7 @@ class ConnectionMock extends Connection
     }
 
     #[\Override]
-    public function fetchColumn($statement, array $params = [], $colnum = 0, array $types = [])
+    public function fetchOne(string $query, array $params = [], array $types = [])
     {
         return $this->fetchOneResult;
     }

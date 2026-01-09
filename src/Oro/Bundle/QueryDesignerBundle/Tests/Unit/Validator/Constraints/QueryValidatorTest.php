@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Validator\Constraints;
 
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -157,7 +157,7 @@ class QueryValidatorTest extends ConstraintValidatorTestCase
             [
                 $this->createMock(OrmDatasource::class),
                 false,
-                new DBALException('failed'),
+                new Exception('failed'),
                 null,
                 1
             ],
@@ -178,7 +178,7 @@ class QueryValidatorTest extends ConstraintValidatorTestCase
             [
                 $this->createMock(OrmDatasource::class),
                 true,
-                new DBALException('failed'),
+                new Exception('failed'),
                 null,
                 1
             ],

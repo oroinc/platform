@@ -4,7 +4,8 @@ namespace Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Connection as DriverConnection;
-use Doctrine\DBAL\Statement;
+use Doctrine\DBAL\Driver\Result as DriverResult;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
@@ -26,17 +27,19 @@ class QueryCountCalculatorTest extends OrmTestCase
 
     private EntityManagerInterface $em;
     private Connection&MockObject $connection;
-    private Statement&MockObject $statement;
+    private Result&MockObject $statement;
+    private DriverResult&MockObject $driverResult;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->statement = $this->createMock(Statement::class);
+        $this->statement = $this->createMock(Result::class);
+        $this->driverResult = $this->createMock(DriverResult::class);
 
         $driverConnection = $this->createMock(DriverConnection::class);
         $driverConnection->expects($this->any())
             ->method('query')
-            ->willReturn($this->statement);
+            ->willReturn($this->driverResult);
 
         $this->connection = $this->getMockBuilder(Connection::class)
             ->onlyMethods(['executeQuery'])
@@ -61,17 +64,17 @@ class QueryCountCalculatorTest extends OrmTestCase
     public function testCalculateCountForQueryWithoutParameters(): void
     {
         $query = $this->getQuery('SELECT e FROM ' . Entity::class . ' e');
-        $expectedSql = 'SELECT count(e0_.a) AS sclr_0 FROM Entity e0_';
+        $expectedSql = 'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_) AS count_query';
 
         $this->connection->expects($this->once())
             ->method('executeQuery')
             ->with($expectedSql, [], [])
             ->willReturn($this->statement);
-        $this->statement->expects($this->exactly(2))
-            ->method('fetch')
-            ->willReturnOnConsecutiveCalls(['sclr_0' => self::TEST_COUNT], false);
+        $this->statement->expects($this->once())
+            ->method('fetchOne')
+            ->willReturn(self::TEST_COUNT);
 
-        $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query));
+        $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query, false));
     }
 
     public function testCalculateCountForQueryWithGroupBy(): void
@@ -86,7 +89,7 @@ class QueryCountCalculatorTest extends OrmTestCase
             ->with($expectedSql, [], [])
             ->willReturn($this->statement);
         $this->statement->expects($this->once())
-            ->method('fetchColumn')
+            ->method('fetchOne')
             ->willReturn(self::TEST_COUNT);
 
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query));
@@ -107,7 +110,7 @@ class QueryCountCalculatorTest extends OrmTestCase
             ->with($expectedSql, $sqlParams, $types)
             ->willReturn($this->statement);
         $this->statement->expects($this->exactly(2))
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturnOnConsecutiveCalls(['sclr_0' => self::TEST_COUNT], false);
 
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query));
@@ -130,7 +133,7 @@ class QueryCountCalculatorTest extends OrmTestCase
             ->with($expectedSql, $sqlParams, $types)
             ->willReturn($this->statement);
         $this->statement->expects($this->once())
-            ->method('fetchColumn')
+            ->method('fetchOne')
             ->willReturn(self::TEST_COUNT);
 
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query, false));
@@ -152,7 +155,7 @@ class QueryCountCalculatorTest extends OrmTestCase
             ->with($expectedSql, $sqlParams, $types)
             ->willReturn($this->statement);
         $this->statement->expects($this->exactly(2))
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturnOnConsecutiveCalls(['sclr_0' => self::TEST_COUNT], false);
 
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query));
@@ -175,7 +178,7 @@ class QueryCountCalculatorTest extends OrmTestCase
             ->with($expectedSql, $sqlParams, $types)
             ->willReturn($this->statement);
         $this->statement->expects($this->once())
-            ->method('fetchColumn')
+            ->method('fetchOne')
             ->willReturn(self::TEST_COUNT);
 
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query, false));
@@ -196,7 +199,7 @@ class QueryCountCalculatorTest extends OrmTestCase
             ->with($expectedSql, $sqlParams, $types)
             ->willReturn($this->statement);
         $this->statement->expects($this->exactly(2))
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturnOnConsecutiveCalls(['sclr_0' => self::TEST_COUNT], false);
 
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query));
@@ -219,7 +222,7 @@ class QueryCountCalculatorTest extends OrmTestCase
             ->with($expectedSql, $sqlParams, $types)
             ->willReturn($this->statement);
         $this->statement->expects($this->once())
-            ->method('fetchColumn')
+            ->method('fetchOne')
             ->willReturn(self::TEST_COUNT);
 
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query, false));
@@ -240,7 +243,7 @@ class QueryCountCalculatorTest extends OrmTestCase
             ->with($expectedSql, $sqlParams, $types)
             ->willReturn($this->statement);
         $this->statement->expects($this->exactly(2))
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturnOnConsecutiveCalls(['sclr_0' => self::TEST_COUNT], false);
 
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCountDistinct($query));
@@ -284,7 +287,7 @@ class QueryCountCalculatorTest extends OrmTestCase
             )
             ->willReturn($this->statement);
         $this->statement->expects($this->exactly(6))
-            ->method('fetch')
+            ->method('fetchAssociative')
             ->willReturnOnConsecutiveCalls(
                 ['a_0' => $expectedEntity1->a, 'b_1' => $expectedEntity1->b],
                 false,
@@ -332,7 +335,7 @@ class QueryCountCalculatorTest extends OrmTestCase
             ->willReturn($this->statement);
 
         $this->statement->expects($this->once())
-            ->method('fetchColumn')
+            ->method('fetchOne')
             ->willReturn(self::TEST_COUNT);
 
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query, $useWalker));

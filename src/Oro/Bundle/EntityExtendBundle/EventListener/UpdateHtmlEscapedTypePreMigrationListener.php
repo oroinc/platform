@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -55,7 +55,7 @@ class UpdateHtmlEscapedTypePreMigrationListener
     private function getHtmlEscapedFields(): array
     {
         $connection = $this->configManager->getEntityManager()->getConnection();
-        if (!$connection->getSchemaManager()->tablesExist(['oro_entity_config_field'])) {
+        if (!$connection->createSchemaManager()->tablesExist(['oro_entity_config_field'])) {
             return [];
         }
 
@@ -126,7 +126,7 @@ SQL;
             );
         }
 
-        if ($platform instanceof MySqlPlatform) {
+        if ($platform instanceof MySQLPlatform) {
             $connection->executeStatement(
                 \sprintf(
                     'ALTER TABLE %s CHANGE %s %s text',

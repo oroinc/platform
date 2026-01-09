@@ -18,7 +18,7 @@ class NumberToStringTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (null === $value) {
             return '';
@@ -32,7 +32,7 @@ class NumberToStringTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (!\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');

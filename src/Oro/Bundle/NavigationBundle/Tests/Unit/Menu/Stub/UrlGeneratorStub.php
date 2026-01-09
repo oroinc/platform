@@ -41,7 +41,7 @@ class UrlGeneratorStub implements UrlGeneratorInterface
     }
 
     #[\Override]
-    public function setContext(RequestContext $context)
+    public function setContext(RequestContext $context): void
     {
         $this->context = $context;
     }

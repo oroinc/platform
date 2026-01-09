@@ -7,6 +7,7 @@ use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\HandlerWrapper;
 use Monolog\Handler\NullHandler;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 
 /**
@@ -34,13 +35,13 @@ class ConsoleErrorHandler extends HandlerWrapper
     }
 
     #[\Override]
-    public function isHandling(array $record): bool
+    public function isHandling(LogRecord $record): bool
     {
         return $this->consumerState->isConsumptionStarted() && parent::isHandling($record);
     }
 
     #[\Override]
-    public function handle(array $record): bool
+    public function handle(LogRecord $record): bool
     {
         return $this->consumerState->isConsumptionStarted() && parent::handle($record);
     }
@@ -51,11 +52,11 @@ class ConsoleErrorHandler extends HandlerWrapper
     }
 
     #[\Override]
-    public function reset()
+    public function reset(): void
     {
         // Clearing all buffered records because the BufferHandler flushes them to the output before resetting.
         $this->clear();
 
-        return parent::reset();
+        parent::reset();
     }
 }

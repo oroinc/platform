@@ -7,6 +7,7 @@ use Oro\Bundle\UIBundle\Model\TreeItem;
 use Oro\Bundle\UIBundle\Validator\Constraints\MoveToChild;
 use Oro\Bundle\UIBundle\Validator\Constraints\MoveToChildValidator;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -22,7 +23,7 @@ class MoveToChildValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new MoveToChildValidator($this->translator);
     }

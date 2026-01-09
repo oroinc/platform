@@ -9,6 +9,7 @@ use Oro\Bundle\AttachmentBundle\Validator\Constraints\MultipleFileConstraintFrom
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\MultipleFileConstraintFromEntityFieldConfigValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class MultipleFileConstraintFromEntityFieldConfigValidatorTest extends ConstraintValidatorTestCase
@@ -23,7 +24,7 @@ class MultipleFileConstraintFromEntityFieldConfigValidatorTest extends Constrain
     }
 
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new MultipleFileConstraintFromEntityFieldConfigValidator($this->constraintsProvider);
     }

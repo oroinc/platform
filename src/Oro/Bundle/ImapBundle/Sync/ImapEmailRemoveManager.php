@@ -40,7 +40,7 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
      */
     public function removeRemotelyRemovedEmails($imapFolder, $folder, $manager)
     {
-        $this->em->transactional(function () use ($imapFolder, $folder, $manager) {
+        $this->em->wrapInTransaction(function () use ($imapFolder, $folder, $manager) {
             $existingUids = array_map('intval', $manager->getEmailUIDs());
 
             $staleImapEmailsQb = $this->em->getRepository(ImapEmail::class)

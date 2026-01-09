@@ -1118,7 +1118,7 @@ null_filters_exclusion_policy:
                 filters:
                     exclusion_policy: null
     expected: []
-    error: 'The value null is not allowed for path "entity.subresources.testSubresource.filters.exclusion_policy". Permissible values: "all", "none"'
+    error: 'The value of type "null" is not allowed for path "entity.subresources.testSubresource.filters.exclusion_policy". Permissible values: "all", "none"'
 
 invalid_filters_exclusion_policy:
     config:
@@ -1326,7 +1326,7 @@ null_sorters_exclusion_policy:
                 sorters:
                     exclusion_policy: null
     expected: []
-    error: 'The value null is not allowed for path "entity.subresources.testSubresource.sorters.exclusion_policy". Permissible values: "all", "none"'
+    error: 'The value of type "null" is not allowed for path "entity.subresources.testSubresource.sorters.exclusion_policy". Permissible values: "all", "none"'
 
 invalid_sorters_exclusion_policy:
     config:

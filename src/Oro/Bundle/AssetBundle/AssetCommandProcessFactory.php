@@ -5,7 +5,7 @@ namespace Oro\Bundle\AssetBundle;
 use Symfony\Component\Process\Process;
 
 /**
- * Creating assets command process using js engine path.
+ * Creates a Process instance for running asset build commands with the configured JS engine.
  */
 class AssetCommandProcessFactory
 {
@@ -24,17 +24,9 @@ class AssetCommandProcessFactory
         if (!$this->jsEnginePath) {
             throw new \RuntimeException('Js engine path is not found');
         }
+
         $process = new Process(array_merge([$this->jsEnginePath], $command), $cwd);
         $process->setTimeout($timeout);
-
-        // some workaround when this command is launched from web
-        if (isset($_SERVER['PATH'])) {
-            $env = $_SERVER;
-            if (isset($env['Path'])) {
-                unset($env['Path']);
-            }
-            $process->setEnv($env);
-        }
 
         return $process;
     }

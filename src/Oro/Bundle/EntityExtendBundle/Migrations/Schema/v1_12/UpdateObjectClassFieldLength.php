@@ -16,6 +16,6 @@ class UpdateObjectClassFieldLength implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_enum_value_trans');
-        $table->changeColumn('object_class', ['length' => 191]);
+        $table->modifyColumn('object_class', ['length' => 191]);
     }
 }

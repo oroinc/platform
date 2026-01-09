@@ -4,12 +4,13 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\EnumValuesUnique;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\EnumValuesUniqueValidator;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class EnumValuesUniqueValidatorTest extends ConstraintValidatorTestCase
 {
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new EnumValuesUniqueValidator();
     }

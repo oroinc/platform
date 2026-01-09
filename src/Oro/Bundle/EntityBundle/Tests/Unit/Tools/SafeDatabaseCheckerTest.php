@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Tools;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
@@ -30,7 +30,7 @@ class SafeDatabaseCheckerTest extends TestCase
         $connection->expects($this->once())
             ->method('connect');
         $connection->expects($this->once())
-            ->method('getSchemaManager')
+            ->method('createSchemaManager')
             ->willReturn($schemaManager);
         $schemaManager->expects($this->once())
             ->method('tablesExist')
@@ -95,7 +95,7 @@ class SafeDatabaseCheckerTest extends TestCase
     {
         return [
             [new \PDOException()],
-            [new DBALException()],
+            [new Exception()],
         ];
     }
 
@@ -201,7 +201,7 @@ class SafeDatabaseCheckerTest extends TestCase
     {
         return [
             [new \PDOException()],
-            [new DBALException()],
+            [new Exception()],
             [new ORMException()],
             [new \ReflectionException()],
         ];
@@ -264,7 +264,7 @@ class SafeDatabaseCheckerTest extends TestCase
     {
         return [
             [new \PDOException()],
-            [new DBALException()],
+            [new Exception()],
             [new ORMException()],
             [new \ReflectionException()],
         ];

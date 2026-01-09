@@ -60,7 +60,7 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
             $valuesParameter->setValue(array_filter($valuesParameter->getValue()));
         }
         $this->aclHelper->apply($qb, 'TRANSLATE');
-        $translations = $qb->getQuery()->iterate(null, Query::HYDRATE_SCALAR);
+        $translations = $qb->getQuery()->toIterable([], Query::HYDRATE_SCALAR);
 
         // if huge amount data must be deleted
         set_time_limit(0);
@@ -77,13 +77,12 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function resetTranslations(\Traversable $translations, EntityManagerInterface $em): int
+    private function resetTranslations(iterable $translations, EntityManagerInterface $em): int
     {
         $hasJsTranslations = false;
         $totalCount = 0;
         $updateCount = 0;
-        foreach ($translations as $item) {
-            $translationData = reset($item);
+        foreach ($translations as $translationData) {
             if (false === $translationData) {
                 continue;
             }

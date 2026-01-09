@@ -10,8 +10,8 @@ use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
 use Oro\Bundle\NavigationBundle\Entity\PinbarTab;
 use Oro\Bundle\NavigationBundle\Provider\PinbarTabTitleProvider;
 use Oro\Bundle\NavigationBundle\Utils\PinbarTabUrlNormalizer;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
+use Oro\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * Updates PinbarTabs title and titleShort properties with actual titles.

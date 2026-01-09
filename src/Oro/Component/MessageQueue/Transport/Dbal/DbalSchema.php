@@ -35,7 +35,7 @@ class DbalSchema extends BaseSchema
         $this->connection = $connection;
         $this->tableName = $tableName;
 
-        $this->schemaManager = $this->connection->getSchemaManager();
+        $this->schemaManager = $this->connection->createSchemaManager();
 
         parent::__construct([], [], $this->schemaManager->createSchemaConfig());
 

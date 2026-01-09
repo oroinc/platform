@@ -22,7 +22,7 @@ class WidgetEntityJquerySelect2HiddenType extends OroJquerySelect2HiddenType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventListener(
-            FormEvents::POST_SET_DATA,
+            FormEvents::PRE_SET_DATA,
             function (FormEvent $event) {
                 $data = $event->getData();
                 if (is_array($data)) {

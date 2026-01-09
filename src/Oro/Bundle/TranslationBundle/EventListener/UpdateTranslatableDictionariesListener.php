@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\EventListener;
 
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
@@ -181,7 +182,7 @@ class UpdateTranslatableDictionariesListener
                     'object_class' => $entityClass,
                     'field'        => $translatableFieldName
                 ],
-                array_fill(0, 5, \PDO::PARAM_STR)
+                array_fill(0, 5, ParameterType::STRING)
             );
             if (0 === $affectedRows) {
                 $newData[$key] = $value;
@@ -205,7 +206,7 @@ class UpdateTranslatableDictionariesListener
                     self::getSqlParamPlaceholders($placeholders)
                 ),
                 $params,
-                array_fill(0, count($params), \PDO::PARAM_STR)
+                array_fill(0, count($params), ParameterType::STRING)
             );
         }
     }
@@ -228,7 +229,7 @@ class UpdateTranslatableDictionariesListener
                 self::getSqlParamPlaceholders(array_fill(0, count($keys), '?'))
             ),
             $params,
-            array_fill(0, count($params), \PDO::PARAM_STR)
+            array_fill(0, count($params), ParameterType::STRING)
         );
     }
 

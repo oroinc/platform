@@ -12,7 +12,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 class MoneyValueTransformer implements DataTransformerInterface
 {
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         return $value;
     }
@@ -23,7 +23,7 @@ class MoneyValueTransformer implements DataTransformerInterface
      * @return mixed|string
      */
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (!is_numeric($value)) {
             return $value;

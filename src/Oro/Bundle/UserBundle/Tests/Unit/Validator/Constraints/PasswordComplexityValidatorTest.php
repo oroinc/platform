@@ -8,6 +8,7 @@ use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
 use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
 use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexityValidator;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class PasswordComplexityValidatorTest extends ConstraintValidatorTestCase
@@ -22,7 +23,7 @@ class PasswordComplexityValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         $featureChecker = $this->createMock(FeatureChecker::class);
         $featureChecker->expects(self::any())

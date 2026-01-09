@@ -21,7 +21,7 @@ class DelegatingLoader extends Loader
         parent::__construct();
     }
 
-    public function load(mixed $resource, ?string $type = null)
+    public function load(mixed $resource, ?string $type = null): mixed
     {
         $routes = $this->decoratedLoader->load($resource, $type);
 
@@ -31,7 +31,7 @@ class DelegatingLoader extends Loader
         return $event->getCollection();
     }
 
-    public function supports(mixed $resource, ?string $type = null)
+    public function supports(mixed $resource, ?string $type = null): bool
     {
         return $this->decoratedLoader->supports($resource, $type);
     }

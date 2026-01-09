@@ -25,6 +25,9 @@ services:
             - { name: controller.argument_value_resolver, priority: 110 }
         public: true
 
+    annotation_reader:
+        class: Doctrine\Common\Annotations\AnnotationReader
+
     oro_platform.argument_resolver:
         class: Oro\Bundle\PlatformBundle\ArgumentResolver\ArgumentResolver
         decorates: 'argument_resolver'
@@ -252,3 +255,11 @@ services:
             - '@oro_platform.post_upgrade.task_registry'
         tags:
             - { name: console.command }
+
+    oro_platform.migration.update_json_array_type.pre.listener:
+        class: Oro\Bundle\PlatformBundle\EventListener\UpdateJsonArrayTypePreMigrationListener
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.pre_up, method: onPreUp, priority: 110 }

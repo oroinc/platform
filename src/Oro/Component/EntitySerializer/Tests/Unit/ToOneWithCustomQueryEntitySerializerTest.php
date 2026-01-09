@@ -2,6 +2,7 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\Query\Expr\Join;
 use Oro\Component\EntitySerializer\AssociationQuery;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity;
@@ -38,7 +39,7 @@ class ToOneWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 123, 2 => 456],
-            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER, 2 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT g0_.id AS id_0, c1_.name AS name_1'
@@ -55,7 +56,7 @@ class ToOneWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 123, 2 => 456],
-            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER, 2 => ParameterType::INTEGER]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
@@ -127,7 +128,7 @@ class ToOneWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 123, 2 => 456],
-            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER, 2 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT g0_.id AS id_0, c1_.name AS name_1, c1_.label AS label_2'
@@ -145,7 +146,7 @@ class ToOneWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 123, 2 => 456],
-            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER, 2 => ParameterType::INTEGER]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 

@@ -141,6 +141,10 @@ class OroEntityManager extends EntityManager
     #[\Override]
     public function clear($entityName = null): void
     {
+        if (!$this->getEventManager()) {
+            // Entity manager was reset, no need to clear it
+            return;
+        }
         $this->getEventManager()->dispatchEvent(Events::preClear, new PreClearEventArgs($this, $entityName));
 
         parent::clear($entityName);

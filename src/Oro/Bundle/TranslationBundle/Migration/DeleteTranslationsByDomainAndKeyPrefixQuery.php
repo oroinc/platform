@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\TranslationBundle\Migration;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -37,7 +37,7 @@ class DeleteTranslationsByDomainAndKeyPrefixQuery extends ParametrizedMigrationQ
 
         $sql = sprintf(
             'DELETE FROM oro_translation_key WHERE domain = :domain AND %s LIKE :key_prefix;',
-            $this->connection->getDatabasePlatform() instanceof MySqlPlatform ? '`key`' : 'key'
+            $this->connection->getDatabasePlatform() instanceof MySQLPlatform ? '`key`' : 'key'
         );
 
         $this->logQuery($logger, $sql, $params, $types);

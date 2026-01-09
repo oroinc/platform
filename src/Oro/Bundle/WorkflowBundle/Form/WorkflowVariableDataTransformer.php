@@ -32,7 +32,7 @@ class WorkflowVariableDataTransformer implements DataTransformerInterface
      * @return mixed
      */
     #[\Override]
-    public function transform($entity)
+    public function transform($entity): mixed
     {
         return $entity;
     }
@@ -43,7 +43,7 @@ class WorkflowVariableDataTransformer implements DataTransformerInterface
      * @return string
      */
     #[\Override]
-    public function reverseTransform($entity)
+    public function reverseTransform($entity): mixed
     {
         $class = is_object($entity) ? get_class($entity) : null;
         $metadata = $this->getMetadataForClass($class);

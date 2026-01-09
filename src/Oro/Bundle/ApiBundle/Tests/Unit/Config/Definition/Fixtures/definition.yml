@@ -34,7 +34,7 @@ null_exclusion_policy:
     config:
         exclusion_policy: null
     expected: []
-    error: 'The value null is not allowed for path "entity.exclusion_policy". Permissible values: "all", "custom_fields", "none"'
+    error: 'The value of type "null" is not allowed for path "entity.exclusion_policy". Permissible values: "all", "custom_fields", "none"'
 
 invalid_exclusion_policy:
     config:

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Tools;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
@@ -33,7 +33,7 @@ class SafeDatabaseChecker
             }
 
             $connection->connect();
-            return $connection->getSchemaManager()->tablesExist($tables);
+            return $connection->createSchemaManager()->tablesExist($tables);
         }, false);
     }
 
@@ -88,7 +88,7 @@ class SafeDatabaseChecker
         try {
             return call_user_func($callable);
         } catch (\PDOException $e) {
-        } catch (DBALException $e) {
+        } catch (Exception $e) {
         }
 
         return $emptyValue;
@@ -107,7 +107,7 @@ class SafeDatabaseChecker
         try {
             return call_user_func($callable);
         } catch (\PDOException $e) {
-        } catch (DBALException $e) {
+        } catch (Exception $e) {
         } catch (ORMException $e) {
         } catch (\ReflectionException $e) {
         }

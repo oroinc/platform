@@ -201,7 +201,7 @@ class OroUserBundleInstaller implements
         $table->addColumn('expire_at', 'datetime');
         $table->addColumn('login_at', 'datetime', ['notnull' => false]);
         $table->addColumn('notify', 'boolean', ['notnull' => true, 'default' => false]);
-        $table->addColumn('ip_address', 'string', ['length' => 255, 'nullable' => false, 'default' => '127.0.0.1']);
+        $table->addColumn('ip_address', 'string', ['length' => 255, 'notnull' => true, 'default' => '127.0.0.1']);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['token'], 'token_idx');
         $table->addIndex(['ip_address'], 'oro_user_imp_ip');

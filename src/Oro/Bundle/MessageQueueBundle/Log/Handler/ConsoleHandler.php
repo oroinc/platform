@@ -3,6 +3,7 @@
 namespace Oro\Bundle\MessageQueueBundle\Log\Handler;
 
 use Monolog\Handler\HandlerWrapper;
+use Monolog\LogRecord;
 use Oro\Bundle\MessageQueueBundle\Log\Formatter\ConsoleFormatter;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler as BaseConsoleHandler;
@@ -34,7 +35,7 @@ class ConsoleHandler extends HandlerWrapper implements EventSubscriberInterface
     }
 
     #[\Override]
-    public function isHandling(array $record): bool
+    public function isHandling(LogRecord $record): bool
     {
         return
             $this->consumerState->isConsumptionStarted()
@@ -42,7 +43,7 @@ class ConsoleHandler extends HandlerWrapper implements EventSubscriberInterface
     }
 
     #[\Override]
-    public function handle(array $record): bool
+    public function handle(LogRecord $record): bool
     {
         return
             $this->consumerState->isConsumptionStarted()

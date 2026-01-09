@@ -33,7 +33,7 @@ class TestUser implements UserInterface
     }
 
     #[\Override]
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 

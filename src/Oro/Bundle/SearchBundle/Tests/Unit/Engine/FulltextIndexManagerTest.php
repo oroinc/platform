@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\SearchBundle\Engine\FulltextIndexManager;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
@@ -55,7 +55,7 @@ class FulltextIndexManagerTest extends TestCase
 
         $this->connection->expects($this->once())
             ->method('executeQuery')
-            ->willThrowException(new DBALException());
+            ->willThrowException(new Exception());
 
         $this->assertFalse($this->indexManager->createIndexes());
     }

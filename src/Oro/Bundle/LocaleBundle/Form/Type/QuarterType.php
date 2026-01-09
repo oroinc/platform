@@ -10,6 +10,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Provides a form type for selecting a quarter as a date.
+ */
 class QuarterType extends AbstractType
 {
     #[\Override]
@@ -38,6 +41,8 @@ class QuarterType extends AbstractType
                 'model_timezone' => 'UTC',
                 'view_timezone'  => 'UTC',
                 'format'         => 'dMMMy',
+                'widget'         => 'choice',
+                'html5'          => false,
                 'input'          => 'array',
             ]
         );

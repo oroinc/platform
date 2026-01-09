@@ -155,8 +155,7 @@ class MappingConfiguration implements ConfigurationInterface
                     }
                 )
             ->end()
-            ->prototype('scalar')->end()
-        ->end();
+            ->prototype('scalar')->end();
 
         return $targetFieldsNode;
     }

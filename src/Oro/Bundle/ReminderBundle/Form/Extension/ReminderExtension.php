@@ -36,7 +36,7 @@ class ReminderExtension extends AbstractTypeExtension implements ServiceSubscrib
     }
 
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit'], -128);
     }

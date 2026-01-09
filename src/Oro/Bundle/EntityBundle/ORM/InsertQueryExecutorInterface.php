@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\QueryBuilder;
 
@@ -13,7 +12,7 @@ interface InsertQueryExecutorInterface
 {
     /**
      * @throws QueryException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function execute(string $className, array $fields, QueryBuilder $selectQueryBuilder): int;
 }

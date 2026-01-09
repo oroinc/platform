@@ -25,7 +25,7 @@ class TagTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (!$value) {
             return new ArrayCollection();
@@ -48,7 +48,7 @@ class TagTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         $result = [];
         if (is_array($value)) {

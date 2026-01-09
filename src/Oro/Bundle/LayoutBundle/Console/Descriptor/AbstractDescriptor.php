@@ -18,7 +18,7 @@ abstract class AbstractDescriptor implements DescriptorInterface
     protected $output;
 
     #[\Override]
-    public function describe(OutputInterface $output, $object, array $options = [])
+    public function describe(OutputInterface $output, $object, array $options = []): void
     {
         $this->output = $output;
 

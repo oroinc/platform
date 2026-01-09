@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Entity\Provider;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
@@ -33,7 +33,7 @@ class MailboxEmailOwnerProviderTest extends WebTestCase
     {
         $em = $this->getEntityManager();
         $conn = $em->getConnection();
-        if ($conn->getDatabasePlatform() instanceof MySqlPlatform) {
+        if ($conn->getDatabasePlatform() instanceof MySQLPlatform) {
             $supported = (bool)$conn->fetchAllAssociative(
                 'SELECT 1 FROM information_schema.columns WHERE '
                 . 'TABLE_SCHEMA = ? AND TABLE_NAME = ? AND COLUMN_NAME = ? AND COLLATION_NAME LIKE ? LIMIT 1;',

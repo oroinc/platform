@@ -27,7 +27,7 @@ class RemoveWorkflowDefinitionsForRelatedEntityQuery extends ParametrizedMigrati
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     #[\Override]
     public function execute(LoggerInterface $logger)

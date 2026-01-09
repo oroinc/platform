@@ -21,7 +21,7 @@ class WorkflowAwareCacheClearer implements CacheClearerInterface
     }
 
     #[\Override]
-    public function clear($cacheDir)
+    public function clear($cacheDir): void
     {
         $this->workflowAwareCache->invalidateRelated();
         $this->workflowAwareCache->invalidateActiveRelated();

@@ -4,6 +4,8 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
@@ -21,6 +23,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Metadata\Factory\MetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\EntityConfig\Mock\ConfigurationHandlerMock;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -35,7 +38,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
  * To enable tests use ENABLE_TESTS constant.
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
+class ConfigManagerPerformanceTest extends TestCase
 {
     private const ENABLE_TESTS = false;
     private const ENABLE_ASSERTS = true;
@@ -399,6 +402,12 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
                 return null;
             });
 
+        $queryBuilder = $this->createQueryBuilderMock();
+
+        $repo->expects($this->any())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+
         $uow = $this->createMock(UnitOfWork::class);
         $em->expects($this->any())
             ->method('getUnitOfWork')
@@ -458,6 +467,30 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
             new ConfigCache($cache, $modelCache, ['test' => 'test']),
             $serviceProvider
         );
+    }
+
+    private function createQueryBuilderMock(): QueryBuilder
+    {
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $query = $this->createMock(Query::class);
+
+        $queryBuilder->expects($this->any())
+            ->method('where')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->any())
+            ->method('setParameter')
+            ->willReturn($queryBuilder);
+
+        $queryBuilder->expects($this->any())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $query->expects($this->any())
+            ->method('getResult')
+            ->willReturn([]);
+
+        return $queryBuilder;
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Extension;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
@@ -22,7 +22,7 @@ class RenameExtensionTest extends TestCase
     protected function setUp(): void
     {
         $this->optionsManager = $this->createMock(ExtendOptionsManager::class);
-        $this->databasePlatform = $this->createMock(MySqlPlatform::class);
+        $this->databasePlatform = $this->createMock(MySQLPlatform::class);
 
         $this->extension = new RenameExtension($this->optionsManager);
         $this->extension->setDatabasePlatform($this->databasePlatform);

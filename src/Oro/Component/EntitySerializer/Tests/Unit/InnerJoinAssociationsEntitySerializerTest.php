@@ -2,6 +2,7 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
+use Doctrine\DBAL\ParameterType;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Product;
 
 class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
@@ -27,7 +28,7 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(
@@ -82,7 +83,7 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT t0.name AS name_1, t0.label AS label_2'
@@ -95,7 +96,7 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 'user_category_name'],
-            [1 => \PDO::PARAM_STR]
+            [1 => ParameterType::STRING]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
@@ -156,7 +157,7 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(
@@ -207,7 +208,7 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(
@@ -258,7 +259,7 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(
@@ -316,7 +317,7 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(
@@ -372,7 +373,7 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(
@@ -431,7 +432,7 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(
@@ -496,7 +497,7 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT t0.name AS name_1, t0.label AS label_2'
@@ -509,7 +510,7 @@ class InnerJoinAssociationsEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 'user_category_name'],
-            [1 => \PDO::PARAM_STR]
+            [1 => ParameterType::STRING]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 

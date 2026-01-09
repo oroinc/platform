@@ -7,7 +7,7 @@ use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
-use Psr\Log\Test\TestLogger;
+use Oro\Component\Testing\Logger\TestLogger;
 use Symfony\Bundle\FrameworkBundle\Test\MailerAssertionsTrait;
 
 /**

@@ -5,12 +5,13 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\BusinessUnitOwner;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\BusinessUnitOwnerValidator;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class BusinessUnitOwnerValidatorTest extends ConstraintValidatorTestCase
 {
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new BusinessUnitOwnerValidator();
     }

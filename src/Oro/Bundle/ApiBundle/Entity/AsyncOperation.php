@@ -77,7 +77,7 @@ class AsyncOperation
     #[ORM\Column(name: 'has_errors', type: Types::BOOLEAN, options: ['default' => false])]
     private ?bool $hasErrors = false;
 
-    #[ORM\Column(name: 'summary', type: 'json_array', nullable: true)]
+    #[ORM\Column(name: 'summary', type: 'json', nullable: true)]
     private ?array $summary = null;
 
     #[ORM\Column(name: 'affected_entities', type: Types::JSON, nullable: true)]

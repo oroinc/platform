@@ -2,10 +2,16 @@
 
 namespace Oro\Component\Testing\Unit\ORM\Mocks;
 
+use Doctrine\DBAL\Driver;
+use Doctrine\DBAL\Driver\API\ExceptionConverter;
+use Doctrine\DBAL\Driver\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
+
 /**
  * This class is a clone of namespace Doctrine\Tests\Mocks\DriverMock that is excluded from doctrine package since v2.4.
  */
-class DriverMock implements \Doctrine\DBAL\Driver
+class DriverMock implements Driver
 {
     private $platformMock;
 
@@ -45,10 +51,12 @@ class DriverMock implements \Doctrine\DBAL\Driver
     }
 
     /**
+     * @param \Doctrine\DBAL\Connection $conn
+     * @param AbstractPlatform $platform
      * @override
      */
     #[\Override]
-    public function getSchemaManager(\Doctrine\DBAL\Connection $conn)
+    public function getSchemaManager(\Doctrine\DBAL\Connection $conn, AbstractPlatform $platform)
     {
         if ($this->schemaManagerMock == null) {
             return new SchemaManagerMock($conn);
@@ -64,7 +72,7 @@ class DriverMock implements \Doctrine\DBAL\Driver
         $this->platformMock = $platform;
     }
 
-    public function setSchemaManager(\Doctrine\DBAL\Schema\AbstractSchemaManager $sm)
+    public function setSchemaManager(AbstractSchemaManager $sm)
     {
         $this->schemaManagerMock = $sm;
     }
@@ -78,20 +86,13 @@ class DriverMock implements \Doctrine\DBAL\Driver
         }
     }
 
-    public function setDriverConnection(\Doctrine\DBAL\Driver\Connection $dc)
+    public function setDriverConnection(Connection $dc)
     {
         $this->driverConnectionMock = $dc;
     }
 
-    #[\Override]
-    public function getName()
+    public function getExceptionConverter(): ExceptionConverter
     {
-        return 'mock';
-    }
-
-    #[\Override]
-    public function getDatabase(\Doctrine\DBAL\Connection $conn)
-    {
-        return;
+        return new \Doctrine\DBAL\Driver\API\PostgreSQL\ExceptionConverter();
     }
 }

@@ -2080,6 +2080,30 @@ class DataAuditTest extends WebTestCase
         $this->markTestSkipped('BAP-18750');
     }
 
+    public function testDatePoint(): void
+    {
+        // date_point is a new type since Symfony 7.3 (symfony/doctrine-bridge) for the Clock component,
+        // https://github.com/symfony/doctrine-bridge/blob/7.3/CHANGELOG.md#73
+        // DatePointType extends DateTimeImmutableType
+        $this->markTestSkipped('BAP-18750');
+    }
+
+    public function testDayPoint(): void
+    {
+        // day_point is a new type since Symfony 7.4 (symfony/doctrine-bridge) for the Clock component,
+        // https://github.com/symfony/doctrine-bridge/blob/7.4/CHANGELOG.md
+        // DayPointType extends DateImmutableType
+        $this->markTestSkipped('BAP-18750');
+    }
+
+    public function testTimePoint(): void
+    {
+        // time_point is a new type since Symfony 7.4 (symfony/doctrine-bridge) for the Clock component,
+        // https://github.com/symfony/doctrine-bridge/blob/7.4/CHANGELOG.md
+        // TimePointType extends TimeImmutableType
+        $this->markTestSkipped('BAP-18750');
+    }
+
     /**
      * <ul>
      *      <li>

@@ -8,6 +8,9 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Adds a position field to forms that support sorting.
+ */
 class SortableExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
@@ -15,7 +18,7 @@ class SortableExtension extends AbstractTypeExtension
     public const POSITION_FIELD_NAME = '_position';
 
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!$options['sortable']) {
             return;
@@ -32,7 +35,7 @@ class SortableExtension extends AbstractTypeExtension
     }
 
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'sortable' => false,

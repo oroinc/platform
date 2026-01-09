@@ -22,6 +22,6 @@ class MakeEmailLowercaseFieldNotNull implements Migration, OrderedMigrationInter
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_user');
-        $table->changeColumn('email_lowercase', ['notnull' => true]);
+        $table->modifyColumn('email_lowercase', ['notnull' => true]);
     }
 }

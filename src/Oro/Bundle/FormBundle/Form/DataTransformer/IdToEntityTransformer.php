@@ -28,7 +28,7 @@ class IdToEntityTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (!$value) {
             return null;
@@ -39,7 +39,7 @@ class IdToEntityTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (!is_object($value) || !is_a($value, $this->className, true)) {
             return null;

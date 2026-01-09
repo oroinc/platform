@@ -4,12 +4,13 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotPhpKeyword;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotPhpKeywordValidator;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NotPhpKeywordValidatorTest extends ConstraintValidatorTestCase
 {
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new NotPhpKeywordValidator();
     }

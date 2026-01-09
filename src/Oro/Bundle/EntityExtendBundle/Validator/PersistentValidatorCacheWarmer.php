@@ -14,6 +14,8 @@ use Symfony\Component\VarExporter\VarExporter;
  */
 class PersistentValidatorCacheWarmer extends ValidatorCacheWarmer
 {
+    private const string DUMMY_DIR_TO_FAIL_IF_USED = '__VALIDATOR_CACHE_MUST_WRITE_TO_PERSISTENT_CACHE_ERROR__';
+
     public function __construct(
         private readonly CacheItemPoolInterface $persistentCache,
         ValidatorBuilder $validatorBuilder,
@@ -23,12 +25,13 @@ class PersistentValidatorCacheWarmer extends ValidatorCacheWarmer
         parent::__construct($validatorBuilder, $phpArrayFile);
     }
 
-    public function warmUp(string $cacheDir): array
+    #[\Override]
+    public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         $arrayAdapter = new ArrayAdapter();
         spl_autoload_register([ClassExistenceResource::class, 'throwOnRequiredClass']);
         try {
-            if (!$this->doWarmUp($cacheDir, $arrayAdapter)) {
+            if (!$this->doWarmUp($cacheDir, $arrayAdapter, $buildDir ?: self::DUMMY_DIR_TO_FAIL_IF_USED)) {
                 return [];
             }
         } finally {

@@ -3,13 +3,14 @@
 namespace Oro\Bundle\LoggerBundle\Monolog;
 
 use Monolog\Handler\HandlerWrapper;
+use Monolog\LogRecord;
 
 /**
  * Disables Monolog deprecation messages based on 'oro_platform.collect_deprecations' parameter value
  */
 class DisableDeprecationsHandlerWrapper extends HandlerWrapper
 {
-    public function handle(array $record): bool
+    public function handle(LogRecord $record): bool
     {
         $exception = $record['context']['exception'] ?? null;
         if ($exception instanceof \ErrorException

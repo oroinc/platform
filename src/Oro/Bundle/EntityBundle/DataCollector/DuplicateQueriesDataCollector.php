@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\DataCollector;
 
-use Doctrine\DBAL\Logging\DebugStack;
+use Doctrine\Bundle\DoctrineBundle\Middleware\BacktraceDebugDataHolder;
 use Oro\Bundle\EntityBundle\DataCollector\Analyzer\DuplicateQueryAnalyzer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,39 +13,27 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
  */
 class DuplicateQueriesDataCollector extends DataCollector
 {
-    /**
-     * @var array
-     */
-    protected $loggers = [];
+    private BacktraceDebugDataHolder $debugDataHolder;
 
-    public function __construct()
+    public function __construct(BacktraceDebugDataHolder $debugDataHolder)
     {
+        $this->debugDataHolder = $debugDataHolder;
         $this->reset();
-    }
-
-    /**
-     * Adds the stack logger for a doctrine connection.
-     *
-     * @param string $name
-     * @param DebugStack $logger
-     */
-    public function addLogger($name, DebugStack $logger)
-    {
-        $this->loggers[$name] = $logger;
     }
 
     #[\Override]
     public function collect(Request $request, Response $response, ?\Throwable $exception = null)
     {
-        foreach ($this->loggers as $name => $logger) {
+        $data = $this->debugDataHolder->getData();
+        foreach ($data as $connectionName => $queries) {
             $queryAnalyser = new DuplicateQueryAnalyzer();
-            foreach ($logger->queries as $query) {
-                $queryAnalyser->addQuery($query['sql'], (array)$query['params']);
+            foreach ($queries as $query) {
+                $queryAnalyser->addQuery($query['sql'], (array)($query['params'] ?? []));
             }
 
-            $this->data['queriesCount'][$name] = $queryAnalyser->getQueriesCount();
-            $this->data['identical'][$name] = $queryAnalyser->getIdenticalQueries();
-            $this->data['similar'][$name] = $queryAnalyser->getSimilarQueries();
+            $this->data['queriesCount'][$connectionName] = $queryAnalyser->getQueriesCount();
+            $this->data['identical'][$connectionName] = $queryAnalyser->getIdenticalQueries();
+            $this->data['similar'][$connectionName] = $queryAnalyser->getSimilarQueries();
         }
     }
 

@@ -27,7 +27,7 @@ class FillRelationSql extends ParametrizedMigrationQuery
      * @param LoggerInterface $logger
      * @param bool $dryRun
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function fillRelations(LoggerInterface $logger, $dryRun = false)
     {

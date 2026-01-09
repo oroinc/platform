@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
+use Doctrine\DBAL\ParameterType;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
@@ -162,7 +163,7 @@ class OrmIndexer extends AbstractIndexer
             $this->getIndexManager()->getConnection()->executeQuery(
                 $query,
                 [$class],
-                [\PDO::PARAM_STR]
+                [ParameterType::STRING]
             );
         }
     }

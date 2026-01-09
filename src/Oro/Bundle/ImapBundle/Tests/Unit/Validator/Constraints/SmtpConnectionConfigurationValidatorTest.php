@@ -10,6 +10,7 @@ use Oro\Bundle\ImapBundle\Validator\Constraints\SmtpConnectionConfiguration;
 use Oro\Bundle\ImapBundle\Validator\Constraints\SmtpConnectionConfigurationValidator;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
@@ -27,7 +28,7 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
     }
 
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new SmtpConnectionConfigurationValidator(
             $this->checker,

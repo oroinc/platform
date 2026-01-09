@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Migration;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -62,10 +62,10 @@ class SetUUIDFieldOfFileEntityQuery extends ParametrizedMigrationQuery
     private function executeQuery(LoggerInterface $logger, int $start, int $end, $dryRun): void
     {
         $query = sprintf(
-            'UPDATE oro_attachment_file SET uuid = %s WHERE uuid IS NULL AND id BETWEEN :start AND :end',
-            $this->databasePlatform->getGuidExpression()
+            'UPDATE oro_attachment_file SET uuid = UUID_GENERATE_V4()'
+            . ' WHERE uuid IS NULL AND id BETWEEN :start AND :end',
         );
-        $types = ['start' => Type::INTEGER, 'end' => Type::INTEGER];
+        $types = ['start' => Types::INTEGER, 'end' => Types::INTEGER];
 
         while ($start <= $end) {
             $params = ['start' => $start, 'end' => $start + self::BATCH_SIZE];

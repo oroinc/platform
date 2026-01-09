@@ -13,7 +13,9 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Provider\PhpArrayConfigCacheModifier;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class WidgetControllerTest extends WebTestCase
@@ -89,7 +91,7 @@ class WidgetControllerTest extends WebTestCase
                 self::assertStringContainsString($item, $crawler->html());
             }
         } else {
-            $this->assertEmpty($crawler);
+            $this->assertEmptyResponse($crawler, $result);
         }
     }
 
@@ -167,7 +169,7 @@ class WidgetControllerTest extends WebTestCase
                 $this->assertNotEmpty($crawler->selectButton($action));
             }
         } else {
-            $this->assertEmpty($crawler);
+            $this->assertEmptyResponse($crawler, $result);
         }
     }
 
@@ -597,5 +599,22 @@ class WidgetControllerTest extends WebTestCase
         $config = $this->configProvider->getConfiguration();
         $config['operations'] = $operations;
         $this->configModifier->updateCache($config);
+    }
+
+    /**
+     * Asserts that the response is empty
+     *
+     * Since Symfony 7.4, Crawler wraps empty content with "<head></head><body></body>"
+     * so $crawler->count() will contain at least one node.
+     *
+     * @see \Symfony\Component\DomCrawler\Crawler::parseXhtml
+     */
+    private function assertEmptyResponse(Crawler $crawler, Response $response): void
+    {
+        $this->assertEquals(1, $crawler->count());
+        $this->assertEquals("<head></head><body></body>", $crawler->html());
+
+        $responseContent = $response->getContent();
+        self::assertEmpty($responseContent, 'Expected empty response but got: ' . $responseContent);
     }
 }

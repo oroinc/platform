@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\ManagerRegistry;
@@ -77,7 +78,7 @@ class DynamicTranslationLoaderTest extends OrmTestCase
                 ],
             ],
             [1 => 'en_US', 2 => 'en', 3 => Translation::SCOPE_SYSTEM],
-            [1 => \PDO::PARAM_STR, 2 => \PDO::PARAM_STR, 3 => \PDO::PARAM_INT]
+            [1 => ParameterType::STRING, 2 => ParameterType::STRING, 3 => ParameterType::INTEGER]
         );
 
         self::assertEquals(
@@ -151,7 +152,7 @@ class DynamicTranslationLoaderTest extends OrmTestCase
                 ],
             ],
             [1 => 'en_US', 2 => 'en'],
-            [1 => \PDO::PARAM_STR, 2 => \PDO::PARAM_STR]
+            [1 => ParameterType::STRING, 2 => ParameterType::STRING]
         );
 
         self::assertEquals(

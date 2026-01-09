@@ -85,8 +85,8 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
         $table->addColumn('integer_property', 'integer', ['notnull' => false, 'comment' => '(DC2Type:integer)']);
         $table->addColumn(
             'json_array_property',
-            'json_array',
-            ['notnull' => false, 'comment' => '(DC2Type:json_array)']
+            'json',
+            ['notnull' => false, 'comment' => '(DC2Type:json)']
         );
         $table->addColumn('money_property', 'money', ['notnull' => false, 'comment' => '(DC2Type:money)']);
         $table->addColumn(

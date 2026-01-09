@@ -5,6 +5,7 @@ namespace Oro\Bundle\LoggerBundle\Monolog;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\HandlerWrapper;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Monolog\ResettableInterface;
 
 /**
@@ -21,7 +22,7 @@ class DisableFilterHandlerWrapper extends HandlerWrapper
     }
 
     #[\Override]
-    public function handle(array $record): bool
+    public function handle(LogRecord $record): bool
     {
         $this->setMinLevel();
 

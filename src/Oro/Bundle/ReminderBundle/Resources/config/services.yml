@@ -9,7 +9,8 @@ services:
         arguments:
             - '@Psr\Container\ContainerInterface'
         tags:
-            - { name: doctrine.event_subscriber }
+            - { name: doctrine.event_listener, event: postLoad }
+            - { name: doctrine.event_listener, event: postPersist }
             - { name: container.service_subscriber, id: oro_reminder.entity.manager }
 
     oro_reminder.sender:

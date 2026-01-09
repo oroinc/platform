@@ -54,7 +54,7 @@ class UpdateDateVariablesQuery implements MigrationQuery, ConnectionAwareInterfa
 
     private function processRow(array $row)
     {
-        $definition = $this->connection->convertToPHPValue($row['definition'], Types::JSON_ARRAY);
+        $definition = $this->connection->convertToPHPValue($row['definition'], Types::JSON);
         if (empty($definition['filters'])) {
             return;
         }
@@ -69,7 +69,7 @@ class UpdateDateVariablesQuery implements MigrationQuery, ConnectionAwareInterfa
             $this->segmentTable,
             ['definition' => $definition],
             ['id' => $row['id']],
-            [Types::JSON_ARRAY]
+            [Types::JSON]
         );
     }
 

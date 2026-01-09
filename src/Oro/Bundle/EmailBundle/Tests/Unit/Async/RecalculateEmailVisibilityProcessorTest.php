@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\ManagerRegistry;
@@ -95,7 +96,7 @@ class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
             . ' WHERE e4_.email IN (?) OR e3_.email IN (?)',
             [['sclr_0' => $count]],
             [1 => $email, 2 => $email],
-            [1 => \PDO::PARAM_STR, 2 => \PDO::PARAM_STR]
+            [1 => ParameterType::STRING, 2 => ParameterType::STRING]
         );
     }
 
@@ -117,7 +118,7 @@ class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
             $sql,
             $data,
             [1 => $email, 2 => $email],
-            [1 => \PDO::PARAM_STR, 2 => \PDO::PARAM_STR]
+            [1 => ParameterType::STRING, 2 => ParameterType::STRING]
         );
     }
 
@@ -133,7 +134,12 @@ class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
             . ' WHERE e4_.email IN (?, ?) OR e3_.email IN (?, ?)',
             [['sclr_0' => $count]],
             [1 => $emails[0], 2 => $emails[1], 3 => $emails[0], 4 => $emails[1]],
-            [1 => \PDO::PARAM_STR, 2 => \PDO::PARAM_STR, 3 => \PDO::PARAM_STR, 4 => \PDO::PARAM_STR]
+            [
+                1 => ParameterType::STRING,
+                2 => ParameterType::STRING,
+                3 => ParameterType::STRING,
+                4 => ParameterType::STRING
+            ]
         );
     }
 
@@ -155,7 +161,12 @@ class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
             $sql,
             $data,
             [1 => $emails[0], 2 => $emails[1], 3 => $emails[0], 4 => $emails[1]],
-            [1 => \PDO::PARAM_STR, 2 => \PDO::PARAM_STR, 3 => \PDO::PARAM_STR, 4 => \PDO::PARAM_STR]
+            [
+                1 => ParameterType::STRING,
+                2 => ParameterType::STRING,
+                3 => ParameterType::STRING,
+                4 => ParameterType::STRING
+            ]
         );
     }
 

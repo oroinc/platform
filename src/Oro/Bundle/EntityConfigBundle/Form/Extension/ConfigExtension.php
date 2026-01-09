@@ -6,12 +6,15 @@ use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Adds config-related form options to entity and field configuration forms.
+ */
 class ConfigExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
 
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         // config_is_new is true if a new entity or field is created
         // note that this option is false if entity or field is edited even if its state is New

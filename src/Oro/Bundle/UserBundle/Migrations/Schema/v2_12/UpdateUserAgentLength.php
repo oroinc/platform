@@ -24,6 +24,6 @@ class UpdateUserAgentLength implements Migration
         }
 
         //use text field cause user-agent has no restrictions for length
-        $table->changeColumn('user_agent', ['type' => Type::getType(Types::TEXT), 'notnull' => false, 'default' => '']);
+        $table->modifyColumn('user_agent', ['type' => Type::getType(Types::TEXT), 'notnull' => false, 'default' => '']);
     }
 }

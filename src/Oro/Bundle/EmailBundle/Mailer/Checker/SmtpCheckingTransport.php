@@ -17,7 +17,7 @@ class SmtpCheckingTransport extends EsmtpTransport
             $this->getStream()->initialize();
             // Read the opening SMTP greeting
             $this->executeCommand('', [220]);
-            $this->doHeloCommand();
+            $this->executeCommand(\sprintf("HELO %s\r\n", $this->getLocalDomain()), [250]);
 
             return true;
         } catch (\RuntimeException $exception) {

@@ -231,7 +231,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
                     $sql
                 );
 
-                return $this->createCountStatementMock($totalCount);
+                return $this->createCountResultMock($totalCount);
             });
 
         $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
@@ -271,7 +271,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
                     $sql
                 );
 
-                return $this->createCountStatementMock($totalCount);
+                return $this->createCountResultMock($totalCount);
             });
 
         $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);

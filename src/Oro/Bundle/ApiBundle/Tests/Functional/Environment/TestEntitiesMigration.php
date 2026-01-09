@@ -390,7 +390,7 @@ class TestEntitiesMigration implements
         $table->addColumn('field_float', 'float', ['notnull' => false]);
         $table->addColumn('field_array', 'array', ['notnull' => false]);
         $table->addColumn('field_simple_array', 'simple_array', ['notnull' => false]);
-        $table->addColumn('field_json_array', 'json_array', ['notnull' => false]);
+        $table->addColumn('field_json_array', 'json', ['notnull' => false]);
         $table->addColumn('field_json', 'json', [
             'comment' => '(DC2Type:json)',
             'notnull' => false,

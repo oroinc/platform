@@ -80,7 +80,7 @@ class UpdateIntegrationChannelSettingFieldsValue extends ParametrizedMigrationQu
      * @param LoggerInterface $logger
      * @param bool $dryRun
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function prepareColumnOnPostgreSQL92($logger, $dryRun)
     {

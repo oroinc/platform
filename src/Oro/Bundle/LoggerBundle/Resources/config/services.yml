@@ -90,3 +90,11 @@ services:
             - '@monolog.logger.console'
         tags:
             - { name: kernel.event_subscriber }
+
+    oro_logger.doctrine.dbal.logger:
+        class: Oro\Bundle\LoggerBundle\Doctrine\DBAL\Logger\DbalLogger
+        arguments:
+            - '@monolog.logger.doctrine'
+            - '@?debug.stopwatch'
+        tags:
+            - { name: monolog.logger, channel: doctrine }

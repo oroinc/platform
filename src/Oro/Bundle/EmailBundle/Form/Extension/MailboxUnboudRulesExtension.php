@@ -25,7 +25,7 @@ class MailboxUnboudRulesExtension extends AbstractTypeExtension
     }
 
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $unboundRules = $builder->create('unboundRules', HiddenType::class, [
             'mapped' => false,

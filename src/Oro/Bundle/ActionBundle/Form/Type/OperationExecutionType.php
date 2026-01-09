@@ -22,7 +22,7 @@ class OperationExecutionType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class'      => Operation::class,
-                'csrf_protection' => ['enabled' => true],
+                'csrf_protection' => true,
                 'csrf_field_name' => self::CSRF_TOKEN_FIELD,
                 'csrf_token_id'   => null
             ]

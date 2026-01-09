@@ -13,7 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
@@ -21,6 +20,7 @@ use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
  * The authentication provider to retrieve the user and the organization for a UsernamePasswordOrganizationToken.
@@ -70,7 +70,7 @@ class UsernamePasswordOrganizationAuthenticator extends FormLoginAuthenticator
         $passport = parent::authenticate($request);
 
         $request->attributes->set(
-            Security::LAST_USERNAME,
+            SecurityRequestAttributes::LAST_USERNAME,
             $passport->getBadge(UserBadge::class)->getUserIdentifier()
         );
         $request->attributes->set('user', $this->getUser($passport));

@@ -12,9 +12,9 @@ class MakeSomeColumnsNullable implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $auditTable = $schema->getTable('oro_audit');
-        $auditTable->changeColumn('version', ['notnull' => false]);
-        $auditTable->changeColumn('action', ['notnull' => false]);
-        $auditTable->changeColumn('object_name', ['notnull' => false]);
-        $auditTable->changeColumn('logged_at', ['notnull' => false]);
+        $auditTable->modifyColumn('version', ['notnull' => false]);
+        $auditTable->modifyColumn('action', ['notnull' => false]);
+        $auditTable->modifyColumn('object_name', ['notnull' => false]);
+        $auditTable->modifyColumn('logged_at', ['notnull' => false]);
     }
 }

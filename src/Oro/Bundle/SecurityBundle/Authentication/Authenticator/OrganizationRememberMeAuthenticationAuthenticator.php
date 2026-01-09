@@ -30,7 +30,7 @@ class OrganizationRememberMeAuthenticationAuthenticator extends RememberMeAuthen
         string $cookieName,
         ?LoggerInterface $logger = null
     ) {
-        parent::__construct($rememberMeHandler, $secret, $tokenStorage, $cookieName, $logger);
+        parent::__construct($rememberMeHandler, $tokenStorage, $cookieName, $logger);
         $this->secret = $secret;
     }
 

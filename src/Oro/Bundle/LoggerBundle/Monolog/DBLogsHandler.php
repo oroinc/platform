@@ -4,8 +4,9 @@ namespace Oro\Bundle\LoggerBundle\Monolog;
 
 use Doctrine\DBAL\Statement;
 use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\LogRecord;
 use Oro\Bundle\LoggerBundle\Entity\LogEntry;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Oro\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * This handler is responsible for saving logs into database
@@ -21,7 +22,7 @@ class DBLogsHandler extends AbstractProcessingHandler
     private $dateTimeFormatString;
 
     #[\Override]
-    protected function write(array $record): void
+    protected function write(LogRecord $record): void
     {
         $formatted = $record['formatted'];
 

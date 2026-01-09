@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Async\Topic;
 
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Component\MessageQueue\Topic\AbstractTopic;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email as EmailConstraint;
@@ -28,6 +29,13 @@ class SendEmailNotificationTopic extends AbstractTopic
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $emailIsValidCallable = Validation::createIsValidCallable(new EmailConstraint());
+        $emailValidationCallable = static function ($value) use ($emailIsValidCallable) {
+            $emailAddressHelper = new EmailAddressHelper();
+            // This prevents email validation errors due to formatting (e.g., '"John Doe" <john@example.com>')
+            $email = $emailAddressHelper->extractPureEmailAddress($value);
+
+            return $email && $emailIsValidCallable($email);
+        };
 
         $resolver
             ->setRequired([
@@ -42,7 +50,7 @@ class SendEmailNotificationTopic extends AbstractTopic
             ->addAllowedTypes('subject', 'string')
             ->addAllowedTypes('body', 'string')
             ->addAllowedTypes('contentType', 'string')
-            ->addAllowedValues('from', $emailIsValidCallable)
-            ->addAllowedValues('toEmail', $emailIsValidCallable);
+            ->addAllowedValues('from', $emailValidationCallable)
+            ->addAllowedValues('toEmail', $emailValidationCallable);
     }
 }

@@ -274,19 +274,19 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
                     ],
                     [
                         'type'       => 'testapientity1',
-                        'id'         => '<toString(@entity1_2->id)>',
+                        'id'         => '<toString(@entity1_3->id)>',
                         'attributes' => [
-                            'name'         => 'Entity 1_2',
-                            'computedName' => 'Entity 1_2 (computed) (decorated)',
+                            'name'         => 'Entity 1_3',
+                            'computedName' => 'Entity 1_3 (computed) (decorated)',
                             'computedIds'  => $computedId
                         ]
                     ],
                     [
                         'type'       => 'testapientity1',
-                        'id'         => '<toString(@entity1_3->id)>',
+                        'id'         => '<toString(@entity1_2->id)>',
                         'attributes' => [
-                            'name'         => 'Entity 1_3',
-                            'computedName' => 'Entity 1_3 (computed) (decorated)',
+                            'name'         => 'Entity 1_2',
+                            'computedName' => 'Entity 1_2 (computed) (decorated)',
                             'computedIds'  => $computedId
                         ]
                     ],

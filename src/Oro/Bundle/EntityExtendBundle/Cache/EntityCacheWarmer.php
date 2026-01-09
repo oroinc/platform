@@ -20,7 +20,7 @@ class EntityCacheWarmer extends CacheWarmer
     }
 
     #[\Override]
-    public function warmUp($cacheDir): array
+    public function warmUp($cacheDir, ?string $buildDir = null): array
     {
         $this->configManager->flushAllCaches();
         $this->configCacheWarmer->warmUpCache(ConfigCacheWarmer::MODE_CONFIGURABLE_ENTITY_ONLY);

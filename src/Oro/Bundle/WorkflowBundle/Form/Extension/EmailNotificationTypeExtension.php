@@ -30,14 +30,14 @@ class EmailNotificationTypeExtension extends AbstractTypeExtension
     }
 
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventListener(FormEvents::POST_SET_DATA, [$this->listener, 'onPostSetData']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this->listener, 'onPreSubmit']);
     }
 
     #[\Override]
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $elements = array_filter(
             array_map(

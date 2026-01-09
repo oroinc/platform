@@ -37,7 +37,7 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
             ->willReturnCallback(function ($sql) use (&$records, &$actualSql) {
                 $actualSql = $sql;
 
-                return $this->createFetchStatementMock([['sclr_0' => count($records)]]);
+                return $this->createFetchResultMock([['sclr_0' => count($records)]]);
             });
 
         $source = $this->em->createQueryBuilder()
@@ -66,7 +66,7 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
             ->willReturnCallback(function ($sql) use (&$records, &$actualSql) {
                 $actualSql = $sql;
 
-                return $this->createFetchStatementMock([['sclr_0' => count($records)]]);
+                return $this->createFetchResultMock([['sclr_0' => count($records)]]);
             });
 
         $source = $this->em->createQueryBuilder()
@@ -93,7 +93,7 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
             ->willReturnCallback(function ($sql) use (&$maxResults, &$actualSql) {
                 $actualSql = $sql;
 
-                return $this->createCountStatementMock($maxResults);
+                return $this->createCountResultMock($maxResults);
             });
 
         $source = $this->em->createQueryBuilder()
@@ -122,7 +122,7 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
             ->willReturnCallback(function ($sql) use (&$maxResults, &$actualSql) {
                 $actualSql = $sql;
 
-                return $this->createCountStatementMock($maxResults);
+                return $this->createCountResultMock($maxResults);
             });
 
         $source = $this->em->createQueryBuilder()
@@ -152,8 +152,8 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
         $actualSqls = [];
         $statementCounter = 0;
         $statements = [
-            $this->createFetchStatementMock([['sclr_0' => count($records)]]),
-            $this->createFetchStatementMock([$records[0], $records[1], $records[2]])
+            $this->createFetchResultMock([['sclr_0' => count($records)]]),
+            $this->createFetchResultMock([$records[0], $records[1], $records[2]])
         ];
 
         $this->mockQuery($statements, $statementCounter, $actualSqls);
@@ -208,8 +208,8 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
         $actualSqls = [];
         $statementCounter = 0;
         $statements = [
-            $this->createCountStatementMock($maxResults),
-            $this->createFetchStatementMock([$records[0], $records[1]]),
+            $this->createCountResultMock($maxResults),
+            $this->createFetchResultMock([$records[0], $records[1]]),
         ];
 
         $this->mockQuery($statements, $statementCounter, $actualSqls);
@@ -253,9 +253,9 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
         $actualSqls = [];
         $statementCounter = 0;
         $statements = [
-            $this->createCountStatementMock($maxResults),
-            $this->createFetchStatementMock([$records[0], $records[1]]),
-            $this->createFetchStatementMock([$records[2]])
+            $this->createCountResultMock($maxResults),
+            $this->createFetchResultMock([$records[0], $records[1]]),
+            $this->createFetchResultMock([$records[2]])
         ];
 
         $this->mockQuery($statements, $statementCounter, $actualSqls);
@@ -305,9 +305,9 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
         $actualSqls = [];
         $statementCounter = 0;
         $statements = [
-            $this->createCountStatementMock($maxResults),
-            $this->createFetchStatementMock([$records[1], $records[2]]),
-            $this->createFetchStatementMock([$records[3]])
+            $this->createCountResultMock($maxResults),
+            $this->createFetchResultMock([$records[1], $records[2]]),
+            $this->createFetchResultMock([$records[3]])
         ];
 
         $this->mockQuery($statements, $statementCounter, $actualSqls);
@@ -357,9 +357,9 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
         $actualSqls = [];
         $statementCounter = 0;
         $statements = [
-            $this->createFetchStatementMock([['sclr_0' => count($records)]]),
-            $this->createFetchStatementMock([$records[0], $records[1]]),
-            $this->createFetchStatementMock([$records[2]])
+            $this->createFetchResultMock([['sclr_0' => count($records)]]),
+            $this->createFetchResultMock([$records[0], $records[1]]),
+            $this->createFetchResultMock([$records[2]])
         ];
 
         $this->mockQuery($statements, $statementCounter, $actualSqls);
@@ -405,8 +405,8 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
         $actualSqls = [];
         $statementCounter = 0;
         $statements = [
-            $this->createFetchStatementMock([['sclr_0' => count($records)]]),
-            $this->createFetchStatementMock([$records[0], $records[1], $records[2]]),
+            $this->createFetchResultMock([['sclr_0' => count($records)]]),
+            $this->createFetchResultMock([$records[0], $records[1], $records[2]]),
         ];
 
         $this->mockQuery($statements, $statementCounter, $actualSqls);
@@ -446,9 +446,9 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
         $actualSqls = [];
         $statementCounter = 0;
         $statements = [
-            $this->createFetchStatementMock([['sclr_0' => count($records)]]),
-            $this->createFetchStatementMock([$records[0], $records[1]]),
-            $this->createFetchStatementMock([$records[2]])
+            $this->createFetchResultMock([['sclr_0' => count($records)]]),
+            $this->createFetchResultMock([$records[0], $records[1]]),
+            $this->createFetchResultMock([$records[2]])
         ];
 
         $this->mockQuery($statements, $statementCounter, $actualSqls);
@@ -519,41 +519,41 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
 
         return [
             [
-                'statements' => [$this->createFetchStatementMock([['sclr_0' => 0]])],
+                'statements' => [$this->createFetchResultMock([['sclr_0' => 0]])],
                 'bufferSize' => 1,
                 'pages' => 0,
             ],
             [
                 'statements' => [
-                    $this->createFetchStatementMock([['sclr_0' => count($records)]]),
-                    $this->createFetchStatementMock([$records[0]]),
-                    $this->createFetchStatementMock([$records[1]]),
-                    $this->createFetchStatementMock([$records[2]]),
+                    $this->createFetchResultMock([['sclr_0' => count($records)]]),
+                    $this->createFetchResultMock([$records[0]]),
+                    $this->createFetchResultMock([$records[1]]),
+                    $this->createFetchResultMock([$records[2]]),
                 ],
                 'bufferSize' => 1,
                 'pages' => 3,
             ],
             [
                 'statements' => [
-                    $this->createFetchStatementMock([['sclr_0' => count($records)]]),
-                    $this->createFetchStatementMock([$records[0], $records[1]]),
-                    $this->createFetchStatementMock([$records[2]]),
+                    $this->createFetchResultMock([['sclr_0' => count($records)]]),
+                    $this->createFetchResultMock([$records[0], $records[1]]),
+                    $this->createFetchResultMock([$records[2]]),
                 ],
                 'bufferSize' => 2,
                 'pages' => 2,
             ],
             [
                 'statements' => [
-                    $this->createFetchStatementMock([['sclr_0' => count($records)]]),
-                    $this->createFetchStatementMock([$records[0], $records[1], $records[2]]),
+                    $this->createFetchResultMock([['sclr_0' => count($records)]]),
+                    $this->createFetchResultMock([$records[0], $records[1], $records[2]]),
                 ],
                 'bufferSize' => 3,
                 'pages' => 1,
             ],
             [
                 'statements' => [
-                    $this->createFetchStatementMock([['sclr_0' => count($records)]]),
-                    $this->createFetchStatementMock([$records[0], $records[1], $records[2]]),
+                    $this->createFetchResultMock([['sclr_0' => count($records)]]),
+                    $this->createFetchResultMock([$records[0], $records[1], $records[2]]),
                 ],
                 'bufferSize' => 5,
                 'pages' => 1,
@@ -591,10 +591,10 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
         return [
             [
                 'statements' => [
-                    $this->createFetchStatementMock([['sclr_0' => count($records)]]),
-                    $this->createFetchStatementMock([$records[0]]),
-                    $this->createFetchStatementMock([$records[1]]),
-                    $this->createFetchStatementMock([$records[2]]),
+                    $this->createFetchResultMock([['sclr_0' => count($records)]]),
+                    $this->createFetchResultMock([$records[0]]),
+                    $this->createFetchResultMock([$records[1]]),
+                    $this->createFetchResultMock([$records[2]]),
                 ],
                 'expectedResult' => [
                     new Entity(1),
@@ -607,10 +607,10 @@ class BufferedQueryWithDoctrineIterableResultIteratorTest extends OrmTestCase
             ],
             [
                 'statements' => [
-                    $this->createFetchStatementMock([['sclr_0' => count($records)]]),
-                    $this->createFetchStatementMock([$records[0]]),
-                    $this->createFetchStatementMock([$records[1]]),
-                    $this->createFetchStatementMock([$records[2]]),
+                    $this->createFetchResultMock([['sclr_0' => count($records)]]),
+                    $this->createFetchResultMock([$records[0]]),
+                    $this->createFetchResultMock([$records[1]]),
+                    $this->createFetchResultMock([$records[2]]),
                 ],
                 'expectedResult' => [
                     ['entity' => new Entity(1), '_id' => 1],

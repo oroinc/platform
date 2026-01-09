@@ -17,7 +17,7 @@ class OutputStub extends Output
     private $output = '';
 
     #[\Override]
-    protected function doWrite($message, $newline)
+    protected function doWrite($message, $newline): void
     {
         $this->messages[] = $message;
         $this->output .= $message;

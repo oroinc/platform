@@ -4,13 +4,14 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EmbeddedFormBundle\Validator\Constraints\NoTags;
 use Oro\Bundle\EmbeddedFormBundle\Validator\Constraints\NoTagsValidator;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NoTagsValidatorTest extends ConstraintValidatorTestCase
 {
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         return new NoTagsValidator();
     }

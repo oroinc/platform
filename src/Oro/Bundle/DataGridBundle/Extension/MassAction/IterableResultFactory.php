@@ -57,7 +57,7 @@ class IterableResultFactory implements IterableResultFactoryInterface
 
         //prepare query builder
         $qb->setMaxResults(null);
-        $qb->setFirstResult(null);
+        $qb->setFirstResult(0);
 
         $identifierField = $this->getIdentifierField($actionConfiguration);
         $objectIdentifier = $this->getObjectIdentifier($actionConfiguration);

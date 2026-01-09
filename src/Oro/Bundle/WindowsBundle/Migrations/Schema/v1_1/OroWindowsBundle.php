@@ -26,9 +26,9 @@ class OroWindowsBundle implements Migration, DatabasePlatformAwareInterface
                 'ALTER TABLE oro_windows_state ALTER COLUMN data TYPE JSON USING data::JSON'
             );
         } else {
-            $column->setType(Type::getType(Types::JSON_ARRAY));
+            $column->setType(Type::getType(Types::JSON));
         }
 
-        $column->setOptions(['comment' => '(DC2Type:json_array)']);
+        $column->setOptions(['comment' => '(DC2Type:json)']);
     }
 }

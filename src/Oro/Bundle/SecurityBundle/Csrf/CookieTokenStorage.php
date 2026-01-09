@@ -37,7 +37,7 @@ class CookieTokenStorage implements TokenStorageInterface
     }
 
     #[\Override]
-    public function setToken($tokenId, $token)
+    public function setToken($tokenId, $token): void
     {
         $request = $this->getRequest();
         if (!$request) {

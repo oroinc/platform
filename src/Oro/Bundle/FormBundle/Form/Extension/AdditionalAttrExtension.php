@@ -8,18 +8,21 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Adds data-ftid and data-name attributes to form fields and generates random IDs.
+ */
 class AdditionalAttrExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
 
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(array('random_id' => true));
     }
 
     #[\Override]
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         if (!empty($options['random_id']) && isset($view->vars['id'])) {
             $view->vars['attr'] = isset($view->vars['attr']) ? $view->vars['attr'] : [];
@@ -29,7 +32,7 @@ class AdditionalAttrExtension extends AbstractTypeExtension
         if (isset($view->vars['name'])) {
             $fieldPrefix = $view->parent ? 'field__' : 'form__';
             $fieldName = $this->canonizeFieldName($view->vars['name']);
-            $view->vars['attr']['data-name'] = $fieldPrefix.$fieldName;
+            $view->vars['attr']['data-name'] = $fieldPrefix . $fieldName;
         }
     }
 

@@ -36,7 +36,7 @@ class OroLocaleBundle implements Migration, DatabasePlatformAwareInterface
         $schemaAfter = clone $schemaBefore;
 
         $table = $schemaAfter->getTable('oro_localization');
-        $table->changeColumn('language_id', ['notnull' => true]);
+        $table->modifyColumn('language_id', ['notnull' => true]);
         $table->dropColumn('language_code');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_language'),

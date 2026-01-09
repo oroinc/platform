@@ -92,7 +92,7 @@ class UpdateEntityConfigIndexFieldValueQuery implements MigrationQuery, Connecti
     /**
      * @param LoggerInterface $logger
      * @param bool            $dryRun
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function updateEntityConfigIndexValue(LoggerInterface $logger, $dryRun = false)
     {

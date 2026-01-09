@@ -40,13 +40,13 @@ class ConditionalReverseTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         return $this->baseTransformer->transform($value);
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (!call_user_func($this->condition, $value)) {
             return $value;

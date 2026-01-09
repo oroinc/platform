@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Query;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
@@ -86,9 +88,9 @@ class IndexerQueryTest extends TestCase
     {
         $this->criteria->expects($this->once())
             ->method('setFirstResult')
-            ->with(self::TEST_VALUE);
+            ->with(self::TEST_COUNT);
 
-        $this->assertEquals($this->query, $this->query->setFirstResult(self::TEST_VALUE));
+        $this->assertEquals($this->query, $this->query->setFirstResult(self::TEST_COUNT));
     }
 
     public function testGetFirstResult(): void
@@ -104,9 +106,9 @@ class IndexerQueryTest extends TestCase
     {
         $this->criteria->expects($this->once())
             ->method('setMaxResults')
-            ->with(self::TEST_VALUE);
+            ->with(self::TEST_COUNT);
 
-        $this->assertEquals($this->query, $this->query->setMaxResults(self::TEST_VALUE));
+        $this->assertEquals($this->query, $this->query->setMaxResults(self::TEST_COUNT));
     }
 
     public function testGetMaxResults(): void

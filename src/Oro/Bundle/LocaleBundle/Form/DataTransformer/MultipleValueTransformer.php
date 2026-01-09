@@ -6,6 +6,9 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
+/**
+ * Transforms data between separate default and collection fields and a merged array.
+ */
 class MultipleValueTransformer implements DataTransformerInterface
 {
     /**
@@ -29,7 +32,7 @@ class MultipleValueTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (null === $value) {
             return null;
@@ -52,7 +55,7 @@ class MultipleValueTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (null === $value) {
             return null;

@@ -29,7 +29,7 @@ class EmailTypeTemplateAccessibilityCheckerExtension extends AbstractTypeExtensi
     }
 
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!$this->authorizationChecker->isGranted('VIEW', 'entity:' . EmailTemplate::class)) {
             $builder->remove('template');

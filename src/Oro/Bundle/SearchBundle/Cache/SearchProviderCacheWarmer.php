@@ -19,19 +19,20 @@ class SearchProviderCacheWarmer implements CacheClearerInterface, CacheWarmerInt
     }
 
     #[\Override]
-    public function warmUp($cacheDir)
+    public function warmUp($cacheDir, ?string $buildDir = null): array
     {
         $this->searchMappingProvider->warmUpCache();
+        return [];
     }
 
     #[\Override]
-    public function isOptional()
+    public function isOptional(): bool
     {
         return true;
     }
 
     #[\Override]
-    public function clear($cacheDir)
+    public function clear($cacheDir): void
     {
         $this->searchMappingProvider->clearCache();
     }

@@ -34,7 +34,6 @@ class ExtendColumnTest extends TestCase
     {
         $options = [
             OroOptions::KEY => ['key1' => 'value1'],
-            'key2' => 'value2',
             'type' => Type::getType('integer')
         ];
 

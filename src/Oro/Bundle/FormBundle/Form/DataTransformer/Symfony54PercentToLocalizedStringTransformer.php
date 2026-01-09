@@ -89,7 +89,7 @@ class Symfony54PercentToLocalizedStringTransformer implements DataTransformerInt
      *                                       if the value could not be transformed
      */
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (null === $value) {
             return '';
@@ -128,7 +128,7 @@ class Symfony54PercentToLocalizedStringTransformer implements DataTransformerInt
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (!\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');

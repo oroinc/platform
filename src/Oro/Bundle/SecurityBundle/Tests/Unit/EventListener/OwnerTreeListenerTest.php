@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Oro\Bundle\SecurityBundle\EventListener\OwnerTreeListener;
@@ -42,7 +43,7 @@ class OwnerTreeListenerTest extends OrmTestCase
             'INSERT INTO tbl_user (username, owner_id) VALUES (?, ?)',
             null,
             [1 => $userName, 2 => $businessUnitId],
-            [1 => \PDO::PARAM_STR, 2 => \PDO::PARAM_INT],
+            [1 => ParameterType::STRING, 2 => ParameterType::INTEGER],
             1
         );
     }
@@ -53,7 +54,7 @@ class OwnerTreeListenerTest extends OrmTestCase
             'UPDATE tbl_user SET username = ? WHERE id = ?',
             null,
             [1 => $userName, 2 => $userId],
-            [1 => \PDO::PARAM_STR, 2 => \PDO::PARAM_INT],
+            [1 => ParameterType::STRING, 2 => ParameterType::INTEGER],
             1
         );
     }
@@ -64,19 +65,19 @@ class OwnerTreeListenerTest extends OrmTestCase
             'DELETE FROM tbl_user_to_business_unit WHERE user_id = ?',
             null,
             [1 => $userId],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'DELETE FROM tbl_user_to_organization WHERE user_id = ?',
             null,
             [1 => $userId],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'DELETE FROM tbl_user WHERE id = ?',
             null,
             [1 => $userId],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
     }
 
@@ -86,7 +87,7 @@ class OwnerTreeListenerTest extends OrmTestCase
             'DELETE FROM tbl_user_to_business_unit WHERE user_id = ? AND business_unit_id = ?',
             null,
             [1 => $userId, 2 => $businessUnitId],
-            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER, 2 => ParameterType::INTEGER]
         );
     }
 
@@ -96,7 +97,7 @@ class OwnerTreeListenerTest extends OrmTestCase
             'INSERT INTO tbl_user_to_business_unit (user_id, business_unit_id) VALUES (?, ?)',
             null,
             [1 => $userId, 2 => $businessUnitId],
-            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT],
+            [1 => ParameterType::INTEGER, 2 => ParameterType::INTEGER],
             1
         );
     }
@@ -107,7 +108,7 @@ class OwnerTreeListenerTest extends OrmTestCase
             'UPDATE tbl_user SET owner_id = ? WHERE id = ?',
             null,
             [1 => $businessUnitId, 2 => $userId],
-            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT],
+            [1 => ParameterType::INTEGER, 2 => ParameterType::INTEGER],
             1
         );
     }
@@ -119,7 +120,7 @@ class OwnerTreeListenerTest extends OrmTestCase
             . ' FROM tbl_user t0 WHERE t0.id = ?',
             [['id_1' => $userId, 'username_2' => $userName, 'owner_id_3' => $ownerId]],
             [1 => $userId],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
     }
 
@@ -136,7 +137,7 @@ class OwnerTreeListenerTest extends OrmTestCase
             . ' WHERE tbl_user_to_business_unit.user_id = ?',
             $rows,
             [1 => $userId],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
     }
 

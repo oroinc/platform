@@ -6,8 +6,8 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
+use Oro\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * Converts api_key column of oro_user_api table to crypted_string type and converts data.
@@ -22,7 +22,7 @@ class ChangeApiKeyFieldType implements Migration, ContainerAwareInterface
         $table = $schema->getTable('oro_user_api');
         if ($table->getColumn('api_key')->getType()->getName() !== 'crypted_string') {
             $type = Type::getType('crypted_string');
-            $table->changeColumn(
+            $table->modifyColumn(
                 'api_key',
                 ['type' => $type, 'comment' => '(DC2Type:crypted_string)']
             );

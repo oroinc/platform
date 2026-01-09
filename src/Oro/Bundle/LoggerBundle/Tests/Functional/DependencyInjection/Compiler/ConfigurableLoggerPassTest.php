@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LoggerBundle\Tests\Functional\DependencyInjection\Compiler;
 
+use Monolog\Logger;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LoggerBundle\Command\LoggerLevelCommand;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\ConfigurableLoggerPass;
@@ -9,7 +10,6 @@ use Oro\Bundle\LoggerBundle\DependencyInjection\OroLoggerExtension;
 use Oro\Bundle\LoggerBundle\Tests\Functional\Stub\CustomLogChannelCommandStub;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\UserManager;
-use Symfony\Bridge\Monolog\Logger;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\LoggerChannelPass;
@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class ConfigurableLoggerPassTest extends WebTestCase
 {
     private RequestStack $requestStack;
+    private DebugProcessor $debugProcessor;
 
     #[\Override]
     protected function setUp(): void
@@ -33,6 +34,8 @@ class ConfigurableLoggerPassTest extends WebTestCase
 
         $this->requestStack = new RequestStack();
         $this->requestStack->push(new Request());
+
+        $this->debugProcessor = new DebugProcessor($this->requestStack);
     }
 
     public function testLogToCustomChannel(): void
@@ -66,7 +69,7 @@ class ConfigurableLoggerPassTest extends WebTestCase
             'command' => $command->getName()
         ]);
 
-        $logs = $logger->getLogs($this->requestStack->getCurrentRequest());
+        $logs = $this->debugProcessor->getLogs($this->requestStack->getCurrentRequest());
 
         self::assertNotEmpty($logs);
         self::assertEquals(CustomLogChannelCommandStub::LOG_MESSAGE, $logs[0]['message']);
@@ -91,7 +94,7 @@ class ConfigurableLoggerPassTest extends WebTestCase
         $container->compile();
 
         $container->get(CustomLogChannelCommandStub::LOGGER_NAME)
-            ->pushProcessor(new DebugProcessor($this->requestStack));
+            ->pushProcessor($this->debugProcessor);
 
         return $container;
     }
@@ -101,8 +104,8 @@ class ConfigurableLoggerPassTest extends WebTestCase
      */
     private function loadYmlFixture(ContainerBuilder $container, string $fixtureFileName): void
     {
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../../Fixtures/yml'));
-        $loader->load($fixtureFileName.'.yml');
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../../Fixtures/yml'));
+        $loader->load($fixtureFileName . '.yml');
     }
 
     private function getLoggerLevelCommand(): LoggerLevelCommand

@@ -140,14 +140,14 @@ class NotEqualToTest extends TestCase
                 'options'  => [new PropertyPath('foo'), 123],
                 'message'  => null,
                 'expected' => '$factory->create(\'neq\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false], [false])'
                     . ', 123])'
             ],
             [
                 'options'  => [new PropertyPath('foo'), 'test'],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'neq\', ['
-                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false])'
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false], [false])'
                     . ', \'test\'])->setMessage(\'Test\')'
             ]
         ];

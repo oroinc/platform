@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LoggerBundle\Monolog\Handler;
 
 use Monolog\Handler\HandlerInterface;
+use Monolog\LogRecord;
 
 /**
  * Exclude logs by message monolog handler.
@@ -14,13 +15,13 @@ class ExcludeLogByMessageHandler implements HandlerInterface
     }
 
     #[\Override]
-    public function isHandling(array $record): bool
+    public function isHandling(LogRecord $record): bool
     {
         return true;
     }
 
     #[\Override]
-    public function handle(array $record): bool
+    public function handle(LogRecord $record): bool
     {
         $logMessage = $record['message'] ?? '';
         $exception = $record['context']['exception'] ?? '';

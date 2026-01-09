@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\EventListener;
 
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception;
 use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
@@ -108,7 +108,7 @@ class LocaleListener implements EventSubscriberInterface
         try {
             $locale = (string)$this->localeSettings->getLocale();
             $language = $this->localeSettings->getLanguage();
-        } catch (DBALException $exception) {
+        } catch (Exception $exception) {
             // application is not installed
             return;
         }

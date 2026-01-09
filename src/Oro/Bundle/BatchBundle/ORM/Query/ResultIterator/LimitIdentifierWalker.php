@@ -16,7 +16,7 @@ class LimitIdentifierWalker extends TreeWalkerAdapter
     public function walkSelectStatement(AST\SelectStatement $AST)
     {
         $this->_getQuery();
-        $queryComponents = $this->_getQueryComponents();
+        $queryComponents = $this->getQueryComponents();
         // Get the root entity and alias from the AST fromClause
         $from = $AST->fromClause->identificationVariableDeclarations;
         if (count($from) !== 1) {

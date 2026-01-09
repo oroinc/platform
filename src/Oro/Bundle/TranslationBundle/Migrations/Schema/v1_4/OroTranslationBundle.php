@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Migrations\Schema\v1_4;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
@@ -26,7 +26,7 @@ class OroTranslationBundle implements Migration, DatabasePlatformAwareInterface
         $queries->addQuery(
             sprintf(
                 $query,
-                $this->platform instanceof MySqlPlatform ? '`key`' : 'key',
+                $this->platform instanceof MySQLPlatform ? '`key`' : 'key',
                 'orocrm.%',
                 'oropro.%'
             )

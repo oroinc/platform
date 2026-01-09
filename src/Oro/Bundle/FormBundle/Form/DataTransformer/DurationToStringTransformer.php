@@ -33,7 +33,7 @@ class DurationToStringTransformer implements DataTransformerInterface
                                 $/ix';
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (null === $value) {
             return '';
@@ -57,7 +57,7 @@ class DurationToStringTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (null === $value || (is_string($value) && '' === trim($value))) {
             return null;

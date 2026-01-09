@@ -13,6 +13,6 @@ class OroIntegrationBundle implements Migration
     public function up(Schema $schema, QueryBag $queries): void
     {
         $schema->getTable('oro_integration_channel_status')
-            ->addColumn('data', Types::JSON_ARRAY, ['notnull' => false]);
+            ->addColumn('data', Types::JSON, ['notnull' => false]);
     }
 }

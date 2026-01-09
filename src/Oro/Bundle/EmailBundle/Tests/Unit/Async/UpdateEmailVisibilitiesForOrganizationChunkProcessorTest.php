@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\ManagerRegistry;
@@ -87,13 +88,13 @@ class UpdateEmailVisibilitiesForOrganizationChunkProcessorTest extends OrmTestCa
             . ' LEFT JOIN oro_email_recipient o4_ ON o2_.id = o4_.email_id'
             . ' LEFT JOIN EmailAddress e5_ ON o4_.email_address_id = e5_.id';
         $params = [1 => $organizationId, 2 => $firstEmailId];
-        $types = [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT];
+        $types = [1 => ParameterType::INTEGER, 2 => ParameterType::INTEGER];
         if (null === $lastEmailId) {
             $sql .= ' WHERE o1_.id = ? AND o2_.id >= ?';
         } else {
             $sql .= ' WHERE (o1_.id = ? AND o2_.id >= ?) AND o2_.id <= ?';
             $params[3] = $lastEmailId;
-            $types[3] = \PDO::PARAM_INT;
+            $types[3] = ParameterType::INTEGER;
         }
         $this->addQueryExpectation(
             $sql,
@@ -116,13 +117,13 @@ class UpdateEmailVisibilitiesForOrganizationChunkProcessorTest extends OrmTestCa
             . ' LEFT JOIN oro_email_recipient o4_ ON o2_.id = o4_.email_id'
             . ' LEFT JOIN EmailAddress e5_ ON o4_.email_address_id = e5_.id';
         $params = [1 => $organizationId, 2 => $firstEmailId];
-        $types = [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT];
+        $types = [1 => ParameterType::INTEGER, 2 => ParameterType::INTEGER];
         if (null === $lastEmailId) {
             $sql .= ' WHERE o1_.id = ? AND o2_.id >= ?';
         } else {
             $sql .= ' WHERE (o1_.id = ? AND o2_.id >= ?) AND o2_.id <= ?';
             $params[3] = $lastEmailId;
-            $types[3] = \PDO::PARAM_INT;
+            $types[3] = ParameterType::INTEGER;
         }
         $sql .= ' ORDER BY o2_.id ASC, o0_.id ASC'
             . ' LIMIT ' . self::BUFFER_SIZE;

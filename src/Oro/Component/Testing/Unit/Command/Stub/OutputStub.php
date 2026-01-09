@@ -4,6 +4,9 @@ namespace Oro\Component\Testing\Unit\Command\Stub;
 
 use Symfony\Component\Console\Output\Output;
 
+/**
+ * Captures console output messages for testing purposes.
+ */
 class OutputStub extends Output
 {
     /**
@@ -17,7 +20,7 @@ class OutputStub extends Output
     private $output = '';
 
     #[\Override]
-    protected function doWrite($message, $newline)
+    protected function doWrite($message, $newline): void
     {
         $this->messages[] = $message;
         $this->output .= $message;

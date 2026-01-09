@@ -3,7 +3,8 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Handler;
 
 use Monolog\Handler\TestHandler;
-use Monolog\Logger;
+use Monolog\Level;
+use Monolog\LogRecord;
 use Oro\Bundle\MessageQueueBundle\Log\Handler\VerbosityFilterHandler;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -35,13 +36,48 @@ class VerbosityFilterHandlerTest extends TestCase
             ->willReturn(OutputInterface::VERBOSITY_QUIET);
         $this->handler->onCommand(new ConsoleCommandEvent(null, $input, $this->output));
 
-        $this->assertFalse($this->handler->isHandling(['level' => Logger::EMERGENCY]));
+        $this->assertFalse($this->handler->isHandling(new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Emergency,
+            message: 'test'
+        )));
         $this->consumerState->startConsumption();
-        $this->assertFalse($this->handler->isHandling(['level' => Logger::DEBUG]));
-        $this->assertFalse($this->handler->isHandling(['level' => Logger::INFO]));
-        $this->assertFalse($this->handler->isHandling(['level' => Logger::WARNING]));
-        $this->assertTrue($this->handler->isHandling(['level' => Logger::ERROR]));
-        $this->assertTrue($this->handler->isHandling(['level' => Logger::CRITICAL]));
-        $this->assertTrue($this->handler->isHandling(['level' => Logger::EMERGENCY]));
+        $this->assertFalse($this->handler->isHandling(new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Debug,
+            message: 'test'
+        )));
+        $this->assertFalse($this->handler->isHandling(new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Info,
+            message: 'test'
+        )));
+        $this->assertFalse($this->handler->isHandling(new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Warning,
+            message: 'test'
+        )));
+        $this->assertTrue($this->handler->isHandling(new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Error,
+            message: 'test'
+        )));
+        $this->assertTrue($this->handler->isHandling(new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Critical,
+            message: 'test'
+        )));
+        $this->assertTrue($this->handler->isHandling(new LogRecord(
+            datetime: new \DateTimeImmutable(),
+            channel: 'test',
+            level: Level::Emergency,
+            message: 'test'
+        )));
     }
 }

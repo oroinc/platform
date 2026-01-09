@@ -1402,3 +1402,8 @@ services:
             - '@oro_api.collector.warnings_collector'
         tags:
             - { name: kernel.event_subscriber }
+
+    oro_api.listener.jsonapi_format_override:
+        class: Oro\Bundle\ApiBundle\EventListener\JsonApiFormatOverrideListener
+        tags:
+            - { name: kernel.event_subscriber }

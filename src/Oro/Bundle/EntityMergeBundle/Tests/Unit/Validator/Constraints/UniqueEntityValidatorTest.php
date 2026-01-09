@@ -8,13 +8,14 @@ use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 use Oro\Bundle\EntityMergeBundle\Validator\Constraints\UniqueEntity;
 use Oro\Bundle\EntityMergeBundle\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 {
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): ConstraintValidatorInterface
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $doctrineHelper->expects($this->any())

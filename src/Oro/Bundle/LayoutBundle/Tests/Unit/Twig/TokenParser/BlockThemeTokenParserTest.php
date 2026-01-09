@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
-use Twig\Node\Expression\NameExpression;
+use Twig\Node\Expression\Variable\ContextVariable;
 use Twig\Parser;
 use Twig\Source;
 
@@ -37,7 +37,7 @@ class BlockThemeTokenParserTest extends TestCase
     {
         $sourceBlockThemeNodeTpl1 = new Source('{% block_theme layout "tpl1" %}', 'index');
         $blockThemeNodeTpl1 = new BlockThemeNode(
-            new NameExpression('layout', 1),
+            new ContextVariable('layout', 1),
             new ArrayExpression(
                 [
                     new ConstantExpression(0, 1),
@@ -52,7 +52,7 @@ class BlockThemeTokenParserTest extends TestCase
 
         $sourceBlockThemeNodeTpl1Tpl2 = new Source('{% block_theme layout "tpl1" "tpl2" %}', 'index');
         $blockThemeNodeTpl1Tpl2 = new BlockThemeNode(
-            new NameExpression('layout', 1),
+            new ContextVariable('layout', 1),
             new ArrayExpression(
                 [
                     new ConstantExpression(0, 1),
@@ -70,7 +70,7 @@ class BlockThemeTokenParserTest extends TestCase
 
         $sourceBlockThemeNodeWithTpl1 = new Source('{% block_theme layout with "tpl1" %}', 'index');
         $blockThemeNodeWithTpl1 = new BlockThemeNode(
-            new NameExpression('layout', 1),
+            new ContextVariable('layout', 1),
             new ConstantExpression('tpl1', 1),
             1,
         );
@@ -79,7 +79,7 @@ class BlockThemeTokenParserTest extends TestCase
 
         $sourceBlockThemeNodeWithTpl1Array = new Source('{% block_theme layout with ["tpl1"] %}', 'index');
         $blockThemeNodeWithTpl1Array = new BlockThemeNode(
-            new NameExpression('layout', 1),
+            new ContextVariable('layout', 1),
             new ArrayExpression(
                 [
                     new ConstantExpression(0, 1),
@@ -94,7 +94,7 @@ class BlockThemeTokenParserTest extends TestCase
 
         $sourceBlockThemeNodeWithTpl1Tpl2Array = new Source('{% block_theme layout with ["tpl1", "tpl2"] %}', 'index');
         $blockThemeNodeWithTpl1Tpl2Array = new BlockThemeNode(
-            new NameExpression('layout', 1),
+            new ContextVariable('layout', 1),
             new ArrayExpression(
                 [
                     new ConstantExpression(0, 1),

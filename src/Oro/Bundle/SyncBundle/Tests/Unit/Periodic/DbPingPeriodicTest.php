@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Periodic;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Statement;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SyncBundle\Periodic\DbPingPeriodic;
@@ -64,7 +64,7 @@ class DbPingPeriodicTest extends TestCase
         $statement1 = $this->createMock(Statement::class);
         $statement1->expects(self::once())
             ->method('executeQuery')
-            ->willThrowException(new DBALException());
+            ->willThrowException(new Exception());
 
         $connection = $this->createMock(Connection::class);
         $connection->expects(self::once())
@@ -78,7 +78,7 @@ class DbPingPeriodicTest extends TestCase
 
         $this->assertLoggerErrorMethodCalled();
 
-        $this->expectException(DBALException::class);
+        $this->expectException(Exception::class);
 
         $this->dbPing->tick();
     }

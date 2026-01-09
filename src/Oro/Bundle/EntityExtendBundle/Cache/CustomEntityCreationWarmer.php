@@ -15,7 +15,7 @@ class CustomEntityCreationWarmer extends CacheWarmer
     }
 
     #[\Override]
-    public function warmUp($cacheDir): array
+    public function warmUp($cacheDir, ?string $buildDir = null): array
     {
         if (empty($this->customEntities)) {
             return [];

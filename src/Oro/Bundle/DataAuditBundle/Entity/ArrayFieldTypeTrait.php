@@ -18,7 +18,7 @@ trait ArrayFieldTypeTrait
     #[ORM\Column(name: 'old_simplearray', type: Types::SIMPLE_ARRAY, nullable: true)]
     protected ?array $oldSimplearray;
 
-    #[ORM\Column(name: 'old_jsonarray', type: 'json_array', nullable: true)]
+    #[ORM\Column(name: 'old_jsonarray', type: 'json', nullable: true)]
     protected ?array $oldJsonarray;
 
     #[ORM\Column(name: 'old_json', type: Types::JSON, nullable: true)]
@@ -30,7 +30,7 @@ trait ArrayFieldTypeTrait
     #[ORM\Column(name: 'new_simplearray', type: Types::SIMPLE_ARRAY, nullable: true)]
     protected ?array $newSimplearray;
 
-    #[ORM\Column(name: 'new_jsonarray', type: 'json_array', nullable: true)]
+    #[ORM\Column(name: 'new_jsonarray', type: 'json', nullable: true)]
     protected ?array $newJsonarray;
 
     #[ORM\Column(name: 'new_json', type: Types::JSON, nullable: true)]

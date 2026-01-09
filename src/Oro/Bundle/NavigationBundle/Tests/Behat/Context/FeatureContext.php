@@ -180,7 +180,10 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
         $actualCount = $this->getPageTransitionCount($em);
 
         foreach ($pages as $page) {
-            $crawler = new Crawler($this->getSession()->getPage()->getHtml());
+            $crawler = new Crawler(
+                node: $this->getSession()->getPage()->getHtml(),
+                useHtml5Parser: false
+            );
             $actualTitle = $crawler->filter('head title')->first()->text();
 
             $clickedElement = $menu->openAndClick($page);
@@ -290,7 +293,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function historyMustLooksLike($tab, TableNode $table)
     {
-        $content = $this->createElement($tab.' Content');
+        $content = $this->createElement($tab . ' Content');
 
         if (!$content->isVisible()) {
             $this->chooseQuickMenuTab($tab);
@@ -367,7 +370,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function tabContentIsEmpty($tab)
     {
-        $content = $this->createElement($tab.' Content');
+        $content = $this->createElement($tab . ' Content');
 
         if (!$content->isVisible()) {
             $this->chooseQuickMenuTab($tab);

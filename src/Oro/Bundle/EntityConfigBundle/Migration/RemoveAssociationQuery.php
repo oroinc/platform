@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
@@ -59,7 +59,7 @@ abstract class RemoveAssociationQuery extends ParametrizedMigrationQuery impleme
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException on any database errors
+     * @throws \Doctrine\DBAL\Exception on any database errors
      * @throws \LogicException if the source entity is not a configurable entity
      */
     #[\Override]
@@ -121,20 +121,21 @@ abstract class RemoveAssociationQuery extends ParametrizedMigrationQuery impleme
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     private function dropRelationshipColumnsAndTables(string $fieldName, LoggerInterface $logger): void
     {
         $nameGenerator = new ExtendDbIdentifierNameGenerator();
         /** @var AbstractSchemaManager $schemaManager */
-        $schemaManager = $this->connection->getSchemaManager();
+        $schemaManager = $this->connection->createSchemaManager();
         if (RelationType::MANY_TO_ONE === $this->relationType) {
-            $targetTable = $schemaManager->listTableDetails($this->targetTableName);
+            $targetTable = $schemaManager->introspectTable($this->targetTableName);
+            $primaryKey = $targetTable->getPrimaryKey();
             $sourceColumnName = $nameGenerator->generateRelationColumnName(
                 $fieldName,
-                '_' . $targetTable->getPrimaryKeyColumns()[0]
+                '_' . $primaryKey->getColumns()[0]
             );
-            $sourceTable = $schemaManager->listTableDetails($this->sourceTableName);
+            $sourceTable = $schemaManager->introspectTable($this->sourceTableName);
             if ($sourceTable->hasColumn($sourceColumnName)) {
                 $foreignKeys = $sourceTable->getForeignKeys();
                 foreach ($foreignKeys as $foreignKey) {

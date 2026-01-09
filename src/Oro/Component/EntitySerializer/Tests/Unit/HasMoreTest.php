@@ -2,6 +2,7 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
+use Doctrine\DBAL\ParameterType;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\User;
 
@@ -167,7 +168,7 @@ class HasMoreTest extends EntitySerializerTestCase
                 ['id_0' => 789, 'name_1' => 'user789']
             ],
             [1 => 123, 2 => 456, 3 => 789],
-            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT, 3 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER, 2 => ParameterType::INTEGER, 3 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT entity.id_0 AS entityId, entity.id_1 AS relatedEntityId'
@@ -213,12 +214,12 @@ class HasMoreTest extends EntitySerializerTestCase
             ],
             [1 => 11, 2 => 12, 3 => 21, 4 => 22, 5 => 31, 6 => 32],
             [
-                1 => \PDO::PARAM_INT,
-                2 => \PDO::PARAM_INT,
-                3 => \PDO::PARAM_INT,
-                4 => \PDO::PARAM_INT,
-                5 => \PDO::PARAM_INT,
-                6 => \PDO::PARAM_INT
+                1 => ParameterType::INTEGER,
+                2 => ParameterType::INTEGER,
+                3 => ParameterType::INTEGER,
+                4 => ParameterType::INTEGER,
+                5 => ParameterType::INTEGER,
+                6 => ParameterType::INTEGER
             ]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
@@ -296,7 +297,7 @@ class HasMoreTest extends EntitySerializerTestCase
                 ['id_0' => 789, 'name_1' => 'user789']
             ],
             [1 => 123, 2 => 456, 3 => 789],
-            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT, 3 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER, 2 => ParameterType::INTEGER, 3 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT entity.id_0 AS entityId, entity.id_1 AS relatedEntityId'
@@ -402,7 +403,7 @@ class HasMoreTest extends EntitySerializerTestCase
                 ['id_0' => 456, 'name_1' => 'user456']
             ],
             [1 => 123, 2 => 456],
-            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER, 2 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT entity.id_0 AS entityId, entity.id_1 AS relatedEntityId'
@@ -436,10 +437,10 @@ class HasMoreTest extends EntitySerializerTestCase
             ],
             [1 => 11, 2 => 12, 3 => 21, 4 => 22],
             [
-                1 => \PDO::PARAM_INT,
-                2 => \PDO::PARAM_INT,
-                3 => \PDO::PARAM_INT,
-                4 => \PDO::PARAM_INT
+                1 => ParameterType::INTEGER,
+                2 => ParameterType::INTEGER,
+                3 => ParameterType::INTEGER,
+                4 => ParameterType::INTEGER
             ]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
@@ -518,7 +519,7 @@ class HasMoreTest extends EntitySerializerTestCase
                 $unionQueriesGroupIndex++;
             }
             $relatedEntityIds[$i] = $relatedEntityId;
-            $relatedEntityIdsTypes[$i] = \PDO::PARAM_INT;
+            $relatedEntityIdsTypes[$i] = ParameterType::INTEGER;
             $relatedEntityRows[] = ['id_0' => $relatedEntityId, 'name_1' => 'group_name' . $i];
             $expectedResult[] = [
                 'id'     => $i,
@@ -604,7 +605,7 @@ class HasMoreTest extends EntitySerializerTestCase
                 ['id_0' => 456, 'name_1' => 'user456']
             ],
             [1 => 123, 2 => 456],
-            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER, 2 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT u0_.id AS id_0, g1_.id AS id_1, g1_.label AS label_2'
@@ -619,7 +620,7 @@ class HasMoreTest extends EntitySerializerTestCase
                 ['id_0' => 456, 'id_1' => 22, 'label_2' => 'group22']
             ],
             [1 => 123, 2 => 456],
-            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER, 2 => ParameterType::INTEGER]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 

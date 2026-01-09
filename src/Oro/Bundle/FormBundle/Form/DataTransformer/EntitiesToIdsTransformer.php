@@ -13,7 +13,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class EntitiesToIdsTransformer extends EntityToIdTransformer
 {
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (null === $value || [] === $value) {
             return [];
@@ -33,7 +33,7 @@ class EntitiesToIdsTransformer extends EntityToIdTransformer
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (!$value) {
             return [];

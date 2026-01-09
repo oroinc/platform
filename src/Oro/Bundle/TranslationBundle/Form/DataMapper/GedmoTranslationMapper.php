@@ -13,7 +13,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class GedmoTranslationMapper implements DataMapperInterface
 {
     #[\Override]
-    public function mapDataToForms($data, $forms)
+    public function mapDataToForms($data, $forms): void
     {
         if (null === $data || [] === $data) {
             return;
@@ -35,7 +35,7 @@ class GedmoTranslationMapper implements DataMapperInterface
     }
 
     #[\Override]
-    public function mapFormsToData($forms, &$data)
+    public function mapFormsToData($forms, &$data): void
     {
         if (null === $data) {
             return;

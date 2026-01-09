@@ -40,8 +40,8 @@ class WorkflowActivationMigrationQuery extends ParametrizedMigrationQuery
         );
 
         $statement = $this->connection->prepare(self::$updateQuery);
-        $statement->bindValue(':is_active', $this->isActive, 'boolean');
-        $statement->bindValue(':workflow_name', $this->workflowName, 'string');
+        $statement->bindValue('is_active', $this->isActive, 'boolean');
+        $statement->bindValue('workflow_name', $this->workflowName, 'string');
 
         $statement->executeQuery();
     }

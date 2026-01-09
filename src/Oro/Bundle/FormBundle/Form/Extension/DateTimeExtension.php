@@ -26,7 +26,7 @@ class DateTimeExtension extends AbstractTypeExtension
     public const HTML5_FORMAT_WITH_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ssZZZZZ";
 
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(['format' => self::HTML5_FORMAT_WITH_TIMEZONE]);
         $resolver->setNormalizer('html5', function (Options $options, $html5) {
@@ -40,7 +40,7 @@ class DateTimeExtension extends AbstractTypeExtension
     }
 
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $pattern = is_string($options['format']) ? $options['format'] : null;
         if (self::HTML5_FORMAT_WITH_TIMEZONE === $pattern) {
@@ -53,12 +53,13 @@ class DateTimeExtension extends AbstractTypeExtension
     }
 
     #[\Override]
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         if (array_key_exists('type', $view->vars) && 'datetime-local' === $view->vars['type']) {
             $view->vars['type'] = 'datetime';
         } elseif (($options['html5'] || $options['format'] === self::HTML5_FORMAT_WITH_TIMEZONE)
-            && 'single_text' === $options['widget']) {
+            && 'single_text' === $options['widget']
+        ) {
             $view->vars['type'] = 'datetime';
         }
     }

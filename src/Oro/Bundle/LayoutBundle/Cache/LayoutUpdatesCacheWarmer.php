@@ -39,7 +39,7 @@ class LayoutUpdatesCacheWarmer implements CacheWarmerInterface
     }
 
     #[\Override]
-    public function warmUp($cacheDir): array
+    public function warmUp($cacheDir, ?string $buildDir = null): array
     {
         $this->loadLayoutUpdates();
         $this->collectExpressionsFromBlockTypes();

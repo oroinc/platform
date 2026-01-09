@@ -8,7 +8,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Widget\WidgetExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\ParameterBag as HttpParameterBag;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -65,7 +65,7 @@ class WidgetExtensionTest extends TestCase
     private function createRequest(array $params): Request
     {
         $currentRequest = Request::create('/', Request::METHOD_GET);
-        $currentRequest->query = new HttpParameterBag($params);
+        $currentRequest->query = new InputBag($params);
 
         return $currentRequest;
     }

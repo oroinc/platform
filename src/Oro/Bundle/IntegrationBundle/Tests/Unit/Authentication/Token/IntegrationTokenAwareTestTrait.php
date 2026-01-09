@@ -22,8 +22,7 @@ trait IntegrationTokenAwareTestTrait
             ->method('getToken')
             ->willReturn($token);
         $tokenStorage->expects(self::exactly($setTokenCallsCount))
-            ->method('setToken')
-            ->willReturn($token);
+            ->method('setToken');
 
         return $tokenStorage;
     }

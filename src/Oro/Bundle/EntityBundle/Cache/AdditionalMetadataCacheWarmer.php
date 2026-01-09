@@ -5,6 +5,9 @@ namespace Oro\Bundle\EntityBundle\Cache;
 use Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
+/**
+ * Warms up the additional entity metadata cache.
+ */
 class AdditionalMetadataCacheWarmer implements CacheWarmerInterface
 {
     /** @var AdditionalMetadataProvider */
@@ -22,7 +25,7 @@ class AdditionalMetadataCacheWarmer implements CacheWarmerInterface
     }
 
     #[\Override]
-    public function warmUp($cacheDir): array
+    public function warmUp($cacheDir, ?string $buildDir = null): array
     {
         $this->additionalMetadataProvider->warmUpMetadata();
         return [];

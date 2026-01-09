@@ -8,7 +8,7 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Migrations\Data\Demo\ORM\LoadLanguageDemoData;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Intl\Locales;
 

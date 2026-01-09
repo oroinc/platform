@@ -104,7 +104,6 @@ class SendDeletedEntitiesToMessageQueueTest extends WebTestCase
                 'id' => [$ownerId, null],
                 'booleanProperty' => [false, null],
                 'stringProperty' => ['string', null],
-                'jsonArrayProperty' => [[], null],
                 'simpleArrayProperty' => [[], null],
             ],
             $deletedEntity['change_set']

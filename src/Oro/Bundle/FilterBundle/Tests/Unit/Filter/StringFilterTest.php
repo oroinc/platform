@@ -3,7 +3,7 @@
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
@@ -42,7 +42,7 @@ class StringFilterTest extends TestCase
             ->willReturn($connection);
         $connection->expects(self::any())
             ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+            ->willReturn(new MySQLPlatform());
 
         return new OrmFilterDatasourceAdapter(new QueryBuilder($em));
     }

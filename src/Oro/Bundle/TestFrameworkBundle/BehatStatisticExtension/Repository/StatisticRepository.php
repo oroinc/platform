@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\Persistence\ObjectRepository;
@@ -173,7 +174,7 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         $result = $this->connection->createQueryBuilder()
             ->select('*')
             ->from($this->className::getName())
-            ->where($this->className::getIdField().' = ?')
+            ->where($this->className::getIdField() . ' = ?')
             ->setParameter(0, $id)
             ->orderBy('id', 'DESC')
             ->execute()
@@ -202,7 +203,7 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         $qb = $this->connection->createQueryBuilder();
         $qb->delete($this->className::getName())
             ->where(
-                $qb->expr()->orX(
+                $qb->expr()->or(
                     $qb->expr()->lt('created_at', '?'),
                     $qb->expr()->isNull('created_at')
                 )
@@ -251,20 +252,24 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
      */
     private function addCriteria(array $criteria, QueryBuilder $queryBuilder)
     {
-        $andExpr = $queryBuilder->expr()->andX();
+        $expressions = [];
 
         foreach ($criteria as $field => $value) {
             if (is_null($value)) {
-                $andExpr->add($queryBuilder->expr()->isNull($field));
+                $expressions[] = $queryBuilder->expr()->isNull($field);
             } elseif (is_array($value)) {
-                $andExpr->add($queryBuilder->expr()->in($field, $value));
+                $valueKey = 'where_value_' . uniqid();
+                $expressions[] = $queryBuilder->expr()->in($field, ':' . $valueKey);
+                $queryBuilder->setParameter($valueKey, $value, ArrayParameterType::STRING);
             } else {
-                $valueKey = uniqid(':where_value_');
-                $andExpr->add($queryBuilder->expr()->eq($field, $valueKey));
+                $valueKey = 'where_value_' . uniqid();
+                $expressions[] = $queryBuilder->expr()->eq($field, ':' . $valueKey);
                 $queryBuilder->setParameter($valueKey, $value);
             }
         }
 
-        $queryBuilder->andWhere($andExpr);
+        if (count($expressions) > 0) {
+            $queryBuilder->andWhere($queryBuilder->expr()->and(...$expressions));
+        }
     }
 }

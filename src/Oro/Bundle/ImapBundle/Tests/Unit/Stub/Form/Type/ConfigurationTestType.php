@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Stub\Form\Type;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
@@ -107,7 +109,7 @@ class ConfigurationTestType extends AbstractType
             ));
 
         $builder->addEventListener(
-            FormEvents::POST_SUBMIT,
+            FormEvents::SUBMIT,
             function (FormEvent $event) {
                 /** @var UserEmailOrigin $data */
                 $data = $event->getData();

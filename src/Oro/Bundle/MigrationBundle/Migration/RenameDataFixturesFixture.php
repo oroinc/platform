@@ -27,6 +27,9 @@ class RenameDataFixturesFixture extends AbstractFixture
     #[\Override]
     public function load(ObjectManager $manager)
     {
+        if (empty($this->renamedDataFixtures)) {
+            return;
+        }
         /** @var DataFixture[] $dataFixtures */
         $dataFixtures = $manager->getRepository(DataFixture::class)
             ->findBy(['className' => \array_keys($this->renamedDataFixtures)]);

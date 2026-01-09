@@ -42,7 +42,7 @@ class Column extends BaseColumn
         $this->setOptions($options);
         $this->setColumnDefinition($baseColumn->getColumnDefinition());
         $this->setPlatformOptions($baseColumn->getPlatformOptions());
-        $this->setCustomSchemaOptions($baseColumn->getCustomSchemaOptions());
+        $this->setPlatformOptions($baseColumn->getPlatformOptions());
     }
 
     /**

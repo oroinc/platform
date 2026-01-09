@@ -103,7 +103,7 @@ class DefaultProcessor implements BoardProcessorInterface
 
             $qb->resetDQLPart('where');
             $qb->setMaxResults(null);
-            $qb->setFirstResult(null);
+            $qb->setFirstResult(0);
             $qb->where(sprintf('%s IN (:ids)', $idExpr));
             $qb->setParameters(
                 new ArrayCollection(

@@ -5,7 +5,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
@@ -170,7 +170,7 @@ class JsonArrayChoiceFilterTest extends TestCase
      */
     public function testApply(array $data, ?string $expected): void
     {
-        $ds = $this->getFilterDatasource(new MySqlPlatform());
+        $ds = $this->getFilterDatasource(new MySQLPlatform());
         $this->filter->apply($ds, $data);
 
         $this->assertSame($expected, $this->parseQueryCondition($ds));

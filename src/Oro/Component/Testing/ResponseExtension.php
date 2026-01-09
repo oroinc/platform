@@ -91,7 +91,7 @@ trait ResponseExtension
     {
         $responseStatusCode = $response->getStatusCode();
         if (500 >= $responseStatusCode && $responseStatusCode < 600) {
-            $crawler = new Crawler();
+            $crawler = new Crawler(useHtml5Parser: false);
             $crawler->addHtmlContent($response->getContent());
             if ($crawler->filter('.text-exception h1')->count() > 0) {
                 $exceptionMessage = trim($crawler->filter('.text-exception h1')->text());
@@ -99,7 +99,7 @@ trait ResponseExtension
                 if ($crawler->filter('#traces-0 li')->count() > 0) {
                     list($trace) = explode("\n", trim($crawler->filter('#traces-0 li')->text()));
                 }
-                return 'Internal Server Error: '.$exceptionMessage.' '.$trace;
+                return 'Internal Server Error: ' . $exceptionMessage . ' ' . $trace;
             }
         }
         return $response->getContent();

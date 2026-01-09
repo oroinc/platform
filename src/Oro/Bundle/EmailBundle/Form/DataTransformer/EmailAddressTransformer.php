@@ -5,6 +5,9 @@ namespace Oro\Bundle\EmailBundle\Form\DataTransformer;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * Transforms email addresses to/from semicolon-separated strings.
+ */
 class EmailAddressTransformer implements DataTransformerInterface
 {
     /**
@@ -28,7 +31,7 @@ class EmailAddressTransformer implements DataTransformerInterface
      *
      */
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         if (!$value) {
             return '';
@@ -55,7 +58,7 @@ class EmailAddressTransformer implements DataTransformerInterface
      *
      */
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (!$value) {
             return $this->multiple

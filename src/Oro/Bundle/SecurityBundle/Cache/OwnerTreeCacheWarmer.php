@@ -18,13 +18,14 @@ class OwnerTreeCacheWarmer implements CacheWarmerInterface
     }
 
     #[\Override]
-    public function warmUp($cacheDir)
+    public function warmUp($cacheDir, ?string $buildDir = null): array
     {
         $this->treeProvider->warmUpCache();
+        return [];
     }
 
     #[\Override]
-    public function isOptional()
+    public function isOptional(): bool
     {
         return true;
     }

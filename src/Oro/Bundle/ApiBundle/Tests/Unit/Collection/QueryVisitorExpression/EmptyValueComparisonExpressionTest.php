@@ -136,8 +136,7 @@ class EmptyValueComparisonExpressionTest extends TestCase
     public function jsonFieldDataProvider(): array
     {
         return [
-            ['json'],
-            ['json_array']
+            ['json']
         ];
     }
 

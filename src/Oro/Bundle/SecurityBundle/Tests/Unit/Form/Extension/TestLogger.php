@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension;
 
-use Psr\Log\Test\TestLogger as BaseTestLogger;
+use Oro\Component\Testing\Logger\TestLogger as BaseTestLogger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
@@ -21,7 +21,7 @@ class TestLogger extends BaseTestLogger implements DebugLoggerInterface
     }
 
     #[\Override]
-    public function clear()
+    public function clear(): void
     {
         $this->reset();
     }

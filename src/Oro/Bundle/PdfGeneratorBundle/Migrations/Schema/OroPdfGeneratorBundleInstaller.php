@@ -26,7 +26,7 @@ final class OroPdfGeneratorBundleInstaller implements Installation
     {
         $table = $schema->createTable('oro_pdf_generator_pdf_document');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('uuid', 'guid', ['notnull' => true, 'unique' => true]);
+        $table->addColumn('uuid', 'guid', ['notnull' => true]);
         $table->addColumn('pdf_document_name', 'string', ['length' => 255, 'notnull' => true]);
         $table->addColumn('pdf_document_type', 'string', ['length' => 255, 'notnull' => true]);
         $table->addColumn('pdf_document_file_id', 'integer', ['notnull' => false]);

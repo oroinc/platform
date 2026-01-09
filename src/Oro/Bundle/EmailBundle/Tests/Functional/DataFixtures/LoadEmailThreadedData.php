@@ -9,8 +9,8 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
+use Oro\Component\DependencyInjection\ContainerAwareTrait;
 
 class LoadEmailThreadedData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
@@ -36,7 +36,7 @@ class LoadEmailThreadedData extends AbstractFixture implements ContainerAwareInt
             ->locateResource('@OroEmailBundle/Tests/Functional/DataFixtures/Data');
 
         $templates = [];
-        $handle = fopen($dictionaryDir . DIRECTORY_SEPARATOR. 'emails.csv', 'r');
+        $handle = fopen($dictionaryDir . DIRECTORY_SEPARATOR . 'emails.csv', 'r');
         if ($handle) {
             $headers = [];
             if (($data = fgetcsv($handle, 1000, ",")) !== false) {

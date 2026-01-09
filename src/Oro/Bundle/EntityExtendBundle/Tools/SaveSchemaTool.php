@@ -71,9 +71,9 @@ class SaveSchemaTool extends SchemaTool
      */
     protected function getSchemaDiff(array $classes)
     {
-        $sm = $this->getConnection()->getSchemaManager();
+        $sm = $this->getConnection()->createSchemaManager();
 
-        $fromSchema = $sm->createSchema();
+        $fromSchema = $sm->introspectSchema();
         $toSchema   = $this->getSchemaFromMetadata($classes);
 
         $comparator = new Comparator();

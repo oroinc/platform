@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Translation\Strategy;
 
-use Doctrine\DBAL\Exception\InvalidFieldNameException;
+use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\ManagerRegistry;
@@ -155,7 +155,7 @@ class LocalizationFallbackStrategyTest extends OrmTestCase
     {
         $this->getDriverConnectionMock($this->em)->expects(self::once())
             ->method('query')
-            ->willThrowException($this->createMock(InvalidFieldNameException::class));
+            ->willThrowException($this->createMock(DriverException::class));
 
         $this->cache->expects(self::once())
             ->method('get')

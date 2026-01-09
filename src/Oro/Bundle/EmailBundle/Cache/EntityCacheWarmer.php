@@ -67,7 +67,7 @@ class EntityCacheWarmer extends CacheWarmer
      * {inheritdoc}
      */
     #[\Override]
-    public function warmUp($cacheDir): array
+    public function warmUp($cacheDir, ?string $buildDir = null): array
     {
         $fs   = $this->createFilesystem();
         $twig = $this->createTwigEnvironment();

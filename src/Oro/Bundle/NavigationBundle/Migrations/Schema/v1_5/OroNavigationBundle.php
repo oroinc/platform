@@ -28,9 +28,9 @@ class OroNavigationBundle implements Migration
     protected function updateOroNavigationMenuUpdateTable(Schema $schema)
     {
         $table = $schema->getTable('oro_navigation_menu_upd');
-        $table->changeColumn('ownership_type', ['type' => StringType::getType('string')]);
-        $table->changeColumn('owner_id', ['notnull' => true]);
-        $table->changeColumn('uri', ['length' => 1023]);
+        $table->modifyColumn('ownership_type', ['type' => StringType::getType('string')]);
+        $table->modifyColumn('owner_id', ['notnull' => true]);
+        $table->modifyColumn('uri', ['length' => 1023]);
         $table->addColumn('icon', 'string', ['length' => 150, 'notnull' => false]);
         $table->addColumn('is_divider', 'boolean', []);
         $table->addColumn('is_custom', 'boolean', []);

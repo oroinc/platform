@@ -5,16 +5,19 @@ namespace Oro\Bundle\EntityBundle\Form\DataTransformer;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * Transforms entity field fallback values between the model and view formats.
+ */
 class EntityFieldFallbackTransformer implements DataTransformerInterface
 {
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         return $value;
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         if (!$value instanceof EntityFieldFallbackValue) {
             return $value;

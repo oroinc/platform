@@ -134,7 +134,7 @@ class FeatureEnabledTest extends TestCase
                 'options'  => [new PropertyPath('featureName'), 1],
                 'expected' => '$factory->create(\'feature_enabled\', ' .
                     '[new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'featureName\', [\'featureName\'], ' .
-                    '[false]), 1])'
+                    '[false], [false]), 1])'
             ]
         ];
     }

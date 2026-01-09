@@ -50,7 +50,7 @@ class FeatureContext extends OroFeatureContext
         $dh = $this->getAppContainer()->get('oro_entity.doctrine_helper');
 
         $em = $dh->getEntityManager($class);
-        $sm = $em->getConnection()->getSchemaManager();
+        $sm = $em->getConnection()->createSchemaManager();
 
         $tableName = $em->getClassMetadata($class)->getTableName();
 

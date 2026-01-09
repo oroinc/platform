@@ -17,8 +17,8 @@ use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtensionAwareInterface
 use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtensionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Oro\Component\DependencyInjection\ContainerAwareInterface;
+use Oro\Component\DependencyInjection\ContainerAwareTrait;
 
 class RenameExtendTablesAndColumns implements
     Migration,
@@ -260,7 +260,7 @@ class RenameExtendTablesAndColumns implements
                     $targetTable->getName(),
                     $table->getName(),
                     [$newTargetColumnName],
-                    $table->getPrimaryKeyColumns(),
+                    $table->getPrimaryKey()->getColumns(),
                     ['onDelete' => 'SET NULL']
                 );
             }

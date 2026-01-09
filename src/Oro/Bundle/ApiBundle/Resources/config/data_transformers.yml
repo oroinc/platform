@@ -41,7 +41,6 @@ services:
     oro_api.data_transformer.empty_json_array_to_null:
         class: Oro\Bundle\ApiBundle\DataTransformer\EmptyArrayToNullTransformer
         tags:
-            - { name: oro.api.data_transformer, dataType: json_array }
             - { name: oro.api.data_transformer, dataType: simple_array }
 
     oro_api.data_transformer.decimal:

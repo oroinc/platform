@@ -35,6 +35,9 @@ class EntityDeleteListener
         }
 
         foreach ($idsByClassName as $className => $ids) {
+            if (empty($ids)) {
+                continue;
+            }
             $files = $repository->findBy(
                 [
                     'parentEntityClass' => $className,

@@ -15,7 +15,7 @@ class NavigationConfiguration implements ConfigurationInterface
     public const ROOT_NODE = 'navigation';
 
     #[\Override]
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NODE, 'array', new MenuTreeBuilder());
         $rootNode = $treeBuilder->getRootNode();

@@ -32,7 +32,7 @@ class SanitizedSqlDumpApplyTest extends WebTestCase
             ->getManager()
             ->getConnection();
 
-        $this->outputFile = $this->getTempFile('sanitized_sql_dump_apply', 'sanitize_dump'. '.sql');
+        $this->outputFile = $this->getTempFile('sanitized_sql_dump_apply', 'sanitize_dump' . '.sql');
 
         $metadataProvider = $this->getContainer()->get(EntityAllMetadataProviderDecorator::class);
         $metadataProvider->setEntitiesToFilter([TestSanitizable::class]);
@@ -103,7 +103,7 @@ class SanitizedSqlDumpApplyTest extends WebTestCase
             $this->connection->executeQuery($singleSql);
         }
         $sql = 'SELECT * FROM test_sanitizable_entity LIMIT 1';
-        $data = $this->connection->fetchAssoc($sql);
+        $data = $this->connection->fetchAssociative($sql);
         $serializedData = json_decode($data['serialized_data'], true, 512, JSON_THROW_ON_ERROR);
 
         return [$data, $serializedData];

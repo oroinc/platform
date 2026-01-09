@@ -6,12 +6,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
+/**
+ * Transforms between data changeset formats for form data handling.
+ */
 class DataChangesetTransformer implements DataTransformerInterface
 {
     public const DATA_KEY = 'data';
 
     #[\Override]
-    public function transform($value)
+    public function transform($value): mixed
     {
         $result = [];
         if (null === $value || [] === $value) {
@@ -26,7 +29,7 @@ class DataChangesetTransformer implements DataTransformerInterface
     }
 
     #[\Override]
-    public function reverseTransform($value)
+    public function reverseTransform($value): mixed
     {
         $result = new ArrayCollection();
         if (!$value) {

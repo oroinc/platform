@@ -2,6 +2,7 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
+use Doctrine\DBAL\ParameterType;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Product;
 
 class ToOneEntitySerializerTest extends EntitySerializerTestCase
@@ -27,7 +28,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(
@@ -78,7 +79,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(
@@ -129,7 +130,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(
@@ -186,7 +187,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(
@@ -236,7 +237,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT u0_.id AS id_0, g1_.id AS id_1'
@@ -255,7 +256,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 10],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
@@ -320,7 +321,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
         $this->addQueryExpectation(
             'SELECT u0_.id AS id_0, g1_.id AS id_1, g1_.name AS name_2'
@@ -341,7 +342,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 10],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
@@ -410,7 +411,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(
@@ -467,7 +468,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ],
             [1 => 1],
-            [1 => \PDO::PARAM_INT]
+            [1 => ParameterType::INTEGER]
         );
 
         $result = $this->serializer->serialize(
