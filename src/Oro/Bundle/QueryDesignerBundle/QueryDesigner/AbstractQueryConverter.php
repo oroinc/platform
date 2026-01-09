@@ -1322,7 +1322,8 @@ abstract class AbstractQueryConverter
         $foundAlias = null;
         $tableAliases = $this->context()->getTableAliases();
         foreach ($tableAliases as $existingJoinId => $existingAlias) {
-            if ($existingJoinId
+            if (
+                $existingJoinId
                 && str_replace($virtualColumnJoinAlias, $existingAlias, $virtualColumnJoinId) === $existingJoinId
             ) {
                 $foundAlias = $existingAlias;

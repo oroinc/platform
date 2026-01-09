@@ -21,7 +21,7 @@ class DbalPidFileManagerTest extends TestCase
 
     public function testCouldCreatePidFile(): void
     {
-        $expectedFile = $this->pidDir.'/CONSUMER.ID.pid';
+        $expectedFile = $this->pidDir . '/CONSUMER.ID.pid';
 
         $processManager = new DbalPidFileManager($this->pidDir);
         $processManager->createPidFile('CONSUMER.ID');
@@ -44,8 +44,8 @@ class DbalPidFileManagerTest extends TestCase
     public function testShouldReturnListOfPidsFileInfo(): void
     {
         $fs = new Filesystem();
-        $fs->dumpFile($this->pidDir.'/pid1.pid', '12345');
-        $fs->dumpFile($this->pidDir.'/pid2.pid', '54321');
+        $fs->dumpFile($this->pidDir . '/pid1.pid', '12345');
+        $fs->dumpFile($this->pidDir . '/pid2.pid', '54321');
 
         $processManager = new DbalPidFileManager($this->pidDir);
 
@@ -68,7 +68,7 @@ class DbalPidFileManagerTest extends TestCase
     public function testShouldThrowIfPidFileContainsNonNumericValue(): void
     {
         $fs = new Filesystem();
-        $fs->dumpFile($this->pidDir.'/pid1.pid', 'non numeric value');
+        $fs->dumpFile($this->pidDir . '/pid1.pid', 'non numeric value');
 
         $processManager = new DbalPidFileManager($this->pidDir);
 
@@ -80,7 +80,7 @@ class DbalPidFileManagerTest extends TestCase
 
     public function testShouldRemovePidFile(): void
     {
-        $filename = $this->pidDir.'/consumer-id.pid';
+        $filename = $this->pidDir . '/consumer-id.pid';
 
         $processManager = new DbalPidFileManager($this->pidDir);
         $processManager->createPidFile('consumer-id');
@@ -99,7 +99,7 @@ class DbalPidFileManagerTest extends TestCase
         $processManager->createPidFile('consumer-id');
 
         // guard
-        $this->assertFileDoesNotExist($this->pidDir.'/not-existent-pid-file.pid');
+        $this->assertFileDoesNotExist($this->pidDir . '/not-existent-pid-file.pid');
 
         // test
         $processManager->removePidFile('not-existent-pid-file');

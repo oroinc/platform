@@ -179,7 +179,8 @@ class SegmentController extends AbstractController
 
     protected function checkSegment(Segment $segment)
     {
-        if ($segment->getEntity() &&
+        if (
+            $segment->getEntity() &&
             !$this->container->get(FeatureChecker::class)->isResourceEnabled($segment->getEntity(), 'entities')
         ) {
             throw $this->createNotFoundException();

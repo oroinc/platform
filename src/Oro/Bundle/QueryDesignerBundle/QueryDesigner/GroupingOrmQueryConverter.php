@@ -81,7 +81,8 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
         $filterById = false;
         if ($entityClass && $this->isVirtualField($entityClass, $fieldName)) {
             $columnJoinId = $this->buildColumnJoinIdentifier($fieldName, $entityClass);
-            if ($this->context()->hasVirtualColumnOption($columnJoinId, 'filter_by_id')
+            if (
+                $this->context()->hasVirtualColumnOption($columnJoinId, 'filter_by_id')
                 && $this->context()->getVirtualColumnOption($columnJoinId, 'filter_by_id')
             ) {
                 $filterById = true;

@@ -78,7 +78,8 @@ class StartAsyncOperation implements ProcessorInterface
                 'includedDataChunkSize' => $includedDataChunkSize
             ], $synchronousMode ? MessagePriority::HIGH : MessagePriority::NORMAL)
         );
-        if ($synchronousMode
+        if (
+            $synchronousMode
             && $this->producer instanceof BufferedMessageProducer
             && $this->producer->isBufferingEnabled()
         ) {

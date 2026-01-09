@@ -241,7 +241,8 @@ class EmailRecipientsHelper
      */
     public function isObjectAllowedForOrganization($object = null, ?Organization $organization = null)
     {
-        if (!$organization ||
+        if (
+            !$organization ||
             !$object ||
             !$this->propertyAccessor->isReadable($object, static::ORGANIZATION_PROPERTY)
         ) {

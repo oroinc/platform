@@ -29,7 +29,8 @@ class PlaceholderFilter
      */
     public function isAttachmentAssociationEnabled($entity)
     {
-        if (!is_object($entity)
+        if (
+            !is_object($entity)
             || !$this->doctrineHelper->isManageableEntity($entity)
             || $this->doctrineHelper->isNewEntity($entity)
         ) {

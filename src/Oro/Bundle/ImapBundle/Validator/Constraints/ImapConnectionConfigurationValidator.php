@@ -27,7 +27,8 @@ class ImapConnectionConfigurationValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, ImapConnectionConfiguration::class);
         }
 
-        if (!$value instanceof UserEmailOrigin
+        if (
+            !$value instanceof UserEmailOrigin
             || false === $value->isImapConfigured()
         ) {
             return;

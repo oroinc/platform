@@ -380,7 +380,8 @@ class EntityMapper
                 $entityClass
             ));
         }
-        if ($this->doctrineHelper->isManageableEntityClass($modelClass)
+        if (
+            $this->doctrineHelper->isManageableEntityClass($modelClass)
             && !self::isParentEntityClass($this->getEntityMetadata($entityClass))
         ) {
             throw new \InvalidArgumentException(sprintf(

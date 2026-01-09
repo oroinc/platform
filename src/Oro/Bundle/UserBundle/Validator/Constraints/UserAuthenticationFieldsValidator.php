@@ -31,7 +31,8 @@ class UserAuthenticationFieldsValidator extends ConstraintValidator
         }
 
         // Don't allow saving username value if such value exist as Primary Email for another user
-        if ($entity->getUsername()
+        if (
+            $entity->getUsername()
             && filter_var($entity->getUsername(), FILTER_VALIDATE_EMAIL)
             && $entity->getUsername() !== $entity->getEmail()
         ) {

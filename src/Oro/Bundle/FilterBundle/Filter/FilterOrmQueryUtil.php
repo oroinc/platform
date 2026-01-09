@@ -175,7 +175,8 @@ class FilterOrmQueryUtil
         string $fieldExpr
     ): void {
         // No need to add group by to sub-query if there is no additional having conditions applied
-        if ($ds->getQueryBuilder()->getDQLPart('having')
+        if (
+            $ds->getQueryBuilder()->getDQLPart('having')
             && $groupByFields = self::getSelectFieldFromGroupBy($ds->getQueryBuilder())
         ) {
             $subQuery->addGroupBy(implode(', ', $groupByFields));

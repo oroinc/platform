@@ -65,7 +65,7 @@ class ContentTransferEncoding extends BaseContentTransferEncoding
         }
 
         throw new InvalidArgumentException(sprintf(
-            '%s expects one of "'. implode(', ', static::$allowedTransferEncodings) . '"; received "%s"',
+            '%s expects one of "' . implode(', ', static::$allowedTransferEncodings) . '"; received "%s"',
             __METHOD__,
             (string) $transferEncoding
         ));

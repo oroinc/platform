@@ -33,7 +33,7 @@ abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInt
         $visitContext = new VisitContext($class);
 
         if ($data->getFilename()) {
-            $class->addComment('Filename: '.$data->getFilename());
+            $class->addComment('Filename: ' . $data->getFilename());
         }
 
         $class->addImplement(LayoutUpdateInterface::class);

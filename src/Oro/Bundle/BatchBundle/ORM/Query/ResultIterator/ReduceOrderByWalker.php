@@ -28,7 +28,8 @@ class ReduceOrderByWalker extends TreeWalkerAdapter
         }
 
         foreach ($AST->orderByClause->orderByItems as $i => $orderByClause) {
-            if (!$orderByClause->expression instanceof AST\PathExpression
+            if (
+                !$orderByClause->expression instanceof AST\PathExpression
                 || !$this->expressionIsIdentifier($orderByClause->expression, $identifierFieldName, $rootAlias)
             ) {
                 unset($AST->orderByClause->orderByItems[$i]);

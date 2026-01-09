@@ -49,7 +49,8 @@ class OrganizationBasicAuthenticator extends AbstractAuthenticator implements Au
         }
         $token = $this->tokenStorage->getToken();
         if (null !== $token) {
-            if ($token instanceof OrganizationAwareTokenInterface
+            if (
+                $token instanceof OrganizationAwareTokenInterface
                 && null !== $token->getUser()
                 && $username === $token->getUser()->getUserIdentifier()
             ) {

@@ -358,7 +358,8 @@ class NormalizeIncludedData implements ProcessorInterface
             $pointer,
             $this->context
         );
-        if (null !== $flags
+        if (
+            null !== $flags
             && !MetaOperationParser::assertOperationFlagNotExists(
                 $meta,
                 JsonApiDoc::META_VALIDATE,

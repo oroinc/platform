@@ -645,7 +645,8 @@ class EntityFieldProvider
         foreach ($entities as $metadata) {
             $targetMappings = $metadata->getAssociationMappings();
             foreach ($targetMappings as $mapping) {
-                if ($mapping['isOwningSide']
+                if (
+                    $mapping['isOwningSide']
                     && empty($mapping['inversedBy'])
                     && $mapping['targetEntity'] === $className
                 ) {

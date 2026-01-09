@@ -30,7 +30,8 @@ class PlaceholderFilter
 
     public function isPasswordManageEnabled(?object $entity): bool
     {
-        if ($entity instanceof User &&
+        if (
+            $entity instanceof User &&
             $entity->getAuthStatus() &&
             $entity->getAuthStatus()->getInternalId() !== UserManager::STATUS_ACTIVE
         ) {
@@ -50,7 +51,8 @@ class PlaceholderFilter
 
     public function isPasswordResetEnabled(?object $entity): bool
     {
-        if (!$entity instanceof User
+        if (
+            !$entity instanceof User
             || !$entity->isEnabled()
             || $this->tokenAccessor->getUserId() === $entity->getId()
         ) {

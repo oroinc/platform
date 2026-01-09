@@ -18,7 +18,8 @@ abstract class AbstractHandler implements ConfigurationHandlerInterface
         }
 
         foreach ($entities as $key => $entity) {
-            if (!empty($entity['name']) && $entity['name'] == $entityName
+            if (
+                !empty($entity['name']) && $entity['name'] == $entityName
                 || $key === $entityName
             ) {
                 return true;

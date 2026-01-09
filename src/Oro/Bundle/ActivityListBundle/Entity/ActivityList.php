@@ -179,8 +179,9 @@ class ActivityList implements
     {
         /** @var $owner ActivityOwner */
         foreach ($this->getActivityOwners() as $owner) {
-            if ($owner->getUser() && $activityOwner->getUser() &&
-                $owner->getUser()->getId() === $activityOwner->getUser()->getId()
+            if (
+                $owner->getUser() && $activityOwner->getUser()
+                && $owner->getUser()->getId() === $activityOwner->getUser()->getId()
                 && $owner->getActivity()->getId() === $activityOwner->getActivity()->getId()
             ) {
                 return true;

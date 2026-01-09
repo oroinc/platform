@@ -234,8 +234,10 @@ class ReportController extends AbstractController
 
     protected function checkReport(Report $report)
     {
-        if ($report->getEntity() &&
-            !$this->container->get(FeatureChecker::class)->isResourceEnabled($report->getEntity(), 'entities')) {
+        if (
+            $report->getEntity() &&
+            !$this->container->get(FeatureChecker::class)->isResourceEnabled($report->getEntity(), 'entities')
+        ) {
             throw $this->createNotFoundException();
         }
     }

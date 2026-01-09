@@ -91,7 +91,8 @@ class MailboxProcessStorage
     {
         $choices = [];
         foreach ($this->processes as $type => $provider) {
-            if (!$provider->isEnabled($mailbox) ||
+            if (
+                !$provider->isEnabled($mailbox) ||
                 !$this->featureChecker->isResourceEnabled($provider->getProcessDefinitionName(), 'processes')
             ) {
                 continue;

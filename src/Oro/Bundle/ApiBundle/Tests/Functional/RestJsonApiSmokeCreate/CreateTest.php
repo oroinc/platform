@@ -25,7 +25,8 @@ class CreateTest extends RestJsonApiTestCase
             }
 
             $entityType = $this->getEntityType($entityClass);
-            if (is_a($entityClass, TestFrameworkEntityInterface::class, true)
+            if (
+                is_a($entityClass, TestFrameworkEntityInterface::class, true)
                 || str_starts_with($entityType, 'testapi')
                 || $this->isSkippedEntity($entityClass, ApiAction::CREATE)
             ) {

@@ -55,7 +55,8 @@ class NavigationListener
             foreach ($extendConfigs as $extendConfig) {
                 if ($this->checkAvailability($extendConfig)) {
                     $config = $entityConfigProvider->getConfig($extendConfig->getId()->getClassname());
-                    if (!class_exists($config->getId()->getClassName()) ||
+                    if (
+                        !class_exists($config->getId()->getClassName()) ||
                         !$this->tokenAccessor->hasUser() ||
                         !$this->authorizationChecker->isGranted('VIEW', 'entity:' . $config->getId()->getClassName())
                     ) {
@@ -102,7 +103,8 @@ class NavigationListener
         foreach ($children as $child) {
             $entitiesMenuItem->addChild($child['label'], $child['options']);
         }
-        if ($entitiesMenuItem->getExtra('no_children_in_config')
+        if (
+            $entitiesMenuItem->getExtra('no_children_in_config')
             && !$entitiesMenuItem->getExtra('isAllowed')
             && $entitiesMenuItem->getDisplayChildren()
         ) {

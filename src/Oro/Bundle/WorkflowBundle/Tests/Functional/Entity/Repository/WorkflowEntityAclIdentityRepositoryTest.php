@@ -56,7 +56,8 @@ class WorkflowEntityAclIdentityRepositoryTest extends WebTestCase
         foreach ($data as $identity) {
             $acl = $identity->getAcl();
 
-            if ($identity->getWorkflowItem()->getDefinition()->getName() === $workflow
+            if (
+                $identity->getWorkflowItem()->getDefinition()->getName() === $workflow
                 && $acl->getStep()->getName() === $step
                 && $acl->getAttribute() === $attr
             ) {

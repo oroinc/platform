@@ -53,7 +53,8 @@ class IdentifierDescriptionHelper
                         $targetAction
                     )
                 );
-            } elseif (ApiAction::UPDATE === $targetAction
+            } elseif (
+                ApiAction::UPDATE === $targetAction
                 && self::ID_DESCRIPTION === $identifierField->getDescription()
             ) {
                 $identifierField->setDescription(self::REQUIRED_ID_DESCRIPTION);
@@ -70,7 +71,8 @@ class IdentifierDescriptionHelper
         $required = false;
         if (ApiAction::UPDATE === $targetAction) {
             $required = true;
-        } elseif (ApiAction::CREATE === $targetAction
+        } elseif (
+            ApiAction::CREATE === $targetAction
             && !$this->hasIdentifierGenerator($entityClass, $identifierFieldName)
         ) {
             $required = true;

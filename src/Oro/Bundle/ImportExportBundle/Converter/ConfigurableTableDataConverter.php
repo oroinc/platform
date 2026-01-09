@@ -91,7 +91,8 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
                 continue;
             }
 
-            if ($this->fieldHelper->isRelation($field) &&
+            if (
+                $this->fieldHelper->isRelation($field) &&
                 !$this->fieldHelper->processRelationAsScalar($entityClassName, $fieldName)
             ) {
                 $relatedClassName = $field['related_entity_name'];
@@ -224,7 +225,8 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
                 $fieldOrder = (int)$fieldOrder;
 
                 // process relations
-                if ($this->fieldHelper->isRelation($field)
+                if (
+                    $this->fieldHelper->isRelation($field)
                     && !$this->fieldHelper->processRelationAsScalar($entityName, $fieldName)
                 ) {
                     $relationRules = $this->getRelatedEntityRules(
@@ -298,7 +300,8 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
                 $fieldOrder = (int)$fieldOrder;
 
                 // process relations
-                if ($this->fieldHelper->isRelation($field)
+                if (
+                    $this->fieldHelper->isRelation($field)
                     && !$this->fieldHelper->processRelationAsScalar($entityName, $fieldName)
                 ) {
                     [$relationRules, $relationBackendHeaders] = $this->getRelatedEntityRulesAndBackendHeaders(

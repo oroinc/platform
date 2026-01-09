@@ -133,7 +133,8 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
             foreach ($classData as $section => $sectionData) {
                 foreach ($sectionData as $element => $elementData) {
                     if (!$this->hasSubElements($section)) {
-                        if (isset($this->loadedData[$className][$section][$element])
+                        if (
+                            isset($this->loadedData[$className][$section][$element])
                             && InheritDocUtil::hasInheritDoc($elementData)
                         ) {
                             $elementData = InheritDocUtil::replaceInheritDoc(
@@ -144,7 +145,8 @@ class MarkdownApiDocParser implements ResourceDocParserInterface
                         $this->loadedData[$className][$section][$element] = $elementData;
                     } else {
                         foreach ($elementData as $subElement => $subElementData) {
-                            if (isset($this->loadedData[$className][$section][$element][$subElement])
+                            if (
+                                isset($this->loadedData[$className][$section][$element][$subElement])
                                 && InheritDocUtil::hasInheritDoc($subElementData)
                             ) {
                                 $subElementData = InheritDocUtil::replaceInheritDoc(

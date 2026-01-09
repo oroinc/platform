@@ -17,13 +17,15 @@ class DeleteListTest extends RestPlainApiTestCase
     public function testDeleteList(): void
     {
         $this->runForEntities(function (string $entityClass, array $excludedActions) {
-            if (\in_array(ApiAction::DELETE_LIST, $excludedActions, true)
+            if (
+                \in_array(ApiAction::DELETE_LIST, $excludedActions, true)
                 || \in_array(ApiAction::GET_LIST, $excludedActions, true)
             ) {
                 return;
             }
 
-            if ($this->isSkippedEntity($entityClass, ApiAction::DELETE_LIST)
+            if (
+                $this->isSkippedEntity($entityClass, ApiAction::DELETE_LIST)
                 || $this->isSkippedEntity($entityClass, ApiAction::GET_LIST)
             ) {
                 return;

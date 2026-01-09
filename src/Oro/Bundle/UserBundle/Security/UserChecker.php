@@ -68,7 +68,8 @@ class UserChecker implements UserCheckerInterface
             return;
         }
 
-        if (null !== $this->tokenStorage->getToken()
+        if (
+            null !== $this->tokenStorage->getToken()
             && null !== $user->getPasswordChangedAt()
             && null !== $user->getLastLogin()
             && $user->getPasswordChangedAt() > $user->getLastLogin()

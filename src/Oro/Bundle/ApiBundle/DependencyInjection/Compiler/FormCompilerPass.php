@@ -40,7 +40,8 @@ class FormCompilerPass implements CompilerPassInterface
     #[\Override]
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasDefinition(self::FORM_REGISTRY_SERVICE_ID) ||
+        if (
+            !$container->hasDefinition(self::FORM_REGISTRY_SERVICE_ID) ||
             !$container->hasDefinition(self::API_FORM_SWITCHABLE_EXTENSION_SERVICE_ID)
         ) {
             return;

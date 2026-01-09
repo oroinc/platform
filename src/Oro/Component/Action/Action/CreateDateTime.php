@@ -37,7 +37,8 @@ class CreateDateTime extends AbstractDateAction
 
         if (empty($options['timezone'])) {
             $options['timezone'] = new \DateTimeZone('UTC');
-        } elseif (!$options['timezone'] instanceof PropertyPathInterface
+        } elseif (
+            !$options['timezone'] instanceof PropertyPathInterface
             && !is_string($options['timezone'])
             && !$options['timezone'] instanceof \DateTimeZone
         ) {

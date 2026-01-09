@@ -36,7 +36,8 @@ class DoNotRunConsumerOptionController implements Controller
     #[\Override]
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$input->getOption('do-not-run-consumer') &&
+        if (
+            !$input->getOption('do-not-run-consumer') &&
             !$input->getOption('check') &&
             !$input->getOption('dry-run') &&
             !$input->getOption('skip-isolators-but-load-fixtures') &&

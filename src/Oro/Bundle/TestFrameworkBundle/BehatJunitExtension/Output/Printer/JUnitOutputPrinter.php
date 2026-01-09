@@ -37,7 +37,7 @@ final class JUnitOutputPrinter extends StreamOutputPrinter
 
     private function addCall(string $method, array $arguments)
     {
-        $this->callstack[] = ['exec'.ucfirst($method), $arguments];
+        $this->callstack[] = ['exec' . ucfirst($method), $arguments];
     }
 
     private function isCallstackCallable(): bool
@@ -143,8 +143,8 @@ final class JUnitOutputPrinter extends StreamOutputPrinter
      */
     private function execSetFileName($fileName, $extension = 'xml')
     {
-        if ('.'.$extension !== substr($fileName, strlen($extension) + 1)) {
-            $fileName .= '.'.$extension;
+        if ('.' . $extension !== substr($fileName, strlen($extension) + 1)) {
+            $fileName .= '.' . $extension;
         }
 
         $this->getOutputFactory()->setFileName($fileName);

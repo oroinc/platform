@@ -1,7 +1,5 @@
 <?php
 
-namespace Oro\Bundle\ImapBundle\Mail\Header;
-
 /**
  * Copyright (c) 2020 Laminas Project a Series of LF Projects, LLC.
  *
@@ -24,6 +22,8 @@ namespace Oro\Bundle\ImapBundle\Mail\Header;
  *
  * This file is a copy of {@see \Laminas\Mail\Header\Cc}
  */
+
+namespace Oro\Bundle\ImapBundle\Mail\Header;
 
 use Laminas\Mail\Header\Cc as BaseHeader;
 

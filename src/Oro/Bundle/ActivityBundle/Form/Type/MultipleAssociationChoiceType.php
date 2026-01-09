@@ -21,7 +21,8 @@ class MultipleAssociationChoiceType extends BaseMultipleAssociationChoiceType
         /** @var FormView $choiceView */
         foreach ($view->children as $choiceView) {
             // disable activity with same class as target entity
-            if ((isset($view->vars['disabled']) && $view->vars['disabled'])
+            if (
+                (isset($view->vars['disabled']) && $view->vars['disabled'])
                 || ($choiceView->vars['value'] === $targetClassName)
             ) {
                 $choiceView->vars['disabled'] = true;

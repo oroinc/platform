@@ -40,8 +40,10 @@ class ContactInformationEmailsProvider
                 $extendFieldConfig = $this->configManager->
                     getFieldConfig('extend', $entityName, $fieldId->getFieldName());
 
-                if ('Active' === $extendFieldConfig->get('state')
-                    && 'email' === $fieldConfig->get('contact_information')) {
+                if (
+                    'Active' === $extendFieldConfig->get('state')
+                    && 'email' === $fieldConfig->get('contact_information')
+                ) {
                     $emailFields[$fieldConfig->get('label')] = $fieldId->getFieldName();
                 }
             }

@@ -53,7 +53,8 @@ class DateTimeParser
         }
         // set UTC time zone if no other one is specified
         $pos = strrpos($value, ':');
-        if (false !== $pos
+        if (
+            false !== $pos
             && (
                 false === strpos($value, '+', $pos + 1)
                 && false === strpos($value, '-', $pos + 1)

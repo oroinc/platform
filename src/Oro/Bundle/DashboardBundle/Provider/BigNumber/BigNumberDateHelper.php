@@ -42,7 +42,8 @@ class BigNumberDateHelper
     {
         $start = $dateRange['start'];
         $end   = $dateRange['end'];
-        if ((isset($dateRange['type']) && $dateRange['type'] === AbstractDateFilterType::TYPE_LESS_THAN)
+        if (
+            (isset($dateRange['type']) && $dateRange['type'] === AbstractDateFilterType::TYPE_LESS_THAN)
             || (isset($dateRange['part']) && $dateRange['part'] === DateModifierInterface::PART_ALL_TIME)
         ) {
             QueryBuilderUtil::checkIdentifier($field);

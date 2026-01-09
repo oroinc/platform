@@ -32,7 +32,7 @@ class RepeatableFileProfilerStorage extends FileProfilerStorage
         }
 
         if (\function_exists('gzcompress')) {
-            $file = 'compress.zlib://'.$file;
+            $file = 'compress.zlib://' . $file;
         }
 
         // Prevent notice on try unserialize partial content

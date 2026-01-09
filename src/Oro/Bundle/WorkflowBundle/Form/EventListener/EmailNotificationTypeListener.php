@@ -70,7 +70,8 @@ class EmailNotificationTypeListener
 
     private function addWorkflowFields(FormInterface $form, EmailNotification $data)
     {
-        if (!$data->getEntityName() ||
+        if (
+            !$data->getEntityName() ||
             !$data->getEventName() ||
             $data->getEventName() !== WorkflowEvents::NOTIFICATION_TRANSIT_EVENT
         ) {

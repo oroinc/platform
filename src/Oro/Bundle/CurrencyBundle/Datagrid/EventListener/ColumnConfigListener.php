@@ -48,8 +48,10 @@ class ColumnConfigListener
 
         foreach ($columns as $columnName => $columnConfig) {
             $newColumnsSet[$columnName] = $columnConfig;
-            if (isset($columnConfig[PropertyInterface::FRONTEND_TYPE_KEY]) &&
-                $columnConfig[PropertyInterface::FRONTEND_TYPE_KEY] == Guesser::MULTI_CURRENCY_TYPE) {
+            if (
+                isset($columnConfig[PropertyInterface::FRONTEND_TYPE_KEY]) &&
+                $columnConfig[PropertyInterface::FRONTEND_TYPE_KEY] == Guesser::MULTI_CURRENCY_TYPE
+            ) {
                 $multiCurrencyConfigOptions = $this->guessMultiCurrencyConfigOptions(
                     $columnName,
                     $columnConfig

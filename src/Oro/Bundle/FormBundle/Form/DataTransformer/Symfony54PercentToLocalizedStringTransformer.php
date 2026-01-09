@@ -169,7 +169,8 @@ class Symfony54PercentToLocalizedStringTransformer implements DataTransformerInt
             $result /= 100;
         }
 
-        if (\function_exists('mb_detect_encoding')
+        if (
+            \function_exists('mb_detect_encoding')
             && false !== $encoding = mb_detect_encoding($value, null, true)
         ) {
             $length = mb_strlen($value, $encoding);

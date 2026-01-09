@@ -624,7 +624,8 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
             if (EmailSyncNotificationAlert::ALERT_TYPE_SWITCH_FOLDER === $notificationAlert->getAlertType()) {
                 $failedFoldersExist = true;
             }
-            if (EmailSyncNotificationAlert::ALERT_TYPE_SYNC === $notificationAlert->getAlertType()
+            if (
+                EmailSyncNotificationAlert::ALERT_TYPE_SYNC === $notificationAlert->getAlertType()
                 && EmailSyncNotificationAlert::STEP_GET_LIST === $notificationAlert->getStep()
             ) {
                 $collectionAlertsExist = true;

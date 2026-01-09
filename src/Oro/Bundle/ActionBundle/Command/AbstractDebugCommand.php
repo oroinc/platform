@@ -48,7 +48,7 @@ abstract class AbstractDebugCommand extends Command
         $types = $this->factory->getTypes();
         try {
             $service = $this->container->get($types[$name]);
-        } catch (\TypeError|\ErrorException $e) {
+        } catch (\TypeError | \ErrorException $e) {
             $this->printErrorServiceLoadException($output, $e, $types[$name]);
             return Command::FAILURE;
         }
@@ -83,7 +83,7 @@ abstract class AbstractDebugCommand extends Command
                 $service = $this->container->get($type);
                 $description = $docCommentParser->getShortComment(get_class($service));
                 $table->addRow([$key, $description]);
-            } catch (\TypeError|\ErrorException $e) {
+            } catch (\TypeError | \ErrorException $e) {
                 $this->printErrorServiceLoadException($output, $e, $type);
             }
         }

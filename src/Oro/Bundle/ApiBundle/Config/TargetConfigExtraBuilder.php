@@ -37,7 +37,8 @@ class TargetConfigExtraBuilder
         foreach ($parentConfigExtras as $extra) {
             if ($extra instanceof ExpandRelatedEntitiesConfigExtra) {
                 $extra = self::buildExpandRelatedEntitiesConfigExtra($extra, $associationPath);
-            } elseif ($extra instanceof FiltersConfigExtra
+            } elseif (
+                $extra instanceof FiltersConfigExtra
                 || $extra instanceof SortersConfigExtra
                 || $extra instanceof RootPathConfigExtra
             ) {
@@ -85,7 +86,8 @@ class TargetConfigExtraBuilder
         foreach ($configExtras as $extra) {
             if ($extra instanceof ExpandRelatedEntitiesConfigExtra) {
                 $extra = self::buildParentExpandRelatedEntitiesConfigExtra($extra, $associationName);
-            } elseif ($extra instanceof RootPathConfigExtra
+            } elseif (
+                $extra instanceof RootPathConfigExtra
                 || $extra instanceof FilterIdentifierFieldsConfigExtra
             ) {
                 $extra = null;

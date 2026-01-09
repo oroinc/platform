@@ -206,7 +206,8 @@ class CriteriaNormalizer
                     if (null !== $this->doctrineHelper->findEntityMetadataByPath($rootEntityClass, $field)) {
                         $pathMap[$field] = $this->buildJoinPathMapValue($field);
                     }
-                } elseif (!str_starts_with($field, Criteria::PLACEHOLDER_START)
+                } elseif (
+                    !str_starts_with($field, Criteria::PLACEHOLDER_START)
                     && !str_contains($field, '.')
                     && ($rootMetadata->hasAssociation($field) || $this->isMultiEnumField($rootEntityClass, $field))
                 ) {

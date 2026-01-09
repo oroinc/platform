@@ -94,7 +94,8 @@ class WorkflowDefinitionTranslationFieldsIterator extends AbstractWorkflowTransl
      */
     private function setStepField(array &$configuration, $stepName, $fieldName, $value)
     {
-        if (isset($configuration[WorkflowConfiguration::NODE_STEPS][$stepName])
+        if (
+            isset($configuration[WorkflowConfiguration::NODE_STEPS][$stepName])
             && is_array($configuration[WorkflowConfiguration::NODE_STEPS][$stepName])
         ) {
             $configuration[WorkflowConfiguration::NODE_STEPS][$stepName][$fieldName] = $value;

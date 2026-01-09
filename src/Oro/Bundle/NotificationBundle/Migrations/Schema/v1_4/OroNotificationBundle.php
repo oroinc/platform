@@ -35,14 +35,14 @@ class OroNotificationBundle implements Migration
         return new ParametrizedSqlMigrationQuery(
             sprintf(
                 'UPDATE %s SET additional_email_associations = CASE'
-                .' WHEN additional_email_associations IS NULL THEN :owner'
-                .' WHEN additional_email_associations != :owner'
-                .' AND additional_email_associations NOT LIKE :ownerStart'
-                .' AND additional_email_associations NOT LIKE :ownerEnd'
-                .' AND additional_email_associations NOT LIKE :ownerMiddle'
-                .' THEN CONCAT_WS(\',\', COALESCE(additional_email_associations, \'\'), :owner)'
-                .' ELSE additional_email_associations END'
-                .' WHERE owner = :isOwner',
+                . ' WHEN additional_email_associations IS NULL THEN :owner'
+                . ' WHEN additional_email_associations != :owner'
+                . ' AND additional_email_associations NOT LIKE :ownerStart'
+                . ' AND additional_email_associations NOT LIKE :ownerEnd'
+                . ' AND additional_email_associations NOT LIKE :ownerMiddle'
+                . ' THEN CONCAT_WS(\',\', COALESCE(additional_email_associations, \'\'), :owner)'
+                . ' ELSE additional_email_associations END'
+                . ' WHERE owner = :isOwner',
                 $tableName
             ),
             [

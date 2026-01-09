@@ -48,7 +48,8 @@ abstract class AbstractScopeManager
         }
 
         $result = null;
-        if (null !== $setting[ConfigManager::VALUE_KEY]
+        if (
+            null !== $setting[ConfigManager::VALUE_KEY]
             || false === $setting[ConfigManager::USE_PARENT_SCOPE_VALUE_KEY]
         ) {
             $result = $setting[ConfigManager::VALUE_KEY];
@@ -355,7 +356,8 @@ abstract class AbstractScopeManager
         foreach ($settings as $section => $sectionSettings) {
             foreach ($sectionSettings as $key => $setting) {
                 $settingPath = sprintf('%s.%s', $section, $key);
-                if (empty($configFields[$settingPath])
+                if (
+                    empty($configFields[$settingPath])
                     || $setting['value'] === null
                     || empty($configFields[$settingPath]['data_type'])
                 ) {

@@ -60,7 +60,8 @@ class AddParentEntityIdToQuery implements ProcessorInterface
             return;
         }
 
-        if (ConfigUtil::IGNORE_PROPERTY_PATH === $associationName
+        if (
+            ConfigUtil::IGNORE_PROPERTY_PATH === $associationName
             || $this->isEnumerableType($context->getParentConfig(), $context->getAssociationName())
         ) {
             $this->entityIdHelper->applyEntityIdentifierRestriction(
@@ -121,7 +122,8 @@ class AddParentEntityIdToQuery implements ProcessorInterface
                 $joinParentClassName = $parentClassName;
                 if (!$this->doctrineHelper->isManageableEntityClass($joinParentClassName)) {
                     $parentResourceClass = $parentConfig->getParentResourceClass();
-                    if ($parentResourceClass
+                    if (
+                        $parentResourceClass
                         && $this->doctrineHelper->isManageableEntityClass($parentResourceClass)
                     ) {
                         $joinParentClassName = $parentResourceClass;

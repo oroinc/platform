@@ -355,7 +355,8 @@ class ProcessTrigger implements EventTriggerInterface
      */
     public function isDefinitiveEqual(ProcessTrigger $trigger)
     {
-        if ($this->event !== $trigger->getEvent()
+        if (
+            $this->event !== $trigger->getEvent()
             || $this->field !== $trigger->getField()
             || $this->cron !== $trigger->getCron()
         ) {

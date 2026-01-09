@@ -296,7 +296,8 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
         if (is_dir($realPath)) {
             $files = $this->getDirectoryContentsArray($realPath);
             foreach ($files as $filename) {
-                if (!$this->isResourceFileFresh($resource, $bundleClass, $filename, $timestamp)
+                if (
+                    !$this->isResourceFileFresh($resource, $bundleClass, $filename, $timestamp)
                     && !$this->isOverriddenByAppFile($filename, $registeredAppFiles, $bundleAppDir, $bundleDir)
                 ) {
                     return false;

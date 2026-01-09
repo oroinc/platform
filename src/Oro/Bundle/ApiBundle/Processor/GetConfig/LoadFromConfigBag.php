@@ -136,7 +136,8 @@ class LoadFromConfigBag implements ProcessorInterface
      */
     private function getConfig(string $entityClass, string $version, RequestType $requestType): array|null|false
     {
-        if ($this->entityClass
+        if (
+            $this->entityClass
             && $entityClass !== $this->entityClass
             && !$this->parentResourceClass
             && $this->resourcesProvider->isResourceKnown($entityClass, $version, $requestType)

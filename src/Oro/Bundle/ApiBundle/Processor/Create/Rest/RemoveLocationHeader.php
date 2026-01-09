@@ -16,7 +16,8 @@ class RemoveLocationHeader implements ProcessorInterface
     {
         /** @var Context $context */
 
-        if ($context->hasErrors()
+        if (
+            $context->hasErrors()
             && $context->getResponseHeaders()->has(SetLocationHeader::RESPONSE_HEADER_NAME)
         ) {
             $context->getResponseHeaders()->remove(SetLocationHeader::RESPONSE_HEADER_NAME);

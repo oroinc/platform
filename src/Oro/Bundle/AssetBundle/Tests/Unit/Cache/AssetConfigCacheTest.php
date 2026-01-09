@@ -34,8 +34,8 @@ class AssetConfigCacheTest extends TestCase
         $warmer = new AssetConfigCache($kernel, self::WEBPACK_DEV_SERVER_OPTIONS, $manager);
         $tempDir = $this->getTempDir('cache');
         $warmer->warmUp($tempDir);
-        $file = $tempDir.'/asset-config.json';
-        $this->assertJsonFileEqualsJsonFile(__DIR__.'/asset-config.json', $file);
+        $file = $tempDir . '/asset-config.json';
+        $this->assertJsonFileEqualsJsonFile(__DIR__ . '/asset-config.json', $file);
     }
 
     private function getBundle(string $path): BundleInterface

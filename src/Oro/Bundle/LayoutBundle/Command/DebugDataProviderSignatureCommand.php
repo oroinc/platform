@@ -81,7 +81,8 @@ HELP
             foreach ($methodsInfo as $methodInfo) {
                 $methodName = $methodInfo['name'];
                 unset($methodInfo['name']);
-                if (isset($methodInfo['return']['type'])
+                if (
+                    isset($methodInfo['return']['type'])
                     && $methodInfo['return']['type'] instanceof \ReflectionType
                 ) {
                     $methodInfo['return']['type'] = $methodInfo['return']['type']->__toString();

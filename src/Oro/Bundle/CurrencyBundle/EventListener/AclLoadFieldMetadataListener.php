@@ -67,7 +67,8 @@ class AclLoadFieldMetadataListener
                 unset($fields[$fieldName]);
             }
 
-            if ($field->get('virtual_field')
+            if (
+                $field->get('virtual_field')
                 && $target
                 && !isset($fieldsToAdd[$target])
             ) {

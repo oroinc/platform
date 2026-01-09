@@ -275,7 +275,8 @@ class FieldType extends AbstractType
 
             return !$this->hasReverseRelation($extendProvider, $className, $relationKey);
         } else {
-            if ($extendProvider->hasConfigById($fieldId)
+            if (
+                $extendProvider->hasConfigById($fieldId)
                 && !$extendProvider->getConfigById($fieldId)->is('state', ExtendScope::STATE_DELETE)
             ) {
                 return false;
@@ -307,9 +308,11 @@ class FieldType extends AbstractType
         foreach ($fieldConfigs as $fieldConfig) {
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $fieldConfig->getId();
-            if (in_array($fieldConfigId->getFieldType(), RelationTypeBase::$anyToAnyRelations, true)
+            if (
+                in_array($fieldConfigId->getFieldType(), RelationTypeBase::$anyToAnyRelations, true)
                 && $fieldConfig->is('relation_key', $relationKey)
-                && !$fieldConfig->is('state', ExtendScope::STATE_DELETE)) {
+                && !$fieldConfig->is('state', ExtendScope::STATE_DELETE)
+            ) {
                 return true;
             }
         }

@@ -22,7 +22,7 @@ class AbstractEntityUrlProviderTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
-        $this->provider = new class($this->router) extends AbstractEntityUrlProvider {
+        $this->provider = new class ($this->router) extends AbstractEntityUrlProvider {
             public function __construct(RouterInterface $router)
             {
                 $this->router = $router;
@@ -195,7 +195,7 @@ class AbstractEntityUrlProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetUrlReturnsNullWhenRouteIsNull(): void
     {
         // Create a provider that returns null for getRoute
-        $provider = new class($this->router) extends AbstractEntityUrlProvider {
+        $provider = new class ($this->router) extends AbstractEntityUrlProvider {
             public function __construct(RouterInterface $router)
             {
                 $this->router = $router;

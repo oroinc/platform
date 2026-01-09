@@ -35,17 +35,20 @@ class ActionConfig
         if (null !== $this->exclude) {
             $result[ConfigUtil::EXCLUDE] = $this->exclude;
         }
-        if (isset($result[ConfigUtil::DISABLE_INCLUSION])
+        if (
+            isset($result[ConfigUtil::DISABLE_INCLUSION])
             && false === $result[ConfigUtil::DISABLE_INCLUSION]
         ) {
             unset($result[ConfigUtil::DISABLE_INCLUSION]);
         }
-        if (isset($result[ConfigUtil::DISABLE_FIELDSET])
+        if (
+            isset($result[ConfigUtil::DISABLE_FIELDSET])
             && false === $result[ConfigUtil::DISABLE_FIELDSET]
         ) {
             unset($result[ConfigUtil::DISABLE_FIELDSET]);
         }
-        if (isset($result[ConfigUtil::DISABLE_META_PROPERTIES])
+        if (
+            isset($result[ConfigUtil::DISABLE_META_PROPERTIES])
             && false === $result[ConfigUtil::DISABLE_META_PROPERTIES]
         ) {
             unset($result[ConfigUtil::DISABLE_META_PROPERTIES]);
@@ -53,7 +56,8 @@ class ActionConfig
         if ($this->disabledMetaProperties) {
             $result[ConfigUtil::DISABLED_META_PROPERTIES] = $this->disabledMetaProperties;
         }
-        if (isset($result[ConfigUtil::DISABLE_PARTIAL_LOAD])
+        if (
+            isset($result[ConfigUtil::DISABLE_PARTIAL_LOAD])
             && false === $result[ConfigUtil::DISABLE_PARTIAL_LOAD]
         ) {
             unset($result[ConfigUtil::DISABLE_PARTIAL_LOAD]);

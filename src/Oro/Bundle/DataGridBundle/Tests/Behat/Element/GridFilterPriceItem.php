@@ -41,7 +41,7 @@ class GridFilterPriceItem extends GridFilterStringItem
      */
     public function selectRadioUnitType($filterUnitType)
     {
-        $radio = $this->find('css', '.product-price-unit-filter input[value="' . $filterUnitType .'"]');
+        $radio = $this->find('css', '.product-price-unit-filter input[value="' . $filterUnitType . '"]');
         if (!empty($radio)) {
             $radio->getParent()->click();
             return;

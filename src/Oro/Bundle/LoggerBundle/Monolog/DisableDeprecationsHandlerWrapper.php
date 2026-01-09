@@ -13,7 +13,8 @@ class DisableDeprecationsHandlerWrapper extends HandlerWrapper
     public function handle(LogRecord $record): bool
     {
         $exception = $record['context']['exception'] ?? null;
-        if ($exception instanceof \ErrorException
+        if (
+            $exception instanceof \ErrorException
             && \in_array($exception->getSeverity(), [\E_DEPRECATED, \E_USER_DEPRECATED], true)
         ) {
             return false;

@@ -21,8 +21,10 @@ class RootJobActionConfiguration
         $job = $record->getRootEntity();
 
         $showInterruptRootJob = true;
-        if ($job->isInterrupted() ||
-            in_array($job->getStatus(), [Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_CANCELLED])) {
+        if (
+            $job->isInterrupted() ||
+            in_array($job->getStatus(), [Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_CANCELLED])
+        ) {
             $showInterruptRootJob = false;
         }
 

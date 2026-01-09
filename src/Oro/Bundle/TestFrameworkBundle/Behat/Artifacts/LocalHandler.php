@@ -17,7 +17,7 @@ class LocalHandler implements ArtifactsHandlerInterface
     {
         $this->directory = rtrim($config['directory'], DIRECTORY_SEPARATOR);
         $this->baseUrl = $config['base_url'] ? trim($config['base_url'], " \t\n\r\0\x0B\\") : null;
-        $this->baseUrl = rtrim($this->baseUrl, '/').'/';
+        $this->baseUrl = rtrim($this->baseUrl, '/') . '/';
         $filesystem = new Filesystem();
         if ($config['auto_clear']) {
             $filesystem->remove($this->directory);
@@ -31,16 +31,16 @@ class LocalHandler implements ArtifactsHandlerInterface
     #[\Override]
     public function save($file)
     {
-        $fileName = TokenGenerator::generateToken('image').'.png';
-        $screenshotName = $this->directory.DIRECTORY_SEPARATOR.$fileName;
+        $fileName = TokenGenerator::generateToken('image') . '.png';
+        $screenshotName = $this->directory . DIRECTORY_SEPARATOR . $fileName;
 
         file_put_contents($screenshotName, $file);
 
         if ($this->baseUrl) {
-            return $this->baseUrl.$fileName;
+            return $this->baseUrl . $fileName;
         }
 
-        return 'file://'.$screenshotName;
+        return 'file://' . $screenshotName;
     }
 
     #[\Override]

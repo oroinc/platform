@@ -27,7 +27,8 @@ class ActionConfiguration
     {
         $result = [];
 
-        if ($record->getValue('enabled') === 'disabled'
+        if (
+            $record->getValue('enabled') === 'disabled'
             || false === $this->typesRegistry->supportsSync($record->getValue('type'))
         ) {
             $result['schedule'] = false;

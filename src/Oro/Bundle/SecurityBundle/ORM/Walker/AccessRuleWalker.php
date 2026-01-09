@@ -100,7 +100,8 @@ class AccessRuleWalker extends TreeWalkerAdapter
 
         if ($conditionalExpression instanceof AST\ConditionalPrimary) {
             $expression = $conditionalExpression->simpleConditionalExpression;
-            if ($expression && isset($expression->subselect)
+            if (
+                $expression && isset($expression->subselect)
                 && $expression->subselect instanceof AST\Subselect
             ) {
                 $this->processSelectStatement($expression->subselect, $context);
@@ -267,7 +268,8 @@ class AccessRuleWalker extends TreeWalkerAdapter
     {
         // in case if $queryExpression is some kind if comparison expression
         // - wrap it with ConditionalPrimary expression
-        if (!($queryExpression instanceof AST\ConditionalPrimary)
+        if (
+            !($queryExpression instanceof AST\ConditionalPrimary)
             && !($queryExpression instanceof AST\ConditionalTerm)
         ) {
             $conditionalExpressionPrimary = new AST\ConditionalPrimary();

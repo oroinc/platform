@@ -192,7 +192,8 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     {
         /** @var PersistentCollection $collection */
         foreach ($collections as $collection) {
-            if (spl_object_hash($collection->getOwner()) === $ownerSplHash
+            if (
+                spl_object_hash($collection->getOwner()) === $ownerSplHash
                 && $this->auditConfigProvider->isAuditableEntity($collection->getTypeClass()->getName())
             ) {
                 return true;

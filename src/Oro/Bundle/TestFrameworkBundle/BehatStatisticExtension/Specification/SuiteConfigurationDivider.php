@@ -41,7 +41,7 @@ class SuiteConfigurationDivider implements SpecificationDividerInterface
         $index = 0;
 
         while (count($suiteDuration)) {
-            $setName = $baseName.'_'.$index;
+            $setName = $baseName . '_' . $index;
             if (!isset($generatedSets[$setName])) {
                 $setDuration[$setName] = reset($suiteDuration);
                 $generatedSets[$setName][] = $array[key($suiteDuration)];

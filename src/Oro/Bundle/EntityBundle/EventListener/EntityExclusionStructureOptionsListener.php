@@ -68,7 +68,8 @@ class EntityExclusionStructureOptionsListener
                 $fieldClassMetadata = $entityClassMetadata;
             }
             $relatedEntity = $field->getRelatedEntityName();
-            if (($relatedEntity && $this->exclusionProvider->isIgnoredEntity($relatedEntity)) ||
+            if (
+                ($relatedEntity && $this->exclusionProvider->isIgnoredEntity($relatedEntity)) ||
                 $this->exclusionProvider->isIgnoredField($fieldClassMetadata, $realFieldName)
             ) {
                 $field->addOption(self::OPTION_NAME, true);

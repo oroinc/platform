@@ -299,7 +299,7 @@ class AttributeFamily implements
     #[\Override]
     public function toString()
     {
-        return 'code:'.$this->getCode();
+        return 'code:' . $this->getCode();
     }
 
     #[\Override]

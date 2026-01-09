@@ -398,7 +398,8 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         /**
          * In case folder sync completed and batch save time exceeded limit - throws exception.
          */
-        if ($isFolderSyncComplete
+        if (
+            $isFolderSyncComplete
             && $folder != null
             && $this->dbBatchSaveTime > 0
             && $this->dbBatchSaveTime > self::DB_BATCH_TIME

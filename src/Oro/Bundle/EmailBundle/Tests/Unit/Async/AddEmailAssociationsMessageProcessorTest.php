@@ -83,8 +83,8 @@ class AddEmailAssociationsMessageProcessorTest extends TestCase
         $jobRunner->expects($this->exactly(2))
             ->method('createDelayed')
             ->withConsecutive(
-                ['oro.email.add_association_to_email'.':class:123:1'],
-                ['oro.email.add_association_to_email'.':class:123:2']
+                ['oro.email.add_association_to_email' . ':class:123:1'],
+                ['oro.email.add_association_to_email' . ':class:123:2']
             )
             ->willReturnOnConsecutiveCalls(
                 new ReturnCallback(function ($name, $callback) use ($jobRunner) {

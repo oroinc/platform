@@ -180,7 +180,8 @@ class WorkflowAttributesType extends AbstractType
             $fieldName = $attribute->getName();
             if (isset($attributes[$fieldName])) {
                 $attributeConfiguration = $attributes[$fieldName];
-                if (array_key_exists('property_path', $attributeConfiguration)
+                if (
+                    array_key_exists('property_path', $attributeConfiguration)
                     && $attributeConfiguration['property_path']
                 ) {
                     $fieldName = $attributeConfiguration['property_path'];

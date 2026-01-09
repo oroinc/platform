@@ -39,9 +39,11 @@ class ElementsDumpSubscriber implements EventSubscriberInterface
             return;
         }
         $browserCapabilities = $driver->getDesiredCapabilities();
-        if ($browserCapabilities
+        if (
+            $browserCapabilities
             && isset($browserCapabilities['chromeOptions']['args'])
-            && \in_array('--headless', $browserCapabilities['chromeOptions']['args'], true)) {
+            && \in_array('--headless', $browserCapabilities['chromeOptions']['args'], true)
+        ) {
             return;
         }
 

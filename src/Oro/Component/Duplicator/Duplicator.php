@@ -16,9 +16,9 @@ use Oro\Component\Duplicator\Matcher\MatcherFactory;
  */
 class Duplicator implements DuplicatorInterface
 {
-    protected ?FilterFactory  $filterFactory;
+    protected ?FilterFactory $filterFactory;
     protected ?MatcherFactory $matcherFactory;
-    protected array           $defaultRules = [];
+    protected array $defaultRules = [];
 
     #[\Override]
     public function duplicate(mixed $object, array $settings = []): mixed

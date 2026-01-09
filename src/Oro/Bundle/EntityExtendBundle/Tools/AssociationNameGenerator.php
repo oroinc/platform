@@ -136,8 +136,10 @@ class AssociationNameGenerator
         if (count($methodSplit) < 3) {
             return null;
         }
-        if (in_array($methodSplit[0], self::NAME_PREFIXES)
-            && in_array(end($methodSplit), self::NAME_POSTFIXES)) {
+        if (
+            in_array($methodSplit[0], self::NAME_PREFIXES)
+            && in_array(end($methodSplit), self::NAME_POSTFIXES)
+        ) {
             return lcfirst(implode('', array_slice($methodSplit, 1, -1)));
         }
 

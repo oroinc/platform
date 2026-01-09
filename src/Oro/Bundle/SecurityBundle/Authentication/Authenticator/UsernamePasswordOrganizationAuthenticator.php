@@ -110,7 +110,8 @@ class UsernamePasswordOrganizationAuthenticator extends FormLoginAuthenticator
     #[\Override]
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
-        if ($exception instanceof BadCredentialsException
+        if (
+            $exception instanceof BadCredentialsException
             && !$exception instanceof BadUserCredentialsException
             && isset($this->errorMessageOptions[$this->firewallName])
         ) {

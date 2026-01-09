@@ -66,7 +66,8 @@ abstract class RemoveInfoRecords implements ProcessorInterface
      */
     protected function processEntity(array &$data, EntityMetadata $metadata, string $propertyPath): array
     {
-        if (is_a($metadata->getClassName(), EntityIdentifier::class, true)
+        if (
+            is_a($metadata->getClassName(), EntityIdentifier::class, true)
             && !empty($data[ConfigUtil::CLASS_NAME])
         ) {
             $metadata = $metadata->getEntityMetadata($data[ConfigUtil::CLASS_NAME]);
@@ -193,7 +194,8 @@ abstract class RemoveInfoRecords implements ProcessorInterface
 
     private function getAssociationTargetMetadata(AssociationMetadata $association, array $data): EntityMetadata
     {
-        if (is_a($association->getTargetClassName(), EntityIdentifier::class, true)
+        if (
+            is_a($association->getTargetClassName(), EntityIdentifier::class, true)
             && !empty($data[ConfigUtil::CLASS_NAME])
         ) {
             return $association->getTargetMetadata($data[ConfigUtil::CLASS_NAME]);

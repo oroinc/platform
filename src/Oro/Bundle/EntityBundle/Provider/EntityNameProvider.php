@@ -195,7 +195,8 @@ class EntityNameProvider implements EntityNameProviderInterface
         }
         $configs = $this->configProvider->getConfigs($metadata->getName(), true);
         foreach ($configs as $config) {
-            if (ExtendHelper::isMultiEnumType($config->getId()->getFieldType())
+            if (
+                ExtendHelper::isMultiEnumType($config->getId()->getFieldType())
                 && ExtendHelper::isFieldAccessible($config)
             ) {
                 $result[] = $config->getId()->getFieldName();
@@ -230,7 +231,8 @@ class EntityNameProvider implements EntityNameProviderInterface
         if ($metadata->getTypeOfField($fieldName) !== Types::STRING) {
             return false;
         }
-        if ($this->configProvider->hasConfig($metadata->getName(), $fieldName)
+        if (
+            $this->configProvider->hasConfig($metadata->getName(), $fieldName)
             && !ExtendHelper::isFieldAccessible($this->configProvider->getConfig($metadata->getName(), $fieldName))
         ) {
             return false;

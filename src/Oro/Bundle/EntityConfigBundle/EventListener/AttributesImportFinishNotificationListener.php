@@ -43,8 +43,10 @@ class AttributesImportFinishNotificationListener
             return false;
         }
 
-        if (AttributeImportExportConfigurationProvider::ATTRIBUTE_IMPORT_FROM_CSV_JOB_NAME
-            !== $jobExecution->getJobInstance()->getAlias()) {
+        if (
+            AttributeImportExportConfigurationProvider::ATTRIBUTE_IMPORT_FROM_CSV_JOB_NAME
+            !== $jobExecution->getJobInstance()->getAlias()
+        ) {
             return false;
         }
 

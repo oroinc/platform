@@ -81,7 +81,8 @@ class NoteApiHandler
             $extendProvider = $this->configManager->getProvider('extend');
 
             $fieldName    = ExtendHelper::buildAssociationName($association['entity']);
-            if ($noteProvider->hasConfig(Note::class, $fieldName)
+            if (
+                $noteProvider->hasConfig(Note::class, $fieldName)
                 && $extendProvider->getConfig(Note::class, $fieldName)->is('state', ExtendScope::STATE_ACTIVE)
             ) {
                 $note[$fieldName] = $association['id'];

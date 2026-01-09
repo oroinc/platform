@@ -50,7 +50,8 @@ class LoginListener
         }
 
         $token = $event->getAuthenticationToken();
-        if ($token instanceof UsernamePasswordToken
+        if (
+            $token instanceof UsernamePasswordToken
             && $token->getUser() instanceof UserInterface
             && !$this->consumerHeartbeat->isAlive()
         ) {

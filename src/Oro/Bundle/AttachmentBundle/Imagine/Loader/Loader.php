@@ -15,7 +15,7 @@ class Loader extends BaseLoader
     public function __construct(string $path, string $protocol)
     {
         parent::__construct($path);
-        if ($this->isUrl && str_starts_with($this->path, $protocol.'://')) {
+        if ($this->isUrl && str_starts_with($this->path, $protocol . '://')) {
             $this->isUrl = false;
             $this->checkLocalFile();
         }

@@ -149,7 +149,8 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
             $choiceView = new ChoiceView($data, $item, (string)$key);
             $view->vars['choices'][] = $choiceView;
 
-            if ((is_array($disabledValues) && in_array((string)$key, $disabledValues, true))
+            if (
+                (is_array($disabledValues) && in_array((string)$key, $disabledValues, true))
                 || (is_callable($disabledValues) && $disabledValues((string)$key))
             ) {
                 $choiceView->attr = ['disabled' => 'disabled'];

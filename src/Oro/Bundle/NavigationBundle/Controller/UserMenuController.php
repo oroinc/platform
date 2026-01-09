@@ -95,8 +95,7 @@ class UserMenuController extends AbstractMenuController
         if (!$this->isGranted(
             'oro_user_user_update',
             $context[ScopeUserCriteriaProvider::USER]
-        )
-        ) {
+        )) {
             throw $this->createAccessDeniedException();
         }
         parent::checkAcl($context);

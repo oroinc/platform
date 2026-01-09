@@ -142,7 +142,8 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
         if (\array_key_exists(JsonApiDoc::ATTRIBUTES, $data)) {
             $this->validateArray($data, JsonApiDoc::ATTRIBUTES, $pointer, true, true);
         }
-        if (\array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)
+        if (
+            \array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)
             && $this->validateArray($data, JsonApiDoc::RELATIONSHIPS, $pointer, true, true)
         ) {
             $this->validateRelationships(
@@ -199,7 +200,8 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
 
     protected function validateIncludedResources(array $data): void
     {
-        if (\array_key_exists(JsonApiDoc::INCLUDED, $data)
+        if (
+            \array_key_exists(JsonApiDoc::INCLUDED, $data)
             && $this->validateArray($data, JsonApiDoc::INCLUDED, self::ROOT_POINTER, true)
         ) {
             $includedPointer = $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::INCLUDED);

@@ -79,7 +79,8 @@ abstract class AbstractDateFilter extends AbstractFilter
         if (null !== $dateEndValue) {
             $this->setParameter($ds, $endDateParameterName, $dateEndValue);
         }
-        if ($data['type'] === DateRangeFilterType::TYPE_NOT_EQUAL &&
+        if (
+            $data['type'] === DateRangeFilterType::TYPE_NOT_EQUAL &&
             $comparisonType === DateRangeFilterType::TYPE_EQUAL
         ) {
             [$startDateParameterName, $endDateParameterName] = [$endDateParameterName, $startDateParameterName];

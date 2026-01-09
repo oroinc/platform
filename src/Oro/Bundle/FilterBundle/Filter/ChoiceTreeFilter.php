@@ -70,7 +70,7 @@ class ChoiceTreeFilter extends AbstractFilter
                 $ds->setParameter($parameterName, $data['value']);
             }
 
-            return $fieldName . ' in (:'. $parameterName .')';
+            return $fieldName . ' in (:' . $parameterName . ')';
         }
     }
 

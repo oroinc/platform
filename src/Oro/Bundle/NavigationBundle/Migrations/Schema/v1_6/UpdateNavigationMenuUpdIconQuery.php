@@ -212,7 +212,7 @@ class UpdateNavigationMenuUpdIconQuery extends ParametrizedMigrationQuery
     {
         foreach (self::$iconReplaceMask as $pattern => $replace) {
             $exact = str_ends_with($pattern, '*') ? '' : '$';
-            $pattern = '/' . $pattern . $exact .'/';
+            $pattern = '/' . $pattern . $exact . '/';
             $next = false;
 
             if (is_array($replace) && $replace['next']) {

@@ -45,7 +45,8 @@ class ThrowExceptionInBatchUpdate implements ProcessorInterface
                         ));
                     }
                 }
-            } elseif (\in_array($context->getFirstGroup(), $this->exceptionController->getFailedGroups(), true)
+            } elseif (
+                \in_array($context->getFirstGroup(), $this->exceptionController->getFailedGroups(), true)
                 && ($context->getFirstGroup() !== ApiActionGroup::NORMALIZE_RESULT || $context->getSourceGroup())
             ) {
                 throw new RuntimeException(sprintf(

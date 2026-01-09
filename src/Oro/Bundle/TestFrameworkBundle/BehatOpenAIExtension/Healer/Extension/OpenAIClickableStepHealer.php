@@ -42,7 +42,8 @@ class OpenAIClickableStepHealer implements HealerInterface
         if (!isset($call->getBoundCallable()[1])) {
             return false;
         }
-        if (isset($call->getArguments()['button'])
+        if (
+            isset($call->getArguments()['button'])
             && in_array($call->getBoundCallable()[1], self::SUPPORTED_STEPS, true)
         ) {
             return true;
@@ -62,7 +63,8 @@ class OpenAIClickableStepHealer implements HealerInterface
             $response = $this->client->chat()->create($parameters);
             $failedStep = $call->getStep();
 
-            if (empty($response->choices[0]->message->content)
+            if (
+                empty($response->choices[0]->message->content)
                 || !str_starts_with(trim($response->choices[0]->message->content, '`'), $failedStep->getKeyword())
             ) {
                 return false;

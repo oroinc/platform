@@ -33,7 +33,8 @@ class ComputePercent100RoundType implements ProcessorInterface
                 continue;
             }
 
-            if (\array_key_exists($fieldName, $data)
+            if (
+                \array_key_exists($fieldName, $data)
                 && 'test_percent_100_round' === $dataType
                 && null !== $data[$fieldName]
             ) {

@@ -210,7 +210,7 @@ class DatagridStartTransitionButtonProviderExtensionTest extends TestCase
         return (new ButtonSearchContext())->setEntity($entityClass, $entityId)->setDatagrid($datagrid);
     }
 
-    private function createWorkflowDefinition(string $relatedEntity, array  $datagrids = []): WorkflowDefinition
+    private function createWorkflowDefinition(string $relatedEntity, array $datagrids = []): WorkflowDefinition
     {
         $workflowDefinition = $this->createMock(WorkflowDefinition::class);
         $workflowDefinition->expects($this->any())

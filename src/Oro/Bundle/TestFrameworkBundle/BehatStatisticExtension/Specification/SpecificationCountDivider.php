@@ -31,7 +31,7 @@ class SpecificationCountDivider implements SpecificationDividerInterface
 
         $chunks = $this->getChunks($array, $divider);
         foreach ($chunks as $index => $chunk) {
-            $generatedSuiteName = $baseName.'_'.$index;
+            $generatedSuiteName = $baseName . '_' . $index;
             $generatedSuites[$generatedSuiteName] = $chunk;
         }
 

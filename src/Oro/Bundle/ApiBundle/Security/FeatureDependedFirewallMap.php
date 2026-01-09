@@ -50,7 +50,8 @@ class FeatureDependedFirewallMap extends FirewallMap
         $logoutListener = $context->getLogoutListener();
 
         $firewallName = $context->getConfig()->getName();
-        if (isset($this->featureDependedFirewalls[$firewallName])
+        if (
+            isset($this->featureDependedFirewalls[$firewallName])
             && !$this->featureChecker->isFeatureEnabled($this->featureDependedFirewalls[$firewallName]['feature_name'])
         ) {
             $listeners = $this->getApplicableListeners(
@@ -80,10 +81,12 @@ class FeatureDependedFirewallMap extends FirewallMap
 
         $context = $method->invoke($this, $request);
         // removing the stateless attribute for a csrf-protected api requests that should be stateful
-        if (null !== $context
+        if (
+            null !== $context
             && $context->getConfig()?->isStateless()
             && $request->attributes->has('_stateless')
-            && $request->headers->has(CsrfRequestManager::CSRF_HEADER)) {
+            && $request->headers->has(CsrfRequestManager::CSRF_HEADER)
+        ) {
             $request->attributes->remove('_stateless');
         }
 
@@ -96,8 +99,10 @@ class FeatureDependedFirewallMap extends FirewallMap
             $applicableListeners = [];
             $isFeatureListenerAdded = false;
             foreach ($listeners as $listener) {
-                if ((!$isFeatureListenerAdded && $listener instanceof AccessListener)
-                    || $listener instanceof OnNoTokenAccessListener) {
+                if (
+                    (!$isFeatureListenerAdded && $listener instanceof AccessListener)
+                    || $listener instanceof OnNoTokenAccessListener
+                ) {
                     $applicableListeners[] = $this->featureAccessListener;
                     $isFeatureListenerAdded = true;
                 }

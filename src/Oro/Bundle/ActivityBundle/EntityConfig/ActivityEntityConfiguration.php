@@ -46,7 +46,7 @@ class ActivityEntityConfiguration implements EntityConfigInterface
             ->end()
             ->variableNode('immutable')
                 ->info('`boolean or array` is used to prohibit changing the activity state (regardless of whether ' .
-                    'it is enabled or not) for the entity. If TRUE, then activity state cannot be changed. '.
+                    'it is enabled or not) for the entity. If TRUE, then activity state cannot be changed. ' .
                     'It can also be an array with the list of class names of activities whose state cannot be changed.')
             ->end()
             ->scalarNode('route')

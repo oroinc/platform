@@ -76,7 +76,8 @@ class EnumTypeHelper extends ConfigTypeHelper
                     // skip not enum fields
                     continue;
                 }
-                if ($fieldConfigId->getFieldName() === $fieldName
+                if (
+                    $fieldConfigId->getFieldName() === $fieldName
                     && $fieldConfigId->getClassName() === $className
                 ) {
                     // skip current field

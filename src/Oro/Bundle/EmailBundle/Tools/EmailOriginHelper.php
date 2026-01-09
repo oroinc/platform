@@ -168,8 +168,10 @@ class EmailOriginHelper
     protected function hasOriginAccess($emailOwner)
     {
         $access = false;
-        if ($emailOwner instanceof User
-            && $this->tokenAccessor->getUserId() === $emailOwner->getId()) {
+        if (
+            $emailOwner instanceof User
+            && $this->tokenAccessor->getUserId() === $emailOwner->getId()
+        ) {
             $access = true;
         } elseif ($emailOwner instanceof Mailbox) {
             $ownerIds = [];

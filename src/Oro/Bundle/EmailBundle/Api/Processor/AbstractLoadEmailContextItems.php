@@ -450,7 +450,8 @@ abstract class AbstractLoadEmailContextItems implements ProcessorInterface
 
         $filteredRecords = [];
         foreach ($records as $record) {
-            if (User::class === $record['entity']
+            if (
+                User::class === $record['entity']
                 && $currentUserId == $record['id']
                 && ($record['assigned'] ?? false) === false
             ) {

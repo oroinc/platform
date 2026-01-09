@@ -153,17 +153,17 @@ class SymfonyGetSetMethodNormalizer extends AbstractObjectNormalizer
         ?string $format = null,
         array $context = []
     ): mixed {
-        $getter = 'get'.$attribute;
+        $getter = 'get' . $attribute;
         if (method_exists($object, $getter) && \is_callable([$object, $getter])) {
             return $object->$getter();
         }
 
-        $isser = 'is'.$attribute;
+        $isser = 'is' . $attribute;
         if (method_exists($object, $isser) && \is_callable([$object, $isser])) {
             return $object->$isser();
         }
 
-        $haser = 'has'.$attribute;
+        $haser = 'has' . $attribute;
         if (method_exists($object, $haser) && \is_callable([$object, $haser])) {
             return $object->$haser();
         }
@@ -178,8 +178,8 @@ class SymfonyGetSetMethodNormalizer extends AbstractObjectNormalizer
         ?string $format = null,
         array $context = []
     ): void {
-        $setter = 'set'.$attribute;
-        $key = $object::class.':'.$setter;
+        $setter = 'set' . $attribute;
+        $key = $object::class . ':' . $setter;
 
         if (!isset(self::$setterAccessibleCache[$key])) {
             self::$setterAccessibleCache[$key] = method_exists($object, $setter)
@@ -216,7 +216,7 @@ class SymfonyGetSetMethodNormalizer extends AbstractObjectNormalizer
 
         if ($context['_read_attributes'] ?? true) {
             foreach (['get', 'is', 'has'] as $getterPrefix) {
-                $getter = $getterPrefix.$attribute;
+                $getter = $getterPrefix . $attribute;
                 $reflectionMethod = $reflection->hasMethod($getter) ? $reflection->getMethod($getter) : null;
                 if ($reflectionMethod && $this->isGetMethod($reflectionMethod)) {
                     return true;
@@ -226,7 +226,7 @@ class SymfonyGetSetMethodNormalizer extends AbstractObjectNormalizer
             return false;
         }
 
-        $setter = 'set'.$attribute;
+        $setter = 'set' . $attribute;
         if ($reflection->hasMethod($setter) && $this->isSetMethod($reflection->getMethod($setter))) {
             return true;
         }

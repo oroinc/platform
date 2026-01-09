@@ -30,7 +30,8 @@ class LoadProcessorsCompilerPass implements CompilerPassInterface
     #[\Override]
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition($this->processorBagConfigBuilderServiceId)
+        if (
+            !$container->hasDefinition($this->processorBagConfigBuilderServiceId)
             && !$container->hasAlias($this->processorBagConfigBuilderServiceId)
         ) {
             return;

@@ -112,7 +112,8 @@ trait FallbackTrait
         $result = null;
         foreach ($values as $value) {
             $valueLocalization = $value->getLocalization();
-            if ($valueLocalization === $localization
+            if (
+                $valueLocalization === $localization
                 || (
                     null !== $valueLocalization
                     && null !== $localization
@@ -129,7 +130,7 @@ EOF;
                     // error_log is a temporary solution and should be removed in scope of BAP-20337
                     /** @noinspection ForgottenDebugOutputInspection */
                     /** @noinspection PhpUsageOfSilenceOperatorInspection */
-                    @error_log(sprintf($message, $value, $localization, get_class($value)).PHP_EOL);
+                    @error_log(sprintf($message, $value, $localization, get_class($value)) . PHP_EOL);
                     break;
                 }
                 $result = $value;

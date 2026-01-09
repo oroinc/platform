@@ -40,7 +40,8 @@ class CompleteObjectDefinitionHelper
         foreach ($fieldNames as $fieldName) {
             /** @var EntityDefinitionFieldConfig $field */
             $field = $definition->getField($fieldName);
-            if (\in_array($fieldName, $idFieldNames, true)
+            if (
+                \in_array($fieldName, $idFieldNames, true)
                 || (
                     $field->isMetaProperty()
                     && (

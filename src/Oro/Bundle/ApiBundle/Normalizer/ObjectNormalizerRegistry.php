@@ -36,7 +36,8 @@ class ObjectNormalizerRegistry
     {
         $result = null;
         foreach ($this->normalizers as [$serviceId, $objectClass, $expression]) {
-            if (is_a($object, $objectClass)
+            if (
+                is_a($object, $objectClass)
                 && (!$expression || $this->matcher->matchValue($expression, $requestType))
             ) {
                 $result = $this->container->get($serviceId);

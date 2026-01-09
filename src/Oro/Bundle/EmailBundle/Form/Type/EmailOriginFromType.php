@@ -106,7 +106,7 @@ class EmailOriginFromType extends AbstractType
         return $origins;
     }
 
-    private function processFillUserEmail($email, array $origins, ?User  $owner = null): array
+    private function processFillUserEmail($email, array $origins, ?User $owner = null): array
     {
         $key = '0|' . $email;
         if (!\array_key_exists($key, $origins)) {

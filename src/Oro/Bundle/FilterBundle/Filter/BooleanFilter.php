@@ -69,7 +69,8 @@ class BooleanFilter extends AbstractFilter
     protected function parseData($data)
     {
         $data = parent::parseData($data);
-        if (!is_array($data)
+        if (
+            !is_array($data)
             || !array_key_exists('value', $data)
             || !$data['value']
             || !in_array($data['value'], [BooleanFilterType::TYPE_YES, BooleanFilterType::TYPE_NO])

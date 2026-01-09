@@ -169,7 +169,7 @@ class DependentJobMessageProcessorTest extends TestCase
 
         $this->logger->expects($this->once())
             ->method('critical')
-            ->with('Got invalid dependent job data. '.
+            ->with('Got invalid dependent job data. ' .
              'job: "123", dependentJob: "{"topic":"topic-name"}"');
 
         $message = new TransportMessage();

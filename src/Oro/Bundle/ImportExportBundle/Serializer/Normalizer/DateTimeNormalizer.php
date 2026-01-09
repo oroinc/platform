@@ -92,7 +92,8 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
         }
 
         // If we are denormalizing date or time for backward compatibility try to denormalize as dateTime
-        if (false === $datetime
+        if (
+            false === $datetime
             && array_key_exists('type', $context)
             && in_array($context['type'], ['date', 'time'], true)
         ) {

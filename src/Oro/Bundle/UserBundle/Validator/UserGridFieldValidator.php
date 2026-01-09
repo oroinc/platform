@@ -45,7 +45,8 @@ class UserGridFieldValidator implements CustomGridFieldValidatorInterface
 
         $currentUser = $this->tokenAccessor->getUser();
 
-        if ($this->hasField($entity, $fieldName)
+        if (
+            $this->hasField($entity, $fieldName)
             && in_array($fieldName, $this->getCurrentUserFieldBlockList(), true)
             && $currentUser->getId() !== $entity->getId()
         ) {

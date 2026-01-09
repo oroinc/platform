@@ -34,9 +34,11 @@ class MinkSessionManager extends Mink
     {
         $session = parent::getSession($name);
         $name = $name ?? $this->getDefaultSessionName();
-        if (null !== $session->getDriver()->getWebDriverSession()
+        if (
+            null !== $session->getDriver()->getWebDriverSession()
             && $this->sessionHolder->isWatchMode()
-            && !$this->sessionHolder->hasSession($name)) {
+            && !$this->sessionHolder->hasSession($name)
+        ) {
             $this->sessionHolder->register($name, $session->getDriver()->getWebDriverSession()->getUrl());
         }
 

@@ -71,7 +71,8 @@ class RunActionGroup extends AbstractAction
             self::OPTION_RESULTS,
             function ($value) {
                 foreach ($value as $target => $source) {
-                    if ((!is_string($target) && !$target instanceof PropertyPathInterface) ||
+                    if (
+                        (!is_string($target) && !$target instanceof PropertyPathInterface) ||
                         (!$source instanceof PropertyPathInterface)
                     ) {
                         return false;

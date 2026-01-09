@@ -96,7 +96,8 @@ class FileManager extends GaufretteFileManager
     {
         $path = trim($path);
         $protocolDelimiter = strpos($path, '://');
-        if (false !== $protocolDelimiter
+        if (
+            false !== $protocolDelimiter
             && !$this->protocolValidator->isSupportedProtocol(strtolower(substr($path, 0, $protocolDelimiter)))
         ) {
             throw new ProtocolNotSupportedException($path);

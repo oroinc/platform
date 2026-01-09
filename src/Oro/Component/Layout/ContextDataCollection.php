@@ -44,7 +44,8 @@ class ContextDataCollection
      */
     public function get($name)
     {
-        if (!isset($this->items[$name])
+        if (
+            !isset($this->items[$name])
             && !array_key_exists($name, $this->items)
             && !$this->applyDefaultValue($name)
         ) {

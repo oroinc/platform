@@ -93,7 +93,7 @@ class CalendarTest extends TestCase
         );
 
         foreach ($actual as $monthNum => $monthName) {
-            $expected = $formatter->format(\DateTime::createFromFormat('n-d', $monthNum.'-1'));
+            $expected = $formatter->format(\DateTime::createFromFormat('n-d', $monthNum . '-1'));
             $this->assertEquals($expected, $actual[$monthNum], 'Incorrect month for month #' . $monthNum);
         }
     }

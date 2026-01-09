@@ -40,7 +40,8 @@ class WorkflowOperationFilter implements OperationRegistryFilterInterface
 
         $filteredOperations = [];
         foreach ($operations as $operationName => $operation) {
-            if (!isset($this->disabledOperations[$operationName][self::WILDCARD]) &&
+            if (
+                !isset($this->disabledOperations[$operationName][self::WILDCARD]) &&
                 !isset($this->disabledOperations[$operationName][$entityClass])
             ) {
                 $filteredOperations[$operationName] = $operation;

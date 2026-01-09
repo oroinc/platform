@@ -64,7 +64,8 @@ class ConfigurableImportStrategyHelper extends ImportStrategyHelper
             return;
         }
 
-        if ((null !== $sourceValue && null !== $targetValue)
+        if (
+            (null !== $sourceValue && null !== $targetValue)
             && $sourceValue !== $targetValue
             && $sourceValue == $targetValue
             && gettype($sourceValue) !== gettype($targetValue)

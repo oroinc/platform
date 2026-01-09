@@ -292,7 +292,8 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
                         if ($isGranting) {
                             // the access is granted if there is at least one granting ACE
-                            if (null === $triggeredAce
+                            if (
+                                null === $triggeredAce
                                 || $extension->getAccessLevel($requiredMask, null, $object)
                                 > $extension->getAccessLevel($triggeredMask, null, $object)
                             ) {

@@ -182,7 +182,8 @@ class SyncProcessor extends AbstractSyncProcessor
         Integration $integration,
         array $processedConnectorStatuses
     ) {
-        if ($connector instanceof AllowedConnectorInterface
+        if (
+            $connector instanceof AllowedConnectorInterface
             && !$connector->isAllowed($integration, $processedConnectorStatuses)
         ) {
             $this->logger->info(

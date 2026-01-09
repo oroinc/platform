@@ -21,7 +21,7 @@ class UnionOutputResultModifier extends AbstractOutputResultModifier
         $hookIdentifier = $query->getHint(self::HINT_UNION_KEY);
         $unionQuery = $query->getHint(self::HINT_UNION_VALUE);
         if ($hookIdentifier && $unionQuery && stripos($result, $hookIdentifier) !== false) {
-            $result = str_ireplace($hookIdentifier, '', $result).' UNION '. $unionQuery;
+            $result = str_ireplace($hookIdentifier, '', $result) . ' UNION ' . $unionQuery;
         }
 
         return $result;

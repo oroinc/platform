@@ -41,12 +41,14 @@ class MultiFileAssociationProvider implements ResetInterface
         }
 
         $multiFileAssociationNames = [];
-        if ($this->doctrineHelper->isManageableEntityClass($entityClass)
+        if (
+            $this->doctrineHelper->isManageableEntityClass($entityClass)
             && $this->configManager->hasConfig($entityClass)
         ) {
             $fieldConfigs = $this->configManager->getConfigs('extend', $entityClass);
             foreach ($fieldConfigs as $fieldConfig) {
-                if (FieldConfigHelper::isMultiField($fieldConfig->getId())
+                if (
+                    FieldConfigHelper::isMultiField($fieldConfig->getId())
                     && ExtendHelper::isFieldAccessible($fieldConfig)
                 ) {
                     $multiFileAssociationNames[] = $fieldConfig->getId()->getFieldName();

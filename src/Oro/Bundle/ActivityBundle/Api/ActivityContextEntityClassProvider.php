@@ -43,7 +43,8 @@ class ActivityContextEntityClassProvider implements SearchEntityClassProviderInt
         $searchableEntityClasses = $this->searchIndexer->getEntitiesListAliases();
         foreach ($activityTargets as $entityClass => $fieldName) {
             $searchAlias = $searchableEntityClasses[$entityClass] ?? null;
-            if ($searchAlias
+            if (
+                $searchAlias
                 && $this->resourcesProvider->isResourceAccessible($entityClass, $version, $requestType)
             ) {
                 $result[$entityClass] = $searchAlias;
@@ -59,7 +60,8 @@ class ActivityContextEntityClassProvider implements SearchEntityClassProviderInt
         $entityClasses = $this->getAccessibleEntityClasses($version, $requestType);
         $allowedSearchableEntityClasses = $this->searchIndexer->getAllowedEntitiesListAliases();
         foreach ($entityClasses as $entityClass => $searchAlias) {
-            if (!isset($allowedSearchableEntityClasses[$entityClass])
+            if (
+                !isset($allowedSearchableEntityClasses[$entityClass])
                 || !$this->resourcesProvider->isResourceEnabled($entityClass, ApiAction::GET, $version, $requestType)
             ) {
                 unset($entityClasses[$entityClass]);

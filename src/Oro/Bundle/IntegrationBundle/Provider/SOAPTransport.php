@@ -187,7 +187,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     protected function getLastResponseStatusCode(): ?int
     {
         try {
-            $response = Message::parseResponse($this->client->__getLastResponseHeaders()."\n");
+            $response = Message::parseResponse($this->client->__getLastResponseHeaders() . "\n");
 
             return $response->getStatusCode();
         } catch (\InvalidArgumentException $e) {

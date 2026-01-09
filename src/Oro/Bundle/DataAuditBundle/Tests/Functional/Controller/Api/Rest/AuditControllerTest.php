@@ -202,7 +202,7 @@ class AuditControllerTest extends WebTestCase
 
         $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_audits').'?loggedAt>='.urlencode('2012-10-12T00:01+0000')
+            $this->getUrl('oro_api_get_audits') . '?loggedAt>=' . urlencode('2012-10-12T00:01+0000')
         );
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeJson();
@@ -246,7 +246,7 @@ class AuditControllerTest extends WebTestCase
 
         $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_audits').'?loggedAt>'.urlencode('2012-10-12T00:01+0000')
+            $this->getUrl('oro_api_get_audits') . '?loggedAt>' . urlencode('2012-10-12T00:01+0000')
         );
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeJson();
@@ -290,7 +290,7 @@ class AuditControllerTest extends WebTestCase
 
         $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_audits').'?loggedAt<='.urlencode('2012-10-12T00:01+0000')
+            $this->getUrl('oro_api_get_audits') . '?loggedAt<=' . urlencode('2012-10-12T00:01+0000')
         );
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeJson();
@@ -334,7 +334,7 @@ class AuditControllerTest extends WebTestCase
 
         $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_audits').'?loggedAt<'.urlencode('2012-10-12T00:01+0000')
+            $this->getUrl('oro_api_get_audits') . '?loggedAt<' . urlencode('2012-10-12T00:01+0000')
         );
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeJson();
@@ -378,7 +378,7 @@ class AuditControllerTest extends WebTestCase
 
         $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_audits').'?action=create'
+            $this->getUrl('oro_api_get_audits') . '?action=create'
         );
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeJson();
@@ -422,7 +422,7 @@ class AuditControllerTest extends WebTestCase
 
         $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_audits').'?action<>create'
+            $this->getUrl('oro_api_get_audits') . '?action<>create'
         );
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeJson();
@@ -466,7 +466,7 @@ class AuditControllerTest extends WebTestCase
 
         $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_audits').'?objectClass='.TestAuditDataOwner::class
+            $this->getUrl('oro_api_get_audits') . '?objectClass=' . TestAuditDataOwner::class
         );
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeJson();
@@ -510,7 +510,7 @@ class AuditControllerTest extends WebTestCase
 
         $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_audits').'?objectClass<>'.TestAuditDataOwner::class
+            $this->getUrl('oro_api_get_audits') . '?objectClass<>' . TestAuditDataOwner::class
         );
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeJson();
@@ -556,7 +556,7 @@ class AuditControllerTest extends WebTestCase
 
         $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_audits').'?user='.$user->getId()
+            $this->getUrl('oro_api_get_audits') . '?user=' . $user->getId()
         );
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeJson();
@@ -584,7 +584,7 @@ class AuditControllerTest extends WebTestCase
 
         $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_audits').'?user=0'
+            $this->getUrl('oro_api_get_audits') . '?user=0'
         );
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeJson();

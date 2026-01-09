@@ -36,7 +36,8 @@ class NormalizeEntityId implements ProcessorInterface
             return;
         }
 
-        if (ExtendHelper::isOutdatedEnumOptionEntity($context->getClassName())
+        if (
+            ExtendHelper::isOutdatedEnumOptionEntity($context->getClassName())
             && !ExtendHelper::isInternalEnumId($entityId)
         ) {
             // an enum entity identifier is already normalized

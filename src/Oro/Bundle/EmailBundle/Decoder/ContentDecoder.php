@@ -32,7 +32,7 @@ class ContentDecoder
         }
         if (!empty($fromEncoding) && !empty($toEncoding) && strtolower($fromEncoding) !== strtolower($toEncoding)) {
             // Added additional option to avoid `illegal character` iconv decoding error
-            $toEncodingIconv = $toEncoding.'//TRANSLIT//IGNORE';
+            $toEncodingIconv = $toEncoding . '//TRANSLIT//IGNORE';
             // work around for php-8.1.6-1.el8.remi iconv library version => 2.28
             // with iconv library version => 2.35 should be reverted
             if (Windows1250::isSupported($toEncoding, $fromEncoding)) {

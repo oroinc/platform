@@ -40,7 +40,8 @@ class FileConfigType extends AbstractType
                 $entityConfig = $this->configManager
                     ->getProvider('extend')
                     ->getConfig($fieldConfigId->getClassName());
-                if ($entityConfig->is('state', ExtendScope::STATE_ACTIVE)
+                if (
+                    $entityConfig->is('state', ExtendScope::STATE_ACTIVE)
                     && !$this->hasRelation($entityConfig, $this->getRelationKey($fieldConfigId))
                 ) {
                     $entityConfig->set('state', ExtendScope::STATE_UPDATE);

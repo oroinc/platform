@@ -29,7 +29,8 @@ class ErrorHandler extends BaseErrorHandler
             }
 
             // silence deprecation from ReflectionType::__toString()
-            if (str_contains($message, 'Function ReflectionType::__toString() is deprecated')
+            if (
+                str_contains($message, 'Function ReflectionType::__toString() is deprecated')
                 || str_contains($message, 'a ? b : c ? d : e')
             ) {
                 return true;

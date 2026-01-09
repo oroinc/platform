@@ -46,12 +46,12 @@ class PinbarTabUrlNormalizerTest extends TestCase
             ],
             'with datagrid parameters' => [
                 'url' => '/sample-url?grid%5Busers-grid%5D=i%3D1%26p%3D25%26s%255Busername%255D%3D-1%26f%255Benabled'
-                    .'%255D%255Bvalue%255D%3D1%26c%3DfirstName1.lastName1.email1.username1.enabled0.auth_status1.'
-                    .'createdAt1.updatedAt1.tags1%26v%3Duser.active%26a%3Dgrid%26g%255BoriginalRoute%255D%3D'
-                    .'oro_user_index&b=extra-parameter',
+                    . '%255D%255Bvalue%255D%3D1%26c%3DfirstName1.lastName1.email1.username1.enabled0.auth_status1.'
+                    . 'createdAt1.updatedAt1.tags1%26v%3Duser.active%26a%3Dgrid%26g%255BoriginalRoute%255D%3D'
+                    . 'oro_user_index&b=extra-parameter',
                 'expectedUrl' => '/sample-url?b=extra-parameter&grid%5Busers-grid%5D=a%3Dgrid%26c%3DfirstName1.'
-                    .'lastName1.email1.username1.enabled0.auth_status1.createdAt1.updatedAt1.tags1%26f%255Benabled'
-                    .'%255D%255Bvalue%255D%3D1%26g%255BoriginalRoute%255D%3Doro_user_index%26i%3D1%26p%3D25%26s%255B'.
+                    . 'lastName1.email1.username1.enabled0.auth_status1.createdAt1.updatedAt1.tags1%26f%255Benabled'
+                    . '%255D%255Bvalue%255D%3D1%26g%255BoriginalRoute%255D%3Doro_user_index%26i%3D1%26p%3D25%26s%255B' .
                     'username%255D%3D-1%26v%3Duser.active',
             ],
             'with invalid datagrid parameters' => [

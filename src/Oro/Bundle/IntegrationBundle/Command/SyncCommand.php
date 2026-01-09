@@ -144,7 +144,7 @@ HELP
 
             // check if the integration job with `new` or `in progress` status already exists.
             // Temporary solution. should be refacored during BAP-14803.
-            $jobName = 'oro_integration:sync_integration:'.$integration->getId();
+            $jobName = 'oro_integration:sync_integration:' . $integration->getId();
             $existingJob = $this->jobProcessor->findNotStaleRootJobyJobNameAndStatuses(
                 $jobName,
                 [Job::STATUS_NEW, Job::STATUS_RUNNING]

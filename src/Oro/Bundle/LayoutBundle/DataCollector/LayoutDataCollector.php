@@ -190,8 +190,10 @@ class LayoutDataCollector extends DataCollector
 
     private function getDataByBlock(string $contextHash, string $blockId): mixed
     {
-        if (isset($this->dataByBlock[$contextHash])
-            && array_key_exists($blockId, $this->dataByBlock[$contextHash])) {
+        if (
+            isset($this->dataByBlock[$contextHash])
+            && array_key_exists($blockId, $this->dataByBlock[$contextHash])
+        ) {
             $data = $this->dataByBlock[$contextHash][$blockId];
         } else {
             $data = ['id' => $blockId, 'visible' => false];

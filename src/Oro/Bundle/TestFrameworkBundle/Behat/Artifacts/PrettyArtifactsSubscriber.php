@@ -18,10 +18,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class PrettyArtifactsSubscriber implements EventSubscriberInterface
 {
-    protected bool                $isOutline = false;
-    protected OutputPrinter       $printer;
+    protected bool $isOutline = false;
+    protected OutputPrinter $printer;
     protected ScreenshotGenerator $screenshotGenerator;
-    private Mink                  $mink;
+    private Mink $mink;
 
     public function __construct(
         NodeEventListeningFormatter $formatter,
@@ -67,7 +67,8 @@ class PrettyArtifactsSubscriber implements EventSubscriberInterface
          * and went to another page, get an alert.
          * Since the alert blocks this beforeStep, the cursor is not fixed for such steps.
          * */
-        if (str_contains($scope->getStep()->getText(), 'should see alert with message')
+        if (
+            str_contains($scope->getStep()->getText(), 'should see alert with message')
             || str_contains($scope->getStep()->getText(), 'accept alert')
         ) {
             return;

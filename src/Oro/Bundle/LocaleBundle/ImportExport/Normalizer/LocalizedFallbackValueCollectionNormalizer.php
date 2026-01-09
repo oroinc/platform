@@ -120,8 +120,10 @@ class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
 
     protected function getLocalization(string $localizationName): ?Localization
     {
-        if ($localizationName !== LocalizationCodeFormatter::DEFAULT_LOCALIZATION
-            && !array_key_exists($localizationName, $this->localizations)) {
+        if (
+            $localizationName !== LocalizationCodeFormatter::DEFAULT_LOCALIZATION
+            && !array_key_exists($localizationName, $this->localizations)
+        ) {
             $this->localizations[$localizationName] = clone $this->localization;
             $this->localizations[$localizationName]->setName($localizationName);
         }

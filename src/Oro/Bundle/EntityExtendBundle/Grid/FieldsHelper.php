@@ -80,7 +80,8 @@ class FieldsHelper
      */
     protected function isApplicableField(ConfigInterface $extendConfig, ConfigInterface $fieldConfig)
     {
-        if ($extendConfig->has('target_entity')
+        if (
+            $extendConfig->has('target_entity')
             && !$this->featureChecker->isResourceEnabled($extendConfig->get('target_entity'), 'entities')
         ) {
             return false;

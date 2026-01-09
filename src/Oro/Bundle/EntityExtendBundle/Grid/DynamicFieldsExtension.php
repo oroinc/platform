@@ -88,7 +88,8 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
     protected function prepareColumnOptions(FieldConfigId $field, array &$columnOptions): void
     {
         parent::prepareColumnOptions($field, $columnOptions);
-        if ($this->getFieldConfig('datagrid', $field)->is('show_filter')
+        if (
+            $this->getFieldConfig('datagrid', $field)->is('show_filter')
             || (ExtendHelper::isEnumerableType($field->getFieldType())
                 && $this->getFieldConfig('datagrid', $field)->is('is_visible'))
         ) {

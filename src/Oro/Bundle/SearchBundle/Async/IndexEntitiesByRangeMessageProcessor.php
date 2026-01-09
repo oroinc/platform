@@ -75,10 +75,10 @@ class IndexEntitiesByRangeMessageProcessor implements MessageProcessorInterface,
             $repository = $em->getRepository($payload['entityClass']);
 
             $ids = $repository->createQueryBuilder('ids')
-                ->select('ids.'.$identifierFieldName)
+                ->select('ids.' . $identifierFieldName)
                 ->setFirstResult($payload['offset'])
                 ->setMaxResults($payload['limit'])
-                ->orderBy('ids.'.$identifierFieldName, 'ASC')
+                ->orderBy('ids.' . $identifierFieldName, 'ASC')
                 ->getQuery()->getArrayResult()
             ;
             $ids = array_map('current', $ids);

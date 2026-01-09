@@ -112,7 +112,7 @@ class CurrentStepNameIsEqualTest extends TestCase
         ]);
         $result = $this->condition->toArray();
 
-        $key = '@'.CurrentStepNameIsEqual::NAME;
+        $key = '@' . CurrentStepNameIsEqual::NAME;
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey($key, $result);

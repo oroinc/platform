@@ -9,6 +9,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 /**
  * Data transformer for security-sensitive data.
+ * See BB-9260 and BAP-14664
  */
 class CryptedDataTransformer implements DataTransformerInterface, LoggerAwareInterface
 {

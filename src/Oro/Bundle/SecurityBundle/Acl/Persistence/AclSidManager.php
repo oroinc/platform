@@ -58,7 +58,6 @@ class AclSidManager extends AbstractAclManager
                 /**
                  * Marking removed Role as Disabled instead of delete, because straight deleting role identity breaks
                  * ace indexes
-                 * TODO: Create a job to remove marked role identities and rebuild ace indexes
                  */
                 $disabledSid = new RoleSecurityIdentity($sid->getRole() . uniqid(self::ROLE_DISABLED_FLAG));
                 $this->aclProvider->updateSecurityIdentity($disabledSid, $sid->getRole());

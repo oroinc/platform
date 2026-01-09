@@ -39,7 +39,8 @@ class PreviousFilterDateRangeConverter extends FilterDateRangeConverter
                 );
             }
 
-            if (AbstractDateFilterType::TYPE_LESS_THAN !== $currentDateRange['type']
+            if (
+                AbstractDateFilterType::TYPE_LESS_THAN !== $currentDateRange['type']
                 && $currentDateRange['start']
                 && $currentDateRange['end']
             ) {

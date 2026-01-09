@@ -41,8 +41,7 @@ class IndexMetadataBuilder implements MetadataBuilderInterface
     {
         $className = $extendConfig->getId()->getClassName();
         $indices   = $extendConfig->get('index');
-        // Should be changed to fieldName => columnName
-        // in scope https://magecore.atlassian.net/browse/BAP-3940
+        // see BAP-3940
         foreach ($indices as $columnName => $indexType) {
             $fieldConfig = $this->extendConfigProvider->getConfig($className, $columnName);
             if (\is_a(Type::getType($fieldConfig->getId()->getFieldType()), JsonType::class, true)) {

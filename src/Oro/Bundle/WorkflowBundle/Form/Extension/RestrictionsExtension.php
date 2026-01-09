@@ -49,7 +49,8 @@ class RestrictionsExtension extends AbstractTypeExtension
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        if ($options['disable_workflow_restrictions'] ||
+        if (
+            $options['disable_workflow_restrictions'] ||
             empty($options['data_class']) ||
             !$this->restrictionsManager->hasEntityClassRestrictions($options['data_class'])
         ) {

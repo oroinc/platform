@@ -69,7 +69,8 @@ class FiltersParserContext
      */
     public function checkBeginGroup()
     {
-        if ($this->lastTokenType !== self::NONE_TOKEN &&
+        if (
+            $this->lastTokenType !== self::NONE_TOKEN &&
             $this->lastTokenType !== self::OPERATOR_TOKEN &&
             $this->lastTokenType !== self::BEGIN_GROUP_TOKEN
         ) {
@@ -82,7 +83,8 @@ class FiltersParserContext
      */
     public function checkEndGroup()
     {
-        if ($this->lastTokenType !== self::FILTER_TOKEN &&
+        if (
+            $this->lastTokenType !== self::FILTER_TOKEN &&
             $this->lastTokenType !== self::END_GROUP_TOKEN
         ) {
             $this->throwInvalidFiltersException('unexpected end of group');
@@ -94,7 +96,8 @@ class FiltersParserContext
      */
     public function checkOperator($operator)
     {
-        if ($this->lastTokenType !== self::FILTER_TOKEN &&
+        if (
+            $this->lastTokenType !== self::FILTER_TOKEN &&
             $this->lastTokenType !== self::END_GROUP_TOKEN
         ) {
             $this->throwInvalidFiltersException(
@@ -108,7 +111,8 @@ class FiltersParserContext
      */
     public function checkFilter($filter)
     {
-        if ($this->lastTokenType !== self::NONE_TOKEN &&
+        if (
+            $this->lastTokenType !== self::NONE_TOKEN &&
             $this->lastTokenType !== self::OPERATOR_TOKEN &&
             $this->lastTokenType !== self::BEGIN_GROUP_TOKEN
         ) {

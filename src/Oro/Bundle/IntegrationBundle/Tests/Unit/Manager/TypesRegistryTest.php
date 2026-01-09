@@ -99,7 +99,7 @@ class TypesRegistryTest extends TestCase
         $expectedIntegrationType = 'someType';
 
         $this->typesRegistry->addConnectorType(
-            $expectedIntegrationType.'Type',
+            $expectedIntegrationType . 'Type',
             $expectedIntegrationType,
             $this->createMock(ConnectorInterface::class)
         );

@@ -313,9 +313,11 @@ class ExtendConfigDumper
         if ($fieldConfig->is('is_extend')) {
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $fieldConfig->getId();
-            if ($fieldConfig->get('state') === ExtendScope::STATE_DELETE &&
+            if (
+                $fieldConfig->get('state') === ExtendScope::STATE_DELETE &&
                 $reflectionEntityClass &&
-                !$reflectionEntityClass->hasProperty($fieldConfigId->getFieldName())) {
+                !$reflectionEntityClass->hasProperty($fieldConfigId->getFieldName())
+            ) {
                 return;
             }
             $fieldName = $fieldConfigId->getFieldName();
@@ -441,9 +443,11 @@ class ExtendConfigDumper
             $isDeleted = $fieldConfig ? $fieldConfig->is('is_deleted') : false;
             if (!isset($relationProperties[$fieldName])) {
                 $relationProperties[$fieldName] = [];
-                if ($fieldConfig && $fieldConfig->get('state') === ExtendScope::STATE_DELETE
+                if (
+                    $fieldConfig && $fieldConfig->get('state') === ExtendScope::STATE_DELETE
                     && $reflectionEntityClass
-                    && !$reflectionEntityClass->hasProperty($fieldId->getFieldName())) {
+                    && !$reflectionEntityClass->hasProperty($fieldId->getFieldName())
+                ) {
                     continue;
                 }
                 if ($isDeleted) {

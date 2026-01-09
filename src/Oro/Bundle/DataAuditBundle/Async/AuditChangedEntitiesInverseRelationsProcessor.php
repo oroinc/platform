@@ -102,7 +102,8 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
             }
 
             foreach ($sourceEntityData['change_set'] as $sourceFieldName => $sourceChange) {
-                if (!$sourceEntityMeta->hasField($sourceFieldName) &&
+                if (
+                    !$sourceEntityMeta->hasField($sourceFieldName) &&
                     !$sourceEntityMeta->hasAssociation($sourceFieldName)
                 ) {
                     continue;
@@ -250,7 +251,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
         }
 
         $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
-        $change[1]['inserted'][$sourceEntityClass.$sourceEntityId] = [
+        $change[1]['inserted'][$sourceEntityClass . $sourceEntityId] = [
             'entity_class' => $sourceEntityClass,
             'entity_id' => $sourceEntityId,
             'change_set' => $this->getChangeSetFromMap($map, $sourceEntityClass, $sourceEntityId),
@@ -276,7 +277,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
         }
 
         $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
-        $change[0]['deleted'][$sourceEntityClass.$sourceEntityId] = [
+        $change[0]['deleted'][$sourceEntityClass . $sourceEntityId] = [
             'entity_class' => $sourceEntityClass,
             'entity_id' => $sourceEntityId,
             'change_set' => $this->getChangeSetFromMap($map, $sourceEntityClass, $sourceEntityId),

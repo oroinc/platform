@@ -55,7 +55,8 @@ class UpdateExtendEntityEnumFieldsMigration implements Migration, ConnectionAwar
                     $fieldConfig['data'],
                     'array'
                 );
-                if (!isset($fieldConfigData['enum']['enum_code'])
+                if (
+                    !isset($fieldConfigData['enum']['enum_code'])
                     || !isset($fieldConfigData['extend']['target_entity'])
                 ) {
                     continue;
@@ -151,7 +152,8 @@ class UpdateExtendEntityEnumFieldsMigration implements Migration, ConnectionAwar
                 continue;
             }
             foreach ($serializedOptions as $serializedOption) {
-                if (ExtendHelper::buildEnumOptionId($fieldConfig['data']['enum']['enum_code'], $targetValue)
+                if (
+                    ExtendHelper::buildEnumOptionId($fieldConfig['data']['enum']['enum_code'], $targetValue)
                     !== $serializedOption['id']
                 ) {
                     continue;

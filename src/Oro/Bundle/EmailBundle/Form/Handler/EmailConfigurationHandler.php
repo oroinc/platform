@@ -23,7 +23,8 @@ class EmailConfigurationHandler
 
     public function process(ConfigManager $manager, ConfigChangeSet $changeSet, FormInterface $form): void
     {
-        if (!$changeSet->isChanged('oro_email.smtp_settings_host')
+        if (
+            !$changeSet->isChanged('oro_email.smtp_settings_host')
             && !$changeSet->isChanged('oro_email.smtp_settings_port')
             && !$changeSet->isChanged('oro_email.smtp_settings_encryption')
             && !$changeSet->isChanged('oro_email.smtp_settings_username')

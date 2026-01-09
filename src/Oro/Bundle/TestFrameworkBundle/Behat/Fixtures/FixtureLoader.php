@@ -132,7 +132,8 @@ class FixtureLoader
             if (!$em->contains($object)) {
                 $metadata = $em->getClassMetadata(\get_class($object));
 
-                if (count($metadata->getIdentifier()) === 1
+                if (
+                    count($metadata->getIdentifier()) === 1
                     && $metadata->getSingleIdReflectionProperty()->getValue($object)
                 ) {
                     $metadata->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_NONE);
@@ -161,7 +162,7 @@ class FixtureLoader
         list($bundleName, $filename) = explode(':', $filename);
         $bundlePath = $bundleName !== 'app'
             ? $this->kernel->getBundle($bundleName)->getPath()
-            : $this->kernel->getProjectDir().DIRECTORY_SEPARATOR.'src';
+            : $this->kernel->getProjectDir() . DIRECTORY_SEPARATOR . 'src';
         $suitePaths = [sprintf('%s%sTests%2$sBehat%2$sFeatures', $bundlePath, DIRECTORY_SEPARATOR)];
 
         if (!$file = $this->findFileInPath($filename, $suitePaths)) {
@@ -178,7 +179,7 @@ class FixtureLoader
     private function findFileInPath(string $filename, array $paths): ?string
     {
         foreach ($paths as $path) {
-            $file = $path.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$filename;
+            $file = $path . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . $filename;
             if (is_file($file)) {
                 return $file;
             }

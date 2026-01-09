@@ -22,7 +22,7 @@ class ExtendClassLoadingUtils
      */
     public static function getEntityBaseCacheDir(string $cacheDir): string
     {
-        return $cacheDir . DIRECTORY_SEPARATOR . 'oro_entities' . DIRECTORY_SEPARATOR. 'Extend';
+        return $cacheDir . DIRECTORY_SEPARATOR . 'oro_entities' . DIRECTORY_SEPARATOR . 'Extend';
     }
 
     /**

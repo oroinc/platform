@@ -73,7 +73,8 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     {
         try {
             $propertyPath = $this->getMappedPath($name);
-            if ($changeModified &&
+            if (
+                $changeModified &&
                 (!$this->has($name) || $this->propertyAccessor->getValue($this->data, $propertyPath) !== $value)
             ) {
                 $this->modified = true;

@@ -14,7 +14,7 @@ class NoTags extends Constraint
     #[\Override]
     public function validatedBy(): string
     {
-        return get_class($this).'Validator';
+        return get_class($this) . 'Validator';
     }
 
     #[\Override]

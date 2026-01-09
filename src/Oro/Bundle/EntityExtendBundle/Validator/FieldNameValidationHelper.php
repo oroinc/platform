@@ -58,7 +58,8 @@ class FieldNameValidationHelper
                 continue;
             }
 
-            if ($normalizedFieldName === $this->normalizeFieldName($fieldName)
+            if (
+                $normalizedFieldName === $this->normalizeFieldName($fieldName)
                 && !$config->is('is_deleted')
                 && !$config->is('state', ExtendScope::STATE_DELETE)
             ) {
@@ -112,7 +113,8 @@ class FieldNameValidationHelper
     public function getSimilarExistingFieldData(string $className, string $fieldName, bool $isAttribute = false): array
     {
         $fieldConfig = $this->findFieldConfig($className, $fieldName);
-        if ($fieldConfig
+        if (
+            $fieldConfig
             && $this->hasFieldNameConflict($fieldName, $fieldConfig, $fieldConfig->getId()->getFieldName())
         ) {
             /** @var FieldConfigId $id */
@@ -166,7 +168,8 @@ class FieldNameValidationHelper
         if (strtolower($newFieldName) === strtolower($existingFieldName)) {
             return true;
         }
-        if ($this->normalizeFieldName($newFieldName) === $this->normalizeFieldName($existingFieldName)
+        if (
+            $this->normalizeFieldName($newFieldName) === $this->normalizeFieldName($existingFieldName)
             && !$existingFieldConfig->is('is_deleted')
             && !$existingFieldConfig->is('state', ExtendScope::STATE_DELETE)
         ) {

@@ -46,9 +46,11 @@ class ReflectionExtractor extends BasicReflectionExtractor
     {
         $info = parent::getReadInfo($class, $property, $context);
 
-        if ($info === null ||
+        if (
+            $info === null ||
             $info->getType() !== PropertyWriteInfo::TYPE_PROPERTY ||
-            !is_subclass_of($class, ExtendEntityInterface::class)) {
+            !is_subclass_of($class, ExtendEntityInterface::class)
+        ) {
             return $info;
         }
 
@@ -77,9 +79,11 @@ class ReflectionExtractor extends BasicReflectionExtractor
     public function getWriteInfo(string $class, string $property, array $context = []): ?PropertyWriteInfo
     {
         $info = parent::getWriteInfo($class, $property, $context);
-        if ($info === null ||
+        if (
+            $info === null ||
             $info->getType() !== PropertyWriteInfo::TYPE_PROPERTY ||
-            !is_subclass_of($class, ExtendEntityInterface::class)) {
+            !is_subclass_of($class, ExtendEntityInterface::class)
+        ) {
             return $info;
         }
 

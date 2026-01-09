@@ -61,7 +61,8 @@ class LocalizedValueRenderListener
 
         if ($originalValue instanceof AddressInterface) {
             $fieldValueEvent->setConvertedValue($this->addressFormatter->format($originalValue));
-        } elseif ($originalValue instanceof NamePrefixInterface ||
+        } elseif (
+            $originalValue instanceof NamePrefixInterface ||
             $originalValue instanceof FirstNameInterface ||
             $originalValue instanceof MiddleNameInterface ||
             $originalValue instanceof LastNameInterface ||

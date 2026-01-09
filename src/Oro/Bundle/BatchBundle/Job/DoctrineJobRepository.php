@@ -48,7 +48,8 @@ class DoctrineJobRepository implements JobRepositoryInterface
         $jobManager = $this->getJobManager();
 
         $jobInstance = $jobExecution->getJobInstance();
-        if ($jobInstance->getId()
+        if (
+            $jobInstance->getId()
             && UnitOfWork::STATE_DETACHED === $jobManager->getUnitOfWork()->getEntityState($jobInstance)
         ) {
             $jobInstance = $jobManager->merge($jobInstance);
@@ -65,7 +66,8 @@ class DoctrineJobRepository implements JobRepositoryInterface
     public function updateStepExecution(StepExecution $stepExecution): StepExecution
     {
         $jobManager = $this->getJobManager();
-        if ($stepExecution->getId()
+        if (
+            $stepExecution->getId()
             && UnitOfWork::STATE_DETACHED === $jobManager->getUnitOfWork()->getEntityState($stepExecution)
         ) {
             $stepExecution = $jobManager->merge($stepExecution);
@@ -79,7 +81,8 @@ class DoctrineJobRepository implements JobRepositoryInterface
          * persist operations".
          */
         $jobExecution = $stepExecution->getJobExecution();
-        if ($jobExecution->getId()
+        if (
+            $jobExecution->getId()
             && UnitOfWork::STATE_DETACHED === $jobManager->getUnitOfWork()->getEntityState($jobExecution)
         ) {
             $this->updateJobExecution($jobExecution);

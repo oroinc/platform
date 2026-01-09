@@ -59,7 +59,8 @@ class HasRunningWorkflowFromRecordGroup extends AbstractCondition implements Con
         }
         foreach ($runningWorkflowNames as $workflowName) {
             $workflow = $this->getWorkflow($workflowName);
-            if (null !== $workflow
+            if (
+                null !== $workflow
                 && \in_array($this->groupName, $workflow->getDefinition()->getExclusiveRecordGroups(), true)
             ) {
                 return true;

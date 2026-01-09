@@ -34,7 +34,8 @@ class AddOrderLineItemsToOrder implements ProcessorInterface
         }
 
         foreach ($includedEntities as $entity) {
-            if ($entity instanceof TestOrderLineItem
+            if (
+                $entity instanceof TestOrderLineItem
                 && $entity->getOrder() === $order
                 && !$order->getLineItems()->contains($entity)
             ) {

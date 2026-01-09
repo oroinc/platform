@@ -141,7 +141,8 @@ class MenuExtension extends AbstractExtension implements ServiceSubscriberInterf
                 }
             );
 
-            if (count($filteredChildren) === count($invisibleChildren)
+            if (
+                count($filteredChildren) === count($invisibleChildren)
                 && (!$item->getUri() || $item->getUri() === '#')
             ) {
                 $item->setExtra('isAllowed', false);

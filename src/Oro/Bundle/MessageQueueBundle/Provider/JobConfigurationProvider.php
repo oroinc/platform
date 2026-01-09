@@ -38,7 +38,8 @@ class JobConfigurationProvider implements JobConfigurationProviderInterface
      */
     private function checkKeyByJobNameOrItsPart($jobName)
     {
-        if (isset($this->configuration[self::JOBS_ARRAY_KEY][$jobName])
+        if (
+            isset($this->configuration[self::JOBS_ARRAY_KEY][$jobName])
             && $this->configuration[self::JOBS_ARRAY_KEY][$jobName]
         ) {
             return $this->configuration[self::JOBS_ARRAY_KEY][$jobName];

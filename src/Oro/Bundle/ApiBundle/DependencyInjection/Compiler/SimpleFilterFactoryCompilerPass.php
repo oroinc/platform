@@ -50,7 +50,8 @@ class SimpleFilterFactoryCompilerPass implements CompilerPassInterface
         $factoryClass = $container->getDefinition($factoryServiceId)->getClass();
         $factoryClass = $container->getParameterBag()->resolveValue($factoryClass);
         $refl = new \ReflectionClass($factoryClass);
-        if (!$refl->hasMethod($factoryMethod)
+        if (
+            !$refl->hasMethod($factoryMethod)
             || !$refl->getMethod($factoryMethod)->isPublic()
             || 1 !== $refl->getMethod($factoryMethod)->getNumberOfParameters()
         ) {

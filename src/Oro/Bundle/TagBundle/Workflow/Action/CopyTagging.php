@@ -43,7 +43,8 @@ class CopyTagging extends AbstractAction
             throw new InvalidParameterException('Source must be valid property definition');
         }
 
-        if (!empty($options[static::PATH_DESTINATION]) &&
+        if (
+            !empty($options[static::PATH_DESTINATION]) &&
             !$options[static::PATH_DESTINATION] instanceof PropertyPathInterface
         ) {
             throw new InvalidParameterException('Destination must be valid property definition');
@@ -75,7 +76,8 @@ class CopyTagging extends AbstractAction
      */
     protected function getOrganization($context)
     {
-        if (empty($this->options[static::PATH_ORGANIZATION]) ||
+        if (
+            empty($this->options[static::PATH_ORGANIZATION]) ||
             !$this->options[static::PATH_ORGANIZATION] instanceof PropertyPathInterface
         ) {
             return null;

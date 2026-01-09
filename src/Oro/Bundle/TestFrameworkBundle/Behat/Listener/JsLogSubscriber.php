@@ -42,7 +42,7 @@ class JsLogSubscriber implements EventSubscriberInterface
     {
         $this->mink = $mink;
         $this->logDir = $logDir;
-        $this->logFile = $this->logDir.DIRECTORY_SEPARATOR.'behat_'.LogType::BROWSER.'.log';
+        $this->logFile = $this->logDir . DIRECTORY_SEPARATOR . 'behat_' . LogType::BROWSER . '.log';
     }
 
     #[\Override]
@@ -111,7 +111,7 @@ class JsLogSubscriber implements EventSubscriberInterface
 
         foreach ($content as $item) {
             $time = isset($item['timestamp'])
-                ? '@'.round($item['timestamp'] / 1000)
+                ? '@' . round($item['timestamp'] / 1000)
                 : 'now';
             $dateTime = new \DateTime($time);
             $level = isset($item['level'])

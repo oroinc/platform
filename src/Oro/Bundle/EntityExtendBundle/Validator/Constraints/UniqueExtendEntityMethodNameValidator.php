@@ -60,7 +60,8 @@ class UniqueExtendEntityMethodNameValidator extends AbstractFieldValidator
         }
 
         $realRelationType = $this->fieldTypeHelper->getUnderlyingType($value->getType());
-        if ($this->hasAtLeastOneMethod($className, $fieldName, ClassMethodNameChecker::$getters)
+        if (
+            $this->hasAtLeastOneMethod($className, $fieldName, ClassMethodNameChecker::$getters)
             || $this->hasAtLeastOneMethod($className, $fieldName, ClassMethodNameChecker::$setters)
             || (
                 in_array($realRelationType, RelationType::$anyToAnyRelations, true)

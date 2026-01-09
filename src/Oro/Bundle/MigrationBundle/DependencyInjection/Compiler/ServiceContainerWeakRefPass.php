@@ -40,7 +40,8 @@ class ServiceContainerWeakRefPass implements CompilerPassInterface
         $definitions = $container->getDefinitions();
 
         foreach ($definitions as $id => $definition) {
-            if ($id && '.' !== $id[0]
+            if (
+                $id && '.' !== $id[0]
                 && (!$definition->isPublic() || $definition->isPrivate())
                 && !$definition->getErrors()
                 && !$definition->isAbstract()
@@ -63,7 +64,8 @@ class ServiceContainerWeakRefPass implements CompilerPassInterface
                 while (isset($aliases[$target = (string) $alias])) {
                     $alias = $aliases[$target];
                 }
-                if (isset($definitions[$target])
+                if (
+                    isset($definitions[$target])
                     && !$definitions[$target]->getErrors()
                     && !$definitions[$target]->isAbstract()
                 ) {

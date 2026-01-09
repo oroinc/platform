@@ -74,7 +74,8 @@ final class LoadCustomAssociationUtil
             /** @var FilterFieldsConfigExtra $filterFieldsConfigExtra */
             $filterFieldsConfigExtra = $configExtras[$i];
             $fieldFilters = $filterFieldsConfigExtra->getFieldFilters();
-            if (!\array_key_exists($parentClassName, $fieldFilters)
+            if (
+                !\array_key_exists($parentClassName, $fieldFilters)
                 || !\in_array($associationName, $fieldFilters[$parentClassName] ?? [], true)
             ) {
                 $fieldFilters[$parentClassName][] = $associationName;

@@ -125,7 +125,8 @@ abstract class AbstractStatusCalculator
             } else {
                 $status = Job::STATUS_SUCCESS;
             }
-        } elseif ($statusCountList['running'] ||
+        } elseif (
+            $statusCountList['running'] ||
             $statusCountList['cancelled'] ||
             $statusCountList['failed'] ||
             $statusCountList['success'] ||

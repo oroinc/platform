@@ -25,7 +25,8 @@ class WidgetSortByConverter extends ConfigValueConverterAbstract
     #[\Override]
     public function getViewValue(mixed $value): mixed
     {
-        if (empty($value['property'])
+        if (
+            empty($value['property'])
             || !$this->entityConfigProvider->hasConfig($value['className'], $value['property'])
         ) {
             return null;

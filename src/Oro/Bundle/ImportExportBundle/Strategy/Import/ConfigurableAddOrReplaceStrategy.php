@@ -147,7 +147,8 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         // find and cache existing or new entity
         $existingEntity = $this->findExistingEntity($entity, $searchContext);
         if ($existingEntity) {
-            if (!$entityIsRelation
+            if (
+                !$entityIsRelation
                 && !$this->isPermissionGrantedForEntity('EDIT', $existingEntity, $entityClass)
             ) {
                 return null;
@@ -611,7 +612,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      */
     protected function isEntityFieldFallbackValue(string $className, string $fieldName): bool
     {
-        $key = $className.'::'.$fieldName;
+        $key = $className . '::' . $fieldName;
         if (array_key_exists($key, $this->isEntityFieldFallbackValue)) {
             return (bool)$this->isEntityFieldFallbackValue[$key];
         }

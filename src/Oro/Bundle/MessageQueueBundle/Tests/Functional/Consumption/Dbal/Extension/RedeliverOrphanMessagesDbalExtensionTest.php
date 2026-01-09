@@ -40,7 +40,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
         $dbal = $connection->getDBALConnection();
 
         $pidDir = $this->getTempDir('message-queue');
-        file_put_contents($pidDir.'/consumer-id.pid', '123456');
+        file_put_contents($pidDir . '/consumer-id.pid', '123456');
 
         $dbal->insert(self::TABLE_NAME, [
             'consumer_id' => 'consumer-id',

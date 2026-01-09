@@ -24,17 +24,15 @@ class SuiteDividerController implements Controller
     #[\Override]
     public function configure(SymfonyCommand $command)
     {
-        $command
-            ->addOption(
-                '--suite-divider',
-                '-sd',
-                InputOption::VALUE_REQUIRED,
-                'Divide suite to several.'.PHP_EOL.
-                'e.g. if AcmeDemo suite has 13 features, and suites-divider is 5, so 3 suites will be created'.PHP_EOL.
-                'AcmeDemo#1 with 5 features, and AcmeDemo#2 and AcmeDemo#3 suites with 4 features'.PHP_EOL.
-                'Original AcmeDemo suite will be excluded from list.'
-            )
-        ;
+        $command->addOption(
+            '--suite-divider',
+            '-sd',
+            InputOption::VALUE_REQUIRED,
+            'Divide suite to several.' . PHP_EOL
+            . 'e.g. if AcmeDemo suite has 13 features, and suites-divider is 5, so 3 suites will be created' . PHP_EOL
+            . 'AcmeDemo#1 with 5 features, and AcmeDemo#2 and AcmeDemo#3 suites with 4 features' . PHP_EOL
+            . 'Original AcmeDemo suite will be excluded from list.'
+        );
     }
 
     #[\Override]

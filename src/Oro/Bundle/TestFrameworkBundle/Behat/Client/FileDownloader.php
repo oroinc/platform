@@ -59,7 +59,7 @@ class FileDownloader
                 # Property names in Selenium cookie start with a lowercase character, but they start with the uppercase
                 # character in Guzzle, so we can't pass the Selenium cookie to the \GuzzleHttp\Cookie\SetCookie
                 # constructor, and calling setters is more reliable.
-                call_user_func([$setCookie, 'set'.ucfirst($name)], $value);
+                call_user_func([$setCookie, 'set' . ucfirst($name)], $value);
             }
             $cookieJar->setCookie($setCookie);
         }

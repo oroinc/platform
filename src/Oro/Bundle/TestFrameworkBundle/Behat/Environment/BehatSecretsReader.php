@@ -14,8 +14,8 @@ class BehatSecretsReader
 {
     private const CONFIG_FILENAME = '.behat-secrets.yml';
 
-    private static ?BehatSecretsReader $instance      = null;
-    private array                      $configuration = [];
+    private static ?BehatSecretsReader $instance = null;
+    private array $configuration = [];
 
     /**
      * @throws BehatSecretsReaderException

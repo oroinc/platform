@@ -22,7 +22,8 @@ class UpdateDefaultLocalizationFormattingCode extends AbstractFixture
         $enUSLocalization = $manager->getRepository(Localization::class)
             ->findOneBy(['name' => 'English (United States)']);
 
-        if ($defaultLocalization && !$enUSLocalization &&
+        if (
+            $defaultLocalization && !$enUSLocalization &&
             $defaultLocalization->getName() === 'English' && $defaultLocalization->getFormattingCode() === 'en'
         ) {
             $defaultLocalization->setFormattingCode('en_US');

@@ -15,7 +15,7 @@ class CommandRunner implements CommandRunnerInterface
 
     public function __construct(string $projectDir, string $environment)
     {
-        $this->commandExecutor = new CommandExecutor($projectDir.'/bin/console', $environment);
+        $this->commandExecutor = new CommandExecutor($projectDir . '/bin/console', $environment);
     }
 
     /**

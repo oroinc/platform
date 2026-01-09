@@ -74,7 +74,8 @@ class ActivityListEntityConfigDumperExtension extends AbstractEntityConfigDumper
 
             $configs = $this->configManager->getProvider('extend')->getConfigs();
             foreach ($configs as $config) {
-                if ($config->is('upgradeable')
+                if (
+                    $config->is('upgradeable')
                     && in_array($config->getId()->getClassName(), $targetEntityClasses)
                 ) {
                     $this->targetEntityConfigs[] = $config;

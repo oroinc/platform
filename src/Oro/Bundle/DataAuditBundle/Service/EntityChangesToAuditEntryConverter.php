@@ -183,8 +183,10 @@ class EntityChangesToAuditEntryConverter
 
             $entityClass = $entityChange['entity_class'];
             $entityId = $entityChange['entity_id'];
-            if (\is_a($entityClass, EnumOptionInterface::class, true) ||
-                !$this->configProvider->isAuditableEntity($entityClass)) {
+            if (
+                \is_a($entityClass, EnumOptionInterface::class, true) ||
+                !$this->configProvider->isAuditableEntity($entityClass)
+            ) {
                 continue;
             }
 

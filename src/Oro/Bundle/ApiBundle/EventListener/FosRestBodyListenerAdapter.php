@@ -25,7 +25,8 @@ class FosRestBodyListenerAdapter implements BodyListenerInterface
     {
         $request = $event->getRequest();
         $methodOverride = $request->headers->get(self::HTTP_METHOD_OVERRIDE_HEADER_NAME);
-        if ($methodOverride
+        if (
+            $methodOverride
             && Request::METHOD_GET === strtoupper($methodOverride)
             && Request::METHOD_POST === $request->getRealMethod()
         ) {

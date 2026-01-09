@@ -24,7 +24,7 @@ class OwnersWidgetProviderFilter implements WidgetProviderFilterInterface
         $alias = QueryBuilderUtil::getSingleRootAlias($queryBuilder, false);
         if ($owners) {
             // check if options are for opportunity_by_status
-            QueryBuilderUtil::applyOptimizedIn($queryBuilder, $alias.'.owner', $owners);
+            QueryBuilderUtil::applyOptimizedIn($queryBuilder, $alias . '.owner', $owners);
         }
     }
 }

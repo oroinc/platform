@@ -138,7 +138,8 @@ abstract class AbstractWorkflowTranslationFieldsIterator implements TranslationF
      */
     private function &transitionAttributeFields(array &$transitionConfig, \ArrayObject $context)
     {
-        if ($this->hasArrayNode('form_options', $transitionConfig)
+        if (
+            $this->hasArrayNode('form_options', $transitionConfig)
             && $this->hasArrayNode('attribute_fields', $transitionConfig['form_options'])
         ) {
             foreach ($transitionConfig['form_options']['attribute_fields'] as $attributeName => &$attributeConfig) {

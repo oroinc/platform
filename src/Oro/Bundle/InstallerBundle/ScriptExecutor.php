@@ -50,8 +50,7 @@ class ScriptExecutor
                 '/@' . self::ORO_SCRIPT_ANNOTATION . '(\(("([\w \-]*)")?\))?/i',
                 file_get_contents($fileName),
                 $tokens
-            )
-            ) {
+            )) {
                 $scriptLabel = count($tokens) === 4 && $tokens[3]
                     ? sprintf('"%s" (%s)', $tokens[3], $fileName)
                     : sprintf('"%s"', $fileName);

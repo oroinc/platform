@@ -93,7 +93,7 @@ class DuplicateQueryAnalyzer
      */
     protected function generateQueryKey($sql, array $parameters)
     {
-        return $this->generateSqlKey($sql).':'.$this->generateParametersKey($parameters);
+        return $this->generateSqlKey($sql) . ':' . $this->generateParametersKey($parameters);
     }
 
     /**

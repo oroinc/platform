@@ -40,7 +40,8 @@ class SetCorsAllowAndExposeHeaders implements ProcessorInterface
         /** @var Context $context */
 
         $responseHeaders = $context->getResponseHeaders();
-        if (!$responseHeaders->has(CorsHeaders::ACCESS_CONTROL_ALLOW_HEADERS)
+        if (
+            !$responseHeaders->has(CorsHeaders::ACCESS_CONTROL_ALLOW_HEADERS)
             && $context->getRequestHeaders()->get(CorsHeaders::ACCESS_CONTROL_REQUEST_METHOD)
         ) {
             $responseHeaders->set(
@@ -68,7 +69,8 @@ class SetCorsAllowAndExposeHeaders implements ProcessorInterface
                 )
             );
         }
-        if ($this->corsSettings->isCredentialsAllowed()
+        if (
+            $this->corsSettings->isCredentialsAllowed()
             && !$responseHeaders->has(CorsHeaders::ACCESS_CONTROL_ALLOW_CREDENTIALS)
         ) {
             $responseHeaders->set(CorsHeaders::ACCESS_CONTROL_ALLOW_CREDENTIALS, 'true');

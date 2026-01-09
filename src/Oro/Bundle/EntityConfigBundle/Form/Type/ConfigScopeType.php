@@ -272,7 +272,8 @@ class ConfigScopeType extends AbstractType
         $exists = false;
         if ($requiredPropertyConfigId->getClassName() === $itemConfigId->getClassName()) {
             if ($requiredPropertyConfigId instanceof FieldConfigId) {
-                if ($itemConfigId instanceof FieldConfigId
+                if (
+                    $itemConfigId instanceof FieldConfigId
                     && $itemConfigId->getFieldName() === $requiredPropertyConfigId->getFieldName()
                 ) {
                     $exists = true;

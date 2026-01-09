@@ -70,12 +70,12 @@ class CollectionField extends Element
         return $this->findAll(
             'css',
             'input:not([type=button])'
-            .':not([type=checkbox])'
-            .':not([type=hidden])'
-            .':not([type=image])'
-            .':not([type=radio])'
-            .':not([type=reset])'
-            .':not([type=submit])'
+            . ':not([type=checkbox])'
+            . ':not([type=hidden])'
+            . ':not([type=image])'
+            . ':not([type=radio])'
+            . ':not([type=reset])'
+            . ':not([type=submit])'
         );
     }
 

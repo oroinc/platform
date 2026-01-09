@@ -37,7 +37,8 @@ class CommentPlaceholderFilter
      */
     public function isApplicable($entity)
     {
-        if (!is_object($entity)
+        if (
+            !is_object($entity)
             || !$this->doctrineHelper->isManageableEntity($entity)
             || !$this->authorizationChecker->isGranted('oro_comment_view')
         ) {

@@ -145,7 +145,7 @@ class TemplateListenerTest extends TestCase
      * @dataProvider controllerDataProviderTemplateString
      */
     public function testOnKernelControllerPathWithTemplateAsString(
-        string   $inputTemplate,
+        string $inputTemplate,
         Template $expectedTemplate
     ): void {
         $this->controlerEvent->setController($this->callable, [Template::class => [$inputTemplate]]);
@@ -176,11 +176,11 @@ class TemplateListenerTest extends TestCase
      * @dataProvider templateDataProviderTemplateAttribute
      */
     public function testOnKernelViewWidgetTemplateWithTemplateAsAttribute(
-        bool     $containerExists,
-        bool     $widgetExists,
+        bool $containerExists,
+        bool $widgetExists,
         Template $inputTemplate,
         Template $expectedTemplate,
-        string   $requestAttribute
+        string $requestAttribute
     ): void {
         $this->request->{$requestAttribute}->set('_widgetContainer', 'container');
         $this->request->attributes->set('_template', $inputTemplate);
@@ -274,11 +274,11 @@ class TemplateListenerTest extends TestCase
      * @dataProvider templateDataProviderTemplateString
      */
     public function testOnKernelViewWidgetTemplateWithTemplateAsString(
-        bool     $containerExists,
-        bool     $widgetExists,
-        string   $inputTemplate,
+        bool $containerExists,
+        bool $widgetExists,
+        string $inputTemplate,
         Template $expectedTemplate,
-        string   $requestAttribute
+        string $requestAttribute
     ): void {
         $this->request->{$requestAttribute}->set('_widgetContainer', 'container');
         $this->request->attributes->set('_template', $inputTemplate);

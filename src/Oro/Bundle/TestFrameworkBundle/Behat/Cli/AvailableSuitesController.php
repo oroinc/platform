@@ -36,7 +36,7 @@ class AvailableSuitesController implements Controller
                 '--available-suites',
                 null,
                 InputOption::VALUE_NONE,
-                'Show all available test suites.'.PHP_EOL.
+                'Show all available test suites.' . PHP_EOL .
                 'Suites can be configured automatically by extensions, and manually by configuration'
             );
     }

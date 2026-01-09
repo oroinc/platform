@@ -147,7 +147,8 @@ class BatchItem
         if ($this->aces !== null) {
             $toRemoveKey = null;
             foreach ($this->aces as $key => $val) {
-                if ($sid->equals($val->getSecurityIdentity())
+                if (
+                    $sid->equals($val->getSecurityIdentity())
                     && $type === $val->getType()
                     && $field === $val->getField()
                     && $granting === $val->isGranting()
@@ -178,7 +179,8 @@ class BatchItem
         if ($this->aces !== null) {
             $toRemoveKeys = array();
             foreach ($this->aces as $key => $val) {
-                if ($sid->equals($val->getSecurityIdentity())
+                if (
+                    $sid->equals($val->getSecurityIdentity())
                     && $type === $val->getType()
                     && $field === $val->getField()
                 ) {

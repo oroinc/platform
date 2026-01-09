@@ -104,7 +104,8 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
                     continue;
                 }
                 if (isset($this->emails[$email])) {
-                    if (isset($this->emails[$email]['user'])
+                    if (
+                        isset($this->emails[$email]['user'])
                         && $userId === $this->emails[$email]['user']
                     ) {
                         return true;
@@ -178,7 +179,8 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
         if (!empty($emailsToLoad)) {
             $this->loadKnownEmailAddresses($emailsToLoad);
             foreach ($emailsToLoad as $email) {
-                if ($this->emails[$email]['known'] &&
+                if (
+                    $this->emails[$email]['known'] &&
                     isset($this->emails[$email]['mailbox']) &&
                     ($this->emails[$email]['mailbox'] === $mailboxId)
                 ) {

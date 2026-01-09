@@ -55,14 +55,16 @@ class BuildTranslationQuery implements ProcessorInterface
     private function isTranslationJoinRequired(Context $context): bool
     {
         $config = $context->getConfig();
-        if ($this->isFieldRequested($config, self::HAS_TRANSLATION_FIELD_NAME)
+        if (
+            $this->isFieldRequested($config, self::HAS_TRANSLATION_FIELD_NAME)
             || $this->isFieldRequested($config, self::TRANSLATED_VALUE_FIELD_NAME)
         ) {
             return true;
         }
 
         $filterValueAccessor = $context->getFilterValues();
-        if ($filterValueAccessor->has(self::HAS_TRANSLATION_FIELD_NAME)
+        if (
+            $filterValueAccessor->has(self::HAS_TRANSLATION_FIELD_NAME)
             || $filterValueAccessor->has(self::TRANSLATED_VALUE_FIELD_NAME)
         ) {
             return true;

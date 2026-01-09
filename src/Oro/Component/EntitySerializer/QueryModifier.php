@@ -83,7 +83,8 @@ class QueryModifier
                 continue;
             }
             $parentFieldExcludedFields = $parentFieldConfig->get(ConfigUtil::EXCLUDED_FIELDS);
-            if (null !== $parentFieldExcludedFields
+            if (
+                null !== $parentFieldExcludedFields
                 && \in_array(substr($propertyPath, $pathDelimiterPos + 1), $parentFieldExcludedFields, true)
             ) {
                 continue;
@@ -140,7 +141,8 @@ class QueryModifier
             $targetEntityClass = $entityMetadata->getAssociationTargetClass($property);
             $targetConfig = $this->configAccessor->getTargetEntity($config, $field);
             $this->updateSelectQueryPart($qb, $alias, $targetEntityClass, $targetConfig, true);
-            if ($isForcePartialLoadEnabled
+            if (
+                $isForcePartialLoadEnabled
                 && !$needToDisableForcePartialLoadHint
                 && $this->hasLeftJoinSingleValuedAssociations(
                     $targetEntityClass,

@@ -247,7 +247,8 @@ class AclRoleHandler
 
         if ($fixValues || $hideDefault) {
             foreach ($sortedPrivileges as $sortedPrivilege) {
-                if ($hideDefault
+                if (
+                    $hideDefault
                     && $sortedPrivilege->getIdentity()->getName() === AclPrivilegeRepository::ROOT_PRIVILEGE_NAME
                 ) {
                     $sortedPrivileges->removeElement($sortedPrivilege);

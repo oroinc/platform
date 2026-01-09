@@ -45,7 +45,8 @@ class EntityConfigListener
         );
 
         // synchronize field state with entity state, when custom field state changed
-        if (isset($changeSet['state'])
+        if (
+            isset($changeSet['state'])
             && $changeSet['state'][1] !== ExtendScope::STATE_ACTIVE
             && $config->is('owner', ExtendScope::OWNER_CUSTOM)
             && $preSetRequireUpdateEvent->isUpdateRequired()

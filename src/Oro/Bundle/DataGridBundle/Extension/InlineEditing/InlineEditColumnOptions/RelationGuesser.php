@@ -21,8 +21,10 @@ class RelationGuesser implements GuesserInterface
     public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)
     {
         $result = [];
-        if (array_key_exists(PropertyInterface::FRONTEND_TYPE_KEY, $column)
-            && $column[PropertyInterface::FRONTEND_TYPE_KEY] === self::RELATION) {
+        if (
+            array_key_exists(PropertyInterface::FRONTEND_TYPE_KEY, $column)
+            && $column[PropertyInterface::FRONTEND_TYPE_KEY] === self::RELATION
+        ) {
             $isConfiguredInlineEdit = array_key_exists(Configuration::BASE_CONFIG_KEY, $column);
             $result = $this->guessEditorView($column, $isConfiguredInlineEdit, $result);
             $result = $this->guessApiAccessorClass($column, $isConfiguredInlineEdit, $result);

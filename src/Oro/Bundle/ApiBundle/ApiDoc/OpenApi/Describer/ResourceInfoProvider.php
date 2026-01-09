@@ -111,7 +111,8 @@ class ResourceInfoProvider implements ResourceInfoProviderInterface, ResetInterf
     private function getSubresource(string $entityType, string $associationName): ?ApiSubresource
     {
         $view = $this->docViewDetector->getView();
-        if (!isset($this->subresources[$entityType])
+        if (
+            !isset($this->subresources[$entityType])
             || !\array_key_exists($view, $this->subresources[$entityType])
         ) {
             $this->subresources[$entityType][$view] = $this->loadSubresources(

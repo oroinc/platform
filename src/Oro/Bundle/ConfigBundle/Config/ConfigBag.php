@@ -65,7 +65,8 @@ class ConfigBag
      */
     public function getFieldsRoot($node)
     {
-        if (isset($this->config[ProcessorDecorator::FIELDS_ROOT]) &&
+        if (
+            isset($this->config[ProcessorDecorator::FIELDS_ROOT]) &&
             isset($this->config[ProcessorDecorator::FIELDS_ROOT][$node])
         ) {
             return $this->config[ProcessorDecorator::FIELDS_ROOT][$node];
@@ -83,7 +84,8 @@ class ConfigBag
      */
     public function getTreeRoot($treeName)
     {
-        if (isset($this->config[ProcessorDecorator::TREE_ROOT]) &&
+        if (
+            isset($this->config[ProcessorDecorator::TREE_ROOT]) &&
             isset($this->config[ProcessorDecorator::TREE_ROOT][$treeName])
         ) {
             return $this->config[ProcessorDecorator::TREE_ROOT][$treeName];
@@ -101,7 +103,8 @@ class ConfigBag
      */
     public function getGroupsNode($name)
     {
-        if (isset($this->config[ProcessorDecorator::GROUPS_NODE]) &&
+        if (
+            isset($this->config[ProcessorDecorator::GROUPS_NODE]) &&
             isset($this->config[ProcessorDecorator::GROUPS_NODE][$name])
         ) {
             return $this->config[ProcessorDecorator::GROUPS_NODE][$name];

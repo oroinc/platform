@@ -314,7 +314,8 @@ class ExtendOptionsBuilder
 
     protected function getUnderlyingType(string $columnType, array $options): string
     {
-        if (ExtendHelper::isEnumerableType($columnType)
+        if (
+            ExtendHelper::isEnumerableType($columnType)
             && isset($options[ExtendOptionsManager::TARGET_OPTION]['table_name'])
             && str_starts_with($options[ExtendOptionsManager::TARGET_OPTION]['table_name'], 'oro_enum_')
         ) {

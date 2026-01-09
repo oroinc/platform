@@ -73,17 +73,11 @@ class Builder
      */
     public function build(DatagridConfiguration $config, ParameterBag $parameters, array $additionalParameters = [])
     {
-        /**
-         * should be refactored in BAP-6849
-         */
         $minified = $parameters->get(ParameterBag::MINIFIED_PARAMETERS);
         if (is_array($minified) && array_key_exists('g', $minified) && is_array($minified['g'])) {
             $parameters->add(array_merge($minified['g'], $additionalParameters));
         }
 
-        /**
-         * should be refactored in BAP-6826
-         */
         $event = new PreBuild($config, $parameters);
         $this->eventDispatcher->dispatch($event, PreBuild::NAME);
 

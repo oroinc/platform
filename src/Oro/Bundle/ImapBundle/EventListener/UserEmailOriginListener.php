@@ -36,7 +36,8 @@ class UserEmailOriginListener
 
     public function preUpdate(UserEmailOrigin $origin, PreUpdateEventArgs $args): void
     {
-        if ($args->hasChangedField('refreshToken')
+        if (
+            $args->hasChangedField('refreshToken')
             && false === $origin->isSyncEnabled()
             && $args->getOldValue('refreshToken') !== $args->getNewValue('refreshToken')
         ) {

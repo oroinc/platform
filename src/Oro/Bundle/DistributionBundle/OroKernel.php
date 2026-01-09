@@ -523,7 +523,8 @@ abstract class OroKernel extends Kernel
         if ($this instanceof CompilerPassInterface) {
             $container->addCompilerPass($this, PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
         }
-        if (class_exists('ProxyManager\Configuration')
+        if (
+            class_exists('ProxyManager\Configuration')
             && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator')
         ) {
             $container->setProxyInstantiator(new RuntimeInstantiator());

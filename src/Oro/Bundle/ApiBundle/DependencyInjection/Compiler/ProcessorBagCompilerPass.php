@@ -368,7 +368,8 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
 
     private function assertExtraAttribute(string $processorId, array $attributes): void
     {
-        if (\array_key_exists(self::EXTRA_ATTRIBUTE, $attributes)
+        if (
+            \array_key_exists(self::EXTRA_ATTRIBUTE, $attributes)
             && \is_array($attributes[self::EXTRA_ATTRIBUTE])
             && Matcher::OPERATOR_OR === key($attributes[self::EXTRA_ATTRIBUTE])
         ) {

@@ -49,7 +49,8 @@ class NotLessThanOriginalValueValidator extends ConstraintValidator
 
         // validator should not be executed if the field is in New state
         $extendScopeOptions = $model->toArray('extend');
-        if (!empty($extendScopeOptions)
+        if (
+            !empty($extendScopeOptions)
             && !empty($extendScopeOptions['state'])
             && $extendScopeOptions['state'] === 'New'
         ) {

@@ -127,22 +127,26 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
      */
     protected function completeRouteRequirements(Route $route)
     {
-        if (null === $route->getRequirement(self::ACTIVITY_ATTRIBUTE)
+        if (
+            null === $route->getRequirement(self::ACTIVITY_ATTRIBUTE)
             && $this->hasAttribute($route, self::ACTIVITY_PLACEHOLDER)
         ) {
             $route->setRequirement(self::ACTIVITY_ATTRIBUTE, '\w+');
         }
-        if (null === $route->getRequirement(self::ACTIVITY_ID_ATTRIBUTE)
+        if (
+            null === $route->getRequirement(self::ACTIVITY_ID_ATTRIBUTE)
             && $this->hasAttribute($route, self::ACTIVITY_ID_PLACEHOLDER)
         ) {
             $route->setRequirement(self::ACTIVITY_ID_ATTRIBUTE, '\d+');
         }
-        if (null === $route->getRequirement(self::ENTITY_ATTRIBUTE)
+        if (
+            null === $route->getRequirement(self::ENTITY_ATTRIBUTE)
             && $this->hasAttribute($route, self::ENTITY_PLACEHOLDER)
         ) {
             $route->setRequirement(self::ENTITY_ATTRIBUTE, '\w+');
         }
-        if (null === $route->getRequirement(self::ENTITY_ID_ATTRIBUTE)
+        if (
+            null === $route->getRequirement(self::ENTITY_ID_ATTRIBUTE)
             && $this->hasAttribute($route, self::ENTITY_ID_PLACEHOLDER)
         ) {
             $route->setRequirement(self::ENTITY_ID_ATTRIBUTE, '[^/]+');

@@ -86,7 +86,8 @@ class FlushDataHandler implements FlushDataHandlerInterface
 
         $entityManager->flush();
 
-        if (!$validate &&
+        if (
+            !$validate &&
             !$this->dispatchFlushEvent(CustomizeFormDataContext::EVENT_POST_FLUSH_DATA, $context, $connection)
         ) {
             return false;
@@ -228,7 +229,8 @@ class FlushDataHandler implements FlushDataHandlerInterface
 
         $entityContext->setResult($eventEntity);
         $includedEntities = $entityContext->getIncludedEntities();
-        if (null !== $includedEntities
+        if (
+            null !== $includedEntities
             && $this->shouldEntityBeReplaced($includedEntities->getPrimaryEntity(), $eventEntity, $eventContext)
         ) {
             $includedEntities->setPrimaryEntity($eventEntity, $includedEntities->getPrimaryEntityMetadata());

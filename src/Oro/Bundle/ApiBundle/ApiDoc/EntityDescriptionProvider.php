@@ -234,7 +234,8 @@ class EntityDescriptionProvider
 
     private function getFieldConfig(string $entityClass, string $fieldName): ?ConfigInterface
     {
-        if (!$this->isConfigurableEntity($entityClass)
+        if (
+            !$this->isConfigurableEntity($entityClass)
             || !$this->configManager->hasConfig($entityClass, $fieldName)
             || $this->configManager->isHiddenModel($entityClass, $fieldName)
         ) {

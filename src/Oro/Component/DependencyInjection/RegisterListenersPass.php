@@ -142,10 +142,12 @@ class RegisterListenersPass implements CompilerPassInterface
                         }, $event['event']);
                     $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
 
-                    if (null !== ($class = $container->getDefinition($id)->getClass())
+                    if (
+                        null !== ($class = $container->getDefinition($id)->getClass())
                         && ($r = $container->getReflectionClass($class, false)) && !$r->hasMethod(
                             $event['method']
-                        )) {
+                        )
+                    ) {
                         if (!$r->hasMethod('__invoke')) {
                             throw new InvalidArgumentException(
                                 sprintf(
@@ -246,7 +248,8 @@ class RegisterListenersPass implements CompilerPassInterface
 
     private function getEventFromTypeDeclaration(ContainerBuilder $container, string $id, string $method): string
     {
-        if (null === ($class = $container->getDefinition($id)->getClass())
+        if (
+            null === ($class = $container->getDefinition($id)->getClass())
             || !($r = $container->getReflectionClass($class, false))
             || !$r->hasMethod($method)
             || 1 > ($m = $r->getMethod($method))->getNumberOfParameters()

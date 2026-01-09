@@ -124,7 +124,7 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
         $connection = $session->getConnection();
 
         $sql = sprintf(
-            'UPDATE %s SET consumer_id=NULL, redelivered=:isRedelivered '.
+            'UPDATE %s SET consumer_id=NULL, redelivered=:isRedelivered ' .
             'WHERE consumer_id IN (:consumerIds)',
             $connection->getTableName()
         );

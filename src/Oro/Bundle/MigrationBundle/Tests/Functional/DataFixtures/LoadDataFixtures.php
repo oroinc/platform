@@ -50,6 +50,6 @@ class LoadDataFixtures extends AbstractFixture
      */
     private function getFixturesData()
     {
-        return Yaml::parse(file_get_contents(__DIR__.'/data/data_fixtures.yml'));
+        return Yaml::parse(file_get_contents(__DIR__ . '/data/data_fixtures.yml'));
     }
 }

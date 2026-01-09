@@ -56,7 +56,8 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
         if ($underlyingException instanceof HttpExceptionInterface) {
             return $underlyingException->getStatusCode();
         }
-        if ($underlyingException instanceof AccessDeniedException
+        if (
+            $underlyingException instanceof AccessDeniedException
             || $underlyingException instanceof AuthenticationException
         ) {
             return Response::HTTP_FORBIDDEN;
@@ -97,7 +98,8 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
         $underlyingExceptionClass = \get_class($underlyingException);
         if ($underlyingException instanceof AuthenticationException) {
             $underlyingExceptionClass = AuthenticationException::class;
-        } elseif ($underlyingException instanceof AccessDeniedException
+        } elseif (
+            $underlyingException instanceof AccessDeniedException
             || $underlyingException instanceof AccessDeniedHttpException
         ) {
             $underlyingExceptionClass = AccessDeniedException::class;

@@ -25,7 +25,8 @@ class EntityAliasConfigListener
 
         $configManager = $event->getConfigManager();
         $changeSet = $configManager->getConfigChangeSet($config);
-        if (isset($changeSet['state'])
+        if (
+            isset($changeSet['state'])
             && $changeSet['state'][1] === ExtendScope::STATE_ACTIVE
         ) {
             $this->entityAliasResolver->clearCache();

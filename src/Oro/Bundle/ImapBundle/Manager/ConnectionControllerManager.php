@@ -98,7 +98,8 @@ class ConnectionControllerManager
 
         // if user have existing email origin and old or new origin type is Other - use existing origin as base
         // to be able to save existing synced emails.
-        if ($existingOrigin
+        if (
+            $existingOrigin
             && (
                 $existingOrigin->getAccountType() === AccountTypeModel::ACCOUNT_TYPE_OTHER
                 || $type === AccountTypeModel::ACCOUNT_TYPE_OTHER

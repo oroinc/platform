@@ -267,7 +267,8 @@ class ActionExtension extends AbstractExtension
 
         $existingCallback = null;
         $actionConfiguration = $config->offsetGetByPath($actionConfigurationPropertyPath);
-        if ($actionConfiguration
+        if (
+            $actionConfiguration
             && 'callback' === $actionConfiguration[CallbackProperty::TYPE_KEY]
             && !empty($actionConfiguration[CallbackProperty::CALLABLE_KEY])
         ) {

@@ -300,7 +300,8 @@ trait FormContextTrait
      */
     public function removeConfigExtra(string $extraName): void
     {
-        if (ExpandRelatedEntitiesConfigExtra::NAME === $extraName
+        if (
+            ExpandRelatedEntitiesConfigExtra::NAME === $extraName
             || FilterFieldsConfigExtra::NAME === $extraName
             || MetaPropertiesConfigExtra::NAME === $extraName
         ) {

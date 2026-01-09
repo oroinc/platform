@@ -96,11 +96,13 @@ class SelectIdentifierWalker extends TreeWalkerAdapter
         if ($query instanceof Query && $AST->orderByClause && count($fromRoot->joins)) {
             foreach ($AST->orderByClause->orderByItems as $orderByItem) {
                 $expression = $orderByItem->expression;
-                if ($orderByItem->expression instanceof AST\PathExpression
+                if (
+                    $orderByItem->expression instanceof AST\PathExpression
                     && isset($queryComponents[$expression->identificationVariable])
                 ) {
                     $queryComponent = $queryComponents[$expression->identificationVariable];
-                    if (isset($queryComponent['parent'])
+                    if (
+                        isset($queryComponent['parent'])
                         && $queryComponent['relation']['type'] & ClassMetadataInfo::TO_MANY
                     ) {
                         throw new \LogicException('Query contains Order By joined to-many field');

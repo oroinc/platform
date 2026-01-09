@@ -428,8 +428,10 @@ class EmailActivityListProvider implements
                 if ($owner->isEmailPrivate()) {
                     continue;
                 }
-                if (($owner->getMailboxOwner() && $owner->getOrganization()) ||
-                    (!$owner->getMailboxOwner() && $owner->getOrganization() && $owner->getOwner())) {
+                if (
+                    ($owner->getMailboxOwner() && $owner->getOrganization()) ||
+                    (!$owner->getMailboxOwner() && $owner->getOrganization() && $owner->getOwner())
+                ) {
                     $activityOwner = new ActivityOwner();
                     $activityOwner->setActivity($activityList);
                     $activityOwner->setOrganization($owner->getOrganization());

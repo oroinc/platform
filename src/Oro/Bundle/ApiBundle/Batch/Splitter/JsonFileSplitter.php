@@ -235,7 +235,8 @@ class JsonFileSplitter implements FileSplitterInterface
     {
         $this->assertChunkCountLimitNotExceeded();
 
-        if ($this->sectionName
+        if (
+            $this->sectionName
             && !empty($this->sectionNamesToSplit)
             && !\in_array($this->sectionName, $this->sectionNamesToSplit, true)
         ) {
@@ -374,7 +375,8 @@ class JsonFileSplitter implements FileSplitterInterface
             $chunkCountLimits = $this->getChunkCountLimitPerSection();
             $chunkCountLimit = $chunkCountLimits[$this->sectionName] ?? null;
         }
-        if (null !== $chunkCountLimit
+        if (
+            null !== $chunkCountLimit
             && isset($this->processedChunkCounts[$processedChunkCountSectionKey])
             && $this->processedChunkCounts[$processedChunkCountSectionKey] >= $chunkCountLimit
         ) {

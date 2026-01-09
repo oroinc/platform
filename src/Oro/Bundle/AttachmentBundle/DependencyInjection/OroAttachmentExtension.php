@@ -119,7 +119,8 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
                 $configs[$i]['loaders']['default']['filesystem']['bundle_resources']['enabled'] = true;
             }
         }
-        if ($this->isImagineDefaultResolverOroGaufrette($configs)
+        if (
+            $this->isImagineDefaultResolverOroGaufrette($configs)
             && !$this->hasImagineDefaultResolverFileManagerService($configs[$i])
         ) {
             $configs[$i]['resolvers']['default']['oro_gaufrette']['file_manager_service'] = self::IMAGINE_FILE_MANAGER;
@@ -145,7 +146,8 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
     private function isImagineDefaultLoaderFilesystem(array $configs): bool
     {
         foreach ($configs as $config) {
-            if (!empty($config['loaders']['default'])
+            if (
+                !empty($config['loaders']['default'])
                 && !\array_key_exists('filesystem', $config['loaders']['default'])
             ) {
                 return false;
@@ -158,7 +160,8 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
     private function isImagineDefaultResolverOroGaufrette(array $configs): bool
     {
         foreach ($configs as $config) {
-            if (!empty($config['resolvers']['default'])
+            if (
+                !empty($config['resolvers']['default'])
                 && !\array_key_exists('oro_gaufrette', $config['resolvers']['default'])
             ) {
                 return false;

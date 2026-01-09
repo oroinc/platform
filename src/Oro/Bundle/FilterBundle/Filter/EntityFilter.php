@@ -29,7 +29,8 @@ class EntityFilter extends ChoiceFilter
     {
         $params[FilterUtility::FRONTEND_TYPE_KEY] = 'choice';
         $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY, []);
-        if ($this->isLazy()
+        if (
+            $this->isLazy()
             && isset($options[self::FIELD_OPTIONS_KEY])
             && !isset($options[self::FIELD_OPTIONS_KEY][self::CHOICES_KEY])
         ) {

@@ -30,7 +30,7 @@ class PreImportMessageProcessorTest extends WebTestCase
         parent::setUp();
 
         $this->initClient();
-        $this->fixturePath =  __DIR__. DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR;
+        $this->fixturePath =  __DIR__ . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR;
 
         $this->processor = self::getContainer()->get('oro_importexport.async.pre_import');
     }

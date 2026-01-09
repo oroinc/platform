@@ -291,7 +291,7 @@ class QueryBuilderToolsTest extends TestCase
         $tools = new QueryBuilderTools();
 
         $condition = '(DATE(l.createdAt) >= :param1 AND MIN(l.createdAt) <= :param2) AND ' .
-            '(COUNT(l.id) >= :param3 AND MAX(l.id) <= :param4) AND '.
+            '(COUNT(l.id) >= :param3 AND MAX(l.id) <= :param4) AND ' .
             '(TIME(l.updatedAt) = :param5 OR AVG(l.id) > :param6 OR DATE(l.createdAt) >= :param7)';
 
         $this->assertEquals(

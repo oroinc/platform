@@ -85,40 +85,40 @@ class ThemesRelativePathGeneratorExtensionTest extends TestCase
             ],
             'themes_null' => [
                 'source' => ['actions' => [['@setBlockTheme' => ['themes' => null]]]],
-                'filename' => __DIR__.'/data/layout.yml',
+                'filename' => __DIR__ . '/data/layout.yml',
                 'expectedSource' => [
                     'actions' => [['@setBlockTheme' => ['themes' => []]]]
                 ],
             ],
             'themes_null_in_array' => [
                 'source' => ['actions' => [['@setBlockTheme' => ['themes' => [null]]]]],
-                'filename' => __DIR__.'/data/layout.yml',
+                'filename' => __DIR__ . '/data/layout.yml',
                 'expectedSource' => [
                     'actions' => [['@setBlockTheme' => ['themes' => null]]]
                 ],
             ],
             'themes_null_and_relative' => [
                 'source' => ['actions' => [['@setBlockTheme' => ['themes' => [null, 'sub/update.html.twig']]]]],
-                'filename' => __DIR__.'/data/layout.yml',
+                'filename' => __DIR__ . '/data/layout.yml',
                 'expectedSource' => ['actions' => [['@setBlockTheme' => ['themes' => [null, $namespacedThemeName]]]]],
             ],
             'themes_relative_with_cd' => [
                 'source' => ['actions' => [['@setBlockTheme' => ['themes' => '../data/sub/update.html.twig']]]],
-                'filename' => __DIR__.'/data/layout.yml',
+                'filename' => __DIR__ . '/data/layout.yml',
                 'expectedSource' => [
                     'actions' => [['@setBlockTheme' => ['themes' => $namespacedThemeName]]]
                 ],
             ],
             'themes_form' => [
                 'source' => ['actions' => [['@setFormTheme' => ['themes' => '../data/sub/update.html.twig']]]],
-                'filename' => __DIR__.'/data/layout.yml',
+                'filename' => __DIR__ . '/data/layout.yml',
                 'expectedSource' => [
                     'actions' => [['@setFormTheme' => ['themes' => $namespacedThemeName]]]
                 ],
             ],
             'themes_relative_in_resources_views' => [
                 'source' => ['actions' => [['@setBlockTheme' => ['themes' => 'Resources/views/sub/update.html.twig']]]],
-                'filename' => __DIR__.'/data/layout.yml',
+                'filename' => __DIR__ . '/data/layout.yml',
                 'expectedSource' => [
                     'actions' => [['@setBlockTheme' => ['themes' => $namespacedThemeName]]]
                 ],
@@ -128,7 +128,7 @@ class ThemesRelativePathGeneratorExtensionTest extends TestCase
 
     public function testPrepareReturnAbsolutePath(): void
     {
-        $fileName = __DIR__.'/data/layout.yml';
+        $fileName = __DIR__ . '/data/layout.yml';
         $source = [
             'actions' => [
                 [

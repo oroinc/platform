@@ -74,7 +74,7 @@ class MethodPhpDocExtractor
         $methodInfo['description'] = trim($docBlock->getSummary());
         $description = \trim((string)$docBlock->getDescription());
         if (!empty($description)) {
-            $methodInfo['description'] .= "\n".$description;
+            $methodInfo['description'] .= "\n" . $description;
         }
         $docBlockParameters = $docBlock->getTagsByName('param');
         /** @var \phpDocumentor\Reflection\DocBlock\Tags\Param $docBlockParameter */

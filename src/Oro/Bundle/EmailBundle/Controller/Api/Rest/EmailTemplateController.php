@@ -186,7 +186,7 @@ class EmailTemplateController extends RestController
                 ],
                 Response::HTTP_OK
             );
-        } catch (SyntaxError|LoaderError|RuntimeError $e) {
+        } catch (SyntaxError | LoaderError | RuntimeError $e) {
             $view = $this->view(
                 [
                     'reason' => $this->container->get('translator')->trans('oro.email.emailtemplate.failed_to_compile'),
@@ -234,7 +234,7 @@ class EmailTemplateController extends RestController
         );
     }
 
-    public function setOrganizationProvider(EmailTemplateOrganizationProvider  $organizationProvider): void
+    public function setOrganizationProvider(EmailTemplateOrganizationProvider $organizationProvider): void
     {
         $this->organizationProvider = $organizationProvider;
     }

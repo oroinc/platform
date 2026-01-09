@@ -35,7 +35,8 @@ class WebpAwarePictureSourcesProvider implements PictureSourcesProviderInterface
     {
         $sources = $this->innerPictureSourcesProvider->getFilteredPictureSources($file, $filterName);
 
-        if ($file instanceof File
+        if (
+            $file instanceof File
             && $file->getExternalUrl() === null
             && $file->getExtension() !== 'webp'
             && $this->attachmentManager->isWebpEnabledIfSupported()
@@ -59,7 +60,8 @@ class WebpAwarePictureSourcesProvider implements PictureSourcesProviderInterface
     {
         $sources = $this->innerPictureSourcesProvider->getResizedPictureSources($file, $width, $height);
 
-        if ($file instanceof File
+        if (
+            $file instanceof File
             && $file->getExternalUrl() === null
             && $file->getExtension() !== 'webp'
             && $this->attachmentManager->isWebpEnabledIfSupported()

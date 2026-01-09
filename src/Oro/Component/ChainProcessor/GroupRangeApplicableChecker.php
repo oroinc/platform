@@ -26,7 +26,8 @@ class GroupRangeApplicableChecker implements ApplicableCheckerInterface, Process
     #[\Override]
     public function isApplicable(ContextInterface $context, array $processorAttributes): int
     {
-        if (null === $this->processorBag
+        if (
+            null === $this->processorBag
             || empty($processorAttributes['group'])
             || (!$context->getFirstGroup() && !$context->getLastGroup())
         ) {

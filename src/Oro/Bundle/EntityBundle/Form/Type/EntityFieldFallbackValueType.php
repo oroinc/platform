@@ -220,8 +220,7 @@ class EntityFieldFallbackValueType extends AbstractType
                 $form->getParent()->getData(),
                 $form->getConfig()->getName(),
                 $fallbackId
-            )
-            ) {
+            )) {
                 continue;
             }
 

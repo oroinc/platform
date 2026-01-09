@@ -118,9 +118,11 @@ class MenuUpdateApplier implements MenuUpdateApplierInterface
             }
         }
 
-        if (!$isOrphaned
+        if (
+            !$isOrphaned
             && $parentMenuItem
-            && $targetMenuItem->getParent()?->getName() !== $parentMenuItem->getName()) {
+            && $targetMenuItem->getParent()?->getName() !== $parentMenuItem->getName()
+        ) {
             // Moves the menu item according to its menu update parent key.
             $this->move($targetMenuItem, $parentMenuItem);
             $context->removeOrphanedItem($parentMenuItem->getName(), $targetMenuItemName);

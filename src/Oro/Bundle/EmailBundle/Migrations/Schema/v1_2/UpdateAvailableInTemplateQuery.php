@@ -86,7 +86,8 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
                 }
                 if (null !== $metadata && isset($metadata->fieldMetadata[$fieldName])) {
                     $fieldMetadata = $metadata->fieldMetadata[$fieldName];
-                    if (isset($fieldMetadata->defaultValues['email'])
+                    if (
+                        isset($fieldMetadata->defaultValues['email'])
                         && array_key_exists('available_in_template', $fieldMetadata->defaultValues['email'])
                     ) {
                         // skip because this field has ConfigField annotations with email.available_in_template

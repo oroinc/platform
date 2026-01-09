@@ -92,7 +92,8 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
             $targetEntityClassName = $entityConfigurationRow['class_name'];
             $targetTableName = $this->extendExtension->getTableNameByEntityClass($targetEntityClassName);
             $noteAssociationColumnName = $this->getNoteAssociationColumnName($targetEntityClassName);
-            if (!$targetTableName
+            if (
+                !$targetTableName
                 || !$this->schema->hasTable($targetTableName)
                 || !$noteTable->hasColumn($noteAssociationColumnName)
             ) {

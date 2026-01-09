@@ -31,8 +31,10 @@ class SearchStringFilter extends AbstractFilter
         }
 
         $length = strlen($data['value']);
-        if ($length < $this->get(FilterUtility::MIN_LENGTH_KEY)
-            || $length > $this->get(FilterUtility::MAX_LENGTH_KEY)) {
+        if (
+            $length < $this->get(FilterUtility::MIN_LENGTH_KEY)
+            || $length > $this->get(FilterUtility::MAX_LENGTH_KEY)
+        ) {
             return;
         }
 

@@ -116,7 +116,8 @@ class UserController extends AbstractController
     {
         $isViewProfile = (bool)$request->query->get('viewProfile', false);
 
-        if (!(($isViewProfile && $this->getUser()->getId() === $user->getId())
+        if (
+            !(($isViewProfile && $this->getUser()->getId() === $user->getId())
             || $this->isGranted('oro_user_user_view', $user))
         ) {
             throw new AccessDeniedException();

@@ -56,7 +56,8 @@ class AddAssociationValidators implements ProcessorInterface
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             $fieldName = $field->getPropertyPath($fieldName);
-            if (ConfigUtil::IGNORE_PROPERTY_PATH !== $fieldName
+            if (
+                ConfigUtil::IGNORE_PROPERTY_PATH !== $fieldName
                 && $metadata->hasAssociation($fieldName)
                 && !$associationAccessExclusionProvider->isIgnoreAssociationAccessCheck($entityClass, $fieldName)
             ) {
@@ -85,7 +86,8 @@ class AddAssociationValidators implements ProcessorInterface
                 $fieldName = $field->getPropertyPath($fieldName);
                 // to avoid duplication, check if the constraint already exist
                 // e.g. the constraint can be already added if a model for API resource inherited from ORM entity
-                if (ConfigUtil::IGNORE_PROPERTY_PATH !== $fieldName
+                if (
+                    ConfigUtil::IGNORE_PROPERTY_PATH !== $fieldName
                     && !$this->isByReference($field)
                     && !$this->isHasAdderAndRemoverConstraintExist($field, $entityClass, $fieldName)
                 ) {
@@ -115,7 +117,8 @@ class AddAssociationValidators implements ProcessorInterface
         $constraints = $field->getFormConstraints();
         if (!empty($constraints)) {
             foreach ($constraints as $constraint) {
-                if ($constraint instanceof Assert\HasAdderAndRemover
+                if (
+                    $constraint instanceof Assert\HasAdderAndRemover
                     && $constraint->property === $fieldName
                     && is_a($entityClass, $constraint->class, true)
                 ) {

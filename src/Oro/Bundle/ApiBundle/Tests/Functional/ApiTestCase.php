@@ -403,7 +403,8 @@ abstract class ApiTestCase extends WebTestCase
         try {
             \PHPUnit\Framework\TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
-            if ($response->getStatusCode() >= Response::HTTP_BAD_REQUEST
+            if (
+                $response->getStatusCode() >= Response::HTTP_BAD_REQUEST
                 && static::isApplicableContentType($response->headers)
             ) {
                 $e = new \PHPUnit\Framework\ExpectationFailedException(
@@ -438,7 +439,8 @@ abstract class ApiTestCase extends WebTestCase
                 throw new \PHPUnit\Framework\ExpectationFailedException($failureMessage);
             }
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
-            if ($response->getStatusCode() >= Response::HTTP_BAD_REQUEST
+            if (
+                $response->getStatusCode() >= Response::HTTP_BAD_REQUEST
                 && static::isApplicableContentType($response->headers)
             ) {
                 $e = new \PHPUnit\Framework\ExpectationFailedException(
@@ -473,7 +475,8 @@ abstract class ApiTestCase extends WebTestCase
                 throw new \PHPUnit\Framework\ExpectationFailedException($failureMessage);
             }
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
-            if ($response->getStatusCode() >= Response::HTTP_BAD_REQUEST
+            if (
+                $response->getStatusCode() >= Response::HTTP_BAD_REQUEST
                 && static::isApplicableContentType($response->headers)
             ) {
                 $e = new \PHPUnit\Framework\ExpectationFailedException(

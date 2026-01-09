@@ -72,8 +72,8 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends TestCase
         $jobRunner->expects($this->exactly(2))
             ->method('createDelayed')
             ->withConsecutive(
-                ['oro.email.update_email_owner_association'.':class:1'],
-                ['oro.email.update_email_owner_association'.':class:2']
+                ['oro.email.update_email_owner_association' . ':class:1'],
+                ['oro.email.update_email_owner_association' . ':class:2']
             )
             ->willReturnOnConsecutiveCalls(
                 new ReturnCallback(function ($name, $callback) use ($jobRunner) {

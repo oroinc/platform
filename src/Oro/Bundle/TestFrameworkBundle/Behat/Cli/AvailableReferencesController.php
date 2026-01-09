@@ -69,7 +69,7 @@ class AvailableReferencesController implements Controller
         $table->setHeaders(['ID', 'Object class']);
 
         foreach ($this->aliceLoader->getReferenceRepository()->toArray() as $key => $object) {
-            $table->addRow(['@'.$key, get_class($object)]);
+            $table->addRow(['@' . $key, get_class($object)]);
         }
 
         $table->render();

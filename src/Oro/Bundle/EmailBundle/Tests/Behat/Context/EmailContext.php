@@ -218,7 +218,7 @@ class EmailContext extends OroFeatureContext
         $url = $this->getLinkUrlFromEmail($linkCaption);
 
         if ($url) {
-            $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'email';
+            $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'email';
             if (!is_dir($path)) {
                 mkdir($path);
             }
@@ -442,7 +442,7 @@ class EmailContext extends OroFeatureContext
         self::assertContains(
             $fieldName,
             $allowedFields,
-            'Email field must be one of '.implode(', ', $allowedFields)
+            'Email field must be one of ' . implode(', ', $allowedFields)
         );
     }
 

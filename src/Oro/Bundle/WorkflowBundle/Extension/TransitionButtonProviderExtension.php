@@ -71,7 +71,8 @@ class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
      */
     protected function findByDatagrids(Workflow $workflow, ButtonSearchContext $searchContext)
     {
-        if ($searchContext->getDatagrid() &&
+        if (
+            $searchContext->getDatagrid() &&
             in_array($searchContext->getDatagrid(), $workflow->getDefinition()->getDatagrids(), true) &&
             $workflow->getDefinition()->getRelatedEntity() === $searchContext->getEntityClass()
         ) {

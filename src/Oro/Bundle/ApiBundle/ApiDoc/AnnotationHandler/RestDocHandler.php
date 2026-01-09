@@ -57,7 +57,8 @@ class RestDocHandler implements HandlerInterface
     #[\Override]
     public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method): void
     {
-        if ($route->getOption(RestRouteOptionsResolver::GROUP_OPTION) !== $this->routeGroup
+        if (
+            $route->getOption(RestRouteOptionsResolver::GROUP_OPTION) !== $this->routeGroup
             || $this->docViewDetector->getRequestType()->isEmpty()
         ) {
             return;

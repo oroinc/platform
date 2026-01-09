@@ -32,8 +32,10 @@ class LocalizationValidator extends ConstraintValidator
         if (!$parentLocalization) {
             return;
         }
-        if ((null !== $localization->getId() && $localization->getId() === $parentLocalization->getId())
-            || $this->localizationExists($parentLocalization, $localization)) {
+        if (
+            (null !== $localization->getId() && $localization->getId() === $parentLocalization->getId())
+            || $this->localizationExists($parentLocalization, $localization)
+        ) {
             $this->context->buildViolation($constraint->messageCircularReference)
                 ->atPath('parentLocalization')
                 ->addViolation();

@@ -114,7 +114,8 @@ class FieldAccessor
         $fields = $this->getFields($entityClass, $config);
         foreach ($fields as $field) {
             $field = $this->getPropertyPath($field, $config->getField($field));
-            if ($entityMetadata->isField($field)
+            if (
+                $entityMetadata->isField($field)
                 || ($withAssociations && $entityMetadata->isSingleValuedAssociation($field))
             ) {
                 $result[] = $field;

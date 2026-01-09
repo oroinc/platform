@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 
 class DateTimeExtensionTest extends TestCase
 {
-    use  EntityTrait;
+    use EntityTrait;
 
     private DateTimeExtension $extension;
 

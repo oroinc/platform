@@ -84,7 +84,7 @@ class EntityVariablesTemplateProcessor
 
                 $replaceExpr = \preg_replace_callback(
                     // Search entity variables (they start with "entity.")
-                    '/('. $this->entitySection .'\.[\w|\.]+)/u',
+                    '/(' . $this->entitySection . '\.[\w|\.]+)/u',
                     function ($m) use ($templateData) {
                         // $variable contains string that starts with "entity."
                         $variable = $m[0];

@@ -75,7 +75,8 @@ class ExpandAssociatedEntities implements ProcessorInterface
             if (!$targetClass) {
                 continue;
             }
-            if (!$this->doctrineHelper->isManageableEntityClass($targetClass)
+            if (
+                !$this->doctrineHelper->isManageableEntityClass($targetClass)
                 && !ExtendHelper::isOutdatedEnumOptionEntity($targetClass)
             ) {
                 continue;

@@ -64,7 +64,8 @@ class FixAssociationLabelsQuery extends ParametrizedMigrationQuery
             $hasChanges = false;
             // fix field label if needed
             if ($fieldType === RelationType::MANY_TO_ONE) {
-                if ($targetEntityLabel
+                if (
+                    $targetEntityLabel
                     && $label !== $targetEntityLabel
                     && (
                         $label === $this->getLabel('label', $targetClassName, $fieldName)
@@ -75,7 +76,8 @@ class FixAssociationLabelsQuery extends ParametrizedMigrationQuery
                     $hasChanges              = true;
                 }
             } elseif ($fieldType === RelationType::MANY_TO_MANY) {
-                if ($targetEntityLabel
+                if (
+                    $targetEntityLabel
                     && $targetEntityPluralLabel
                     && $label !== $targetEntityPluralLabel
                     && (
@@ -125,21 +127,24 @@ class FixAssociationLabelsQuery extends ParametrizedMigrationQuery
             }
 
             $hasChanges = false;
-            if ($entityConfig['label'] !== $this->getLabel('label', $className)
+            if (
+                $entityConfig['label'] !== $this->getLabel('label', $className)
                 && !str_contains($entityConfig['label'], '.')
             ) {
                 $entityConfig['label']   = $this->getLabel('label', $className);
                 $data['entity']['label'] = $entityConfig['label'];
                 $hasChanges              = true;
             }
-            if ($entityConfig['plural_label'] !== $this->getLabel('plural_label', $className)
+            if (
+                $entityConfig['plural_label'] !== $this->getLabel('plural_label', $className)
                 && !str_contains($entityConfig['plural_label'], '.')
             ) {
                 $entityConfig['plural_label']   = $this->getLabel('plural_label', $className);
                 $data['entity']['plural_label'] = $entityConfig['plural_label'];
                 $hasChanges                     = true;
             }
-            if ($entityConfig['description'] !== $this->getLabel('description', $className)
+            if (
+                $entityConfig['description'] !== $this->getLabel('description', $className)
                 && !str_contains($entityConfig['description'], '.')
             ) {
                 $entityConfig['description']   = $this->getLabel('description', $className);

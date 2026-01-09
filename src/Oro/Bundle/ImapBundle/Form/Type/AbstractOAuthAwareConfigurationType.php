@@ -166,7 +166,8 @@ abstract class AbstractOAuthAwareConfigurationType extends AbstractType
                     }
                 );
                 if (count($filtered) > 0) {
-                    if ($entity instanceof UserEmailOrigin
+                    if (
+                        $entity instanceof UserEmailOrigin
                         && $entity->getImapHost() !== null
                         && array_key_exists('imapHost', $data) && $data['imapHost'] !== null
                         && array_key_exists('user', $data) && $data['user'] !== null

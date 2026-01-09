@@ -17,8 +17,10 @@ class HideEmptyItemsBuilder implements BuilderInterface
 
     private function applyRecursively(ItemInterface $menuItem): void
     {
-        if ($menuItem->getDisplayChildren() && $menuItem->getChildren()
-            && in_array($menuItem->getUri(), [null, '#'], true)) {
+        if (
+            $menuItem->getDisplayChildren() && $menuItem->getChildren()
+            && in_array($menuItem->getUri(), [null, '#'], true)
+        ) {
             $isDisplayed = false;
             foreach ($menuItem->getChildren() as $childMenuItem) {
                 $this->applyRecursively($childMenuItem);

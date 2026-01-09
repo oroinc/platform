@@ -106,7 +106,7 @@ class InputOptionProvider
 
         $settings = $options['settings'] ?? [];
         foreach ($settings as $setterName => $parameters) {
-            $question->{'set'. ucfirst($setterName)}(...$parameters);
+            $question->{'set' . ucfirst($setterName)}(...$parameters);
         }
 
         $question->setMaxAttempts(5);

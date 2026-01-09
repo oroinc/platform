@@ -186,7 +186,7 @@ class UpdateListMessageProcessorTest extends TestCase
 
     private function expectRunUniqueJob(MessageInterface $expectedMessage, Job $job): void
     {
-        $job->setName(self::JOB_NAME.'123');
+        $job->setName(self::JOB_NAME . '123');
         $this->jobRunner->expects(self::once())
             ->method('runUniqueByMessage')
             ->willReturnCallback(function ($actualMessage, $runCallback) use ($expectedMessage, $job) {
@@ -201,7 +201,7 @@ class UpdateListMessageProcessorTest extends TestCase
         $this->jobRunner->expects(self::once())
             ->method('createDelayed')
             ->willReturnCallback(function ($name, $startCallback) use ($operationId, $job, $jobId) {
-                self::assertEquals(sprintf(self::JOB_NAME.'%d:chunk:1', $operationId), $name);
+                self::assertEquals(sprintf(self::JOB_NAME . '%d:chunk:1', $operationId), $name);
                 $job->setId($jobId);
 
                 return $startCallback($this->jobRunner, $job);
@@ -658,7 +658,7 @@ class UpdateListMessageProcessorTest extends TestCase
                 ]
             );
 
-        $chunkJobNameTemplate = sprintf(self::JOB_NAME.'%s:chunk:', $operationId) . '%s';
+        $chunkJobNameTemplate = sprintf(self::JOB_NAME . '%s:chunk:', $operationId) . '%s';
         $nextChunkFileIndex = 2;
         $this->processingHelper->expects(self::once())
             ->method('createChunkJobs')

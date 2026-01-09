@@ -141,7 +141,8 @@ class ApiDocDescriber implements
 
     private function registerPrimaryModels(OA\OpenApi $api, ApiDoc $apiDoc, string $action, string $entityType): void
     {
-        if (ApiAction::OPTIONS === $action
+        if (
+            ApiAction::OPTIONS === $action
             || ApiAction::DELETE === $action
             || ApiAction::DELETE_LIST === $action
             || $this->isSubresourceApiAction($action)

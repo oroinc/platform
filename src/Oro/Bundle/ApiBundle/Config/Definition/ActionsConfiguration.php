@@ -155,7 +155,8 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->always(function ($v) {
                 foreach ($v as $action => $actionConfig) {
                     foreach (self::OPTIONS_ALLOWED_ONLY_FOR_CHANGE_SUBRESOURCE_ACTIONS as $option) {
-                        if (\array_key_exists($option, $actionConfig)
+                        if (
+                            \array_key_exists($option, $actionConfig)
                             && !\in_array($action, self::CHANGE_SUBRESOURCE_ACTIONS, true)
                         ) {
                             throw new \InvalidArgumentException(sprintf(
@@ -206,7 +207,8 @@ class ActionsConfiguration extends AbstractConfigurationSection
             }
             unset($config[ConfigUtil::DISABLE_PAGING]);
         }
-        if (\array_key_exists(ConfigUtil::PAGE_SIZE, $config)
+        if (
+            \array_key_exists(ConfigUtil::PAGE_SIZE, $config)
             && -1 === $config[ConfigUtil::PAGE_SIZE]
             && !\array_key_exists(ConfigUtil::MAX_RESULTS, $config)
         ) {

@@ -75,7 +75,8 @@ class UserPasswordResetHandler
         }
 
         $email = $user->getEmail();
-        if ($user->isPasswordRequestNonExpired($this->ttl)
+        if (
+            $user->isPasswordRequestNonExpired($this->ttl)
             && !($isFrontend && null === $user->getPasswordRequestedAt())
         ) {
             $this->logger->notice(

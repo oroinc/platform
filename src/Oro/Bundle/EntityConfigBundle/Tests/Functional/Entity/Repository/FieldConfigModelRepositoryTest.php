@@ -76,7 +76,7 @@ class FieldConfigModelRepositoryTest extends WebTestCase
         /** @var AttributeFamily $family */
         $family = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1);
 
-        $attributes = $this->getRepository()->getAttributesByClass($family->getEntityClass().'FalseClass');
+        $attributes = $this->getRepository()->getAttributesByClass($family->getEntityClass() . 'FalseClass');
 
         $this->assertCount(0, $attributes);
     }

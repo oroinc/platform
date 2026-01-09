@@ -76,7 +76,8 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
         $query->setHint(Query::HINT_INCLUDE_META_COLUMNS, true);
 
         // Protects the query with ACL.
-        if (null !== $this->aclHelper
+        if (
+            null !== $this->aclHelper
             && (!isset($this->aclOptions['disable']) || true !== $this->aclOptions['disable'])
         ) {
             $options = $this->aclOptions['options'] ?? [];

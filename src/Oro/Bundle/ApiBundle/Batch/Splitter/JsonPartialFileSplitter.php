@@ -132,7 +132,8 @@ class JsonPartialFileSplitter extends JsonFileSplitter implements PartialFileSpl
             $this->chunkTime += (int)round(1000 * (microtime(true) - $this->chunkStartTime));
             $this->chunkStartTime = null;
 
-            if ($this->chunkTime >= $this->timeout
+            if (
+                $this->chunkTime >= $this->timeout
                 || ((int)round($this->chunkTime / $this->chunkCount)) > $this->timeout - $this->chunkTime
             ) {
                 throw new TimeoutExceededFileSplitterException();

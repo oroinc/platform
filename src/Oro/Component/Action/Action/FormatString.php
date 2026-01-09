@@ -40,7 +40,8 @@ class FormatString extends AbstractAction
             throw new InvalidParameterException('String parameter must be specified');
         }
 
-        if (!empty($options['arguments'])
+        if (
+            !empty($options['arguments'])
             && !is_array($options['arguments'])
             && !$options['arguments'] instanceof PropertyPathInterface
         ) {

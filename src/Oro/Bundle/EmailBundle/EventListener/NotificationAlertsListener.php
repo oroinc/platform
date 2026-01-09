@@ -19,12 +19,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class NotificationAlertsListener
 {
     public function __construct(
-        private RouterInterface          $router,
-        private RequestStack             $requestStack,
-        private TranslatorInterface      $translator,
+        private RouterInterface $router,
+        private RequestStack $requestStack,
+        private TranslatorInterface $translator,
         private NotificationAlertManager $notificationAlertManager,
-        private MailboxManager           $mailboxManager,
-        private TokenAccessorInterface   $tokenAccessor
+        private MailboxManager $mailboxManager,
+        private TokenAccessorInterface $tokenAccessor
     ) {
     }
 
@@ -87,7 +87,8 @@ class NotificationAlertsListener
             $this->tokenAccessor->getOrganizationId()
         );
 
-        if (!empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_AUTH])
+        if (
+            !empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_AUTH])
             || !empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_REFRESH_TOKEN])
         ) {
             $messages[] = $this->translator->trans('oro.email.sync_alert.system_origin.auth');
@@ -109,7 +110,8 @@ class NotificationAlertsListener
     {
         $messages = [];
         $alerts = $this->notificationAlertManager->getNotificationAlertsCountGroupedByType();
-        if (!empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_AUTH])
+        if (
+            !empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_AUTH])
             || !empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_REFRESH_TOKEN])
         ) {
             $messages[] = $this->translator->trans('oro.email.sync_alert.auth.short');
@@ -164,7 +166,8 @@ class NotificationAlertsListener
         if (!empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_SYNC])) {
             $messages[] = $this->translator->trans('oro.email.sync_alert.sync');
         }
-        if (!empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_AUTH])
+        if (
+            !empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_AUTH])
             || !empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_REFRESH_TOKEN])
         ) {
             $messages[] = $this->translator->trans('oro.email.sync_alert.auth.full', [

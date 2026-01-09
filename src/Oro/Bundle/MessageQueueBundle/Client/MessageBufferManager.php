@@ -38,7 +38,8 @@ class MessageBufferManager
      */
     public function flushBuffer(bool $force = false): void
     {
-        if ($this->bufferedProducer->isBufferingEnabled()
+        if (
+            $this->bufferedProducer->isBufferingEnabled()
             && $this->bufferedProducer->hasBufferedMessages()
             && ($force || $this->isFlushBufferRequired())
         ) {

@@ -92,6 +92,6 @@ class GetContextValue extends AbstractFunction
      */
     protected function createPropertyPath($value)
     {
-        return new PropertyPath(self::PROPERTY_PATH_PREFIX.$value);
+        return new PropertyPath(self::PROPERTY_PATH_PREFIX . $value);
     }
 }

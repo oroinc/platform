@@ -237,9 +237,11 @@ class EmailTemplateDataMapper implements DataMapperInterface
                         /** @var EmailTemplateAttachment $originalEmailAttachment */
                         $originalEmailAttachment = $templateTranslation->getAttachments()->get($key);
                         $emailTemplateAttachmentFile = $emailTemplateAttachment->getFile();
-                        if ($emailTemplateAttachmentFile &&
+                        if (
+                            $emailTemplateAttachmentFile &&
                             !$emailTemplateAttachmentFile->getId() &&
-                            !$emailTemplateAttachmentFile->getFile()) {
+                            !$emailTemplateAttachmentFile->getFile()
+                        ) {
                             if ($emailTemplateAttachmentFile->isEmptyFile()) {
                                 $emailTemplateAttachmentFile = null;
                             } else {

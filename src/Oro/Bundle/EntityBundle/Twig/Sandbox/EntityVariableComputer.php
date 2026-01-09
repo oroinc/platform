@@ -49,7 +49,8 @@ class EntityVariableComputer
         $path = \explode(self::PATH_SEPARATOR, $variable);
         if (\count($path) === 2) {
             $result = null;
-            if ($this->tryProcessEntityVariable($variable, $data->getRootEntity(), $path[1], $data)
+            if (
+                $this->tryProcessEntityVariable($variable, $data->getRootEntity(), $path[1], $data)
                 && $data->hasComputedVariable($variable)
             ) {
                 $result = $data->getComputedVariablePath($variable);
@@ -98,7 +99,8 @@ class EntityVariableComputer
         $propertyPath = \implode(self::PATH_SEPARATOR, $path);
         $propertyVariable = \substr($variable, 0, -\strlen($propertyPath))
             . \str_replace(self::PATH_SEPARATOR, '_', $propertyPath);
-        if ($this->tryProcessEntityVariable($propertyVariable, $rootEntity, $propertyPath, $data)
+        if (
+            $this->tryProcessEntityVariable($propertyVariable, $rootEntity, $propertyPath, $data)
             && $data->hasComputedVariable($propertyVariable)
         ) {
             return $data->getComputedVariablePath($propertyVariable);

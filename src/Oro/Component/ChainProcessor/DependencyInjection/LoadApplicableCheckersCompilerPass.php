@@ -31,7 +31,8 @@ class LoadApplicableCheckersCompilerPass implements CompilerPassInterface
     #[\Override]
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition($this->processorBagServiceId)
+        if (
+            !$container->hasDefinition($this->processorBagServiceId)
             && !$container->hasAlias($this->processorBagServiceId)
         ) {
             return;

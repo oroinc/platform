@@ -24,7 +24,7 @@ trait IntegrationTokenAwareTrait
             $token->setOrganization($integration->getOrganization());
         }
 
-        $token->setAttribute('owner_description', 'Integration: '. $integration->getName());
+        $token->setAttribute('owner_description', 'Integration: ' . $integration->getName());
         $this->tokenStorage->setToken($token);
     }
 

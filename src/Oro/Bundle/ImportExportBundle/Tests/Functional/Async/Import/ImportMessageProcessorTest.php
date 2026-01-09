@@ -34,7 +34,7 @@ class ImportMessageProcessorTest extends WebTestCase
     {
         $fileName = 'import.csv';
         $this->getImportExportFileManager()->writeFileToStorage(
-            __DIR__. DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . $fileName,
+            __DIR__ . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . $fileName,
             $fileName
         );
 

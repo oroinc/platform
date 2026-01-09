@@ -115,7 +115,7 @@ class ExportTopicTest extends AbstractTopicTestCase
                 ],
                 'exceptionClass' => InvalidOptionsException::class,
                 'exceptionMessage' => '/The option "organizationId" with value stdClass is expected '
-                    .'to be of type "int" or "null"/',
+                    . 'to be of type "int" or "null"/',
             ],
             'wrong exportType type' => [
                 'body' => [

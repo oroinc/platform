@@ -110,7 +110,8 @@ class LoadProcessConfigurationCommandTest extends WebTestCase
         $found = false;
         /** @var ProcessTrigger $trigger */
         foreach ($triggers as $trigger) {
-            if ($trigger->getEvent() === $event &&
+            if (
+                $trigger->getEvent() === $event &&
                 $trigger->getCron() === $cron &&
                 $trigger->getDefinition()->getName() === $name
             ) {

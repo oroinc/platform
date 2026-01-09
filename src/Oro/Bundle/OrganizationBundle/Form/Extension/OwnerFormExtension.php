@@ -186,7 +186,8 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
      */
     public function preSubmit(FormEvent $event)
     {
-        if ($event->getForm()->has($this->fieldName)
+        if (
+            $event->getForm()->has($this->fieldName)
             && is_object($event->getForm()->get($this->fieldName)->getData())
         ) {
             $this->oldOwner = $event->getForm()->get($this->fieldName)->getData()->getId();
@@ -217,7 +218,8 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
 
         $newOwner = $this->getEntityOwnerAccessor()->getOwner($entity);
         //validate only if owner was changed or then we are on create page
-        if (is_null($event->getData()->getId())
+        if (
+            is_null($event->getData()->getId())
             || ($this->oldOwner && $newOwner->getId() && $this->oldOwner !== $newOwner->getId())
         ) {
             $metadata = $this->getMetadata($form->getNormData());
@@ -257,7 +259,8 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
         }
         $entity = $event->getData();
 
-        if (is_object($entity)
+        if (
+            is_object($entity)
             && $entity->getId()
         ) {
             $permission = 'ASSIGN';

@@ -77,7 +77,8 @@ class ImportStrategyListener implements ImportStrategyListenerInterface
              * If import process was executed not in anonymous mode (for example, grid's import),
              * current organization for entities should be set.
              */
-            if (!$tokenOrganization
+            if (
+                !$tokenOrganization
                 || ($tokenOrganization && $entityOrganization->getId() == $this->tokenAccessor->getOrganizationId())
             ) {
                 return;

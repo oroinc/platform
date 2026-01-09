@@ -190,7 +190,8 @@ trait DocumentationTestTrait
         }
         if ($this->isEmptyDescription($definition, 'documentation')) {
             $missingDocs[] = 'Empty documentation';
-        } elseif (isset(self::$defaultDocumentation[$action])
+        } elseif (
+            isset(self::$defaultDocumentation[$action])
             && in_array($definition['documentation'], (array)self::$defaultDocumentation[$action], true)
             && (
                 !$association
@@ -225,7 +226,8 @@ trait DocumentationTestTrait
                 if (!$this->isSkippedField($entityClass, $name) && !$this->isTestField($entityClass, $name)) {
                     if ($this->isEmptyDescription($item, 'description')) {
                         $missingDocs[] = sprintf('Input Field: %s. Empty description.', $name);
-                    } elseif ($idFieldName
+                    } elseif (
+                        $idFieldName
                         && $name === $idFieldName
                         && $this->isIdFieldRequired($definition, $entityClass, $action, $association)
                     ) {
@@ -261,7 +263,8 @@ trait DocumentationTestTrait
         }
         if (!empty($definition['response'])) {
             foreach ($definition['response'] as $name => $item) {
-                if ($this->isEmptyDescription($item, 'description')
+                if (
+                    $this->isEmptyDescription($item, 'description')
                     && !$this->isSkippedField($entityClass, $name)
                     && !$this->isTestField($entityClass, $name)
                 ) {

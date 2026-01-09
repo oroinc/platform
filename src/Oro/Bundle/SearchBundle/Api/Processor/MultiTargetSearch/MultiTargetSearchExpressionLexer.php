@@ -76,7 +76,8 @@ class MultiTargetSearchExpressionLexer
     {
         /** @var Token $fieldNameToken */
         $fieldNameToken = array_shift($comparison);
-        if (isset($this->fieldMappings[$fieldNameToken->value])
+        if (
+            isset($this->fieldMappings[$fieldNameToken->value])
             && \is_array($this->fieldMappings[$fieldNameToken->value])
         ) {
             $tokens[] = new Token(Token::PUNCTUATION_TYPE, '(', 0);

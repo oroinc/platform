@@ -33,7 +33,7 @@ class AddTreeGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionI
                     $transformedActions[] = $actionDefinition;
                     continue;
                 }
-                $path = $actionsKey.'.'.$nodeNo;
+                $path = $actionsKey . '.' . $nodeNo;
                 $actionNode = reset($actionDefinition);
 
                 // looking for items, parent and tree it self
@@ -50,7 +50,7 @@ class AddTreeGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionI
                 try {
                     $this->processTree($transformedActions, $tree, $treeParent, $actionNode[self::NODE_ITEMS], $path);
                 } catch (\LogicException $e) {
-                    throw new SyntaxException('invalid tree definition. '.$e->getMessage(), $actionDefinition, $path);
+                    throw new SyntaxException('invalid tree definition. ' . $e->getMessage(), $actionDefinition, $path);
                 }
             }
             $source[$actionsKey] = $transformedActions;

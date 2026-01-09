@@ -49,7 +49,8 @@ class ThemeConfigurationSubscriber implements EventSubscriberInterface
         // Remove outdated options from ThemeConfiguration
         foreach ($themeConfiguration->getConfiguration() as $key => $value) {
             list($sKey, $oKey) = explode(LayoutThemeConfiguration::OPTION_KEY_DELIMITER, $key);
-            if (isset($configuration['sections'][$sKey]['options']) &&
+            if (
+                isset($configuration['sections'][$sKey]['options']) &&
                 array_key_exists($oKey, $configuration['sections'][$sKey]['options'])
             ) {
                 continue;

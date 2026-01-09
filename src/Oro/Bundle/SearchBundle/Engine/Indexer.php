@@ -329,7 +329,8 @@ class Indexer
     protected function filterAllowedEntities($permission, $entities)
     {
         foreach (array_keys($entities) as $entityClass) {
-            if ($this->securityProvider->isProtectedEntity($entityClass)
+            if (
+                $this->securityProvider->isProtectedEntity($entityClass)
                 && !$this->securityProvider->isGranted(
                     $permission,
                     ObjectIdentityHelper::encodeIdentityString(EntityAclExtension::NAME, $entityClass)

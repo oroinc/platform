@@ -58,7 +58,8 @@ class ValidateOwnerListener
         }
 
         // check organization field
-        if (($ownershipMetadata->isUserOwned() || $ownershipMetadata->isBusinessUnitOwned())
+        if (
+            ($ownershipMetadata->isUserOwned() || $ownershipMetadata->isBusinessUnitOwned())
             && null === $this->propertyAccessor->getValue($entity, $ownershipMetadata->getOrganizationFieldName())
         ) {
             $context->addError($this->getErrorString($entity, $ownershipMetadata->getOrganizationFieldName()));

@@ -277,9 +277,9 @@ class GuzzleRestClientTest extends TestCase
 
         $this->expectException(GuzzleRestException::class);
         $this->expectExceptionMessage(
-            "Client error response".PHP_EOL.
-            "[status code] $statusCode".PHP_EOL.
-            "[reason phrase] $reasonPhrase".PHP_EOL.
+            "Client error response" . PHP_EOL .
+            "[status code] $statusCode" . PHP_EOL .
+            "[reason phrase] $reasonPhrase" . PHP_EOL .
             "[url] $url"
         );
 

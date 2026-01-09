@@ -174,7 +174,8 @@ class TagsExtension extends AbstractTagsExtension
 
     private function enableInlineEditing(DatagridConfiguration $config): void
     {
-        if ($this->inlineEditingConfigurator->isInlineEditingSupported($config)
+        if (
+            $this->inlineEditingConfigurator->isInlineEditingSupported($config)
             && $config->offsetGetByPath(InlineEditingConfiguration::ENABLED_CONFIG_PATH) !== false
             && $config->offsetGetByPath($this->getInlineEditingEnabledPathForColumn()) !== false
         ) {

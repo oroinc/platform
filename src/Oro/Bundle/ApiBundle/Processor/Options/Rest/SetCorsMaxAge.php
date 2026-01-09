@@ -27,7 +27,8 @@ class SetCorsMaxAge implements ProcessorInterface
         /** @var OptionsContext $context */
 
         $responseHeaders = $context->getResponseHeaders();
-        if ($this->corsSettings->getPreflightMaxAge() > 0
+        if (
+            $this->corsSettings->getPreflightMaxAge() > 0
             && !$responseHeaders->has(CorsHeaders::ACCESS_CONTROL_MAX_AGE)
             && $context->getRequestHeaders()->has(CorsHeaders::ACCESS_CONTROL_REQUEST_METHOD)
         ) {

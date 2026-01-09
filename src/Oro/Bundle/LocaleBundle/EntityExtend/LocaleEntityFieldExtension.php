@@ -180,7 +180,8 @@ class LocaleEntityFieldExtension extends AbstractEntityFieldExtension implements
         $result = null;
         foreach ($values as $value) {
             $valueLocalization = $value->getLocalization();
-            if ($valueLocalization === $localization
+            if (
+                $valueLocalization === $localization
                 || (
                     null !== $valueLocalization
                     && null !== $localization
@@ -326,7 +327,8 @@ EOF;
     public function set(EntityFieldProcessTransport $transport): void
     {
         $properties = $this->getProperties($transport);
-        if (array_key_exists($transport->getName(), $properties)
+        if (
+            array_key_exists($transport->getName(), $properties)
             && isset($properties[$transport->getName()][self::PROPERTY_SETTER])
         ) {
             $transport->setArguments([$transport->getValue()]);

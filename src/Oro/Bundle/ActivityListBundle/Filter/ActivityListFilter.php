@@ -142,7 +142,8 @@ class ActivityListFilter extends EntityFilter
             ->select('1')
             ->setMaxResults(1);
 
-        if (!$this->activityAssociationHelper->hasActivityAssociations($entityClass)
+        if (
+            !$this->activityAssociationHelper->hasActivityAssociations($entityClass)
             && !$activityListRepository->getRecordsCountForTargetClass($entityClass)
         ) {
             $activityQb->andWhere('1 = 0');

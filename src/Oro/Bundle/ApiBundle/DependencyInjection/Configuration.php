@@ -122,7 +122,8 @@ class Configuration implements ConfigurationInterface
                         foreach ($value as $k1 => $v1) {
                             $requestType1 = self::getRequestType($v1);
                             foreach ($value as $k2 => $v2) {
-                                if ($k1 !== $k2
+                                if (
+                                    $k1 !== $k2
                                     && self::areRequestTypesEqual($requestType1, self::getRequestType($v2))
                                 ) {
                                     throw new \LogicException(sprintf(

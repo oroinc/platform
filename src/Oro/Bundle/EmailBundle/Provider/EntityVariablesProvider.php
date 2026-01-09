@@ -27,10 +27,10 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
 
     public function __construct(
         protected TranslatorInterface $translator,
-        protected ConfigManager       $configManager,
-        protected ManagerRegistry     $doctrine,
-        protected FormatterManager    $formatterManager,
-        protected Inflector           $inflector
+        protected ConfigManager $configManager,
+        protected ManagerRegistry $doctrine,
+        protected FormatterManager $formatterManager,
+        protected Inflector $inflector
     ) {
     }
 
@@ -81,7 +81,8 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
     {
         $entityClass = ClassUtils::getRealClass($entityClass);
         $extendConfigProvider = $this->configManager->getProvider('extend');
-        if (!$extendConfigProvider->hasConfig($entityClass)
+        if (
+            !$extendConfigProvider->hasConfig($entityClass)
             || !ExtendHelper::isEntityAccessible($extendConfigProvider->getConfig($entityClass))
         ) {
             return [];
@@ -136,7 +137,8 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
     {
         $entityClass = ClassUtils::getRealClass($entityClass);
         $extendConfigProvider = $this->configManager->getProvider('extend');
-        if (!$extendConfigProvider->hasConfig($entityClass)
+        if (
+            !$extendConfigProvider->hasConfig($entityClass)
             || !ExtendHelper::isEntityAccessible($extendConfigProvider->getConfig($entityClass))
         ) {
             return [];

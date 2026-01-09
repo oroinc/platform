@@ -51,7 +51,8 @@ class OroEmbeddedFormExtension extends Extension implements PrependExtensionInte
             '/embedded-form/success' => 'ALLOW'
         ];
 
-        if (isset($securityConfig[0]['clickjacking']['paths'])
+        if (
+            isset($securityConfig[0]['clickjacking']['paths'])
             && \is_array($securityConfig[0]['clickjacking']['paths'])
         ) {
             $securityConfig[0]['clickjacking']['paths']

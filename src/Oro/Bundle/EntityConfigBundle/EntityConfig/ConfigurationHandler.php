@@ -167,7 +167,8 @@ class ConfigurationHandler
         }
 
         foreach ($config[$type]['items'] as $code => $item) {
-            if (!isset($incomingConfigValues[$code])
+            if (
+                !isset($incomingConfigValues[$code])
                 && isset($configValues[$code])
                 && isset($item['options']['allowed_type'])
                 && !in_array($fieldType, $item['options']['allowed_type'], true)

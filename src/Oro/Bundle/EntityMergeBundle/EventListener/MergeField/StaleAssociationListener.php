@@ -62,7 +62,8 @@ class StaleAssociationListener
     {
         $metadata = $fieldData->getMetadata();
 
-        if (MergeModes::REPLACE === $fieldData->getMode() &&
+        if (
+            MergeModes::REPLACE === $fieldData->getMode() &&
             $metadata->hasDoctrineMetadata() &&
             $metadata->isDefinedBySourceEntity() &&
             $metadata->getDoctrineMetadata()->isAssociation() &&

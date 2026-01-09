@@ -214,7 +214,7 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
                         'column1'                                                    => 'c1',
                         $enR1 . '::rc1+' . $en1 . '::column2'                        => 'c2',
                         $enR1 . '::rc2+' . $en1 . '::column2'                        => 'c3',
-                        $enR1 . '::rc3+'  .$en1 . '::column2'                        => 'c4',
+                        $enR1 . '::rc3+'  . $en1 . '::column2'                        => 'c4',
                         'rc1+' . $en1 . '::' . $enR1 . '::rc1+' . $en2 . '::column1' => 'c5',
                     ],
                 ]

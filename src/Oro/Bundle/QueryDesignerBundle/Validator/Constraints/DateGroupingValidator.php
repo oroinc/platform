@@ -40,7 +40,8 @@ class DateGroupingValidator extends ConstraintValidator
         }
 
         $dateGrouping = $definition[DateGroupingType::DATE_GROUPING_NAME];
-        if (isset($dateGrouping[DateGroupingType::USE_DATE_GROUPING_FILTER])
+        if (
+            isset($dateGrouping[DateGroupingType::USE_DATE_GROUPING_FILTER])
             && !isset($dateGrouping[DateGroupingType::FIELD_NAME_ID])
         ) {
             $this->context->addViolation($constraint->dateFieldMandatoryMessage);

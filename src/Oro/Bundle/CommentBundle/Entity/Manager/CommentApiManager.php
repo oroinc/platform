@@ -242,7 +242,8 @@ class CommentApiManager extends ApiEntityManager
     protected function getCommentAvatarImage($user): array
     {
         $attachment = PropertyAccess::createPropertyAccessor()->getValue($user, self::AVATAR_FIELD_NAME);
-        if (($this->pictureSourcesProvider instanceof PictureSourcesProviderInterface) &&
+        if (
+            ($this->pictureSourcesProvider instanceof PictureSourcesProviderInterface) &&
             $attachment &&
             $attachment->getFilename()
         ) {

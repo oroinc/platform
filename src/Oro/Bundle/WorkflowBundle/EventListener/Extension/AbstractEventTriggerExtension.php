@@ -101,7 +101,8 @@ abstract class AbstractEventTriggerExtension implements EventTriggerExtensionInt
      */
     protected function isEqual($first, $second)
     {
-        if (is_object($first) && is_object($second) &&
+        if (
+            is_object($first) && is_object($second) &&
             $this->doctrineHelper->isManageableEntity($first) &&
             $this->doctrineHelper->isManageableEntity($second)
         ) {

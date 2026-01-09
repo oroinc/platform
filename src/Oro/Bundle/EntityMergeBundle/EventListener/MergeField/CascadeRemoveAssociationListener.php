@@ -34,7 +34,8 @@ class CascadeRemoveAssociationListener
         $fieldData = $event->getFieldData();
         $metadata = $fieldData->getMetadata();
 
-        if (MergeModes::REPLACE != $fieldData->getMode() ||
+        if (
+            MergeModes::REPLACE != $fieldData->getMode() ||
             !$metadata->hasDoctrineMetadata() ||
             !$metadata->getDoctrineMetadata()->isAssociation() ||
             !$metadata->isDefinedBySourceEntity() ||

@@ -48,7 +48,8 @@ class ResponseHashnavListener implements ServiceSubscriberInterface
                     $isFullRedirect = true;
                 }
             }
-            if ($response->isNotFound()
+            if (
+                $response->isNotFound()
                 || ($response->getStatusCode() === Response::HTTP_SERVICE_UNAVAILABLE && !$this->debug)
             ) {
                 $location = $request->getUri();

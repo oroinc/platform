@@ -36,7 +36,8 @@ class ResponseHeaderProvider implements ResponseHeaderProviderInterface
             return [];
         }
         $headers = [];
-        if (ApiAction::CREATE === $action
+        if (
+            ApiAction::CREATE === $action
             && $entityType
             && ($associationName || !$this->resourceInfoProvider->isResourceWithoutIdentifier($entityType))
         ) {
@@ -44,7 +45,8 @@ class ResponseHeaderProvider implements ResponseHeaderProviderInterface
                 'description' => 'The URL of a newly created API resource.'
             ];
         }
-        if (ApiAction::GET_LIST === $action
+        if (
+            ApiAction::GET_LIST === $action
             || ApiAction::DELETE_LIST === $action
             || ApiAction::GET_SUBRESOURCE === $action
             || ApiAction::GET_RELATIONSHIP === $action

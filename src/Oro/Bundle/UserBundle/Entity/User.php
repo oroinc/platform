@@ -587,7 +587,8 @@ class User extends AbstractUser implements
     public function setImapConfiguration($imapConfiguration = null)
     {
         $currentImapConfiguration = $this->getImapConfiguration();
-        if ($currentImapConfiguration &&
+        if (
+            $currentImapConfiguration &&
             (null === $imapConfiguration || $currentImapConfiguration->getId() !== $imapConfiguration->getId())
         ) {
             // deactivate current IMAP configuration and remove a reference to it

@@ -47,7 +47,8 @@ class CommentLifecycleListener
     {
         $user = $this->tokenAccessor->getUser();
 
-        if (null !== $user
+        if (
+            null !== $user
             && $entityManager->getUnitOfWork()->getEntityState($user) === UnitOfWork::STATE_DETACHED
         ) {
             $user = $entityManager->find(User::class, $user->getId());

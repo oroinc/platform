@@ -78,7 +78,8 @@ class DatagridFiltersProvider implements DatagridFiltersProviderInterface
         foreach ($filtersConfig as $filterName => &$filterConfig) {
             if (!\array_key_exists(self::LABEL_KEY, $filterConfig)) {
                 $filterConfig[self::LABEL_KEY] = $this->getColumnOption($gridConfig, $filterName, self::LABEL_KEY);
-                if (($filterConfig[FilterUtility::TRANSLATABLE_KEY] ?? true)
+                if (
+                    ($filterConfig[FilterUtility::TRANSLATABLE_KEY] ?? true)
                     && $this->getColumnOption($gridConfig, $filterName, FilterUtility::TRANSLATABLE_KEY) === false
                 ) {
                     $filterConfig[FilterUtility::TRANSLATABLE_KEY] = false;

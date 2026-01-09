@@ -128,7 +128,7 @@ class RestrictionsExtension extends AbstractExtension
      *
      * @return array
      */
-    protected function addRestrictionsToData(array  $rows, array $restrictions, $identifier, $restrictionColumnId)
+    protected function addRestrictionsToData(array $rows, array $restrictions, $identifier, $restrictionColumnId)
     {
         return array_map(
             function (ResultRecord $item) use ($restrictions, $identifier, $restrictionColumnId) {

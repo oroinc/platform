@@ -112,7 +112,8 @@ class ApiConfiguration implements ConfigurationInterface
                     }
                     if (!empty($entityConfig[ConfigUtil::FIELDS])) {
                         foreach ($entityConfig[ConfigUtil::FIELDS] as $fieldName => $fieldConfig) {
-                            if (\array_key_exists(ConfigUtil::EXCLUDE, $fieldConfig)
+                            if (
+                                \array_key_exists(ConfigUtil::EXCLUDE, $fieldConfig)
                                 && !$fieldConfig[ConfigUtil::EXCLUDE]
                             ) {
                                 $config[self::INCLUSIONS_SECTION][] = [

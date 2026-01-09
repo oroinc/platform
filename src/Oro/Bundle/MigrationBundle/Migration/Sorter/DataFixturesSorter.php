@@ -129,8 +129,10 @@ class DataFixturesSorter
         $sequence  = 1;
         $lastCount = -1;
 
-        while (($count = count($unsequencedClasses = $this->getUnsequencedClasses($sequenceForClasses))) > 0
-            && $count !== $lastCount) {
+        while (
+            ($count = count($unsequencedClasses = $this->getUnsequencedClasses($sequenceForClasses))) > 0
+            && $count !== $lastCount
+        ) {
             foreach ($unsequencedClasses as $key => $class) {
                 $fixture                 = $this->fixtures[$class];
                 $dependencies            = $fixture->getDependencies();

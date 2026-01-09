@@ -88,8 +88,10 @@ class Serializer extends SymfonySerializer implements SerializerInterface
         }
 
         foreach ($this->normalizers as $normalizer) {
-            if ($normalizer instanceof DenormalizerInterface
-                && $normalizer->supportsDenormalization($data, $type, $format, $context)) {
+            if (
+                $normalizer instanceof DenormalizerInterface
+                && $normalizer->supportsDenormalization($data, $type, $format, $context)
+            ) {
                 $this->denormalizerCache[$cacheKey] = $normalizer;
 
                 return $normalizer->denormalize($data, $type, $format, $context);
@@ -166,8 +168,10 @@ class Serializer extends SymfonySerializer implements SerializerInterface
         }
 
         foreach ($this->normalizers as $normalizer) {
-            if ($normalizer instanceof NormalizerInterface
-                && $normalizer->supportsNormalization($object, $format, $context)) {
+            if (
+                $normalizer instanceof NormalizerInterface
+                && $normalizer->supportsNormalization($object, $format, $context)
+            ) {
                 $this->normalizerCache[$cacheKey] = $normalizer;
 
                 return $normalizer->normalize($object, $format, $context);

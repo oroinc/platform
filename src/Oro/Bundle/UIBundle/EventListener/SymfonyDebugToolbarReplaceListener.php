@@ -35,8 +35,10 @@ class SymfonyDebugToolbarReplaceListener
             return;
         }
 
-        if ($request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER)
-            || $request->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER)) {
+        if (
+            $request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER)
+            || $request->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER)
+        ) {
             $event->getResponse()->headers->set('Symfony-Debug-Toolbar-Replace', 1);
         }
     }

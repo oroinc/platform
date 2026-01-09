@@ -124,7 +124,8 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
                 )
             );
 
-            if (!$form->getData()
+            if (
+                !$form->getData()
                 || ($form->getData() && !$form->getData()->getRegionText())
                 || !empty($data['region'])
             ) {

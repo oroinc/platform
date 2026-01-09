@@ -80,7 +80,7 @@ class DbalPidFileManager
         $this->ensurePidDirExists();
 
         $pidsFileInfo = [];
-        $path = rtrim($this->pidDir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'*'.$this->pidFileExtension;
+        $path = rtrim($this->pidDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '*' . $this->pidFileExtension;
         /** @var \SplFileInfo $file */
         foreach (new \GlobIterator($path) as $file) {
             $content = file_get_contents($file->getPathname());
@@ -117,6 +117,6 @@ class DbalPidFileManager
      */
     private function generateFilenameByConsumerId($consumerId)
     {
-        return rtrim($this->pidDir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$consumerId.$this->pidFileExtension;
+        return rtrim($this->pidDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $consumerId . $this->pidFileExtension;
     }
 }

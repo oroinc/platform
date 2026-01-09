@@ -95,7 +95,8 @@ class DoctrineTagEventListener implements OptionalListenerInterface, ServiceSubs
     private function addEntityTags(object $entity, bool $includeCollectionTag = false): void
     {
         $hash = spl_object_hash($entity);
-        if (!isset($this->processedEntities[$hash])
+        if (
+            !isset($this->processedEntities[$hash])
             && !isset($this->skipTrackingFor[ClassUtils::getClass($entity)])
         ) {
             $this->collectedTags = array_merge(

@@ -21,7 +21,8 @@ class MergeMassActionListener
     public function onBuildBefore(BuildBefore $event)
     {
         $config = $event->getConfig();
-        if (!isset($config['mass_actions'])
+        if (
+            !isset($config['mass_actions'])
             || empty($config['mass_actions']['merge']['entity_name'])
         ) {
             return;

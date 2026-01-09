@@ -28,12 +28,14 @@ class OrganizationFieldForCustomEntities implements Migration, ContainerAwareInt
         $entityConfigIds = $configManager->getIds('extend');
         $ownerProvider = $configManager->getProvider('ownership');
         foreach ($entityConfigIds as $entityConfigId) {
-            if ($configManager->getConfig($entityConfigId)->get('owner') == ExtendScope::OWNER_CUSTOM
+            if (
+                $configManager->getConfig($entityConfigId)->get('owner') == ExtendScope::OWNER_CUSTOM
                 && $ownerProvider->hasConfigById($entityConfigId)
             ) {
                 $className   = $entityConfigId->getClassName();
                 $ownerConfig = $ownerProvider->getConfig($className);
-                if (in_array($ownerConfig->get('owner_type'), ['USER', 'BUSINESS_UNIT'])
+                if (
+                    in_array($ownerConfig->get('owner_type'), ['USER', 'BUSINESS_UNIT'])
                     && !$ownerConfig->has('organization_field_name')
                 ) {
                     $tableName    = $configManager->getProvider('extend')

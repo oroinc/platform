@@ -48,7 +48,8 @@ class GetContext extends SingleItemContext
         if ($parentAction) {
             $normalizationContext[self::PARENT_ACTION] = $parentAction;
         }
-        if ($this->hasSkippedGroups()
+        if (
+            $this->hasSkippedGroups()
             && \in_array(ApiActionGroup::DATA_SECURITY_CHECK, $this->getSkippedGroups(), true)
         ) {
             $normalizationContext[AclProtectedQueryResolver::SKIP_ACL_FOR_ROOT_ENTITY] = true;

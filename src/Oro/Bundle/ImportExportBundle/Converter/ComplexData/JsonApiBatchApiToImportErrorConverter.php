@@ -319,7 +319,8 @@ class JsonApiBatchApiToImportErrorConverter implements BatchApiToImportErrorConv
                 continue;
             }
             if (ArrayUtil::isAssoc($relationshipData)) {
-                if (($relationshipData[JsonApiDoc::TYPE] ?? null) === $relatedTargetType
+                if (
+                    ($relationshipData[JsonApiDoc::TYPE] ?? null) === $relatedTargetType
                     && ($relationshipData[JsonApiDoc::ID] ?? null) === $relatedId
                 ) {
                     return $this->getErrorPropertyPathByTargetPath(
@@ -329,7 +330,8 @@ class JsonApiBatchApiToImportErrorConverter implements BatchApiToImportErrorConv
                 }
             } else {
                 foreach ($relationshipData as $itemIndex => $item) {
-                    if (($item[JsonApiDoc::TYPE] ?? null) === $relatedTargetType
+                    if (
+                        ($item[JsonApiDoc::TYPE] ?? null) === $relatedTargetType
                         && ($item[JsonApiDoc::ID] ?? null) === $relatedId
                     ) {
                         return $this->buildPath([

@@ -67,7 +67,8 @@ class PackageProvider
         foreach (InstalledVersions::getAllRawData() as $installed) {
             $rootPackageName = isset($installed['root']) ? $installed['root']['name'] : null;
             foreach ($installed['versions'] as $packageName => $packageData) {
-                if (isset($packageData['reference'])
+                if (
+                    isset($packageData['reference'])
                     && $packageName !== $rootPackageName
                     && !isset($packages[$packageName])
                 ) {

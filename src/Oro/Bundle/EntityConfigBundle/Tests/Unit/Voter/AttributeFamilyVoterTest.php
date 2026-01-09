@@ -16,6 +16,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 class AttributeFamilyVoterTest extends TestCase
 {
     use EntityTrait;
+
     private const ENTITY_CLASS_NAME = 'stdClass';
     private const FAMILY_ID = 777;
 

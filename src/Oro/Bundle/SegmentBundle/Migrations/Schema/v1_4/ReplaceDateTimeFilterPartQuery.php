@@ -62,7 +62,8 @@ class ReplaceDateTimeFilterPartQuery extends ParametrizedSqlMigrationQuery
         foreach ($filtersToProcess as $filterDefinition) {
             $newDefinition = $filterDefinition;
             if (isset($filterDefinition['criterion'])) {
-                if (isset($filterDefinition['criterion']['filter']) &&
+                if (
+                    isset($filterDefinition['criterion']['filter']) &&
                     in_array($filterDefinition['criterion']['filter'], ['date', 'datetime'], true) &&
                     isset($filterDefinition['criterion']['data']['part']) &&
                     $filterDefinition['criterion']['data']['part'] === 'source'

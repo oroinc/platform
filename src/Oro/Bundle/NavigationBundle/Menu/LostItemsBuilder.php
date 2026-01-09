@@ -34,8 +34,10 @@ class LostItemsBuilder implements BuilderInterface
             $menuItem->getParent()?->removeChild($menuItem);
 
             foreach (MenuUpdateUtils::createRecursiveIterator($menuItem) as $removedItemChild) {
-                if ($removedItemChild->getExtra(MenuUpdateInterface::IS_CUSTOM)
-                    || $removedItemChild->getExtra(MenuUpdateInterface::IS_SYNTHETIC)) {
+                if (
+                    $removedItemChild->getExtra(MenuUpdateInterface::IS_CUSTOM)
+                    || $removedItemChild->getExtra(MenuUpdateInterface::IS_SYNTHETIC)
+                ) {
                     $removedItemChild->getParent()?->removeChild($removedItemChild->getName());
                     $menu->addChild($removedItemChild);
                 }

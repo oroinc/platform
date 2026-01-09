@@ -160,7 +160,8 @@ class EntityOwnershipAssociationsSetter
         $businessUnits = $user->getBusinessUnits();
         foreach ($businessUnits as $businessUnit) {
             $businessUnitOrganization = $businessUnit->getOrganization();
-            if (null !== $businessUnitOrganization
+            if (
+                null !== $businessUnitOrganization
                 && $businessUnitOrganization->getId() === $organization->getId()
             ) {
                 $result = $businessUnit;

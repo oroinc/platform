@@ -54,7 +54,8 @@ class NestedAssociationFilter extends AssociationFilter implements
             return $expr;
         }
 
-        if (FilterOperator::EQ === $operator
+        if (
+            FilterOperator::EQ === $operator
             || FilterOperator::NEQ === $operator
             || FilterOperator::NEQ_OR_NULL === $operator
         ) {

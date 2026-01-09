@@ -73,7 +73,8 @@ class ActivityAssociationProvider implements ResetInterface
         }
 
         $result = [];
-        if ($this->doctrineHelper->isManageableEntityClass($entityClass)
+        if (
+            $this->doctrineHelper->isManageableEntityClass($entityClass)
             && $this->configManager->hasConfig($entityClass)
         ) {
             $activityAssociations = $this->activityManager->getActivityAssociations($entityClass);

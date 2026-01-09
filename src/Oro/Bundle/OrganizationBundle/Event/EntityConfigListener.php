@@ -36,7 +36,8 @@ class EntityConfigListener
                 $config->set('owner_column_name', 'owner_id');
                 $haveChanges = true;
             }
-            if (!$config->has('organization_field_name')
+            if (
+                !$config->has('organization_field_name')
                 && in_array($ownerType, [OwnershipType::OWNER_TYPE_USER, OwnershipType::OWNER_TYPE_BUSINESS_UNIT], true)
             ) {
                 // update organization config for entity

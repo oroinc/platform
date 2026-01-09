@@ -202,7 +202,7 @@ class DatagridConfiguration extends ConfigObject
             throw new \BadMethodCallException('DatagridConfiguration::updateLabel: name should not be empty');
         }
 
-        $this->offsetSetByPath(sprintf(self::COLUMN_PATH.'[label]', $name), $label);
+        $this->offsetSetByPath(sprintf(self::COLUMN_PATH . '[label]', $name), $label);
 
         return $this;
     }

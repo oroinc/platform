@@ -209,7 +209,8 @@ class AuditController extends RestGetController
                     }
                 }
 
-                if (!$auditConfigProvider->hasConfig($class, $field) ||
+                if (
+                    !$auditConfigProvider->hasConfig($class, $field) ||
                     !$auditConfigProvider->getConfig($class, $field)->is('auditable')
                 ) {
                     continue;

@@ -23,7 +23,8 @@ class ValidateClassExistenceApplicableChecker implements ApplicableCheckerInterf
     public function isApplicable(ContextInterface $context, array $processorAttributes): int
     {
         foreach (self::CLASS_ATTRIBUTES as $attributeName) {
-            if (isset($processorAttributes[$attributeName])
+            if (
+                isset($processorAttributes[$attributeName])
                 && !$this->isClassExists($processorAttributes[$attributeName])
             ) {
                 throw new \InvalidArgumentException(sprintf(

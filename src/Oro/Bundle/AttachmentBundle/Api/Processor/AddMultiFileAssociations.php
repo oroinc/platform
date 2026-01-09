@@ -81,7 +81,8 @@ class AddMultiFileAssociations implements ProcessorInterface
                 $version,
                 $requestType
             );
-            if ($parentEntityMultiFileAssociationNames
+            if (
+                $parentEntityMultiFileAssociationNames
                 && \in_array($associationName, $parentEntityMultiFileAssociationNames, true)
             ) {
                 /** @see BuildMultiFileSubresourceQuery */

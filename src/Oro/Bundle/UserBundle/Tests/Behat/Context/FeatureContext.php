@@ -99,8 +99,8 @@ class FeatureContext extends OroFeatureContext implements
 
         self::assertNotNull($error, 'Expect to find error on page, but it not found');
         self::assertEquals(
-            'Your login was unsuccessful. '.
-            'Please check your e-mail address and password before trying again. '.
+            'Your login was unsuccessful. ' .
+            'Please check your e-mail address and password before trying again. ' .
             'If you have forgotten your password, follow "Forgot your password?" link.',
             $error->getText()
         );

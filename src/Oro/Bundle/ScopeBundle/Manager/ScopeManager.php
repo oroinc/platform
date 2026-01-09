@@ -351,7 +351,8 @@ class ScopeManager implements ResetInterface
             return false;
         }
 
-        if (!is_a($value, $provider->getCriteriaValueType())
+        if (
+            !is_a($value, $provider->getCriteriaValueType())
             && !is_array($value)
             && ScopeCriteria::IS_NOT_NULL !== $value
         ) {

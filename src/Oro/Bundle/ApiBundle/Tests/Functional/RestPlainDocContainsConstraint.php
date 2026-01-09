@@ -13,7 +13,8 @@ class RestPlainDocContainsConstraint extends ArrayContainsConstraint
     #[\Override]
     protected function matches($other): bool
     {
-        if (parent::matches($other)
+        if (
+            parent::matches($other)
             && \is_array($this->expected)
             && \is_array($other)
             && !empty($this->expected)

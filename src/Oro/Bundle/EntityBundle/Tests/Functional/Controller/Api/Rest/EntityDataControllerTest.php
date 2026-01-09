@@ -263,7 +263,7 @@ class EntityDataControllerTest extends WebTestCase
         $this->client->request('PATCH', $url, [], [], [], $content);
     }
 
-    private function refreshEntity(object  $entity): void
+    private function refreshEntity(object $entity): void
     {
         /** @var ManagerRegistry $doctrine */
         $doctrine = $this->getContainer()->get('doctrine');

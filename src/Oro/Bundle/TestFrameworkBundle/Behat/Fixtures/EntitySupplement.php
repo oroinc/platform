@@ -115,7 +115,8 @@ class EntitySupplement
     protected function completeFields($entity, ClassMetadataInfo $metadata)
     {
         foreach ($metadata->getFieldNames() as $fieldName) {
-            if ($metadata->isNullable($fieldName)
+            if (
+                $metadata->isNullable($fieldName)
                 || true === $metadata->isIdentifier($fieldName)
                 || $metadata->getFieldValue($entity, $fieldName)
             ) {

@@ -23,8 +23,10 @@ class EnumOptionFieldExtension extends AbstractEntityFieldExtension implements E
 
     protected function isApplicable(EntityFieldProcessTransport $transport): bool
     {
-        if ($transport->getClass() !== EnumOption::class
-            && !$transport->getObject() instanceof EnumOptionInterface) {
+        if (
+            $transport->getClass() !== EnumOption::class
+            && !$transport->getObject() instanceof EnumOptionInterface
+        ) {
             return false;
         }
 

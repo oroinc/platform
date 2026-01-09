@@ -44,8 +44,10 @@ class ExtendAutocompleteGenerator
             foreach ($extendConfigs as $config) {
                 $schema = $config->get('schema');
                 // Exclude enums and custom entities.
-                if (null === $schema
-                    || str_starts_with($schema['class'], ExtendClassLoadingUtils::getEntityNamespace())) {
+                if (
+                    null === $schema
+                    || str_starts_with($schema['class'], ExtendClassLoadingUtils::getEntityNamespace())
+                ) {
                     continue;
                 }
                 $classes .= $this->buildPhpAutocompleteTrait($schema);
@@ -166,7 +168,7 @@ class ExtendAutocompleteGenerator
 
                 return $this->isMethodHasArgument($methodName)
                     ? $methodName . '(' . str_replace('?', '', $propertyType) . ' $value)'
-                    : $returnType . ' '. $methodName . '() ';
+                    : $returnType . ' ' . $methodName . '() ';
             }
             $methodsArguments = $this->isMethodHasArgument($methodName) ? '($value)' : '()';
 
@@ -204,7 +206,7 @@ class ExtendAutocompleteGenerator
             return null;
         }
 
-        $currentEntity = '\\' .$entityMetadata->getValues()['schema']['entity'];
+        $currentEntity = '\\' . $entityMetadata->getValues()['schema']['entity'];
         foreach ($entityMetadata->getValues()['relation'] as $relation) {
             if ($relation['field_id']->getFieldName() !== $fieldName) {
                 continue;
@@ -213,23 +215,23 @@ class ExtendAutocompleteGenerator
             if ($relation['field_id']->getFieldType() === 'manyToMany') {
                 $collection = '\\' . Collection::class;
                 if ($this->isAdderMethod($methodName)) {
-                    return 'void ' . $methodName .'(' . $targetEntity . ' $value)';
+                    return 'void ' . $methodName . '(' . $targetEntity . ' $value)';
                 } elseif ($this->isGetterMethod($methodName)) {
                     // Check if the method name is singular
                     return EntityFieldAccessorsHelper::getterName($fieldName) !== $methodName
-                        ? $targetEntity . '|null ' . $methodName .'()'
+                        ? $targetEntity . '|null ' . $methodName . '()'
                         : $collection  . ' ' . $methodName . '()';
                 } elseif ($this->isRemoveMethod($methodName)) {
-                    return 'void ' . $methodName. '(' . $targetEntity . ' $value)';
+                    return 'void ' . $methodName . '(' . $targetEntity . ' $value)';
                 } elseif ($this->isDefaultMethod($methodName)) {
-                    return $targetEntity. '|null ' . $methodName.'()';
+                    return $targetEntity . '|null ' . $methodName . '()';
                 } elseif ($this->isSetterMethod($methodName)) {
                     // Check if the method name is singular
                     return EntityFieldAccessorsHelper::setterName($fieldName) !== $methodName
-                        ? $currentEntity . ' ' .$methodName. '(?' . $targetEntity . ' $value)'
-                        : 'void ' . $methodName .'(' . $collection . ' $value)';
+                        ? $currentEntity . ' ' . $methodName . '(?' . $targetEntity . ' $value)'
+                        : 'void ' . $methodName . '(' . $collection . ' $value)';
                 }
-                return 'void ' .$methodName. '()';
+                return 'void ' . $methodName . '()';
             }
             $getFormatedByMethodName = $this->getFormatedByMethodType($methodName, $targetEntity);
             if (null !== $getFormatedByMethodName) {
@@ -237,8 +239,8 @@ class ExtendAutocompleteGenerator
             }
 
             return $this->isSetterMethod($methodName)
-                ? $currentEntity . ' ' . $methodName. '(?' . $targetEntity . ' $value)'
-                : $targetEntity . '|null ' .$methodName. '()';
+                ? $currentEntity . ' ' . $methodName . '(?' . $targetEntity . ' $value)'
+                : $targetEntity . '|null ' . $methodName . '()';
         }
 
         return null;
@@ -247,13 +249,13 @@ class ExtendAutocompleteGenerator
     protected function getFormatedByMethodType(string $methodName, string $targetEntity): ?string
     {
         if ($this->isAdderMethod($methodName)) {
-            return 'void ' .$methodName. '(' . $targetEntity . ' $value)';
+            return 'void ' . $methodName . '(' . $targetEntity . ' $value)';
         } elseif ($this->isGetterMethod($methodName)) {
-            return $targetEntity . '|null ' .$methodName. '()';
+            return $targetEntity . '|null ' . $methodName . '()';
         } elseif ($this->isRemoveMethod($methodName)) {
-            return 'void ' .$methodName. '(' . $targetEntity . ' $value)';
+            return 'void ' . $methodName . '(' . $targetEntity . ' $value)';
         } elseif ($this->isDefaultMethod($methodName)) {
-            return $targetEntity . '|null ' .$methodName. '()';
+            return $targetEntity . '|null ' . $methodName . '()';
         }
 
         return null;
@@ -275,12 +277,12 @@ class ExtendAutocompleteGenerator
                 ? '(' . $this->getArgType($schema['doctrine'][$schema['entity']]['fields'][$fieldName]) . ' $value)'
                 : '($value)';
 
-            return $returnType .' '. $methodName . $formatValue;
+            return $returnType . ' ' . $methodName . $formatValue;
         }
         $isGetter = str_starts_with($methodName, 'get');
         if ($isGetter && $issetDoctrineConfig) {
             return $this->getReturnType($schema['doctrine'][$schema['entity']]['fields'][$fieldName])
-                . ' ' . $methodName .'() ';
+                . ' ' . $methodName . '() ';
         }
 
         return null;

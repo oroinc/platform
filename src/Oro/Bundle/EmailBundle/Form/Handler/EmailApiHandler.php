@@ -104,9 +104,6 @@ class EmailApiHandler extends ApiFormHandler
      */
     protected function processEmailModel(EmailModel $model)
     {
-        /**
-         * TODO EmailEntityBuilder::email or EmailEntityBuilder::emailUser should be user here
-         */
         $this->assertModel($model);
 
         $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));

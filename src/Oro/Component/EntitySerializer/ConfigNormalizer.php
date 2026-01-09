@@ -112,7 +112,8 @@ class ConfigNormalizer
                     $property = $field;
                     // remove 'exclude' option if it is TRUE, because there is another field
                     // that uses data from this association and as result the association should be loaded
-                    if (\is_array($currentConfig[ConfigUtil::FIELDS][$property])
+                    if (
+                        \is_array($currentConfig[ConfigUtil::FIELDS][$property])
                         && ConfigUtil::isExclude($currentConfig[ConfigUtil::FIELDS][$property])
                     ) {
                         unset($currentConfig[ConfigUtil::FIELDS][$property][ConfigUtil::EXCLUDE]);

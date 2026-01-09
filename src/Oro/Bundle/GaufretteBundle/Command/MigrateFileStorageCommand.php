@@ -109,14 +109,14 @@ HELP
         if ('Automatic' === $mode) {
             $io->title('Migration started.');
             foreach ($this->mappings as $filesPath => $fileManagerName) {
-                $this->migratePath($this->projectDir.$filesPath, $this->fileManagers[$fileManagerName], $io);
+                $this->migratePath($this->projectDir . $filesPath, $this->fileManagers[$fileManagerName], $io);
             }
         }
 
         if ('FilesystemsList' === $mode) {
             $io->title('List of available Gaufrette filesystems:');
             foreach (array_keys($this->fileManagers) as $fileSystemName) {
-                $io->writeln('- '.$fileSystemName);
+                $io->writeln('- ' . $fileSystemName);
             }
         }
 

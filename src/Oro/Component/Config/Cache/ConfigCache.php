@@ -87,8 +87,10 @@ class ConfigCache extends ResourceCheckerConfigCache
                 $cacheTimestamp = PHP_INT_MAX;
             }
             foreach ($this->dependencies as $dependency) {
-                if ($dependency instanceof WarmableConfigCacheInterface
-                    && !$dependency->isCacheFresh($cacheTimestamp)) {
+                if (
+                    $dependency instanceof WarmableConfigCacheInterface
+                    && !$dependency->isCacheFresh($cacheTimestamp)
+                ) {
                     $dependency->warmUpCache();
                 }
             }

@@ -137,9 +137,11 @@ class RuntimeStepTester implements StepTester
         }
         $this->testSubProcessDefinition($result, $search, $env, $feature, $step);
 
-        if ($this->sessionHolder->isWatchMode()
+        if (
+            $this->sessionHolder->isWatchMode()
             && !$this->sessionHolder->isWatchFrom()
-            && $this->isLastStep($feature, $step)) {
+            && $this->isLastStep($feature, $step)
+        ) {
             $this->stepTester->tearDown($env, $feature, $step, false, new ExecutedStepResult($search, $result));
             $endTestStatus = $this->questionProvider->askBeforeTestEnd();
             if ($endTestStatus === 1) {
@@ -167,9 +169,11 @@ class RuntimeStepTester implements StepTester
         StepNode $step,
         bool $skipException = false
     ): void {
-        if ($this->sessionHolder->isWatchMode()
+        if (
+            $this->sessionHolder->isWatchMode()
             && !$this->sessionHolder->isWatchFrom()
-            && (null !== $result->getException() || $skipException)) {
+            && (null !== $result->getException() || $skipException)
+        ) {
             // tear down failed step
             if (!$skipException) {
                 $this->stepTester->tearDown($env, $feature, $step, false, new ExecutedStepResult($search, $result));

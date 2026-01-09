@@ -77,7 +77,8 @@ class ConfigTypeSubscriber implements EventSubscriberInterface
                     $this->configManager->persist($extendConfig);
                 }
 
-                if ($configId instanceof FieldConfigId &&
+                if (
+                    $configId instanceof FieldConfigId &&
                     $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM) &&
                     $extendConfig->is('state', ExtendScope::STATE_ACTIVE)
                 ) {

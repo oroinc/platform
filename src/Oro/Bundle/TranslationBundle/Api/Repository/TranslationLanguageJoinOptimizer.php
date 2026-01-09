@@ -86,7 +86,8 @@ class TranslationLanguageJoinOptimizer extends WhereExpressionModifier
         }
 
         $languageCodeParamNameExpr = $comparison->getRightExpr();
-        if (!\is_string($languageCodeParamNameExpr)
+        if (
+            !\is_string($languageCodeParamNameExpr)
             || !$languageCodeParamNameExpr
             || !str_starts_with($languageCodeParamNameExpr, ':')
         ) {

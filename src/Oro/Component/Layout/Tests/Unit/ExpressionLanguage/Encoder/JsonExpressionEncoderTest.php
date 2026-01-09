@@ -31,7 +31,7 @@ class JsonExpressionEncoderTest extends TestCase
 
         $encoder = new JsonExpressionEncoder($expressionManipulator);
         $result = $encoder->encodeExpr($parsedExpression);
-        $this->assertJsonStringEqualsJsonFile(__DIR__.'/Fixtures/expression.json', $result);
+        $this->assertJsonStringEqualsJsonFile(__DIR__ . '/Fixtures/expression.json', $result);
     }
 
     public function testEncodeActions(): void

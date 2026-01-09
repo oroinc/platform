@@ -132,7 +132,8 @@ abstract class AbstractEntityVoter implements VoterInterface
             $permission = $this->getPermissionForAttribute($class, $identifier, $attribute);
 
             // if not abstain or changing from granted to denied
-            if (($result === self::ACCESS_ABSTAIN && $permission !== self::ACCESS_ABSTAIN)
+            if (
+                ($result === self::ACCESS_ABSTAIN && $permission !== self::ACCESS_ABSTAIN)
                 || ($result === self::ACCESS_GRANTED && $permission === self::ACCESS_DENIED)
             ) {
                 $result = $permission;

@@ -44,7 +44,7 @@ class FeatureCSChecker implements HealthCheckerInterface
         $path = $event->getFeature()->getFile();
 
         $featureFileName = pathinfo($path, PATHINFO_BASENAME);
-        $expectedFileName = $this->canonize($featureTitle).'.feature';
+        $expectedFileName = $this->canonize($featureTitle) . '.feature';
 
         if ($expectedFileName != $featureFileName) {
             $this->rename($path, $expectedFileName);
@@ -100,7 +100,7 @@ class FeatureCSChecker implements HealthCheckerInterface
     private function rename($featurePath, $newFileName)
     {
         $dir = pathinfo($featurePath, PATHINFO_DIRNAME);
-        $newFeaturePath = $dir.DIRECTORY_SEPARATOR.$newFileName;
+        $newFeaturePath = $dir . DIRECTORY_SEPARATOR . $newFileName;
 
         if (is_file($newFeaturePath)) {
             $this->errors[] = sprintf('File "%s" cannot be renamed to "%s"', $featurePath, $newFeaturePath);

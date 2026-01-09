@@ -31,7 +31,8 @@ class FixJsonStatusCodeErrorRenderer implements ErrorRendererInterface
         $flattenException = $this->innerErrorRenderer->render($exception);
         if ($this->isJsonResponse($flattenException)) {
             $statusCodeFromJsonResponseBody = $this->getStatusCodeFromJsonResponseBody($flattenException);
-            if (null !== $statusCodeFromJsonResponseBody
+            if (
+                null !== $statusCodeFromJsonResponseBody
                 && $flattenException->getStatusCode() !== $statusCodeFromJsonResponseBody
                 && isset(Response::$statusTexts[$statusCodeFromJsonResponseBody])
             ) {

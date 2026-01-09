@@ -58,8 +58,10 @@ class FormFieldsMapProvider
             $formFieldOptions = $form->get($name)->getConfig()->getOptions();
 
             if ($formFieldOptions['mapped']) {
-                if (empty($formFieldOptions['is_dynamic_field'])
-                    || in_array($classMetadata->getTypeOfField($name), $this->scalarTypes, true)) {
+                if (
+                    empty($formFieldOptions['is_dynamic_field'])
+                    || in_array($classMetadata->getTypeOfField($name), $this->scalarTypes, true)
+                ) {
                     $result[$name] = [
                         'id' => $childView->vars['id'],
                         'key' => $name,

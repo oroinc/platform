@@ -55,7 +55,8 @@ class WorkflowDataNormalizer implements
             $attribute = $this->getAttribute($workflow, $attributeName);
             $attributeValue = $this->normalizeAttribute($workflow, $attribute, $attributeValue);
 
-            if (null !== $attributeValue &&
+            if (
+                null !== $attributeValue &&
                 !is_scalar($attributeValue) &&
                 $this->serializer instanceof NormalizerInterface
             ) {

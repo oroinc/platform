@@ -260,7 +260,8 @@ class SearchMappingProvider
         OwnershipMetadataInterface $ownershipMetadata
     ): ?string {
         /** @noinspection NotOptimalIfConditionsInspection */
-        if (($ownershipMetadata->isUserOwned() || $ownershipMetadata->isBusinessUnitOwned())
+        if (
+            ($ownershipMetadata->isUserOwned() || $ownershipMetadata->isBusinessUnitOwned())
             && $ownershipMetadata->getOwnerFieldName() === $entityFieldName
         ) {
             $fieldName = $this->normalizeFieldName(

@@ -22,7 +22,8 @@ class ScheduleIntervalChecker
         }
 
         foreach ($schedules as $schedule) {
-            if ($schedule instanceof ScheduleIntervalInterface
+            if (
+                $schedule instanceof ScheduleIntervalInterface
                 && $this->isDateAfterScheduleStart($dateTime, $schedule)
                 && $this->isDateBeforeScheduleEnd($dateTime, $schedule)
             ) {

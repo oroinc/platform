@@ -282,7 +282,8 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
     {
         $found = false;
         foreach ($triggers as $trigger) {
-            if ($trigger instanceof TransitionEventTrigger &&
+            if (
+                $trigger instanceof TransitionEventTrigger &&
                 $trigger->getEvent() === $event &&
                 $trigger->getField() === $field
             ) {

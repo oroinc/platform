@@ -79,7 +79,8 @@ class ReflectionUtil
                 continue;
             }
             $hasChildren = ($child->count() > 0);
-            if (!$child->isSubmitted()
+            if (
+                !$child->isSubmitted()
                 && (
                     ($hasChildren && $child->getConfig()->getRequired())
                     || (!$hasChildren && $child->isRequired())
@@ -142,7 +143,8 @@ class ReflectionUtil
 
         if ($class->hasMethod($methodName)) {
             $method = $class->getMethod($methodName);
-            if ($method->isPublic()
+            if (
+                $method->isPublic()
                 && $method->getNumberOfRequiredParameters() <= $parameters
                 && $method->getNumberOfParameters() >= $parameters
             ) {

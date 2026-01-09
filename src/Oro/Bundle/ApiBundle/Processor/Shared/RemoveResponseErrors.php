@@ -21,7 +21,8 @@ class RemoveResponseErrors implements ProcessorInterface
         /** @var Context $context */
 
         $responseStatusCode = $context->getResponseStatusCode();
-        if (null !== $responseStatusCode
+        if (
+            null !== $responseStatusCode
             && $context->hasErrors()
             && $this->isErrorResponseWithoutContent($responseStatusCode)
         ) {

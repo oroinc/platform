@@ -146,7 +146,8 @@ class SegmentManager
         $queryBuilderRootAliases = $queryBuilder->getRootAliases();
         $queryBuilderRootAlias = reset($queryBuilderRootAliases);
 
-        if ($segment->getType()->getName() === SegmentType::TYPE_DYNAMIC
+        if (
+            $segment->getType()->getName() === SegmentType::TYPE_DYNAMIC
             && $this->getFromPart($queryBuilder) !== $this->getFromPart($segmentQueryBuilder)
         ) {
             throw new \LogicException(

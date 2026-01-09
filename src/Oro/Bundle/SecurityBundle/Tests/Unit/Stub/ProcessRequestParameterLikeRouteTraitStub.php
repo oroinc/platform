@@ -10,9 +10,10 @@ use Psr\Log\LoggerInterface;
  */
 class ProcessRequestParameterLikeRouteTraitStub
 {
-    use ProcessRequestParameterLikeRouteTrait{
+    use ProcessRequestParameterLikeRouteTrait {
         ProcessRequestParameterLikeRouteTrait::processRequestParameter as public processRequestParameterPublic;
     }
+
     protected LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger)

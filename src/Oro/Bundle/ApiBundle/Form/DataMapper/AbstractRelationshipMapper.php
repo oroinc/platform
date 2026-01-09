@@ -64,7 +64,8 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
 
             // Write-back is disabled if the form is not synchronized (transformation failed),
             // if the form was not submitted and if the form is disabled (modification not allowed)
-            if (null !== $propertyPath
+            if (
+                null !== $propertyPath
                 && $config->getMapped()
                 && $form->isSubmitted()
                 && $form->isSynchronized()

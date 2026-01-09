@@ -485,7 +485,8 @@ class CollectFormErrors implements ProcessorInterface
     {
         $result = $formError->getMessage();
         $cause = $formError->getCause();
-        if ($cause instanceof ConstraintViolation
+        if (
+            $cause instanceof ConstraintViolation
             && !$cause->getMessageTemplate()
             && null !== $cause->getConstraint()
             && property_exists($cause->getConstraint(), 'message')

@@ -33,7 +33,8 @@ class SetCurrency implements ProcessorInterface
         /** @var CustomizeFormDataContext $context */
 
         $currencyFormField = $context->findFormField($this->currencyFieldName);
-        if (null === $currencyFormField
+        if (
+            null === $currencyFormField
             || !$currencyFormField->isSubmitted()
             || !$currencyFormField->getConfig()->getMapped()
         ) {

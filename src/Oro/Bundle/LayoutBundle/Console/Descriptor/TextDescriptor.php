@@ -17,7 +17,7 @@ class TextDescriptor extends AbstractDescriptor
         $this->output->section('Context');
         $context = [];
         foreach ($options['context'] as $name => $value) {
-            $context[] = [$name.':', $this->formatDefaultOptionValue($value)];
+            $context[] = [$name . ':', $this->formatDefaultOptionValue($value)];
         }
 
         $table = new Table($this->output);
@@ -69,16 +69,16 @@ class TextDescriptor extends AbstractDescriptor
     #[\Override]
     protected function describeDataProvider($dataProvider, array $options = []): void
     {
-        $this->output->text('<options=underscore>Name:</> '.$options['name']);
+        $this->output->text('<options=underscore>Name:</> ' . $options['name']);
         $this->output->text(sprintf('<options=underscore>Class:</> %s', $options['class']));
         $this->output->newLine();
         foreach ($options['methods'] as $method) {
             $this->output->section(
-                '\''.
-                '=data["'.$options['name'].'"].<fg=green>'.$method['name'].'</>('.implode(
+                '\'' .
+                '=data["' . $options['name'] . '"].<fg=green>' . $method['name'] . '</>(' . implode(
                     ', ',
                     array_keys($method['arguments'])
-                ).')\''
+                ) . ')\''
             );
             if (!empty($method['description'])) {
                 $this->output->block($method['description']);
@@ -87,19 +87,19 @@ class TextDescriptor extends AbstractDescriptor
                 $this->output->writeln('  <options=underscore>arguments:</>');
                 foreach ($method['arguments'] as $argument) {
                     $this->output->write('   * ');
-                    $this->output->write('<options=bold>'.$argument['name'].'</>');
+                    $this->output->write('<options=bold>' . $argument['name'] . '</>');
                     if (array_key_exists('default', $argument)) {
-                        $this->output->write(' = '.$this->formatDefaultOptionValue($argument['default']));
+                        $this->output->write(' = ' . $this->formatDefaultOptionValue($argument['default']));
                     }
                     if ($argument['type']) {
-                        $this->output->write(' ['.$argument['type'].'] ');
+                        $this->output->write(' [' . $argument['type'] . '] ');
                     }
                     if (!$argument['required']) {
                         $this->output->write('<comment>(optional)</comment> ');
                     }
                     if (!empty($argument['description'])) {
                         $this->output->block(
-                            '    '.$argument['description'],
+                            '    ' . $argument['description'],
                             null,
                             'fg=default;bg=default',
                             '    '
@@ -121,6 +121,6 @@ class TextDescriptor extends AbstractDescriptor
             return '';
         }
 
-        return is_string($value) ? '"'.$value.'"' : json_encode($value);
+        return is_string($value) ? '"' . $value . '"' : json_encode($value);
     }
 }

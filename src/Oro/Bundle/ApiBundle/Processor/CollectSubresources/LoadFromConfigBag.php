@@ -239,7 +239,8 @@ class LoadFromConfigBag extends LoadSubresources
                 $targetClass
             ));
         }
-        if (($targetClass || $subresourceConfig->hasTargetType())
+        if (
+            ($targetClass || $subresourceConfig->hasTargetType())
             && $subresourceConfig->isCollectionValuedAssociation() !== $subresource->isCollection()
         ) {
             throw new \RuntimeException(sprintf(

@@ -64,7 +64,7 @@ class Decode extends BaseDecode
         // find an empty line between headers and body
         // default is set new line
         if (strpos($message, $EOL . $EOL)) {
-            [$headers, $body] = explode($EOL.$EOL, $message, 2);
+            [$headers, $body] = explode($EOL . $EOL, $message, 2);
             // next is the standard new line
         } elseif ($EOL != "\r\n" && strpos($message, "\r\n\r\n")) {
             [$headers, $body] = explode("\r\n\r\n", $message, 2);

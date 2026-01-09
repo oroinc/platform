@@ -201,7 +201,8 @@ class EntityDescriptionHelper implements ResetInterface
         EntityDefinitionConfig $definition,
         string $targetAction
     ): ?string {
-        if (ApiAction::GET_LIST === $targetAction
+        if (
+            ApiAction::GET_LIST === $targetAction
             || ApiAction::GET_RELATIONSHIP === $targetAction
             || ApiAction::GET_SUBRESOURCE === $targetAction
         ) {

@@ -248,7 +248,8 @@ class TestEntitiesMigration implements
      */
     private function createTestCustomIdentifierTables(Schema $schema): void
     {
-        if ($schema->hasTable('test_api_custom_id')
+        if (
+            $schema->hasTable('test_api_custom_id')
             || $schema->hasTable('test_api_custom_composite_id')
             || $schema->hasTable('test_api_custom_int_id')
         ) {
@@ -623,7 +624,8 @@ class TestEntitiesMigration implements
      */
     private function createTestEntityTables(Schema $schema): void
     {
-        if ($schema->hasTable('test_api_owner')
+        if (
+            $schema->hasTable('test_api_owner')
             || $schema->hasTable('test_api_target')
             || $schema->hasTable('test_api_activity')
         ) {
@@ -753,7 +755,8 @@ class TestEntitiesMigration implements
      */
     private function createTestOverrideClassEntityTables(Schema $schema): void
     {
-        if ($schema->hasTable('test_api_override_owner')
+        if (
+            $schema->hasTable('test_api_override_owner')
             || $schema->hasTable('test_api_override_target')
             || $schema->hasTable('test_api_override_a_target')
             || $schema->hasTable('test_api_override_activity')

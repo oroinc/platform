@@ -81,7 +81,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         }
 
         $environment = $_SERVER['ORO_ENV'] ?? $_ENV['ORO_ENV'] ?? 'prod';
-        putenv('APP_ENV='.$environment);
+        putenv('APP_ENV=' . $environment);
         $_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = $environment;
 
         /** @var MinkExtension $minkExtension */

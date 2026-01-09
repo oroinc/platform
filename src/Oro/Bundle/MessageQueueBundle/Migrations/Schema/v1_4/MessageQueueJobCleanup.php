@@ -22,8 +22,8 @@ class MessageQueueJobCleanup implements Migration
         $queries->addPostQuery("
           DELETE 
           FROM  oro_message_queue_job 
-          WHERE (status = '".Job::STATUS_FAILED."' AND stopped_at < '".$dateIntervalForStatusFailed."') 
-          OR (status = '".Job::STATUS_SUCCESS."' AND stopped_at < '".$dateIntervalForStatusSuccess."')
+          WHERE (status = '" . Job::STATUS_FAILED . "' AND stopped_at < '" . $dateIntervalForStatusFailed . "') 
+          OR (status = '" . Job::STATUS_SUCCESS . "' AND stopped_at < '" . $dateIntervalForStatusSuccess . "')
         ");
     }
 }

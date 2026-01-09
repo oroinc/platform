@@ -194,7 +194,8 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
                 return $this->formatter->formatYear($start);
             }
 
-            if (AbstractDateFilterType::TYPE_MORE_THAN === $value['type']
+            if (
+                AbstractDateFilterType::TYPE_MORE_THAN === $value['type']
                 || (AbstractDateFilterType::TYPE_BETWEEN === $value['type'] && !$end)
             ) {
                 return \sprintf(
@@ -203,7 +204,8 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
                     $this->formatter->formatDate($start)
                 );
             }
-            if (AbstractDateFilterType::TYPE_LESS_THAN === $value['type']
+            if (
+                AbstractDateFilterType::TYPE_LESS_THAN === $value['type']
                 || (AbstractDateFilterType::TYPE_BETWEEN === $value['type'] && !$start)
             ) {
                 return \sprintf(
@@ -227,7 +229,8 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
         $endValue = $value['value']['end'];
         $type = $value['type'];
 
-        if (AbstractDateFilterType::TYPE_LESS_THAN === $type
+        if (
+            AbstractDateFilterType::TYPE_LESS_THAN === $type
             || (AbstractDateFilterType::TYPE_BETWEEN === $type && null === $startValue)
         ) {
             if ($saveOpenRange) {
@@ -238,7 +241,8 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
             }
         }
 
-        if (AbstractDateFilterType::TYPE_MORE_THAN === $type
+        if (
+            AbstractDateFilterType::TYPE_MORE_THAN === $type
             || (AbstractDateFilterType::TYPE_BETWEEN === $type && null === $endValue)
         ) {
             if ($saveOpenRange) {

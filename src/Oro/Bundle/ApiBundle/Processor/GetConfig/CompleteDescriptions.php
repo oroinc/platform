@@ -57,7 +57,8 @@ class CompleteDescriptions implements ProcessorInterface
         $entityClass = $context->getClassName();
         $definition = $context->getResult();
         $isInherit = false;
-        if (ExtendHelper::getParentClassName($entityClass)
+        if (
+            ExtendHelper::getParentClassName($entityClass)
             && $this->resourcesProvider->isResourceKnown($entityClass, $context->getVersion(), $requestType)
         ) {
             $isInherit = true;

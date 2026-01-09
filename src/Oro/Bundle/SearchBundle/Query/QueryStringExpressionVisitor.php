@@ -54,6 +54,6 @@ class QueryStringExpressionVisitor extends ExpressionVisitor
         foreach ($expr->getExpressionList() as $child) {
             $expressionList[] = $this->dispatch($child);
         }
-        return '(' . implode(' ' . strtolower($expr->getType()). ' ', $expressionList) . ')';
+        return '(' . implode(' ' . strtolower($expr->getType()) . ' ', $expressionList) . ')';
     }
 }

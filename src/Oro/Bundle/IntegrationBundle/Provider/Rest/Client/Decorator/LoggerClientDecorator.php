@@ -66,9 +66,6 @@ class LoggerClientDecorator implements RestClientInterface
 
     protected function logRequest($httpMethod, $action, $params = [])
     {
-        /**
-         * @todo Filter security sensitive information from params or replaced real value on '*****'
-         */
         $this->logger->debug(
             sprintf(
                 '[%.1fMB/%.1fMB] Call %s action with http method %s with %s parameters',

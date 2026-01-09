@@ -25,7 +25,7 @@ class ImportsAwareLayoutUpdateVisitor implements VisitorInterface
     {
         $class = $visitContext->getClass();
         $class->addImplement(ImportsAwareLayoutUpdateInterface::class);
-        $class->addMethod('getImports')->addBody('return '.var_export($this->imports, true).';');
+        $class->addMethod('getImports')->addBody('return ' . var_export($this->imports, true) . ';');
     }
 
     /**

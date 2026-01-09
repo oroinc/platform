@@ -177,7 +177,8 @@ class DatabaseHelper implements ServiceSubscriberInterface
                 $checkOrganizations[] = $organization->getId();
             }
 
-            if (!$entityOrganization
+            if (
+                !$entityOrganization
                 || !\in_array($entityOrganization->getId(), $checkOrganizations)
             ) {
                 return null;

@@ -42,7 +42,8 @@ class ValidateApiDocViewListener
             }
 
             $defaultView = $this->getDefaultView($request);
-            if ($defaultView
+            if (
+                $defaultView
                 && $request->attributes->get('view') !== $defaultView
                 && $this->isDefaultViewRequested($request)
             ) {

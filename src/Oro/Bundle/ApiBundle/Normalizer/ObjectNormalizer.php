@@ -179,7 +179,8 @@ class ObjectNormalizer
 
             $propertyPath = $field->getPropertyPath($fieldName);
 
-            if (null === $field->getAssociationQuery()
+            if (
+                null === $field->getAssociationQuery()
                 && str_contains($propertyPath, ConfigUtil::PATH_DELIMITER)
             ) {
                 $referenceFields[$fieldName] = ConfigUtil::explodePropertyPath($propertyPath);
@@ -239,7 +240,8 @@ class ObjectNormalizer
         }
 
         $result = $this->dataAccessor->tryGetValue($object, $propertyName, $value);
-        if ($result
+        if (
+            $result
             && null !== $metadata
             && $metadata->hasAssociation($propertyName)
             && !$associationAccessExclusionProvider->isIgnoreAssociationAccessCheck($metadata->name, $propertyName)

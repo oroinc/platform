@@ -652,7 +652,8 @@ class ConfigManager
         // Then we are comparing persistConfigs size to stored persistConfigs size in case new persistConfigs
         // were added and configChangeSets were recalculated. In this case persistConfigs and configChangeSets sizes
         // will be equal, but we still need to rerun the logic with updated persistConfigs.
-        if (count($this->persistConfigs) !== count($this->configChangeSets)
+        if (
+            count($this->persistConfigs) !== count($this->configChangeSets)
             || count($this->persistConfigs) !== $persistConfigsCount
         ) {
             $this->prepareFlush($models);

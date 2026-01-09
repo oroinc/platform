@@ -23,7 +23,8 @@ class RequestTypeApplicableChecker extends MatchApplicableChecker
         if (!empty($processorAttributes[self::REQUEST_TYPE]) && $context->has(self::REQUEST_TYPE)) {
             /** @var RequestType $requestType */
             $requestType = $context->get(self::REQUEST_TYPE);
-            if (!$requestType->isEmpty()
+            if (
+                !$requestType->isEmpty()
                 && !$this->isMatch($processorAttributes[self::REQUEST_TYPE], $requestType, self::REQUEST_TYPE)
             ) {
                 $result = self::NOT_APPLICABLE;

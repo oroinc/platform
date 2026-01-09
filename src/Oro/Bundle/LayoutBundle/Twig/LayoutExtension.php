@@ -237,7 +237,7 @@ class LayoutExtension extends AbstractExtension implements ServiceSubscriberInte
      */
     public function highlightString($value)
     {
-        $highlightString = @highlight_string('<?php '.$value, true);
+        $highlightString = @highlight_string('<?php ' . $value, true);
         $highlightString = str_replace('&lt;?php&nbsp;', '', $highlightString);
 
         return $highlightString;

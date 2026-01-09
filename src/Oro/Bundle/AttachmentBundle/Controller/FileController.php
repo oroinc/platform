@@ -179,9 +179,11 @@ class FileController extends AbstractController
 
     private function assertValidFilename(File $file, string $filename): void
     {
-        if ($filename === $file->getFilename()
+        if (
+            $filename === $file->getFilename()
             || $filename === $file->getOriginalFilename()
-            || $filename === $this->getFileNameProvider()->getFileName($file)) {
+            || $filename === $this->getFileNameProvider()->getFileName($file)
+        ) {
             return;
         }
 
@@ -194,8 +196,10 @@ class FileController extends AbstractController
             return;
         }
 
-        if ($this->getWebpConfiguration()->isEnabledIfSupported()
-            && $filename === $this->getFileNameProvider()->getFilteredImageName($file, $filterName, 'webp')) {
+        if (
+            $this->getWebpConfiguration()->isEnabledIfSupported()
+            && $filename === $this->getFileNameProvider()->getFilteredImageName($file, $filterName, 'webp')
+        ) {
             return;
         }
 
@@ -208,8 +212,10 @@ class FileController extends AbstractController
             return;
         }
 
-        if ($this->getWebpConfiguration()->isEnabledIfSupported()
-            && $filename === $this->getFileNameProvider()->getResizedImageName($file, $width, $height, 'webp')) {
+        if (
+            $this->getWebpConfiguration()->isEnabledIfSupported()
+            && $filename === $this->getFileNameProvider()->getResizedImageName($file, $width, $height, 'webp')
+        ) {
             return;
         }
 

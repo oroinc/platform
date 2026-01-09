@@ -128,7 +128,8 @@ final class AliceFixtureReferenceResolver implements ChainableValueResolverInter
     ): ResolvedValueWithFixtureSet {
         if ($fixtureSet->getObjects()->has($referredFixture)) {
             $referredObject = $fixtureSet->getObjects()->get($referredFixture);
-            if ($referredObject instanceof CompleteObject
+            if (
+                $referredObject instanceof CompleteObject
                 || $passIncompleteObject
                 || array_key_exists($referredFixtureId, $this->incompleteObjects)
             ) {
@@ -169,7 +170,8 @@ final class AliceFixtureReferenceResolver implements ChainableValueResolverInter
                 $fixtureSet
             );
         } catch (CircularReferenceException $exception) {
-            if (false === $needsCompleteGeneration
+            if (
+                false === $needsCompleteGeneration
                 && null !== $passIncompleteObject
             ) {
                 throw $exception;

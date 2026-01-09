@@ -184,7 +184,8 @@ class SearchQuery
         $lastIndex = $itemsCount - 1;
         if ($lastIndex != -1) {
             $lastItem = $exprItems[$lastIndex];
-            if (!($lastItem instanceof SearchQueryExprOperator)
+            if (
+                !($lastItem instanceof SearchQueryExprOperator)
                 || (($lastItem instanceof SearchQueryExprOperator) && $lastItem->getName() == ')')
             ) {
                 $this->andOperator();

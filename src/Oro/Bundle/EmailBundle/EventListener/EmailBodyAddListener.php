@@ -53,7 +53,8 @@ class EmailBodyAddListener
 
     public function linkToScope(EmailBodyAdded $event): void
     {
-        if (null !== $this->tokenStorage->getToken()
+        if (
+            null !== $this->tokenStorage->getToken()
             && !$this->authorizationChecker->isGranted(
                 'CREATE',
                 ObjectIdentityHelper::encodeIdentityString(EntityAclExtension::NAME, Attachment::class)

@@ -27,22 +27,22 @@ class EntityFieldAccessorsHelper
 
     public static function getterName(string $fieldName): string
     {
-        return 'get'.\ucfirst(self::getInflector()->camelize($fieldName));
+        return 'get' . \ucfirst(self::getInflector()->camelize($fieldName));
     }
 
     public static function setterName(string $fieldName): string
     {
-        return 'set'.\ucfirst(self::getInflector()->camelize($fieldName));
+        return 'set' . \ucfirst(self::getInflector()->camelize($fieldName));
     }
 
     public static function adderName(string $fieldName): string
     {
-        return 'add'.\ucfirst(self::getSingular($fieldName));
+        return 'add' . \ucfirst(self::getSingular($fieldName));
     }
 
     public static function removerName(string $fieldName): string
     {
-        return 'remove'.\ucfirst(self::getSingular($fieldName));
+        return 'remove' . \ucfirst(self::getSingular($fieldName));
     }
 
     public static function getInflector(): Inflector

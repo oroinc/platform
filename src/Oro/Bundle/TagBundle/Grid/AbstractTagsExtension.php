@@ -108,7 +108,7 @@ abstract class AbstractTagsExtension extends AbstractExtension
      *
      * @return array
      */
-    protected function addTagsToData(array  $rows, array $tags, $identifier, $tagsColumnId)
+    protected function addTagsToData(array $rows, array $tags, $identifier, $tagsColumnId)
     {
         return array_map(
             function (ResultRecord $item) use ($tags, $identifier, $tagsColumnId) {

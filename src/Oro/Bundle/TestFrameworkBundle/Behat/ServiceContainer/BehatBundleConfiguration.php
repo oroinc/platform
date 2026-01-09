@@ -58,7 +58,7 @@ class BehatBundleConfiguration implements ConfigurationInterface
                                                 $bundleName = explode('/', substr($v, 1))[0];
                                                 $bundlePath = $this->kernel->getBundle($bundleName)->getPath();
 
-                                                return str_replace('@'.$bundleName, $bundlePath, $v);
+                                                return str_replace('@' . $bundleName, $bundlePath, $v);
                                             }
 
                                             if (!str_starts_with($v, '/')) {

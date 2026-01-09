@@ -305,7 +305,8 @@ class MigrationsLoader
             $installerBundleName = $installer['bundleName'];
             $installerVersion    = $installer['version'];
             foreach ($files['migrations'] as $sourceFile => $migration) {
-                if ($migration['bundleName'] === $installerBundleName
+                if (
+                    $migration['bundleName'] === $installerBundleName
                     && version_compare($migration['version'], $installerVersion) < 1
                 ) {
                     unset($migrations[$sourceFile]);

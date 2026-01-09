@@ -35,7 +35,7 @@ class SuiteSetDividerController implements Controller
                 '--max_suite_set_execution_time',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Group suites in sets based on feature duration statistics.'.PHP_EOL.
+                'Group suites in sets based on feature duration statistics.' . PHP_EOL .
                 'Maximum time in seconds of execution one suite set'
             )
         ;

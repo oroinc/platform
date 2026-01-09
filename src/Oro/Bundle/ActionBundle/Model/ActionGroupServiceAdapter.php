@@ -109,7 +109,8 @@ class ActionGroupServiceAdapter implements ActionGroupInterface
             $parameter->setType($parameterConfig['type'] ?? $methodParameter->getType()?->getName());
         }
 
-        if (!empty($parameterConfig['type'])
+        if (
+            !empty($parameterConfig['type'])
             || ($methodParameter->isOptional() && $methodParameter->isDefaultValueAvailable())
         ) {
             $parameter->setDefault($parameterConfig['type'] ?? $methodParameter->getDefaultValue());

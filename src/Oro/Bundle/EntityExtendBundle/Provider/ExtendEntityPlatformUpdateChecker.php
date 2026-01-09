@@ -50,7 +50,8 @@ readonly class ExtendEntityPlatformUpdateChecker implements PlatformUpdateChecke
     private function isSchemaUpdateRequired(ConfigInterface $config): bool
     {
         //Extend Custom New entity do NOT require update
-        if ($config->is('is_extend')
+        if (
+            $config->is('is_extend')
             && $config->is('owner', ExtendScope::OWNER_CUSTOM)
             && $config->is('state', ExtendScope::STATE_NEW)
         ) {

@@ -337,7 +337,8 @@ class ConfigCacheWarmer implements WarmableConfigCacheInterface
     ): array {
         $newItems = [];
         foreach ($items as $item) {
-            if (!$this->hasInclusionOrExclusion($item, $existingItems)
+            if (
+                !$this->hasInclusionOrExclusion($item, $existingItems)
                 && !$this->hasInclusionOrExclusion($item, $existingInverseItems)
             ) {
                 $newItems[] = $item;

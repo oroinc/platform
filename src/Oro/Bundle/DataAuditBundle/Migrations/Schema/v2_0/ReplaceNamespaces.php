@@ -43,7 +43,7 @@ class ReplaceNamespaces implements Migration, ConnectionAwareInterface, OrderedM
     private function resolveVersionsMysql()
     {
         while (true) {
-            $sql = 'SELECT object_id, REPLACE(object_class, \'OroCRM\', \'Oro\') AS object_class FROM oro_audit '.
+            $sql = 'SELECT object_id, REPLACE(object_class, \'OroCRM\', \'Oro\') AS object_class FROM oro_audit ' .
                 'GROUP BY object_id, REPLACE(object_class, \'OroCRM\', \'Oro\'), version HAVING COUNT(*) > 1 LIMIT 100';
             $rows = $this->connection->fetchAllAssociative($sql);
             if (!$rows) {
@@ -51,9 +51,9 @@ class ReplaceNamespaces implements Migration, ConnectionAwareInterface, OrderedM
             }
 
             foreach ($rows as $row) {
-                $sql = 'SET @version = -1;'.
-                    'UPDATE oro_audit SET version = @version:=@version+1 '.
-                    'WHERE object_id = :object_id AND '.
+                $sql = 'SET @version = -1;' .
+                    'UPDATE oro_audit SET version = @version:=@version+1 ' .
+                    'WHERE object_id = :object_id AND ' .
                     'REPLACE(object_class, \'OroCRM\', \'Oro\') = :object_class ORDER BY id ASC;';
 
                 $this->connection->executeStatement(

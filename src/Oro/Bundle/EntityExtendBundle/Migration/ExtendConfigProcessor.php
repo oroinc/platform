@@ -104,7 +104,8 @@ class ExtendConfigProcessor
                             if (isset($fieldConfigs['configs']['extend'])) {
                                 $doctrineAttrModificationCount = 0;
                                 foreach ($doctrineFieldAttributes as $attrName) {
-                                    if (isset($fieldConfigs['configs']['extend'][$attrName])
+                                    if (
+                                        isset($fieldConfigs['configs']['extend'][$attrName])
                                         || (array_key_exists($attrName, $fieldConfigs['configs']['extend']))
                                     ) {
                                         $doctrineAttrModificationCount++;
@@ -280,7 +281,8 @@ class ExtendConfigProcessor
      */
     protected function createFieldModel($className, $fieldName, $fieldType, $mode, array $configs, $isExtendEntity)
     {
-        if (!$isExtendEntity
+        if (
+            !$isExtendEntity
             && isset($configs['extend']['is_extend'])
             && $configs['extend']['is_extend']
             && !ExtendHelper::isExtendEntity($className)

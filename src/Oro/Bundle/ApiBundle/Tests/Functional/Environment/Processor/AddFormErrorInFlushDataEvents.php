@@ -24,7 +24,8 @@ class AddFormErrorInFlushDataEvents implements ProcessorInterface
         /** @var TestDepartment $department */
         $department = $context->getForm()->getViewData();
         $departmentName = $department->getName();
-        if ($departmentName
+        if (
+            $departmentName
             && str_starts_with($departmentName, self::FORM_ERROR_PREFIX)
             && substr($departmentName, \strlen(self::FORM_ERROR_PREFIX)) === $context->getEvent()
         ) {

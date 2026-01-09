@@ -50,7 +50,8 @@ class ApiEventListener
      */
     protected function checkObjectAccess($object, Request $request)
     {
-        if (is_object($object)
+        if (
+            is_object($object)
             && $this->requestAuthorizationChecker->isRequestObjectIsGranted($request, $object) === -1
         ) {
             throw new AccessDeniedException();

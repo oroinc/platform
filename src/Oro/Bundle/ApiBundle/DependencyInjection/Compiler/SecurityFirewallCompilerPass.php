@@ -93,7 +93,8 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
         foreach ($listeners->getValues() as $listener) {
             $id = (string)$listener;
             // the context listener should be before the access listener or remember me listener
-            if (false === $wasSet
+            if (
+                false === $wasSet
                 && (
                     'security.access_listener' === $id
                     || str_starts_with($id, 'oro_security.authentication.listener.rememberme')

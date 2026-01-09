@@ -57,7 +57,8 @@ class DateTimeExtension extends AbstractTypeExtension
     {
         if (array_key_exists('type', $view->vars) && 'datetime-local' === $view->vars['type']) {
             $view->vars['type'] = 'datetime';
-        } elseif (($options['html5'] || $options['format'] === self::HTML5_FORMAT_WITH_TIMEZONE)
+        } elseif (
+            ($options['html5'] || $options['format'] === self::HTML5_FORMAT_WITH_TIMEZONE)
             && 'single_text' === $options['widget']
         ) {
             $view->vars['type'] = 'datetime';

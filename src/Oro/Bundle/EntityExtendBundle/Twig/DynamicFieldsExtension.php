@@ -165,7 +165,8 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
     private function filterFields(ConfigInterface $extendConfig)
     {
         // skip system and not accessible fields
-        if (!$extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
+        if (
+            !$extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
             || !ExtendHelper::isFieldAccessible($extendConfig)
         ) {
             return false;
@@ -184,7 +185,8 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
             ->getUnderlyingType($fieldConfigId->getFieldType(), $extendConfig);
 
         // skip disabled entities by feature flags
-        if ($extendConfig->has('target_entity')
+        if (
+            $extendConfig->has('target_entity')
             && !$this->getFeatureChecker()->isResourceEnabled($extendConfig->get('target_entity'), 'entities')
         ) {
             return false;

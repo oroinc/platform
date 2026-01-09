@@ -54,7 +54,8 @@ class DataNormalizer
             // to-many association
             $values = [];
             foreach ($row[$field] as $key => $value) {
-                if (ConfigUtil::INFO_RECORD_KEY !== $key
+                if (
+                    ConfigUtil::INFO_RECORD_KEY !== $key
                     && \is_array($value)
                     && \array_key_exists($targetField, $value)
                 ) {
