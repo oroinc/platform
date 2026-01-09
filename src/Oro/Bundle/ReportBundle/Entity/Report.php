@@ -219,7 +219,7 @@ class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface
      * Set a business unit owning this report
      *
      * @param BusinessUnit $owningBusinessUnit
-     * @return BusinessUnit
+     * @return $this
      */
     public function setOwner($owningBusinessUnit)
     {
